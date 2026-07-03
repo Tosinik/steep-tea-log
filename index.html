@@ -13,7 +13,7 @@
 <link rel="icon" href="icon-192.png">
 <title>Steep — Tea Log</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --porcelain:#F6F2E9;
@@ -29,13 +29,30 @@
   --line:#D8CFB9;
   --white:#FFFEFB;
   --red:#B5504A;
+  --glow:0 0 0 rgba(0,0,0,0);
+}
+html[data-theme="dark"]{
+  --porcelain:#15140F;
+  --porcelain-dim:#1E1C15;
+  --ink:#EDE6D6;
+  --ink-soft:#A79C87;
+  --jade:#6F9A66;
+  --jade-pale:#233024;
+  --jade-deep:#8FBE83;
+  --amber:#E3A15C;
+  --amber-pale:#3A2C1A;
+  --clay:#C99872;
+  --line:#332F24;
+  --white:#1C1A14;
+  --red:#E08C82;
+  --glow:0 0 18px rgba(227,161,92,.18);
 }
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;background:var(--porcelain);color:var(--ink);font-family:'Inter',sans-serif;}
+html,body{margin:0;padding:0;background:var(--porcelain);color:var(--ink);font-family:'Inter',sans-serif;transition:background .25s,color .25s;}
 body{-webkit-font-smoothing:antialiased;}
 h1,h2,h3,.display{font-family:'Fraunces',serif;}
-.mono{font-family:'IBM Plex Mono',monospace;}
-.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);}
+.mono{font-family:'Silkscreen',monospace;}
+.eyebrow{font-family:'Silkscreen',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
 button{font-family:'Inter',sans-serif;cursor:pointer;}
 #app{max-width:920px;margin:0 auto;padding:0 16px 80px;}
 a{color:inherit;}
@@ -63,7 +80,7 @@ a{color:inherit;}
 .btn-primary:hover{background:var(--jade-deep);}
 .btn-ghost{background:transparent;border:none;color:var(--ink-soft);text-decoration:underline;}
 .btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);}
-.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;font-family:'Silkscreen',monospace;letter-spacing:.02em;}
 .grid{display:grid;gap:12px;}
 .grid-3{grid-template-columns:repeat(3,1fr);}
 .grid-2{grid-template-columns:repeat(2,1fr);}
@@ -85,11 +102,13 @@ a{color:inherit;}
 
 /* stat card */
 .stat{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 12px;text-align:center;}
-.stat .num{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:var(--jade-deep);}
+.stat .num{font-family:'Silkscreen',monospace;font-size:24px;font-weight:600;color:var(--jade-deep);}
 .stat .lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px;}
 
 /* persona banner */
-.persona{background:linear-gradient(135deg,var(--jade-deep),var(--jade));color:var(--white);border-radius:14px;padding:18px 20px;}
+.persona{background:linear-gradient(135deg,var(--jade-deep),var(--jade));color:var(--white);border-radius:14px;padding:18px 20px;box-shadow:var(--glow);}
+html[data-theme="dark"] .persona{color:#0F1710;}
+html[data-theme="dark"] .persona .eyebrow{color:#0F1710;opacity:.7;}
 .persona .eyebrow{color:#C9DEC6;}
 .persona h2{margin:2px 0 0;font-size:24px;font-weight:500;}
 
@@ -155,8 +174,11 @@ a{color:inherit;}
 .tag-suggest div:hover{background:var(--jade-pale);}
 
 /* timer */
-.timer-box{background:var(--jade-deep);color:var(--white);border-radius:12px;padding:16px;text-align:center;}
-.timer-display{font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;letter-spacing:.02em;}
+.timer-box{background:var(--jade-deep);color:var(--white);border-radius:12px;padding:16px;text-align:center;box-shadow:var(--glow);}
+html[data-theme="dark"] .timer-box{color:#0F1710;}
+html[data-theme="dark"] .timer-box .timer-modebtns button{color:#0F1710;}
+html[data-theme="dark"] .timer-ctrls button{color:var(--jade-deep);}
+.timer-display{font-family:'Silkscreen',monospace;font-size:38px;font-weight:600;letter-spacing:.02em;}
 .timer-modebtns{display:flex;gap:6px;justify-content:center;margin-bottom:10px;}
 .timer-modebtns button{background:rgba(255,255,255,.12);border:none;color:var(--white);padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;}
 .timer-modebtns button.active{background:var(--amber);}
@@ -176,9 +198,9 @@ a{color:inherit;}
 /* list rows */
 .rank-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
 .rank-row:last-child{border-bottom:none;}
-.rank-num{font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);width:16px;}
+.rank-num{font-family:'Silkscreen',monospace;color:var(--ink-soft);width:16px;}
 .rank-row .rname{flex:1;font-weight:600;}
-.rank-row .rval{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-weight:600;}
+.rank-row .rval{font-family:'Silkscreen',monospace;color:var(--amber);font-weight:600;}
 
 .empty{color:var(--ink-soft);font-size:13px;padding:20px 0;text-align:center;}
 .img-upload{width:100%;height:110px;border:1.5px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-soft);background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden;}
@@ -195,6 +217,21 @@ a{color:inherit;}
 <div id="app"></div>
 
 <script>
+/* ---------- theme ---------- */
+(function applyStoredTheme(){
+  const saved = localStorage.getItem('tealog_theme');
+  const theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('tealog_theme', next);
+  const btn = document.getElementById('themeToggleBtn');
+  if(btn) btn.textContent = next==='dark' ? '☀️' : '🌙';
+}
+
 /* ---------- storage helpers (localStorage-based, works standalone) ---------- */
 async function loadKey(key, fallback){
   try{
@@ -329,13 +366,18 @@ function render(){
         <button class="tab ${state.view==='teas'||state.view==='tea-detail'?'active':''}" onclick="goView('teas')">Teas</button>
         <button class="tab ${state.view==='vessels'?'active':''}" onclick="goView('vessels')">Vessels</button>
       </div>
-      <button class="btn-log" onclick="quickLogSession()">＋ Log session</button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn" id="themeToggleBtn" onclick="toggleTheme()" style="padding:9px 12px;" title="Toggle dark mode"></button>
+        <button class="btn-log" onclick="quickLogSession()">＋ Log session</button>
+      </div>
     </div></div>
     <div style="padding-top:18px;">${body}</div>
     ${state.teaFormOpen ? teaFormModal() : ''}
     ${state.vesselFormOpen ? vesselFormModal() : ''}
   `;
   bindDynamic();
+  const themeBtn = document.getElementById('themeToggleBtn');
+  if(themeBtn) themeBtn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙';
 }
 
 function goView(v){ state.view=v; state.activeTeaId=null; render(); }
@@ -357,6 +399,45 @@ function bindDynamic(){
     tagInput.oninput = ()=> renderTagSuggest(tagInput.value, tagInput.dataset.target);
     tagInput.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addTagFromInput(tagInput.dataset.target); } };
   }
+}
+
+function backupSectionHTML(){
+  return `<div class="section card">
+    <div class="section-title"><h2>Data &amp; backup</h2></div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:0;">Your data lives only in this browser. Export a backup now and then, or use it to move your log to another device.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-primary" onclick="exportData()">Export backup (.json)</button>
+      <button class="btn" onclick="triggerImport()">Import backup</button>
+      <input type="file" id="importFileInput" accept="application/json" style="display:none" onchange="handleImportFile(event)">
+    </div>
+  </div>`;
+}
+function exportData(){
+  const payload = {teas:state.teas, vessels:state.vessels, sessions:state.sessions, tagLibrary:state.tagLibrary, exportedAt:new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download = 'steep-tea-log-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function triggerImport(){ document.getElementById('importFileInput').click(); }
+function handleImportFile(e){
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!data.teas || !data.vessels || !data.sessions){ alert("This file doesn't look like a Steep backup."); return; }
+      if(!confirm('Import will replace your current data ('+state.teas.length+' teas, '+state.sessions.length+' sessions) with the backup ('+data.teas.length+' teas, '+data.sessions.length+' sessions). Continue?')) return;
+      state.teas = data.teas||[]; state.vessels=data.vessels||[]; state.sessions=data.sessions||[]; state.tagLibrary=data.tagLibrary||[...DEFAULT_TAGS];
+      persistTeas(); persistVessels(); persistSessions(); persistTags();
+      render();
+      alert('Import complete.');
+    }catch(err){ alert('Could not read that file: '+err.message); }
+  };
+  reader.readAsText(f);
+  e.target.value='';
 }
 
 /* ================= DASHBOARD ================= */
@@ -443,7 +524,7 @@ function heatmapHTML(days){
 
 function viewDashboard(){
   if(state.teas.length===0 && state.sessions.length===0){
-    return `<div class="card empty">No tea logged yet. Head to <strong>Teas</strong> to add your first tea, then log a session to see stats here.</div>`;
+    return `<div class="card empty">No tea logged yet. Head to <strong>Teas</strong> to add your first tea, then log a session to see stats here.</div>${backupSectionHTML()}`;
   }
   const s = computeStats();
   const persona = computePersona(s.typeCounts);
@@ -522,6 +603,8 @@ function viewDashboard(){
       </div>
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
     </div>
+
+    ${backupSectionHTML()}
   `;
 }
 
