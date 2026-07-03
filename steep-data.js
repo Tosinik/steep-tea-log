@@ -74,8 +74,8 @@
   const steepFromDb = r => ({ id: r.id, order: r.steep_order, tempC: r.temp_c != null ? Number(r.temp_c) : null, timeSeconds: r.time_seconds, description: r.description || '', tags: r.tags || [] });
   const steepToDb = (st, sessionId) => ({ id: st.id, session_id: sessionId, user_id: userId(), steep_order: st.order, temp_c: (st.tempC === '' || st.tempC == null) ? null : st.tempC, time_seconds: st.timeSeconds || 0, description: st.description || null, tags: st.tags || [] });
 
-  const sessionFromDb = r => ({ id: r.id, teaId: r.tea_id, vesselId: r.vessel_id, date: r.session_date, isColdBrew: !!r.is_cold_brew, waterType: r.water_type || '', waterTDS: r.water_tds != null ? r.water_tds : null, gramsUsed: Number(r.grams_used) || 0, rating: Number(r.rating) || 0, description: r.description || '', tags: r.tags || [], steeps: [] });
-  const sessionToDb = s => ({ id: s.id, user_id: userId(), tea_id: s.teaId || null, vessel_id: s.vesselId || null, session_date: s.date || new Date().toISOString(), is_cold_brew: !!s.isColdBrew, water_type: s.waterType || null, water_tds: (s.waterTDS === '' || s.waterTDS == null) ? null : s.waterTDS, grams_used: s.gramsUsed || 0, rating: s.rating || 0, description: s.description || null, tags: s.tags || [] });
+  const sessionFromDb = r => ({ id: r.id, userId: r.user_id, teaId: r.tea_id, vesselId: r.vessel_id, date: r.session_date, isColdBrew: !!r.is_cold_brew, waterType: r.water_type || '', waterTDS: r.water_tds != null ? r.water_tds : null, gramsUsed: Number(r.grams_used) || 0, rating: Number(r.rating) || 0, description: r.description || '', tags: r.tags || [], isShared: !!r.is_shared, teaName: r.tea_name || '', teaType: r.tea_type || '', vesselName: r.vessel_name || '', steeps: [] });
+  const sessionToDb = s => ({ id: s.id, user_id: userId(), tea_id: s.teaId || null, vessel_id: s.vesselId || null, session_date: s.date || new Date().toISOString(), is_cold_brew: !!s.isColdBrew, water_type: s.waterType || null, water_tds: (s.waterTDS === '' || s.waterTDS == null) ? null : s.waterTDS, grams_used: s.gramsUsed || 0, rating: s.rating || 0, description: s.description || null, tags: s.tags || [], is_shared: !!s.isShared, tea_name: s.teaName || null, tea_type: s.teaType || null, vessel_name: s.vesselName || null });
 
   /* ---------- helper: delete this user's rows whose id isn't in keepIds ---------- */
   async function deleteMissing(table, keepIds) {
@@ -210,6 +210,62 @@
     localStorage.setItem('tealog_migrated_' + userId(), new Date().toISOString());
   }
 
+  /* ============================ social (v3) ============================ */
+  const profileFromDb = r => ({ id: r.id, username: r.username, displayName: r.display_name || '', avatarUrl: r.avatar_url || null, bio: r.bio || '', createdAt: r.created_at });
+
+  async function signInWithGoogle() {
+    return sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+  }
+
+  async function getMyProfile() {
+    if (!currentUser) return null;
+    const { data, error } = await sb.from('profiles').select('*').eq('id', userId()).maybeSingle();
+    if (error) throw error;
+    return data ? profileFromDb(data) : null;
+  }
+  async function saveProfile(p) {
+    const row = { id: userId(), username: (p.username || '').trim().toLowerCase(), display_name: p.displayName || null, avatar_url: p.avatarUrl || null, bio: p.bio || null };
+    const { error } = await sb.from('profiles').upsert(row, { onConflict: 'id' });
+    if (error) throw error;
+  }
+  async function searchProfiles(q) {
+    q = (q || '').trim().toLowerCase();
+    if (!q) return [];
+    const { data, error } = await sb.from('profiles').select('*').ilike('username', `%${q}%`).neq('id', userId()).limit(20);
+    if (error) throw error;
+    return (data || []).map(profileFromDb);
+  }
+  async function getProfilesByIds(ids) {
+    const map = {};
+    if (!ids.length) return map;
+    const { data, error } = await sb.from('profiles').select('*').in('id', ids);
+    if (error) throw error;
+    (data || []).forEach(r => { map[r.id] = profileFromDb(r); });
+    return map;
+  }
+  async function follow(id) { const { error } = await sb.from('follows').insert({ follower_id: userId(), followee_id: id }); if (error) throw error; }
+  async function unfollow(id) { const { error } = await sb.from('follows').delete().eq('follower_id', userId()).eq('followee_id', id); if (error) throw error; }
+  async function getFollowing() { const { data, error } = await sb.from('follows').select('followee_id').eq('follower_id', userId()); if (error) throw error; return (data || []).map(r => r.followee_id); }
+  async function getFollowers() { const { data, error } = await sb.from('follows').select('follower_id').eq('followee_id', userId()); if (error) throw error; return (data || []).map(r => r.follower_id); }
+
+  async function getFeed(limit = 50) {
+    const following = await getFollowing();
+    if (!following.length) return { sessions: [], profiles: {}, following: [] };
+    const { data: ses, error } = await sb.from('sessions').select('*')
+      .in('user_id', following).eq('is_shared', true)
+      .order('session_date', { ascending: false }).limit(limit);
+    if (error) throw error;
+    const sessions = (ses || []).map(sessionFromDb);
+    const ids = sessions.map(s => s.id);
+    if (ids.length) {
+      const { data: st } = await sb.from('steeps').select('*').in('session_id', ids).order('steep_order', { ascending: true });
+      const byId = {}; sessions.forEach(s => byId[s.id] = s);
+      (st || []).forEach(r => { const s = byId[r.session_id]; if (s) s.steeps.push(steepFromDb(r)); });
+    }
+    const profiles = await getProfilesByIds(following);
+    return { sessions, profiles, following };
+  }
+
   /* ============================ settings (synced) ============================ */
   const SETTINGS_CACHE = 'tealog_cache_settings';
   async function loadSettings(defaults) {
@@ -285,14 +341,18 @@
     const app = document.getElementById('app');
     if (!app) return;
     app.innerHTML = shell(`
-      <p class="auth-sub">Your tea log, synced across every device. Sign in with a magic link — no password.</p>
-      <div class="field" style="margin-bottom:12px;">
+      <p class="auth-sub">Your tea log, synced across every device. Sign in to get started.</p>
+      <button class="btn" id="googleBtn" style="width:100%;margin-bottom:14px;font-weight:600;">Continue with Google</button>
+      <div class="auth-divider"><span>or use email</span></div>
+      <div class="field" style="margin:12px 0;">
         <label>Email</label>
         <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
       </div>
       <button class="btn btn-primary" style="width:100%;" id="authSendBtn">Send magic link</button>
       <div id="authMsg" class="auth-msg"></div>
     `);
+    const gbtn = document.getElementById('googleBtn');
+    if (gbtn) gbtn.onclick = async () => { gbtn.disabled = true; const { error } = await signInWithGoogle(); if (error) { gbtn.disabled = false; document.getElementById('authMsg').textContent = 'Google sign-in failed: ' + error.message; } };
     const btn = document.getElementById('authSendBtn');
     const emailEl = document.getElementById('authEmail');
     const msg = document.getElementById('authMsg');
@@ -342,5 +402,9 @@
   }
 
   /* ---------- public API ---------- */
-  window.SteepDB = { loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signOut, newId, migrateFromLocalStorage, getUser: () => currentUser };
+  window.SteepDB = {
+    loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signInWithGoogle, signOut, newId, migrateFromLocalStorage,
+    getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFollowers, getFeed,
+    getUser: () => currentUser
+  };
 })();
