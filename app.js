@@ -13,15 +13,21 @@ function toggleTheme(){
   if(btn) btn.textContent = next==='dark' ? '☀️' : '🌙';
 }
 
-/* ---------- storage helpers (localStorage-based, works standalone) ---------- */
+/* ---------- storage helpers (v2: Supabase-backed via steep-data.js) ---------- */
 async function loadKey(key, fallback){
-  try{
-    const raw = localStorage.getItem('tealog_'+key);
-    return raw ? JSON.parse(raw) : fallback;
-  }catch(e){ return fallback; }
+  return window.SteepDB.loadKey(key, fallback);
 }
 async function saveKey(key, val){
-  try{ localStorage.setItem('tealog_'+key, JSON.stringify(val)); }catch(e){ console.error('save fail', key, e); }
+  return window.SteepDB.saveKey(key, val);
+}
+let _saveErrShown = false;
+function saveErr(e){
+  console.error('[Steep] save failed', e);
+  if(!_saveErrShown){
+    _saveErrShown = true;
+    alert("Couldn't sync that change — you may be offline. It'll need to be re-saved once you're back online.");
+    setTimeout(()=>{ _saveErrShown = false; }, 4000);
+  }
 }
 
 /* ---------- state ---------- */
@@ -31,33 +37,48 @@ const TYPES = [
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
 ];
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, monoFont:'pixel' };
 
 let state = {
   teas: [], vessels: [], sessions: [], tagLibrary: [...DEFAULT_TAGS],
   view: 'dashboard',
   activeTeaId: null,
   teaFormOpen: false, editingTea: null,
-  vesselFormOpen: false,
+  vesselFormOpen: false, editingVessel: null,
   sessionEditOpen: false, editingSession: null,
   sessionDraft: null, // {teaId, vesselId, isColdBrew, waterType, waterTDS, gramsUsed, steeps:[], currentSteep:{}, timer:{...}}
+  settings: {...DEFAULT_SETTINGS},
+  settingsOpen: false,
   loaded:false
 };
 
-function uid(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+function uid(){ return window.SteepDB.newId(); }
 
 async function init(){
-  const [teas, vessels, sessions, tagLibrary] = await Promise.all([
-    loadKey('teas', []), loadKey('vessels', []), loadKey('sessions', []), loadKey('tagLibrary', [...DEFAULT_TAGS])
+  const [teas, vessels, sessions, tagLibrary, settings] = await Promise.all([
+    loadKey('teas', []), loadKey('vessels', []), loadKey('sessions', []), loadKey('tagLibrary', [...DEFAULT_TAGS]),
+    window.SteepDB.loadSettings(DEFAULT_SETTINGS)
   ]);
   state.teas = teas; state.vessels = vessels; state.sessions = sessions; state.tagLibrary = tagLibrary;
+  state.settings = {...DEFAULT_SETTINGS, ...settings};
+  applySettings();
   state.loaded = true;
   render();
 }
 
-function persistTeas(){ saveKey('teas', state.teas); }
-function persistVessels(){ saveKey('vessels', state.vessels); }
-function persistSessions(){ saveKey('sessions', state.sessions); }
-function persistTags(){ saveKey('tagLibrary', state.tagLibrary); }
+/* ---------- settings ---------- */
+function applySettings(){
+  document.documentElement.setAttribute('data-mono', state.settings.monoFont==='clean' ? 'clean' : 'pixel');
+}
+function persistSettings(){ window.SteepDB.saveSettings(state.settings).catch(saveErr); }
+function tempUnitLabel(){ return state.settings.tempUnit==='f' ? '°F' : '°C'; }
+function cToDisplay(c){ if(c==null||c==='') return ''; return state.settings.tempUnit==='f' ? Math.round(c*9/5+32) : c; }
+function displayToC(v){ if(v===''||v==null) return null; v=Number(v); if(isNaN(v)) return null; return state.settings.tempUnit==='f' ? Math.round((v-32)*5/9) : v; }
+
+function persistTeas(){ saveKey('teas', state.teas).catch(saveErr); }
+function persistVessels(){ saveKey('vessels', state.vessels).catch(saveErr); }
+function persistSessions(){ saveKey('sessions', state.sessions).catch(saveErr); }
+function persistTags(){ saveKey('tagLibrary', state.tagLibrary).catch(saveErr); }
 
 /* ---------- helpers ---------- */
 function fmtStars(v){ return v.toFixed(1).replace('.0',''); }
@@ -155,6 +176,7 @@ function render(){
         <button class="tab ${state.view==='vessels'?'active':''}" onclick="goView('vessels')">Vessels</button>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn" onclick="openSettings()" style="padding:9px 12px;" title="Settings">⚙</button>
         <button class="btn" id="themeToggleBtn" onclick="toggleTheme()" style="padding:9px 12px;" title="Toggle dark mode"></button>
         <button class="btn-log" onclick="quickLogSession()">＋ Log session</button>
       </div>
@@ -163,6 +185,7 @@ function render(){
     ${state.teaFormOpen ? teaFormModal() : ''}
     ${state.vesselFormOpen ? vesselFormModal() : ''}
     ${state.sessionEditOpen ? sessionEditModal() : ''}
+    ${state.settingsOpen ? settingsModal() : ''}
   `;
   bindDynamic();
   const themeBtn = document.getElementById('themeToggleBtn');
@@ -191,12 +214,14 @@ function bindDynamic(){
 }
 
 function backupSectionHTML(){
+  const email = window.SteepDB.getUser()?.email || '';
   return `<div class="section card">
-    <div class="section-title"><h2>Data &amp; backup</h2></div>
-    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:0;">Your data lives only in this browser. Export a backup now and then, or use it to move your log to another device.</p>
+    <div class="section-title"><h2>Data &amp; account</h2></div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:0;">Signed in as <strong>${email}</strong>. Your log syncs to your account across devices. You can still export a JSON backup anytime.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <button class="btn btn-primary" onclick="exportData()">Export backup (.json)</button>
       <button class="btn" onclick="triggerImport()">Import backup</button>
+      <button class="btn" onclick="window.SteepDB.signOut()">Sign out</button>
       <input type="file" id="importFileInput" accept="application/json" style="display:none" onchange="handleImportFile(event)">
     </div>
   </div>`;
@@ -227,6 +252,47 @@ function handleImportFile(e){
   };
   reader.readAsText(f);
   e.target.value='';
+}
+
+/* ================= SETTINGS ================= */
+function openSettings(){ state.settingsOpen = true; render(); }
+function closeSettings(){ state.settingsOpen = false; render(); }
+function setSetting(key, val){
+  state.settings[key] = val;
+  applySettings();
+  persistSettings();
+  render();
+}
+function seg(key, options){
+  return `<div class="seg">${options.map(o=>`<button class="${state.settings[key]===o.v?'active':''}" onclick="setSetting('${key}','${o.v}')">${o.label}</button>`).join('')}</div>`;
+}
+function toggle(key){
+  return `<label class="toggle"><input type="checkbox" ${state.settings[key]?'checked':''} onchange="setSetting('${key}', this.checked)"><span class="track"></span></label>`;
+}
+function settingsModal(){
+  const email = window.SteepDB.getUser()?.email || '';
+  return `<div class="overlay" onclick="if(event.target===this) closeSettings()">
+    <div class="modal" style="max-width:460px;">
+      <div class="modal-head"><h2>Settings</h2><button class="close-x" onclick="closeSettings()">✕</button></div>
+      <div class="set-row">
+        <div><div class="set-label">Temperature unit</div><div class="set-sub">How steep temperatures are shown and entered</div></div>
+        ${seg('tempUnit',[{v:'c',label:'°C'},{v:'f',label:'°F'}])}
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Timer sounds</div><div class="set-sub">Chime when a countdown finishes</div></div>
+        ${toggle('soundEnabled')}
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Show achievements</div><div class="set-sub">Display the badge grid on the dashboard</div></div>
+        ${toggle('showAchievements')}
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Display font</div><div class="set-sub">Pixel is the retro look; Clean is a plain monospace</div></div>
+        ${seg('monoFont',[{v:'pixel',label:'Pixel'},{v:'clean',label:'Clean'}])}
+      </div>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Signed in as ${email}. Settings sync across your devices.</p>
+    </div>
+  </div>`;
 }
 
 /* ================= DASHBOARD ================= */
@@ -426,7 +492,7 @@ function viewDashboard(){
   return `
     <div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>
 
-    ${achievementsHTML(s)}
+    ${state.settings.showAchievements ? achievementsHTML(s) : ''}
 
     <div class="section grid grid-3">
       <div class="stat"><div class="num">${s.totalSessions}</div><div class="lbl">Sessions</div></div>
@@ -664,27 +730,44 @@ function viewTeaDetail(){
 function viewVessels(){
   const rows = state.vessels.length ? state.vessels.map(v=>`
     <div class="rank-row">
+      <span class="vessel-thumb" style="${v.image?`background-image:url(${v.image})`:''}">${v.image?'':'🫖'}</span>
       <span class="rname">${v.name} <span style="color:var(--ink-soft);font-weight:400;">— ${v.type}${v.material?', '+v.material:''}</span></span>
       <span class="rval">${v.capacityMl?v.capacityMl+'ml':''}</span>
+      <button class="btn-ghost" onclick="openVesselForm(vesselById('${v.id}'))">edit</button>
       <button class="btn-ghost" onclick="deleteVessel('${v.id}')">remove</button>
     </div>
   `).join('') : '<div class="empty">No vessels yet — add your gaiwan, kyusu, or teapot.</div>';
   return `
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My vessels</h2><button class="btn btn-primary" onclick="state.vesselFormOpen=true;render()">＋ Add vessel</button></div>
+    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My vessels</h2><button class="btn btn-primary" onclick="openVesselForm()">＋ Add vessel</button></div>
     <div class="card">${rows}</div>
   `;
 }
+function openVesselForm(existing){
+  state.editingVessel = existing || null;
+  state._draftImage = existing ? (existing.image || null) : null;
+  state.vesselFormOpen = true;
+  render();
+}
+function closeVesselForm(){ state.vesselFormOpen=false; state.editingVessel=null; state._draftImage=null; render(); }
 function vesselFormModal(){
-  const opts = VESSEL_TYPES.map(v=>`<option>${v}</option>`).join('');
-  return `<div class="overlay" onclick="if(event.target===this){state.vesselFormOpen=false;render();}">
+  const v = state.editingVessel || {};
+  const opts = VESSEL_TYPES.map(vt=>`<option ${v.type===vt?'selected':''}>${vt}</option>`).join('');
+  return `<div class="overlay" onclick="if(event.target===this) closeVesselForm()">
     <div class="modal" style="max-width:440px;">
-      <div class="modal-head"><h2>Add a vessel</h2><button class="close-x" onclick="state.vesselFormOpen=false;render();">✕</button></div>
+      <div class="modal-head"><h2>${v.id?'Edit vessel':'Add a vessel'}</h2><button class="close-x" onclick="closeVesselForm()">✕</button></div>
       <form onsubmit="submitVesselForm(event)">
-        <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan"></div>
+        <div class="field" style="margin-bottom:12px;">
+          <label>Photo</label>
+          <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+            ${state._draftImage?'':'Tap to upload photo'}
+            <input type="file" accept="image/*" class="js-img-input">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan" value="${v.name||''}"></div>
         <div class="field" style="margin-bottom:12px;"><label>Type</label><select name="type">${opts}</select></div>
-        <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..."></div>
-        <div class="field" style="margin-bottom:12px;"><label>Capacity (ml)</label><input type="number" name="capacityMl" placeholder="120"></div>
-        <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="state.vesselFormOpen=false;render();">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+        <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..." value="${v.material||''}"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Capacity (ml)</label><input type="number" name="capacityMl" placeholder="120" value="${v.capacityMl??''}"></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="closeVesselForm()">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
       </form>
     </div>
   </div>`;
@@ -692,10 +775,22 @@ function vesselFormModal(){
 function submitVesselForm(e){
   e.preventDefault();
   const f = e.target;
-  state.vessels.push({id:uid(), name:f.name.value.trim(), type:f.type.value, material:f.material.value.trim(), capacityMl:f.capacityMl.value?Number(f.capacityMl.value):null});
+  const data = {
+    id: state.editingVessel?.id || uid(),
+    name: f.name.value.trim(),
+    type: f.type.value,
+    material: f.material.value.trim(),
+    capacityMl: f.capacityMl.value?Number(f.capacityMl.value):null,
+    image: state._draftImage || null
+  };
+  if(state.editingVessel){
+    const idx = state.vessels.findIndex(x=>x.id===data.id);
+    state.vessels[idx] = data;
+  } else {
+    state.vessels.push(data);
+  }
   persistVessels();
-  state.vesselFormOpen=false;
-  render();
+  closeVesselForm();
 }
 function deleteVessel(id){
   if(!confirm('Remove this vessel?')) return;
@@ -714,7 +809,10 @@ function openSessionEdit(sessionId){
 }
 function closeSessionEdit(){ state.sessionEditOpen=false; state.editingSession=null; render(); }
 function es_set(key, val){ state.editingSession[key]=val; }
-function es_setSteep(i, key, val){ state.editingSession.steeps[i][key] = (key==='timeSeconds'||key==='tempC') ? (val===''?null:Number(val)) : val; }
+function es_setSteep(i, key, val){
+  if(key==='tempC'){ state.editingSession.steeps[i].tempC = displayToC(val); return; }
+  state.editingSession.steeps[i][key] = (key==='timeSeconds') ? (val===''?null:Number(val)) : val;
+}
 function setEditSessionRating(v){
   state.editingSession.rating = v;
   document.getElementById('editRatingWrap').innerHTML = renderStarsInteractive(v,true,'setEditSessionRating');
@@ -758,7 +856,7 @@ function sessionEditModal(){
     <div class="steep-item">
       <div class="steep-head"><span>Steep ${i+1}</span><button class="btn-ghost" onclick="removeEditSteep(${i})">remove</button></div>
       <div class="form-grid" style="margin-top:6px;">
-        <div class="field"><label>Temp °C</label><input type="number" value="${st.tempC??''}" oninput="es_setSteep(${i},'tempC',this.value)"></div>
+        <div class="field"><label>Temp ${tempUnitLabel()}</label><input type="number" value="${cToDisplay(st.tempC)}" oninput="es_setSteep(${i},'tempC',this.value)"></div>
         <div class="field"><label>Time (sec)</label><input type="number" value="${st.timeSeconds??''}" oninput="es_setSteep(${i},'timeSeconds',this.value)"></div>
         <div class="field span2"><label>Notes</label><textarea oninput="es_setSteep(${i},'description',this.value)">${st.description||''}</textarea></div>
       </div>
@@ -870,7 +968,7 @@ function sessionSteepingHTML(d){
   const tm = d.timer;
   const steepsHTML = d.steeps.map((s,i)=>`
     <div class="steep-item">
-      <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${s.tempC?s.tempC+'°C · ':''}${fmtSec(s.timeSeconds)}</span></div>
+      <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC)+tempUnitLabel()+' · ':''}${fmtSec(s.timeSeconds)}</span></div>
       ${s.description?`<div style="margin-top:3px;color:var(--ink-soft);">${s.description}</div>`:''}
       ${s.tags.length?`<div class="steep-tags">${s.tags.map(t=>`<span class="tagchip">${t}</span>`).join(' ')}</div>`:''}
     </div>
@@ -904,7 +1002,7 @@ function sessionSteepingHTML(d){
       </div>
 
       <div class="form-grid" style="margin-top:14px;">
-        <div class="field"><label>Water temp (°C)</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
+        <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
         <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="d_setcur('curTime', this.value)"></div>
         <div class="field span2"><label>Notes for this steep</label><textarea id="steepDesc" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
         <div class="field span2">
@@ -935,21 +1033,23 @@ function setTimerTarget(v){
 let _audioCtx = null;
 function playTimerDone(){
   try{
-    if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    const ctx = _audioCtx;
-    if(ctx.state==='suspended') ctx.resume();
-    const now = ctx.currentTime;
-    [0, 0.22, 0.44].forEach((offset,i)=>{
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = i===2 ? 1046 : 784;
-      gain.gain.setValueAtTime(0.0001, now+offset);
-      gain.gain.exponentialRampToValueAtTime(0.25, now+offset+0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now+offset+0.18);
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.start(now+offset); osc.stop(now+offset+0.2);
-    });
+    if(state.settings.soundEnabled){
+      if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const ctx = _audioCtx;
+      if(ctx.state==='suspended') ctx.resume();
+      const now = ctx.currentTime;
+      [0, 0.22, 0.44].forEach((offset,i)=>{
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = i===2 ? 1046 : 784;
+        gain.gain.setValueAtTime(0.0001, now+offset);
+        gain.gain.exponentialRampToValueAtTime(0.25, now+offset+0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now+offset+0.18);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now+offset); osc.stop(now+offset+0.2);
+      });
+    }
     if(navigator.vibrate) navigator.vibrate([150,80,150]);
   }catch(e){ /* audio not available */ }
 }
@@ -1051,7 +1151,7 @@ function saveSteepAndContinue(){
   const time = document.getElementById('steepTime').value;
   const desc = document.getElementById('steepDesc').value;
   if(!time){ alert('Enter a steep time (or use the timer).'); return; }
-  d.steeps.push({id:uid(), order:d.steeps.length+1, tempC:temp?Number(temp):null, timeSeconds:Number(time), description:desc.trim(), tags:[...d.curSteepTags]});
+  d.steeps.push({id:uid(), order:d.steeps.length+1, tempC:displayToC(temp), timeSeconds:Number(time), description:desc.trim(), tags:[...d.curSteepTags]});
   clearTimerInterval();
   d.curSteepTags=[]; d.curSteepDesc=''; d.curTemp=''; d.curTime='';
   d.timer = {mode:d.timer.mode, target:d.timer.target, elapsed:0, running:false, intervalId:null};
@@ -1123,7 +1223,7 @@ function commitSession(){
 }
 
 /* ---------- boot ---------- */
-init();
+window.SteepDB.boot(init);
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{

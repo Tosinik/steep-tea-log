@@ -1,12 +1,15 @@
-const CACHE_NAME = 'steep-tea-log-v2';
+const CACHE_NAME = 'steep-tea-log-v4';
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './supabase-config.js',
+  './steep-data.js',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
 ];
 
 self.addEventListener('install', (event) => {
