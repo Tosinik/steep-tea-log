@@ -49,6 +49,7 @@ let state = {
   sessionDraft: null, // {teaId, vesselId, isColdBrew, waterType, waterTDS, gramsUsed, steeps:[], currentSteep:{}, timer:{...}}
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
+  calMonth: null, calSelDay: null,
   loaded:false
 };
 
@@ -64,6 +65,7 @@ async function init(){
   applySettings();
   state.loaded = true;
   render();
+  syncAchievements(false); // reconcile seen list on load, no celebration
 }
 
 /* ---------- settings ---------- */
@@ -165,6 +167,7 @@ function render(){
   else if(state.view==='teas') body = viewTeas();
   else if(state.view==='tea-detail') body = viewTeaDetail();
   else if(state.view==='vessels') body = viewVessels();
+  else if(state.view==='sessions') body = viewSessions();
   else if(state.view==='session') body = viewSessionFlow();
 
   app.innerHTML = `
@@ -173,6 +176,7 @@ function render(){
       <div class="tabs">
         <button class="tab ${state.view==='dashboard'?'active':''}" onclick="goView('dashboard')">Dashboard</button>
         <button class="tab ${state.view==='teas'||state.view==='tea-detail'?'active':''}" onclick="goView('teas')">Teas</button>
+        <button class="tab ${state.view==='sessions'?'active':''}" onclick="goView('sessions')">Sessions</button>
         <button class="tab ${state.view==='vessels'?'active':''}" onclick="goView('vessels')">Vessels</button>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
@@ -247,6 +251,7 @@ function handleImportFile(e){
       state.teas = data.teas||[]; state.vessels=data.vessels||[]; state.sessions=data.sessions||[]; state.tagLibrary=data.tagLibrary||[...DEFAULT_TAGS];
       persistTeas(); persistVessels(); persistSessions(); persistTags();
       render();
+      syncAchievements(false);
       alert('Import complete.');
     }catch(err){ alert('Could not read that file: '+err.message); }
   };
@@ -279,7 +284,7 @@ function settingsModal(){
         ${seg('tempUnit',[{v:'c',label:'°C'},{v:'f',label:'°F'}])}
       </div>
       <div class="set-row">
-        <div><div class="set-label">Timer sounds</div><div class="set-sub">Chime when a countdown finishes</div></div>
+        <div><div class="set-label">Timer sounds</div><div class="set-sub">Chime and vibration when a countdown finishes</div></div>
         ${toggle('soundEnabled')}
       </div>
       <div class="set-row">
@@ -398,39 +403,116 @@ function brewingClockHTML(s){
   </div>`;
 }
 
-/* ================= ACHIEVEMENTS ================= */
+/* ================= ACHIEVEMENTS (tiered) ================= */
+// Each achievement is a family with escalating tiers. metric(s) returns the
+// current value; the level is how many thresholds have been passed.
 const ACHIEVEMENTS = [
-  {id:'first_steep', title:'First steep', desc:'Log your first session', check:(s,teas,sessions)=> s.totalSessions>=1},
-  {id:'collector', title:'Collector', desc:'Add 20 teas to your library', check:(s,teas)=> teas.length>=20},
-  {id:'explorer', title:'Explorer', desc:'Brew 5 different tea types', check:(s)=> s.typesUsedCount>=5},
-  {id:'deep_dive', title:'Deep dive', desc:'Brew the same tea 10 times', check:(s)=> s.mostBrewed.length>0 && s.mostBrewed[0].count>=10},
-  {id:'century', title:'Century club', desc:'Log 100 infusions', check:(s)=> s.totalSteeps>=100},
-  {id:'perfect_cup', title:'Perfect cup', desc:'Rate a session 5 stars', check:(s)=> s.fiveStarSessions>=1},
-  {id:'cold_brewer', title:'Cold brewer', desc:'Log a cold brew session', check:(s)=> s.coldBrewCount>=1},
-  {id:'night_owl', title:'Night owl', desc:'Log a session after 10pm', check:(s)=> s.nightSessionCount>=1},
-  {id:'vessel_variety', title:'Vessel variety', desc:'Brew with 3 different vessels', check:(s)=> s.vesselsUsedCount>=3},
-  {id:'streak7', title:'Steady steeper', desc:'Reach a 7-day streak', check:(s)=> s.streak>=7},
-  {id:'streak30', title:'Marathon brewer', desc:'Reach a 30-day streak', check:(s)=> s.streak>=30},
-  {id:'liter_club', title:'Liter club', desc:'Brew 5 liters total', check:(s)=> s.totalLiters>=5},
+  {id:'first_steep',    title:'First Steep',     tiers:[1],              metric:s=>s.totalSessions,                              label:n=>`Log your first session`},
+  {id:'sessions',       title:'Steeper',         tiers:[10,50,100,500], metric:s=>s.totalSessions,                              label:n=>`Log ${n} sessions`},
+  {id:'century',        title:'Century Club',    tiers:[100,250,500,1000], metric:s=>s.totalSteeps,                             label:n=>`Log ${n} infusions`},
+  {id:'liter_club',     title:'Liter Club', unit:'L', tiers:[5,25,50,100], metric:s=>s.totalLiters,                             label:n=>`Brew ${n} liters total`},
+  {id:'leaf_muncher',   title:'Leaf Muncher', unit:'g', tiers:[100,500,1000,2500], metric:s=>s.totalGrams,                      label:n=>`Brew ${n}g of leaf total`},
+  {id:'collector',      title:'Collector',       tiers:[20,50,100,200], metric:s=>state.teas.length,                           label:n=>`Keep ${n} teas in your library`},
+  {id:'deep_dive',      title:'Deep Dive',       tiers:[10,25,50,100],  metric:s=>s.mostBrewed.length?s.mostBrewed[0].count:0, label:n=>`Brew one tea ${n} times`},
+  {id:'streak',         title:'Steady Steeper', unit:'d', tiers:[7,30,100,365], metric:s=>s.streak,                            label:n=>`Reach a ${n}-day streak`},
+  {id:'explorer',       title:'Explorer',        tiers:[3,5,6],         metric:s=>s.typesUsedCount,                            label:n=>`Brew ${n} different tea types`},
+  {id:'vessel_variety', title:'Vessel Variety',  tiers:[3,5,8],         metric:s=>s.vesselsUsedCount,                          label:n=>`Brew with ${n} different vessels`},
+  {id:'perfect_cup',    title:'Perfect Cup',     tiers:[1,10,25,50],    metric:s=>s.fiveStarSessions,                          label:n=>`Rate ${n} session${n>1?'s':''} 5 stars`},
+  {id:'cold_brewer',    title:'Cold Brewer',     tiers:[1,10,25,50],    metric:s=>s.coldBrewCount,                             label:n=>`Log ${n} cold brew${n>1?'s':''}`},
+  {id:'night_owl',      title:'Night Owl',       tiers:[1,10,25,50],    metric:s=>s.nightSessionCount,                         label:n=>`Log ${n} session${n>1?'s':''} after 10pm`},
 ];
-function computeAchievements(s, teas, sessions){
-  return ACHIEVEMENTS.map(a=>({...a, unlocked: a.check(s, teas, sessions)}));
+function computeAchievements(s){
+  return ACHIEVEMENTS.map(a=>{
+    const value = a.metric(s);
+    const level = a.tiers.filter(t=>value>=t).length;
+    const maxed = level===a.tiers.length;
+    return {...a, value, level, maxed, unlocked:level>0, tierCount:a.tiers.length,
+      unlockedTier: level>0?a.tiers[level-1]:null, nextTier: maxed?null:a.tiers[level]};
+  });
 }
-function achievementsHTML(s){
-  const list = computeAchievements(s, state.teas, state.sessions);
-  const unlockedCount = list.filter(a=>a.unlocked).length;
-  const tiles = list.map(a=>`
-    <div class="badge ${a.unlocked?'unlocked':'locked'}">
-      <div class="badge-icon">${a.unlocked?'✓':'—'}</div>
-      <div class="badge-title">${a.title}</div>
-      <div class="badge-desc">${a.desc}</div>
-    </div>
-  `).join('');
-  return `<div class="section card">
-    <div class="section-title"><h2>Achievements</h2><span class="mono" style="font-size:12px;color:var(--amber);">${unlockedCount}/${list.length}</span></div>
-    <div class="badge-grid">${tiles}</div>
+function fmtMetric(a,v){ return a.unit==='L' ? (Math.round(v*10)/10) : Math.round(v); }
+function aUnit(a){ return a.unit==='L' ? ' L' : (a.unit||''); }
+function badgeHTML(a){
+  const denom = a.maxed ? a.unlockedTier : (a.nextTier ?? a.tiers[0]);
+  const pct = a.maxed ? 100 : Math.min(100, Math.round(a.value/denom*100));
+  const tierPip = a.tierCount>1 ? `<span class="badge-tier">Lv ${a.level}/${a.tierCount}</span>` : '';
+  const desc = a.maxed ? `Maxed — ${a.label(a.unlockedTier)}` : (a.unlocked ? `Next: ${a.label(a.nextTier)}` : a.label(a.tiers[0]));
+  const u = aUnit(a);
+  return `<div class="badge ${a.unlocked?'unlocked':'locked'} ${a.maxed?'maxed':''}" data-akey="${a.id}#${a.level}">
+    <div class="badge-icon">${a.maxed?'★':a.unlocked?'✓':'—'}</div>
+    <div class="badge-title">${a.title}${tierPip}</div>
+    <div class="badge-desc">${desc}</div>
+    <div class="badge-prog"><div class="badge-prog-fill" style="width:${pct}%"></div></div>
+    <div class="badge-prog-num">${fmtMetric(a,a.value)}${u} / ${denom}${u}</div>
   </div>`;
 }
+function achievementsHTML(s){
+  const list = computeAchievements(s);
+  const started = list.filter(a=>a.unlocked).length;
+  const totalTiers = list.reduce((n,a)=>n+a.tierCount,0);
+  const earnedTiers = list.reduce((n,a)=>n+a.level,0);
+  const collapsed = !!state.settings.achievementsCollapsed;
+  const head = `<div class="section-title"><h2>Achievements</h2>
+    <span style="display:flex;align-items:center;gap:12px;">
+      <span class="mono" style="font-size:12px;color:var(--amber);">${earnedTiers}/${totalTiers} tiers</span>
+      <button class="btn-ghost" style="text-decoration:none;font-size:15px;padding:0;" onclick="toggleAchievementsCollapsed()" title="${collapsed?'Expand':'Minimize'}">${collapsed?'▸':'▾'}</button>
+    </span></div>`;
+  if(collapsed){
+    return `<div class="section card">${head}
+      <div style="font-size:12.5px;color:var(--ink-soft);">${started} of ${list.length} achievements started · tap ▸ to expand</div>
+    </div>`;
+  }
+  return `<div class="section card">${head}<div class="badge-grid">${list.map(badgeHTML).join('')}</div></div>`;
+}
+function toggleAchievementsCollapsed(){
+  state.settings.achievementsCollapsed = !state.settings.achievementsCollapsed;
+  persistSettings(); render();
+}
+
+/* ---- newly-unlocked detection + celebration ---- */
+function syncAchievements(animate){
+  const list = computeAchievements(computeStats());
+  const keys = list.filter(a=>a.level>0).map(a=>`${a.id}#${a.level}`);
+  let seen = state.settings.seenAchievements;
+  if(!Array.isArray(seen)){ // first ever run: record silently, never a burst of old unlocks
+    state.settings.seenAchievements = keys; persistSettings(); return;
+  }
+  const seenSet = new Set(seen);
+  const fresh = list.filter(a=>a.level>0 && !seenSet.has(`${a.id}#${a.level}`));
+  if(fresh.length){
+    state.settings.seenAchievements = Array.from(new Set([...seen, ...keys])); // accumulate, so drops don't re-fire
+    persistSettings();
+    if(animate) celebrateAchievements(fresh);
+  }
+}
+function celebrateAchievements(list){
+  const names = list.map(a=>a.tierCount>1?`${a.title} (Lv ${a.level})`:a.title);
+  showToast('🎉 Unlocked: '+names.join(' · '));
+  confettiBurst();
+}
+function showToast(msg){
+  let host = document.getElementById('toastHost');
+  if(!host){ host=document.createElement('div'); host.id='toastHost'; document.body.appendChild(host); }
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  host.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),320); }, 4200);
+}
+function confettiBurst(){
+  const host=document.createElement('div'); host.className='confetti';
+  const colors=['#C17A3E','#3F5E42','#8B5E4A','#C6A825','#5B9440'];
+  for(let i=0;i<30;i++){
+    const p=document.createElement('i');
+    p.style.left=Math.random()*100+'%';
+    p.style.background=colors[i%colors.length];
+    p.style.animationDelay=(Math.random()*0.25).toFixed(2)+'s';
+    p.style.setProperty('--rot',(Math.random()*360|0)+'deg');
+    host.appendChild(p);
+  }
+  document.body.appendChild(host);
+  setTimeout(()=>host.remove(),2000);
+}
+
 
 function heatmapHTML(days){
   // 13 weeks x 7 days
@@ -660,6 +742,7 @@ function submitTeaForm(e){
   }
   persistTeas();
   state.teaFormOpen = false; state.editingTea = null; state._draftImage = null;
+  syncAchievements(true);
   render();
 }
 function deleteTea(id){
@@ -723,6 +806,82 @@ function viewTeaDetail(){
         ${histHTML}
       </div>
     </div>
+  `;
+}
+
+/* ================= SESSIONS (list + calendar) ================= */
+function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+function calShift(delta){
+  const m = state.calMonth || startOfMonth(new Date());
+  state.calMonth = new Date(m.getFullYear(), m.getMonth()+delta, 1);
+  render();
+}
+function selectCalDay(key){
+  state.calSelDay = (state.calSelDay===key) ? null : key;
+  render();
+}
+function sessionsByDay(){
+  const map = {};
+  state.sessions.forEach(s=>{ const k=dayKey(s.date); (map[k]=map[k]||[]).push(s); });
+  return map;
+}
+function sessionRowHTML(s){
+  const tea = teaById(s.teaId);
+  const v = vesselById(s.vesselId);
+  const tags = (s.tags||[]).slice(0,4).map(t=>`<span class="tagchip">${t}</span>`).join(' ');
+  return `<div class="sess-row" onclick="openSessionEdit('${s.id}')">
+    <div class="sess-thumb" style="${tea&&tea.image?`background-image:url(${tea.image})`:''}">${tea&&tea.image?'':'🍵'}</div>
+    <div class="sess-main">
+      <div class="sess-top"><strong>${tea?tea.name:'Unknown tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
+      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?v.name:'—'} · ${s.steeps.length} steep${s.steeps.length===1?'':'s'}${s.isColdBrew?' · cold brew':''}</div>
+      ${tags?`<div class="sess-tags">${tags}</div>`:''}
+    </div>
+    <span class="sess-chev">›</span>
+  </div>`;
+}
+function viewSessions(){
+  if(state.sessions.length===0){
+    return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Sessions</h2></div>
+      <div class="card empty">No sessions yet. Tap <strong>＋ Log session</strong> to record your first brew.</div>`;
+  }
+  if(!state.calMonth) state.calMonth = startOfMonth(new Date());
+  const m = state.calMonth;
+  const byDay = sessionsByDay();
+  const monthLabel = m.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  const firstDow = m.getDay();
+  const daysInMonth = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
+  const todayKey = dayKey(new Date());
+  const dow = ['S','M','T','W','T','F','S'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  let cells = '';
+  for(let i=0;i<firstDow;i++) cells += `<div class="cal-cell blank"></div>`;
+  for(let day=1; day<=daysInMonth; day++){
+    const key = dayKey(new Date(m.getFullYear(), m.getMonth(), day));
+    const list = byDay[key] || [];
+    const has = list.length>0;
+    cells += `<div class="cal-cell ${has?'has':''} ${state.calSelDay===key?'sel':''} ${key===todayKey?'today':''}" onclick="selectCalDay('${key}')">
+      <span class="cal-num">${day}</span>${has?`<span class="cal-dot">${list.length>1?list.length:''}</span>`:''}
+    </div>`;
+  }
+  const cal = `<div class="card">
+    <div class="cal-head"><button class="btn-ghost" onclick="calShift(-1)">‹</button><strong>${monthLabel}</strong><button class="btn-ghost" onclick="calShift(1)">›</button></div>
+    <div class="cal-grid cal-dows">${dow}</div>
+    <div class="cal-grid">${cells}</div>
+  </div>`;
+
+  let listSessions = [...state.sessions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  let listTitle = 'All sessions';
+  if(state.calSelDay){
+    listSessions = listSessions.filter(s=>dayKey(s.date)===state.calSelDay);
+    listTitle = fmtDate(state.calSelDay);
+  }
+  const rows = listSessions.map(sessionRowHTML).join('');
+  return `
+    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Sessions</h2>
+      <span class="mono" style="font-size:12px;color:var(--ink-soft);">${state.sessions.length} total</span></div>
+    ${cal}
+    <div class="section-title" style="margin-top:20px;"><h2>${listTitle}</h2>
+      ${state.calSelDay?`<button class="btn-ghost" onclick="selectCalDay('${state.calSelDay}')">show all</button>`:''}</div>
+    <div>${rows || '<div class="card empty">No sessions on this day.</div>'}</div>
   `;
 }
 
@@ -790,6 +949,7 @@ function submitVesselForm(e){
     state.vessels.push(data);
   }
   persistVessels();
+  syncAchievements(true);
   closeVesselForm();
 }
 function deleteVessel(id){
@@ -839,6 +999,7 @@ function saveSessionEdit(){
   delete e._localDate;
   state.sessions[idx] = e;
   persistSessions();
+  syncAchievements(true);
   closeSessionEdit();
 }
 function deleteSession(){
@@ -1049,8 +1210,8 @@ function playTimerDone(){
         osc.connect(gain); gain.connect(ctx.destination);
         osc.start(now+offset); osc.stop(now+offset+0.2);
       });
+      if(navigator.vibrate) navigator.vibrate([150,80,150]);
     }
-    if(navigator.vibrate) navigator.vibrate([150,80,150]);
   }catch(e){ /* audio not available */ }
 }
 
@@ -1219,6 +1380,7 @@ function commitSession(){
   state.sessionDraft=null;
   state.activeTeaId = d.teaId;
   state.view='tea-detail';
+  syncAchievements(true);
   render();
 }
 

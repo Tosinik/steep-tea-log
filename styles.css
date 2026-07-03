@@ -255,3 +255,53 @@ html[data-theme="dark"] .timer-ctrls button{color:var(--jade-deep);}
 
 /* vessel thumbnail in list */
 .vessel-thumb{width:34px;height:34px;border-radius:8px;flex:0 0 auto;background:var(--jade-pale);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:16px;}
+
+/* ---------- tiered achievements ---------- */
+.badge-tier{display:inline-block;margin-left:5px;font-family:var(--font-mono);font-size:9px;color:var(--amber);vertical-align:middle;}
+.badge.maxed{background:var(--amber-pale);border-color:var(--amber);}
+.badge.maxed .badge-icon{background:var(--amber);color:var(--white);}
+.badge-prog{height:5px;background:var(--porcelain-dim);border-radius:4px;overflow:hidden;margin-top:8px;}
+.badge-prog-fill{height:100%;background:var(--jade);border-radius:4px;transition:width .4s ease;}
+.badge.maxed .badge-prog-fill{background:var(--amber);}
+.badge-prog-num{font-family:var(--font-mono);font-size:9px;color:var(--ink-soft);margin-top:4px;}
+
+/* ---------- achievement unlock toast + confetti ---------- */
+#toastHost{position:fixed;left:0;right:0;bottom:24px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2000;pointer-events:none;padding:0 16px;}
+.toast{background:var(--jade-deep);color:#fff;padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.28);max-width:440px;text-align:center;opacity:0;transform:translateY(16px);transition:opacity .3s,transform .3s;}
+html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
+.toast.show{opacity:1;transform:translateY(0);}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:1999;overflow:hidden;}
+.confetti i{position:absolute;top:-12px;width:9px;height:9px;border-radius:2px;animation:confetti-fall 1.6s ease-in forwards;}
+@keyframes confetti-fall{
+  0%{transform:translateY(0) rotate(0);opacity:1;}
+  100%{transform:translateY(102vh) rotate(var(--rot,360deg));opacity:.7;}
+}
+@media (prefers-reduced-motion: reduce){ .confetti{display:none;} .toast{transition:opacity .3s;transform:none;} }
+
+/* ---------- calendar ---------- */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-head strong{font-family:'Fraunces',serif;font-size:16px;}
+.cal-head .btn-ghost{font-size:22px;text-decoration:none;padding:0 10px;line-height:1;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dows{margin-bottom:4px;}
+.cal-dow{text-align:center;font-family:var(--font-mono);font-size:9px;color:var(--ink-soft);padding:2px 0;}
+.cal-cell{position:relative;aspect-ratio:1;border-radius:8px;background:var(--porcelain-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid transparent;}
+.cal-cell.blank{background:transparent;cursor:default;}
+.cal-cell .cal-num{font-size:12px;color:var(--ink-soft);}
+.cal-cell.has{background:var(--jade-pale);}
+.cal-cell.has .cal-num{color:var(--ink);font-weight:600;}
+.cal-cell.today{border-color:var(--amber);}
+.cal-cell.sel{background:var(--jade);}
+.cal-cell.sel .cal-num{color:#fff;}
+.cal-dot{position:absolute;bottom:4px;right:5px;min-width:14px;height:14px;padding:0 3px;border-radius:8px;background:var(--jade);color:#fff;font-family:var(--font-mono);font-size:9px;display:flex;align-items:center;justify-content:center;}
+.cal-cell.sel .cal-dot{background:var(--amber);}
+
+/* ---------- session rows ---------- */
+.sess-row{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;}
+.sess-row:hover{border-color:var(--jade);}
+.sess-thumb{width:44px;height:44px;border-radius:9px;flex:0 0 auto;background:var(--jade-pale);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.sess-main{flex:1;min-width:0;}
+.sess-top{display:flex;align-items:center;gap:8px;justify-content:space-between;}
+.sess-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+.sess-tags{margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;}
+.sess-chev{color:var(--ink-soft);font-size:20px;flex:0 0 auto;}
