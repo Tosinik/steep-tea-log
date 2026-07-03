@@ -233,6 +233,19 @@
   }
   function readCacheRaw(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } }
 
+  /* ============================ photo storage ============================ */
+  const PHOTO_BUCKET = 'tea-photos';
+  // Takes a compressed data: URL, uploads to Storage, returns a public URL.
+  // Passes through anything that isn't a data: URL (already a URL, or null).
+  async function uploadImage(dataUrl) {
+    if (!dataUrl || !dataUrl.startsWith('data:')) return dataUrl || null;
+    const blob = await (await fetch(dataUrl)).blob();
+    const path = `${userId()}/${newId()}.jpg`;
+    const { error } = await sb.storage.from(PHOTO_BUCKET).upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+    if (error) throw error;
+    return sb.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+
   /* ============================ auth + boot ============================ */
   async function signIn(email) {
     return sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname } });
@@ -329,5 +342,5 @@
   }
 
   /* ---------- public API ---------- */
-  window.SteepDB = { loadKey, saveKey, loadSettings, saveSettings, boot, signIn, signOut, newId, migrateFromLocalStorage, getUser: () => currentUser };
+  window.SteepDB = { loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signOut, newId, migrateFromLocalStorage, getUser: () => currentUser };
 })();

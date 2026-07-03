@@ -140,6 +140,13 @@ function dotsRow(n, max){
 }
 
 /* ---------- image compression ---------- */
+async function resolveDraftImage(){
+  const img = state._draftImage;
+  if(!img) return null;
+  if(!img.startsWith('data:')) return img; // already a stored URL — leave as-is
+  try { return await window.SteepDB.uploadImage(img); }
+  catch(e){ console.warn('[Steep] photo upload failed, keeping inline copy', e); return img; } // offline fallback
+}
 function handleImageFile(file, cb){
   const reader = new FileReader();
   reader.onload = function(e){
@@ -225,10 +232,29 @@ function backupSectionHTML(){
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <button class="btn btn-primary" onclick="exportData()">Export backup (.json)</button>
       <button class="btn" onclick="triggerImport()">Import backup</button>
+      <button class="btn" onclick="migratePhotosToStorage()">Move photos to cloud</button>
       <button class="btn" onclick="window.SteepDB.signOut()">Sign out</button>
       <input type="file" id="importFileInput" accept="application/json" style="display:none" onchange="handleImportFile(event)">
     </div>
   </div>`;
+}
+async function migratePhotosToStorage(){
+  const count = [...state.teas, ...state.vessels].filter(x=>x.image && x.image.startsWith('data:')).length;
+  if(count===0){ alert('No inline photos to move — everything is already in cloud storage.'); return; }
+  if(!confirm(`Move ${count} photo${count===1?'':'s'} to cloud storage? This shrinks each row and speeds up loading.`)) return;
+  let ok=0, fail=0;
+  for(const t of state.teas){
+    if(t.image && t.image.startsWith('data:')){
+      try{ t.image = await window.SteepDB.uploadImage(t.image); ok++; }catch(e){ fail++; }
+    }
+  }
+  for(const v of state.vessels){
+    if(v.image && v.image.startsWith('data:')){
+      try{ v.image = await window.SteepDB.uploadImage(v.image); ok++; }catch(e){ fail++; }
+    }
+  }
+  persistTeas(); persistVessels(); render();
+  alert(`Moved ${ok} photo${ok===1?'':'s'} to storage.${fail?` ${fail} failed — try again when online.`:''}`);
 }
 function exportData(){
   const payload = {teas:state.teas, vessels:state.vessels, sessions:state.sessions, tagLibrary:state.tagLibrary, exportedAt:new Date().toISOString()};
@@ -420,6 +446,8 @@ const ACHIEVEMENTS = [
   {id:'perfect_cup',    title:'Perfect Cup',     tiers:[1,10,25,50],    metric:s=>s.fiveStarSessions,                          label:n=>`Rate ${n} session${n>1?'s':''} 5 stars`},
   {id:'cold_brewer',    title:'Cold Brewer',     tiers:[1,10,25,50],    metric:s=>s.coldBrewCount,                             label:n=>`Log ${n} cold brew${n>1?'s':''}`},
   {id:'night_owl',      title:'Night Owl',       tiers:[1,10,25,50],    metric:s=>s.nightSessionCount,                         label:n=>`Log ${n} session${n>1?'s':''} after 10pm`},
+  {id:'big_spender',    title:'Big Spender', unit:'$', tiers:[50,200,500,1000], metric:s=>s.totalSpent,                        label:n=>`Spend ${n} on tea`},
+  {id:'type_master',    title:'Type Master',     tiers:[1,3,6],         metric:s=>Object.values(s.typeCounts).filter(t=>t.count>=10).length, label:n=>`Brew ${n} type${n>1?'s':''} 10+ times each`},
 ];
 function computeAchievements(s){
   return ACHIEVEMENTS.map(a=>{
@@ -710,9 +738,10 @@ function setTeaFormRating(v){
   document.getElementById('teaRatingInput').value = v;
   document.getElementById('teaRatingWrap').innerHTML = renderStarsInteractive(v,true,'setTeaFormRating');
 }
-function submitTeaForm(e){
+async function submitTeaForm(e){
   e.preventDefault();
   const f = e.target;
+  const imageUrl = await resolveDraftImage();
   const data = {
     id: state.editingTea?.id || uid(),
     name: f.name.value.trim(),
@@ -731,7 +760,7 @@ function submitTeaForm(e){
     isFavorite: f.isFavorite.checked,
     wouldRebuy: f.wouldRebuy.checked,
     purchaseType: f.isRepeat.checked?'repeat':'first',
-    image: state._draftImage || null,
+    image: imageUrl,
     dateAdded: state.editingTea?.dateAdded || new Date().toISOString()
   };
   if(state.editingTea){
@@ -931,16 +960,17 @@ function vesselFormModal(){
     </div>
   </div>`;
 }
-function submitVesselForm(e){
+async function submitVesselForm(e){
   e.preventDefault();
   const f = e.target;
+  const imageUrl = await resolveDraftImage();
   const data = {
     id: state.editingVessel?.id || uid(),
     name: f.name.value.trim(),
     type: f.type.value,
     material: f.material.value.trim(),
     capacityMl: f.capacityMl.value?Number(f.capacityMl.value):null,
-    image: state._draftImage || null
+    image: imageUrl
   };
   if(state.editingVessel){
     const idx = state.vessels.findIndex(x=>x.id===data.id);
