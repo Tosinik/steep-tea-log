@@ -15,6 +15,31 @@ function teaCardHTML(t){
 function distinctVendors(){
   return [...new Set(state.teas.map(t=>(t.source||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 }
+function vendorManagerHTML(){
+  const vendors = distinctVendors();
+  if(!vendors.length) return '';
+  const esc = v => v.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const rows = vendors.map(v=>{
+    const count = state.teas.filter(t=>(t.source||'').trim()===v).length;
+    return `<div class="vendor-row">
+      <input type="text" value="${esc(v)}" data-old="${esc(v)}" onchange="renameVendorFromInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      <span class="vendor-count">${count} tea${count===1?'':'s'}</span>
+    </div>`;
+  }).join('');
+  return `<div class="set-row" style="flex-direction:column;align-items:stretch;">
+    <div><div class="set-label">Vendors / shops</div><div class="set-sub">Rename to fix a typo, or type an existing name to merge duplicates.</div></div>
+    <div style="margin-top:10px;">${rows}</div>
+  </div>`;
+}
+function renameVendorFromInput(el){ renameVendor(el.dataset.old, el.value.trim()); }
+function renameVendor(oldName, newName){
+  oldName = (oldName||'').trim();
+  if(!newName || newName===oldName){ render(); return; }
+  let changed = 0;
+  state.teas.forEach(t=>{ if((t.source||'').trim()===oldName){ t.source = newName; window.SteepDB.putTea(t).catch(saveErr); changed++; } });
+  if(changed) showToast(`✓ "${oldName}" → "${newName}" (${changed} tea${changed===1?'':'s'})`);
+  render();
+}
 function filteredSortedTeas(){
   const F = state.teaFilter;
   const list = state.teas.filter(t=>{

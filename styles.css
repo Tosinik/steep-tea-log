@@ -415,3 +415,8 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 /* v3 — consumption forecast */
 .forecast-line{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.45;}
 .forecast-line b{color:var(--ink);}
+
+/* v3 — vendor manager */
+.vendor-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.vendor-row input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--white);color:var(--ink);font-size:13px;}
+.vendor-count{font-size:11px;color:var(--ink-soft);white-space:nowrap;font-family:var(--font-mono);}

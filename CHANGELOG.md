@@ -24,6 +24,13 @@ Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
 
+## v3.11 — vendor manager
+Deploy: `service-worker.js` (v22), `steep-teas.js`, `steep-settings.js`, `styles.css`.
+
+- **Vendor manager** in Settings — lists every shop you've used with its tea count; rename
+  to fix typos, or type an existing name to merge duplicates. Updates the `source` on every
+  affected tea (per-row writes). No popups.
+
 ## v3.10 — consumption forecast, map matching fixes
 Deploy: `service-worker.js` (v21), `steep-passport.js`, `steep-dashboard.js`,
 `steep-teas.js`, `styles.css`.
