@@ -29,6 +29,23 @@ function saveErr(e){
     setTimeout(()=>{ _saveErrShown = false; }, 4000);
   }
 }
+// Social actions surface the actual cause instead of the generic offline message,
+// so a permissions/setup problem is distinguishable from being truly offline.
+function socialErr(e, action){
+  console.error('[Steep] '+action+' failed', e);
+  const m = ((e&&e.message)||String(e)).toLowerCase();
+  const code = e&&e.code;
+  let msg;
+  if(code==='42P01' || m.includes('schema cache') || (m.includes('does not exist')) || (m.includes('relation')&&m.includes('follow')))
+    msg = "Social tables aren't set up yet — run v3_0-social.sql in the Supabase SQL Editor, then try again.";
+  else if(m.includes('row-level security') || m.includes('violates') || m.includes('policy'))
+    msg = "That action was blocked by database permissions. Re-run v3_0-social.sql to (re)create the follows policies, then try again.";
+  else if(m.includes('failed to fetch') || m.includes('networkerror') || m.includes('network request failed'))
+    msg = "Couldn't reach the server — you may be offline. Try again once you're back online.";
+  else
+    msg = "Could not "+action+": "+((e&&e.message)||e);
+  alert(msg);
+}
 
 /* ---------- state ---------- */
 const DEFAULT_TAGS = ["floral","fruity","roasted","vegetal","umami","sweet","astringent","woody","honey","mineral","creamy","smoky","malty","buttery","grassy","stonefruit","citrus"];
@@ -232,6 +249,7 @@ function render(){
   else if(state.view==='vessels') body = viewVessels();
   else if(state.view==='sessions') body = viewSessions();
   else if(state.view==='friends') body = viewFriends();
+  else if(state.view==='achievements') body = viewAchievements();
   else if(state.view==='session') body = viewSessionFlow();
 
   app.innerHTML = `
@@ -245,6 +263,7 @@ function render(){
         <button class="tab ${state.view==='friends'?'active':''}" onclick="goFriends()">Friends</button>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
+        ${state.settings.showAchievements ? `<button class="btn ${state.view==='achievements'?'active-ghost':''}" onclick="goView('achievements')" style="padding:9px 12px;" title="Achievements">🏆</button>` : ''}
         <button class="btn" onclick="openSettings()" style="padding:9px 12px;" title="Settings">⚙</button>
         <button class="btn" id="themeToggleBtn" onclick="toggleTheme()" style="padding:9px 12px;" title="Toggle dark mode"></button>
         <button class="btn-log" onclick="quickLogSession()">＋ Log session</button>
@@ -379,7 +398,7 @@ function settingsModal(){
         ${toggle('quietMode')}
       </div>
       <div class="set-row">
-        <div><div class="set-label">Show achievements</div><div class="set-sub">Display the badge grid on the dashboard</div></div>
+        <div><div class="set-label">Show achievements</div><div class="set-sub">Adds a 🏆 button in the header that opens your achievements page</div></div>
         ${toggle('showAchievements')}
       </div>
       <div class="set-row">
@@ -631,9 +650,51 @@ function heatmapHTML(days){
   return `<div class="heatmap">${cols}</div>`;
 }
 
+function onboardingHTML(){
+  const hasTea = state.teas.length>0;
+  const hasVessel = state.vessels.length>0;
+  const ready = hasTea && hasVessel;
+  const step = (done, n, title, sub, btn) => `
+    <div class="ob-step ${done?'done':''}">
+      <div class="ob-check">${done?'✓':n}</div>
+      <div class="ob-step-body">
+        <div class="ob-step-title">${title}</div>
+        <div class="ob-step-sub">${sub}</div>
+      </div>
+      ${done?'<span class="ob-done-tag">done</span>':(btn||'')}
+    </div>`;
+  return `
+    <div class="ob-hero">
+      <div class="brand-mark"></div>
+      <h1>Welcome to Steep</h1>
+      <p class="ob-lede">A calm home for your tea. Log a few sessions and this space fills with your rhythms — what you brew, your streak, your favourites. No rush.</p>
+    </div>
+    <div class="card ob-steps">
+      ${step(hasTea, 1, 'Add your first tea', 'Name and type are enough; add a photo and notes if you like.', `<button class="btn btn-primary ob-btn" onclick="goView('teas')">Add tea</button>`)}
+      ${step(hasVessel, 2, 'Add a vessel', 'A gaiwan, teapot, or mug — whatever you brew in.', `<button class="btn btn-primary ob-btn" onclick="goView('vessels')">Add vessel</button>`)}
+      ${step(false, 3, 'Log your first session', ready?"Everything's ready — go brew something.":'Add a tea and a vessel first.', ready?`<button class="btn btn-primary ob-btn" onclick="quickLogSession()">Log session</button>`:'')}
+    </div>
+    ${backupSectionHTML()}
+  `;
+}
+function viewAchievements(){
+  const s = computeStats();
+  const list = computeAchievements(s);
+  const totalTiers = list.reduce((n,a)=>n+a.tierCount,0);
+  const earnedTiers = list.reduce((n,a)=>n+a.level,0);
+  const started = list.filter(a=>a.unlocked).length;
+  return `
+    <button class="detail-back" onclick="goView('dashboard')">← Back to dashboard</button>
+    <div class="section-title" style="margin-top:6px;">
+      <h2 style="font-family:'Fraunces',serif;font-size:20px;">Achievements</h2>
+      <span class="mono" style="font-size:12px;color:var(--amber);">${earnedTiers}/${totalTiers} tiers · ${started} started</span>
+    </div>
+    <div class="card"><div class="badge-grid">${list.map(badgeHTML).join('')}</div></div>
+  `;
+}
 function viewDashboard(){
-  if(state.teas.length===0 && state.sessions.length===0){
-    return `<div class="card empty">No tea logged yet. Head to <strong>Teas</strong> to add your first tea, then log a session to see stats here.</div>${backupSectionHTML()}`;
+  if(state.sessions.length===0){
+    return onboardingHTML();
   }
   const s = computeStats();
   const persona = computePersona(s);
@@ -682,8 +743,6 @@ function viewDashboard(){
     <div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>
 
     ${recentHTML}
-
-    ${(!state.settings.quietMode && state.settings.showAchievements) ? achievementsHTML(s) : ''}
 
     <div class="section grid grid-3">
       <div class="stat"><div class="num">${s.totalSessions}</div><div class="lbl">Sessions</div></div>
@@ -1144,8 +1203,20 @@ async function doSearch(){
   render();
   setTimeout(()=>{ const i=document.getElementById('userSearch'); if(i){ i.value=q; i.focus(); } },0);
 }
-async function doFollow(id){ try{ await window.SteepDB.follow(id); if(!state.social.following.includes(id)) state.social.following.push(id); await refreshFeed(); }catch(e){ saveErr(e); } }
-async function doUnfollow(id){ try{ await window.SteepDB.unfollow(id); state.social.following=state.social.following.filter(x=>x!==id); await refreshFeed(); }catch(e){ saveErr(e); } }
+async function doFollow(id){
+  try{ await window.SteepDB.follow(id); }
+  catch(e){ return socialErr(e, 'follow'); }
+  if(!state.social.following.includes(id)) state.social.following.push(id);
+  render();
+  try{ await refreshFeed(); }catch(e){ console.warn('[Steep] feed refresh after follow failed', e); }
+}
+async function doUnfollow(id){
+  try{ await window.SteepDB.unfollow(id); }
+  catch(e){ return socialErr(e, 'unfollow'); }
+  state.social.following=state.social.following.filter(x=>x!==id);
+  render();
+  try{ await refreshFeed(); }catch(e){ console.warn('[Steep] feed refresh after unfollow failed', e); }
+}
 
 /* ================= SESSIONS (list + calendar) ================= */
 function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
