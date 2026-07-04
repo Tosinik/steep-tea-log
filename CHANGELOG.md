@@ -24,6 +24,16 @@ Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
 
+## v3.9 — meditative focus mode
+Deploy: `service-worker.js` (v20), `steep-core.js`, `steep-sessions.js`, `styles.css`.
+
+- **Focus mode** during a steeping session: a "🧘 Focus mode" button opens a calm,
+  distraction-free screen (no topbar/tabs) with the tea name, a teacup that fills with amber
+  as the steep progresses, a large countdown, and gentle steam. Minimal controls: Start/Pause,
+  Reset, "Log this infusion →" (records the time and resets for the next), and exit. The
+  character-in-a-tea-garden animation is deferred until there's human-made art; this is the
+  mechanic + cup-fill timer.
+
 ## v3.8 — streak regression fix, map cleanup, gaiwan app icon
 Deploy: `service-worker.js` (v19), `steep-dashboard.js`, `steep-passport.js`,
 `steep-teas.js`, and the new `icon-192.png` / `icon-512.png`.

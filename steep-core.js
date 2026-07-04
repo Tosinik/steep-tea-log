@@ -272,6 +272,13 @@ function steepLogoSVG(px){
 function render(){
   const app = document.getElementById('app');
   if(!state.loaded){ app.innerHTML = '<div class="empty">Loading your tea log…</div>'; return; }
+  // Meditative focus mode — a calm, distraction-free steeping screen (no topbar).
+  const fd = state.sessionDraft;
+  if(fd && fd.stage==='steeping' && fd.focusMode){
+    app.innerHTML = `<div class="focus-screen">${sessionFocusHTML(fd)}</div>`;
+    bindDynamic();
+    return;
+  }
   let body = '';
   if(state.view==='dashboard') body = viewDashboard();
   else if(state.view==='teas') body = viewTeas();

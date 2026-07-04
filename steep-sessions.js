@@ -436,6 +436,7 @@ function sessionSteepingHTML(d){
           <button onclick="timerReset()">Reset</button>
           <button onclick="useTimerValue()">Use this time</button>
         </div>
+        <button class="btn" style="margin-top:10px;width:100%;" onclick="toggleFocusMode()">🧘 Focus mode — just the timer</button>
       </div>
 
       <div class="form-grid" style="margin-top:14px;">
@@ -461,6 +462,55 @@ function sessionSteepingHTML(d){
   `;
 }
 
+function toggleFocusMode(){ state.sessionDraft.focusMode=!state.sessionDraft.focusMode; render(); }
+function focusProgress(tm){ return tm.mode==='timer' ? (tm.target>0?Math.min(1,tm.elapsed/tm.target):0) : Math.min(1,tm.elapsed/60); }
+function sessionFocusHTML(d){
+  const tea = teaById(d.teaId);
+  const tm = d.timer;
+  const bowlH = 102, bowlBottom = 192;
+  const prog = focusProgress(tm);
+  const fillH = (prog*bowlH).toFixed(1);
+  const fillY = (bowlBottom - prog*bowlH).toFixed(1);
+  const done = tm.mode==='timer' && tm.target>0 && tm.elapsed>=tm.target;
+  const disp = tm.mode==='timer' ? Math.max(0, tm.target-tm.elapsed) : tm.elapsed;
+  return `
+    <div class="focus-inner">
+      <div class="focus-name">${tea?tea.name:'Steeping'}</div>
+      <div class="focus-sub">Infusion ${d.steeps.length+1}${d.isColdBrew?' · cold brew':''}</div>
+      <svg class="focus-cup" viewBox="0 0 200 230" role="img" aria-label="Steeping cup">
+        <defs><clipPath id="focusCupClip"><path d="M52,90 L148,90 L136,175 Q128,192 100,192 Q72,192 64,175 Z"/></clipPath></defs>
+        <g class="focus-steam" opacity="0.55">
+          <path d="M88,70 q-8,-12 0,-24" fill="none" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M100,66 q8,-12 0,-26" fill="none" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M112,70 q-8,-12 0,-24" fill="none" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g clip-path="url(#focusCupClip)">
+          <rect id="focusCupFill" x="48" width="104" y="${fillY}" height="${fillH}" fill="var(--amber)"/>
+        </g>
+        <path d="M52,90 L148,90 L136,175 Q128,192 100,192 Q72,192 64,175 Z" fill="none" stroke="var(--ink)" stroke-width="3.5"/>
+        <path d="M148,104 q26,4 20,30 q-6,18 -26,16" fill="none" stroke="var(--ink)" stroke-width="3.5"/>
+        <ellipse cx="100" cy="201" rx="60" ry="9" fill="none" stroke="var(--line)" stroke-width="3"/>
+      </svg>
+      <div class="focus-time" id="focusTime">${fmtSec(disp)}</div>
+      <div class="focus-status" id="focusStatus">${done?'ready — pour':(tm.running?'steeping…':'paused')}</div>
+      <div class="focus-ctrls">
+        <button class="btn btn-primary" id="focusStartBtn" onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
+        <button class="btn" onclick="timerReset()">Reset</button>
+        <button class="btn" onclick="focusLogSteep()">Log this infusion →</button>
+      </div>
+      <button class="focus-exit" onclick="toggleFocusMode()">exit focus mode</button>
+    </div>
+  `;
+}
+function focusLogSteep(){
+  const d = state.sessionDraft; const tm = d.timer;
+  const secs = tm.mode==='timer' ? (tm.elapsed || tm.target) : tm.elapsed;
+  if(!secs){ return; }
+  clearTimerInterval();
+  d.steeps.push({ id:uid(), order:d.steeps.length+1, tempC:(d.curTemp!==''&&d.curTemp!=null)?displayToC(d.curTemp):null, timeSeconds:Number(secs), description:'', tags:[] });
+  d.timer = { mode:tm.mode, target:tm.target, elapsed:0, running:false, intervalId:null };
+  render();
+}
 function setTimerMode(m){ state.sessionDraft.timer.mode=m; render(); }
 function setTimerTarget(v){
   state.sessionDraft.timer.target=Number(v)||0;
@@ -515,6 +565,19 @@ function updateTimerDisplayOnly(){
   if(disp) disp.textContent = fmtSec(tm.mode==='timer'?Math.max(0,tm.target-tm.elapsed):tm.elapsed);
   const btn = document.querySelector('.timer-ctrls button');
   if(btn) btn.textContent = tm.running?'Pause':'Start';
+  // focus mode: animate the cup + calm readout
+  const cup = document.getElementById('focusCupFill');
+  if(cup){
+    const bowlH=102, bowlBottom=192, prog=focusProgress(tm);
+    cup.setAttribute('height',(prog*bowlH).toFixed(1));
+    cup.setAttribute('y',(bowlBottom-prog*bowlH).toFixed(1));
+  }
+  const ft = document.getElementById('focusTime');
+  if(ft) ft.textContent = fmtSec(tm.mode==='timer'?Math.max(0,tm.target-tm.elapsed):tm.elapsed);
+  const fbtn = document.getElementById('focusStartBtn');
+  if(fbtn) fbtn.textContent = tm.running?'Pause':'Start';
+  const fstat = document.getElementById('focusStatus');
+  if(fstat){ const done = tm.mode==='timer' && tm.target>0 && tm.elapsed>=tm.target; fstat.textContent = done?'ready — pour':(tm.running?'steeping…':'paused'); }
 }
 function timerReset(){
   const tm = state.sessionDraft.timer;
