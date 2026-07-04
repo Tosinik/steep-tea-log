@@ -68,6 +68,7 @@ let state = {
   settingsOpen: false,
   calMonth: null, calSelDay: null,
   teaSort: 'newest', teaFilter: { type:'', vendor:'', lowStock:false },
+  recapPeriod: 'week',
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },
   loaded:false
 };
@@ -658,6 +659,77 @@ function heatmapHTML(days){
   </div>`;
 }
 
+function streakCardHTML(){
+  const s = computeStats();
+  return `<div class="section card" style="margin-top:16px;">
+    <div class="section-title"><h2>Drinking streak</h2><span class="mono" style="font-size:13px;color:var(--amber);font-weight:600;">${s.streak} day${s.streak===1?'':'s'} current</span></div>
+    ${heatmapHTML(s.days)}
+  </div>`;
+}
+function periodRange(period){
+  const now = new Date();
+  const end = new Date(now); end.setHours(23,59,59,999);
+  let start;
+  if(period==='month'){
+    start = new Date(now.getFullYear(), now.getMonth(), 1);
+  } else {
+    start = new Date(now); start.setHours(0,0,0,0);
+    const monFirst = (start.getDay()+6)%7; // Mon=0 … Sun=6
+    start.setDate(start.getDate()-monFirst);
+  }
+  return { start, end };
+}
+function computeRecap(period){
+  const { start, end } = periodRange(period);
+  const inRange = state.sessions.filter(s=>{ const d=new Date(s.date); return d>=start && d<=end; });
+  const infusions = inRange.reduce((a,s)=>a+steepCountOf(s),0);
+  const grams = inRange.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0);
+  const liters = inRange.reduce((a,s)=>{ const v=vesselById(s.vesselId); const cap=v?Number(v.capacityMl)||0:0; return a+(cap*steepCountOf(s))/1000; },0);
+  const counts={}; inRange.forEach(s=>{ if(s.teaId) counts[s.teaId]=(counts[s.teaId]||0)+1; });
+  let mostBrewed=null, mostN=0;
+  Object.entries(counts).forEach(([id,n])=>{ if(n>mostN){ mostN=n; mostBrewed=teaById(id); } });
+  const topSession = inRange.filter(s=>Number(s.rating)>0).sort((a,b)=>b.rating-a.rating)[0]||null;
+  const typeCounts={}; inRange.forEach(s=>{ const t=s.teaType||(teaById(s.teaId)||{}).type; if(t) typeCounts[t]=(typeCounts[t]||0)+1; });
+  const days = new Set(inRange.map(s=>new Date(s.date).toISOString().slice(0,10)));
+  const newTeas = state.teas.filter(t=>{ const d=new Date(t.dateAdded||0); return d>=start && d<=end; }).length;
+  return { start, end, sessions:inRange.length, infusions, grams, liters, uniqueTeas:new Set(inRange.map(s=>s.teaId).filter(Boolean)).size, mostBrewed, mostN, topSession, typeCounts, daysActive:days.size, newTeas };
+}
+function recapHTML(){
+  const period = state.recapPeriod || 'week';
+  const r = computeRecap(period);
+  const label = period==='month'
+    ? r.start.toLocaleDateString(undefined,{month:'long',year:'numeric'})
+    : `${r.start.toLocaleDateString(undefined,{month:'short',day:'numeric'})} – today`;
+  const toggle = `<div class="recap-toggle">
+    <button class="${period==='week'?'active':''}" onclick="setRecapPeriod('week')">This week</button>
+    <button class="${period==='month'?'active':''}" onclick="setRecapPeriod('month')">This month</button>
+  </div>`;
+  if(r.sessions===0){
+    return `<div class="section card recap-card">
+      <div class="section-title"><h2>Recap</h2>${toggle}</div>
+      <div class="recap-range">${label}</div>
+      <div class="empty" style="padding:10px 0 2px;">No sessions logged ${period==='week'?'this week':'this month'} yet — the pot's waiting.</div>
+    </div>`;
+  }
+  const typeChips = TYPES.filter(t=>r.typeCounts[t.k]).map(t=>`<span class="pill t-${t.k}">${typeLabel(t.k)} ${r.typeCounts[t.k]}</span>`).join(' ');
+  return `<div class="section card recap-card">
+    <div class="section-title"><h2>Recap</h2>${toggle}</div>
+    <div class="recap-range">${label}</div>
+    <div class="grid grid-3" style="margin-top:10px;">
+      <div class="stat"><div class="num">${r.sessions}</div><div class="lbl">Sessions</div></div>
+      <div class="stat"><div class="num">${r.infusions}</div><div class="lbl">Infusions</div></div>
+      <div class="stat"><div class="num">${r.daysActive}</div><div class="lbl">Days</div></div>
+      <div class="stat"><div class="num">${r.uniqueTeas}</div><div class="lbl">Teas</div></div>
+      <div class="stat"><div class="num">${r.liters.toFixed(1)}</div><div class="lbl">Liters</div></div>
+      <div class="stat"><div class="num">${r.grams.toFixed(0)}</div><div class="lbl">Grams</div></div>
+    </div>
+    ${r.mostBrewed?`<div class="recap-line"><span class="recap-k">Most brewed</span><span class="recap-v">${r.mostBrewed.name} · ${r.mostN}×</span></div>`:''}
+    ${r.topSession?`<div class="recap-line"><span class="recap-k">Top rated</span><span class="recap-v">${(r.topSession.teaName||(teaById(r.topSession.teaId)||{}).name||'—')} ${renderStarsStatic(r.topSession.rating,false)}</span></div>`:''}
+    ${r.newTeas?`<div class="recap-line"><span class="recap-k">New teas added</span><span class="recap-v">${r.newTeas}</span></div>`:''}
+    ${typeChips?`<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">${typeChips}</div>`:''}
+  </div>`;
+}
+function setRecapPeriod(p){ state.recapPeriod=p; render(); }
 function onboardingHTML(){
   const hasTea = state.teas.length>0;
   const hasVessel = state.vessels.length>0;
@@ -750,6 +822,8 @@ function viewDashboard(){
   return `
     <div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>
 
+    ${recapHTML()}
+
     ${recentHTML}
 
     <div class="section grid grid-3">
@@ -759,11 +833,6 @@ function viewDashboard(){
       <div class="stat"><div class="num">${s.totalGrams.toFixed(1)}</div><div class="lbl">Grams brewed</div></div>
       <div class="stat"><div class="num">${s.totalLiters.toFixed(1)}</div><div class="lbl">Liters (est.)</div></div>
       <div class="stat"><div class="num">${s.uniqueTeas}</div><div class="lbl">Teas brewed</div></div>
-    </div>
-
-    <div class="section card">
-      <div class="section-title"><h2>Drinking streak</h2><span class="mono" style="font-size:13px;color:var(--amber);font-weight:600;">${s.streak} day${s.streak===1?'':'s'} current</span></div>
-      ${heatmapHTML(s.days)}
     </div>
 
     ${brewingClockHTML(s)}
@@ -1296,6 +1365,7 @@ function viewSessions(){
     <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Sessions</h2>
       <span class="mono" style="font-size:12px;color:var(--ink-soft);">${state.sessions.length} total</span></div>
     ${cal}
+    ${streakCardHTML()}
     <div class="section-title" style="margin-top:20px;"><h2>${listTitle}</h2>
       ${state.calSelDay?`<button class="btn-ghost" onclick="selectCalDay('${state.calSelDay}')">show all</button>`:''}</div>
     <div>${rows || '<div class="card empty">No sessions on this day.</div>'}</div>
