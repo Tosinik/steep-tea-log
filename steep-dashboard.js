@@ -37,14 +37,13 @@ function computeStats(){
   const gramsBought = state.teas.reduce((a,t)=>a+(Number(t.costOriginalGrams)||0),0);
   const avgCostPerGram = gramsBought>0 ? totalSpent/gramsBought : 0;
 
-  // streak
+  // streak — local day keys, matching the heatmap. If today has no session yet,
+  // don't break the run; count from yesterday.
   const daySet = days;
   let streak = 0;
   let cur = new Date();
-  while(true){
-    const key = cur.toISOString().slice(0,10);
-    if(daySet.has(key)){ streak++; cur.setDate(cur.getDate()-1); } else break;
-  }
+  if(!daySet.has(dayKey(cur))) cur.setDate(cur.getDate()-1);
+  while(daySet.has(dayKey(cur))){ streak++; cur.setDate(cur.getDate()-1); }
 
   const coldBrewCount = sessions.filter(s=>s.isColdBrew).length;
   const nightSessionCount = sessions.filter(s=>{ const h=new Date(s.date).getHours(); return h>=22||h<5; }).length;
@@ -215,18 +214,19 @@ function confettiBurst(){
 
 
 function heatmapHTML(days){
-  // 13 weeks x 7 days
+  // 13 weeks x 7 days, Monday-aligned (matches the recap + local convention)
   const weeks = 13;
   const today = new Date(); today.setHours(0,0,0,0);
   const start = new Date(today); start.setDate(start.getDate()-(weeks*7-1));
-  // align start to Sunday
-  start.setDate(start.getDate()-start.getDay());
+  start.setDate(start.getDate()-((start.getDay()+6)%7)); // back to Monday
+  const dayLabels = ['Mon','','Wed','','Fri','','']; // rows Mon…Sun
+  const labelCol = '<div class="heat-week heat-labels">'+dayLabels.map(l=>`<div class="heat-label">${l}</div>`).join('')+'</div>';
   let cols = '';
   for(let w=0; w<weeks; w++){
     let col = '<div class="heat-week">';
     for(let d=0; d<7; d++){
       const cellDate = new Date(start); cellDate.setDate(start.getDate()+w*7+d);
-      const key = cellDate.toISOString().slice(0,10);
+      const key = dayKey(cellDate);
       const has = days.has(key);
       const future = cellDate>today;
       const isToday = cellDate.getTime()===today.getTime();
@@ -236,7 +236,8 @@ function heatmapHTML(days){
     cols += col;
   }
   return `<div class="heatmap-wrap">
-    <div class="heatmap">${cols}</div>
+    <div class="heatmap">${labelCol}${cols}</div>
+    <div class="heat-caption">Each square is a day · past 13 weeks · columns are weeks</div>
     <div class="heat-legend">
       <span><i class="heat-swatch" style="background:var(--heat-empty)"></i>no tea</span>
       <span><i class="heat-swatch" style="background:var(--heat-fill)"></i>logged</span>
@@ -276,7 +277,7 @@ function computeRecap(period){
   Object.entries(counts).forEach(([id,n])=>{ if(n>mostN){ mostN=n; mostBrewed=teaById(id); } });
   const topSession = inRange.filter(s=>Number(s.rating)>0).sort((a,b)=>b.rating-a.rating)[0]||null;
   const typeCounts={}; inRange.forEach(s=>{ const t=s.teaType||(teaById(s.teaId)||{}).type; if(t) typeCounts[t]=(typeCounts[t]||0)+1; });
-  const days = new Set(inRange.map(s=>new Date(s.date).toISOString().slice(0,10)));
+  const days = new Set(inRange.map(s=>dayKey(s.date)));
   const newTeas = state.teas.filter(t=>{ const d=new Date(t.dateAdded||0); return d>=start && d<=end; }).length;
   return { start, end, sessions:inRange.length, infusions, grams, liters, uniqueTeas:new Set(inRange.map(s=>s.teaId).filter(Boolean)).size, mostBrewed, mostN, topSession, typeCounts, daysActive:days.size, newTeas };
 }

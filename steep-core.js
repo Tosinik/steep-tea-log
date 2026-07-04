@@ -70,6 +70,7 @@ let state = {
   calMonth: null, calSelDay: null,
   teaSort: 'newest', teaFilter: { type:'', vendor:'', lowStock:false },
   recapPeriod: 'week',
+  passportSel: null,
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },
   loaded:false
 };
@@ -170,7 +171,7 @@ function toLocalDatetimeValue(date){
   const pad = n=>String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-function dayKey(iso){ return new Date(iso).toISOString().slice(0,10); }
+function dayKey(iso){ const d=new Date(iso); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
 function renderStarsStatic(value, big){
   let out = '<span class="stars'+(big?' starL':'')+'">';
@@ -279,6 +280,7 @@ function render(){
   else if(state.view==='sessions') body = viewSessions();
   else if(state.view==='friends') body = viewFriends();
   else if(state.view==='achievements') body = viewAchievements();
+  else if(state.view==='passport') body = viewPassport();
   else if(state.view==='session') body = viewSessionFlow();
 
   const inSession = state.view==='session';
@@ -287,6 +289,7 @@ function render(){
       <div class="topbar-brandrow">
         <div class="brand">${steepLogoSVG(30)}<h1>Steep</h1></div>
         <div class="topbar-actions">
+          <button class="icon-btn ${state.view==='passport'?'active':''}" onclick="goView('passport')" title="Tea passport" aria-label="Tea passport">🌍</button>
           ${state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">🏆</button>` : ''}
           <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">⚙</button>
           <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"></button>

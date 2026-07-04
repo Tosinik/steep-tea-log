@@ -15,6 +15,7 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
    achievements page, `viewDashboard`.
 4. `steep-teas.js` — tea cards, vendor list, sort/filter, `viewTeas`, tea form, tea detail.
 5. `steep-social.js` — friends/feed/profile/follow.
+6b. `steep-passport.js` — world dot-map, origin→country matching, tea click-through.
 6. `steep-sessions.js` — sessions calendar, vessels, session-edit modal, session flow
    (setup/steeping/finish/quick), timer, tags, `commitSession`.
 7. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
@@ -22,6 +23,19 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+
+## v3.6 — streak date fix, world-map Tea Passport
+Deploy: `index.html`, `service-worker.js` (v17), `styles.css`, `steep-core.js`,
+`steep-dashboard.js`, and new `steep-passport.js`.
+
+- **Streak fix.** All day-bucketing now uses local calendar dates instead of UTC, so
+  late-evening sessions no longer land on the wrong day. Streak also no longer resets to
+  0 just because today isn't logged yet (counts from yesterday). Heatmap is Monday-aligned
+  with weekday labels + a caption.
+- **Tea Passport** (`steep-passport.js`) — world dot-map reached from the 🌍 header button.
+  Dots sized by teas owned per country; country-level matching from the `origin` field
+  (country names + common regions/cultivars as keywords). Tap a pin/region → teas → tap a
+  tea to open it. Unmapped-origin teas listed underneath. Sub-regions/cultivars later.
 
 ## v3.5 — modularization, header, logo, critical cache fix
 Deploy: `index.html`, `service-worker.js` (v16), `styles.css`, and all `steep-*.js`

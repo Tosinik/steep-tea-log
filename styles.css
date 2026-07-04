@@ -372,3 +372,26 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .recap-line:first-of-type{margin-top:12px;}
 .recap-k{color:var(--ink-soft);font-size:12px;}
 .recap-v{font-weight:600;display:flex;align-items:center;gap:6px;}
+
+/* v3 — heatmap weekday labels + caption */
+.heat-labels{margin-right:2px;}
+.heat-label{height:14px;line-height:14px;font-size:10px;color:var(--ink-soft);text-align:right;padding-right:4px;font-family:var(--font-mono);}
+.heat-caption{font-size:11px;color:var(--ink-soft);margin-top:8px;}
+
+/* v3 — tea passport */
+.pp-map{padding:4px 0;}
+.pp-mark{fill:var(--clay);stroke:var(--white);stroke-width:1.4;cursor:pointer;}
+.pp-mark:hover{fill:var(--amber);}
+.pp-mark.sel{fill:var(--jade);stroke:var(--amber);stroke-width:2.2;}
+.pp-detail{margin-top:14px;min-height:64px;}
+.pp-detail-empty{color:var(--ink-soft);font-size:13px;line-height:1.5;}
+.pp-rname{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);}
+.pp-rsub{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+.pp-teachips{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+.pp-teachip{font-size:12px;background:var(--porcelain-dim);color:var(--jade-deep);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;}
+.pp-teachip:hover{border-color:var(--jade);}
+.pp-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+.pp-chip{font-size:11.5px;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;}
+.pp-chip .n{color:var(--clay);font-weight:600;}
+.pp-chip.sel{border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);}
+.pp-unmapped{font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;}
