@@ -37,7 +37,7 @@ const TYPES = [
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
 ];
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, monoFont:'pixel' };
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, monoFont:'pixel' };
 
 let state = {
   teas: [], vessels: [], sessions: [], tagLibrary: [...DEFAULT_TAGS],
@@ -50,6 +50,7 @@ let state = {
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
   calMonth: null, calSelDay: null,
+  teaSort: 'newest', teaFilter: { type:'', vendor:'', lowStock:false },
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },
   loaded:false
 };
@@ -70,6 +71,41 @@ async function init(){
   render();
   if(state.view==='friends') loadSocial();
   syncAchievements(false); // reconcile seen list on load, no celebration
+  installResumeSync();
+}
+
+// Re-pull data from Supabase when the app regains focus, so the installed PWA
+// syncs changes made elsewhere without a manual reload. Guarded so it never
+// clobbers unsaved input (open form/modal or an in-progress session), and
+// throttled so the double visibilitychange/focus events don't double-fetch.
+let _resumeSyncInstalled = false;
+let _lastResumeSync = Date.now();
+function installResumeSync(){
+  if(_resumeSyncInstalled) return;
+  _resumeSyncInstalled = true;
+  const onResume = ()=>{
+    if(document.visibilityState !== 'visible') return;
+    if(Date.now() - _lastResumeSync < 8000) return; // throttle
+    _lastResumeSync = Date.now();
+    refreshData();
+  };
+  document.addEventListener('visibilitychange', onResume);
+  window.addEventListener('focus', onResume);
+}
+async function refreshData(){
+  if(!state.loaded) return;
+  // never refetch over unsaved work
+  if(state.sessionDraft || state.teaFormOpen || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen) return;
+  try{
+    const [teas, vessels, sessions, tagLibrary] = await Promise.all([
+      loadKey('teas', state.teas), loadKey('vessels', state.vessels),
+      loadKey('sessions', state.sessions), loadKey('tagLibrary', state.tagLibrary)
+    ]);
+    state.teas = teas; state.vessels = vessels; state.sessions = sessions; state.tagLibrary = tagLibrary;
+    render();
+    if(state.view==='friends') loadSocial();
+    syncAchievements(false);
+  }catch(e){ /* offline or transient — keep what we have */ }
 }
 
 /* ---------- settings ---------- */
@@ -339,6 +375,10 @@ function settingsModal(){
         ${toggle('soundEnabled')}
       </div>
       <div class="set-row">
+        <div><div class="set-label">Quiet mode</div><div class="set-sub">Calm-first: hides achievements and skips unlock confetti. Tea, not a scoreboard.</div></div>
+        ${toggle('quietMode')}
+      </div>
+      <div class="set-row">
         <div><div class="set-label">Show achievements</div><div class="set-sub">Display the badge grid on the dashboard</div></div>
         ${toggle('showAchievements')}
       </div>
@@ -536,7 +576,7 @@ function syncAchievements(animate){
   if(fresh.length){
     state.settings.seenAchievements = Array.from(new Set([...seen, ...keys])); // accumulate, so drops don't re-fire
     persistSettings();
-    if(animate) celebrateAchievements(fresh);
+    if(animate && !state.settings.quietMode) celebrateAchievements(fresh);
   }
 }
 function celebrateAchievements(list){
@@ -625,10 +665,25 @@ function viewDashboard(){
     <div class="rank-row"><span class="rname">${t.name}</span><span class="rval" style="color:var(--red)">${Number(t.amountGrams).toFixed(1)}g left</span></div>
   `).join('') : '<div class="empty">All stocked up.</div>';
 
+  const recent = [...state.sessions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
+  const recentHTML = recent.length ? `
+    <div class="section card">
+      <div class="section-title"><h2>Recent sessions</h2></div>
+      ${recent.map(se=>{
+        const tea = teaById(se.teaId);
+        return `<div class="rank-row" onclick="openSessionEdit('${se.id}')" style="cursor:pointer;">
+          <span class="rname">${se.teaName || (tea?tea.name:'—')}${se.rating?' '+renderStarsStatic(se.rating,false):''}</span>
+          <span class="rval" style="color:var(--ink-soft);font-size:12px;">${brewCountLabel(se)} · ${new Date(se.date).toLocaleDateString()}</span>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
   return `
     <div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>
 
-    ${state.settings.showAchievements ? achievementsHTML(s) : ''}
+    ${recentHTML}
+
+    ${(!state.settings.quietMode && state.settings.showAchievements) ? achievementsHTML(s) : ''}
 
     <div class="section grid grid-3">
       <div class="stat"><div class="num">${s.totalSessions}</div><div class="lbl">Sessions</div></div>
@@ -696,13 +751,62 @@ function teaCardHTML(t){
   </div>`;
 }
 
+function distinctVendors(){
+  return [...new Set(state.teas.map(t=>(t.source||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function filteredSortedTeas(){
+  const F = state.teaFilter;
+  const list = state.teas.filter(t=>{
+    if(F.type && t.type!==F.type) return false;
+    if(F.vendor && (t.source||'').trim()!==F.vendor) return false;
+    if(F.lowStock && !(Number(t.amountGrams)<10)) return false;
+    return true;
+  });
+  const time = t => new Date(t.dateAdded||0).getTime();
+  const s = state.teaSort;
+  if(s==='newest') list.sort((a,b)=>time(b)-time(a));
+  else if(s==='oldest') list.sort((a,b)=>time(a)-time(b));
+  else if(s==='name') list.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  else if(s==='stock-high') list.sort((a,b)=>(Number(b.amountGrams)||0)-(Number(a.amountGrams)||0));
+  else if(s==='stock-low') list.sort((a,b)=>(Number(a.amountGrams)||0)-(Number(b.amountGrams)||0));
+  else if(s==='rating') list.sort((a,b)=>(Number(b.rating)||0)-(Number(a.rating)||0));
+  return list;
+}
 function viewTeas(){
-  const cards = state.teas.length ? `<div class="grid grid-3">${state.teas.map(teaCardHTML).join('')}</div>` : '<div class="card empty">No teas yet — add your first one.</div>';
+  const F = state.teaFilter;
+  const vendors = distinctVendors();
+  const list = filteredSortedTeas();
+  const cards = list.length
+    ? `<div class="grid grid-3">${list.map(teaCardHTML).join('')}</div>`
+    : `<div class="card empty">${state.teas.length ? 'No teas match these filters.' : 'No teas yet — add your first one.'}</div>`;
+  const esc = v => v.replace(/"/g,'&quot;');
+  const typeOpts = `<option value="">All types</option>` + TYPES.map(ty=>`<option value="${ty.k}" ${F.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
+  const vendorOpts = `<option value="">All vendors</option>` + vendors.map(v=>`<option value="${esc(v)}" ${F.vendor===v?'selected':''}>${v}</option>`).join('');
+  const controls = state.teas.length ? `
+    <div class="lib-controls">
+      <select class="lib-select" onchange="setTeaSort(this.value)" aria-label="Sort teas">
+        <option value="newest" ${state.teaSort==='newest'?'selected':''}>Newest</option>
+        <option value="oldest" ${state.teaSort==='oldest'?'selected':''}>Oldest</option>
+        <option value="name" ${state.teaSort==='name'?'selected':''}>Name A–Z</option>
+        <option value="stock-high" ${state.teaSort==='stock-high'?'selected':''}>Most stock</option>
+        <option value="stock-low" ${state.teaSort==='stock-low'?'selected':''}>Least stock</option>
+        <option value="rating" ${state.teaSort==='rating'?'selected':''}>Highest rated</option>
+      </select>
+      <select class="lib-select" onchange="setTeaFilter('type', this.value)" aria-label="Filter by type">${typeOpts}</select>
+      ${vendors.length ? `<select class="lib-select" onchange="setTeaFilter('vendor', this.value)" aria-label="Filter by vendor">${vendorOpts}</select>` : ''}
+      <button class="lib-chip ${F.lowStock?'active':''}" onclick="toggleLowStockFilter()">Low stock</button>
+      ${(F.type||F.vendor||F.lowStock) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
+    </div>` : '';
   return `
     <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2><button class="btn btn-primary" onclick="openTeaForm()">＋ Add tea</button></div>
+    ${controls}
     ${cards}
   `;
 }
+function setTeaSort(v){ state.teaSort=v; render(); }
+function setTeaFilter(key, val){ state.teaFilter[key]=val; render(); }
+function toggleLowStockFilter(){ state.teaFilter.lowStock=!state.teaFilter.lowStock; render(); }
+function clearTeaFilters(){ state.teaFilter={type:'',vendor:'',lowStock:false}; render(); }
 
 function openTeaForm(existing){
   state.editingTea = existing || null;
@@ -741,7 +845,7 @@ function teaFormModal(){
           </select></div>
           <div class="field"><label>Origin</label><input type="text" name="origin" value="${t.origin||''}" placeholder="Fujian, China"></div>
           <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${t.cultivar||''}" placeholder="Qi Dan"></div>
-          <div class="field span2"><label>Shop / website</label><input type="text" name="source" value="${t.source||''}" placeholder="URL or shop name"></div>
+          <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${t.source||''}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${v.replace(/"/g,'&quot;')}"></option>`).join('')}</datalist></div>
           <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
           <div class="field"><label>Grams bought (for that price)</label><input type="number" step="0.1" name="costOriginalGrams" value="${t.costOriginalGrams??''}" placeholder="50"></div>
           <div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${t.brewGuide||''}</textarea></div>
@@ -817,7 +921,7 @@ function viewTeaDetail(){
   const histHTML = mySessions.length ? mySessions.map(s=>{
     const v = vesselById(s.vesselId);
     return `<div class="session-hist-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span><strong>${fmtDateTime(s.date)}</strong> · ${v?v.name:'—'} · ${brewCountLabel(s)} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span>
+      <span style="display:flex;align-items:center;gap:8px;">${s.photoUrl?`<img src="${s.photoUrl}" alt="" class="session-thumb" loading="lazy">`:''}<span><strong>${fmtDateTime(s.date)}</strong> · ${v?v.name:'—'} · ${brewCountLabel(s)} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span></span>
       <button class="btn-ghost" onclick="openSessionEdit('${s.id}')">edit</button>
     </div>`;
   }).join('') : '<div class="empty">No sessions logged for this tea yet.</div>';
@@ -992,6 +1096,7 @@ function feedRowHTML(s, prof){
       <div style="font-size:11px;color:var(--ink-soft);">@${prof?prof.username:'?'} · ${fmtDateTime(s.date)}</div></div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">${typePill}<strong>${s.teaName||'a tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
+    ${s.photoUrl?`<img src="${s.photoUrl}" alt="session photo" class="session-photo" loading="lazy">`:''}
     ${meta?`<div style="font-size:12px;color:var(--ink-soft);margin-top:4px;">${meta}</div>`:''}
     ${s.description?`<div style="font-size:13px;margin-top:6px;white-space:pre-wrap;">${s.description}</div>`:''}
     ${steepChips}
@@ -1337,13 +1442,14 @@ function startSessionFor(teaId){
     isShared: false,
     timer: {mode:'timer', target:15, elapsed:0, running:false, intervalId:null}
   };
+  state._draftImage = null;
   state.view='session';
   render();
 }
 function cancelSession(){
   if(!confirm('Discard this session log?')) return;
   clearTimerInterval();
-  state.sessionDraft=null; state.view='teas'; render();
+  state.sessionDraft=null; state._draftImage=null; state.view='teas'; render();
 }
 function clearTimerInterval(){
   const tm = state.sessionDraft?.timer;
@@ -1384,6 +1490,13 @@ function sessionQuickHTML(d){
           <button type="button" aria-label="one fewer infusion" onclick="adjustInfusions(-1)">−</button>
           <span id="infusionCountVal">${d.infusionCount||1}</span>
           <button type="button" aria-label="one more infusion" onclick="adjustInfusions(1)">＋</button>
+        </div>
+      </div>
+      <div class="field span2" style="margin:14px 0;">
+        <label>Photo (optional)</label>
+        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+          ${state._draftImage?'':'Tap to add a photo of this cup'}
+          <input type="file" accept="image/*" class="js-img-input">
         </div>
       </div>
       <div class="field" style="margin-bottom:14px;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
@@ -1650,6 +1763,13 @@ function sessionFinishHTML(d){
     <div class="card">
       <h2 style="margin-top:0;">Wrap up: ${tea?tea.name:''}</h2>
       <div class="eyebrow">${d.steeps.length} steep${d.steeps.length===1?'':'s'} logged</div>
+      <div class="field span2" style="margin:14px 0;">
+        <label>Photo (optional)</label>
+        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+          ${state._draftImage?'':'Tap to add a photo of this cup'}
+          <input type="file" accept="image/*" class="js-img-input">
+        </div>
+      </div>
       <div class="field" style="margin:14px 0;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
       <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
       <div class="field">
@@ -1670,10 +1790,11 @@ function setSessionRating(v){
   state.sessionDraft.sessionRating=v;
   document.getElementById('sessRatingWrap').innerHTML = renderStarsInteractive(v,true,'setSessionRating');
 }
-function commitSession(){
+async function commitSession(){
   const d = state.sessionDraft;
   const descEl = document.getElementById('sessDesc');
   if(descEl) d.sessionDesc = descEl.value.trim();
+  const photoUrl = await resolveDraftImage();
   const tea = teaById(d.teaId);
   const ves = vesselById(d.vesselId);
   const session = {
@@ -1682,7 +1803,7 @@ function commitSession(){
     isColdBrew: d.isColdBrew, waterType: d.waterType, waterTDS: d.waterTDS?Number(d.waterTDS):null,
     gramsUsed: d.gramsUsed?Number(d.gramsUsed):0,
     steeps: d.steeps, rating: d.sessionRating, description: d.sessionDesc, tags: d.sessionTags,
-    isShared: !!d.isShared,
+    isShared: !!d.isShared, photoUrl: photoUrl || null,
     infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
     teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
   };
@@ -1693,6 +1814,7 @@ function commitSession(){
   }
   persistSession(session);
   state.sessionDraft=null;
+  state._draftImage=null;
   state.activeTeaId = d.teaId;
   state.view='tea-detail';
   syncAchievements(true);
