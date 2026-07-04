@@ -406,10 +406,28 @@ function viewDashboard(){
       }).join('')}
     </div>` : '';
 
+  const nearLow = lowStockG()*2;
+  const restock = state.teas
+    .filter(t=>(t.isFavorite||t.wouldRebuy) && Number(t.amountGrams)>0 && Number(t.amountGrams)<nearLow)
+    .sort((a,b)=>Number(a.amountGrams)-Number(b.amountGrams));
+  const restockHTML = restock.length ? `
+    <div class="section card">
+      <div class="section-title"><h2>Running low</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">favourites & rebuys</span></div>
+      ${restock.map(t=>{
+        const g=Number(t.amountGrams); const low=g<lowStockG();
+        return `<div class="rank-row" onclick="openTeaDetail('${t.id}')" style="cursor:pointer;">
+          <span class="rname">${t.isFavorite?'♥ ':''}${t.name}</span>
+          <span class="rval" style="color:${low?'var(--red)':'var(--amber)'};font-weight:600;">${g.toFixed(1)}g · ${low?'low':'getting low'}</span>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
   return `
     <div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>
 
     ${recapHTML()}
+
+    ${restockHTML}
 
     ${recentHTML}
 

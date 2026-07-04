@@ -95,7 +95,10 @@ function teaFormModal(){
           </div>
           <div class="field"><label>Name</label><input type="text" name="name" required value="${t.name||''}"></div>
           <div class="field"><label>Tea type</label><select name="type">${typeOpts}</select></div>
-          <div class="field"><label>Amount on hand (g)</label><input type="number" step="0.1" name="amountGrams" value="${t.amountGrams??''}"></div>
+          <div class="field"><label>Amount on hand (g)</label><input type="number" step="0.1" name="amountGrams" value="${t.amountGrams??''}">
+            <label class="checkrow" style="margin-top:6px;font-size:12px;"><input type="checkbox" name="inclPackaging" onchange="var r=document.getElementById('tareRow'); if(r) r.style.display=this.checked?'flex':'none';"> Weighed with packaging</label>
+            <div id="tareRow" style="display:none;align-items:center;gap:8px;margin-top:6px;"><span style="font-size:12px;color:var(--ink-soft);">subtract</span><input type="number" step="0.1" name="packagingTare" value="${state.settings.defaultPackagingTareG??10}" style="width:64px;"><span style="font-size:12px;color:var(--ink-soft);">g packaging</span></div>
+          </div>
           <div class="field"><label>Your rating</label><div id="teaRatingWrap">${renderStarsInteractive(Number(t.rating)||0,true,'setTeaFormRating')}</div><input type="hidden" name="rating" id="teaRatingInput" value="${t.rating||0}"></div>
           <div class="field"><label>Harvest year</label><input type="text" name="harvestYear" value="${t.harvestYear||''}" placeholder="2025"></div>
           <div class="field"><label>Harvest season</label><select name="harvestSeason">
@@ -138,7 +141,7 @@ async function submitTeaForm(e){
     id: state.editingTea?.id || uid(),
     name: f.name.value.trim(),
     type: f.type.value,
-    amountGrams: f.amountGrams.value?Number(f.amountGrams.value):0,
+    amountGrams: (function(){ var g=f.amountGrams.value?Number(f.amountGrams.value):0; if(f.inclPackaging&&f.inclPackaging.checked){ g=Math.max(0, g-(Number(f.packagingTare&&f.packagingTare.value)||0)); } return g; })(),
     rating: Number(document.getElementById('teaRatingInput').value)||0,
     harvestYear: f.harvestYear.value.trim(),
     harvestSeason: f.harvestSeason.value,

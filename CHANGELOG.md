@@ -24,6 +24,20 @@ Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
 
+## v3.7 — passport polish, running-low reminder, weigh-with-packaging
+Deploy: `service-worker.js` (v18), `steep-passport.js`, `steep-core.js`,
+`steep-settings.js`, `steep-teas.js`, `steep-dashboard.js`.
+
+- **Passport cleanup.** Pins now render clay (were black — a CSS class wasn't applying),
+  chips/teachips have proper spacing (styling inlined so it no longer depends on fresh CSS),
+  map cropped of the empty far-south band. Matching now reads the tea NAME too (not just the
+  origin field), so "Yunnan Silver Bud", "... Dancong", "Sencha Kagoshima" auto-place. Added
+  aliases: dancong, guandong, ya bao, yashi xiang.
+- **Running low** section on Home — favourited/would-rebuy teas under 2× the low-stock
+  threshold, flagged "low" (red) / "getting low" (amber), tap to open.
+- **Weigh with packaging** — tea form has a "weighed with packaging" checkbox + tare field
+  (default from a new Settings value, 10g); net weight is stored so you needn't decant.
+
 ## v3.6 — streak date fix, world-map Tea Passport
 Deploy: `index.html`, `service-worker.js` (v17), `styles.css`, `steep-core.js`,
 `steep-dashboard.js`, and new `steep-passport.js`.

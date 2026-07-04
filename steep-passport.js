@@ -35,7 +35,7 @@ const PASSPORT_LAND = {
 
 // Tea countries with a map cell + matching keywords (country + common regions).
 const PASSPORT_GEO = [
-  { country:'China',       col:50, row:8,  aliases:['china','chinese','fujian','yunnan','anhui','zhejiang','guangdong','wuyi','anxi','yiwu','puer','pu-er',"pu'er",'puerh','sheng','shou','longjing','dragonwell','keemun','dian hong','dianhong','lapsang','tie guan yin','tieguanyin','rou gui','shui xian','dan cong','phoenix','chaozhou','bai mudan','silver needle','shou mei','gong mei','jasmine','gaoshan black','fo shou'] },
+  { country:'China',       col:50, row:8,  aliases:['china','chinese','fujian','yunnan','anhui','zhejiang','guangdong','guandong','wuyi','anxi','yiwu','puer','pu-er',"pu'er",'puerh','sheng','shou','longjing','dragonwell','keemun','dian hong','dianhong','lapsang','tie guan yin','tieguanyin','rou gui','shui xian','dan cong','dancong','yashi xiang','ya bao','phoenix','chaozhou','bai mudan','silver needle','shou mei','gong mei','jasmine','gaoshan black','fo shou'] },
   { country:'Japan',       col:53, row:7,  aliases:['japan','japanese','uji','kyoto','kagoshima','shizuoka','yame','nara','sencha','gyokuro','matcha','hojicha','houjicha','bancha','genmaicha','kabuse','kabusecha','saemidori','shincha','tamaryokucha'] },
   { country:'Taiwan',      col:51, row:9,  aliases:['taiwan','taiwanese','formosa','alishan','ali shan','nantou','lishan','li shan','dong ding','dongding','shan lin xi','oriental beauty','ruby 18','sun moon lake','high mountain','gaoshan oolong','dong pian'] },
   { country:'India',       col:45, row:8,  aliases:['india','indian','darjeeling','assam','nilgiri','sikkim','munnar','first flush','second flush'] },
@@ -55,9 +55,11 @@ const PASSPORT_GEO = [
 ];
 
 function passportCountryFor(tea){
-  const o = (tea.origin || '').toLowerCase().trim();
-  if(!o) return null;
-  for(const g of PASSPORT_GEO){ if(g.aliases.some(a=>o.includes(a))) return g.country; }
+  // Search the origin field AND the tea name — regions/cultivars in the name
+  // ("Yunnan Silver Bud", "... Dancong") are strong signals.
+  const hay = ((tea.origin||'') + ' ' + (tea.name||'')).toLowerCase();
+  if(!hay.trim()) return null;
+  for(const g of PASSPORT_GEO){ if(g.aliases.some(a=>hay.includes(a))) return g.country; }
   return null;
 }
 function passportGeo(country){ return PASSPORT_GEO.find(g=>g.country===country); }
@@ -72,36 +74,41 @@ function viewPassport(){
 
   // ---- dot map ----
   const cell=9, pad=6, W=60, H=24;
-  const vbW = pad*2+W*cell, vbH = pad*2+H*cell;
+  const vbW = pad*2+W*cell, vbH = pad*2+21*cell; // crop the near-empty far-south band
   const cx = c => pad+c*cell+cell/2, cy = r => pad+r*cell+cell/2;
   let svg = `<svg viewBox="0 0 ${vbW} ${vbH}" role="img" aria-label="World map of your tea regions" style="width:100%;height:auto;display:block;">`;
-  for(const r in PASSPORT_LAND){ PASSPORT_LAND[r].forEach(seg=>{ for(let c=seg[0];c<=seg[1];c++){ svg += `<circle cx="${cx(c)}" cy="${cy(+r)}" r="2.2" fill="var(--heat-empty)"/>`; } }); }
+  for(const r in PASSPORT_LAND){ if(+r>20) continue; PASSPORT_LAND[r].forEach(seg=>{ for(let c=seg[0];c<=seg[1];c++){ svg += `<circle cx="${cx(c)}" cy="${cy(+r)}" r="2.4" fill="var(--heat-empty)"/>`; } }); }
   owned.forEach(country=>{
     const g = passportGeo(country); if(!g) return;
     const n = byCountry[country].length;
     const rad = (4 + n*0.7).toFixed(1);
     const sel = state.passportSel===country;
-    svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${rad}" class="pp-mark${sel?' sel':''}" onclick="passportSelect('${country.replace(/'/g,"\\'")}')"><title>${country} · ${n} tea${n===1?'':'s'}</title></circle>`;
+    const fill = sel ? 'var(--jade)' : 'var(--clay)';
+    const stroke = sel ? 'var(--amber)' : 'var(--white)';
+    const sw = sel ? 2.2 : 1.4;
+    svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSelect('${country.replace(/'/g,"\\'")}')"><title>${country} · ${n} tea${n===1?'':'s'}</title></circle>`;
   });
   svg += `</svg>`;
 
   // ---- detail panel ----
+  const chipCss = 'display:inline-block;background:var(--porcelain-dim);border:1px solid var(--line);border-radius:6px;padding:6px 11px;margin:0 6px 6px 0;cursor:pointer;font-size:12px;color:var(--jade-deep);';
   let panel;
   if(state.passportSel && byCountry[state.passportSel]){
     const list = byCountry[state.passportSel];
-    panel = `<div class="pp-rname">${state.passportSel}</div>
-      <div class="pp-rsub">${list.length} tea${list.length===1?'':'s'}</div>
-      <div class="pp-teachips">${list.map(t=>`<span class="pp-teachip" onclick="openTeaDetail('${t.id}')">${t.name}</span>`).join('')}</div>`;
+    panel = `<div style="font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);">${state.passportSel}</div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'} · tap to open</div>
+      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${t.id}')">${t.name}</span>`).join('')}</div>`;
   } else {
-    panel = `<div class="pp-detail-empty">Tap a pin — or a region below — to see the teas you've brewed from there. Tap a tea to open it.</div>`;
+    panel = `<div style="color:var(--ink-soft);font-size:13px;line-height:1.5;">Tap a pin — or a region below — to see the teas you've brewed from there. Tap a tea to open it.</div>`;
   }
 
   // ---- region chips (sorted by count) ----
+  const rchipCss = 'display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0 7px 7px 0;cursor:pointer;';
   const chips = owned.sort((a,b)=>byCountry[b].length-byCountry[a].length)
-    .map(c=>`<span class="pp-chip ${state.passportSel===c?'sel':''}" onclick="passportSelect('${c.replace(/'/g,"\\'")}')">${c} <span class="n">${byCountry[c].length}</span></span>`).join('');
+    .map(c=>`<span style="${rchipCss}${state.passportSel===c?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSelect('${c.replace(/'/g,"\\'")}')">${c} <b style="color:var(--clay);">${byCountry[c].length}</b></span>`).join('');
 
   const unmappedNote = unmapped.length
-    ? `<div class="pp-unmapped">${unmapped.length} tea${unmapped.length===1?'':'s'} without a mapped origin${unmapped.length<=6?': '+unmapped.map(t=>t.name).join(', '):''}. Add a country to the origin field to place ${unmapped.length===1?'it':'them'}.</div>`
+    ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;">${unmapped.length} tea${unmapped.length===1?'':'s'} not yet placed${unmapped.length<=6?': '+unmapped.map(t=>t.name).join(', '):''}. Add a country to the origin field to map ${unmapped.length===1?'it':'them'}.</div>`
     : '';
 
   return `
@@ -112,9 +119,9 @@ function viewPassport(){
     </div>
     ${owned.length===0 && unmapped.length===0
       ? `<div class="card empty">Add teas with an origin (e.g. "Fujian, China") and they'll appear on the map.</div>`
-      : `<div class="card"><div class="pp-map">${svg}</div></div>
-    <div class="card pp-detail">${panel}</div>
-    ${chips?`<div class="pp-chips">${chips}</div>`:''}
+      : `<div class="card" style="padding:12px;">${svg}</div>
+    <div class="card" style="margin-top:14px;min-height:60px;">${panel}</div>
+    ${chips?`<div style="display:flex;flex-wrap:wrap;margin-top:14px;">${chips}</div>`:''}
     ${unmappedNote}`}
   `;
 }

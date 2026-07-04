@@ -94,6 +94,10 @@ function settingsModal(){
         <input type="number" min="1" max="500" value="${lowStockG()}" style="width:70px;text-align:right;" onchange="setSetting('lowStockThreshold', Math.max(1,Number(this.value)||15))">
       </div>
       <div class="set-row">
+        <div><div class="set-label">Default packaging weight</div><div class="set-sub">Pre-filled tare when you weigh a tea with its packaging</div></div>
+        <input type="number" min="0" max="200" step="0.5" value="${state.settings.defaultPackagingTareG??10}" style="width:70px;text-align:right;" onchange="setSetting('defaultPackagingTareG', Math.max(0,Number(this.value)||10))">
+      </div>
+      <div class="set-row">
         <div><div class="set-label">Quiet mode</div><div class="set-sub">Calm-first: hides achievements and skips unlock confetti. Tea, not a scoreboard.</div></div>
         ${toggle('quietMode')}
       </div>
