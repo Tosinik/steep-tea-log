@@ -74,8 +74,8 @@
   const steepFromDb = r => ({ id: r.id, order: r.steep_order, tempC: r.temp_c != null ? Number(r.temp_c) : null, timeSeconds: r.time_seconds, description: r.description || '', tags: r.tags || [] });
   const steepToDb = (st, sessionId) => ({ id: st.id, session_id: sessionId, user_id: userId(), steep_order: st.order, temp_c: (st.tempC === '' || st.tempC == null) ? null : st.tempC, time_seconds: st.timeSeconds || 0, description: st.description || null, tags: st.tags || [] });
 
-  const sessionFromDb = r => ({ id: r.id, userId: r.user_id, teaId: r.tea_id, vesselId: r.vessel_id, date: r.session_date, isColdBrew: !!r.is_cold_brew, waterType: r.water_type || '', waterTDS: r.water_tds != null ? r.water_tds : null, gramsUsed: Number(r.grams_used) || 0, rating: Number(r.rating) || 0, description: r.description || '', tags: r.tags || [], isShared: !!r.is_shared, teaName: r.tea_name || '', teaType: r.tea_type || '', vesselName: r.vessel_name || '', steeps: [] });
-  const sessionToDb = s => ({ id: s.id, user_id: userId(), tea_id: s.teaId || null, vessel_id: s.vesselId || null, session_date: s.date || new Date().toISOString(), is_cold_brew: !!s.isColdBrew, water_type: s.waterType || null, water_tds: (s.waterTDS === '' || s.waterTDS == null) ? null : s.waterTDS, grams_used: s.gramsUsed || 0, rating: s.rating || 0, description: s.description || null, tags: s.tags || [], is_shared: !!s.isShared, tea_name: s.teaName || null, tea_type: s.teaType || null, vessel_name: s.vesselName || null });
+  const sessionFromDb = r => ({ id: r.id, userId: r.user_id, teaId: r.tea_id, vesselId: r.vessel_id, date: r.session_date, isColdBrew: !!r.is_cold_brew, waterType: r.water_type || '', waterTDS: r.water_tds != null ? r.water_tds : null, gramsUsed: Number(r.grams_used) || 0, rating: Number(r.rating) || 0, description: r.description || '', tags: r.tags || [], isShared: !!r.is_shared, teaName: r.tea_name || '', teaType: r.tea_type || '', vesselName: r.vessel_name || '', infusionCount: r.infusion_count != null ? Number(r.infusion_count) : null, steeps: [] });
+  const sessionToDb = s => ({ id: s.id, user_id: userId(), tea_id: s.teaId || null, vessel_id: s.vesselId || null, session_date: s.date || new Date().toISOString(), is_cold_brew: !!s.isColdBrew, water_type: s.waterType || null, water_tds: (s.waterTDS === '' || s.waterTDS == null) ? null : s.waterTDS, grams_used: s.gramsUsed || 0, rating: s.rating || 0, description: s.description || null, tags: s.tags || [], is_shared: !!s.isShared, tea_name: s.teaName || null, tea_type: s.teaType || null, vessel_name: s.vesselName || null, infusion_count: (s.infusionCount === '' || s.infusionCount == null) ? null : Number(s.infusionCount) });
 
   /* ---------- helper: delete this user's rows whose id isn't in keepIds ---------- */
   async function deleteMissing(table, keepIds) {
@@ -168,6 +168,106 @@
       writeCache(k, val); return;
     }
     throw new Error('Unknown storage key: ' + key);
+  }
+
+  /* ============================================================================
+     Per-row writes (v3) — the scalability fix.
+     ----------------------------------------------------------------------------
+     saveKey() above upserts a whole array + diff-deletes on every change (a
+     localStorage-era holdover). Every real mutation in the app touches exactly
+     one row, so these write just that row and keep the offline read-cache in
+     sync locally. saveKey/loadKey stay only for genuine bulk ops (import,
+     migration), where replace-all is the actual intent.
+  ============================================================================ */
+  function cacheUpsert(k, item) {
+    const arr = readCache(k, []);
+    const i = arr.findIndex(x => x && x.id === item.id);
+    if (i >= 0) arr[i] = item; else arr.push(item);
+    writeCache(k, arr);
+  }
+  function cacheRemove(k, id) {
+    writeCache(k, readCache(k, []).filter(x => x && x.id !== id));
+  }
+  function requireAuth() {
+    if (!currentUser) throw new Error('Sign in to save changes (offline / not authenticated).');
+  }
+
+  /* ---------- teas ---------- */
+  async function putTea(tea) {
+    requireAuth();
+    const { error } = await sb.from('teas').upsert(teaToDb(tea), { onConflict: 'id' });
+    if (error) throw error;
+    cacheUpsert('tealog_teas', tea);
+  }
+  async function removeTea(id) {
+    requireAuth();
+    const { error } = await sb.from('teas').delete().eq('id', id).eq('user_id', userId());
+    if (error) throw error;
+    cacheRemove('tealog_teas', id);
+  }
+  async function putTeas(teas) { // bulk upsert without diff-delete (e.g. photo migration)
+    requireAuth();
+    if (!teas.length) return;
+    const { error } = await sb.from('teas').upsert(teas.map(teaToDb), { onConflict: 'id' });
+    if (error) throw error;
+    teas.forEach(t => cacheUpsert('tealog_teas', t));
+  }
+
+  /* ---------- vessels ---------- */
+  async function putVessel(v) {
+    requireAuth();
+    const { error } = await sb.from('vessels').upsert(vesselToDb(v), { onConflict: 'id' });
+    if (error) throw error;
+    cacheUpsert('tealog_vessels', v);
+  }
+  async function removeVessel(id) {
+    requireAuth();
+    const { error } = await sb.from('vessels').delete().eq('id', id).eq('user_id', userId());
+    if (error) throw error;
+    cacheRemove('tealog_vessels', id);
+  }
+  async function putVessels(vessels) {
+    requireAuth();
+    if (!vessels.length) return;
+    const { error } = await sb.from('vessels').upsert(vessels.map(vesselToDb), { onConflict: 'id' });
+    if (error) throw error;
+    vessels.forEach(v => cacheUpsert('tealog_vessels', v));
+  }
+
+  /* ---------- sessions (+ their steeps) ---------- */
+  async function putSession(session) {
+    requireAuth();
+    const { error } = await sb.from('sessions').upsert(sessionToDb(session), { onConflict: 'id' });
+    if (error) throw error;
+    const steepRows = (session.steeps || []).map(st => steepToDb(st, session.id));
+    if (steepRows.length) {
+      const { error: e2 } = await sb.from('steeps').upsert(steepRows, { onConflict: 'id' });
+      if (e2) throw e2;
+    }
+    // Prune steeps removed from THIS session only — a per-session diff-delete, not a
+    // whole-table one. Cheap and correct (covers edited/quick sessions losing steeps).
+    let dq = sb.from('steeps').delete().eq('session_id', session.id).eq('user_id', userId());
+    const keep = steepRows.map(r => r.id);
+    if (keep.length) dq = dq.not('id', 'in', '(' + keep.map(id => `"${id}"`).join(',') + ')');
+    const { error: e3 } = await dq;
+    if (e3) console.warn('[Steep] steep prune failed on', session.id, ':', e3.message);
+    cacheUpsert('tealog_sessions', session);
+  }
+  async function removeSession(id) {
+    requireAuth();
+    // steeps cascade via FK (sessions on delete cascade)
+    const { error } = await sb.from('sessions').delete().eq('id', id).eq('user_id', userId());
+    if (error) throw error;
+    cacheRemove('tealog_sessions', id);
+  }
+
+  /* ---------- tags ---------- */
+  async function addTag(tag) {
+    requireAuth();
+    const { error } = await sb.from('tag_library').upsert({ user_id: userId(), tag }, { onConflict: 'user_id,tag' });
+    if (error) throw error;
+    const arr = readCache('tealog_tagLibrary', []);
+    if (!arr.includes(tag)) { arr.push(tag); writeCache('tealog_tagLibrary', arr); }
   }
 
   /* ============================ migration ============================ */
@@ -404,6 +504,7 @@
   /* ---------- public API ---------- */
   window.SteepDB = {
     loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signInWithGoogle, signOut, newId, migrateFromLocalStorage,
+    putTea, removeTea, putTeas, putVessel, removeVessel, putVessels, putSession, removeSession, addTag,
     getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFollowers, getFeed,
     getUser: () => currentUser
   };

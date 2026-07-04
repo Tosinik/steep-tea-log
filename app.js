@@ -81,10 +81,20 @@ function tempUnitLabel(){ return state.settings.tempUnit==='f' ? '°F' : '°C'; 
 function cToDisplay(c){ if(c==null||c==='') return ''; return state.settings.tempUnit==='f' ? Math.round(c*9/5+32) : c; }
 function displayToC(v){ if(v===''||v==null) return null; v=Number(v); if(isNaN(v)) return null; return state.settings.tempUnit==='f' ? Math.round((v-32)*5/9) : v; }
 
+// Bulk (blob) writes — used ONLY where a full replace is the actual intent (import).
 function persistTeas(){ saveKey('teas', state.teas).catch(saveErr); }
 function persistVessels(){ saveKey('vessels', state.vessels).catch(saveErr); }
 function persistSessions(){ saveKey('sessions', state.sessions).catch(saveErr); }
 function persistTags(){ saveKey('tagLibrary', state.tagLibrary).catch(saveErr); }
+
+// Per-row writes (v3) — the default for every normal mutation.
+function persistTea(t){ window.SteepDB.putTea(t).catch(saveErr); }
+function dropTea(id){ window.SteepDB.removeTea(id).catch(saveErr); }
+function persistVessel(v){ window.SteepDB.putVessel(v).catch(saveErr); }
+function dropVessel(id){ window.SteepDB.removeVessel(id).catch(saveErr); }
+function persistSession(s){ window.SteepDB.putSession(s).catch(saveErr); }
+function dropSession(id){ window.SteepDB.removeSession(id).catch(saveErr); }
+function persistTag(tag){ window.SteepDB.addTag(tag).catch(saveErr); }
 
 /* ---------- helpers ---------- */
 function fmtStars(v){ return v.toFixed(1).replace('.0',''); }
@@ -92,6 +102,12 @@ function typeLabel(k){ const t = TYPES.find(x=>x.k===k); return t?t.label:k; }
 function teaById(id){ return state.teas.find(t=>t.id===id); }
 function vesselById(id){ return state.vessels.find(v=>v.id===id); }
 function fmtSec(s){ s=Math.round(s); const m=Math.floor(s/60); const sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+// A session's infusion count: real steeps if it has them, else the quick-log count.
+function steepCountOf(s){ return (s.steeps && s.steeps.length) ? s.steeps.length : (Number(s.infusionCount)||0); }
+function brewCountLabel(s){
+  if(s.steeps && s.steeps.length){ const n=s.steeps.length; return `${n} steep${n===1?'':'s'}`; }
+  const n=Number(s.infusionCount)||0; return n?`${n} infusion${n===1?'':'s'}`:'';
+}
 function fmtDate(iso){ const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
 function fmtDateTime(iso){ const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}); }
 function toLocalDatetimeValue(date){
@@ -250,17 +266,19 @@ async function migratePhotosToStorage(){
   if(count===0){ alert('No inline photos to move — everything is already in cloud storage.'); return; }
   if(!confirm(`Move ${count} photo${count===1?'':'s'} to cloud storage? This shrinks each row and speeds up loading.`)) return;
   let ok=0, fail=0;
+  const changedTeas=[], changedVessels=[];
   for(const t of state.teas){
     if(t.image && t.image.startsWith('data:')){
-      try{ t.image = await window.SteepDB.uploadImage(t.image); ok++; }catch(e){ fail++; }
+      try{ t.image = await window.SteepDB.uploadImage(t.image); changedTeas.push(t); ok++; }catch(e){ fail++; }
     }
   }
   for(const v of state.vessels){
     if(v.image && v.image.startsWith('data:')){
-      try{ v.image = await window.SteepDB.uploadImage(v.image); ok++; }catch(e){ fail++; }
+      try{ v.image = await window.SteepDB.uploadImage(v.image); changedVessels.push(v); ok++; }catch(e){ fail++; }
     }
   }
-  persistTeas(); persistVessels(); render();
+  try{ await window.SteepDB.putTeas(changedTeas); await window.SteepDB.putVessels(changedVessels); }catch(e){ saveErr(e); }
+  render();
   alert(`Moved ${ok} photo${ok===1?'':'s'} to storage.${fail?` ${fail} failed — try again when online.`:''}`);
 }
 function exportData(){
@@ -337,12 +355,12 @@ function settingsModal(){
 function computeStats(){
   const sessions = state.sessions;
   const totalSessions = sessions.length;
-  const totalSteeps = sessions.reduce((a,s)=>a+(s.steeps?.length||0),0);
+  const totalSteeps = sessions.reduce((a,s)=>a+steepCountOf(s),0);
   const totalGrams = sessions.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0);
   const totalLiters = sessions.reduce((a,s)=>{
     const v = vesselById(s.vesselId);
     const cap = v ? Number(v.capacityMl)||0 : 0;
-    return a + (cap*(s.steeps?.length||0))/1000;
+    return a + (cap*steepCountOf(s))/1000;
   },0);
   const days = new Set(sessions.map(s=>dayKey(s.date)));
   const uniqueTeas = new Set(sessions.map(s=>s.teaId)).size;
@@ -777,7 +795,7 @@ async function submitTeaForm(e){
   } else {
     state.teas.push(data);
   }
-  persistTeas();
+  persistTea(data);
   state.teaFormOpen = false; state.editingTea = null; state._draftImage = null;
   syncAchievements(true);
   render();
@@ -785,7 +803,7 @@ async function submitTeaForm(e){
 function deleteTea(id){
   if(!confirm('Delete this tea? Session history stays but will show as an unknown tea.')) return;
   state.teas = state.teas.filter(t=>t.id!==id);
-  persistTeas();
+  dropTea(id);
   state.teaFormOpen=false; state.editingTea=null; state.view='teas'; state.activeTeaId=null;
   render();
 }
@@ -799,7 +817,7 @@ function viewTeaDetail(){
   const histHTML = mySessions.length ? mySessions.map(s=>{
     const v = vesselById(s.vesselId);
     return `<div class="session-hist-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span><strong>${fmtDateTime(s.date)}</strong> · ${v?v.name:'—'} · ${s.steeps.length} steep${s.steeps.length===1?'':'s'} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span>
+      <span><strong>${fmtDateTime(s.date)}</strong> · ${v?v.name:'—'} · ${brewCountLabel(s)} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span>
       <button class="btn-ghost" onclick="openSessionEdit('${s.id}')">edit</button>
     </div>`;
   }).join('') : '<div class="empty">No sessions logged for this tea yet.</div>';
@@ -969,7 +987,7 @@ function feedHTML(){
 function feedRowHTML(s, prof){
   const tags=(s.tags||[]).slice(0,5).map(t=>`<span class="tagchip">${t}</span>`).join(' ');
   const typePill = s.teaType?`<span class="pill t-${s.teaType}">${typeLabel(s.teaType)}</span>`:'';
-  const meta=[s.vesselName, s.steeps.length?`${s.steeps.length} steep${s.steeps.length===1?'':'s'}`:'', s.isColdBrew?'cold brew':''].filter(Boolean).join(' · ');
+  const meta=[s.vesselName, brewCountLabel(s), s.isColdBrew?'cold brew':''].filter(Boolean).join(' · ');
   const steepChips = s.steeps.length?`<div class="steep-tags" style="margin-top:8px;">${s.steeps.map((st,i)=>`<span class="tagchip">${i+1}: ${cToDisplay(st.tempC)!==''?cToDisplay(st.tempC)+tempUnitLabel()+' ':''}${fmtSec(st.timeSeconds)}</span>`).join(' ')}</div>`:'';
   return `<div class="card" style="margin-bottom:10px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
@@ -1052,7 +1070,7 @@ function sessionRowHTML(s){
     <div class="sess-thumb" style="${tea&&tea.image?`background-image:url(${tea.image})`:''}">${tea&&tea.image?'':'🍵'}</div>
     <div class="sess-main">
       <div class="sess-top"><strong>${tea?tea.name:'Unknown tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
-      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?v.name:'—'} · ${s.steeps.length} steep${s.steeps.length===1?'':'s'}${s.isColdBrew?' · cold brew':''}</div>
+      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?v.name:'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}</div>
       ${tags?`<div class="sess-tags">${tags}</div>`:''}
     </div>
     <span class="sess-chev">›</span>
@@ -1168,14 +1186,14 @@ async function submitVesselForm(e){
   } else {
     state.vessels.push(data);
   }
-  persistVessels();
+  persistVessel(data);
   syncAchievements(true);
   closeVesselForm();
 }
 function deleteVessel(id){
   if(!confirm('Remove this vessel?')) return;
   state.vessels = state.vessels.filter(v=>v.id!==id);
-  persistVessels(); render();
+  dropVessel(id); render();
 }
 
 /* ================= SESSION EDITING ================= */
@@ -1192,6 +1210,12 @@ function es_set(key, val){ state.editingSession[key]=val; }
 function es_setSteep(i, key, val){
   if(key==='tempC'){ state.editingSession.steeps[i].tempC = displayToC(val); return; }
   state.editingSession.steeps[i][key] = (key==='timeSeconds') ? (val===''?null:Number(val)) : val;
+}
+function es_adjustInfusions(delta){
+  const e = state.editingSession;
+  e.infusionCount = Math.max(1, (Number(e.infusionCount)||1) + delta);
+  const el = document.getElementById('editInfusionVal');
+  if(el) el.textContent = e.infusionCount;
 }
 function setEditSessionRating(v){
   state.editingSession.rating = v;
@@ -1212,7 +1236,7 @@ function saveSessionEdit(){
   const delta = newGrams - (Number(old.gramsUsed)||0);
   if(delta!==0){
     const tea = teaById(e.teaId);
-    if(tea){ tea.amountGrams = Math.max(0,(Number(tea.amountGrams)||0)-delta); persistTeas(); }
+    if(tea){ tea.amountGrams = Math.max(0,(Number(tea.amountGrams)||0)-delta); persistTea(tea); }
   }
   e.gramsUsed = newGrams;
   e.date = e._localDate ? new Date(e._localDate).toISOString() : e.date;
@@ -1220,7 +1244,7 @@ function saveSessionEdit(){
   const tea = teaById(e.teaId), ves = vesselById(e.vesselId);
   e.teaName = tea?tea.name:(e.teaName||''); e.teaType = tea?tea.type:(e.teaType||''); e.vesselName = ves?ves.name:(e.vesselName||'');
   state.sessions[idx] = e;
-  persistSessions();
+  persistSession(e);
   syncAchievements(true);
   closeSessionEdit();
 }
@@ -1228,9 +1252,9 @@ function deleteSession(){
   const e = state.editingSession;
   if(!confirm('Delete this session? Its grams will be added back to the tea stock.')) return;
   const tea = teaById(e.teaId);
-  if(tea && Number(e.gramsUsed)>0){ tea.amountGrams = (Number(tea.amountGrams)||0) + Number(e.gramsUsed); persistTeas(); }
+  if(tea && Number(e.gramsUsed)>0){ tea.amountGrams = (Number(tea.amountGrams)||0) + Number(e.gramsUsed); persistTea(tea); }
   state.sessions = state.sessions.filter(x=>x.id!==e.id);
-  persistSessions();
+  dropSession(e.id);
   closeSessionEdit();
 }
 function sessionEditModal(){
@@ -1261,8 +1285,13 @@ function sessionEditModal(){
           ${tagLibraryChipsHTML('edit')}
         </div>
       </div>
-      <div class="eyebrow" style="margin:16px 0 8px;">Steeps</div>
-      ${steepsHTML}
+      ${e.steeps.length ? `<div class="eyebrow" style="margin:16px 0 8px;">Steeps</div>${steepsHTML}` : `
+      <div class="eyebrow" style="margin:16px 0 8px;">Infusions</div>
+      <div class="infusion-stepper">
+        <button type="button" aria-label="one fewer infusion" onclick="es_adjustInfusions(-1)">−</button>
+        <span id="editInfusionVal">${Number(e.infusionCount)||1}</span>
+        <button type="button" aria-label="one more infusion" onclick="es_adjustInfusions(1)">＋</button>
+      </div>`}
       <div style="display:flex;justify-content:space-between;margin-top:16px;">
         <button class="btn btn-danger" onclick="deleteSession()">Delete session</button>
         <div style="display:flex;gap:8px;"><button class="btn" onclick="closeSessionEdit()">Cancel</button><button class="btn btn-primary" onclick="saveSessionEdit()">Save changes</button></div>
@@ -1287,7 +1316,8 @@ function startSessionFor(teaId){
     waterTDS: '',
     gramsUsed: '',
     steeps: [],
-    stage: 'setup', // setup -> steeping -> finish
+    infusionCount: 1,
+    stage: 'setup', // setup -> steeping -> finish  (or setup -> quick)
     curSteepTags: [],
     curSteepDesc: '',
     sessionTags: [],
@@ -1315,6 +1345,51 @@ function viewSessionFlow(){
   if(d.stage==='setup') return sessionSetupHTML(d);
   if(d.stage==='steeping') return sessionSteepingHTML(d);
   if(d.stage==='finish') return sessionFinishHTML(d);
+  if(d.stage==='quick') return sessionQuickHTML(d);
+}
+function beginQuickLog(){
+  const d = state.sessionDraft;
+  if(!d.infusionCount || d.infusionCount<1) d.infusionCount = 1;
+  d.steeps = []; // quick log carries no timed steeps
+  d.stage = 'quick';
+  render();
+}
+function adjustInfusions(delta){
+  const d = state.sessionDraft;
+  d.infusionCount = Math.max(1, (Number(d.infusionCount)||1) + delta);
+  const el = document.getElementById('infusionCountVal');
+  if(el) el.textContent = d.infusionCount;
+}
+function sessionQuickHTML(d){
+  const tea = teaById(d.teaId);
+  return `
+    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <div class="card">
+      <h2 style="margin-top:0;">Quick log: ${tea?tea.name:''}</h2>
+      <div class="eyebrow">No timed steeps — just how it went.</div>
+      <div class="field" style="margin:14px 0;">
+        <label>Infusions</label>
+        <div class="infusion-stepper">
+          <button type="button" aria-label="one fewer infusion" onclick="adjustInfusions(-1)">−</button>
+          <span id="infusionCountVal">${d.infusionCount||1}</span>
+          <button type="button" aria-label="one more infusion" onclick="adjustInfusions(1)">＋</button>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:14px;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
+      <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
+      <div class="field">
+        <label>Overall tags</label>
+        <div>${d.sessionTags.map(t=>`<span class="tagchip">${t} <button onclick="removeSessionTag('${t}')">✕</button></span>`).join(' ')}</div>
+        <div class="tag-input-wrap">
+          <input type="text" id="tagInputField" data-target="session" placeholder="Type your own, press Enter...">
+          <div id="tagSuggestBox"></div>
+        </div>
+        ${tagLibraryChipsHTML('session')}
+      </div>
+      <label class="checkrow" style="margin-top:16px;"><input type="checkbox" ${d.isShared?'checked':''} onchange="state.sessionDraft.isShared=this.checked"> Share this session with followers</label>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save session</button>
+    </div>
+  `;
 }
 
 function sessionSetupHTML(d){
@@ -1334,6 +1409,8 @@ function sessionSetupHTML(d){
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_set('isColdBrew', this.checked)"> Cold brew</label></div>
       </div>
       <button class="btn btn-primary" style="margin-top:16px;" onclick="beginSteeping()">Begin steeping →</button>
+      <button class="btn" style="margin-top:8px;width:100%;" onclick="beginQuickLog()">Quick log — just infusions & notes</button>
+      <div class="hint" style="margin-top:8px;">Quick log skips the per-steep timer — for when you'd rather drink than babysit a form.</div>
     </div>
   `;
 }
@@ -1509,7 +1586,7 @@ function tagLibraryChipsHTML(target){
   return `<div class="taglib">${available.map(t=>`<button type="button" class="taglib-chip" onclick="addTag('${t.replace(/'/g,"\\'")}','${target}')">＋ ${t}</button>`).join('')}</div>`;
 }
 function addTag(tag, target){
-  if(!state.tagLibrary.includes(tag)){ state.tagLibrary.push(tag); persistTags(); }
+  if(!state.tagLibrary.includes(tag)){ state.tagLibrary.push(tag); persistTag(tag); }
   const list = tagListFor(target);
   if(!list.includes(tag)) list.push(tag);
   render();
@@ -1597,14 +1674,15 @@ function commitSession(){
     gramsUsed: d.gramsUsed?Number(d.gramsUsed):0,
     steeps: d.steeps, rating: d.sessionRating, description: d.sessionDesc, tags: d.sessionTags,
     isShared: !!d.isShared,
+    infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
     teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
   };
   state.sessions.push(session);
   if(tea && session.gramsUsed){
     tea.amountGrams = Math.max(0, (Number(tea.amountGrams)||0) - session.gramsUsed);
-    persistTeas();
+    persistTea(tea);
   }
-  persistSessions();
+  persistSession(session);
   state.sessionDraft=null;
   state.activeTeaId = d.teaId;
   state.view='tea-detail';

@@ -314,3 +314,10 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .avatar{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;border-radius:50%;background:var(--jade-pale);background-size:cover;background-position:center;font-family:'Fraunces',serif;font-weight:600;color:var(--jade-deep);font-size:15px;overflow:hidden;}
 .user-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
 .user-row:last-child{border-bottom:none;}
+
+/* v3 — quick log */
+.hint{font-size:12px;color:var(--ink-soft);line-height:1.4;}
+.infusion-stepper{display:inline-flex;align-items:center;gap:18px;border:1px solid var(--line);border-radius:12px;padding:8px 14px;background:var(--white);}
+.infusion-stepper button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--white);color:var(--ink);font-size:19px;line-height:1;font-weight:600;display:flex;align-items:center;justify-content:center;}
+.infusion-stepper button:hover{border-color:var(--jade);color:var(--jade);}
+.infusion-stepper span{font-family:var(--font-mono);font-size:22px;min-width:1.5ch;text-align:center;color:var(--ink);}
