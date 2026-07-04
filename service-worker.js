@@ -1,4 +1,4 @@
-const CACHE_NAME = 'steep-tea-log-v10';
+const CACHE_NAME = 'steep-tea-log-v11';
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -14,7 +14,12 @@ const FILES_TO_CACHE = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) =>
+      // cache:'reload' bypasses the browser HTTP cache, so a fresh service worker
+      // never re-caches a stale app.js that GitHub Pages was still serving from
+      // its edge cache. This is what fixes "SW bumped but the refresh shows old UI".
+      cache.addAll(FILES_TO_CACHE.map((u) => new Request(u, { cache: 'reload' })))
+    )
   );
   self.skipWaiting();
 });

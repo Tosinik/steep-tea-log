@@ -909,17 +909,13 @@ async function submitProfile(e){
   if(msg){ msg.classList.remove('ok'); msg.textContent='Saving…'; }
   try{
     const avatarUrl = await resolveDraftImage();
-    await window.SteepDB.saveProfile({ username, displayName:f.displayName.value.trim(), avatarUrl, bio:f.bio.value.trim() });
-    state.social.profile = await window.SteepDB.getMyProfile(); // read back to confirm it really saved
-    if(state.social.profile){
-      state.social.draft=null; state.social.profileEditOpen=false; state._draftImage=null;
-      showToast('✓ Profile saved as @'+state.social.profile.username);
-      try{ const fd=await window.SteepDB.getFeed(); state.social.feed=fd; state.social.following=fd.following||[]; }catch(_){}
-      render();
-    } else {
-      if(btn){ btn.disabled=false; btn.textContent='Create profile'; }
-      if(msg) msg.textContent='Saved, but could not reload it — please refresh the page.';
-    }
+    // saveProfile returns the written row, so we no longer depend on a read-back
+    // that could momentarily come back empty (the old hard-reload bug).
+    state.social.profile = await window.SteepDB.saveProfile({ username, displayName:f.displayName.value.trim(), avatarUrl, bio:f.bio.value.trim() });
+    state.social.draft=null; state.social.profileEditOpen=false; state._draftImage=null;
+    showToast('✓ Profile saved as @'+state.social.profile.username);
+    try{ const fd=await window.SteepDB.getFeed(); state.social.feed=fd; state.social.following=fd.following||[]; }catch(_){}
+    render();
   }catch(err){
     const m=((err&&err.message)||String(err)).toLowerCase();
     if(btn){ btn.disabled=false; btn.textContent=state.social.profile?'Save':'Create profile'; }
@@ -1227,6 +1223,19 @@ function removeEditSteep(i){
   state.editingSession.steeps.splice(i,1);
   render();
 }
+function addEditSteep(){
+  const st = state.editingSession.steeps;
+  const last = st[st.length-1];
+  st.push({ id: uid(), order: st.length+1, tempC: last ? last.tempC : null, timeSeconds: null, description: '', tags: [] });
+  render();
+}
+function es_convertToSteeps(){
+  const e = state.editingSession;
+  const n = Math.max(1, Number(e.infusionCount)||1);
+  e.steeps = Array.from({length:n}, (_,i)=>({ id: uid(), order: i+1, tempC: null, timeSeconds: null, description: '', tags: [] }));
+  e.infusionCount = null;
+  render();
+}
 function saveSessionEdit(){
   const e = state.editingSession;
   const idx = state.sessions.findIndex(x=>x.id===e.id);
@@ -1285,13 +1294,15 @@ function sessionEditModal(){
           ${tagLibraryChipsHTML('edit')}
         </div>
       </div>
-      ${e.steeps.length ? `<div class="eyebrow" style="margin:16px 0 8px;">Steeps</div>${steepsHTML}` : `
+      ${e.steeps.length ? `<div class="eyebrow" style="margin:16px 0 8px;">Steeps</div>${steepsHTML}
+      <button class="btn" style="margin-top:8px;" onclick="addEditSteep()">＋ Add steep</button>` : `
       <div class="eyebrow" style="margin:16px 0 8px;">Infusions</div>
       <div class="infusion-stepper">
         <button type="button" aria-label="one fewer infusion" onclick="es_adjustInfusions(-1)">−</button>
         <span id="editInfusionVal">${Number(e.infusionCount)||1}</span>
         <button type="button" aria-label="one more infusion" onclick="es_adjustInfusions(1)">＋</button>
-      </div>`}
+      </div>
+      <button class="btn" style="margin-top:10px;" onclick="es_convertToSteeps()">Switch to detailed steeps</button>`}
       <div style="display:flex;justify-content:space-between;margin-top:16px;">
         <button class="btn btn-danger" onclick="deleteSession()">Delete session</button>
         <div style="display:flex;gap:8px;"><button class="btn" onclick="closeSessionEdit()">Cancel</button><button class="btn btn-primary" onclick="saveSessionEdit()">Save changes</button></div>
@@ -1549,7 +1560,9 @@ function timerReset(){
 function useTimerValue(){
   const tm = state.sessionDraft.timer;
   const val = tm.mode==='timer' ? tm.target : tm.elapsed;
-  document.getElementById('steepTime').value = val;
+  state.sessionDraft.curTime = val; // persist to state so a re-render doesn't wipe it
+  const el = document.getElementById('steepTime');
+  if(el) el.value = val;
 }
 
 function renderTagSuggest(query, target){
@@ -1621,13 +1634,9 @@ function saveSteepAndContinue(){
 }
 function finishSteeping(){
   const d = state.sessionDraft;
-  // if there's an in-progress steep with a time filled, prompt to save it
+  // Auto-capture an in-progress steep (time filled in) — no browser popup.
   const timeVal = document.getElementById('steepTime')?.value;
-  if(timeVal && Number(timeVal)>0){
-    if(confirm('Save the current steep before finishing?')){
-      saveSteepAndContinue();
-    }
-  }
+  if(timeVal && Number(timeVal)>0){ saveSteepAndContinue(); }
   if(state.sessionDraft.steeps.length===0){ alert('Log at least one steep first.'); return; }
   clearTimerInterval();
   state.sessionDraft.stage='finish';

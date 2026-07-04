@@ -325,8 +325,12 @@
   }
   async function saveProfile(p) {
     const row = { id: userId(), username: (p.username || '').trim().toLowerCase(), display_name: p.displayName || null, avatar_url: p.avatarUrl || null, bio: p.bio || null };
-    const { error } = await sb.from('profiles').upsert(row, { onConflict: 'id' });
+    // Return the written row directly (.select) so callers don't need a fragile
+    // read-after-write that can race RLS/replication — this is what caused the
+    // "saved but had to hard-reload to see it" bug.
+    const { data, error } = await sb.from('profiles').upsert(row, { onConflict: 'id' }).select().maybeSingle();
     if (error) throw error;
+    return data ? profileFromDb(data) : profileFromDb({ ...row, created_at: new Date().toISOString() });
   }
   async function searchProfiles(q) {
     q = (q || '').trim().toLowerCase();
@@ -343,7 +347,7 @@
     (data || []).forEach(r => { map[r.id] = profileFromDb(r); });
     return map;
   }
-  async function follow(id) { const { error } = await sb.from('follows').insert({ follower_id: userId(), followee_id: id }); if (error) throw error; }
+  async function follow(id) { const { error } = await sb.from('follows').insert({ follower_id: userId(), followee_id: id }); if (error && error.code !== '23505') throw error; }
   async function unfollow(id) { const { error } = await sb.from('follows').delete().eq('follower_id', userId()).eq('followee_id', id); if (error) throw error; }
   async function getFollowing() { const { data, error } = await sb.from('follows').select('followee_id').eq('follower_id', userId()); if (error) throw error; return (data || []).map(r => r.followee_id); }
   async function getFollowers() { const { data, error } = await sb.from('follows').select('follower_id').eq('followee_id', userId()); if (error) throw error; return (data || []).map(r => r.follower_id); }
