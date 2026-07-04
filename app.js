@@ -642,12 +642,20 @@ function heatmapHTML(days){
       const key = cellDate.toISOString().slice(0,10);
       const has = days.has(key);
       const future = cellDate>today;
-      col += `<div class="heat-cell" style="background:${future?'transparent':has?'var(--heat-fill)':'var(--heat-empty)'}" title="${key}"></div>`;
+      const isToday = cellDate.getTime()===today.getTime();
+      col += `<div class="heat-cell${isToday?' heat-today':''}" style="background:${future?'transparent':has?'var(--heat-fill)':'var(--heat-empty)'}" title="${key}${isToday?' (today)':''}"></div>`;
     }
     col += '</div>';
     cols += col;
   }
-  return `<div class="heatmap">${cols}</div>`;
+  return `<div class="heatmap-wrap">
+    <div class="heatmap">${cols}</div>
+    <div class="heat-legend">
+      <span><i class="heat-swatch" style="background:var(--heat-empty)"></i>no tea</span>
+      <span><i class="heat-swatch" style="background:var(--heat-fill)"></i>logged</span>
+      <span><i class="heat-swatch heat-today" style="background:var(--heat-fill)"></i>today</span>
+    </div>
+  </div>`;
 }
 
 function onboardingHTML(){
