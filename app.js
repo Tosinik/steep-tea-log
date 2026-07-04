@@ -50,7 +50,7 @@ let state = {
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
   calMonth: null, calSelDay: null,
-  social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false },
+  social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },
   loaded:false
 };
 
@@ -64,8 +64,11 @@ async function init(){
   state.teas = teas; state.vessels = vessels; state.sessions = sessions; state.tagLibrary = tagLibrary;
   state.settings = {...DEFAULT_SETTINGS, ...settings};
   applySettings();
+  const savedView = (()=>{ try{ return localStorage.getItem('tealog_view'); }catch(e){ return null; } })();
+  if(savedView && ['dashboard','teas','sessions','vessels','friends'].includes(savedView)) state.view = savedView;
   state.loaded = true;
   render();
+  if(state.view==='friends') loadSocial();
   syncAchievements(false); // reconcile seen list on load, no celebration
 }
 
@@ -206,7 +209,8 @@ function render(){
   if(themeBtn) themeBtn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙';
 }
 
-function goView(v){ state.view=v; state.activeTeaId=null; render(); }
+function goView(v){ state.view=v; state.activeTeaId=null; saveView(v); render(); }
+function saveView(v){ try{ if(['dashboard','teas','sessions','vessels','friends'].includes(v)) localStorage.setItem('tealog_view', v); }catch(e){} }
 
 function bindDynamic(){
   // image upload
@@ -467,14 +471,15 @@ function badgeHTML(a){
   const denom = a.maxed ? a.unlockedTier : (a.nextTier ?? a.tiers[0]);
   const pct = a.maxed ? 100 : Math.min(100, Math.round(a.value/denom*100));
   const tierPip = a.tierCount>1 ? `<span class="badge-tier">Lv ${a.level}/${a.tierCount}</span>` : '';
-  const desc = a.maxed ? `Maxed — ${a.label(a.unlockedTier)}` : (a.unlocked ? `Next: ${a.label(a.nextTier)}` : a.label(a.tiers[0]));
+  const desc = a.maxed ? (a.tierCount>1?`Maxed — ${a.label(a.unlockedTier)}`:'Earned') : (a.unlocked ? `Next: ${a.label(a.nextTier)}` : a.label(a.tiers[0]));
   const u = aUnit(a);
+  const progNum = a.maxed ? (a.tierCount>1 ? `${denom}${u} ✓` : 'Complete') : `${fmtMetric(a,a.value)}${u} / ${denom}${u}`;
   return `<div class="badge ${a.unlocked?'unlocked':'locked'} ${a.maxed?'maxed':''}" data-akey="${a.id}#${a.level}">
     <div class="badge-icon">${a.maxed?'★':a.unlocked?'✓':'—'}</div>
     <div class="badge-title">${a.title}${tierPip}</div>
     <div class="badge-desc">${desc}</div>
     <div class="badge-prog"><div class="badge-prog-fill" style="width:${pct}%"></div></div>
-    <div class="badge-prog-num">${fmtMetric(a,a.value)}${u} / ${denom}${u}</div>
+    <div class="badge-prog-num">${progNum}</div>
   </div>`;
 }
 function achievementsHTML(s){
@@ -842,7 +847,7 @@ function viewTeaDetail(){
 }
 
 /* ================= FRIENDS (social) ================= */
-function goFriends(){ state.view='friends'; state.activeTeaId=null; state.social.loaded=false; render(); loadSocial(); }
+function goFriends(){ state.view='friends'; state.activeTeaId=null; saveView('friends'); state.social.loaded=false; render(); loadSocial(); }
 async function loadSocial(){
   const so=state.social; if(so.busy) return; so.busy=true;
   try{
@@ -867,25 +872,48 @@ function avatarHTML(p, size){
   return `<span class="avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size/2.6)}px;${url?`background-image:url(${url})`:''}">${url?'':letter}</span>`;
 }
 function editProfile(){ state.social.profileEditOpen=true; state._draftImage=state.social.profile?.avatarUrl||null; render(); }
-function cancelProfileEdit(){ state.social.profileEditOpen=false; state._draftImage=null; render(); }
+function setProfileDraft(k, v){
+  if(!state.social.draft) state.social.draft = {...(state.social.profile||{})};
+  state.social.draft[k] = v;
+}
+function cancelProfileEdit(){ state.social.profileEditOpen=false; state._draftImage=null; state.social.draft=null; render(); }
 async function submitProfile(e){
   e.preventDefault();
   const f=e.target;
+  const msg=document.getElementById('profileMsg');
+  const btn=f.querySelector('button[type=submit]');
   const username=(f.username.value||'').trim().toLowerCase();
-  if(!/^[a-z0-9_]{3,20}$/.test(username)){ alert('Username must be 3–20 characters — lowercase letters, numbers, or underscore.'); return; }
-  const avatarUrl = await resolveDraftImage();
+  if(!/^[a-z0-9_]{3,20}$/.test(username)){
+    if(msg) msg.textContent='Username must be 3–20 characters: lowercase letters, numbers, or underscore.';
+    return;
+  }
+  if(btn){ btn.disabled=true; btn.textContent='Saving…'; }
+  if(msg){ msg.classList.remove('ok'); msg.textContent='Saving…'; }
   try{
+    const avatarUrl = await resolveDraftImage();
     await window.SteepDB.saveProfile({ username, displayName:f.displayName.value.trim(), avatarUrl, bio:f.bio.value.trim() });
-    state.social.profileEditOpen=false; state._draftImage=null;
-    await loadSocial();
+    state.social.profile = await window.SteepDB.getMyProfile(); // read back to confirm it really saved
+    if(state.social.profile){
+      state.social.draft=null; state.social.profileEditOpen=false; state._draftImage=null;
+      showToast('✓ Profile saved as @'+state.social.profile.username);
+      try{ const fd=await window.SteepDB.getFeed(); state.social.feed=fd; state.social.following=fd.following||[]; }catch(_){}
+      render();
+    } else {
+      if(btn){ btn.disabled=false; btn.textContent='Create profile'; }
+      if(msg) msg.textContent='Saved, but could not reload it — please refresh the page.';
+    }
   }catch(err){
-    const msg=(err&&err.message||'').toLowerCase();
-    if(msg.includes('duplicate')||err.code==='23505') alert('That username is taken — try another.');
-    else alert('Could not save profile: '+(err.message||err));
+    const m=((err&&err.message)||String(err)).toLowerCase();
+    if(btn){ btn.disabled=false; btn.textContent=state.social.profile?'Save':'Create profile'; }
+    if(msg){
+      if(m.includes('duplicate')||err.code==='23505') msg.textContent='That username is taken — try another.';
+      else if(m.includes('does not exist')||m.includes('relation')||m.includes('schema cache')) msg.textContent='Profiles table not found — run v3_0-social.sql in the Supabase SQL Editor, then try again.';
+      else msg.textContent='Could not save: '+((err&&err.message)||err);
+    }
   }
 }
 function profileSetupHTML(){
-  const p=state.social.profile||{};
+  const p=state.social.draft || state.social.profile || {};
   const editing=!!state.social.profile;
   return `
     <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">${editing?'Edit profile':'Create your profile'}</h2></div>
@@ -898,10 +926,11 @@ function profileSetupHTML(){
             ${state._draftImage?'':'Photo'}<input type="file" accept="image/*" class="js-img-input">
           </div>
         </div>
-        <div class="field" style="margin-bottom:12px;"><label>Username</label><input type="text" name="username" required value="${p.username||''}" placeholder="teafiend"></div>
-        <div class="field" style="margin-bottom:12px;"><label>Display name</label><input type="text" name="displayName" value="${p.displayName||''}" placeholder="Optional"></div>
-        <div class="field" style="margin-bottom:12px;"><label>Bio</label><textarea name="bio" placeholder="Optional">${p.bio||''}</textarea></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <div class="field" style="margin-bottom:12px;"><label>Username</label><input type="text" name="username" required value="${p.username||''}" oninput="setProfileDraft('username',this.value)" placeholder="teafiend"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Display name</label><input type="text" name="displayName" value="${p.displayName||''}" oninput="setProfileDraft('displayName',this.value)" placeholder="Optional"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Bio</label><textarea name="bio" oninput="setProfileDraft('bio',this.value)" placeholder="Optional">${p.bio||''}</textarea></div>
+        <div id="profileMsg" class="auth-msg" style="text-align:left;"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
           ${editing?`<button type="button" class="btn" onclick="cancelProfileEdit()">Cancel</button>`:''}
           <button type="submit" class="btn btn-primary">${editing?'Save':'Create profile'}</button>
         </div>
