@@ -1,0 +1,674 @@
+function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+function calShift(delta){
+  const m = state.calMonth || startOfMonth(new Date());
+  state.calMonth = new Date(m.getFullYear(), m.getMonth()+delta, 1);
+  render();
+}
+function selectCalDay(key){
+  state.calSelDay = (state.calSelDay===key) ? null : key;
+  render();
+}
+function sessionsByDay(){
+  const map = {};
+  state.sessions.forEach(s=>{ const k=dayKey(s.date); (map[k]=map[k]||[]).push(s); });
+  return map;
+}
+function sessionRowHTML(s){
+  const tea = teaById(s.teaId);
+  const v = vesselById(s.vesselId);
+  const tags = (s.tags||[]).slice(0,4).map(t=>`<span class="tagchip">${t}</span>`).join(' ');
+  return `<div class="sess-row" onclick="openSessionEdit('${s.id}')">
+    <div class="sess-thumb" style="${tea&&tea.image?`background-image:url(${tea.image})`:''}">${tea&&tea.image?'':'🍵'}</div>
+    <div class="sess-main">
+      <div class="sess-top"><strong>${tea?tea.name:'Unknown tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
+      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?v.name:'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}</div>
+      ${tags?`<div class="sess-tags">${tags}</div>`:''}
+    </div>
+    <span class="sess-chev">›</span>
+  </div>`;
+}
+function viewSessions(){
+  if(state.sessions.length===0){
+    return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Sessions</h2></div>
+      <div class="card empty">No sessions yet. Tap <strong>＋ Log session</strong> to record your first brew.</div>`;
+  }
+  if(!state.calMonth) state.calMonth = startOfMonth(new Date());
+  const m = state.calMonth;
+  const byDay = sessionsByDay();
+  const monthLabel = m.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  const firstDow = m.getDay();
+  const daysInMonth = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
+  const todayKey = dayKey(new Date());
+  const dow = ['S','M','T','W','T','F','S'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  let cells = '';
+  for(let i=0;i<firstDow;i++) cells += `<div class="cal-cell blank"></div>`;
+  for(let day=1; day<=daysInMonth; day++){
+    const key = dayKey(new Date(m.getFullYear(), m.getMonth(), day));
+    const list = byDay[key] || [];
+    const has = list.length>0;
+    cells += `<div class="cal-cell ${has?'has':''} ${state.calSelDay===key?'sel':''} ${key===todayKey?'today':''}" onclick="selectCalDay('${key}')">
+      <span class="cal-num">${day}</span>${has?`<span class="cal-dot">${list.length>1?list.length:''}</span>`:''}
+    </div>`;
+  }
+  const cal = `<div class="card">
+    <div class="cal-head"><button class="btn-ghost" onclick="calShift(-1)">‹</button><strong>${monthLabel}</strong><button class="btn-ghost" onclick="calShift(1)">›</button></div>
+    <div class="cal-grid cal-dows">${dow}</div>
+    <div class="cal-grid">${cells}</div>
+  </div>`;
+
+  let listSessions = [...state.sessions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  let listTitle = 'All sessions';
+  if(state.calSelDay){
+    listSessions = listSessions.filter(s=>dayKey(s.date)===state.calSelDay);
+    listTitle = fmtDate(state.calSelDay);
+  }
+  const rows = listSessions.map(sessionRowHTML).join('');
+  return `
+    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Sessions</h2>
+      <span class="mono" style="font-size:12px;color:var(--ink-soft);">${state.sessions.length} total</span></div>
+    ${cal}
+    ${streakCardHTML()}
+    <div class="section-title" style="margin-top:20px;"><h2>${listTitle}</h2>
+      ${state.calSelDay?`<button class="btn-ghost" onclick="selectCalDay('${state.calSelDay}')">show all</button>`:''}</div>
+    <div>${rows || '<div class="card empty">No sessions on this day.</div>'}</div>
+  `;
+}
+
+/* ================= VESSELS ================= */
+function viewVessels(){
+  const rows = state.vessels.length ? state.vessels.map(v=>`
+    <div class="rank-row">
+      <span class="vessel-thumb" style="${v.image?`background-image:url(${v.image})`:''}">${v.image?'':'🫖'}</span>
+      <span class="rname">${v.name} <span style="color:var(--ink-soft);font-weight:400;">— ${v.type}${v.material?', '+v.material:''}</span></span>
+      <span class="rval">${v.capacityMl?v.capacityMl+'ml':''}</span>
+      <button class="btn-ghost" onclick="openVesselForm(vesselById('${v.id}'))">edit</button>
+      <button class="btn-ghost" onclick="deleteVessel('${v.id}')">remove</button>
+    </div>
+  `).join('') : '<div class="empty">No vessels yet — add your gaiwan, kyusu, or teapot.</div>';
+  return `
+    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My vessels</h2><button class="btn btn-primary" onclick="openVesselForm()">＋ Add vessel</button></div>
+    <div class="card">${rows}</div>
+  `;
+}
+function openVesselForm(existing){
+  state.editingVessel = existing || null;
+  state._draftImage = existing ? (existing.image || null) : null;
+  state.vesselFormOpen = true;
+  render();
+}
+function closeVesselForm(){ state.vesselFormOpen=false; state.editingVessel=null; state._draftImage=null; render(); }
+function vesselFormModal(){
+  const v = state.editingVessel || {};
+  const opts = VESSEL_TYPES.map(vt=>`<option ${v.type===vt?'selected':''}>${vt}</option>`).join('');
+  return `<div class="overlay" onclick="if(event.target===this) closeVesselForm()">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-head"><h2>${v.id?'Edit vessel':'Add a vessel'}</h2><button class="close-x" onclick="closeVesselForm()">✕</button></div>
+      <form onsubmit="submitVesselForm(event)">
+        <div class="field" style="margin-bottom:12px;">
+          <label>Photo</label>
+          <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+            ${state._draftImage?'':'Tap to upload photo'}
+            <input type="file" accept="image/*" class="js-img-input">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan" value="${v.name||''}"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Type</label><select name="type">${opts}</select></div>
+        <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..." value="${v.material||''}"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Capacity (ml)</label><input type="number" name="capacityMl" placeholder="120" value="${v.capacityMl??''}"></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="closeVesselForm()">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+      </form>
+    </div>
+  </div>`;
+}
+async function submitVesselForm(e){
+  e.preventDefault();
+  const f = e.target;
+  const imageUrl = await resolveDraftImage();
+  const data = {
+    id: state.editingVessel?.id || uid(),
+    name: f.name.value.trim(),
+    type: f.type.value,
+    material: f.material.value.trim(),
+    capacityMl: f.capacityMl.value?Number(f.capacityMl.value):null,
+    image: imageUrl
+  };
+  if(state.editingVessel){
+    const idx = state.vessels.findIndex(x=>x.id===data.id);
+    state.vessels[idx] = data;
+  } else {
+    state.vessels.push(data);
+  }
+  persistVessel(data);
+  syncAchievements(true);
+  closeVesselForm();
+}
+function deleteVessel(id){
+  if(!confirm('Remove this vessel?')) return;
+  state.vessels = state.vessels.filter(v=>v.id!==id);
+  dropVessel(id); render();
+}
+
+/* ================= SESSION EDITING ================= */
+function openSessionEdit(sessionId){
+  const s = state.sessions.find(x=>x.id===sessionId);
+  if(!s) return;
+  state.editingSession = JSON.parse(JSON.stringify(s));
+  state.editingSession.tags = state.editingSession.tags || [];
+  state.sessionEditOpen = true;
+  render();
+}
+function closeSessionEdit(){ state.sessionEditOpen=false; state.editingSession=null; render(); }
+function es_set(key, val){ state.editingSession[key]=val; }
+function es_setSteep(i, key, val){
+  if(key==='tempC'){ state.editingSession.steeps[i].tempC = displayToC(val); return; }
+  state.editingSession.steeps[i][key] = (key==='timeSeconds') ? (val===''?null:Number(val)) : val;
+}
+function es_adjustInfusions(delta){
+  const e = state.editingSession;
+  e.infusionCount = Math.max(1, (Number(e.infusionCount)||1) + delta);
+  const el = document.getElementById('editInfusionVal');
+  if(el) el.textContent = e.infusionCount;
+}
+function setEditSessionRating(v){
+  state.editingSession.rating = v;
+  document.getElementById('editRatingWrap').innerHTML = renderStarsInteractive(v,true,'setEditSessionRating');
+}
+function removeEditSteep(i){
+  if(state.editingSession.steeps.length<=1){ alert('A session needs at least one steep. Delete the whole session instead if needed.'); return; }
+  if(!confirm('Remove steep '+(i+1)+'?')) return;
+  state.editingSession.steeps.splice(i,1);
+  render();
+}
+function addEditSteep(){
+  const st = state.editingSession.steeps;
+  const last = st[st.length-1];
+  st.push({ id: uid(), order: st.length+1, tempC: last ? last.tempC : null, timeSeconds: null, description: '', tags: [] });
+  render();
+}
+function es_convertToSteeps(){
+  const e = state.editingSession;
+  const n = Math.max(1, Number(e.infusionCount)||1);
+  e.steeps = Array.from({length:n}, (_,i)=>({ id: uid(), order: i+1, tempC: null, timeSeconds: null, description: '', tags: [] }));
+  e.infusionCount = null;
+  render();
+}
+function saveSessionEdit(){
+  const e = state.editingSession;
+  const idx = state.sessions.findIndex(x=>x.id===e.id);
+  if(idx<0) return;
+  const old = state.sessions[idx];
+  const newGrams = e.gramsUsed===''?0:Number(e.gramsUsed)||0;
+  const delta = newGrams - (Number(old.gramsUsed)||0);
+  if(delta!==0){
+    const tea = teaById(e.teaId);
+    if(tea){ tea.amountGrams = Math.max(0,(Number(tea.amountGrams)||0)-delta); persistTea(tea); }
+  }
+  e.gramsUsed = newGrams;
+  e.date = e._localDate ? new Date(e._localDate).toISOString() : e.date;
+  delete e._localDate;
+  const tea = teaById(e.teaId), ves = vesselById(e.vesselId);
+  e.teaName = tea?tea.name:(e.teaName||''); e.teaType = tea?tea.type:(e.teaType||''); e.vesselName = ves?ves.name:(e.vesselName||'');
+  state.sessions[idx] = e;
+  persistSession(e);
+  syncAchievements(true);
+  closeSessionEdit();
+}
+function deleteSession(){
+  const e = state.editingSession;
+  if(!confirm('Delete this session? Its grams will be added back to the tea stock.')) return;
+  const tea = teaById(e.teaId);
+  if(tea && Number(e.gramsUsed)>0){ tea.amountGrams = (Number(tea.amountGrams)||0) + Number(e.gramsUsed); persistTea(tea); }
+  state.sessions = state.sessions.filter(x=>x.id!==e.id);
+  dropSession(e.id);
+  closeSessionEdit();
+}
+function sessionEditModal(){
+  const e = state.editingSession;
+  const steepsHTML = e.steeps.map((st,i)=>`
+    <div class="steep-item">
+      <div class="steep-head"><span>Steep ${i+1}</span><button class="btn-ghost" onclick="removeEditSteep(${i})">remove</button></div>
+      <div class="form-grid" style="margin-top:6px;">
+        <div class="field"><label>Temp ${tempUnitLabel()}</label><input type="number" value="${cToDisplay(st.tempC)}" oninput="es_setSteep(${i},'tempC',this.value)"></div>
+        <div class="field"><label>Time (sec)</label><input type="number" value="${st.timeSeconds??''}" oninput="es_setSteep(${i},'timeSeconds',this.value)"></div>
+        <div class="field span2"><label>Notes</label><textarea oninput="es_setSteep(${i},'description',this.value)">${st.description||''}</textarea></div>
+      </div>
+    </div>
+  `).join('');
+  return `<div class="overlay" onclick="if(event.target===this) closeSessionEdit()">
+    <div class="modal">
+      <div class="modal-head"><h2>Edit session</h2><button class="close-x" onclick="closeSessionEdit()">✕</button></div>
+      <div class="form-grid">
+        <div class="field"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
+        <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${e.gramsUsed??''}" oninput="es_set('gramsUsed', this.value)"></div>
+        <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isColdBrew?'checked':''} onchange="es_set('isColdBrew', this.checked)"> Cold brew</label></div>
+        <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isShared?'checked':''} onchange="es_set('isShared', this.checked)"> Shared with followers</label></div>
+        <div class="field span2"><label>Overall rating</label><div id="editRatingWrap">${renderStarsInteractive(Number(e.rating)||0,true,'setEditSessionRating')}</div></div>
+        <div class="field span2"><label>Overall notes</label><textarea oninput="es_set('description', this.value)">${e.description||''}</textarea></div>
+        <div class="field span2">
+          <label>Tags</label>
+          <div>${e.tags.map(t=>`<span class="tagchip">${t} <button onclick="removeEditTag('${t}')">✕</button></span>`).join(' ')}</div>
+          ${tagLibraryChipsHTML('edit')}
+        </div>
+      </div>
+      ${e.steeps.length ? `<div class="eyebrow" style="margin:16px 0 8px;">Steeps</div>${steepsHTML}
+      <button class="btn" style="margin-top:8px;" onclick="addEditSteep()">＋ Add steep</button>` : `
+      <div class="eyebrow" style="margin:16px 0 8px;">Infusions</div>
+      <div class="infusion-stepper">
+        <button type="button" aria-label="one fewer infusion" onclick="es_adjustInfusions(-1)">−</button>
+        <span id="editInfusionVal">${Number(e.infusionCount)||1}</span>
+        <button type="button" aria-label="one more infusion" onclick="es_adjustInfusions(1)">＋</button>
+      </div>
+      <button class="btn" style="margin-top:10px;" onclick="es_convertToSteeps()">Switch to detailed steeps</button>`}
+      <div style="display:flex;justify-content:space-between;margin-top:16px;">
+        <button class="btn btn-danger" onclick="deleteSession()">Delete session</button>
+        <div style="display:flex;gap:8px;"><button class="btn" onclick="closeSessionEdit()">Cancel</button><button class="btn btn-primary" onclick="saveSessionEdit()">Save changes</button></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ================= SESSION LOGGING ================= */
+function quickLogSession(){
+  if(state.teas.length===0){ alert('Add a tea first.'); state.view='teas'; render(); return; }
+  startSessionFor(null);
+}
+function startSessionFor(teaId){
+  if(state.vessels.length===0){ alert('Add a vessel first (Vessels tab) before logging a session.'); state.view='vessels'; render(); return; }
+  state.sessionDraft = {
+    teaId: teaId || state.teas[0].id,
+    vesselId: state.vessels[0].id,
+    sessionDate: toLocalDatetimeValue(new Date()),
+    isColdBrew: false,
+    waterType: '',
+    waterTDS: '',
+    gramsUsed: '',
+    steeps: [],
+    infusionCount: 1,
+    stage: 'setup', // setup -> steeping -> finish  (or setup -> quick)
+    curSteepTags: [],
+    curSteepDesc: '',
+    sessionTags: [],
+    sessionRating: 0,
+    sessionDesc: '',
+    isShared: false,
+    timer: {mode:'timer', target:15, elapsed:0, running:false, intervalId:null}
+  };
+  state._draftImage = null;
+  state.view='session';
+  render();
+}
+function cancelSession(){
+  if(!confirm('Discard this session log?')) return;
+  clearTimerInterval();
+  state.sessionDraft=null; state._draftImage=null; state.view='teas'; render();
+}
+function clearTimerInterval(){
+  const tm = state.sessionDraft?.timer;
+  if(tm?.intervalId){ clearInterval(tm.intervalId); tm.intervalId=null; }
+}
+
+function viewSessionFlow(){
+  const d = state.sessionDraft;
+  if(!d) return '<div class="empty">No active session.</div>';
+  if(d.stage==='setup') return sessionSetupHTML(d);
+  if(d.stage==='steeping') return sessionSteepingHTML(d);
+  if(d.stage==='finish') return sessionFinishHTML(d);
+  if(d.stage==='quick') return sessionQuickHTML(d);
+}
+function beginQuickLog(){
+  const d = state.sessionDraft;
+  if(!d.infusionCount || d.infusionCount<1) d.infusionCount = 1;
+  d.steeps = []; // quick log carries no timed steeps
+  d.stage = 'quick';
+  render();
+}
+function adjustInfusions(delta){
+  const d = state.sessionDraft;
+  d.infusionCount = Math.max(1, (Number(d.infusionCount)||1) + delta);
+  const el = document.getElementById('infusionCountVal');
+  if(el) el.textContent = d.infusionCount;
+}
+function sessionQuickHTML(d){
+  const tea = teaById(d.teaId);
+  return `
+    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <div class="card">
+      <h2 style="margin-top:0;">Quick log: ${tea?tea.name:''}</h2>
+      <div class="eyebrow">No timed steeps — just how it went.</div>
+      <div class="field" style="margin:14px 0;">
+        <label>Infusions</label>
+        <div class="infusion-stepper">
+          <button type="button" aria-label="one fewer infusion" onclick="adjustInfusions(-1)">−</button>
+          <span id="infusionCountVal">${d.infusionCount||1}</span>
+          <button type="button" aria-label="one more infusion" onclick="adjustInfusions(1)">＋</button>
+        </div>
+      </div>
+      <div class="field span2" style="margin:14px 0;">
+        <label>Photo (optional)</label>
+        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+          ${state._draftImage?'':'Tap to add a photo of this cup'}
+          <input type="file" accept="image/*" class="js-img-input">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:14px;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
+      <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
+      <div class="field">
+        <label>Overall tags</label>
+        <div>${d.sessionTags.map(t=>`<span class="tagchip">${t} <button onclick="removeSessionTag('${t}')">✕</button></span>`).join(' ')}</div>
+        <div class="tag-input-wrap">
+          <input type="text" id="tagInputField" data-target="session" placeholder="Type your own, press Enter...">
+          <div id="tagSuggestBox"></div>
+        </div>
+        ${tagLibraryChipsHTML('session')}
+      </div>
+      <label class="checkrow" style="margin-top:16px;"><input type="checkbox" ${d.isShared?'checked':''} onchange="state.sessionDraft.isShared=this.checked"> Share this session with followers</label>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save session</button>
+    </div>
+  `;
+}
+
+function sessionSetupHTML(d){
+  const teaOpts = state.teas.map(t=>`<option value="${t.id}" ${d.teaId===t.id?'selected':''}>${t.name}</option>`).join('');
+  const vesselOpts = state.vessels.map(v=>`<option value="${v.id}" ${d.vesselId===v.id?'selected':''}>${v.name}</option>`).join('');
+  return `
+    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <div class="card">
+      <h2 style="margin-top:0;">Set up your session</h2>
+      <div class="form-grid">
+        <div class="field span2"><label>Tea</label><select onchange="d_set('teaId', this.value)">${teaOpts}</select></div>
+        <div class="field"><label>Vessel</label><select onchange="d_set('vesselId', this.value)">${vesselOpts}</select></div>
+        <div class="field"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
+        <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
+        <div class="field"><label>Water type</label><input type="text" value="${d.waterType}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
+        <div class="field"><label>Water TDS (optional)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="ppm"></div>
+        <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_set('isColdBrew', this.checked)"> Cold brew</label></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="beginSteeping()">Begin steeping →</button>
+      <button class="btn" style="margin-top:8px;width:100%;" onclick="beginQuickLog()">Quick log — just infusions & notes</button>
+      <div class="hint" style="margin-top:8px;">Quick log skips the per-steep timer — for when you'd rather drink than babysit a form.</div>
+    </div>
+  `;
+}
+function d_set(key, val){
+  state.sessionDraft[key] = val;
+}
+function d_setcur(key, val){
+  state.sessionDraft[key] = val;
+}
+function beginSteeping(){
+  state.sessionDraft.stage='steeping';
+  render();
+}
+
+function sessionSteepingHTML(d){
+  const tea = teaById(d.teaId);
+  const tm = d.timer;
+  const steepsHTML = d.steeps.map((s,i)=>`
+    <div class="steep-item">
+      <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC)+tempUnitLabel()+' · ':''}${fmtSec(s.timeSeconds)}</span></div>
+      ${s.description?`<div style="margin-top:3px;color:var(--ink-soft);">${s.description}</div>`:''}
+      ${s.tags.length?`<div class="steep-tags">${s.tags.map(t=>`<span class="tagchip">${t}</span>`).join(' ')}</div>`:''}
+    </div>
+  `).join('');
+
+  const modeBtns = `
+    <div class="timer-modebtns">
+      <button class="${tm.mode==='timer'?'active':''}" onclick="setTimerMode('timer')">Countdown</button>
+      <button class="${tm.mode==='stopwatch'?'active':''}" onclick="setTimerMode('stopwatch')">Stopwatch</button>
+    </div>`;
+
+  const displaySeconds = tm.mode==='timer' ? Math.max(0, tm.target - tm.elapsed) : tm.elapsed;
+
+  return `
+    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <div class="card">
+      <div class="eyebrow">${tea?tea.name:''} ${d.isColdBrew?'· cold brew':''}</div>
+      <h2 style="margin-top:2px;">${dotsRow(d.steeps.length, Math.max(d.steeps.length+1,6))} Steep ${d.steeps.length+1}</h2>
+
+      ${d.steeps.length ? `<div style="margin-bottom:14px;">${steepsHTML}</div>` : ''}
+
+      <div class="timer-box">
+        ${modeBtns}
+        ${tm.mode==='timer' ? `<div style="margin-bottom:8px;"><input type="number" value="${tm.target}" style="width:70px;text-align:center;border-radius:6px;border:none;padding:4px;" oninput="setTimerTarget(this.value)"> sec target</div>` : ''}
+        <div class="timer-display">${fmtSec(displaySeconds)}</div>
+        <div class="timer-ctrls">
+          <button onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
+          <button onclick="timerReset()">Reset</button>
+          <button onclick="useTimerValue()">Use this time</button>
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top:14px;">
+        <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
+        <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="d_setcur('curTime', this.value)"></div>
+        <div class="field span2"><label>Notes for this steep</label><textarea id="steepDesc" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
+        <div class="field span2">
+          <label>Tasting tags</label>
+          <div id="curTagChips">${d.curSteepTags.map(t=>`<span class="tagchip">${t} <button onclick="removeCurTag('${t}')">✕</button></span>`).join(' ')}</div>
+          <div class="tag-input-wrap">
+            <input type="text" id="tagInputField" data-target="steep" placeholder="Type your own, press Enter...">
+            <div id="tagSuggestBox"></div>
+          </div>
+          ${tagLibraryChipsHTML('steep')}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveSteepAndContinue()">Save steep & brew another</button>
+        <button class="btn" onclick="finishSteeping()">Finish session</button>
+      </div>
+    </div>
+  `;
+}
+
+function setTimerMode(m){ state.sessionDraft.timer.mode=m; render(); }
+function setTimerTarget(v){
+  state.sessionDraft.timer.target=Number(v)||0;
+  updateTimerDisplayOnly();
+}
+
+let _audioCtx = null;
+function playTimerDone(){
+  try{
+    if(state.settings.soundEnabled){
+      if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const ctx = _audioCtx;
+      if(ctx.state==='suspended') ctx.resume();
+      const now = ctx.currentTime;
+      [0, 0.22, 0.44].forEach((offset,i)=>{
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = i===2 ? 1046 : 784;
+        gain.gain.setValueAtTime(0.0001, now+offset);
+        gain.gain.exponentialRampToValueAtTime(0.25, now+offset+0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now+offset+0.18);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now+offset); osc.stop(now+offset+0.2);
+      });
+      if(navigator.vibrate) navigator.vibrate([150,80,150]);
+    }
+  }catch(e){ /* audio not available */ }
+}
+
+function timerStartPause(){
+  const tm = state.sessionDraft.timer;
+  if(tm.running){
+    clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false;
+  } else {
+    if(!_audioCtx){ try{ _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+    tm.running=true;
+    tm.intervalId = setInterval(()=>{
+      tm.elapsed += 1;
+      if(tm.mode==='timer' && tm.elapsed>=tm.target){
+        clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false;
+        playTimerDone();
+      }
+      updateTimerDisplayOnly();
+    },1000);
+  }
+  render();
+}
+function updateTimerDisplayOnly(){
+  const disp = document.querySelector('.timer-display');
+  const tm = state.sessionDraft.timer;
+  if(disp) disp.textContent = fmtSec(tm.mode==='timer'?Math.max(0,tm.target-tm.elapsed):tm.elapsed);
+  const btn = document.querySelector('.timer-ctrls button');
+  if(btn) btn.textContent = tm.running?'Pause':'Start';
+}
+function timerReset(){
+  const tm = state.sessionDraft.timer;
+  clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false; tm.elapsed=0;
+  render();
+}
+function useTimerValue(){
+  const tm = state.sessionDraft.timer;
+  const val = tm.mode==='timer' ? tm.target : tm.elapsed;
+  state.sessionDraft.curTime = val; // persist to state so a re-render doesn't wipe it
+  const el = document.getElementById('steepTime');
+  if(el) el.value = val;
+}
+
+function renderTagSuggest(query, target){
+  const box = document.getElementById('tagSuggestBox');
+  if(!box) return;
+  if(!query){ box.innerHTML=''; return; }
+  const matches = state.tagLibrary.filter(t=>t.toLowerCase().includes(query.toLowerCase())).slice(0,6);
+  box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onclick="pickTagSuggest('${m}','${target}')">${m}</div>`).join('')}</div>` : '';
+}
+function pickTagSuggest(tag, target){
+  addTag(tag, target);
+  const inp = document.getElementById('tagInputField');
+  if(inp) inp.value='';
+  document.getElementById('tagSuggestBox').innerHTML='';
+}
+function addTagFromInput(target){
+  const inp = document.getElementById('tagInputField');
+  const val = inp.value.trim().toLowerCase();
+  if(!val) return;
+  addTag(val, target);
+  inp.value='';
+  document.getElementById('tagSuggestBox').innerHTML='';
+}
+function tagListFor(target){
+  if(target==='steep') return state.sessionDraft.curSteepTags;
+  if(target==='session') return state.sessionDraft.sessionTags;
+  if(target==='edit') return state.editingSession.tags;
+  return [];
+}
+function tagLibraryChipsHTML(target){
+  const selected = tagListFor(target);
+  const available = state.tagLibrary.filter(t=>!selected.includes(t));
+  if(!available.length) return '';
+  return `<div class="taglib">${available.map(t=>`<button type="button" class="taglib-chip" onclick="addTag('${t.replace(/'/g,"\\'")}','${target}')">＋ ${t}</button>`).join('')}</div>`;
+}
+function addTag(tag, target){
+  if(!state.tagLibrary.includes(tag)){ state.tagLibrary.push(tag); persistTag(tag); }
+  const list = tagListFor(target);
+  if(!list.includes(tag)) list.push(tag);
+  render();
+  setTimeout(()=>{ const inp=document.getElementById('tagInputField'); if(inp) inp.focus(); },0);
+}
+function removeCurTag(tag){
+  const d = state.sessionDraft;
+  d.curSteepTags = d.curSteepTags.filter(t=>t!==tag);
+  render();
+}
+function removeSessionTag(tag){
+  const d = state.sessionDraft;
+  d.sessionTags = d.sessionTags.filter(t=>t!==tag);
+  render();
+}
+function removeEditTag(tag){
+  state.editingSession.tags = state.editingSession.tags.filter(t=>t!==tag);
+  render();
+}
+
+function saveSteepAndContinue(){
+  const d = state.sessionDraft;
+  const temp = document.getElementById('steepTemp').value;
+  const time = document.getElementById('steepTime').value;
+  const desc = document.getElementById('steepDesc').value;
+  if(!time){ alert('Enter a steep time (or use the timer).'); return; }
+  d.steeps.push({id:uid(), order:d.steeps.length+1, tempC:displayToC(temp), timeSeconds:Number(time), description:desc.trim(), tags:[...d.curSteepTags]});
+  clearTimerInterval();
+  d.curSteepTags=[]; d.curSteepDesc=''; d.curTemp=''; d.curTime='';
+  d.timer = {mode:d.timer.mode, target:d.timer.target, elapsed:0, running:false, intervalId:null};
+  render();
+}
+function finishSteeping(){
+  const d = state.sessionDraft;
+  // Auto-capture an in-progress steep (time filled in) — no browser popup.
+  const timeVal = document.getElementById('steepTime')?.value;
+  if(timeVal && Number(timeVal)>0){ saveSteepAndContinue(); }
+  if(state.sessionDraft.steeps.length===0){ alert('Log at least one steep first.'); return; }
+  clearTimerInterval();
+  state.sessionDraft.stage='finish';
+  render();
+}
+
+function sessionFinishHTML(d){
+  const tea = teaById(d.teaId);
+  return `
+    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <div class="card">
+      <h2 style="margin-top:0;">Wrap up: ${tea?tea.name:''}</h2>
+      <div class="eyebrow">${d.steeps.length} steep${d.steeps.length===1?'':'s'} logged</div>
+      <div class="field span2" style="margin:14px 0;">
+        <label>Photo (optional)</label>
+        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+          ${state._draftImage?'':'Tap to add a photo of this cup'}
+          <input type="file" accept="image/*" class="js-img-input">
+        </div>
+      </div>
+      <div class="field" style="margin:14px 0;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
+      <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
+      <div class="field">
+        <label>Overall tags</label>
+        <div>${d.sessionTags.map(t=>`<span class="tagchip">${t} <button onclick="removeSessionTag('${t}')">✕</button></span>`).join(' ')}</div>
+        <div class="tag-input-wrap">
+          <input type="text" id="tagInputField" data-target="session" placeholder="Type your own, press Enter...">
+          <div id="tagSuggestBox"></div>
+        </div>
+        ${tagLibraryChipsHTML('session')}
+      </div>
+      <label class="checkrow" style="margin-top:16px;"><input type="checkbox" ${d.isShared?'checked':''} onchange="state.sessionDraft.isShared=this.checked"> Share this session with followers</label>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save session</button>
+    </div>
+  `;
+}
+function setSessionRating(v){
+  state.sessionDraft.sessionRating=v;
+  document.getElementById('sessRatingWrap').innerHTML = renderStarsInteractive(v,true,'setSessionRating');
+}
+async function commitSession(){
+  const d = state.sessionDraft;
+  const descEl = document.getElementById('sessDesc');
+  if(descEl) d.sessionDesc = descEl.value.trim();
+  const photoUrl = await resolveDraftImage();
+  const tea = teaById(d.teaId);
+  const ves = vesselById(d.vesselId);
+  const session = {
+    id: uid(), teaId: d.teaId, vesselId: d.vesselId,
+    date: d.sessionDate ? new Date(d.sessionDate).toISOString() : new Date().toISOString(),
+    isColdBrew: d.isColdBrew, waterType: d.waterType, waterTDS: d.waterTDS?Number(d.waterTDS):null,
+    gramsUsed: d.gramsUsed?Number(d.gramsUsed):0,
+    steeps: d.steeps, rating: d.sessionRating, description: d.sessionDesc, tags: d.sessionTags,
+    isShared: !!d.isShared, photoUrl: photoUrl || null,
+    infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
+    teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
+  };
+  state.sessions.push(session);
+  if(tea && session.gramsUsed){
+    tea.amountGrams = Math.max(0, (Number(tea.amountGrams)||0) - session.gramsUsed);
+    persistTea(tea);
+  }
+  persistSession(session);
+  state.sessionDraft=null;
+  state._draftImage=null;
+  state.activeTeaId = d.teaId;
+  state.view='tea-detail';
+  syncAchievements(true);
+  render();
+}
+

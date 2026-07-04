@@ -1,0 +1,233 @@
+function teaCardHTML(t){
+  const bg = t.image ? `background-image:url(${t.image})` : '';
+  const sessionsForTea = state.sessions.filter(s=>s.teaId===t.id).length;
+  return `<div class="tea-card" onclick="openTeaDetail('${t.id}')">
+    <div class="tea-thumb" style="${bg}">${t.isFavorite?'<span class="fav">♥</span>':''}</div>
+    <div class="tea-body">
+      <span class="pill t-${t.type}">${typeLabel(t.type)}</span>
+      <div class="name">${t.name}</div>
+      ${renderStarsStatic(Number(t.rating)||0,false)}
+      <div class="tea-meta">${Number(t.amountGrams)<lowStockG()?'<span class="stock-low">'+Number(t.amountGrams).toFixed(1)+'g left</span>':Number(t.amountGrams).toFixed(1)+'g on hand'} · ${sessionsForTea} session${sessionsForTea===1?'':'s'}</div>
+    </div>
+  </div>`;
+}
+
+function distinctVendors(){
+  return [...new Set(state.teas.map(t=>(t.source||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function filteredSortedTeas(){
+  const F = state.teaFilter;
+  const list = state.teas.filter(t=>{
+    if(F.type && t.type!==F.type) return false;
+    if(F.vendor && (t.source||'').trim()!==F.vendor) return false;
+    if(F.lowStock && !(Number(t.amountGrams)<lowStockG())) return false;
+    return true;
+  });
+  const time = t => new Date(t.dateAdded||0).getTime();
+  const s = state.teaSort;
+  if(s==='newest') list.sort((a,b)=>time(b)-time(a));
+  else if(s==='oldest') list.sort((a,b)=>time(a)-time(b));
+  else if(s==='name') list.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  else if(s==='stock-high') list.sort((a,b)=>(Number(b.amountGrams)||0)-(Number(a.amountGrams)||0));
+  else if(s==='stock-low') list.sort((a,b)=>(Number(a.amountGrams)||0)-(Number(b.amountGrams)||0));
+  else if(s==='rating') list.sort((a,b)=>(Number(b.rating)||0)-(Number(a.rating)||0));
+  return list;
+}
+function viewTeas(){
+  const F = state.teaFilter;
+  const vendors = distinctVendors();
+  const list = filteredSortedTeas();
+  const cards = list.length
+    ? `<div class="grid grid-3">${list.map(teaCardHTML).join('')}</div>`
+    : `<div class="card empty">${state.teas.length ? 'No teas match these filters.' : 'No teas yet — add your first one.'}</div>`;
+  const esc = v => v.replace(/"/g,'&quot;');
+  const typeOpts = `<option value="">All types</option>` + TYPES.map(ty=>`<option value="${ty.k}" ${F.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
+  const vendorOpts = `<option value="">All vendors</option>` + vendors.map(v=>`<option value="${esc(v)}" ${F.vendor===v?'selected':''}>${v}</option>`).join('');
+  const controls = state.teas.length ? `
+    <div class="lib-controls">
+      <select class="lib-select" onchange="setTeaSort(this.value)" aria-label="Sort teas">
+        <option value="newest" ${state.teaSort==='newest'?'selected':''}>Newest</option>
+        <option value="oldest" ${state.teaSort==='oldest'?'selected':''}>Oldest</option>
+        <option value="name" ${state.teaSort==='name'?'selected':''}>Name A–Z</option>
+        <option value="stock-high" ${state.teaSort==='stock-high'?'selected':''}>Most stock</option>
+        <option value="stock-low" ${state.teaSort==='stock-low'?'selected':''}>Least stock</option>
+        <option value="rating" ${state.teaSort==='rating'?'selected':''}>Highest rated</option>
+      </select>
+      <select class="lib-select" onchange="setTeaFilter('type', this.value)" aria-label="Filter by type">${typeOpts}</select>
+      ${vendors.length ? `<select class="lib-select" onchange="setTeaFilter('vendor', this.value)" aria-label="Filter by vendor">${vendorOpts}</select>` : ''}
+      <button class="lib-chip ${F.lowStock?'active':''}" onclick="toggleLowStockFilter()">Low stock</button>
+      ${(F.type||F.vendor||F.lowStock) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
+    </div>` : '';
+  return `
+    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2><button class="btn btn-primary" onclick="openTeaForm()">＋ Add tea</button></div>
+    <div class="mono" style="font-size:12px;color:var(--ink-soft);margin:-6px 0 12px;">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length?` · ${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length} low`:''}</div>
+    ${controls}
+    ${cards}
+  `;
+}
+function setTeaSort(v){ state.teaSort=v; render(); }
+function setTeaFilter(key, val){ state.teaFilter[key]=val; render(); }
+function toggleLowStockFilter(){ state.teaFilter.lowStock=!state.teaFilter.lowStock; render(); }
+function clearTeaFilters(){ state.teaFilter={type:'',vendor:'',lowStock:false}; render(); }
+
+function openTeaForm(existing){
+  state.editingTea = existing || null;
+  state._draftImage = existing ? existing.image : null;
+  state.teaFormOpen = true;
+  render();
+}
+function closeTeaForm(){ state.teaFormOpen=false; state.editingTea=null; state._draftImage=null; render(); }
+
+function teaFormModal(){
+  const t = state.editingTea || {};
+  const typeOpts = TYPES.map(ty=>`<option value="${ty.k}" ${t.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
+  return `<div class="overlay" onclick="if(event.target===this) closeTeaForm()">
+    <div class="modal">
+      <div class="modal-head"><h2>${t.id?'Edit tea':'Add a tea'}</h2><button class="close-x" onclick="closeTeaForm()">✕</button></div>
+      <form id="teaForm" onsubmit="submitTeaForm(event)">
+        <div class="form-grid">
+          <div class="field span2">
+            <label>Photo</label>
+            <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+              ${state._draftImage?'':'Tap to upload photo'}
+              <input type="file" accept="image/*" class="js-img-input">
+            </div>
+          </div>
+          <div class="field"><label>Name</label><input type="text" name="name" required value="${t.name||''}"></div>
+          <div class="field"><label>Tea type</label><select name="type">${typeOpts}</select></div>
+          <div class="field"><label>Amount on hand (g)</label><input type="number" step="0.1" name="amountGrams" value="${t.amountGrams??''}"></div>
+          <div class="field"><label>Your rating</label><div id="teaRatingWrap">${renderStarsInteractive(Number(t.rating)||0,true,'setTeaFormRating')}</div><input type="hidden" name="rating" id="teaRatingInput" value="${t.rating||0}"></div>
+          <div class="field"><label>Harvest year</label><input type="text" name="harvestYear" value="${t.harvestYear||''}" placeholder="2025"></div>
+          <div class="field"><label>Harvest season</label><select name="harvestSeason">
+            <option value="" ${!t.harvestSeason?'selected':''}>—</option>
+            <option ${t.harvestSeason==='Spring'?'selected':''}>Spring</option>
+            <option ${t.harvestSeason==='Summer'?'selected':''}>Summer</option>
+            <option ${t.harvestSeason==='Autumn'?'selected':''}>Autumn</option>
+            <option ${t.harvestSeason==='Winter'?'selected':''}>Winter</option>
+          </select></div>
+          <div class="field"><label>Origin</label><input type="text" name="origin" value="${t.origin||''}" placeholder="Fujian, China"></div>
+          <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${t.cultivar||''}" placeholder="Qi Dan"></div>
+          <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${t.source||''}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${v.replace(/"/g,'&quot;')}"></option>`).join('')}</datalist></div>
+          <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
+          <div class="field"><label>Grams bought (for that price)</label><input type="number" step="0.1" name="costOriginalGrams" value="${t.costOriginalGrams??''}" placeholder="50"></div>
+          <div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${t.brewGuide||''}</textarea></div>
+          <div class="field span2"><label>Description</label><textarea name="description" placeholder="Tasting notes, character, story...">${t.description||''}</textarea></div>
+          <div class="field span2" style="flex-direction:row;gap:18px;flex-wrap:wrap;">
+            <label class="checkrow"><input type="checkbox" name="isFavorite" ${t.isFavorite?'checked':''}> Favorite</label>
+            <label class="checkrow"><input type="checkbox" name="wouldRebuy" ${t.wouldRebuy?'checked':''}> Would rebuy</label>
+            <label class="checkrow"><input type="checkbox" name="isRepeat" ${t.purchaseType==='repeat'?'checked':''}> Repeat buy (unchecked = first time)</label>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:18px;">
+          <div>${t.id?`<button type="button" class="btn-danger btn" onclick="deleteTea('${t.id}')">Delete</button>`:'<span></span>'}</div>
+          <div style="display:flex;gap:8px;"><button type="button" class="btn" onclick="closeTeaForm()">Cancel</button><button type="submit" class="btn btn-primary">Save tea</button></div>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function setTeaFormRating(v){
+  document.getElementById('teaRatingInput').value = v;
+  document.getElementById('teaRatingWrap').innerHTML = renderStarsInteractive(v,true,'setTeaFormRating');
+}
+async function submitTeaForm(e){
+  e.preventDefault();
+  const f = e.target;
+  const imageUrl = await resolveDraftImage();
+  const data = {
+    id: state.editingTea?.id || uid(),
+    name: f.name.value.trim(),
+    type: f.type.value,
+    amountGrams: f.amountGrams.value?Number(f.amountGrams.value):0,
+    rating: Number(document.getElementById('teaRatingInput').value)||0,
+    harvestYear: f.harvestYear.value.trim(),
+    harvestSeason: f.harvestSeason.value,
+    origin: f.origin.value.trim(),
+    cultivar: f.cultivar.value.trim(),
+    source: f.source.value.trim(),
+    costTotal: f.costTotal.value?Number(f.costTotal.value):0,
+    costOriginalGrams: f.costOriginalGrams.value?Number(f.costOriginalGrams.value):0,
+    brewGuide: f.brewGuide.value.trim(),
+    description: f.description.value.trim(),
+    isFavorite: f.isFavorite.checked,
+    wouldRebuy: f.wouldRebuy.checked,
+    purchaseType: f.isRepeat.checked?'repeat':'first',
+    image: imageUrl,
+    dateAdded: state.editingTea?.dateAdded || new Date().toISOString()
+  };
+  if(state.editingTea){
+    const idx = state.teas.findIndex(t=>t.id===data.id);
+    state.teas[idx] = data;
+  } else {
+    state.teas.push(data);
+  }
+  persistTea(data);
+  state.teaFormOpen = false; state.editingTea = null; state._draftImage = null;
+  syncAchievements(true);
+  render();
+}
+function deleteTea(id){
+  if(!confirm('Delete this tea? Session history stays but will show as an unknown tea.')) return;
+  state.teas = state.teas.filter(t=>t.id!==id);
+  dropTea(id);
+  state.teaFormOpen=false; state.editingTea=null; state.view='teas'; state.activeTeaId=null;
+  render();
+}
+
+function openTeaDetail(id){ state.activeTeaId=id; state.view='tea-detail'; render(); }
+
+function viewTeaDetail(){
+  const t = teaById(state.activeTeaId);
+  if(!t) return '<div class="empty">Tea not found.</div>';
+  const mySessions = state.sessions.filter(s=>s.teaId===t.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const histHTML = mySessions.length ? mySessions.map(s=>{
+    const v = vesselById(s.vesselId);
+    return `<div class="session-hist-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <span style="display:flex;align-items:center;gap:8px;">${s.photoUrl?`<img src="${s.photoUrl}" alt="" class="session-thumb" loading="lazy">`:''}<span><strong>${fmtDateTime(s.date)}</strong> · ${v?v.name:'—'} · ${brewCountLabel(s)} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span></span>
+      <button class="btn-ghost" onclick="openSessionEdit('${s.id}')">edit</button>
+    </div>`;
+  }).join('') : '<div class="empty">No sessions logged for this tea yet.</div>';
+
+  return `
+    <button class="detail-back" onclick="goView('teas')">← Back to teas</button>
+    <div class="card">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="width:140px;height:140px;border-radius:12px;background:${t.image?`url(${t.image}) center/cover`:'var(--jade-pale)'};flex:0 0 auto;"></div>
+        <div style="flex:1;min-width:200px;">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="pill t-${t.type}">${typeLabel(t.type)}</span>
+            ${t.isFavorite?'<span class="pill" style="background:#F6E3E2;color:#B5504A;">♥ favorite</span>':''}
+            ${t.wouldRebuy?'<span class="pill" style="background:#E4EAE0;color:#3F5E42;">would rebuy</span>':''}
+          </div>
+          <h2 style="margin:8px 0 4px;">${t.name}</h2>
+          ${renderStarsStatic(Number(t.rating)||0,true)}
+          <div class="eyebrow" style="margin-top:8px;">On hand</div>
+          <div style="font-size:14px;${Number(t.amountGrams)<10?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:16px;">
+        <div><div class="eyebrow">Origin</div><div>${t.origin||'—'}</div></div>
+        <div><div class="eyebrow">Cultivar</div><div>${t.cultivar||'—'}</div></div>
+        <div><div class="eyebrow">Harvest</div><div>${[t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—'}</div></div>
+        <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}</div></div>
+        <div><div class="eyebrow">Source</div><div>${t.source||'—'}</div></div>
+        <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
+      </div>
+      ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.brewGuide}</div></div>`:''}
+      ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.description}</div></div>`:''}
+
+      <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="startSessionFor('${t.id}')">Start session</button>
+        <button class="btn" onclick="openTeaForm(teaById('${t.id}'))">Edit</button>
+      </div>
+
+      <div class="session-hist">
+        <div class="eyebrow" style="margin-bottom:6px;">Session history</div>
+        ${histHTML}
+      </div>
+    </div>
+  `;
+}
+
+/* ================= FRIENDS (social) ================= */
