@@ -205,7 +205,8 @@ function viewTeaDetail(){
           <h2 style="margin:8px 0 4px;">${t.name}</h2>
           ${renderStarsStatic(Number(t.rating)||0,true)}
           <div class="eyebrow" style="margin-top:8px;">On hand</div>
-          <div style="font-size:14px;${Number(t.amountGrams)<10?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
+          <div style="font-size:14px;${Number(t.amountGrams)<lowStockG()?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
+          ${forecastLine(t)}
         </div>
       </div>
 

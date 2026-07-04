@@ -35,9 +35,9 @@ const PASSPORT_LAND = {
 
 // Tea countries with a map cell + matching keywords (country + common regions).
 const PASSPORT_GEO = [
-  { country:'China',       col:50, row:8,  aliases:['china','chinese','fujian','yunnan','anhui','zhejiang','guangdong','guandong','wuyi','anxi','yiwu','puer','pu-er',"pu'er",'puerh','sheng','shou','longjing','dragonwell','keemun','dian hong','dianhong','lapsang','tie guan yin','tieguanyin','rou gui','shui xian','dan cong','dancong','yashi xiang','ya bao','phoenix','chaozhou','bai mudan','silver needle','shou mei','gong mei','jasmine','gaoshan black','fo shou'] },
-  { country:'Japan',       col:53, row:7,  aliases:['japan','japanese','uji','kyoto','kagoshima','shizuoka','yame','nara','sencha','gyokuro','matcha','hojicha','houjicha','bancha','genmaicha','kabuse','kabusecha','saemidori','shincha','tamaryokucha'] },
-  { country:'Taiwan',      col:51, row:9,  aliases:['taiwan','taiwanese','formosa','alishan','ali shan','nantou','lishan','li shan','dong ding','dongding','shan lin xi','oriental beauty','ruby 18','sun moon lake','high mountain','gaoshan oolong','dong pian'] },
+  { country:'China',       col:50, row:8,  aliases:['china','chinese','fujian','yunnan','anhui','zhejiang','guangdong','guandong','wuyi','wuyishan','anxi','yiwu','menghai','lincang','jingmai','bulang','fuding','zhenghe','hangzhou','huangshan','puer','pu-er',"pu'er",'puerh','sheng','shou','longjing','dragonwell','keemun','qimen','dian hong','dianhong','lapsang','zhengshan','tie guan yin','tieguanyin','rou gui','shui xian','shuixian','dan cong','dancong','yashi xiang','ya bao','mi lan','phoenix','feng huang','chaozhou','bai mudan','white peony','silver needle','yin zhen','shou mei','gong mei','jasmine','mo li','gaoshan black','fo shou','bi luo chun','biluochun','mao feng','maofeng','mao jian','gua pian','liu bao','liubao','hei cha','fu zhuan','gunpowder','huang ya','huangya','huoshan','huo shan'] },
+  { country:'Japan',       col:53, row:7,  aliases:['japan','japanese','uji','kyoto','kagoshima','shizuoka','yame','nara','miyazaki','fukuoka','wazuka','sencha','gyokuro','matcha','hojicha','houjicha','bancha','genmaicha','kabuse','kabusecha','fukamushi','tencha','kukicha','saemidori','shincha','tamaryokucha','asamushi'] },
+  { country:'Taiwan',      col:51, row:9,  aliases:['taiwan','taiwanese','formosa','alishan','ali shan','nantou','lishan','li shan','dong ding','dongding','shan lin xi','baozhong','pouchong','wenshan','muzha','meishan','oriental beauty','bai hao','ruby 18','red jade','hong yu','sun moon lake','high mountain','gaoshan oolong','jin xuan','jinxuan','si ji chun','four seasons','dong pian'] },
   { country:'India',       col:45, row:8,  aliases:['india','indian','darjeeling','assam','nilgiri','sikkim','munnar','first flush','second flush'] },
   { country:'Nepal',       col:44, row:8,  aliases:['nepal','nepali','ilam','himalayan'] },
   { country:'Sri Lanka',   col:44, row:12, aliases:['sri lanka','ceylon','nuwara eliya','dimbula','uva','kandy'] },
@@ -54,13 +54,18 @@ const PASSPORT_GEO = [
   { country:'England',     col:30, row:4,  aliases:['england','english','cornwall','tregothnan'] }
 ];
 
+function passportMatchText(text){
+  text = (text||'').toLowerCase();
+  if(!text.trim()) return null;
+  // Longest matching alias wins, so a specific region ("ali shan", "dong pian")
+  // beats a generic one that also appears ("fo shou").
+  let best=null, bestLen=0;
+  for(const g of PASSPORT_GEO){ for(const a of g.aliases){ if(a.length>bestLen && text.includes(a)){ best=g.country; bestLen=a.length; } } }
+  return best;
+}
 function passportCountryFor(tea){
-  // Search the origin field AND the tea name — regions/cultivars in the name
-  // ("Yunnan Silver Bud", "... Dancong") are strong signals.
-  const hay = ((tea.origin||'') + ' ' + (tea.name||'')).toLowerCase();
-  if(!hay.trim()) return null;
-  for(const g of PASSPORT_GEO){ if(g.aliases.some(a=>hay.includes(a))) return g.country; }
-  return null;
+  // Trust the origin field first; fall back to the name.
+  return passportMatchText(tea.origin) || passportMatchText(tea.name);
 }
 function passportGeo(country){ return PASSPORT_GEO.find(g=>g.country===country); }
 function passportSelect(country){ state.passportSel = (state.passportSel===country ? null : country); render(); }

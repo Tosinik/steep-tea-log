@@ -24,6 +24,19 @@ Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
 
+## v3.10 — consumption forecast, map matching fixes
+Deploy: `service-worker.js` (v21), `steep-passport.js`, `steep-dashboard.js`,
+`steep-teas.js`, `styles.css`.
+
+- **"Runs out in ~N days" forecast.** From each tea's grams-tracked sessions we estimate a
+  weekly consumption rate and project when it'll run out. Shown on the tea detail ("~5g/week,
+  about 2 weeks left") and appended to the Running-low card. Needs ≥2 grams-tracked sessions;
+  flagged "rough estimate" until ≥4 — it genuinely sharpens as more sessions are logged.
+- **Map matching fixes.** (1) Ordering bug: a Taiwan tea ("Ali Shan Fo Shou Dong Pian")
+  matched China via "fo shou". Matching now trusts the origin field first, then picks the
+  LONGEST/most-specific keyword, so "ali shan"/"dong pian" win. (2) Big keyword expansion for
+  China (yunnan, huoshan/huang ya, wuyi, dancong, many regions), Japan and Taiwan.
+
 ## v3.9 — meditative focus mode
 Deploy: `service-worker.js` (v20), `steep-core.js`, `steep-sessions.js`, `styles.css`.
 

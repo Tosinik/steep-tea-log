@@ -256,6 +256,31 @@ function streakCardHTML(){
     ${heatmapHTML(s.days)}
   </div>`;
 }
+function teaForecast(tea){
+  // Estimate consumption from grams-tracked sessions. More sessions → sharper estimate.
+  const ss = state.sessions.filter(s=>s.teaId===tea.id && Number(s.gramsUsed)>0).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(ss.length<2) return null; // need at least two data points
+  const totalG = ss.reduce((a,s)=>a+Number(s.gramsUsed),0);
+  const spanDays = Math.max(3, (Date.now()-new Date(ss[0].date))/86400000);
+  const perDay = totalG/spanDays;
+  if(perDay<=0) return null;
+  const g = Number(tea.amountGrams)||0;
+  return { perWeek: perDay*7, daysLeft: g>0?Math.round(g/perDay):0, sessions: ss.length, confident: ss.length>=4 };
+}
+function fmtDaysLeft(days){
+  if(days<=0) return 'out';
+  if(days<14) return '~'+days+' days';
+  if(days<60) return '~'+Math.round(days/7)+' weeks';
+  if(days<365) return '~'+Math.round(days/30)+' months';
+  return 'over a year';
+}
+function forecastLine(tea){
+  const f = teaForecast(tea);
+  if(!f) return '';
+  const wk = f.perWeek<1 ? f.perWeek.toFixed(1) : Math.round(f.perWeek);
+  if((Number(tea.amountGrams)||0)<=0) return `<div class="forecast-line">Out of stock — you were going through ~${wk}g/week.</div>`;
+  return `<div class="forecast-line">At your pace (~${wk}g/week), about <b>${fmtDaysLeft(f.daysLeft)}</b> left${f.confident?'':' · rough estimate, sharpens as you log more'}.</div>`;
+}
 function periodRange(period){
   const now = new Date();
   const end = new Date(now); end.setHours(23,59,59,999);
@@ -418,9 +443,10 @@ function viewDashboard(){
       <div class="section-title"><h2>Running low</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">favourites & rebuys</span></div>
       ${restock.map(t=>{
         const g=Number(t.amountGrams); const low=g<lowStockG();
+        const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
         return `<div class="rank-row" onclick="openTeaDetail('${t.id}')" style="cursor:pointer;">
           <span class="rname">${t.isFavorite?'♥ ':''}${t.name}</span>
-          <span class="rval" style="color:${low?'var(--red)':'var(--amber)'};font-weight:600;">${g.toFixed(1)}g · ${low?'low':'getting low'}</span>
+          <span class="rval" style="color:${low?'var(--red)':'var(--amber)'};font-weight:600;">${g.toFixed(1)}g${est}</span>
         </div>`;
       }).join('')}
     </div>` : '';
