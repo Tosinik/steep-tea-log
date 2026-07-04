@@ -54,7 +54,8 @@ const TYPES = [
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
 ];
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, monoFont:'pixel' };
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, monoFont:'pixel' };
+function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
 let state = {
   teas: [], vessels: [], sessions: [], tagLibrary: [...DEFAULT_TAGS],
@@ -257,7 +258,7 @@ function render(){
     <div class="topbar"><div class="topbar-inner">
       <div class="brand"><div class="brand-mark"></div><h1>Steep</h1></div>
       <div class="tabs">
-        <button class="tab ${state.view==='dashboard'?'active':''}" onclick="goView('dashboard')">Dashboard</button>
+        <button class="tab ${state.view==='dashboard'?'active':''}" onclick="goView('dashboard')">Home</button>
         <button class="tab ${state.view==='teas'||state.view==='tea-detail'?'active':''}" onclick="goView('teas')">Teas</button>
         <button class="tab ${state.view==='sessions'?'active':''}" onclick="goView('sessions')">Sessions</button>
         <button class="tab ${state.view==='vessels'?'active':''}" onclick="goView('vessels')">Vessels</button>
@@ -395,6 +396,10 @@ function settingsModal(){
         ${toggle('soundEnabled')}
       </div>
       <div class="set-row">
+        <div><div class="set-label">Low-stock warning</div><div class="set-sub">Flag a tea as low when it drops below this many grams</div></div>
+        <input type="number" min="1" max="500" value="${lowStockG()}" style="width:70px;text-align:right;" onchange="setSetting('lowStockThreshold', Math.max(1,Number(this.value)||15))">
+      </div>
+      <div class="set-row">
         <div><div class="set-label">Quiet mode</div><div class="set-sub">Calm-first: hides achievements and skips unlock confetti. Tea, not a scoreboard.</div></div>
         ${toggle('quietMode')}
       </div>
@@ -445,7 +450,7 @@ function computeStats(){
 
   const favorites = state.teas.filter(t=>t.isFavorite);
 
-  const lowStock = state.teas.filter(t=>Number(t.amountGrams)<10);
+  const lowStock = state.teas.filter(t=>Number(t.amountGrams)<lowStockG());
 
   const totalSpent = state.teas.reduce((a,t)=>a+(Number(t.costTotal)||0),0);
   const gramsBought = state.teas.reduce((a,t)=>a+(Number(t.costOriginalGrams)||0),0);
@@ -882,7 +887,7 @@ function teaCardHTML(t){
       <span class="pill t-${t.type}">${typeLabel(t.type)}</span>
       <div class="name">${t.name}</div>
       ${renderStarsStatic(Number(t.rating)||0,false)}
-      <div class="tea-meta">${Number(t.amountGrams)<10?'<span class="stock-low">'+Number(t.amountGrams).toFixed(1)+'g left</span>':Number(t.amountGrams).toFixed(1)+'g on hand'} · ${sessionsForTea} session${sessionsForTea===1?'':'s'}</div>
+      <div class="tea-meta">${Number(t.amountGrams)<lowStockG()?'<span class="stock-low">'+Number(t.amountGrams).toFixed(1)+'g left</span>':Number(t.amountGrams).toFixed(1)+'g on hand'} · ${sessionsForTea} session${sessionsForTea===1?'':'s'}</div>
     </div>
   </div>`;
 }
@@ -895,7 +900,7 @@ function filteredSortedTeas(){
   const list = state.teas.filter(t=>{
     if(F.type && t.type!==F.type) return false;
     if(F.vendor && (t.source||'').trim()!==F.vendor) return false;
-    if(F.lowStock && !(Number(t.amountGrams)<10)) return false;
+    if(F.lowStock && !(Number(t.amountGrams)<lowStockG())) return false;
     return true;
   });
   const time = t => new Date(t.dateAdded||0).getTime();
@@ -935,6 +940,7 @@ function viewTeas(){
     </div>` : '';
   return `
     <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2><button class="btn btn-primary" onclick="openTeaForm()">＋ Add tea</button></div>
+    <div class="mono" style="font-size:12px;color:var(--ink-soft);margin:-6px 0 12px;">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length?` · ${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length} low`:''}</div>
     ${controls}
     ${cards}
   `;

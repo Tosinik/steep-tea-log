@@ -1,4 +1,4 @@
-const CACHE_NAME = 'steep-tea-log-v14';
+const CACHE_NAME = 'steep-tea-log-v15';
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -34,13 +34,22 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
+  // Only the app shell (same-origin GET) and the pinned Supabase-js CDN script are
+  // cacheable. Everything else — Supabase REST/auth/storage, any cross-origin or
+  // non-GET request — goes straight to the network and is NEVER cached. Caching
+  // data responses was serving stale teas/photos until a hard reload.
+  const cacheable = req.method === 'GET' &&
+    (url.origin === self.location.origin ||
+     url.href === 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
+  if (!cacheable) { event.respondWith(fetch(req)); return; }
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).then((response) => {
-        // cache same-origin GET requests as we go
-        if (event.request.method === 'GET' && response && response.status === 200) {
+    caches.match(req).then((cached) => {
+      return cached || fetch(req).then((response) => {
+        if (response && response.status === 200) {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
         }
         return response;
       }).catch(() => cached);
