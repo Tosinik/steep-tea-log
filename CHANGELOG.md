@@ -24,6 +24,21 @@ Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
 
+## v3.8 — streak regression fix, map cleanup, gaiwan app icon
+Deploy: `service-worker.js` (v19), `steep-dashboard.js`, `steep-passport.js`,
+`steep-teas.js`, and the new `icon-192.png` / `icon-512.png`.
+
+- **Streak fix (regression).** The Monday-alignment shifted the grid start back without
+  extending the end, so the last column ended a few days BEFORE today and recent squares
+  (incl. today) fell off the grid — no green. Now the last column is anchored to the current
+  week, so today is always shown.
+- **World map cleanup.** Cropped to the tea hemisphere (Europe/Africa/Asia/Oceania) — the
+  Americas are dropped, which zooms everything up so it's readable on mobile. Tapping a tea
+  from the map now returns to the passport (back button says "Back to passport").
+- **App icon.** New pixel-gaiwan `icon-192.png` / `icon-512.png` (jade bg). Replaces the old
+  home-screen icon. On iOS/Android you may need to remove and re-add to the home screen to
+  see it, since the OS caches the old icon.
+
 ## v3.7 — passport polish, running-low reminder, weigh-with-packaging
 Deploy: `service-worker.js` (v18), `steep-passport.js`, `steep-core.js`,
 `steep-settings.js`, `steep-teas.js`, `steep-dashboard.js`.

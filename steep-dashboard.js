@@ -214,11 +214,14 @@ function confettiBurst(){
 
 
 function heatmapHTML(days){
-  // 13 weeks x 7 days, Monday-aligned (matches the recap + local convention)
+  // 13 weeks x 7 days, Monday-aligned. Anchor the LAST column to the current week
+  // so today (and recent days) are always inside the grid.
   const weeks = 13;
   const today = new Date(); today.setHours(0,0,0,0);
-  const start = new Date(today); start.setDate(start.getDate()-(weeks*7-1));
-  start.setDate(start.getDate()-((start.getDay()+6)%7)); // back to Monday
+  const monThisWeek = new Date(today);
+  monThisWeek.setDate(today.getDate() - ((today.getDay()+6)%7)); // Monday of this week
+  const start = new Date(monThisWeek);
+  start.setDate(monThisWeek.getDate() - (weeks-1)*7);           // 13 weeks back, on a Monday
   const dayLabels = ['Mon','','Wed','','Fri','','']; // rows Mon…Sun
   const labelCol = '<div class="heat-week heat-labels">'+dayLabels.map(l=>`<div class="heat-label">${l}</div>`).join('')+'</div>';
   let cols = '';

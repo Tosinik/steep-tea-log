@@ -177,7 +177,7 @@ function deleteTea(id){
   render();
 }
 
-function openTeaDetail(id){ state.activeTeaId=id; state.view='tea-detail'; render(); }
+function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail'; render(); }
 
 function viewTeaDetail(){
   const t = teaById(state.activeTeaId);
@@ -192,7 +192,7 @@ function viewTeaDetail(){
   }).join('') : '<div class="empty">No sessions logged for this tea yet.</div>';
 
   return `
-    <button class="detail-back" onclick="goView('teas')">← Back to teas</button>
+    <button class="detail-back" onclick="goView('${state.teaDetailFrom==='passport'?'passport':'teas'}')">← Back to ${state.teaDetailFrom==='passport'?'passport':'teas'}</button>
     <div class="card">
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
         <div style="width:140px;height:140px;border-radius:12px;background:${t.image?`url(${t.image}) center/cover`:'var(--jade-pale)'};flex:0 0 auto;"></div>

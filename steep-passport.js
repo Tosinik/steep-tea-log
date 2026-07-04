@@ -74,10 +74,14 @@ function viewPassport(){
 
   // ---- dot map ----
   const cell=9, pad=6, W=60, H=24;
-  const vbW = pad*2+W*cell, vbH = pad*2+21*cell; // crop the near-empty far-south band
+  // Crop to the tea-growing hemisphere (Europe/Africa/Asia/Oceania) — the Americas
+  // aren't used, and cropping zooms everything up so it reads well on mobile.
+  const colMin=28, colMax=59, rowMin=2, rowMax=20;
+  const vbX = pad+colMin*cell, vbY = pad+rowMin*cell;
+  const vbW = (colMax-colMin+1)*cell, vbH = (rowMax-rowMin+1)*cell;
   const cx = c => pad+c*cell+cell/2, cy = r => pad+r*cell+cell/2;
-  let svg = `<svg viewBox="0 0 ${vbW} ${vbH}" role="img" aria-label="World map of your tea regions" style="width:100%;height:auto;display:block;">`;
-  for(const r in PASSPORT_LAND){ if(+r>20) continue; PASSPORT_LAND[r].forEach(seg=>{ for(let c=seg[0];c<=seg[1];c++){ svg += `<circle cx="${cx(c)}" cy="${cy(+r)}" r="2.4" fill="var(--heat-empty)"/>`; } }); }
+  let svg = `<svg viewBox="${vbX} ${vbY} ${vbW} ${vbH}" role="img" aria-label="Map of your tea regions" style="width:100%;height:auto;display:block;">`;
+  for(const r in PASSPORT_LAND){ if(+r<rowMin||+r>rowMax) continue; PASSPORT_LAND[r].forEach(seg=>{ for(let c=Math.max(seg[0],colMin);c<=Math.min(seg[1],colMax);c++){ svg += `<circle cx="${cx(c)}" cy="${cy(+r)}" r="2.4" fill="var(--heat-empty)"/>`; } }); }
   owned.forEach(country=>{
     const g = passportGeo(country); if(!g) return;
     const n = byCountry[country].length;
@@ -97,7 +101,7 @@ function viewPassport(){
     const list = byCountry[state.passportSel];
     panel = `<div style="font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);">${state.passportSel}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'} · tap to open</div>
-      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${t.id}')">${t.name}</span>`).join('')}</div>`;
+      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${t.id}','passport')">${t.name}</span>`).join('')}</div>`;
   } else {
     panel = `<div style="color:var(--ink-soft);font-size:13px;line-height:1.5;">Tap a pin — or a region below — to see the teas you've brewed from there. Tap a tea to open it.</div>`;
   }
