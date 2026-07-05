@@ -523,7 +523,6 @@ function onboardingHTML(){
       ${step(hasVessel, 2, 'Add a vessel', 'A gaiwan, teapot, or mug — whatever you brew in.', `<button class="btn btn-primary ob-btn" onclick="goView('vessels')">Add vessel</button>`)}
       ${step(false, 3, 'Log your first session', ready?"Everything's ready — go brew something.":'Add a tea and a vessel first.', ready?`<button class="btn btn-primary ob-btn" onclick="quickLogSession()">Log session</button>`:'')}
     </div>
-    ${backupSectionHTML()}
   `;
 }
 function viewAchievements(){
@@ -809,7 +808,6 @@ function viewDashboard(){
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
     </div>
 
-    ${backupSectionHTML()}
   `;
 }
 

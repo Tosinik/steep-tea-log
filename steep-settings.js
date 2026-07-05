@@ -1,8 +1,10 @@
 function backupSectionHTML(){
   const email = window.SteepDB.getUser()?.email || '';
-  return `<div class="section card">
-    <div class="section-title"><h2>Data &amp; account</h2></div>
-    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:0;">Signed in as <strong>${email}</strong>. Your log syncs to your account across devices. You can still export a JSON backup anytime.</p>
+  return `<div class="set-row" style="flex-direction:column;align-items:stretch;gap:12px;">
+    <div>
+      <div class="set-label">Data &amp; account</div>
+      <div class="set-sub">Signed in as <strong>${email}</strong>. Your log syncs across devices; export a JSON backup anytime.</div>
+    </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <button class="btn btn-primary" onclick="exportData()">Export backup (.json)</button>
       <button class="btn" onclick="triggerImport()">Import backup</button>
@@ -120,7 +122,8 @@ function settingsModal(){
         <div><div class="set-label">Display font</div><div class="set-sub">Pixel is the retro look; Clean is a plain monospace</div></div>
         ${seg('monoFont',[{v:'pixel',label:'Pixel'},{v:'clean',label:'Clean'}])}
       </div>
-      <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Signed in as ${email}. Settings sync across your devices. Manage vendors from the Teas tab.</p>
+      ${backupSectionHTML()}
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Settings sync across your devices. Manage vendors from the Teas tab.</p>
     </div>
   </div>`;
 }

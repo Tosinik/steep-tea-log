@@ -24,7 +24,8 @@ Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
 ## v3.24 — brew-guide → prefilled steep schedule
-Deploy: `service-worker.js` (v35), `steep-core.js`, `steep-sessions.js`, `steep-settings.js`.
+Deploy: `service-worker.js` (v35), `steep-core.js`, `steep-sessions.js`, `steep-settings.js`,
+        `steep-dashboard.js`.
 - Parses each tea's free-text "How to brew" note into a light schedule
   (`{tempC, rinseSeconds, times[]}`) via `parseBrewGuide()` in steep-core. Rule-based and
   forgiving: gongfu slash-runs (`15s / 20s / 30s`), comma lists, `m:ss` clocks, Western
@@ -38,6 +39,8 @@ Deploy: `service-worker.js` (v35), `steep-core.js`, `steep-sessions.js`, `steep-
   stays editable; "turn off" disables it mid-session.
 - Skipped for cold brew (which already has its own single-long-steep path). New synced
   setting **Brew-guide autofill** (default on). No SQL, no CSS, no new module.
+- Also in this batch: moved the **Data & account** section (export/import/move-photos/sign-out)
+  off Home into the bottom of the Settings modal (reachable via ⚙, styled as a settings row).
 
 ## v3.23 — theme toggle in Settings only
 Deploy: `service-worker.js` (v34), `steep-core.js`.
