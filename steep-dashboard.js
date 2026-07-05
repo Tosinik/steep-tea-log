@@ -214,14 +214,25 @@ function confettiBurst(){
 
 
 function heatmapHTML(days){
-  // 13 weeks x 7 days, Monday-aligned. Anchor the LAST column to the current week
-  // so today (and recent days) are always inside the grid.
-  const weeks = 13;
+  // Monday-aligned grid. Span starts at the week of your FIRST logged day (clamped
+  // 4–13 weeks) so a brand-new log doesn't show a long empty run of unused weeks.
+  const weeksMax = 13, weeksMin = 4;
   const today = new Date(); today.setHours(0,0,0,0);
   const monThisWeek = new Date(today);
   monThisWeek.setDate(today.getDate() - ((today.getDay()+6)%7)); // Monday of this week
+  let earliest = null;
+  days.forEach(k=>{ const p=k.split('-'); const dt=new Date(+p[0], +p[1]-1, +p[2]); if(!earliest || dt<earliest) earliest=dt; });
+  let weeks = weeksMax;
+  if(earliest){
+    const monFirst = new Date(earliest);
+    monFirst.setDate(earliest.getDate() - ((earliest.getDay()+6)%7));
+    const span = Math.floor((monThisWeek - monFirst)/(7*86400000)) + 1;
+    weeks = Math.max(weeksMin, Math.min(weeksMax, span));
+  } else {
+    weeks = weeksMin;
+  }
   const start = new Date(monThisWeek);
-  start.setDate(monThisWeek.getDate() - (weeks-1)*7);           // 13 weeks back, on a Monday
+  start.setDate(monThisWeek.getDate() - (weeks-1)*7);
   const dayLabels = ['Mon','','Wed','','Fri','','']; // rows Mon…Sun
   const labelCol = '<div class="heat-week heat-labels">'+dayLabels.map(l=>`<div class="heat-label">${l}</div>`).join('')+'</div>';
   let cols = '';
@@ -240,7 +251,7 @@ function heatmapHTML(days){
   }
   return `<div class="heatmap-wrap">
     <div class="heatmap">${labelCol}${cols}</div>
-    <div class="heat-caption">Each square is a day · past 13 weeks · columns are weeks</div>
+    <div class="heat-caption">Each square is a day · ${weeks} week${weeks>1?'s':''} · columns are weeks</div>
     <div class="heat-legend">
       <span><i class="heat-swatch" style="background:var(--heat-empty)"></i>no tea</span>
       <span><i class="heat-swatch" style="background:var(--heat-fill)"></i>logged</span>

@@ -15,7 +15,7 @@
   --glow:0 0 0 rgba(0,0,0,0);
   --heat-empty:#E4DCC5;
   --heat-fill:#4A7A3F;
-  --font-mono:'Silkscreen',monospace;
+  --font-mono:'Pixelify Sans',monospace;
 }
 /* "Clean" font option (Settings): swap the pixel font for a standard monospace */
 html[data-mono="clean"]{

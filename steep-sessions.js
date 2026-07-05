@@ -333,8 +333,14 @@ function sessionQuickHTML(d){
   return `
     <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
     <div class="card">
-      <h2 style="margin-top:0;">Quick log: ${tea?tea.name:''}</h2>
-      <div class="eyebrow">No timed steeps — just how it went.</div>
+      <h2 style="margin-top:0;">${d.isColdBrew?'Cold brew':'Quick log'}: ${tea?tea.name:''}</h2>
+      <div class="eyebrow">${d.isColdBrew?'A single long steep — just how it went.':'No timed steeps — just how it went.'}</div>
+      ${d.isColdBrew ? `
+      <div class="field" style="margin:14px 0;">
+        <label>Steep</label>
+        <div class="hint">Logged as one long cold steep.</div>
+      </div>
+      ` : `
       <div class="field" style="margin:14px 0;">
         <label>Infusions</label>
         <div class="infusion-stepper">
@@ -343,6 +349,7 @@ function sessionQuickHTML(d){
           <button type="button" aria-label="one more infusion" onclick="adjustInfusions(1)">＋</button>
         </div>
       </div>
+      `}
       <div class="field span2" style="margin:14px 0;">
         <label>Photo (optional)</label>
         <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
@@ -381,11 +388,16 @@ function sessionSetupHTML(d){
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
         <div class="field"><label>Water type</label><input type="text" value="${d.waterType}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
         <div class="field"><label>Water TDS (optional)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="ppm"></div>
-        <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_set('isColdBrew', this.checked)"> Cold brew</label></div>
+        <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
       </div>
+      ${d.isColdBrew ? `
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="beginColdBrewLog()">Log cold brew →</button>
+      <div class="hint" style="margin-top:8px;">Cold brew is logged as a single long steep — no per-steep timer.</div>
+      ` : `
       <button class="btn btn-primary" style="margin-top:16px;" onclick="beginSteeping()">Begin steeping →</button>
       <button class="btn" style="margin-top:8px;width:100%;" onclick="beginQuickLog()">Quick log — just infusions & notes</button>
       <div class="hint" style="margin-top:8px;">Quick log skips the per-steep timer — for when you'd rather drink than babysit a form.</div>
+      `}
     </div>
   `;
 }
@@ -397,6 +409,13 @@ function d_setcur(key, val){
 }
 function beginSteeping(){
   state.sessionDraft.stage='steeping';
+  render();
+}
+function d_setColdBrew(v){ state.sessionDraft.isColdBrew = v; render(); } // re-render so the setup buttons swap
+function beginColdBrewLog(){
+  const d = state.sessionDraft;
+  d.isColdBrew = true; d.infusionCount = 1; d.steeps = []; // one long steep, no timed infusions
+  d.stage = 'quick';
   render();
 }
 
