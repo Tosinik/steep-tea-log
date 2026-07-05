@@ -345,6 +345,101 @@ function recapHTML(){
   </div>`;
 }
 function setRecapPeriod(p){ state.recapPeriod=p; render(); }
+
+/* ================= INSIGHTS =================
+   Gentle, self-knowledge readings drawn from session timestamps + grams.
+   Calm-first: observational, never guilt. Rows only appear once there's
+   enough signal to be meaningful; the whole card hides below 5 sessions. */
+function computeInsights(){
+  const sessions = state.sessions;
+  if(sessions.length < 5) return null;
+  const now = new Date();
+  const DAY = 86400000;
+  const age = d => (now - new Date(d));
+
+  // Cadence — last 28 days, and the 28 before that for a gentle trend.
+  const last28 = sessions.filter(s=>{ const a=age(s.date); return a>=0 && a<=28*DAY; });
+  const prev28 = sessions.filter(s=>{ const a=age(s.date); return a>28*DAY && a<=56*DAY; });
+  const perWeek = last28.length/4;
+  const activeDays28 = new Set(last28.map(s=>dayKey(s.date))).size;
+  let trend = null;
+  if(prev28.length>=3 && last28.length>=3){
+    const ratio = last28.length/prev28.length;
+    trend = ratio>=1.25 ? 'up' : ratio<=0.8 ? 'down' : 'steady';
+  }
+
+  // Weekend vs weekday (all sessions). Sun=0, Sat=6.
+  let weekendCount=0;
+  sessions.forEach(s=>{ const d=new Date(s.date).getDay(); if(d===0||d===6) weekendCount++; });
+  const weekendShare = weekendCount/sessions.length;
+
+  // Favourite weekday.
+  const dow = new Array(7).fill(0);
+  sessions.forEach(s=>{ dow[new Date(s.date).getDay()]++; });
+  let favDow=-1, favN=0; dow.forEach((n,i)=>{ if(n>favN){ favN=n; favDow=i; } });
+
+  // Time of day (four parts) — complements the brewing clock with a one-liner.
+  const parts = {morning:0, afternoon:0, evening:0, night:0};
+  sessions.forEach(s=>{ const h=new Date(s.date).getHours();
+    if(h>=5&&h<12) parts.morning++; else if(h>=12&&h<17) parts.afternoon++;
+    else if(h>=17&&h<22) parts.evening++; else parts.night++; });
+  const topPart = Object.entries(parts).sort((a,b)=>b[1]-a[1])[0];
+  const topPartShare = topPart[1]/sessions.length;
+
+  // This calendar month vs last.
+  const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lmStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
+  const gramsOf = arr=>arr.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0);
+  const thisMonth = sessions.filter(s=>new Date(s.date)>=mStart);
+  const lastMonth = sessions.filter(s=>{ const d=new Date(s.date); return d>=lmStart && d<mStart; });
+  const month = { thisN:thisMonth.length, lastN:lastMonth.length,
+    thisG:gramsOf(thisMonth), lastG:gramsOf(lastMonth), hasCompare:lastMonth.length>0 };
+
+  return { perWeek, activeDays28, trend, last28n:last28.length,
+    weekendShare, favDow, favN, topPart:topPart[0], topPartShare, month,
+    enough: sessions.length>=8, total:sessions.length };
+}
+function insightsHTML(){
+  const n = computeInsights();
+  if(!n) return '';
+  const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const partLabel = {morning:'mornings', afternoon:'afternoons', evening:'evenings', night:'late nights'};
+
+  let lead;
+  if(n.last28n===0){
+    lead = `It's been a quiet month — nothing logged in the last 28 days. The pot's here whenever you are.`;
+  } else {
+    const wk = n.perWeek>=1 ? Math.round(n.perWeek) : n.perWeek.toFixed(1);
+    const trendPhrase = n.trend==='up' ? ', a little more than the month before'
+      : n.trend==='down' ? ', a touch less than the month before — no pressure'
+      : n.trend==='steady' ? ', holding steady with the month before' : '';
+    lead = `You've been steeping about <b>${wk}×</b> a week this past month${trendPhrase} — tea on ${n.activeDays28} of the last 28 days.`;
+  }
+
+  const rows = [];
+  if(n.enough){
+    const wePct = Math.round(n.weekendShare*100);
+    if(n.weekendShare>=0.4) rows.push(['Weekends', `your ritual — ${wePct}% of sessions`]);
+    else if(n.weekendShare<=0.18) rows.push(['Rhythm', `a weekday habit — ${wePct}% land on weekends`]);
+    else rows.push(['Weekends', `${wePct}% of your sessions`]);
+
+    if(n.topPartShare>=0.35) rows.push(['Time of day', `mostly ${partLabel[n.topPart]} — ${Math.round(n.topPartShare*100)}%`]);
+
+    if(n.favN>=3 && n.favDow>=0) rows.push(['Steepiest day', `${DOW[n.favDow]} · ${n.favN} sessions`]);
+  }
+  if(n.month.hasCompare){
+    const arrow = n.month.thisN>n.month.lastN ? '↑' : n.month.thisN<n.month.lastN ? '↓' : '→';
+    const g = (n.month.thisG>0||n.month.lastG>0) ? ` · ${n.month.thisG.toFixed(0)}g vs ${n.month.lastG.toFixed(0)}g` : '';
+    rows.push(['This month vs last', `<span style="color:var(--ink-soft);">${arrow}</span> ${n.month.thisN} vs ${n.month.lastN} sessions${g}`]);
+  }
+
+  const rowsHTML = rows.map(([k,v])=>`<div class="recap-line"><span class="recap-k">${k}</span><span class="recap-v">${v}</span></div>`).join('');
+  return `<div class="section card">
+    <div class="section-title"><h2>Insights</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">your patterns</span></div>
+    <div style="font-size:14px;line-height:1.55;color:var(--ink);margin-top:2px;">${lead}</div>
+    ${rowsHTML}
+  </div>`;
+}
 function onboardingHTML(){
   const hasTea = state.teas.length>0;
   const hasVessel = state.vessels.length>0;
@@ -470,6 +565,8 @@ function viewDashboard(){
     </div>
 
     ${brewingClockHTML(s)}
+
+    ${insightsHTML()}
 
     <div class="section card">
       <div class="section-title"><h2>What you brewed</h2></div>
