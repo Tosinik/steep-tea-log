@@ -23,6 +23,20 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.21 — hotfix: shared sessions leaking into personal stats
+Deploy: `service-worker.js` (v32), `steep-data.js`.
+- loadKey('sessions') / steeps now filter by user_id. A social RLS policy lets
+  followers read shared sessions; the unfiltered personal query was pulling those
+  into your own stats, streak, insights, persona, and Wrapped. Feed unaffected.
+
+## v3.20 — shopping list
+DB: run v3_3-wishlist.sql (new `wishlist` table + RLS).
+Deploy: `service-worker.js` (v31), `steep-shopping.js` (new), `steep-data.js`,
+        `steep-core.js`, `steep-teas.js`, `index.html`.
+- Shopping list behind a 🛒 header icon: manual entries + auto-suggested restocks
+  from the forecast (low/out teas, favourites first), check-off, and "add as tea"
+  (pre-fills the tea form). Wishlist writes flow through the offline queue.
+
 ## v3.19 — richer tea persona
 Deploy: `service-worker.js` (v30), `steep-dashboard.js`.
 - Persona blends habit signals: a title modifier (Cold-Brew / Gongfu / Nocturnal
