@@ -23,6 +23,10 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.23 — theme toggle in Settings only
+Deploy: `service-worker.js` (v34), `steep-core.js`.
+- Removed the header ☀️/🌙 button; appearance lives in Settings.
+
 ## v3.22 — quick-fix batch
 Deploy: `service-worker.js` (v33), `steep-teas.js`, `steep-dashboard.js`,
         `steep-core.js`, `steep-settings.js`.
