@@ -23,6 +23,15 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.22 — quick-fix batch
+Deploy: `service-worker.js` (v33), `steep-teas.js`, `steep-dashboard.js`,
+        `steep-core.js`, `steep-settings.js`.
+- Favourite-tea filter (★) in the Teas library.
+- Light/Dark control in Settings (mirrors the header toggle).
+- Steep Wrapped no longer counts cold-brew steep time toward "steeping time".
+- Cost overview: tapping "Low stock" opens the Teas list filtered to low stock.
+- Cost/session on a tea's detail (cost/gram × avg leaf per session).
+
 ## v3.21 — hotfix: shared sessions leaking into personal stats
 Deploy: `service-worker.js` (v32), `steep-data.js`.
 - loadKey('sessions') / steeps now filter by user_id. A social RLS policy lets
