@@ -23,6 +23,12 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.19 — richer tea persona
+Deploy: `service-worker.js` (v30), `steep-dashboard.js`.
+- Persona blends habit signals: a title modifier (Cold-Brew / Gongfu / Nocturnal
+  / Morning) on the type core, plus up to two combined subtitle traits (cadence,
+  time of day, infusion depth, leaf strength, loyalty vs variety, perfect cups).
+
 ## v3.18 — vendor manager → Teas tab
 Deploy: `service-worker.js` (v29), `steep-teas.js`, `steep-settings.js`.
 - Moved vendor rename/merge out of Settings into an "Edit vendors" toggle beside
