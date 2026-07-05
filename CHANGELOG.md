@@ -23,6 +23,15 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.12 — insights
+Deploy: `service-worker.js` (v23), `steep-dashboard.js`.
+
+- **Insights card** on Home (under the brewing clock). Reads session timestamps +
+  grams for gentle, calm-first patterns: weekly cadence with a trend vs the prior
+  28 days, weekend-vs-weekday lean, dominant time of day, steepiest weekday, and
+  this-month-vs-last (sessions + grams). Signal-gated so rows only appear with
+  enough data; the whole card hides below 5 sessions. No CSS/SQL — reuses the
+  recap row + stat styles.
 
 ## v3.11 — vendor manager
 Deploy: `service-worker.js` (v22), `steep-teas.js`, `steep-settings.js`, `styles.css`.
