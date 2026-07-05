@@ -360,7 +360,12 @@ function computeInsights(){
   // Cadence — last 28 days, and the 28 before that for a gentle trend.
   const last28 = sessions.filter(s=>{ const a=age(s.date); return a>=0 && a<=28*DAY; });
   const prev28 = sessions.filter(s=>{ const a=age(s.date); return a>28*DAY && a<=56*DAY; });
-  const perWeek = last28.length/4;
+  // Divide by the span you've ACTUALLY been logging in this window, not a flat 4
+  // weeks — so a recent ramp-up reads as your real recent pace instead of a diluted
+  // monthly average. Floored at ~half a week so one busy day can't spike it.
+  const firstInWindow = last28.length ? Math.min(...last28.map(s=>new Date(s.date).getTime())) : now.getTime();
+  const spanWeeks = Math.max(0.5, (now - firstInWindow)/(7*DAY));
+  const perWeek = last28.length / spanWeeks;
   const activeDays28 = new Set(last28.map(s=>dayKey(s.date))).size;
   let trend = null;
   if(prev28.length>=3 && last28.length>=3){
@@ -409,11 +414,19 @@ function insightsHTML(){
   if(n.last28n===0){
     lead = `It's been a quiet month — nothing logged in the last 28 days. The pot's here whenever you are.`;
   } else {
-    const wk = n.perWeek>=1 ? Math.round(n.perWeek) : n.perWeek.toFixed(1);
+    let cadence;
+    if(n.perWeek >= 6.5){
+      const perDay = n.perWeek/7;
+      cadence = perDay >= 1.5 ? `about <b>${Math.round(perDay)}×</b> a day` : `about <b>once</b> a day`;
+    } else if(n.perWeek >= 1){
+      cadence = `about <b>${Math.round(n.perWeek)}×</b> a week`;
+    } else {
+      cadence = `about <b>${n.perWeek.toFixed(1)}×</b> a week`;
+    }
     const trendPhrase = n.trend==='up' ? ', a little more than the month before'
       : n.trend==='down' ? ', a touch less than the month before — no pressure'
       : n.trend==='steady' ? ', holding steady with the month before' : '';
-    lead = `You've been steeping about <b>${wk}×</b> a week this past month${trendPhrase} — tea on ${n.activeDays28} of the last 28 days.`;
+    lead = `You've been steeping ${cadence} lately${trendPhrase} — tea on ${n.activeDays28} of the last 28 days.`;
   }
 
   const rows = [];
