@@ -23,6 +23,24 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.18 — vendor manager → Teas tab
+Deploy: `service-worker.js` (v29), `steep-teas.js`, `steep-settings.js`.
+- Moved vendor rename/merge out of Settings into an "Edit vendors" toggle beside
+  "＋ Add tea" in the Teas tab, as an inline panel. Removed from Settings (pointer
+  left behind). Same rename/merge logic; scales better as vendors grow.
+
+## v3.17 — pixel font swap
+Deploy: `service-worker.js` (v28), `styles.css`, `index.html`.
+- Replaced Silkscreen with Pixelify Sans for the pixel display font, so 4 and 9
+  are clearly distinct. "Clean" font toggle unchanged.
+
+## v3.16 — cleanup pass
+Deploy: `service-worker.js` (v27), `steep-sessions.js`, `steep-dashboard.js`.
+- Cold-brew sessions skip the timed-steep flow — logged as a single long steep
+  (no per-steep timer / infusion stepper).
+- Streak heatmap starts at your first logged week (clamped 4–13 weeks) instead of
+  a fixed 13, so a fresh log no longer shows a long empty run.
+
 ## v3.15 — Steep Wrapped
 Deploy: `service-worker.js` (v26), `steep-dashboard.js`, `steep-core.js`.
 - Steep Wrapped: a seasonal recap view (Northern-hemisphere meteorological
