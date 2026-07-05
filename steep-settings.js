@@ -109,8 +109,7 @@ function settingsModal(){
         <div><div class="set-label">Display font</div><div class="set-sub">Pixel is the retro look; Clean is a plain monospace</div></div>
         ${seg('monoFont',[{v:'pixel',label:'Pixel'},{v:'clean',label:'Clean'}])}
       </div>
-      ${vendorManagerHTML()}
-      <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Signed in as ${email}. Settings sync across your devices.</p>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Signed in as ${email}. Settings sync across your devices. Manage vendors from the Teas tab.</p>
     </div>
   </div>`;
 }

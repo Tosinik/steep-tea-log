@@ -17,7 +17,6 @@ function distinctVendors(){
 }
 function vendorManagerHTML(){
   const vendors = distinctVendors();
-  if(!vendors.length) return '';
   const esc = v => v.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
   const rows = vendors.map(v=>{
     const count = state.teas.filter(t=>(t.source||'').trim()===v).length;
@@ -26,11 +25,13 @@ function vendorManagerHTML(){
       <span class="vendor-count">${count} tea${count===1?'':'s'}</span>
     </div>`;
   }).join('');
-  return `<div class="set-row" style="flex-direction:column;align-items:stretch;">
-    <div><div class="set-label">Vendors / shops</div><div class="set-sub">Rename to fix a typo, or type an existing name to merge duplicates.</div></div>
-    <div style="margin-top:10px;">${rows}</div>
+  return `<div class="card" style="margin-bottom:14px;">
+    <div class="section-title" style="margin-bottom:6px;"><h2 style="font-family:'Fraunces',serif;font-size:17px;">Vendors</h2><button class="lib-chip" onclick="toggleVendors()">Done</button></div>
+    <div style="font-size:12px;color:var(--ink-soft);margin-bottom:10px;">Rename to fix a typo, or type an existing name to merge duplicates. Changes apply across every tea from that shop.</div>
+    ${vendors.length ? rows : '<div class="empty" style="padding:10px;">No vendors yet — add a shop when you add a tea.</div>'}
   </div>`;
 }
+function toggleVendors(){ state.vendorsOpen = !state.vendorsOpen; render(); }
 function renameVendorFromInput(el){ renameVendor(el.dataset.old, el.value.trim()); }
 function renameVendor(oldName, newName){
   oldName = (oldName||'').trim();
@@ -84,7 +85,13 @@ function viewTeas(){
       ${(F.type||F.vendor||F.lowStock) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
     </div>` : '';
   return `
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2><button class="btn btn-primary" onclick="openTeaForm()">＋ Add tea</button></div>
+    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2>
+      <div style="display:flex;gap:8px;align-items:center;">
+        ${vendors.length ? `<button class="lib-chip ${state.vendorsOpen?'active':''}" onclick="toggleVendors()">${state.vendorsOpen?'✕ Vendors':'Edit vendors'}</button>` : ''}
+        <button class="btn btn-primary" onclick="openTeaForm()">＋ Add tea</button>
+      </div>
+    </div>
+    ${state.vendorsOpen && vendors.length ? vendorManagerHTML() : ''}
     <div class="mono" style="font-size:12px;color:var(--ink-soft);margin:-6px 0 12px;">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length?` · ${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length} low`:''}</div>
     ${controls}
     ${cards}
