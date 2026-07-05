@@ -36,6 +36,18 @@ Deploy: `service-worker.js` (v25), `steep-dashboard.js`.
 - Insights cadence now measures over the span you've actually been logging (not a
   flat 4 weeks), and phrases per-day once you're brewing daily+ ("about 2× a day
   lately"). A steady month-long 2×/week user still reads "2× a week."
+
+## v3.13 — offline write queue
+Deploy: `service-worker.js` (v24), `steep-data.js`, `steep-sessions.js`.
+
+- **Offline write queue (Option B).** Personal-data writes (teas, vessels,
+  sessions, tags, settings) are now local-first: cached immediately and queued
+  on network failure, replayed FIFO on reconnect / next write / launch.
+  Idempotent (upsert/delete by id); FIFO keeps foreign refs valid. "N waiting
+  to sync" pill + "Synced N" toast. Non-network errors still surface.
+- Offline session photos are deferred — session saves now, photo re-added when
+  online. Data: URLs are never persisted to Postgres.
+- Social actions and bulk import remain online-only by design.
   
 ## v3.12 — insights
 Deploy: `service-worker.js` (v23), `steep-dashboard.js`.
