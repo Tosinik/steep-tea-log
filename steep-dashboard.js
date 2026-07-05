@@ -569,7 +569,7 @@ function computeWrapped(){
   const infusions = inSeason.reduce((a,s)=>a+steepCountOf(s),0);
   const grams = inSeason.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0);
   let steepSeconds = 0;
-  inSeason.forEach(s=>(s.steeps||[]).forEach(st=>{ steepSeconds += Number(st.timeSeconds)||0; }));
+  inSeason.forEach(s=>{ if(s.isColdBrew) return; (s.steeps||[]).forEach(st=>{ steepSeconds += Number(st.timeSeconds)||0; }); }); // cold brews would skew this
   const activeDays = new Set(inSeason.map(s=>dayKey(s.date))).size;
   const coldN = inSeason.filter(s=>s.isColdBrew).length;
 
@@ -802,7 +802,9 @@ function viewDashboard(){
       <div class="grid grid-3">
         <div class="stat"><div class="num">${s.totalSpent.toFixed(0)}</div><div class="lbl">Total spent</div></div>
         <div class="stat"><div class="num">${s.avgCostPerGram.toFixed(2)}</div><div class="lbl">Avg / gram</div></div>
-        <div class="stat"><div class="num">${s.lowStock.length}</div><div class="lbl">Low stock</div></div>
+        ${s.lowStock.length
+          ? `<div class="stat" onclick="goLowStock()" style="cursor:pointer;" title="View low-stock teas"><div class="num">${s.lowStock.length}</div><div class="lbl">Low stock ›</div></div>`
+          : `<div class="stat"><div class="num">0</div><div class="lbl">Low stock</div></div>`}
       </div>
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
     </div>

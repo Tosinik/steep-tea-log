@@ -47,6 +47,7 @@ function filteredSortedTeas(){
     if(F.type && t.type!==F.type) return false;
     if(F.vendor && (t.source||'').trim()!==F.vendor) return false;
     if(F.lowStock && !(Number(t.amountGrams)<lowStockG())) return false;
+    if(F.favorite && !t.isFavorite) return false;
     return true;
   });
   const time = t => new Date(t.dateAdded||0).getTime();
@@ -82,7 +83,8 @@ function viewTeas(){
       <select class="lib-select" onchange="setTeaFilter('type', this.value)" aria-label="Filter by type">${typeOpts}</select>
       ${vendors.length ? `<select class="lib-select" onchange="setTeaFilter('vendor', this.value)" aria-label="Filter by vendor">${vendorOpts}</select>` : ''}
       <button class="lib-chip ${F.lowStock?'active':''}" onclick="toggleLowStockFilter()">Low stock</button>
-      ${(F.type||F.vendor||F.lowStock) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
+      <button class="lib-chip ${F.favorite?'active':''}" onclick="toggleFavoriteFilter()">★ Favorites</button>
+      ${(F.type||F.vendor||F.lowStock||F.favorite) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
     </div>` : '';
   return `
     <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2>
@@ -100,7 +102,9 @@ function viewTeas(){
 function setTeaSort(v){ state.teaSort=v; render(); }
 function setTeaFilter(key, val){ state.teaFilter[key]=val; render(); }
 function toggleLowStockFilter(){ state.teaFilter.lowStock=!state.teaFilter.lowStock; render(); }
-function clearTeaFilters(){ state.teaFilter={type:'',vendor:'',lowStock:false}; render(); }
+function clearTeaFilters(){ state.teaFilter={type:'',vendor:'',lowStock:false,favorite:false}; render(); }
+function toggleFavoriteFilter(){ state.teaFilter.favorite=!state.teaFilter.favorite; render(); }
+function goLowStock(){ state.teaFilter={type:'',vendor:'',lowStock:true,favorite:false}; goView('teas'); }
 
 function openTeaForm(existing){
   state.editingTea = existing || null;
@@ -215,6 +219,9 @@ function viewTeaDetail(){
   const t = teaById(state.activeTeaId);
   if(!t) return '<div class="empty">Tea not found.</div>';
   const mySessions = state.sessions.filter(s=>s.teaId===t.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const _cpg = t.costOriginalGrams ? (t.costTotal/t.costOriginalGrams) : 0;
+  const _avgG = mySessions.length ? mySessions.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0)/mySessions.length : 0;
+  const costPerSession = (_cpg>0 && _avgG>0) ? _cpg*_avgG : 0;
   const histHTML = mySessions.length ? mySessions.map(s=>{
     const v = vesselById(s.vesselId);
     return `<div class="session-hist-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
@@ -249,6 +256,7 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}</div></div>
         <div><div class="eyebrow">Source</div><div>${t.source||'—'}</div></div>
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
+        <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
       </div>
       ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.brewGuide}</div></div>`:''}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.description}</div></div>`:''}

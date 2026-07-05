@@ -106,6 +106,13 @@ function settingsModal(){
         ${toggle('showAchievements')}
       </div>
       <div class="set-row">
+        <div><div class="set-label">Appearance</div><div class="set-sub">Light or dark — also the ☀️/🌙 button in the header</div></div>
+        <div class="seg">
+          <button class="${document.documentElement.getAttribute('data-theme')==='light'?'active':''}" onclick="setTheme('light')">Light</button>
+          <button class="${document.documentElement.getAttribute('data-theme')==='dark'?'active':''}" onclick="setTheme('dark')">Dark</button>
+        </div>
+      </div>
+      <div class="set-row">
         <div><div class="set-label">Display font</div><div class="set-sub">Pixel is the retro look; Clean is a plain monospace</div></div>
         ${seg('monoFont',[{v:'pixel',label:'Pixel'},{v:'clean',label:'Clean'}])}
       </div>

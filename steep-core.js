@@ -12,6 +12,13 @@ function toggleTheme(){
   const btn = document.getElementById('themeToggleBtn');
   if(btn) btn.textContent = next==='dark' ? '☀️' : '🌙';
 }
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('tealog_theme', t);
+  const btn = document.getElementById('themeToggleBtn');
+  if(btn) btn.textContent = t==='dark' ? '☀️' : '🌙';
+  render();
+}
 
 /* ---------- storage helpers (v2: Supabase-backed via steep-data.js) ---------- */
 async function loadKey(key, fallback){
