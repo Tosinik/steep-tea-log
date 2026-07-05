@@ -23,6 +23,20 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.15 — Steep Wrapped
+Deploy: `service-worker.js` (v26), `steep-dashboard.js`, `steep-core.js`.
+- Steep Wrapped: a seasonal recap view (Northern-hemisphere meteorological
+  seasons) built from existing session data — sessions, infusions, grams,
+  steeping time, top tea/type, favourite time, new teas, standout cup. Dashboard
+  teaser card opens it; share via Web Share API with clipboard fallback (text).
+- No new infra. (Bundles the v3.14 insights cadence fix in the same dashboard file.)
+
+## v3.14 — insights cadence fix
+Deploy: `service-worker.js` (v25), `steep-dashboard.js`.
+- Insights cadence now measures over the span you've actually been logging (not a
+  flat 4 weeks), and phrases per-day once you're brewing daily+ ("about 2× a day
+  lately"). A steady month-long 2×/week user still reads "2× a week."
+  
 ## v3.12 — insights
 Deploy: `service-worker.js` (v23), `steep-dashboard.js`.
 
