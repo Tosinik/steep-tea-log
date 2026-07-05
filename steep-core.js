@@ -288,6 +288,7 @@ function render(){
   else if(state.view==='friends') body = viewFriends();
   else if(state.view==='achievements') body = viewAchievements();
   else if(state.view==='passport') body = viewPassport();
+  else if(state.view==='wrapped') body = viewWrapped();
   else if(state.view==='session') body = viewSessionFlow();
 
   const inSession = state.view==='session';

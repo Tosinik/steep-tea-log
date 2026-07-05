@@ -495,6 +495,153 @@ function viewAchievements(){
     <div class="card"><div class="badge-grid">${list.map(badgeHTML).join('')}</div></div>
   `;
 }
+/* ================= STEEP WRAPPED =================
+   A calm, seasonal recap built entirely from existing session data. No new
+   infra. Northern-hemisphere meteorological seasons (matches Steep's users);
+   flip the month ranges for a southern-hemisphere option later. */
+function seasonInfo(date){
+  const m = date.getMonth(), y = date.getFullYear();
+  if(m===11 || m<=1){ const sy = m===11 ? y : y-1; return {name:'Winter', start:new Date(sy,11,1), end:new Date(sy+1,2,1), year:m===11?y+1:y}; }
+  if(m<=4) return {name:'Spring', start:new Date(y,2,1), end:new Date(y,5,1), year:y};
+  if(m<=7) return {name:'Summer', start:new Date(y,5,1), end:new Date(y,8,1), year:y};
+  return {name:'Autumn', start:new Date(y,8,1), end:new Date(y,11,1), year:y};
+}
+function partWord(p){ return ({morning:'mornings', afternoon:'afternoons', evening:'evenings', night:'late nights'})[p] || p; }
+function fmtSteepDuration(sec){
+  if(sec<60) return Math.round(sec)+'s';
+  const m = Math.round(sec/60);
+  if(m<90) return m+' min';
+  const h = Math.floor(m/60), r = m%60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+}
+function computeWrapped(){
+  const now = new Date();
+  const season = seasonInfo(now);
+  const inSeason = state.sessions.filter(s=>{ const d=new Date(s.date); return d>=season.start && d<season.end && d<=now; });
+  if(inSeason.length===0) return { season, empty:true };
+
+  const infusions = inSeason.reduce((a,s)=>a+steepCountOf(s),0);
+  const grams = inSeason.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0);
+  let steepSeconds = 0;
+  inSeason.forEach(s=>(s.steeps||[]).forEach(st=>{ steepSeconds += Number(st.timeSeconds)||0; }));
+  const activeDays = new Set(inSeason.map(s=>dayKey(s.date))).size;
+  const coldN = inSeason.filter(s=>s.isColdBrew).length;
+
+  const teaCounts = {};
+  inSeason.forEach(s=>{ teaCounts[s.teaId]=(teaCounts[s.teaId]||0)+1; });
+  let topTeaId=null, topTeaN=0; Object.entries(teaCounts).forEach(([id,c])=>{ if(c>topTeaN){ topTeaN=c; topTeaId=id; } });
+  const topTea = teaById(topTeaId);
+  const distinctTeas = Object.keys(teaCounts).length;
+
+  const typeCounts = {};
+  inSeason.forEach(s=>{ const t=teaById(s.teaId); if(t) typeCounts[t.type]=(typeCounts[t.type]||0)+1; });
+  let topType=null, topTypeN=0; Object.entries(typeCounts).forEach(([k,c])=>{ if(c>topTypeN){ topTypeN=c; topType=k; } });
+
+  const parts = {morning:0, afternoon:0, evening:0, night:0};
+  inSeason.forEach(s=>{ const h=new Date(s.date).getHours();
+    if(h>=5&&h<12) parts.morning++; else if(h>=12&&h<17) parts.afternoon++;
+    else if(h>=17&&h<22) parts.evening++; else parts.night++; });
+  const topPart = Object.entries(parts).sort((a,b)=>b[1]-a[1])[0][0];
+
+  // "New this season" = teas whose first-ever session lands in the window.
+  const firstSeen = {};
+  state.sessions.forEach(s=>{ const t=new Date(s.date).getTime(); if(firstSeen[s.teaId]==null || t<firstSeen[s.teaId]) firstSeen[s.teaId]=t; });
+  const newTeas = Object.keys(firstSeen)
+    .filter(id => firstSeen[id]>=season.start.getTime() && firstSeen[id]<season.end.getTime())
+    .map(id=>teaById(id)).filter(Boolean);
+
+  const standout = inSeason.filter(s=>Number(s.rating)>0)
+    .sort((a,b)=> (b.rating-a.rating) || (new Date(b.date)-new Date(a.date)))[0] || null;
+
+  return { season, empty:false, n:inSeason.length, infusions, grams, steepSeconds, activeDays,
+    coldN, topTea, topTeaN, distinctTeas, topType, topTypeN, topPart, newTeas, standout };
+}
+function wrappedTeaser(){
+  const w = computeWrapped();
+  if(w.empty) return '';
+  return `<div class="section card" style="cursor:pointer;" onclick="goView('wrapped')">
+    <div class="section-title"><h2>Your ${w.season.name} in tea</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">wrapped →</span></div>
+    <div style="font-size:14px;color:var(--ink-soft);margin-top:2px;">${w.n} session${w.n>1?'s':''} this ${w.season.name.toLowerCase()} so far — tap for your recap.</div>
+  </div>`;
+}
+function wrappedShareText(w){
+  const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+  const lines = [`My ${w.season.name} ${w.season.year} in tea · Steep`,
+    `${w.n} sessions · ${w.infusions} infusions${w.grams?` · ${w.grams.toFixed(0)}g`:''}`];
+  if(w.topTea) lines.push(`Most brewed: ${w.topTea.name} (${w.topTeaN}×)`);
+  if(w.topType) lines.push(`Mostly ${typeLabel(w.topType).toLowerCase()}, mostly ${partWord(w.topPart)}`);
+  if(w.newTeas.length) lines.push(`${w.newTeas.length} new tea${w.newTeas.length>1?'s':''} discovered`);
+  return lines.join('\n');
+}
+async function shareWrapped(){
+  const w = computeWrapped();
+  if(w.empty) return;
+  const text = wrappedShareText(w);
+  try{
+    if(navigator.share){ await navigator.share({ text }); return; }
+    await navigator.clipboard.writeText(text);
+    showToast('Copied your recap — paste it anywhere.');
+  }catch(e){
+    if(e && e.name==='AbortError') return; // user dismissed the share sheet
+    showToast('Could not copy — you can screenshot this instead.');
+  }
+}
+function viewWrapped(){
+  const w = computeWrapped();
+  const back = `<button class="detail-back" onclick="goView('dashboard')">← Back to dashboard</button>`;
+  if(w.empty){
+    return `${back}
+    <div class="section card" style="text-align:center;padding:34px 20px;">
+      <div class="eyebrow">Steep Wrapped</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:26px;margin:8px 0 6px;">Your ${w.season.name} is just beginning</h2>
+      <p style="color:var(--ink-soft);font-size:14px;max-width:34ch;margin:0 auto;">No sessions logged this ${w.season.name.toLowerCase()} yet. Brew a few cups and your recap fills in here.</p>
+    </div>`;
+  }
+  const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+  const sixth = w.steepSeconds>0
+    ? `<div class="stat"><div class="num">${fmtSteepDuration(w.steepSeconds)}</div><div class="lbl">Steeping time</div></div>`
+    : `<div class="stat"><div class="num">${w.coldN}</div><div class="lbl">Cold brews</div></div>`;
+  return `${back}
+    <div class="section card" style="text-align:center;padding:30px 20px;background:linear-gradient(160deg,var(--white,#fff),var(--porcelain,#f4efe4));">
+      <div class="eyebrow">Steep Wrapped</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:28px;margin:8px 0 4px;">Your ${w.season.name} in tea</h2>
+      <div class="mono" style="font-size:12px;color:var(--ink-soft);">${w.season.year} · so far</div>
+    </div>
+
+    <div class="section grid grid-3">
+      <div class="stat"><div class="num">${w.n}</div><div class="lbl">Sessions</div></div>
+      <div class="stat"><div class="num">${w.infusions}</div><div class="lbl">Infusions</div></div>
+      <div class="stat"><div class="num">${w.activeDays}</div><div class="lbl">Days with tea</div></div>
+      <div class="stat"><div class="num">${w.grams.toFixed(0)}</div><div class="lbl">Grams brewed</div></div>
+      <div class="stat"><div class="num">${w.distinctTeas}</div><div class="lbl">Teas explored</div></div>
+      ${sixth}
+    </div>
+
+    ${w.topTea ? `<div class="section card">
+      <div class="eyebrow">Your ${w.season.name.toLowerCase()} companion</div>
+      <h2 style="margin:6px 0 2px;">${w.topTea.name}</h2>
+      <div style="color:var(--ink-soft);font-size:13px;">${typeLabel(w.topTea.type)} · brewed ${w.topTeaN} time${w.topTeaN>1?'s':''}</div>
+    </div>` : ''}
+
+    <div class="section card">
+      ${w.topType?`<div class="recap-line"><span class="recap-k">Leaf of the season</span><span class="recap-v">${typeLabel(w.topType)} · ${w.topTypeN}</span></div>`:''}
+      <div class="recap-line"><span class="recap-k">Favourite time</span><span class="recap-v">${cap(partWord(w.topPart))}</span></div>
+      <div class="recap-line"><span class="recap-k">New this season</span><span class="recap-v">${w.newTeas.length} tea${w.newTeas.length!==1?'s':''}</span></div>
+      ${w.standout?`<div class="recap-line"><span class="recap-k">Standout cup</span><span class="recap-v">${(w.standout.teaName||(teaById(w.standout.teaId)||{}).name||'—')} ${renderStarsStatic(w.standout.rating,false)}</span></div>`:''}
+    </div>
+
+    ${w.newTeas.length?`<div class="section card">
+      <div class="eyebrow">Teas you met this ${w.season.name.toLowerCase()}</div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${w.newTeas.slice(0,12).map(t=>`<span style="font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;">${t.name}</span>`).join('')}</div>
+    </div>`:''}
+
+    <div class="section card" style="text-align:center;">
+      <p style="color:var(--ink-soft);font-size:14px;margin:0 0 14px;">A season of quiet cups. Here's to the next one.</p>
+      <button class="btn btn-primary" onclick="shareWrapped()">Share my ${w.season.name}</button>
+    </div>
+  `;
+}
+
 function viewDashboard(){
   if(state.sessions.length===0){
     return onboardingHTML();
@@ -563,6 +710,8 @@ function viewDashboard(){
     <div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>
 
     ${recapHTML()}
+
+    ${wrappedTeaser()}
 
     ${restockHTML}
 
