@@ -114,9 +114,12 @@
         const out = data.map(r => r.tag); writeCache(k, out); return out;
       }
       if (k === 'tealog_sessions') {
-        const { data: ses, error: e1 } = await sb.from('sessions').select('*').order('session_date', { ascending: false });
+        // IMPORTANT: scope to the current user. A social RLS policy lets followers
+        // read others' *shared* sessions, so an unfiltered select would pull those
+        // into personal stats/insights. The feed uses getFeed() separately.
+        const { data: ses, error: e1 } = await sb.from('sessions').select('*').eq('user_id', userId()).order('session_date', { ascending: false });
         if (e1) throw e1;
-        const { data: st, error: e2 } = await sb.from('steeps').select('*').order('steep_order', { ascending: true });
+        const { data: st, error: e2 } = await sb.from('steeps').select('*').eq('user_id', userId()).order('steep_order', { ascending: true });
         if (e2) throw e2;
         const byId = {};
         const out = ses.map(r => { const o = sessionFromDb(r); byId[o.id] = o; return o; });
