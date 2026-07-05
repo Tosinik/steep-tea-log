@@ -23,6 +23,22 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.24 — brew-guide → prefilled steep schedule
+Deploy: `service-worker.js` (v35), `steep-core.js`, `steep-sessions.js`, `steep-settings.js`.
+- Parses each tea's free-text "How to brew" note into a light schedule
+  (`{tempC, rinseSeconds, times[]}`) via `parseBrewGuide()` in steep-core. Rule-based and
+  forgiving: gongfu slash-runs (`15s / 20s / 30s`), comma lists, `m:ss` clocks, Western
+  minute steeps, °F→°C, "boiling"/"degrees"; strips grams/ml/years/infusion-counts so they
+  aren't read as times; returns null when nothing usable is found (calm-first — no schedule,
+  no fuss).
+- Session setup shows a "From your brew guide" preview (temp · rinse · times) with a
+  per-session toggle. During steeping, each infusion's timer target + temperature are
+  prefilled; a quiet strip shows the plan with the current step marked and extrapolated
+  steeps flagged `~` (extends past the listed steeps by repeating the last gap). Everything
+  stays editable; "turn off" disables it mid-session.
+- Skipped for cold brew (which already has its own single-long-steep path). New synced
+  setting **Brew-guide autofill** (default on). No SQL, no CSS, no new module.
+
 ## v3.23 — theme toggle in Settings only
 Deploy: `service-worker.js` (v34), `steep-core.js`.
 - Removed the header ☀️/🌙 button; appearance lives in Settings.

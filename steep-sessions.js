@@ -285,6 +285,9 @@ function startSessionFor(teaId){
     steeps: [],
     infusionCount: 1,
     stage: 'setup', // setup -> steeping -> finish  (or setup -> quick)
+    schedule: null,                                     // parsed brew guide (set at beginSteeping)
+    useGuide: state.settings.brewGuideAutofill!==false, // per-session opt-out
+    curTemp: '', curTime: '',
     curSteepTags: [],
     curSteepDesc: '',
     sessionTags: [],
@@ -382,7 +385,7 @@ function sessionSetupHTML(d){
     <div class="card">
       <h2 style="margin-top:0;">Set up your session</h2>
       <div class="form-grid">
-        <div class="field span2"><label>Tea</label><select onchange="d_set('teaId', this.value)">${teaOpts}</select></div>
+        <div class="field span2"><label>Tea</label><select onchange="d_setTea(this.value)">${teaOpts}</select></div>
         <div class="field"><label>Vessel</label><select onchange="d_set('vesselId', this.value)">${vesselOpts}</select></div>
         <div class="field"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
@@ -394,6 +397,7 @@ function sessionSetupHTML(d){
       <button class="btn btn-primary" style="margin-top:16px;" onclick="beginColdBrewLog()">Log cold brew →</button>
       <div class="hint" style="margin-top:8px;">Cold brew is logged as a single long steep — no per-steep timer.</div>
       ` : `
+      ${brewGuidePreviewHTML(d)}
       <button class="btn btn-primary" style="margin-top:16px;" onclick="beginSteeping()">Begin steeping →</button>
       <button class="btn" style="margin-top:8px;width:100%;" onclick="beginQuickLog()">Quick log — just infusions & notes</button>
       <div class="hint" style="margin-top:8px;">Quick log skips the per-steep timer — for when you'd rather drink than babysit a form.</div>
@@ -407,8 +411,45 @@ function d_set(key, val){
 function d_setcur(key, val){
   state.sessionDraft[key] = val;
 }
+function d_setTea(val){ state.sessionDraft.teaId = val; render(); }   // re-render so the guide preview follows the tea
+function d_toggleGuide(val){ state.sessionDraft.useGuide = val; render(); }
+
+// Setup preview: shows the schedule read from the selected tea's brew guide,
+// with a per-session opt-out. Hidden for cold brew or when nothing parses.
+function brewGuidePreviewHTML(d){
+  if(d.isColdBrew) return '';
+  const tea = teaById(d.teaId);
+  const sched = parseBrewGuide(tea && tea.brewGuide);
+  if(!sched) return '';
+  const on = d.useGuide!==false;
+  return `<div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div style="min-width:0;">
+        <div class="eyebrow">From your brew guide</div>
+        <div class="mono" style="font-size:13px;margin-top:2px;">${brewScheduleSummary(sched)}</div>
+      </div>
+      <label class="toggle"><input type="checkbox" ${on?'checked':''} onchange="d_toggleGuide(this.checked)"><span class="track"></span></label>
+    </div>
+    <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${on?'Each steep\u2019s timer and temperature will be prefilled \u2014 adjust any of them as you go.':'Autofill off for this session. Steeps start blank.'}</div>
+  </div>`;
+}
+
+// Prefill the current steep's timer + temp from the parsed schedule.
+// Called at each steep boundary, so it never fights values typed mid-steep.
+function applyScheduleToCurrentSteep(d){
+  if(!d || !d.schedule || d.useGuide===false) return;
+  const i = d.steeps.length;
+  const t = scheduleTimeForIndex(d.schedule, i);
+  if(t!=null){ d.timer.mode='timer'; d.timer.target=t; d.curTime=String(t); }
+  if(d.schedule.tempC!=null){ const disp=cToDisplay(d.schedule.tempC); if(disp!=='') d.curTemp=String(disp); }
+}
+
 function beginSteeping(){
-  state.sessionDraft.stage='steeping';
+  const d = state.sessionDraft;
+  const tea = teaById(d.teaId);
+  d.schedule = (!d.isColdBrew && d.useGuide!==false) ? parseBrewGuide(tea && tea.brewGuide) : null;
+  d.stage='steeping';
+  applyScheduleToCurrentSteep(d);
   render();
 }
 function d_setColdBrew(v){ state.sessionDraft.isColdBrew = v; render(); } // re-render so the setup buttons swap
@@ -417,6 +458,35 @@ function beginColdBrewLog(){
   d.isColdBrew = true; d.infusionCount = 1; d.steeps = []; // one long steep, no timed infusions
   d.stage = 'quick';
   render();
+}
+
+// Calm strip during steeping: the guide's temp + steep times as chips, with the
+// current step marked and extended steeps flagged "~". A quiet link turns it off.
+function scheduleStripHTML(d){
+  if(!d.schedule || d.useGuide===false) return '';
+  const sched = d.schedule;
+  const cur = d.steeps.length; // index of the steep being brewed now
+  const shownCount = Math.max(sched.times.length, cur+1);
+  let chips='';
+  for(let i=0;i<shownCount;i++){
+    const secs = scheduleTimeForIndex(sched, i);
+    if(secs==null) break;
+    const beyond = i>=sched.times.length;
+    const isCur = i===cur;
+    chips += `<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;margin:0 4px 4px 0;`
+      + (isCur ? 'background:var(--amber);color:#3a2a12;font-weight:600;' : 'background:transparent;color:var(--ink-soft);border:1px solid var(--line);')
+      + `">${beyond?'~':''}${fmtSecShort(secs)}</span>`;
+  }
+  const meta=[];
+  if(sched.tempC!=null) meta.push(cToDisplay(sched.tempC)+tempUnitLabel());
+  if(sched.rinseSeconds!=null) meta.push('rinse '+sched.rinseSeconds+'s');
+  return `<div class="card" style="margin-bottom:14px;background:var(--jade-pale);border:1px solid var(--line);padding:12px 14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div class="eyebrow">Brew guide${meta.length?' · '+meta.join(' · '):''}</div>
+      <button class="btn-ghost" style="font-size:11.5px;" onclick="d_toggleGuide(false)">turn off</button>
+    </div>
+    <div style="margin-top:8px;">${chips}</div>
+  </div>`;
 }
 
 function sessionSteepingHTML(d){
@@ -444,6 +514,7 @@ function sessionSteepingHTML(d){
       <div class="eyebrow">${tea?tea.name:''} ${d.isColdBrew?'· cold brew':''}</div>
       <h2 style="margin-top:2px;">${dotsRow(d.steeps.length, Math.max(d.steeps.length+1,6))} Steep ${d.steeps.length+1}</h2>
 
+      ${scheduleStripHTML(d)}
       ${d.steeps.length ? `<div style="margin-bottom:14px;">${steepsHTML}</div>` : ''}
 
       <div class="timer-box">
@@ -676,6 +747,7 @@ function saveSteepAndContinue(){
   clearTimerInterval();
   d.curSteepTags=[]; d.curSteepDesc=''; d.curTemp=''; d.curTime='';
   d.timer = {mode:d.timer.mode, target:d.timer.target, elapsed:0, running:false, intervalId:null};
+  applyScheduleToCurrentSteep(d); // prefill the next steep's timer + temp from the guide
   render();
 }
 function finishSteeping(){

@@ -61,7 +61,7 @@ const TYPES = [
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
 ];
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel' };
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel', brewGuideAutofill:true };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
 let state = {
@@ -145,6 +145,104 @@ function persistSettings(){ window.SteepDB.saveSettings(state.settings).catch(sa
 function tempUnitLabel(){ return state.settings.tempUnit==='f' ? '°F' : '°C'; }
 function cToDisplay(c){ if(c==null||c==='') return ''; return state.settings.tempUnit==='f' ? Math.round(c*9/5+32) : c; }
 function displayToC(v){ if(v===''||v==null) return null; v=Number(v); if(isNaN(v)) return null; return state.settings.tempUnit==='f' ? Math.round((v-32)*5/9) : v; }
+
+/* ---------- brew-guide parsing (v3.24) ----------
+   Reads a tea's free-text "How to brew" note into a light schedule:
+   { tempC, rinseSeconds, times:[secs...] }. Rule-based and forgiving —
+   returns null when it can't find anything usable (calm-first: no schedule,
+   no fuss). tempC is always Celsius (display via cToDisplay). */
+function bg_extractTimes(w){
+  const toSec=(numStr,unit)=>{ let n=parseFloat(numStr); if(isNaN(n)) return null;
+    if(unit && /^m/.test(unit)) return Math.round(n*60);
+    if(unit==="'") return Math.round(n*60);
+    return Math.round(n); };
+  // m:ss clock tokens (e.g. 1:30)
+  const clocks=[]; let cm; const clockRe=/(\d+):(\d{2})/g;
+  while(cm=clockRe.exec(w)){ clocks.push(Number(cm[1])*60+Number(cm[2])); }
+  let cleaned = w.replace(/\d+:\d{2}/g,' ');
+  const U='(?:s|sec|secs|second|seconds|m|min|mins|minute|minutes)?';
+  // slash-separated run (the dominant gongfu notation)
+  let runTimes=[];
+  const slashRun = cleaned.match(new RegExp('\\d+(?:\\.\\d+)?\\s*'+U+'\\s*(?:\\/\\s*\\d+(?:\\.\\d+)?\\s*'+U+'\\s*){1,}'));
+  if(slashRun){
+    const govMin=/\b(m|min|mins|minute|minutes)\b/.test(slashRun[0]) && !/\b(s|sec|secs|second|seconds)\b/.test(slashRun[0]);
+    slashRun[0].split('/').forEach(p=>{ const mm=p.match(/(\d+(?:\.\d+)?)\s*(m|min|mins|minute|minutes|s|sec|secs|second|seconds)?/);
+      if(mm){ const v=toSec(mm[1],mm[2]||(govMin?'m':'')); if(v!=null) runTimes.push(v); } });
+    cleaned = cleaned.replace(slashRun[0],' ');
+  }
+  // comma-separated run
+  let commaTimes=[];
+  if(runTimes.length<2){
+    const commaRun = cleaned.match(new RegExp('\\d+(?:\\.\\d+)?\\s*'+U+'\\s*(?:,\\s*\\d+(?:\\.\\d+)?\\s*'+U+'\\s*){1,}'));
+    if(commaRun){
+      const govMin=/\b(m|min|mins|minute|minutes)\b/.test(commaRun[0]) && !/\b(s|sec|secs|second|seconds)\b/.test(commaRun[0]);
+      commaRun[0].split(',').forEach(p=>{ const mm=p.match(/(\d+(?:\.\d+)?)\s*(m|min|mins|minute|minutes|s|sec|secs|second|seconds)?/);
+        if(mm){ const v=toSec(mm[1],mm[2]||(govMin?'m':'')); if(v!=null) commaTimes.push(v); } });
+      cleaned = cleaned.replace(commaRun[0],' ');
+    }
+  }
+  // explicit unit tokens anywhere (e.g. "4 min", "20s")
+  let unitTimes=[]; let um; const unitRe=/(\d+(?:\.\d+)?)\s*(min|mins|minute|minutes|m|sec|secs|seconds|second|s)\b/g;
+  while(um=unitRe.exec(cleaned)){ const v=toSec(um[1],um[2]); if(v!=null) unitTimes.push(v); }
+  let out=[];
+  if(runTimes.length>=2) out=runTimes;
+  else if(commaTimes.length>=2) out=commaTimes;
+  else out=clocks.concat(unitTimes);
+  if(!out.length) out=runTimes.concat(commaTimes,clocks,unitTimes);
+  return out;
+}
+function parseBrewGuide(text){
+  if(!text || typeof text!=='string') return null;
+  let s=' '+text.toLowerCase().replace(/[\u2013\u2014]/g,'-')+' ';
+  // temperature
+  let tempC=null;
+  let mt = s.match(/(\d{2,3})\s*°?\s*(c|f)\b/) || s.match(/(\d{2,3})\s*(?:°|deg|degree|degrees)/);
+  if(mt){ const val=Number(mt[1]); tempC = mt[2]==='f' ? Math.round((val-32)*5/9) : val; }
+  else if(/\bboil/.test(s)) tempC=100;
+  if(tempC!=null && (tempC<40||tempC>100)) tempC=null;
+  // strip temp + non-time numeric tokens so they can't be read as steep times
+  let w = s
+    .replace(/(\d{2,3})\s*°?\s*[cf]\b/g,' ')
+    .replace(/(\d{2,3})\s*°/g,' ')
+    .replace(/\d+(?:\.\d+)?\s*(?:g|grams?|ml|oz|%|ppm)\b/g,' ')
+    .replace(/\bx\s*\d+\b/g,' ')
+    .replace(/\b(?:x\s*)?\d+\s*(?:infusions?|steeps?|brews?|times?)\b/g,' ')
+    .replace(/\b(19|20)\d{2}\b/g,' ');
+  // rinse — trailing form first ("5s rinse"), then a tight leading form ("rinse 5s")
+  let rinseSeconds=null, rm;
+  if(rm=w.match(/(\d+)\s*(?:s|sec|secs)?\s*rinse\b/)) rinseSeconds=Number(rm[1]);
+  else if(rm=w.match(/\brinse\s*:?\s*(\d+)\s*(?:s|sec|secs)\b/)) rinseSeconds=Number(rm[1]);
+  if(rm) w=w.replace(rm[0],' ');
+  w=w.replace(/\brinse\b/g,' ');
+  // steep times
+  let times=(bg_extractTimes(w)||[]).filter(n=>n>=1&&n<=1800).slice(0,12);
+  if(!times.length && tempC==null) return null;
+  return { tempC, rinseSeconds, times };
+}
+// Suggested time (seconds) for steep index i; extends gently past the listed
+// steeps by repeating the last gap, so long gongfu sessions still get a hint.
+function scheduleTimeForIndex(sched, i){
+  if(!sched || !sched.times || !sched.times.length) return null;
+  if(i < sched.times.length) return sched.times[i];
+  const t=sched.times, last=t[t.length-1];
+  let inc = t.length>=2 ? (t[t.length-1]-t[t.length-2]) : 10;
+  if(!(inc>0)) inc=10; inc=Math.max(5,Math.min(30,inc));
+  return Math.min(1800, last + (i-(t.length-1))*inc);
+}
+// One-line human summary, e.g. "95°C · rinse 5s · 15 / 20 / 30 / 45s".
+function brewScheduleSummary(sched){
+  if(!sched) return '';
+  const parts=[];
+  if(sched.tempC!=null) parts.push(cToDisplay(sched.tempC)+tempUnitLabel());
+  if(sched.rinseSeconds!=null) parts.push('rinse '+sched.rinseSeconds+'s');
+  if(sched.times && sched.times.length){
+    const shown = sched.times.slice(0,6).map(fmtSecShort);
+    parts.push(shown.join(' / ')+(sched.times.length>6?' …':''));
+  }
+  return parts.join(' · ');
+}
+// Compact time label: "45s", "2m", "1m30s".
+function fmtSecShort(s){ s=Math.round(s); if(s<60) return s+'s'; const m=Math.floor(s/60), sec=s%60; return sec? m+'m'+sec+'s' : m+'m'; }
 
 // Bulk (blob) writes — used ONLY where a full replace is the actual intent (import).
 function persistTeas(){ saveKey('teas', state.teas).catch(saveErr); }

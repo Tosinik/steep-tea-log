@@ -90,6 +90,10 @@ function settingsModal(){
         ${toggle('soundEnabled')}
       </div>
       <div class="set-row">
+        <div><div class="set-label">Brew-guide autofill</div><div class="set-sub">Prefill each steep's timer and temperature from a tea's brew guide. You can still turn it off per session.</div></div>
+        ${toggle('brewGuideAutofill')}
+      </div>
+      <div class="set-row">
         <div><div class="set-label">Low-stock warning</div><div class="set-sub">Flag a tea as low when it drops below this many grams</div></div>
         <input type="number" min="1" max="500" value="${lowStockG()}" style="width:70px;text-align:right;" onchange="setSetting('lowStockThreshold', Math.max(1,Number(this.value)||15))">
       </div>
