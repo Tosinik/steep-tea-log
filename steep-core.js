@@ -78,11 +78,12 @@ let state = {
 function uid(){ return window.SteepDB.newId(); }
 
 async function init(){
-  const [teas, vessels, sessions, tagLibrary, settings] = await Promise.all([
+  const [teas, vessels, sessions, tagLibrary, wishlist, settings] = await Promise.all([
     loadKey('teas', []), loadKey('vessels', []), loadKey('sessions', []), loadKey('tagLibrary', [...DEFAULT_TAGS]),
+    loadKey('wishlist', []),
     window.SteepDB.loadSettings(DEFAULT_SETTINGS)
   ]);
-  state.teas = teas; state.vessels = vessels; state.sessions = sessions; state.tagLibrary = tagLibrary;
+  state.teas = teas; state.vessels = vessels; state.sessions = sessions; state.tagLibrary = tagLibrary; state.wishlist = wishlist;
   state.settings = {...DEFAULT_SETTINGS, ...settings};
   applySettings();
   const savedView = (()=>{ try{ return localStorage.getItem('tealog_view'); }catch(e){ return null; } })();
@@ -117,11 +118,12 @@ async function refreshData(){
   // never refetch over unsaved work
   if(state.sessionDraft || state.teaFormOpen || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen) return;
   try{
-    const [teas, vessels, sessions, tagLibrary] = await Promise.all([
+    const [teas, vessels, sessions, tagLibrary, wishlist] = await Promise.all([
       loadKey('teas', state.teas), loadKey('vessels', state.vessels),
-      loadKey('sessions', state.sessions), loadKey('tagLibrary', state.tagLibrary)
+      loadKey('sessions', state.sessions), loadKey('tagLibrary', state.tagLibrary),
+      loadKey('wishlist', state.wishlist||[])
     ]);
-    state.teas = teas; state.vessels = vessels; state.sessions = sessions; state.tagLibrary = tagLibrary;
+    state.teas = teas; state.vessels = vessels; state.sessions = sessions; state.tagLibrary = tagLibrary; state.wishlist = wishlist;
     render();
     if(state.view==='friends') loadSocial();
     syncAchievements(false);
@@ -289,6 +291,7 @@ function render(){
   else if(state.view==='achievements') body = viewAchievements();
   else if(state.view==='passport') body = viewPassport();
   else if(state.view==='wrapped') body = viewWrapped();
+  else if(state.view==='shopping') body = viewShopping();
   else if(state.view==='session') body = viewSessionFlow();
 
   const inSession = state.view==='session';
@@ -297,6 +300,7 @@ function render(){
       <div class="topbar-brandrow">
         <div class="brand">${steepLogoSVG(30)}<h1>Steep</h1></div>
         <div class="topbar-actions">
+          <button class="icon-btn ${state.view==='shopping'?'active':''}" onclick="goView('shopping')" title="Shopping list" aria-label="Shopping list">🛒</button>
           <button class="icon-btn ${state.view==='passport'?'active':''}" onclick="goView('passport')" title="Tea passport" aria-label="Tea passport">🌍</button>
           ${state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">🏆</button>` : ''}
           <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">⚙</button>

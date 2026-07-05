@@ -108,10 +108,10 @@ function openTeaForm(existing){
   state.teaFormOpen = true;
   render();
 }
-function closeTeaForm(){ state.teaFormOpen=false; state.editingTea=null; state._draftImage=null; render(); }
+function closeTeaForm(){ state.teaFormOpen=false; state.editingTea=null; state.teaPrefill=null; state._draftImage=null; render(); }
 
 function teaFormModal(){
-  const t = state.editingTea || {};
+  const t = state.editingTea || state.teaPrefill || {};
   const typeOpts = TYPES.map(ty=>`<option value="${ty.k}" ${t.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
   return `<div class="overlay" onclick="if(event.target===this) closeTeaForm()">
     <div class="modal">
@@ -197,7 +197,7 @@ async function submitTeaForm(e){
     state.teas.push(data);
   }
   persistTea(data);
-  state.teaFormOpen = false; state.editingTea = null; state._draftImage = null;
+  state.teaFormOpen = false; state.editingTea = null; state.teaPrefill = null; state._draftImage = null;
   syncAchievements(true);
   render();
 }

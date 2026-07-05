@@ -123,6 +123,11 @@
         st.forEach(r => { const s = byId[r.session_id]; if (s) s.steeps.push(steepFromDb(r)); });
         writeCache(k, out); return out;
       }
+      if (k === 'tealog_wishlist') {
+        const { data, error } = await sb.from('wishlist').select('*').order('created_at', { ascending: true });
+        if (error) throw error;
+        const out = data.map(wishFromDb); writeCache(k, out); return out;
+      }
       return fallback;
     } catch (err) {
       console.warn('[Steep] load failed for', k, '— serving cached copy:', err.message);
@@ -240,6 +245,8 @@
       case 'putSession':    return _netPutSession(e.payload);
       case 'removeSession': return _netRemoveSession(e.payload);
       case 'addTag':        return _netAddTag(e.payload);
+      case 'putWish':       return _netPutWish(e.payload);
+      case 'removeWish':    return _netRemoveWish(e.payload);
       case 'saveSettings':  return _netSaveSettings(e.payload);
       default:              return Promise.resolve();
     }
@@ -414,6 +421,37 @@
       if (!arr.includes(tag)) { arr.push(tag); writeCache('tealog_tagLibrary', arr); }
       enqueue('addTag', tag);
     }
+  }
+
+  /* ---------- wishlist (shopping list) ---------- */
+  function wishToDb(w) {
+    return { id: w.id, user_id: userId(), name: w.name, vendor: w.vendor || null,
+      tea_type: w.type || null, note: w.note || null, done: !!w.done,
+      created_at: w.createdAt || new Date().toISOString() };
+  }
+  function wishFromDb(r) {
+    return { id: r.id, name: r.name, vendor: r.vendor || '', type: r.tea_type || '',
+      note: r.note || '', done: !!r.done, createdAt: r.created_at };
+  }
+  async function _netPutWish(w) {
+    const { error } = await sb.from('wishlist').upsert(wishToDb(w), { onConflict: 'id' });
+    if (error) throw error;
+    cacheUpsert('tealog_wishlist', w);
+  }
+  async function _netRemoveWish(id) {
+    const { error } = await sb.from('wishlist').delete().eq('id', id).eq('user_id', userId());
+    if (error) throw error;
+    cacheRemove('tealog_wishlist', id);
+  }
+  async function putWishItem(w) {
+    requireAuth();
+    try { await _netPutWish(w); scheduleFlush(); }
+    catch (err) { if (!isOfflineError(err)) throw err; cacheUpsert('tealog_wishlist', w); enqueue('putWish', w); }
+  }
+  async function removeWishItem(id) {
+    requireAuth();
+    try { await _netRemoveWish(id); scheduleFlush(); }
+    catch (err) { if (!isOfflineError(err)) throw err; cacheRemove('tealog_wishlist', id); enqueue('removeWish', id); }
   }
 
   /* ============================ migration ============================ */
@@ -662,6 +700,7 @@
   window.SteepDB = {
     loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signInWithGoogle, signOut, newId, migrateFromLocalStorage,
     putTea, removeTea, putTeas, putVessel, removeVessel, putVessels, putSession, removeSession, addTag,
+    putWishItem, removeWishItem,
     getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFollowers, getFeed,
     getUser: () => currentUser,
     flushQueue, pendingWrites: queueLength
