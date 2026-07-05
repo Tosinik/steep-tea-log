@@ -708,7 +708,12 @@ async function commitSession(){
   const d = state.sessionDraft;
   const descEl = document.getElementById('sessDesc');
   if(descEl) d.sessionDesc = descEl.value.trim();
+  const hadInlinePhoto = !!(state._draftImage && String(state._draftImage).startsWith('data:'));
   const photoUrl = await resolveDraftImage();
+  // If the upload couldn't reach Storage (offline), resolveDraftImage returns the
+  // inline data: URL. Save the session now without the photo — it can be re-added
+  // by editing the session once back online.
+  const photoDeferred = hadInlinePhoto && photoUrl && String(photoUrl).startsWith('data:');
   const tea = teaById(d.teaId);
   const ves = vesselById(d.vesselId);
   const session = {
@@ -717,7 +722,7 @@ async function commitSession(){
     isColdBrew: d.isColdBrew, waterType: d.waterType, waterTDS: d.waterTDS?Number(d.waterTDS):null,
     gramsUsed: d.gramsUsed?Number(d.gramsUsed):0,
     steeps: d.steeps, rating: d.sessionRating, description: d.sessionDesc, tags: d.sessionTags,
-    isShared: !!d.isShared, photoUrl: photoUrl || null,
+    isShared: !!d.isShared, photoUrl: photoDeferred ? null : (photoUrl || null),
     infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
     teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
   };
@@ -733,5 +738,8 @@ async function commitSession(){
   state.view='tea-detail';
   syncAchievements(true);
   render();
+  if(photoDeferred && typeof showToast === 'function'){
+    showToast('Session saved. Your photo needs a connection — add it later by editing the session.');
+  }
 }
 

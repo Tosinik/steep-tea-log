@@ -192,20 +192,133 @@
     if (!currentUser) throw new Error('Sign in to save changes (offline / not authenticated).');
   }
 
+  /* ==========================================================================
+     Offline write queue (v3.13, roadmap "Option B").
+     Personal-data writes become local-first: on a genuine network failure we
+     update the offline cache optimistically and queue the op, then replay it
+     FIFO when connectivity returns. Every write is an upsert-by-id or
+     delete-by-id, so replay is idempotent and FIFO order preserves foreign
+     refs (a tea added offline is replayed before the session that uses it).
+     Non-network errors (auth / RLS / validation) still throw and surface as
+     before. Social actions and bulk put* (migration) stay online-only.
+  ========================================================================== */
+  const QUEUE_KEY = 'tealog_writeQueue';
+  let flushing = false;
+
+  function isOfflineError(err) {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return true;
+    const m = ((err && (err.message || err.error_description)) || '') + '';
+    return (err && err.name === 'TypeError') ||
+      /failed to fetch|networkerror|load failed|fetch failed|network request failed|timeout/i.test(m);
+  }
+  function loadQueue() { try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch { return []; } }
+  function saveQueue(q) { try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); } catch (e) { console.warn('[Steep] write-queue persist failed (storage full?):', e && e.message); } }
+  function queueLength() { return loadQueue().length; }
+
+  // data: URL images can't be uploaded offline and must never reach Postgres —
+  // drop the inline image; the user re-adds it once online. (Belt to
+  // commitSession's suspenders, and it covers the tea/vessel forms too.)
+  function stripInlineImage(op, payload) {
+    if (op !== 'putSession' && op !== 'putTea' && op !== 'putVessel') return payload;
+    const p = { ...payload };
+    if (op === 'putSession' && p.photoUrl && String(p.photoUrl).startsWith('data:')) p.photoUrl = null;
+    if ((op === 'putTea' || op === 'putVessel') && p.image && String(p.image).startsWith('data:')) p.image = null;
+    return p;
+  }
+  function enqueue(op, payload) {
+    const q = loadQueue();
+    q.push({ id: newId(), op, payload: stripInlineImage(op, payload), ts: Date.now() });
+    saveQueue(q);
+    updateSyncBadge();
+  }
+  function applyQueued(e) {
+    switch (e.op) {
+      case 'putTea':        return _netPutTea(e.payload);
+      case 'removeTea':     return _netRemoveTea(e.payload);
+      case 'putVessel':     return _netPutVessel(e.payload);
+      case 'removeVessel':  return _netRemoveVessel(e.payload);
+      case 'putSession':    return _netPutSession(e.payload);
+      case 'removeSession': return _netRemoveSession(e.payload);
+      case 'addTag':        return _netAddTag(e.payload);
+      case 'saveSettings':  return _netSaveSettings(e.payload);
+      default:              return Promise.resolve();
+    }
+  }
+  async function flushQueue() {
+    if (flushing || !currentUser) return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+    let q = loadQueue();
+    if (!q.length) return;
+    flushing = true;
+    let synced = 0;
+    try {
+      while (q.length) {
+        const entry = q[0];
+        try {
+          await applyQueued(entry);
+          q.shift(); saveQueue(q); synced++;
+        } catch (err) {
+          if (isOfflineError(err)) break; // offline again — stop, keep order, retry on next 'online'
+          console.warn('[Steep] dropping unreplayable queued op', entry.op, err && err.message);
+          q.shift(); saveQueue(q); // permanent error (e.g. row already gone) — drop and move on
+        }
+      }
+    } finally {
+      flushing = false;
+      updateSyncBadge();
+    }
+    if (synced > 0 && typeof showToast === 'function') {
+      showToast('Synced ' + synced + ' offline change' + (synced > 1 ? 's' : ''));
+    }
+  }
+  function scheduleFlush() { if (queueLength() && (typeof navigator === 'undefined' || navigator.onLine !== false)) setTimeout(flushQueue, 0); }
+
+  // A quiet, self-contained "waiting to sync" pill — no dependency on the app's render().
+  function updateSyncBadge() {
+    if (typeof document === 'undefined') return;
+    const n = queueLength();
+    let el = document.getElementById('steepSyncBadge');
+    if (!n) { if (el) el.remove(); return; }
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'steepSyncBadge';
+      el.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:9998;' +
+        'background:var(--white,#fff);color:var(--ink-soft,#5C5148);border:1px solid var(--line,#D8CFB9);' +
+        'border-radius:999px;padding:7px 14px;font:500 12px/1 Inter,sans-serif;' +
+        'box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;gap:7px;pointer-events:none;';
+      document.body.appendChild(el);
+    }
+    el.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:var(--amber,#C17A3E);"></span>' +
+      n + ' change' + (n > 1 ? 's' : '') + ' waiting to sync';
+  }
+  if (typeof window !== 'undefined') window.addEventListener('online', flushQueue);
+
   /* ---------- teas ---------- */
-  async function putTea(tea) {
-    requireAuth();
+  async function _netPutTea(tea) {
     const { error } = await sb.from('teas').upsert(teaToDb(tea), { onConflict: 'id' });
     if (error) throw error;
     cacheUpsert('tealog_teas', tea);
   }
-  async function removeTea(id) {
-    requireAuth();
+  async function _netRemoveTea(id) {
     const { error } = await sb.from('teas').delete().eq('id', id).eq('user_id', userId());
     if (error) throw error;
     cacheRemove('tealog_teas', id);
   }
-  async function putTeas(teas) { // bulk upsert without diff-delete (e.g. photo migration)
+  async function putTea(tea) {
+    requireAuth();
+    try { await _netPutTea(tea); scheduleFlush(); }
+    catch (err) {
+      if (!isOfflineError(err)) throw err;
+      const p = stripInlineImage('putTea', tea);
+      cacheUpsert('tealog_teas', p); enqueue('putTea', p);
+    }
+  }
+  async function removeTea(id) {
+    requireAuth();
+    try { await _netRemoveTea(id); scheduleFlush(); }
+    catch (err) { if (!isOfflineError(err)) throw err; cacheRemove('tealog_teas', id); enqueue('removeTea', id); }
+  }
+  async function putTeas(teas) { // bulk upsert (migration/photo backfill) — online-only by design
     requireAuth();
     if (!teas.length) return;
     const { error } = await sb.from('teas').upsert(teas.map(teaToDb), { onConflict: 'id' });
@@ -214,19 +327,31 @@
   }
 
   /* ---------- vessels ---------- */
-  async function putVessel(v) {
-    requireAuth();
+  async function _netPutVessel(v) {
     const { error } = await sb.from('vessels').upsert(vesselToDb(v), { onConflict: 'id' });
     if (error) throw error;
     cacheUpsert('tealog_vessels', v);
   }
-  async function removeVessel(id) {
-    requireAuth();
+  async function _netRemoveVessel(id) {
     const { error } = await sb.from('vessels').delete().eq('id', id).eq('user_id', userId());
     if (error) throw error;
     cacheRemove('tealog_vessels', id);
   }
-  async function putVessels(vessels) {
+  async function putVessel(v) {
+    requireAuth();
+    try { await _netPutVessel(v); scheduleFlush(); }
+    catch (err) {
+      if (!isOfflineError(err)) throw err;
+      const p = stripInlineImage('putVessel', v);
+      cacheUpsert('tealog_vessels', p); enqueue('putVessel', p);
+    }
+  }
+  async function removeVessel(id) {
+    requireAuth();
+    try { await _netRemoveVessel(id); scheduleFlush(); }
+    catch (err) { if (!isOfflineError(err)) throw err; cacheRemove('tealog_vessels', id); enqueue('removeVessel', id); }
+  }
+  async function putVessels(vessels) { // online-only bulk
     requireAuth();
     if (!vessels.length) return;
     const { error } = await sb.from('vessels').upsert(vessels.map(vesselToDb), { onConflict: 'id' });
@@ -235,8 +360,7 @@
   }
 
   /* ---------- sessions (+ their steeps) ---------- */
-  async function putSession(session) {
-    requireAuth();
+  async function _netPutSession(session) {
     const { error } = await sb.from('sessions').upsert(sessionToDb(session), { onConflict: 'id' });
     if (error) throw error;
     const steepRows = (session.steeps || []).map(st => steepToDb(st, session.id));
@@ -253,21 +377,43 @@
     if (e3) console.warn('[Steep] steep prune failed on', session.id, ':', e3.message);
     cacheUpsert('tealog_sessions', session);
   }
-  async function removeSession(id) {
-    requireAuth();
+  async function _netRemoveSession(id) {
     // steeps cascade via FK (sessions on delete cascade)
     const { error } = await sb.from('sessions').delete().eq('id', id).eq('user_id', userId());
     if (error) throw error;
     cacheRemove('tealog_sessions', id);
   }
+  async function putSession(session) {
+    requireAuth();
+    try { await _netPutSession(session); scheduleFlush(); }
+    catch (err) {
+      if (!isOfflineError(err)) throw err;
+      const p = stripInlineImage('putSession', session);
+      cacheUpsert('tealog_sessions', p); enqueue('putSession', p);
+    }
+  }
+  async function removeSession(id) {
+    requireAuth();
+    try { await _netRemoveSession(id); scheduleFlush(); }
+    catch (err) { if (!isOfflineError(err)) throw err; cacheRemove('tealog_sessions', id); enqueue('removeSession', id); }
+  }
 
   /* ---------- tags ---------- */
-  async function addTag(tag) {
-    requireAuth();
+  async function _netAddTag(tag) {
     const { error } = await sb.from('tag_library').upsert({ user_id: userId(), tag }, { onConflict: 'user_id,tag' });
     if (error) throw error;
     const arr = readCache('tealog_tagLibrary', []);
     if (!arr.includes(tag)) { arr.push(tag); writeCache('tealog_tagLibrary', arr); }
+  }
+  async function addTag(tag) {
+    requireAuth();
+    try { await _netAddTag(tag); scheduleFlush(); }
+    catch (err) {
+      if (!isOfflineError(err)) throw err;
+      const arr = readCache('tealog_tagLibrary', []);
+      if (!arr.includes(tag)) { arr.push(tag); writeCache('tealog_tagLibrary', arr); }
+      enqueue('addTag', tag);
+    }
   }
 
   /* ============================ migration ============================ */
@@ -385,11 +531,18 @@
       return { ...defaults, ...readCacheRaw(SETTINGS_CACHE, {}) };
     }
   }
+  async function _netSaveSettings(obj) {
+    const { error } = await sb.from('user_settings').upsert({ user_id: userId(), settings: obj, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+    if (error) throw error;
+  }
   async function saveSettings(obj) {
     try { localStorage.setItem(SETTINGS_CACHE, JSON.stringify(obj)); } catch {}
     if (!currentUser) throw new Error('Sign in to save settings.');
-    const { error } = await sb.from('user_settings').upsert({ user_id: userId(), settings: obj, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
-    if (error) throw error;
+    try { await _netSaveSettings(obj); scheduleFlush(); }
+    catch (err) {
+      if (!isOfflineError(err)) throw err;
+      enqueue('saveSettings', obj); // local cache already written above
+    }
   }
   function readCacheRaw(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } }
 
@@ -420,7 +573,7 @@
     // supabase-js v2 emits an INITIAL_SESSION event on subscribe, which covers first load.
     sb.auth.onAuthStateChange((_event, session) => {
       currentUser = session?.user || null;
-      if (currentUser) gateIntoApp(startApp);
+      if (currentUser) { updateSyncBadge(); flushQueue(); gateIntoApp(startApp); }
       else { appStarted = false; renderLogin(); }
     });
   }
@@ -510,6 +663,7 @@
     loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signInWithGoogle, signOut, newId, migrateFromLocalStorage,
     putTea, removeTea, putTeas, putVessel, removeVessel, putVessels, putSession, removeSession, addTag,
     getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFollowers, getFeed,
-    getUser: () => currentUser
+    getUser: () => currentUser,
+    flushQueue, pendingWrites: queueLength
   };
 })();
