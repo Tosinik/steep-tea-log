@@ -23,6 +23,37 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.33 — curated passport: sub-regions + China/Japan zoom
+Deploy: `service-worker.js` (v44), `steep-passport.js`, `steep-core.js`. No SQL.
+- **Sub-region layer on the tea passport.** Beyond the country pins, teas now resolve to a
+  curated sub-region (`PASSPORT_SUB`) placed by real lat/lon on the same grid — Kagoshima, Fukuoka,
+  Uji, Shizuoka (Japan); Yunnan, Guangdong, Fujian, Zhejiang, Anhui, Guangxi (China); Alishan, Nantou,
+  Lishan (Taiwan). `passportSubFor(country,tea)` matches within the parent country only (origin first,
+  then name — so "Ali Shan…" places even when origin is just "Taiwan"), longest-alias-wins.
+- **Tap China or Japan → zoom into sub-regions.** Selecting a zoomable country retargets the SVG
+  viewBox to a window around it (reuses the existing `PASSPORT_LAND` dots — no new geometry) and draws
+  sub-region pins sized by tea count, plus a faint marker for region-unspecified teas. "← Zoom out"
+  returns to the overview; zoomable countries carry a dashed amber ring + `⊕` on their chip.
+- Detail panel gains sub-region chips (incl. "Region unspecified"); tapping one filters the tea list.
+- Verified with the real library in a Node sandbox: Japan→Kagoshima ×3 / Fukuoka ×1; China→Guangdong,
+  Yunnan, Anhui (Huoshan Huangya) + 2 unspecified; Taiwan→Alishan (from name); all render paths clean.
+- New `state`: `passportZoom`, `passportSub` (reset on view change). No schema change.
+
+---
+## v3.32 — forecast coverage + brew-guide parse + reload fixes
+Deploy: `service-worker.js` (v43), `steep-dashboard.js`, `steep-core.js`, `steep-teas.js`. No SQL.
+- **Stock forecast now covers any brewed tea.** Old rule needed 2+ grams-logged sessions, so a tea
+  with one weighed session (or sessions where grams weren't typed) showed nothing — while purchase-date
+  teas predicted from the ledger. New model = **frequency × dose**: sessions/day (across *all* the tea's
+  sessions, incl. cold brew and grams-less ones) × average logged dose, needing just one grams entry to
+  anchor. Ledger still preferred when present. (Kabusecha/Ruby/Sencha/Huang Ya now predict.) `teaForecast`.
+- **Brew-guide parser — range spreading.** A lone time-range now spreads start→end across the infusion
+  count: `60-75°C, 15-30s, 3 infusions` → 68°C, steeps [15, 23, 30] (was one 23s steep). Temperature
+  ranges read as midpoint (`60-75°C` → 68°C). German "Aufguss/Aufgüsse" counts recognised. Multi-range
+  guides (DHP `10-15s / 15-20s`) still read as one steep each. `parseBrewGuide`.
+- **Reload stays on the tea.** Viewing a tea and refreshing now restores that tea's page instead of
+  bouncing to Home (tea-detail route persisted alongside the tab route). `openTeaDetail`/boot restore.
+
 ## v3.31 — mood/energy check-in (enabler)
 Deploy: `service-worker.js` (v42), `steep-sessions.js`, `steep-data.js`, `steep-teas.js`.
 SQL: `v3_7-mood.sql` (adds nullable `sessions.mood`).
