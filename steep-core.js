@@ -509,7 +509,7 @@ function render(){
   if(themeBtn) themeBtn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙';
 }
 
-function goView(v){ state.view=v; state.activeTeaId=null; saveView(v); render(); }
+function goView(v){ state.view=v; state.activeTeaId=null; state.dashEdit=false; saveView(v); render(); }
 function saveView(v){ try{ if(['dashboard','teas','sessions','vessels','friends'].includes(v)) localStorage.setItem('tealog_view', v); }catch(e){} }
 
 function bindDynamic(){

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'steep-tea-log-v37';
+const CACHE_NAME = 'steep-tea-log-v38';
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -29,7 +29,14 @@ self.addEventListener('install', (event) => {
       cache.addAll(FILES_TO_CACHE.map((u) => new Request(u, { cache: 'reload' })))
     )
   );
-  self.skipWaiting();
+  // Note: we intentionally do NOT call skipWaiting() here. The new worker waits
+  // until the user taps "Refresh" (see the message handler + steep-boot.js), so an
+  // open session is never yanked out from under them mid-brew.
+});
+
+// The page posts this when the user accepts the update banner.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

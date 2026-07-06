@@ -23,6 +23,22 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.27 — update prompt + editable dashboard
+Deploy: `service-worker.js` (v38), `steep-boot.js`, `steep-dashboard.js`, `steep-core.js`.
+- **"New version available" prompt.** The service worker no longer auto-`skipWaiting()`s; on an
+  update it waits, and `steep-boot.js` shows a small bottom banner ("A new version of Steep is
+  ready — Refresh"). Tapping it messages the waiting worker to activate, then reloads once on
+  `controllerchange`. Also an hourly `reg.update()` so long-lived installed PWAs notice.
+  This ends the "deployed but still on the old UI / hard-reload dance" problem — no session is
+  interrupted mid-brew, and the user opts in to refresh.
+- **Editable dashboard.** Home cards are now a named registry rendered from a saved order + a
+  hidden set (`settings.dashLayout`, synced — no migration). An "✎ Edit layout" chip enters edit
+  mode: each card gets ↑ / ↓ / Hide, plus a "Hidden cards" panel to restore, and "Reset to
+  default order". Cards: persona, recap, Wrapped, running-low, recent, totals, brewing clock,
+  insights, what-you-brewed, most-brewed/top-rated, favorites, cost. Unknown/new cards fall back
+  to the default order (forward-compatible), so future cards appear automatically. `renderDashboard`
+  + the layout helpers live in steep-dashboard; edit mode clears on navigation.
+
 ## v3.26 — monthly spend overview (+ purchase-date enabler)
 DB: run `v3_5-purchase-date.sql` (adds a nullable `purchase_date` to `teas`).
 Deploy: `service-worker.js` (v37), `steep-data.js`, `steep-teas.js`, `steep-shopping.js`,

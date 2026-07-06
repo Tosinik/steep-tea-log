@@ -772,6 +772,65 @@ function viewWrapped(){
   `;
 }
 
+/* ---------- editable dashboard (v3.27) ----------
+   Home cards are a named registry rendered in a saved order with a hidden set,
+   persisted in synced settings (settings.dashLayout). Edit mode adds move/hide
+   controls; unknown/new cards fall back to the default order (forward-compatible).
+   A generic "configurable synced surface" — reusable for other views later. */
+const DASH_DEFAULT_ORDER = ['persona','recap','wrapped','restock','recent','totals','clock','insights','types','mostrated','favorites','cost'];
+const DASH_LABELS = { persona:'Tea persona', recap:'Recap', wrapped:'Steep Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
+function dashLayout(){
+  const L = state.settings.dashLayout || {};
+  let order = Array.isArray(L.order) ? L.order.filter(id=>DASH_DEFAULT_ORDER.includes(id)) : [];
+  DASH_DEFAULT_ORDER.forEach(id=>{ if(!order.includes(id)) order.push(id); }); // append any new cards
+  const hidden = new Set((Array.isArray(L.hidden)?L.hidden:[]).filter(id=>DASH_DEFAULT_ORDER.includes(id)));
+  return { order, hidden };
+}
+function saveDashLayout(order, hidden){ state.settings.dashLayout = { order, hidden:[...hidden] }; persistSettings(); }
+function dashToggleEdit(){ state.dashEdit = !state.dashEdit; render(); }
+function dashMoveCard(id, dir){
+  const { order, hidden } = dashLayout();
+  const i = order.indexOf(id), j = i+dir;
+  if(i<0 || j<0 || j>=order.length) return;
+  [order[i], order[j]] = [order[j], order[i]];
+  saveDashLayout(order, hidden); render();
+}
+function dashHideCard(id){ const { order, hidden } = dashLayout(); hidden.add(id); saveDashLayout(order, hidden); render(); }
+function dashShowCard(id){ const { order, hidden } = dashLayout(); hidden.delete(id); saveDashLayout(order, hidden); render(); }
+function dashResetLayout(){ state.settings.dashLayout = { order:[...DASH_DEFAULT_ORDER], hidden:[] }; persistSettings(); render(); }
+function renderDashboard(cards){
+  const { order, hidden } = dashLayout();
+  const editing = !!state.dashEdit;
+  const editBar = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+    <button class="lib-chip ${editing?'active':''}" onclick="dashToggleEdit()">${editing?'✓ Done':'✎ Edit layout'}</button>
+  </div>`;
+  const visible = order.filter(id=>!hidden.has(id));
+  const body = visible.map(id=>{
+    const html = cards[id]; if(html==null) return '';
+    if(!editing) return html;
+    const isEmpty = String(html).trim()==='';
+    const inner = isEmpty ? `<div class="card empty" style="opacity:.6;">${DASH_LABELS[id]} — nothing to show right now</div>` : html;
+    return `<div style="border:1px dashed var(--line);border-radius:12px;padding:8px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        <span style="font-size:12px;color:var(--ink-soft);font-weight:600;">${DASH_LABELS[id]}</span>
+        <span style="display:flex;gap:4px;">
+          <button class="lib-chip" onclick="dashMoveCard('${id}',-1)" aria-label="Move up">↑</button>
+          <button class="lib-chip" onclick="dashMoveCard('${id}',1)" aria-label="Move down">↓</button>
+          <button class="lib-chip" onclick="dashHideCard('${id}')">Hide</button>
+        </span>
+      </div>
+      <div style="pointer-events:none;">${inner}</div>
+    </div>`;
+  }).join('');
+  const hiddenIds = order.filter(id=>hidden.has(id));
+  const hiddenPanel = editing ? `<div class="section card">
+    <div class="section-title"><h2>Hidden cards</h2></div>
+    ${hiddenIds.length ? hiddenIds.map(id=>`<div class="rank-row"><span class="rname">${DASH_LABELS[id]}</span><button class="lib-chip" onclick="dashShowCard('${id}')">Show</button></div>`).join('') : '<div class="empty">Nothing hidden — every card is on your dashboard.</div>'}
+    <div style="margin-top:14px;"><button class="btn" onclick="dashResetLayout()">Reset to default order</button></div>
+  </div>` : '';
+  return `${editBar}${body}${hiddenPanel}`;
+}
+
 function viewDashboard(){
   if(state.sessions.length===0){
     return onboardingHTML();
@@ -836,36 +895,27 @@ function viewDashboard(){
       }).join('')}
     </div>` : '';
 
-  return `
-    <div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>
-
-    ${recapHTML()}
-
-    ${wrappedTeaser()}
-
-    ${restockHTML}
-
-    ${recentHTML}
-
-    <div class="section grid grid-3">
+  const cards = {
+    persona: `<div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>`,
+    recap: recapHTML(),
+    wrapped: wrappedTeaser(),
+    restock: restockHTML,
+    recent: recentHTML,
+    totals: `<div class="section grid grid-3">
       <div class="stat"><div class="num">${s.totalSessions}</div><div class="lbl">Sessions</div></div>
       <div class="stat"><div class="num">${s.totalSteeps}</div><div class="lbl">Infusions</div></div>
       <div class="stat"><div class="num">${s.days.size}</div><div class="lbl">Days logged</div></div>
       <div class="stat"><div class="num">${s.totalGrams.toFixed(1)}</div><div class="lbl">Grams brewed</div></div>
       <div class="stat"><div class="num">${s.totalLiters.toFixed(1)}</div><div class="lbl">Liters (est.)</div></div>
       <div class="stat"><div class="num">${s.uniqueTeas}</div><div class="lbl">Teas brewed</div></div>
-    </div>
-
-    ${brewingClockHTML(s)}
-
-    ${insightsHTML()}
-
-    <div class="section card">
+    </div>`,
+    clock: brewingClockHTML(s),
+    insights: insightsHTML(),
+    types: `<div class="section card">
       <div class="section-title"><h2>What you brewed</h2></div>
       ${typeBars || '<div class="empty">No sessions yet.</div>'}
-    </div>
-
-    <div class="section grid grid-2">
+    </div>`,
+    mostrated: `<div class="section grid grid-2">
       <div class="card">
         <div class="section-title"><h2>Most brewed</h2></div>
         ${mostBrewedHTML}
@@ -874,14 +924,12 @@ function viewDashboard(){
         <div class="section-title"><h2>Top rated</h2></div>
         ${topRatedHTML}
       </div>
-    </div>
-
-    <div class="section">
+    </div>`,
+    favorites: `<div class="section">
       <div class="section-title"><h2>Favorites</h2></div>
       ${favHTML}
-    </div>
-
-    <div class="section card">
+    </div>`,
+    cost: `<div class="section card">
       <div class="section-title"><h2>Cost overview</h2></div>
       <div class="grid grid-3">
         <div class="stat" onclick="goView('spend')" style="cursor:pointer;" title="Monthly spending"><div class="num">${s.totalSpent.toFixed(0)}</div><div class="lbl">Total spent ›</div></div>
@@ -892,9 +940,10 @@ function viewDashboard(){
       </div>
       ${(function(){ const ms=computeMonthlySpend(); return ms.thisMonth>0 ? `<div style="margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;" onclick="goView('spend')">This month: <strong style="color:var(--ink);">${ms.thisMonth.toFixed(2)}</strong> across ${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} · see monthly ›</div>` : ''; })()}
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
-    </div>
+    </div>`
+  };
 
-  `;
+  return renderDashboard(cards);
 }
 
 /* ================= TEAS ================= */
