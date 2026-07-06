@@ -23,6 +23,25 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.28 — inventory-over-time + restock v2
+Deploy: `service-worker.js` (v39), `steep-dashboard.js`, `steep-teas.js`. No SQL.
+- **Sharper run-out estimate.** `teaForecast` now prefers a *purchase-date ledger* — real net
+  drawdown `(grams bought − on hand) ÷ days since purchase` — over the old session-span guess.
+  It's anchored to a real buy date and captures untracked use too, so "how long will this last"
+  is meaningfully sharper on any tea logged with a price/pack size + purchase date. Falls back to
+  the session estimate when there's no usable anchor; guarded against bad data (on-hand > bought,
+  <3 days elapsed). Return shape is unchanged, so the Home "Running low" card and the tea-detail
+  forecast line both sharpen with no other edits. The line adds a quiet "· from your purchase date"
+  when the ledger is used (vs "· rough estimate…" while a session estimate is still settling).
+- **Inventory drawdown sparkline** on tea detail. A calm SVG: a jade spine from the purchase
+  anchor (full pack) down to today's on-hand amount, a soft area fill, and a dashed amber
+  projection to the estimated run-out date, with buy-date/amount and "runs out ~date" captions.
+  Only renders when a real buy anchor exists (teas you already had have no chart). Info, not
+  gamification — no toggle, shows in Quiet/Calm mode too. `inventoryHistory` + `inventorySparkline`
+  live in steep-dashboard. First payoff of the v3.26 purchase-date enabler.
+- Parked (noted in ROADMAP): a per-session drawdown *staircase* overlaid on the spine, and the
+  same sparkline on the Home restock card — deferred to keep this a small deploy.
+
 ## v3.27 — update prompt + editable dashboard
 Deploy: `service-worker.js` (v38), `steep-boot.js`, `steep-dashboard.js`, `steep-core.js`.
 - **"New version available" prompt.** The service worker no longer auto-`skipWaiting()`s; on an

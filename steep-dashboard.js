@@ -388,15 +388,104 @@ function streakCardHTML(){
   </div>`;
 }
 function teaForecast(tea){
-  // Estimate consumption from grams-tracked sessions. More sessions → sharper estimate.
-  const ss = state.sessions.filter(s=>s.teaId===tea.id && Number(s.gramsUsed)>0).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(ss.length<2) return null; // need at least two data points
-  const totalG = ss.reduce((a,s)=>a+Number(s.gramsUsed),0);
-  const spanDays = Math.max(3, (Date.now()-new Date(ss[0].date))/86400000);
-  const perDay = totalG/spanDays;
-  if(perDay<=0) return null;
-  const g = Number(tea.amountGrams)||0;
-  return { perWeek: perDay*7, daysLeft: g>0?Math.round(g/perDay):0, sessions: ss.length, confident: ss.length>=4 };
+  // v2 (v3.28): prefer a purchase-date LEDGER — actual net drawdown since you bought it,
+  // (bought − on-hand) / days elapsed — which also captures untracked use. Falls back to
+  // the older session-span estimate when there's no usable purchase anchor. Return shape
+  // is unchanged so the restock card + tea detail sharpen automatically.
+  const amt = Number(tea.amountGrams)||0;
+  const ss = state.sessions.filter(s=>s.teaId===tea.id && Number(s.gramsUsed)>0)
+                           .sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  // Session-span rate (previous method), kept as fallback / cross-check.
+  let sessionRate = null; // g/day
+  if(ss.length>=2){
+    const totalG = ss.reduce((a,s)=>a+Number(s.gramsUsed),0);
+    const spanDays = Math.max(3, (Date.now()-new Date(ss[0].date))/86400000);
+    const r = totalG/spanDays;
+    if(r>0) sessionRate = r;
+  }
+
+  // Ledger rate — anchored to a real buy date and the amount bought.
+  let ledgerRate = null, sincePurchaseDays = null;
+  const bought = Number(tea.costOriginalGrams)||0;
+  if(tea.purchaseDate && bought>0){
+    sincePurchaseDays = (Date.now()-new Date(tea.purchaseDate))/86400000;
+    const consumed = bought - amt;
+    // sane only: something's been used, on-hand not above what was bought, a few days elapsed
+    if(sincePurchaseDays>=3 && consumed>0 && amt<=bought){
+      ledgerRate = consumed/sincePurchaseDays;
+    }
+  }
+
+  let perDay=null, method=null;
+  if(ledgerRate!=null){ perDay=ledgerRate; method='ledger'; }
+  else if(sessionRate!=null){ perDay=sessionRate; method='sessions'; }
+  if(perDay==null || perDay<=0) return null;
+
+  return {
+    perWeek: perDay*7,
+    perDay,
+    daysLeft: amt>0?Math.round(amt/perDay):0,
+    sessions: ss.length,
+    method,
+    sincePurchaseDays: sincePurchaseDays!=null?Math.round(sincePurchaseDays):null,
+    // a real elapsed window is inherently trustworthy; sessions need some volume
+    confident: method==='ledger' ? (sincePurchaseDays>=10) : (ss.length>=4)
+  };
+}
+
+/* Inventory-over-time (v3.28): reconstruct the stock curve for a tea from its purchase
+   anchor (bought grams on the purchase date) down to today's on-hand amount, then a
+   dashed projection to the estimated run-out. Only defined when a real buy anchor exists;
+   teas you already had (no purchase date) simply have no chart. Endpoints are hard facts,
+   so the spine is honest and always monotonic (amt is clamped into [0, bought]). */
+function inventoryHistory(tea){
+  const bought = Number(tea.costOriginalGrams)||0;
+  if(!tea.purchaseDate || bought<=0) return null;
+  const t0 = new Date(tea.purchaseDate).getTime();
+  const now = Date.now();
+  if(!(now>t0)) return null;
+  const amt = Math.max(0, Math.min(bought, Number(tea.amountGrams)||0));
+  const f = teaForecast(tea);
+  const projT = (f && f.daysLeft>0 && amt>0) ? now + f.daysLeft*86400000 : null;
+  return { t0, now, bought, amt, projT, forecast:f };
+}
+
+function inventorySparkline(tea){
+  const h = inventoryHistory(tea);
+  if(!h) return '';
+  const { t0, now, bought, amt, projT } = h;
+  const W=300, H=84, x0=6, x1=W-6, y0=10, y1=H-18;
+  const tEnd = (projT && projT>now) ? projT : now;
+  const tSpan = Math.max(1, tEnd - t0);
+  const gMax  = Math.max(1, bought);
+  const X = t => x0 + ((t - t0)/tSpan)*(x1 - x0);
+  const Y = g => y1 - (Math.max(0,Math.min(gMax,g))/gMax)*(y1 - y0);
+  const bx=X(t0), by=Y(bought), nx=X(now), ny=Y(amt);
+  const area  = `M ${bx} ${y1} L ${bx} ${by} L ${nx} ${ny} L ${nx} ${y1} Z`;
+  const spine = `M ${bx} ${by} L ${nx} ${ny}`;
+  let proj='';
+  if(projT && projT>now){
+    const px=X(projT), py=Y(0);
+    proj = `<path d="M ${nx} ${ny} L ${px} ${py}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>`
+         + `<circle cx="${px}" cy="${py}" r="2.5" fill="var(--amber)"/>`;
+  }
+  const gLabel = g => (g%1 ? g.toFixed(1) : g)+'g';
+  const runout = (projT && projT>now) ? 'runs out ~'+fmtDate(new Date(projT).toISOString()) : (amt<=0 ? 'empty' : '');
+  return `
+  <div class="inv-spark" style="margin-top:10px;">
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;" role="img" aria-label="Stock over time for ${(tea.name||'this tea').replace(/"/g,'&quot;')}">
+      <line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="var(--line)" stroke-width="1"/>
+      <path d="${area}" fill="var(--jade-pale)" opacity="0.7"/>
+      <path d="${spine}" fill="none" stroke="var(--jade)" stroke-width="2" stroke-linecap="round"/>
+      ${proj}
+      <circle cx="${nx}" cy="${ny}" r="3" fill="var(--jade)"/>
+    </svg>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink-soft);margin-top:2px;">
+      <span>${fmtDate(new Date(t0).toISOString())} · ${gLabel(bought)}</span>
+      <span>${runout}</span>
+    </div>
+  </div>`;
 }
 function fmtDaysLeft(days){
   if(days<=0) return 'out';
@@ -410,7 +499,9 @@ function forecastLine(tea){
   if(!f) return '';
   const wk = f.perWeek<1 ? f.perWeek.toFixed(1) : Math.round(f.perWeek);
   if((Number(tea.amountGrams)||0)<=0) return `<div class="forecast-line">Out of stock — you were going through ~${wk}g/week.</div>`;
-  return `<div class="forecast-line">At your pace (~${wk}g/week), about <b>${fmtDaysLeft(f.daysLeft)}</b> left${f.confident?'':' · rough estimate, sharpens as you log more'}.</div>`;
+  const tail = !f.confident ? ' · rough estimate, sharpens as you log more'
+             : (f.method==='ledger' ? ' · from your purchase date' : '');
+  return `<div class="forecast-line">At your pace (~${wk}g/week), about <b>${fmtDaysLeft(f.daysLeft)}</b> left${tail}.</div>`;
 }
 function periodRange(period){
   const now = new Date();

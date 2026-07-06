@@ -254,6 +254,7 @@ function viewTeaDetail(){
           <div class="eyebrow" style="margin-top:8px;">On hand</div>
           <div style="font-size:14px;${Number(t.amountGrams)<lowStockG()?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
           ${forecastLine(t)}
+          ${inventorySparkline(t)}
         </div>
       </div>
 
