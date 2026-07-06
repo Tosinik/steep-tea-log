@@ -23,6 +23,17 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.31 — mood/energy check-in (enabler)
+Deploy: `service-worker.js` (v42), `steep-sessions.js`, `steep-data.js`, `steep-teas.js`.
+SQL: `v3_7-mood.sql` (adds nullable `sessions.mood`).
+- **Optional pre-brew mood/energy** at session setup (Drained · Low · Steady · Lively · Wired),
+  one tap, skippable, applies to cold brew too. Captured *before* you start so it's tied to the
+  session and time of day — the reading the later Garmin/caffeine-sleep correlation (Tier 4) leans on.
+  Editable afterwards on the session-edit form. Stored in `sessions.mood`; `MOODS`/`moodChipsHTML`/
+  `d_setMood`/`setEditSessionMood` in steep-sessions.
+- **Fix:** removed the leaf-form line from the tea detail page (looked cluttered) — the field still
+  lives in the tea edit form, it's just no longer auto-listed on the detail grid.
+
 ## v3.30 — in-session micro-adjust
 Deploy: `service-worker.js` (v41), `steep-sessions.js`. No SQL.
 - **Adjustments now stick.** Previously each steep re-prefilled from the fixed schedule, so lowering
