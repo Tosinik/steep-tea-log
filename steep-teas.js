@@ -274,7 +274,6 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Source</div><div>${t.source||'—'}</div></div>
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
         <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
-        <div><div class="eyebrow">Leaf form</div><div>${leafFormLabel(t)}</div></div>
       </div>
       ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.brewGuide}</div></div>`:''}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.description}</div></div>`:''}

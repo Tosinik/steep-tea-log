@@ -243,6 +243,7 @@ function sessionEditModal(){
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isColdBrew?'checked':''} onchange="es_set('isColdBrew', this.checked)"> Cold brew</label></div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isShared?'checked':''} onchange="es_set('isShared', this.checked)"> Shared with followers</label></div>
         <div class="field span2"><label>Overall rating</label><div id="editRatingWrap">${renderStarsInteractive(Number(e.rating)||0,true,'setEditSessionRating')}</div></div>
+        <div class="field span2"><label>Mood</label><div id="editMoodWrap">${moodChipsHTML(e.mood||null,'setEditSessionMood')}</div></div>
         <div class="field span2"><label>Overall notes</label><textarea oninput="es_set('description', this.value)">${e.description||''}</textarea></div>
         <div class="field span2">
           <label>Tags</label>
@@ -290,6 +291,7 @@ function startSessionFor(teaId){
     brewMode: state.settings.brewGuideAutofill!==false ? 'guide' : 'off', // 'off' | 'guide' | 'tuned'
     advice: null,                                       // computeBrewAdvice() cache for this session
     feedback: null,                                     // 'good' | 'strong' | 'weak' (optional)
+    mood: null,                                          // v3.31 optional pre-brew energy/mood
     curTemp: '', curTime: '',
     curSteepTags: [],
     curSteepDesc: '',
@@ -395,6 +397,7 @@ function sessionSetupHTML(d){
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
         <div class="field"><label>Water type</label><input type="text" value="${d.waterType}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
         <div class="field"><label>Water TDS (optional)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="ppm"></div>
+        <div class="field span2"><label>How are you feeling? <span style="color:var(--ink-soft);font-weight:400;">— optional, for spotting patterns later</span></label>${moodChipsHTML(d.mood, 'd_setMood')}</div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
       </div>
       ${d.isColdBrew ? `
@@ -416,6 +419,19 @@ function d_setcur(key, val){
   state.sessionDraft[key] = val;
 }
 function d_setTea(val){ state.sessionDraft.teaId = val; render(); }   // re-render so the guide preview follows the tea
+
+// v3.31 optional pre-brew mood/energy — captured at setup so it's tied to the session
+// (and the time of day), the reading the future sleep/caffeine correlation will lean on.
+const MOODS = ['Drained','Low','Steady','Lively','Wired'];
+function moodChipsHTML(current, cb){
+  return `<div style="display:flex;gap:6px;flex-wrap:wrap;">` + MOODS.map(m=>{
+    const on = current===m;
+    return `<button type="button" onclick="${cb}('${m}')" style="border:1px solid ${on?'var(--jade)':'var(--line)'};border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;${on?'background:var(--jade);color:#fff;':'background:transparent;color:var(--ink-soft);'}">${m}</button>`;
+  }).join('') + `</div>`;
+}
+function d_setMood(m){ const d=state.sessionDraft; d.mood = (d.mood===m)?null:m; render(); }
+function setEditSessionMood(m){ const e=state.editingSession; e.mood = (e.mood===m)?null:m;
+  const w=document.getElementById('editMoodWrap'); if(w) w.innerHTML=moodChipsHTML(e.mood||null,'setEditSessionMood'); }
 function d_setBrewMode(mode){ state.sessionDraft.brewMode = mode; state.sessionDraft.timeShift = 0; render(); }
 
 // Setup preview: the tea's brew guide plus, once there's session feedback, a
@@ -905,6 +921,7 @@ async function commitSession(){
     isShared: !!d.isShared, photoUrl: photoDeferred ? null : (photoUrl || null),
     infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
     feedback: d.feedback || null,
+    mood: d.mood || null,
     teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
   };
   state.sessions.push(session);
