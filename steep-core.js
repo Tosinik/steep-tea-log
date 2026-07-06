@@ -207,7 +207,13 @@ function parseBrewGuide(text){
     .replace(/\d+(?:\.\d+)?\s*(?:g|grams?|ml|oz|%|ppm)\b/g,' ')
     .replace(/\bx\s*\d+\b/g,' ')
     .replace(/\b(?:x\s*)?\d+\s*(?:infusions?|steeps?|brews?|times?)\b/g,' ')
-    .replace(/\b(19|20)\d{2}\b/g,' ');
+    .replace(/\b(19|20)\d{2}\b/g,' ')
+    // "add 5-10s (each / per steep / thereafter)" is a ramp instruction, not a steep time — drop it
+    .replace(/\b(?:add|plus|\+)\s*\d+(?:\s*-\s*\d+)?\s*(?:s|sec|secs|second|seconds)\b(?:\s*(?:each|per\s+steep|for\s+each(?:\s+steep)?|every\s+steep|thereafter|after)?)?/g,' ')
+    // range like "10-15s" or "2-3 min" -> a single representative (midpoint), so it reads as one steep
+    .replace(/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes)\b/g,(m,a,b,u)=>(Math.round(((+a)+(+b))/2*10)/10)+u)
+    // ordinals: "1st", "2nd steep" — labels, not times
+    .replace(/\b\d+\s*(?:st|nd|rd|th)\b/g,' ');
   // rinse — trailing form first ("5s rinse"), then a tight leading form ("rinse 5s")
   let rinseSeconds=null, rm;
   if(rm=w.match(/(\d+)\s*(?:s|sec|secs)?\s*rinse\b/)) rinseSeconds=Number(rm[1]);
@@ -219,15 +225,105 @@ function parseBrewGuide(text){
   if(!times.length && tempC==null) return null;
   return { tempC, rinseSeconds, times };
 }
-// Suggested time (seconds) for steep index i; extends gently past the listed
-// steeps by repeating the last gap, so long gongfu sessions still get a hint.
+/* ---------- leaf-form steep curves (v3.29) ----------
+   Leaf morphology, not just tea type, drives how steep times should progress:
+   rolled/compressed leaves open over infusions (small early increments, bigger
+   later); open/strip leaves are strongest early and must ramp from the start;
+   greens flash-dip on the 2nd steep then climb; buds release slowly and steadily.
+   Each profile: base = S1 seconds (only used when generating with no listed times);
+   mult = per-steep multipliers vs base for the opening steeps (encodes the green
+   dip / slow start); growth = how the *gap* expands per steep after that; min/max/def
+   bound the extrapolated increment. Explicit guide times always win — these only
+   fill a missing schedule and extend past the last listed steep. */
+const LEAF_PROFILES = {
+  rolled:     { label:'Rolled / balled',   base:15, mult:[1,1,1.2,1.5,1.9],    growth:1.15, minInc:3, maxInc:30, defInc:5 },
+  open:       { label:'Strip / open leaf', base:12, mult:[1,1.35,1.75,2.2],    growth:1.15, minInc:4, maxInc:18, defInc:6 },
+  bud:        { label:'Bud / needle',      base:35, mult:[1,1.15,1.35,1.6,1.9],growth:1.15, minInc:5, maxInc:45, defInc:8 },
+  green_cn:   { label:'Green — pan-fired',  base:12, mult:[1,0.65,1.1,1.6,2.2], growth:1.30, minInc:3, maxInc:45, defInc:6 },
+  green_jp:   { label:'Green — steamed',    base:10, mult:[1,0.6,1.05,1.7],     growth:1.35, minInc:3, maxInc:45, defInc:6 },
+  compressed: { label:'Compressed / cake',  base:15, mult:[1,1,1.15,1.4,1.8],   growth:1.18, minInc:3, maxInc:40, defInc:5 }
+};
+const LEAF_FORM_KEYS = Object.keys(LEAF_PROFILES);
+function niceSec(s){ s=Math.round(s); if(s>=60) s=Math.round(s/5)*5; return Math.max(3,Math.min(1800,s)); }
+
+// Infer a leaf form from the tea's name (cultivar/region/leaf words win, since
+// vendor type labels are unreliable), then fall back to the type default.
+function inferLeafForm(tea){
+  const n = ((tea&&tea.name)||'').toLowerCase();
+  const has = (...ks)=>ks.some(k=>n.includes(k));
+  if(has('gyokuro','sencha','kabuse','kabusecha','tamaryokucha','fukamushi','matcha','japan')) return 'green_jp';
+  if(has('silver needle','yinzhen','yin zhen','baihao yinzhen','bai hao yin','junshan','jun shan')) return 'bud';
+  if(has('dan cong','dancong','yancha','wuyi','wu yi','rou gui','rougui','shui xian','shuixian',
+         'da hong pao','dahongpao','shui jin gui','tie luo han','bai ji guan','rock oolong','cliff','qi lan','qilan')) return 'open';
+  if(has('cake','bing','tuo','brick','compressed','pressed')) return 'compressed';
+  switch(tea&&tea.type){
+    case 'green':  return 'green_cn';
+    case 'white':  return 'open';                                   // bai mu dan / pai mu tan (needle & cake caught above)
+    case 'oolong': return 'rolled';                                 // Dan Cong / yancha caught above
+    case 'puerh':  return has('loose','shou','ripe','maocha') ? 'open' : 'compressed';
+    case 'black':  return 'open';
+    case 'yellow': return has('needle','bud') ? 'bud' : 'green_cn';
+    default:       return 'open';
+  }
+}
+// The form actually used: an explicit field wins; blank = inferred.
+function effectiveLeafForm(tea){
+  const f = tea && tea.leafForm;
+  return (f && LEAF_PROFILES[f]) ? f : inferLeafForm(tea);
+}
+function leafFormLabel(tea){
+  const key = effectiveLeafForm(tea);
+  const explicit = tea && tea.leafForm && LEAF_PROFILES[tea.leafForm];
+  return LEAF_PROFILES[key].label + (explicit ? '' : ' · auto');
+}
+// Generate the opening steep times for a form (seconds), when no guide lists them.
+function generateFormTimes(form, n){
+  const p = LEAF_PROFILES[form] || LEAF_PROFILES.open; n = n || 6;
+  const out=[];
+  for(let i=0;i<n;i++){
+    const m = i<p.mult.length ? p.mult[i]
+      : p.mult[p.mult.length-1]*Math.pow(p.growth, i-(p.mult.length-1));
+    out.push(niceSec(p.base*m));
+  }
+  return out;
+}
+
+// Suggested time (seconds) for steep index i. Within the listed steeps, returns
+// them verbatim; past them, extends using the leaf form's expanding gap so open
+// leaves ramp harder than rolled ones (and long gongfu sessions keep a hint).
 function scheduleTimeForIndex(sched, i){
   if(!sched || !sched.times || !sched.times.length) return null;
-  if(i < sched.times.length) return sched.times[i];
-  const t=sched.times, last=t[t.length-1];
-  let inc = t.length>=2 ? (t[t.length-1]-t[t.length-2]) : 10;
-  if(!(inc>0)) inc=10; inc=Math.max(5,Math.min(30,inc));
-  return Math.min(1800, last + (i-(t.length-1))*inc);
+  const t=sched.times;
+  if(i < t.length) return t[i];
+  const p = LEAF_PROFILES[sched.form] || null;
+  const growth = p?p.growth:1.0, minInc = p?p.minInc:5, maxInc = p?p.maxInc:30, defInc = p?p.defInc:10;
+  let gap = t.length>=2 ? (t[t.length-1]-t[t.length-2]) : defInc;
+  if(!(gap>0)) gap = defInc;
+  let cur = t[t.length-1];
+  for(let k=0, steps=i-(t.length-1); k<steps; k++){
+    gap = Math.max(minInc, Math.min(maxInc, gap*growth));
+    cur += gap;
+  }
+  return niceSec(Math.min(1800, cur));
+}
+
+// The schedule that should prefill a session: an explicit guide's times win; if a
+// guide has no times (or none at all), fall back to a leaf-form-generated set when
+// allowed (advice on). Always stamps the resolved `form` so extrapolation is aware.
+function effectiveGuideSchedule(tea, allowGenerate){
+  if(!tea) return null;
+  const form = effectiveLeafForm(tea);
+  const parsed = parseBrewGuide(tea.brewGuide);
+  if(parsed && parsed.times && parsed.times.length) return { ...parsed, form, generated:false };
+  if(allowGenerate){
+    return {
+      tempC: parsed ? parsed.tempC : null,
+      rinseSeconds: parsed ? parsed.rinseSeconds : null,
+      times: generateFormTimes(form, 6),
+      form, generated:true
+    };
+  }
+  return parsed ? { ...parsed, form, generated:false } : null; // temp-only guide, or nothing
 }
 // One-line human summary, e.g. "95°C · rinse 5s · 15 / 20 / 30 / 45s".
 function brewScheduleSummary(sched){
@@ -273,7 +369,7 @@ function adviceSessionsFor(teaId){
 }
 function computeBrewAdvice(tea){
   if(!tea) return null;
-  const base = parseBrewGuide(tea.brewGuide);
+  const base = effectiveGuideSchedule(tea, state.settings.brewAdvice!==false);
   const sessions = adviceSessionsFor(tea.id);
   let strong=0, weak=0, good=0;
   sessions.forEach(s=>{ const sig=feedbackSignalOf(s); if(sig==='strong')strong++; else if(sig==='weak')weak++; else if(sig==='good')good++; });
@@ -286,7 +382,8 @@ function computeBrewAdvice(tea){
     tuned = {
       tempC: base.tempC!=null ? Math.max(60, Math.min(100, base.tempC+tempAdjC)) : null,
       rinseSeconds: base.rinseSeconds,
-      times: (base.times||[]).map(t=>Math.max(3, Math.round(t*(1+timeAdjPct/100))))
+      times: (base.times||[]).map(t=>Math.max(3, Math.round(t*(1+timeAdjPct/100)))),
+      form: base.form, generated: base.generated
     };
   }
   if(!base && !count) return null;
@@ -301,12 +398,18 @@ function adviceMemoryText(adv){
   if(adv.weak) bits.push(adv.weak+' a bit weak');
   return `Logged ${adv.count}×${bits.length?' · '+bits.join(' · '):''}`;
 }
-// Short human suggestion, e.g. "cooler (\u22125\u00b0) and shorter (\u221215%)".
+// Short human suggestion, e.g. "cooler (\u22125\u00b0) and shorter (\u2248\u22124s/steep)".
+// Time is shown in seconds off a representative steep — a percent is hard to act on mid-brew.
 function adviceSuggestionText(adv){
   if(!adv || !adv.hasNudge) return '';
   const parts=[];
   if(adv.tempAdjC) parts.push((adv.tempAdjC<0?'cooler':'hotter')+' ('+(adv.tempAdjC>0?'+':'')+Math.round(adv.tempAdjC*(state.settings.tempUnit==='f'?9/5:1))+(state.settings.tempUnit==='f'?'\u00b0F':'\u00b0')+')');
-  if(adv.timeAdjPct) parts.push((adv.timeAdjPct<0?'shorter':'longer')+' ('+(adv.timeAdjPct>0?'+':'')+adv.timeAdjPct+'%)');
+  if(adv.timeAdjPct){
+    const t0 = (adv.base && adv.base.times && adv.base.times.length) ? adv.base.times[0] : 20;
+    const d = Math.round(t0*adv.timeAdjPct/100);
+    const secTxt = Math.abs(d)>=1 ? '\u2248'+(d>0?'+':'')+d+'s/steep' : (adv.timeAdjPct>0?'+':'')+adv.timeAdjPct+'%';
+    parts.push((adv.timeAdjPct<0?'shorter':'longer')+' ('+secTxt+')');
+  }
   return parts.join(' and ');
 }
 // Normalise a schedule back into brew-guide text: "92\u00b0C, 5s rinse, 13s / 17s / 26s".

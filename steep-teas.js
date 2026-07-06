@@ -155,6 +155,13 @@ function teaFormModal(){
               <button type="button" class="lib-chip" onclick="setPurchaseToday(this)">Today</button>
             </div>
           </div>
+          <div class="field span2"><label>Leaf form <span style="color:var(--ink-soft);font-weight:400;">— shapes suggested steep times when there's no guide, and how they ramp past the last listed steep</span></label>
+            <select name="leafForm">
+              <option value="" ${!t.leafForm?'selected':''}>Auto — infer from type &amp; name</option>
+              ${LEAF_FORM_KEYS.map(k=>`<option value="${k}" ${t.leafForm===k?'selected':''}>${LEAF_PROFILES[k].label}</option>`).join('')}
+            </select>
+            ${!t.leafForm?`<div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">Currently reads as <b>${LEAF_PROFILES[effectiveLeafForm(t)].label}</b>.</div>`:''}
+          </div>
           <div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${t.brewGuide||''}</textarea></div>
           <div class="field span2"><label>Description</label><textarea name="description" placeholder="Tasting notes, character, story...">${t.description||''}</textarea></div>
           <div class="field span2" style="flex-direction:row;gap:18px;flex-wrap:wrap;">
@@ -199,6 +206,7 @@ async function submitTeaForm(e){
     wouldRebuy: f.wouldRebuy.checked,
     purchaseType: f.isRepeat.checked?'repeat':'first',
     purchaseDate: f.purchaseDate.value || null,
+    leafForm: f.leafForm.value || null,
     image: imageUrl,
     dateAdded: state.editingTea?.dateAdded || new Date().toISOString()
   };
@@ -266,6 +274,7 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Source</div><div>${t.source||'—'}</div></div>
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
         <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
+        <div><div class="eyebrow">Leaf form</div><div>${leafFormLabel(t)}</div></div>
       </div>
       ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.brewGuide}</div></div>`:''}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.description}</div></div>`:''}

@@ -424,8 +424,8 @@ function d_setBrewMode(mode){ state.sessionDraft.brewMode = mode; render(); }
 function brewGuidePreviewHTML(d){
   if(d.isColdBrew) return '';
   const tea = teaById(d.teaId);
-  const base = parseBrewGuide(tea && tea.brewGuide);
   const adviceOn = state.settings.brewAdvice!==false;
+  const base = effectiveGuideSchedule(tea, adviceOn);
   const adv = adviceOn ? computeBrewAdvice(tea) : (base?{base,tuned:base,hasNudge:false,count:0}:null);
   if(!base && !(adv && adv.hasNudge)) return '';
   // keep brewMode valid for what's available
@@ -439,11 +439,14 @@ function brewGuidePreviewHTML(d){
   const memory = (adv && adv.count) ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${adviceMemoryText(adv)}${adv.hasNudge?` — suggests ${adviceSuggestionText(adv)}.`:' — landing well; using your guide as-is.'}</div>` : '';
   const saveLink = (d.brewMode==='tuned' && adv && adv.hasNudge)
     ? `<div style="margin-top:8px;"><button class="btn-ghost" style="font-size:11.5px;padding:0;" onclick="saveTuningToGuide('${tea.id}')">Save this tuning as the tea\u2019s brew guide →</button></div>` : '';
+  const generatedNow = !!(base && base.generated) && d.brewMode!=='tuned';
   const hint = d.brewMode==='off'
     ? 'Steeps start blank.'
-    : (d.brewMode==='tuned' ? 'Prefills each steep from your tuned times \u2014 still fully editable.' : 'Prefills each steep\u2019s timer and temperature \u2014 adjust as you go.');
+    : (d.brewMode==='tuned' ? 'Prefills each steep from your tuned times \u2014 still fully editable.'
+      : (generatedNow ? 'Suggested from the leaf type \u2014 no guide saved yet, so adjust freely as you go.'
+        : 'Prefills each steep\u2019s timer and temperature \u2014 adjust as you go.'));
   return `<div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
-    <div class="eyebrow">${d.brewMode==='tuned'?'Your tuning':'From your brew guide'}</div>
+    <div class="eyebrow">${d.brewMode==='tuned'?'Your tuning':(generatedNow?'Suggested \u00b7 '+LEAF_PROFILES[base.form].label:'From your brew guide')}</div>
     ${summary}
     ${seg}
     ${memory}
@@ -478,7 +481,7 @@ function applyScheduleToCurrentSteep(d){
 function beginSteeping(){
   const d = state.sessionDraft;
   const tea = teaById(d.teaId);
-  const base = (!d.isColdBrew) ? parseBrewGuide(tea && tea.brewGuide) : null;
+  const base = (!d.isColdBrew) ? effectiveGuideSchedule(tea, state.settings.brewAdvice!==false) : null;
   d.advice = (!d.isColdBrew && state.settings.brewAdvice!==false) ? computeBrewAdvice(tea) : null;
   if(d.brewMode==='tuned') d.schedule = (d.advice && d.advice.hasNudge) ? d.advice.tuned : base;
   else if(d.brewMode==='guide') d.schedule = base;
@@ -515,7 +518,7 @@ function scheduleStripHTML(d){
   const meta=[];
   if(sched.tempC!=null) meta.push(cToDisplay(sched.tempC)+tempUnitLabel());
   if(sched.rinseSeconds!=null) meta.push('rinse '+sched.rinseSeconds+'s');
-  const label = d.brewMode==='tuned' ? 'Your tuning' : 'Brew guide';
+  const label = d.brewMode==='tuned' ? 'Your tuning' : (sched.generated ? 'Suggested' : 'Brew guide');
   return `<div class="card" style="margin-bottom:14px;background:var(--jade-pale);border:1px solid var(--line);padding:12px 14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
       <div class="eyebrow">${label}${meta.length?' · '+meta.join(' · '):''}</div>

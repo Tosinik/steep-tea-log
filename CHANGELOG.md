@@ -23,6 +23,30 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.29 — leaf-form steep curves + seconds-first advice
+Deploy: `service-worker.js` (v40), `steep-core.js`, `steep-sessions.js`, `steep-teas.js`, `steep-data.js`.
+SQL: `v3_6-leaf-form.sql` (adds nullable `teas.leaf_form`).
+- **Leaf form drives the steep progression.** Steep times now follow *leaf morphology*, not a single
+  ramp. Six families, each with its own curve: rolled/balled (opens slowly → small early increments),
+  strip/open leaf (strong early → ramps from the start), bud/needle (slow, steady, long), green
+  pan-fired (Chinese — S2 flash-dip then climb), green steamed (Japanese — deeper dip, lower base),
+  compressed/cake (breaks & opens like rolled). `LEAF_PROFILES` + `scheduleTimeForIndex` (now
+  form-aware) in steep-core.
+- **New `leafForm` field on teas** (Auto by default). Auto **infers from the name first**
+  (cultivar/region/leaf: Da Hong Pao/Wuyi/yancha→open, gyokuro/sencha→steamed, silver needle/
+  yinzhen→bud, cake/bing/tuo→compressed) then the type default — because vendor type labels are
+  unreliable. Overridable per tea; shown on tea detail. Nullable column, no backfill.
+- **Suggested schedules with no guide.** A tea with no brew guide now gets a leaf-form-generated
+  schedule in setup (labelled "Suggested · <form>"), so the timer prefills sensibly from day one.
+  Explicit guide times always win; the curve only fills gaps and **extrapolates past the last listed
+  steep** (validated against a real Da Hong Pao card: 10-15s/15-20s + "add 5-10s each" → 13, 18, 24,
+  30, 38, 47, 57s).
+- **Parser hardening.** `parseBrewGuide` now understands ranges ("10-15s" → midpoint), ordinals
+  ("1st/2nd"), and "add 5-10s (each/thereafter)" ramp instructions (dropped, not read as a steep) —
+  so real-world guide text stops producing junk steeps. Slash/comma/clock notations unchanged.
+- **Advice in seconds, not percent.** The tuning suggestion reads "≈+5s/steep" off a representative
+  steep instead of "+8%", since a percentage is hard to act on mid-brew. (`adviceSuggestionText`.)
+
 ## v3.28 — inventory-over-time + restock v2
 Deploy: `service-worker.js` (v39), `steep-dashboard.js`, `steep-teas.js`. No SQL.
 - **Sharper run-out estimate.** `teaForecast` now prefers a *purchase-date ledger* — real net
