@@ -23,6 +23,19 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.34 — quick-fix batch: vessel edit + passport legibility
+Deploy: `service-worker.js` (v45), `steep-sessions.js`, `steep-passport.js`. No SQL.
+- **Change the vessel on a saved session.** Edit-session modal gains a Vessel selector (shows capacity
+  where set); Save recomputes `vesselName`. If the session's vessel was since deleted, its old name is
+  preserved as the current option so nothing silently changes.
+- **Passport legibility (map fix).** The pins were sized big enough to cover the land grid, and the
+  China/Japan zoom cropped too tight to orient by. Now: gentler sqrt pin sizing (no blobs), wider zoom
+  windows with a minimum span so coastline/context shows, and small name+count labels on both country
+  pins (overview) and sub-region pins (zoom). Japan's Kyushu sub-regions (Kagoshima/Fukuoka/Miyazaki)
+  were near-coincident — spread slightly for legibility (curated map, not survey-accurate). No other
+  map changes. Verified render paths + labels in the Node sandbox.
+
+---
 ## v3.33 — curated passport: sub-regions + China/Japan zoom
 Deploy: `service-worker.js` (v44), `steep-passport.js`, `steep-core.js`. No SQL.
 - **Sub-region layer on the tea passport.** Beyond the country pins, teas now resolve to a
