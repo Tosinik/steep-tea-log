@@ -286,6 +286,7 @@ function startSessionFor(teaId){
     infusionCount: 1,
     stage: 'setup', // setup -> steeping -> finish  (or setup -> quick)
     schedule: null,                                     // effective schedule (set at beginSteeping)
+    timeShift: 0,                                        // v3.30 in-session carry: seconds offset applied to upcoming steeps
     brewMode: state.settings.brewGuideAutofill!==false ? 'guide' : 'off', // 'off' | 'guide' | 'tuned'
     advice: null,                                       // computeBrewAdvice() cache for this session
     feedback: null,                                     // 'good' | 'strong' | 'weak' (optional)
@@ -415,7 +416,7 @@ function d_setcur(key, val){
   state.sessionDraft[key] = val;
 }
 function d_setTea(val){ state.sessionDraft.teaId = val; render(); }   // re-render so the guide preview follows the tea
-function d_setBrewMode(mode){ state.sessionDraft.brewMode = mode; render(); }
+function d_setBrewMode(mode){ state.sessionDraft.brewMode = mode; state.sessionDraft.timeShift = 0; render(); }
 
 // Setup preview: the tea's brew guide plus, once there's session feedback, a
 // gently tuned "your tuning" option and a memory of how past cups landed.
@@ -468,14 +469,36 @@ function saveTuningToGuide(teaId){
   render();
 }
 
-// Prefill the current steep's timer + temp from the effective schedule.
-// Called at each steep boundary, so it never fights values typed mid-steep.
+// Prefill the current steep's timer + temp from the effective schedule, plus any
+// in-session carry (manual edits + last-pour nudges) so an adjustment sticks instead
+// of the schedule snapping back to its upward march each steep.
 function applyScheduleToCurrentSteep(d){
   if(!d || !d.schedule) return;
   const i = d.steeps.length;
   const t = scheduleTimeForIndex(d.schedule, i);
-  if(t!=null){ d.timer.mode='timer'; d.timer.target=t; d.curTime=String(t); }
+  if(t!=null){ const adj=Math.max(3, Math.round(t + (d.timeShift||0))); d.timer.mode='timer'; d.timer.target=adj; d.curTime=String(adj); }
   if(d.schedule.tempC!=null){ const disp=cToDisplay(d.schedule.tempC); if(disp!=='') d.curTemp=String(disp); }
+}
+// Nudge the *next* steep from how the last pour tasted (ephemeral to this session).
+function d_nudgeNextSteep(kind){
+  const d = state.sessionDraft; if(!d || !d.schedule) return;
+  const STEP=5, clamp=x=>Math.max(-45, Math.min(45, x));
+  if(kind==='weak') d.timeShift = clamp((d.timeShift||0)+STEP);        // under-extracted → longer
+  else if(kind==='strong') d.timeShift = clamp((d.timeShift||0)-STEP); // over-extracted → shorter
+  // 'ok' leaves the current carry as-is
+  applyScheduleToCurrentSteep(d);
+  render();
+}
+function brewNudgeRowHTML(d){
+  if(!d.schedule || !d.steeps.length) return '';
+  const shift = d.timeShift||0;
+  const chip=(k,l)=>`<button type="button" class="lib-chip" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;
+  const note = shift ? `<span style="font-size:11px;color:var(--ink-soft);">next steep ${shift>0?'+':''}${shift}s vs guide</span>` : '';
+  return `<div style="margin:-4px 0 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <span style="font-size:11.5px;color:var(--ink-soft);">How was that pour?</span>
+    ${chip('weak','Weak → longer')}${chip('ok','Just right')}${chip('strong','Strong → shorter')}
+    ${note}
+  </div>`;
 }
 
 function beginSteeping(){
@@ -486,6 +509,7 @@ function beginSteeping(){
   if(d.brewMode==='tuned') d.schedule = (d.advice && d.advice.hasNudge) ? d.advice.tuned : base;
   else if(d.brewMode==='guide') d.schedule = base;
   else d.schedule = null;
+  d.timeShift = 0;
   d.stage='steeping';
   applyScheduleToCurrentSteep(d);
   render();
@@ -554,6 +578,7 @@ function sessionSteepingHTML(d){
       <h2 style="margin-top:2px;">${dotsRow(d.steeps.length, Math.max(d.steeps.length+1,6))} Steep ${d.steeps.length+1}</h2>
 
       ${scheduleStripHTML(d)}
+      ${brewNudgeRowHTML(d)}
       ${d.steeps.length ? `<div style="margin-bottom:14px;">${steepsHTML}</div>` : ''}
 
       <div class="timer-box">
@@ -782,7 +807,15 @@ function saveSteepAndContinue(){
   const time = document.getElementById('steepTime').value;
   const desc = document.getElementById('steepDesc').value;
   if(!time){ alert('Enter a steep time (or use the timer).'); return; }
+  const idx = d.steeps.length; // index of the steep being committed
   d.steeps.push({id:uid(), order:d.steeps.length+1, tempC:displayToC(temp), timeSeconds:Number(time), description:desc.trim(), tags:[...d.curSteepTags]});
+  // If this steep's time differs from what the schedule predicted, carry that gap
+  // forward so the next steep continues from where you actually landed — your
+  // downward (or upward) adjustment sticks instead of the guide snapping back.
+  if(d.schedule){
+    const raw = scheduleTimeForIndex(d.schedule, idx);
+    if(raw!=null) d.timeShift = Math.max(-45, Math.min(45, Number(time)-raw));
+  }
   clearTimerInterval();
   d.curSteepTags=[]; d.curSteepDesc=''; d.curTemp=''; d.curTime='';
   d.timer = {mode:d.timer.mode, target:d.timer.target, elapsed:0, running:false, intervalId:null};
