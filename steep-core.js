@@ -77,7 +77,7 @@ let state = {
   calMonth: null, calSelDay: null,
   teaSort: 'newest', teaFilter: { type:'', vendor:'', lowStock:false },
   recapPeriod: 'week',
-  passportSel: null,
+  passportSel: null, passportZoom: null, passportSub: null,
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },
   loaded:false
 };
@@ -639,7 +639,7 @@ function render(){
   if(themeBtn) themeBtn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙';
 }
 
-function goView(v){ state.view=v; state.activeTeaId=null; state.dashEdit=false; saveView(v); render(); }
+function goView(v){ state.view=v; state.activeTeaId=null; state.dashEdit=false; if(v!=='passport'){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; } saveView(v); render(); }
 function saveView(v){ try{ if(['dashboard','teas','sessions','vessels','friends'].includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); } }catch(e){} }
 
 function bindDynamic(){
