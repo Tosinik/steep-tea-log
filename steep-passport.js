@@ -71,12 +71,14 @@ const PASSPORT_SUB = {
     { name:'Guangxi',   col:48.1, row:9.0,  aliases:['guangxi','liu bao','liubao','wuzhou'] }
   ],
   Japan: [
-    { name:'Kagoshima', col:51.8, row:7.7,  aliases:['kagoshima','chiran','ei'] },
-    { name:'Fukuoka',   col:51.75,row:7.45, aliases:['fukuoka','fukoaka','yame','hoshino','hoshinomura'] },
-    { name:'Miyazaki',  col:51.9, row:7.65, aliases:['miyazaki'] },
-    { name:'Shizuoka',  col:53.1, row:7.2,  aliases:['shizuoka','makinohara','kawane'] },
-    { name:'Uji',       col:52.6, row:7.2,  aliases:['uji','kyoto','wazuka'] },
-    { name:'Nara',      col:52.65,row:7.28, aliases:['nara','yamato'] }
+    // Kyushu prefectures sit almost on top of each other in reality; spread a little
+    // (this map is curated, not survey-accurate) so the pins + labels stay legible.
+    { name:'Kagoshima', col:51.3, row:8.4,  aliases:['kagoshima','chiran','ei'] },
+    { name:'Fukuoka',   col:51.6, row:7.0,  aliases:['fukuoka','fukoaka','yame','hoshino','hoshinomura'] },
+    { name:'Miyazaki',  col:52.1, row:8.1,  aliases:['miyazaki'] },
+    { name:'Shizuoka',  col:53.5, row:6.9,  aliases:['shizuoka','makinohara','kawane'] },
+    { name:'Uji',       col:52.8, row:7.4,  aliases:['uji','kyoto','wazuka'] },
+    { name:'Nara',      col:53.1, row:7.7,  aliases:['nara','yamato'] }
   ],
   Taiwan: [
     { name:'Alishan',   col:50.1, row:9.05, aliases:['alishan','ali shan'] },
@@ -143,6 +145,10 @@ function viewPassport(){
   const cell=9, pad=6;
   const cx = c => pad+c*cell+cell/2, cy = r => pad+r*cell+cell/2;
   const esc = s => (s||'').replace(/'/g,"\\'");
+  // Gentle pin sizing (sqrt) so counts read as a soft ramp without big blobs that
+  // hide the land underneath. Labels sit just below each pin so the region is legible.
+  const rFor = n => (2.5 + Math.sqrt(Math.max(1,n))*0.95);
+  const label = (txt, c, r, off, size) => `<text x="${cx(c)}" y="${cy(r)+off}" text-anchor="middle" font-size="${size||4.4}" font-family="var(--font-mono),monospace" fill="var(--ink-soft)" style="pointer-events:none;">${txt}</text>`;
 
   // ---- viewBox: overview crop, or a zoomed window around the selected country ----
   let vbX, vbY, vbW, vbH, zoom = state.passportZoom;
@@ -150,8 +156,11 @@ function viewPassport(){
     const g = passportGeo(zoom);
     const cols=[g.col], rows=[g.row];
     PASSPORT_SUB[zoom].forEach(s=>{ if((bySub[zoom]&&bySub[zoom][s.name])){ cols.push(s.col); rows.push(s.row); } });
-    const P=2.6;
-    const c0=Math.min(...cols)-P, c1=Math.max(...cols)+P, r0=Math.min(...rows)-P, r1=Math.max(...rows)+P;
+    const P=3.4;                     // more breathing room = you can see coastline/context
+    let c0=Math.min(...cols)-P, c1=Math.max(...cols)+P, r0=Math.min(...rows)-P, r1=Math.max(...rows)+P;
+    const minW=11, minH=8;           // floor the window so a tight cluster still shows the country
+    if(c1-c0<minW){ const m=(minW-(c1-c0))/2; c0-=m; c1+=m; }
+    if(r1-r0<minH){ const m=(minH-(r1-r0))/2; r0-=m; r1+=m; }
     vbX=pad+c0*cell; vbY=pad+r0*cell; vbW=(c1-c0+1)*cell; vbH=(r1-r0+1)*cell;
   } else {
     // Crop to the tea-growing hemisphere — the Americas aren't used, and cropping
@@ -171,25 +180,29 @@ function viewPassport(){
     const noneCount = (bySub[zoom] && bySub[zoom]._none) ? bySub[zoom]._none.length : 0;
     // faint marker for country-level (region-unspecified) teas
     if(noneCount){
-      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${(3.4+noneCount*0.5).toFixed(1)}" fill="var(--heat-empty)" stroke="var(--line)" stroke-width="1.2" style="cursor:pointer;" onclick="passportSubSelect('${esc(zoom)}',null)"><title>${zoom} · region unspecified · ${noneCount}</title></circle>`;
+      const nr=rFor(noneCount).toFixed(1);
+      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${nr}" fill="var(--heat-empty)" stroke="var(--line)" stroke-width="1.1" style="cursor:pointer;" onclick="passportSubSelect('${esc(zoom)}',null)"><title>${zoom} · region unspecified · ${noneCount}</title></circle>`;
+      svg += label(`? ${noneCount}`, g.col, g.row, +nr+4.6, 4.2);
     }
     PASSPORT_SUB[zoom].forEach(s=>{
       const list = bySub[zoom] && bySub[zoom][s.name]; if(!list) return;
-      const n=list.length, rad=(4+n*0.7).toFixed(1);
+      const n=list.length, rad=rFor(n).toFixed(1);
       const on = state.passportSub===s.name;
-      const fill = on?'var(--jade)':'var(--clay)', stroke = on?'var(--amber)':'var(--white)', sw = on?2.2:1.4;
+      const fill = on?'var(--jade)':'var(--clay)', stroke = on?'var(--amber)':'var(--white)', sw = on?2:1.2;
       svg += `<circle cx="${cx(s.col)}" cy="${cy(s.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSubSelect('${esc(zoom)}','${esc(s.name)}')"><title>${s.name} · ${n} tea${n===1?'':'s'}</title></circle>`;
+      svg += label(`${s.name} ${n}`, s.col, s.row, +rad+4.6, 4.2);
     });
   } else {
     // ---- overview: country pins ----
     owned.forEach(country=>{
       const g = passportGeo(country); if(!g) return;
-      const n = byCountry[country].length, rad=(4+n*0.7).toFixed(1);
+      const n = byCountry[country].length, rad=rFor(n).toFixed(1);
       const sel = state.passportSel===country;
-      const fill = sel?'var(--jade)':'var(--clay)', stroke = sel?'var(--amber)':'var(--white)', sw = sel?2.2:1.4;
+      const fill = sel?'var(--jade)':'var(--clay)', stroke = sel?'var(--amber)':'var(--white)', sw = sel?2:1.2;
       const zoomable = PASSPORT_ZOOMABLE[country];
       svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSelect('${esc(country)}')"><title>${country} · ${n} tea${n===1?'':'s'}${zoomable?' · tap to zoom':''}</title></circle>`;
-      if(zoomable){ svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${(+rad+2.6).toFixed(1)}" fill="none" stroke="var(--amber)" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.55" style="pointer-events:none;"/>`; }
+      if(zoomable){ svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${(+rad+2.2).toFixed(1)}" fill="none" stroke="var(--amber)" stroke-width="0.7" stroke-dasharray="1.6 1.8" opacity="0.5" style="pointer-events:none;"/>`; }
+      svg += label(`${country} ${n}`, g.col, g.row, +rad+6, 6.2);
     });
   }
   svg += `</svg>`;

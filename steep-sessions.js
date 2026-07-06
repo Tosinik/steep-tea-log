@@ -240,6 +240,10 @@ function sessionEditModal(){
       <div class="form-grid">
         <div class="field"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${e.gramsUsed??''}" oninput="es_set('gramsUsed', this.value)"></div>
+        <div class="field span2"><label>Vessel</label><select onchange="es_set('vesselId', this.value)">${
+          (state.vessels.some(v=>v.id===e.vesselId) ? '' : `<option value="${e.vesselId||''}" selected>${e.vesselName||'(unknown vessel)'}</option>`)
+          + state.vessels.map(v=>`<option value="${v.id}" ${e.vesselId===v.id?'selected':''}>${v.name}${v.capacityMl?` · ${v.capacityMl}ml`:''}</option>`).join('')
+        }</select></div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isColdBrew?'checked':''} onchange="es_set('isColdBrew', this.checked)"> Cold brew</label></div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isShared?'checked':''} onchange="es_set('isShared', this.checked)"> Shared with followers</label></div>
         <div class="field span2"><label>Overall rating</label><div id="editRatingWrap">${renderStarsInteractive(Number(e.rating)||0,true,'setEditSessionRating')}</div></div>
