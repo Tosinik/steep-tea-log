@@ -23,6 +23,22 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.26 — monthly spend overview (+ purchase-date enabler)
+DB: run `v3_5-purchase-date.sql` (adds a nullable `purchase_date` to `teas`).
+Deploy: `service-worker.js` (v37), `steep-data.js`, `steep-teas.js`, `steep-shopping.js`,
+        `steep-core.js`, `steep-dashboard.js`.
+- **Purchase date** on teas, distinct from date-added (created_at). The tea form gains a
+  "Purchase date" field with a "Today" quick-set; leaving it blank means "stock I already had"
+  so an initial backlog isn't counted as this month's spend. Teas added from the shopping list
+  default to today. Shown on the tea detail. (Architecture enabler — also unblocks
+  inventory-over-time and sharper restock timing.)
+- **Spending view** (tap "Total spent" on the Home cost overview): current-month total, a
+  12-month bar series (this month highlighted), avg per active month, tracked total, and the
+  list of teas bought this month (tap through to the tea). Priced teas without a purchase date
+  are excluded from the monthly view and summarised separately. Home cost overview also shows a
+  quiet "This month: N across M teas" teaser. No new module; `computeMonthlySpend()` +
+  `viewSpend()` live in steep-dashboard, `monthKey`/`monthLabel` in steep-core.
+
 ## v3.25 — brew advice
 DB: run `v3_4-brew-advice.sql` (adds a nullable `feedback` column to `sessions`).
 Deploy: `service-worker.js` (v36), `steep-core.js`, `steep-sessions.js`, `steep-settings.js`,

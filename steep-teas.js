@@ -149,6 +149,12 @@ function teaFormModal(){
           <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${t.source||''}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${v.replace(/"/g,'&quot;')}"></option>`).join('')}</datalist></div>
           <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
           <div class="field"><label>Grams bought (for that price)</label><input type="number" step="0.1" name="costOriginalGrams" value="${t.costOriginalGrams??''}" placeholder="50"></div>
+          <div class="field span2"><label>Purchase date <span style="color:var(--ink-soft);font-weight:400;">— for spend tracking; leave blank if you already had it</span></label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="date" name="purchaseDate" value="${t.purchaseDate||''}" style="flex:1;">
+              <button type="button" class="lib-chip" onclick="setPurchaseToday(this)">Today</button>
+            </div>
+          </div>
           <div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${t.brewGuide||''}</textarea></div>
           <div class="field span2"><label>Description</label><textarea name="description" placeholder="Tasting notes, character, story...">${t.description||''}</textarea></div>
           <div class="field span2" style="flex-direction:row;gap:18px;flex-wrap:wrap;">
@@ -169,6 +175,7 @@ function setTeaFormRating(v){
   document.getElementById('teaRatingInput').value = v;
   document.getElementById('teaRatingWrap').innerHTML = renderStarsInteractive(v,true,'setTeaFormRating');
 }
+function setPurchaseToday(btn){ const f=btn.closest('form'); if(f&&f.purchaseDate) f.purchaseDate.value = dayKey(new Date()); }
 async function submitTeaForm(e){
   e.preventDefault();
   const f = e.target;
@@ -191,6 +198,7 @@ async function submitTeaForm(e){
     isFavorite: f.isFavorite.checked,
     wouldRebuy: f.wouldRebuy.checked,
     purchaseType: f.isRepeat.checked?'repeat':'first',
+    purchaseDate: f.purchaseDate.value || null,
     image: imageUrl,
     dateAdded: state.editingTea?.dateAdded || new Date().toISOString()
   };
@@ -253,7 +261,7 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Origin</div><div>${t.origin||'—'}</div></div>
         <div><div class="eyebrow">Cultivar</div><div>${t.cultivar||'—'}</div></div>
         <div><div class="eyebrow">Harvest</div><div>${[t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—'}</div></div>
-        <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}</div></div>
+        <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}</div></div>
         <div><div class="eyebrow">Source</div><div>${t.source||'—'}</div></div>
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
         <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>

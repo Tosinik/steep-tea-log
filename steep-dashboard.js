@@ -60,6 +60,91 @@ function computeStats(){
   return {totalSessions, totalSteeps, totalGrams, totalLiters, days, uniqueTeas, typeCounts, mostBrewed, topRated, favorites, lowStock, totalSpent, avgCostPerGram, streak, coldBrewCount, nightSessionCount, typesUsedCount, vesselsUsedCount, fiveStarSessions, hourBuckets, peakBucket};
 }
 
+/* ---------- monthly spend (v3.26) ----------
+   Groups priced teas by purchase MONTH. Teas without a purchase date (stock you
+   already had) are excluded from the monthly view but surfaced separately, so an
+   initial backlog isn't read as this month's spending. Builds a continuous
+   last-12-months series so gaps show as empty bars. */
+function computeMonthlySpend(){
+  const byMonth = {};
+  let undated = 0, undatedCount = 0;
+  (state.teas||[]).forEach(t=>{
+    const cost = Number(t.costTotal)||0;
+    if(cost<=0) return;
+    if(!t.purchaseDate){ undated += cost; undatedCount++; return; }
+    const k = monthKey(t.purchaseDate);
+    (byMonth[k] = byMonth[k] || {total:0,count:0,teas:[]});
+    byMonth[k].total += cost; byMonth[k].count++; byMonth[k].teas.push(t);
+  });
+  const now = new Date();
+  const series = [];
+  for(let i=11;i>=0;i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    const e = byMonth[k] || {total:0,count:0};
+    series.push({key:k, total:e.total, count:e.count});
+  }
+  const nowK = monthKey(now);
+  const totalDated = Object.values(byMonth).reduce((a,e)=>a+e.total,0);
+  const activeMonths = Object.keys(byMonth).length;
+  return {
+    byMonth, series,
+    thisMonth: (byMonth[nowK]&&byMonth[nowK].total)||0,
+    thisMonthCount: (byMonth[nowK]&&byMonth[nowK].count)||0,
+    thisMonthTeas: (byMonth[nowK]&&byMonth[nowK].teas)||[],
+    undated, undatedCount, activeMonths, totalDated,
+    avgPerActiveMonth: activeMonths ? totalDated/activeMonths : 0
+  };
+}
+
+function viewSpend(){
+  const esc = v => (v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const ms = computeMonthlySpend();
+  const nowK = monthKey(new Date());
+  const max = Math.max(1, ...ms.series.map(m=>m.total));
+  const hasAny = ms.totalDated>0 || ms.undated>0;
+
+  const bars = ms.series.map(m=>{
+    const h = Math.max(2, Math.round((m.total/max)*96));
+    const isNow = m.key===nowK;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;">
+      <div style="font-size:10px;color:var(--ink-soft);height:12px;">${m.total?m.total.toFixed(0):''}</div>
+      <div title="${monthLabel(m.key,true)}: ${m.total.toFixed(2)}" style="width:66%;max-width:24px;height:${h}px;border-radius:4px 4px 0 0;background:${isNow?'var(--amber)':'var(--jade)'};opacity:${m.total?1:.2};"></div>
+      <div style="font-size:9.5px;color:var(--ink-soft);white-space:nowrap;">${monthLabel(m.key,false)}</div>
+    </div>`;
+  }).join('');
+
+  const teaRows = ms.thisMonthTeas.slice()
+    .sort((a,b)=>(Number(b.costTotal)||0)-(Number(a.costTotal)||0))
+    .map(t=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer;" onclick="openTeaDetail('${t.id}','teas')">
+      <div style="min-width:0;"><div style="font-weight:600;">${esc(t.name)}</div><div style="font-size:11px;color:var(--ink-soft);">${t.source?esc(t.source)+' · ':''}${t.purchaseDate?fmtDate(t.purchaseDate):''}</div></div>
+      <div class="mono" style="white-space:nowrap;">${(Number(t.costTotal)||0).toFixed(2)}</div>
+    </div>`).join('');
+
+  const thisMonthName = new Date().toLocaleDateString(undefined,{month:'long',year:'numeric'});
+
+  return `
+    <button class="detail-back" onclick="goView('dashboard')">← Back to dashboard</button>
+    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Spending</h2></div>
+    ${!hasAny ? `<div class="card empty">No priced purchases yet. Add a tea with a price and a purchase date and it'll show up here.</div>` : `
+    <div class="card">
+      <div class="eyebrow">${thisMonthName}</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px;">
+        <div style="font-size:30px;font-weight:700;font-family:'Fraunces',serif;">${ms.thisMonth.toFixed(2)}</div>
+        <div style="font-size:12px;color:var(--ink-soft);">${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} this month</div>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:4px;height:130px;margin-top:16px;">${bars}</div>
+      <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--ink-soft);">
+        <span>Avg / active month: <strong style="color:var(--ink);">${ms.avgPerActiveMonth.toFixed(2)}</strong></span>
+        <span>Tracked total: <strong style="color:var(--ink);">${ms.totalDated.toFixed(2)}</strong></span>
+      </div>
+    </div>
+    ${teaRows ? `<div class="card"><div class="eyebrow">Bought this month</div><div style="margin-top:2px;">${teaRows}</div></div>` : ''}
+    ${ms.undatedCount ? `<div class="card" style="font-size:12px;color:var(--ink-soft);"><strong style="color:var(--ink);">${ms.undated.toFixed(2)}</strong> from ${ms.undatedCount} priced tea${ms.undatedCount===1?'':'s'} without a purchase date isn't shown by month. Add a purchase date on a tea to include it.</div>` : ''}
+    `}
+  `;
+}
+
 function computePersona(s){
   const T = s.totalSessions;
 
@@ -799,12 +884,13 @@ function viewDashboard(){
     <div class="section card">
       <div class="section-title"><h2>Cost overview</h2></div>
       <div class="grid grid-3">
-        <div class="stat"><div class="num">${s.totalSpent.toFixed(0)}</div><div class="lbl">Total spent</div></div>
+        <div class="stat" onclick="goView('spend')" style="cursor:pointer;" title="Monthly spending"><div class="num">${s.totalSpent.toFixed(0)}</div><div class="lbl">Total spent ›</div></div>
         <div class="stat"><div class="num">${s.avgCostPerGram.toFixed(2)}</div><div class="lbl">Avg / gram</div></div>
         ${s.lowStock.length
           ? `<div class="stat" onclick="goLowStock()" style="cursor:pointer;" title="View low-stock teas"><div class="num">${s.lowStock.length}</div><div class="lbl">Low stock ›</div></div>`
           : `<div class="stat"><div class="num">0</div><div class="lbl">Low stock</div></div>`}
       </div>
+      ${(function(){ const ms=computeMonthlySpend(); return ms.thisMonth>0 ? `<div style="margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;" onclick="goView('spend')">This month: <strong style="color:var(--ink);">${ms.thisMonth.toFixed(2)}</strong> across ${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} · see monthly ›</div>` : ''; })()}
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
     </div>
 

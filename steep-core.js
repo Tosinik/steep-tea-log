@@ -354,6 +354,8 @@ function toLocalDatetimeValue(date){
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 function dayKey(iso){ const d=new Date(iso); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function monthKey(iso){ const d=new Date(iso); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function monthLabel(key, withYear){ const [y,m]=key.split('-').map(Number); const d=new Date(y,m-1,1); return d.toLocaleDateString(undefined,{month:'short',...(withYear?{year:'numeric'}:{})}); }
 
 function renderStarsStatic(value, big){
   let out = '<span class="stars'+(big?' starL':'')+'">';
@@ -472,6 +474,7 @@ function render(){
   else if(state.view==='passport') body = viewPassport();
   else if(state.view==='wrapped') body = viewWrapped();
   else if(state.view==='shopping') body = viewShopping();
+  else if(state.view==='spend') body = viewSpend();
   else if(state.view==='session') body = viewSessionFlow();
 
   const inSession = state.view==='session';

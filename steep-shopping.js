@@ -103,6 +103,6 @@ function addWishFromTea(teaId){
 }
 function teaFromWishItem(id){
   const w = (state.wishlist||[]).find(x=>x.id===id); if(!w) return;
-  state.teaPrefill = { name:w.name, source:w.vendor||'', type:w.type||'' };
+  state.teaPrefill = { name:w.name, source:w.vendor||'', type:w.type||'', purchaseDate: dayKey(new Date()) };
   openTeaForm(); // editingTea stays null → create path, pre-filled from teaPrefill
 }

@@ -55,6 +55,7 @@
     brewGuide: r.brew_guide || '', description: r.description || '',
     isFavorite: !!r.is_favorite, wouldRebuy: !!r.would_rebuy,
     purchaseType: r.purchase_type || 'first', image: r.image_data || null,
+    purchaseDate: r.purchase_date || null,
     dateAdded: r.created_at
   });
   const teaToDb = t => ({
@@ -65,7 +66,8 @@
     cost_total: t.costTotal || 0, cost_original_grams: t.costOriginalGrams || 0,
     brew_guide: t.brewGuide || null, description: t.description || null,
     is_favorite: !!t.isFavorite, would_rebuy: !!t.wouldRebuy,
-    purchase_type: t.purchaseType || 'first', image_data: t.image || null
+    purchase_type: t.purchaseType || 'first', image_data: t.image || null,
+    purchase_date: t.purchaseDate || null
   });
 
   const vesselFromDb = r => ({ id: r.id, name: r.name, type: r.type || '', material: r.material || '', capacityMl: r.capacity_ml || null, image: r.image_data || null });
