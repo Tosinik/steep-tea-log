@@ -23,6 +23,18 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.30 — in-session micro-adjust
+Deploy: `service-worker.js` (v41), `steep-sessions.js`. No SQL.
+- **Adjustments now stick.** Previously each steep re-prefilled from the fixed schedule, so lowering
+  a steep's time did nothing — the next steep snapped back to the guide's upward march. A session-local
+  `timeShift` now carries the gap between what you actually brewed and what the schedule predicted, so
+  the next steep continues from where you landed (the curve still rises, but from your level). Clamped
+  ±45s, reset on brew-mode change and each new session. Ephemeral — the tea's saved guide is untouched.
+- **"How was that pour?"** After the first steep, a small Weak → longer / Just right / Strong → shorter
+  row nudges the next steep ±5s without retyping, showing the live offset ("next steep −6s vs guide").
+  Same weak/ok/strong vocabulary as the between-session advice, at per-steep granularity.
+  (`d_nudgeNextSteep`, `brewNudgeRowHTML`, carry logic in `saveSteepAndContinue`/`applyScheduleToCurrentSteep`.)
+
 ## v3.29 — leaf-form steep curves + seconds-first advice
 Deploy: `service-worker.js` (v40), `steep-core.js`, `steep-sessions.js`, `steep-teas.js`, `steep-data.js`.
 SQL: `v3_6-leaf-form.sql` (adds nullable `teas.leaf_form`).
