@@ -229,7 +229,9 @@ function deleteTea(id){
   render();
 }
 
-function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail'; render(); }
+function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail';
+  try{ localStorage.setItem('tealog_view','tea-detail'); localStorage.setItem('tealog_activeTea', id); }catch(e){}
+  render(); }
 
 function viewTeaDetail(){
   const t = teaById(state.activeTeaId);

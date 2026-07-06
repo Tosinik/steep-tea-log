@@ -94,7 +94,12 @@ async function init(){
   state.settings = {...DEFAULT_SETTINGS, ...settings};
   applySettings();
   const savedView = (()=>{ try{ return localStorage.getItem('tealog_view'); }catch(e){ return null; } })();
-  if(savedView && ['dashboard','teas','sessions','vessels','friends'].includes(savedView)) state.view = savedView;
+  if(savedView==='tea-detail'){
+    const tid = (()=>{ try{ return localStorage.getItem('tealog_activeTea'); }catch(e){ return null; } })();
+    const t = tid && state.teas.find(x=>x.id===tid);
+    if(t){ state.view='tea-detail'; state.activeTeaId=tid; state.teaDetailFrom='teas'; }
+    else state.view='teas';
+  } else if(savedView && ['dashboard','teas','sessions','vessels','friends'].includes(savedView)) state.view = savedView;
   state.loaded = true;
   render();
   if(state.view==='friends') loadSocial();
@@ -194,34 +199,56 @@ function bg_extractTimes(w){
 function parseBrewGuide(text){
   if(!text || typeof text!=='string') return null;
   let s=' '+text.toLowerCase().replace(/[\u2013\u2014]/g,'-')+' ';
-  // temperature
+  // temperature — support a range ("60-75°C" -> midpoint) as well as a single value
   let tempC=null;
-  let mt = s.match(/(\d{2,3})\s*°?\s*(c|f)\b/) || s.match(/(\d{2,3})\s*(?:°|deg|degree|degrees)/);
-  if(mt){ const val=Number(mt[1]); tempC = mt[2]==='f' ? Math.round((val-32)*5/9) : val; }
+  let mtr = s.match(/(\d{2,3})\s*-\s*(\d{2,3})\s*(?:°\s*)?(c|f|°|deg|degrees?)/);
+  let mt  = s.match(/(\d{2,3})\s*°?\s*(c|f)\b/) || s.match(/(\d{2,3})\s*(?:°|deg|degree|degrees)/);
+  if(mtr){ const v=Math.round((Number(mtr[1])+Number(mtr[2]))/2); tempC = /f/.test(mtr[3]) ? Math.round((v-32)*5/9) : v; }
+  else if(mt){ const val=Number(mt[1]); tempC = mt[2]==='f' ? Math.round((val-32)*5/9) : val; }
   else if(/\bboil/.test(s)) tempC=100;
   if(tempC!=null && (tempC<40||tempC>100)) tempC=null;
+  // capture an explicit infusion count — used to spread a single time-range across N steeps
+  const infM = s.match(/(\d+)\s*(?:infusions?|steeps?|brews?|times?|aufg[uü]sse?)\b/);
+  const infCount = infM ? Math.max(1, Math.min(20, parseInt(infM[1],10))) : null;
   // strip temp + non-time numeric tokens so they can't be read as steep times
   let w = s
+    .replace(/(\d{2,3})\s*-\s*(\d{2,3})\s*°?\s*[cf]\b/g,' ')   // temp range
     .replace(/(\d{2,3})\s*°?\s*[cf]\b/g,' ')
     .replace(/(\d{2,3})\s*°/g,' ')
     .replace(/\d+(?:\.\d+)?\s*(?:g|grams?|ml|oz|%|ppm)\b/g,' ')
     .replace(/\bx\s*\d+\b/g,' ')
-    .replace(/\b(?:x\s*)?\d+\s*(?:infusions?|steeps?|brews?|times?)\b/g,' ')
+    .replace(/\b(?:x\s*)?\d+\s*(?:infusions?|steeps?|brews?|times?|aufg[uü]sse?)\b/g,' ')
     .replace(/\b(19|20)\d{2}\b/g,' ')
     // "add 5-10s (each / per steep / thereafter)" is a ramp instruction, not a steep time — drop it
-    .replace(/\b(?:add|plus|\+)\s*\d+(?:\s*-\s*\d+)?\s*(?:s|sec|secs|second|seconds)\b(?:\s*(?:each|per\s+steep|for\s+each(?:\s+steep)?|every\s+steep|thereafter|after)?)?/g,' ')
-    // range like "10-15s" or "2-3 min" -> a single representative (midpoint), so it reads as one steep
-    .replace(/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes)\b/g,(m,a,b,u)=>(Math.round(((+a)+(+b))/2*10)/10)+u)
-    // ordinals: "1st", "2nd steep" — labels, not times
-    .replace(/\b\d+\s*(?:st|nd|rd|th)\b/g,' ');
-  // rinse — trailing form first ("5s rinse"), then a tight leading form ("rinse 5s")
+    .replace(/\b(?:add|plus|\+)\s*\d+(?:\s*-\s*\d+)?\s*(?:s|sec|secs|second|seconds)\b(?:\s*(?:each|per\s+steep|for\s+each(?:\s+steep)?|every\s+steep|thereafter|after)?)?/g,' ');
+  // rinse — extract before time parsing so its seconds aren't read as a steep
   let rinseSeconds=null, rm;
   if(rm=w.match(/(\d+)\s*(?:s|sec|secs)?\s*rinse\b/)) rinseSeconds=Number(rm[1]);
   else if(rm=w.match(/\brinse\s*:?\s*(\d+)\s*(?:s|sec|secs)\b/)) rinseSeconds=Number(rm[1]);
   if(rm) w=w.replace(rm[0],' ');
   w=w.replace(/\brinse\b/g,' ');
-  // steep times
-  let times=(bg_extractTimes(w)||[]).filter(n=>n>=1&&n<=1800).slice(0,12);
+  // times: if a single time-range is the only timing info, spread it start→end across the
+  // infusion count ("15-30s, 3 infusions" -> 15,23,30). Otherwise collapse ranges to
+  // midpoints (so "10-15s / 15-20s" reads as two steeps) and extract as usual.
+  const rangeRe=/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes)\b/g;
+  const rngs=[...w.matchAll(rangeRe)];
+  let times=null;
+  if(rngs.length===1){
+    const rest=w.replace(rngs[0][0],' ').replace(/\b\d+\s*(?:st|nd|rd|th)\b/g,' ');
+    if((bg_extractTimes(rest)||[]).length===0){
+      const toS=(x,u)=>/^m/.test(u)?Math.round(parseFloat(x)*60):Math.round(parseFloat(x));
+      const lo=toS(rngs[0][1],rngs[0][3]), hi=toS(rngs[0][2],rngs[0][3]);
+      const n=infCount||2; times=[];
+      for(let i=0;i<n;i++) times.push(n<=1?lo:Math.round(lo+(hi-lo)*i/(n-1)));
+    }
+  }
+  if(!times){
+    const w2=w
+      .replace(rangeRe,(m,a,b,u)=>(Math.round(((+a)+(+b))/2*10)/10)+u)   // range -> midpoint
+      .replace(/\b\d+\s*(?:st|nd|rd|th)\b/g,' ');                        // ordinals
+    times=bg_extractTimes(w2)||[];
+  }
+  times=times.filter(n=>n>=1&&n<=1800).slice(0,12);
   if(!times.length && tempC==null) return null;
   return { tempC, rinseSeconds, times };
 }
@@ -613,7 +640,7 @@ function render(){
 }
 
 function goView(v){ state.view=v; state.activeTeaId=null; state.dashEdit=false; saveView(v); render(); }
-function saveView(v){ try{ if(['dashboard','teas','sessions','vessels','friends'].includes(v)) localStorage.setItem('tealog_view', v); }catch(e){} }
+function saveView(v){ try{ if(['dashboard','teas','sessions','vessels','friends'].includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); } }catch(e){} }
 
 function bindDynamic(){
   // image upload

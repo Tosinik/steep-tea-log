@@ -393,16 +393,18 @@ function teaForecast(tea){
   // the older session-span estimate when there's no usable purchase anchor. Return shape
   // is unchanged so the restock card + tea detail sharpen automatically.
   const amt = Number(tea.amountGrams)||0;
-  const ss = state.sessions.filter(s=>s.teaId===tea.id && Number(s.gramsUsed)>0)
-                           .sort((a,b)=>new Date(a.date)-new Date(b.date));
-
-  // Session-span rate (previous method), kept as fallback / cross-check.
+  // Frequency × dose across ALL this tea's sessions (incl. cold brew and grams-less ones):
+  // sessions/day sets the pace, the average logged dose sets the amount. Only one
+  // grams-logged session is needed to anchor the dose — so any tea you've actually brewed
+  // gets a prediction, not just teas with a purchase date or 2+ weighed sessions.
+  const all = state.sessions.filter(s=>s.teaId===tea.id).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const gs  = all.filter(s=>Number(s.gramsUsed)>0);
   let sessionRate = null; // g/day
-  if(ss.length>=2){
-    const totalG = ss.reduce((a,s)=>a+Number(s.gramsUsed),0);
-    const spanDays = Math.max(3, (Date.now()-new Date(ss[0].date))/86400000);
-    const r = totalG/spanDays;
-    if(r>0) sessionRate = r;
+  if(gs.length>=1){
+    const gramsPer = gs.reduce((a,s)=>a+Number(s.gramsUsed),0)/gs.length;
+    const spanDays = Math.max(3, (Date.now()-new Date(all[0].date))/86400000);
+    const perDay = (all.length/spanDays)*gramsPer;
+    if(perDay>0) sessionRate = perDay;
   }
 
   // Ledger rate — anchored to a real buy date and the amount bought.
@@ -426,11 +428,11 @@ function teaForecast(tea){
     perWeek: perDay*7,
     perDay,
     daysLeft: amt>0?Math.round(amt/perDay):0,
-    sessions: ss.length,
+    sessions: all.length,
     method,
     sincePurchaseDays: sincePurchaseDays!=null?Math.round(sincePurchaseDays):null,
-    // a real elapsed window is inherently trustworthy; sessions need some volume
-    confident: method==='ledger' ? (sincePurchaseDays>=10) : (ss.length>=4)
+    // a real elapsed window is inherently trustworthy; sessions need a little volume
+    confident: method==='ledger' ? (sincePurchaseDays>=10) : (all.length>=4)
   };
 }
 
