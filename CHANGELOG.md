@@ -23,6 +23,25 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.25 — brew advice
+DB: run `v3_4-brew-advice.sql` (adds a nullable `feedback` column to `sessions`).
+Deploy: `service-worker.js` (v36), `steep-core.js`, `steep-sessions.js`, `steep-settings.js`,
+        `steep-data.js`.
+- Optional one-tap **"How was this cup?"** (Just right / A bit strong / A bit weak) on the
+  wrap-up and quick-log screens. Stored per session; tap again to clear. Sessions stay loose —
+  it's never required.
+- `computeBrewAdvice()` (steep-core) turns a tea's recent sessions into a gentle tuning of its
+  brew guide: each session's signal is the explicit pick, else inferred from tasting tags
+  (bitter/astringent → strong, watery/thin → weak). Net signal → a small, capped temp/time
+  nudge (±6° / ±24%) off the parsed baseline.
+- Session setup now shows a **Guide / Your tuning / Off** selector (replaces the v3.24 on/off
+  toggle) plus a memory line ("Logged 5× · 3 just right · 2 a bit strong — suggests cooler…").
+  Picking "Your tuning" prefills the adjusted schedule; the steeping strip labels it. A
+  **Save this tuning as the tea's brew guide** action writes it back to the brewGuide text and
+  marks a "tuned as of now" timestamp (in synced settings) so saved tunings don't re-nudge.
+- Skipped for cold brew. New synced setting **Brew advice** (default on). Only one small SQL
+  migration; no new tea column, no new module.
+
 ## v3.24 — brew-guide → prefilled steep schedule
 Deploy: `service-worker.js` (v35), `steep-core.js`, `steep-sessions.js`, `steep-settings.js`,
         `steep-dashboard.js`.

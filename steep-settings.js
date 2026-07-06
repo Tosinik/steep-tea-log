@@ -96,6 +96,10 @@ function settingsModal(){
         ${toggle('brewGuideAutofill')}
       </div>
       <div class="set-row">
+        <div><div class="set-label">Brew advice</div><div class="set-sub">After a session, an optional "how was it?" that gently tunes future brews for that tea. Sessions stay loose.</div></div>
+        ${toggle('brewAdvice')}
+      </div>
+      <div class="set-row">
         <div><div class="set-label">Low-stock warning</div><div class="set-sub">Flag a tea as low when it drops below this many grams</div></div>
         <input type="number" min="1" max="500" value="${lowStockG()}" style="width:70px;text-align:right;" onchange="setSetting('lowStockThreshold', Math.max(1,Number(this.value)||15))">
       </div>

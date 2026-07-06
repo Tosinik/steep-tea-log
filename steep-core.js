@@ -61,7 +61,7 @@ const TYPES = [
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
 ];
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel', brewGuideAutofill:true };
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel', brewGuideAutofill:true, brewAdvice:true };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
 let state = {
@@ -243,6 +243,81 @@ function brewScheduleSummary(sched){
 }
 // Compact time label: "45s", "2m", "1m30s".
 function fmtSecShort(s){ s=Math.round(s); if(s<60) return s+'s'; const m=Math.floor(s/60), sec=s%60; return sec? m+'m'+sec+'s' : m+'m'; }
+
+/* ---------- brew advice (v3.25) ----------
+   Turns a tea's past sessions into a gentle, opt-in tuning of its brew guide.
+   Signal per session: explicit "how was it?" pick (feedback: good|strong|weak),
+   else inferred from tasting tags. Aggregated into a small temp/time nudge from
+   the parsed guide baseline. Sessions stay loose — this only surfaces when asked. */
+const BREW_STRONG_TAGS = ['bitter','astringent','harsh','over-steeped','oversteeped','overbrewed','too strong','stewed'];
+const BREW_WEAK_TAGS   = ['weak','watery','thin','flat','under-steeped','understeeped','bland','too light'];
+function feedbackSignalOf(session){
+  if(!session) return null;
+  if(session.feedback==='strong'||session.feedback==='weak'||session.feedback==='good') return session.feedback;
+  const tags = [].concat(session.tags||[], ...((session.steeps||[]).map(st=>st.tags||[])))
+    .map(t=>String(t).toLowerCase().trim());
+  if(tags.some(t=>BREW_STRONG_TAGS.includes(t))) return 'strong';
+  if(tags.some(t=>BREW_WEAK_TAGS.includes(t))) return 'weak';
+  return null;
+}
+// Sessions counted for advice: this tea, not cold brew, and (if a tuned baseline
+// was saved into the guide) only those logged since — so saved tunings don't
+// double-count. The "since" marker lives in synced settings, no tea migration.
+function adviceSessionsFor(teaId){
+  const since = (state.settings.brewTunedAt||{})[teaId];
+  const sinceMs = since ? new Date(since).getTime() : 0;
+  return (state.sessions||[])
+    .filter(s=>s.teaId===teaId && !s.isColdBrew && new Date(s.date).getTime()>=sinceMs)
+    .sort((a,b)=>new Date(b.date)-new Date(a.date))
+    .slice(0,6);
+}
+function computeBrewAdvice(tea){
+  if(!tea) return null;
+  const base = parseBrewGuide(tea.brewGuide);
+  const sessions = adviceSessionsFor(tea.id);
+  let strong=0, weak=0, good=0;
+  sessions.forEach(s=>{ const sig=feedbackSignalOf(s); if(sig==='strong')strong++; else if(sig==='weak')weak++; else if(sig==='good')good++; });
+  const count = strong+weak+good;
+  const net = weak - strong; // + => hotter/longer, - => cooler/shorter
+  const tempAdjC = Math.max(-6, Math.min(6, net*2));
+  const timeAdjPct = Math.max(-24, Math.min(24, net*8));
+  let tuned = base;
+  if(base && (tempAdjC||timeAdjPct)){
+    tuned = {
+      tempC: base.tempC!=null ? Math.max(60, Math.min(100, base.tempC+tempAdjC)) : null,
+      rinseSeconds: base.rinseSeconds,
+      times: (base.times||[]).map(t=>Math.max(3, Math.round(t*(1+timeAdjPct/100))))
+    };
+  }
+  if(!base && !count) return null;
+  return { base, tuned, tempAdjC, timeAdjPct, net, count, strong, weak, good, hasNudge: !!(base && (tempAdjC||timeAdjPct)) };
+}
+// "Logged 5× · 3 just right · 2 a bit strong"
+function adviceMemoryText(adv){
+  if(!adv || !adv.count) return '';
+  const bits=[];
+  if(adv.good) bits.push(adv.good+' just right');
+  if(adv.strong) bits.push(adv.strong+' a bit strong');
+  if(adv.weak) bits.push(adv.weak+' a bit weak');
+  return `Logged ${adv.count}×${bits.length?' · '+bits.join(' · '):''}`;
+}
+// Short human suggestion, e.g. "cooler (\u22125\u00b0) and shorter (\u221215%)".
+function adviceSuggestionText(adv){
+  if(!adv || !adv.hasNudge) return '';
+  const parts=[];
+  if(adv.tempAdjC) parts.push((adv.tempAdjC<0?'cooler':'hotter')+' ('+(adv.tempAdjC>0?'+':'')+Math.round(adv.tempAdjC*(state.settings.tempUnit==='f'?9/5:1))+(state.settings.tempUnit==='f'?'\u00b0F':'\u00b0')+')');
+  if(adv.timeAdjPct) parts.push((adv.timeAdjPct<0?'shorter':'longer')+' ('+(adv.timeAdjPct>0?'+':'')+adv.timeAdjPct+'%)');
+  return parts.join(' and ');
+}
+// Normalise a schedule back into brew-guide text: "92\u00b0C, 5s rinse, 13s / 17s / 26s".
+function scheduleToGuideText(sched){
+  if(!sched) return '';
+  const parts=[];
+  if(sched.tempC!=null) parts.push(cToDisplay(sched.tempC)+tempUnitLabel());
+  if(sched.rinseSeconds!=null) parts.push(sched.rinseSeconds+'s rinse');
+  if(sched.times && sched.times.length) parts.push(sched.times.map(t=>fmtSecShort(t)).join(' / '));
+  return parts.join(', ');
+}
 
 // Bulk (blob) writes — used ONLY where a full replace is the actual intent (import).
 function persistTeas(){ saveKey('teas', state.teas).catch(saveErr); }

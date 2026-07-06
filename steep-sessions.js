@@ -285,8 +285,10 @@ function startSessionFor(teaId){
     steeps: [],
     infusionCount: 1,
     stage: 'setup', // setup -> steeping -> finish  (or setup -> quick)
-    schedule: null,                                     // parsed brew guide (set at beginSteeping)
-    useGuide: state.settings.brewGuideAutofill!==false, // per-session opt-out
+    schedule: null,                                     // effective schedule (set at beginSteeping)
+    brewMode: state.settings.brewGuideAutofill!==false ? 'guide' : 'off', // 'off' | 'guide' | 'tuned'
+    advice: null,                                       // computeBrewAdvice() cache for this session
+    feedback: null,                                     // 'good' | 'strong' | 'weak' (optional)
     curTemp: '', curTime: '',
     curSteepTags: [],
     curSteepDesc: '',
@@ -361,6 +363,7 @@ function sessionQuickHTML(d){
         </div>
       </div>
       <div class="field" style="margin-bottom:14px;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
+      ${feedbackRowHTML(d)}
       <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
       <div class="field">
         <label>Overall tags</label>
@@ -412,32 +415,60 @@ function d_setcur(key, val){
   state.sessionDraft[key] = val;
 }
 function d_setTea(val){ state.sessionDraft.teaId = val; render(); }   // re-render so the guide preview follows the tea
-function d_toggleGuide(val){ state.sessionDraft.useGuide = val; render(); }
+function d_setBrewMode(mode){ state.sessionDraft.brewMode = mode; render(); }
 
-// Setup preview: shows the schedule read from the selected tea's brew guide,
-// with a per-session opt-out. Hidden for cold brew or when nothing parses.
+// Setup preview: the tea's brew guide plus, once there's session feedback, a
+// gently tuned "your tuning" option and a memory of how past cups landed.
+// A Guide / Tuned / Off selector picks what prefills the steeps. Cold brew and
+// teas with nothing to show are skipped (calm-first — no empty cards).
 function brewGuidePreviewHTML(d){
   if(d.isColdBrew) return '';
   const tea = teaById(d.teaId);
-  const sched = parseBrewGuide(tea && tea.brewGuide);
-  if(!sched) return '';
-  const on = d.useGuide!==false;
+  const base = parseBrewGuide(tea && tea.brewGuide);
+  const adviceOn = state.settings.brewAdvice!==false;
+  const adv = adviceOn ? computeBrewAdvice(tea) : (base?{base,tuned:base,hasNudge:false,count:0}:null);
+  if(!base && !(adv && adv.hasNudge)) return '';
+  // keep brewMode valid for what's available
+  if(d.brewMode==='tuned' && !(adv && adv.hasNudge)) d.brewMode = base ? 'guide' : 'off';
+  if(d.brewMode==='guide' && !base) d.brewMode = (adv && adv.hasNudge) ? 'tuned' : 'off';
+
+  const opt = (mode,label)=>`<button class="${d.brewMode===mode?'active':''}" onclick="d_setBrewMode('${mode}')">${label}</button>`;
+  const seg = `<div class="seg" style="margin-top:10px;">${base?opt('guide','Guide'):''}${(adv&&adv.hasNudge)?opt('tuned','Your tuning'):''}${opt('off','Off')}</div>`;
+  const shownSched = d.brewMode==='tuned' ? (adv&&adv.tuned) : base;
+  const summary = shownSched ? `<div class="mono" style="font-size:13px;margin-top:2px;">${brewScheduleSummary(shownSched)}</div>` : '';
+  const memory = (adv && adv.count) ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${adviceMemoryText(adv)}${adv.hasNudge?` — suggests ${adviceSuggestionText(adv)}.`:' — landing well; using your guide as-is.'}</div>` : '';
+  const saveLink = (d.brewMode==='tuned' && adv && adv.hasNudge)
+    ? `<div style="margin-top:8px;"><button class="btn-ghost" style="font-size:11.5px;padding:0;" onclick="saveTuningToGuide('${tea.id}')">Save this tuning as the tea\u2019s brew guide →</button></div>` : '';
+  const hint = d.brewMode==='off'
+    ? 'Steeps start blank.'
+    : (d.brewMode==='tuned' ? 'Prefills each steep from your tuned times \u2014 still fully editable.' : 'Prefills each steep\u2019s timer and temperature \u2014 adjust as you go.');
   return `<div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-      <div style="min-width:0;">
-        <div class="eyebrow">From your brew guide</div>
-        <div class="mono" style="font-size:13px;margin-top:2px;">${brewScheduleSummary(sched)}</div>
-      </div>
-      <label class="toggle"><input type="checkbox" ${on?'checked':''} onchange="d_toggleGuide(this.checked)"><span class="track"></span></label>
-    </div>
-    <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${on?'Each steep\u2019s timer and temperature will be prefilled \u2014 adjust any of them as you go.':'Autofill off for this session. Steeps start blank.'}</div>
+    <div class="eyebrow">${d.brewMode==='tuned'?'Your tuning':'From your brew guide'}</div>
+    ${summary}
+    ${seg}
+    ${memory}
+    <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${hint}</div>
+    ${saveLink}
   </div>`;
 }
+// Write a schedule back into the tea's free-text brew guide, and mark "tuned as of
+// now" in synced settings so past feedback doesn't keep re-nudging the new baseline.
+function saveTuningToGuide(teaId){
+  const tea = teaById(teaId); if(!tea) return;
+  const adv = computeBrewAdvice(tea); if(!adv || !adv.hasNudge) return;
+  tea.brewGuide = scheduleToGuideText(adv.tuned);
+  persistTea(tea);
+  state.settings.brewTunedAt = { ...(state.settings.brewTunedAt||{}), [teaId]: new Date().toISOString() };
+  persistSettings();
+  if(state.sessionDraft) state.sessionDraft.brewMode = 'guide';
+  showToast('Saved to “'+tea.name+'” brew guide');
+  render();
+}
 
-// Prefill the current steep's timer + temp from the parsed schedule.
+// Prefill the current steep's timer + temp from the effective schedule.
 // Called at each steep boundary, so it never fights values typed mid-steep.
 function applyScheduleToCurrentSteep(d){
-  if(!d || !d.schedule || d.useGuide===false) return;
+  if(!d || !d.schedule) return;
   const i = d.steeps.length;
   const t = scheduleTimeForIndex(d.schedule, i);
   if(t!=null){ d.timer.mode='timer'; d.timer.target=t; d.curTime=String(t); }
@@ -447,7 +478,11 @@ function applyScheduleToCurrentSteep(d){
 function beginSteeping(){
   const d = state.sessionDraft;
   const tea = teaById(d.teaId);
-  d.schedule = (!d.isColdBrew && d.useGuide!==false) ? parseBrewGuide(tea && tea.brewGuide) : null;
+  const base = (!d.isColdBrew) ? parseBrewGuide(tea && tea.brewGuide) : null;
+  d.advice = (!d.isColdBrew && state.settings.brewAdvice!==false) ? computeBrewAdvice(tea) : null;
+  if(d.brewMode==='tuned') d.schedule = (d.advice && d.advice.hasNudge) ? d.advice.tuned : base;
+  else if(d.brewMode==='guide') d.schedule = base;
+  else d.schedule = null;
   d.stage='steeping';
   applyScheduleToCurrentSteep(d);
   render();
@@ -463,7 +498,7 @@ function beginColdBrewLog(){
 // Calm strip during steeping: the guide's temp + steep times as chips, with the
 // current step marked and extended steeps flagged "~". A quiet link turns it off.
 function scheduleStripHTML(d){
-  if(!d.schedule || d.useGuide===false) return '';
+  if(!d.schedule) return '';
   const sched = d.schedule;
   const cur = d.steeps.length; // index of the steep being brewed now
   const shownCount = Math.max(sched.times.length, cur+1);
@@ -480,10 +515,11 @@ function scheduleStripHTML(d){
   const meta=[];
   if(sched.tempC!=null) meta.push(cToDisplay(sched.tempC)+tempUnitLabel());
   if(sched.rinseSeconds!=null) meta.push('rinse '+sched.rinseSeconds+'s');
+  const label = d.brewMode==='tuned' ? 'Your tuning' : 'Brew guide';
   return `<div class="card" style="margin-bottom:14px;background:var(--jade-pale);border:1px solid var(--line);padding:12px 14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-      <div class="eyebrow">Brew guide${meta.length?' · '+meta.join(' · '):''}</div>
-      <button class="btn-ghost" style="font-size:11.5px;" onclick="d_toggleGuide(false)">turn off</button>
+      <div class="eyebrow">${label}${meta.length?' · '+meta.join(' · '):''}</div>
+      <button class="btn-ghost" style="font-size:11.5px;" onclick="d_setBrewMode('off')">turn off</button>
     </div>
     <div style="margin-top:8px;">${chips}</div>
   </div>`;
@@ -776,6 +812,7 @@ function sessionFinishHTML(d){
         </div>
       </div>
       <div class="field" style="margin:14px 0;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
+      ${feedbackRowHTML(d)}
       <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
       <div class="field">
         <label>Overall tags</label>
@@ -794,6 +831,22 @@ function sessionFinishHTML(d){
 function setSessionRating(v){
   state.sessionDraft.sessionRating=v;
   document.getElementById('sessRatingWrap').innerHTML = renderStarsInteractive(v,true,'setSessionRating');
+}
+// Optional one-tap feedback that tunes future brews for this tea. Tap again to clear.
+function feedbackRowHTML(d){
+  if(state.settings.brewAdvice===false) return '';
+  const opt=(v,label)=>`<button type="button" class="lib-chip ${d.feedback===v?'active':''}" onclick="setSessionFeedback('${v}')">${label}</button>`;
+  return `<div class="field" style="margin-bottom:14px;">
+    <label>How was this cup? <span style="color:var(--ink-soft);font-weight:400;">— optional, tunes next time</span></label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      ${opt('good','Just right')}${opt('strong','A bit strong')}${opt('weak','A bit weak')}
+    </div>
+  </div>`;
+}
+function setSessionFeedback(v){
+  const d = state.sessionDraft;
+  d.feedback = (d.feedback===v) ? null : v; // toggle off on second tap
+  render();
 }
 async function commitSession(){
   const d = state.sessionDraft;
@@ -815,6 +868,7 @@ async function commitSession(){
     steeps: d.steeps, rating: d.sessionRating, description: d.sessionDesc, tags: d.sessionTags,
     isShared: !!d.isShared, photoUrl: photoDeferred ? null : (photoUrl || null),
     infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
+    feedback: d.feedback || null,
     teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
   };
   state.sessions.push(session);
