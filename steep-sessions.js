@@ -247,7 +247,7 @@ function sessionEditModal(){
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isColdBrew?'checked':''} onchange="es_set('isColdBrew', this.checked)"> Cold brew</label></div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isShared?'checked':''} onchange="es_set('isShared', this.checked)"> Shared with followers</label></div>
         <div class="field span2"><label>Overall rating</label><div id="editRatingWrap">${renderStarsInteractive(Number(e.rating)||0,true,'setEditSessionRating')}</div></div>
-        <div class="field span2"><label>Mood</label><div id="editMoodWrap">${moodChipsHTML(e.mood||null,'setEditSessionMood')}</div></div>
+        ${(state.settings.showMood || e.mood!=null) ? `<div class="field span2"><label>Mood</label><div id="editMoodWrap">${moodChipsHTML(e.mood||null,'setEditSessionMood')}</div></div>` : ''}
         <div class="field span2"><label>Overall notes</label><textarea oninput="es_set('description', this.value)">${e.description||''}</textarea></div>
         <div class="field span2">
           <label>Tags</label>
@@ -401,7 +401,7 @@ function sessionSetupHTML(d){
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
         <div class="field"><label>Water type</label><input type="text" value="${d.waterType}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
         <div class="field"><label>Water TDS (optional)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="ppm"></div>
-        <div class="field span2"><label>How are you feeling? <span style="color:var(--ink-soft);font-weight:400;">— optional, for spotting patterns later</span></label>${moodChipsHTML(d.mood, 'd_setMood')}</div>
+        ${state.settings.showMood ? `<div class="field span2"><label>How are you feeling? <span style="color:var(--ink-soft);font-weight:400;">— optional, for spotting patterns later</span></label>${moodChipsHTML(d.mood, 'd_setMood')}</div>` : ''}
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
       </div>
       ${d.isColdBrew ? `

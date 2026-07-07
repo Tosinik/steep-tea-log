@@ -80,9 +80,12 @@ function toggle(key){
 }
 function settingsModal(){
   const email = window.SteepDB.getUser()?.email || '';
+  const sec = t => `<div class="eyebrow" style="margin:22px 0 4px;">${t}</div>`;
   return `<div class="overlay" onclick="if(event.target===this) closeSettings()">
     <div class="modal" style="max-width:460px;">
       <div class="modal-head"><h2>Settings</h2><button class="close-x" onclick="closeSettings()">✕</button></div>
+
+      ${sec('Brewing')}
       <div class="set-row">
         <div><div class="set-label">Temperature unit</div><div class="set-sub">How steep temperatures are shown and entered</div></div>
         ${seg('tempUnit',[{v:'c',label:'°C'},{v:'f',label:'°F'}])}
@@ -91,6 +94,8 @@ function settingsModal(){
         <div><div class="set-label">Timer sounds</div><div class="set-sub">Chime and vibration when a countdown finishes</div></div>
         ${toggle('soundEnabled')}
       </div>
+
+      ${sec('Brew guidance')}
       <div class="set-row">
         <div><div class="set-label">Brew-guide autofill</div><div class="set-sub">Prefill each steep's timer and temperature from a tea's brew guide. You can still turn it off per session.</div></div>
         ${toggle('brewGuideAutofill')}
@@ -99,6 +104,14 @@ function settingsModal(){
         <div><div class="set-label">Brew advice</div><div class="set-sub">After a session, an optional "how was it?" that gently tunes future brews for that tea. Sessions stay loose.</div></div>
         ${toggle('brewAdvice')}
       </div>
+
+      ${sec('Session check-in')}
+      <div class="set-row">
+        <div><div class="set-label">Mood check-in</div><div class="set-sub">A quiet, optional "how are you feeling?" when you start a session — for spotting patterns over time. Off hides it everywhere.</div></div>
+        ${toggle('showMood')}
+      </div>
+
+      ${sec('Inventory')}
       <div class="set-row">
         <div><div class="set-label">Low-stock warning</div><div class="set-sub">Flag a tea as low when it drops below this many grams</div></div>
         <input type="number" min="1" max="500" value="${lowStockG()}" style="width:70px;text-align:right;" onchange="setSetting('lowStockThreshold', Math.max(1,Number(this.value)||15))">
@@ -107,16 +120,10 @@ function settingsModal(){
         <div><div class="set-label">Default packaging weight</div><div class="set-sub">Pre-filled tare when you weigh a tea with its packaging</div></div>
         <input type="number" min="0" max="200" step="0.5" value="${state.settings.defaultPackagingTareG??10}" style="width:70px;text-align:right;" onchange="setSetting('defaultPackagingTareG', Math.max(0,Number(this.value)||10))">
       </div>
+
+      ${sec('Appearance')}
       <div class="set-row">
-        <div><div class="set-label">Quiet mode</div><div class="set-sub">Calm-first: hides achievements and skips unlock confetti. Tea, not a scoreboard.</div></div>
-        ${toggle('quietMode')}
-      </div>
-      <div class="set-row">
-        <div><div class="set-label">Show achievements</div><div class="set-sub">Adds a 🏆 button in the header that opens your achievements page</div></div>
-        ${toggle('showAchievements')}
-      </div>
-      <div class="set-row">
-        <div><div class="set-label">Appearance</div><div class="set-sub">Light or dark — also the ☀️/🌙 button in the header</div></div>
+        <div><div class="set-label">Theme</div><div class="set-sub">Light or dark — also the ☀️/🌙 button in the header</div></div>
         <div class="seg">
           <button class="${document.documentElement.getAttribute('data-theme')==='light'?'active':''}" onclick="setTheme('light')">Light</button>
           <button class="${document.documentElement.getAttribute('data-theme')==='dark'?'active':''}" onclick="setTheme('dark')">Dark</button>
@@ -126,6 +133,18 @@ function settingsModal(){
         <div><div class="set-label">Display font</div><div class="set-sub">Pixel is the retro look; Clean is a plain monospace</div></div>
         ${seg('monoFont',[{v:'pixel',label:'Pixel'},{v:'clean',label:'Clean'}])}
       </div>
+
+      ${sec('Calm & achievements')}
+      <div class="set-row">
+        <div><div class="set-label">Quiet mode</div><div class="set-sub">Calm-first: hides achievements and skips unlock confetti. Tea, not a scoreboard.</div></div>
+        ${toggle('quietMode')}
+      </div>
+      <div class="set-row">
+        <div><div class="set-label">Show achievements</div><div class="set-sub">Adds a 🏆 button in the header that opens your achievements page</div></div>
+        ${toggle('showAchievements')}
+      </div>
+
+      ${sec('Data')}
       ${backupSectionHTML()}
       <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Settings sync across your devices. Manage vendors from the Teas tab.</p>
     </div>
