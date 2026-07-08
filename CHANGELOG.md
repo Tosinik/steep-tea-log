@@ -23,6 +23,27 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.38 — tea knowledge base (fixes leaf-form inference misses)
+Deploy: `index.html`, `service-worker.js` (v49), **new** `steep-knowledge.js`, `steep-core.js`,
+`steep-teas.js`. No SQL.
+- **New module `steep-knowledge.js`** — a curated tea knowledge base (`kbResolve(text)` →
+  `{style,type,leafForm,tempC,ratio,first,country}` by longest-alias match over style keywords +
+  cultivars + regions, EN/DE terms). Loads before `steep-core` (added to `index.html` and
+  `FILES_TO_CACHE`).
+- **`inferLeafForm` consults the KB first** (name + cultivar + origin), then maps the KB's finer
+  leafForm vocabulary onto our six `LEAF_PROFILES` families via `KB_LEAFFORM_TO_PROFILE`. This fixes
+  the long-parked misses: Japanese cultivars/regions (Saemidori, Yutakamidori, Kabusecha, Kagoshima,
+  Shincha…) now infer **steamed green** (`green_jp`), and silver-bud whites (Yunnan Silver Bud, Ya Bao)
+  infer **bud** — previously they fell through to pan-fired/wrong families. Falls back to the existing
+  name/type heuristics when the KB doesn't match; guarded so a missing KB never throws.
+- **Gentle KB prefill in the tea form** — as you type a name on a *new* tea, if the KB recognises it and
+  type/origin aren't already set, a dismissible "Looks like {type} from {country}" line offers **Use
+  this** (calm-first: suggested, never auto-applied). leafForm is left to `inferLeafForm`. Non-`TYPES`
+  KB types (e.g. herbal) are never suggested.
+- Validated against real `fixtures/teas_rows.csv`: every tea infers a valid `LEAF_PROFILES` family
+  (no `leafFormLabel` crash) and the parked cases resolve correctly — 25 checks green; XSS render test
+  still green. `node --check` clean on all four JS files.
+
 ## v3.37 — hygiene: re-entrancy guards, date preservation, dedupes
 Deploy: `service-worker.js` (v48), `steep-sessions.js`, `steep-teas.js`, `steep-social.js`,
 `steep-data.js`, `steep-core.js`, `steep-dashboard.js`. No SQL.

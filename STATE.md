@@ -12,9 +12,11 @@ Vanilla JS (no framework) · Supabase (Postgres + RLS + Auth + Storage) · servi
 Supabase project: https://duuosbgjozjjfyfusjzf.supabase.co (anon key in project knowledge).
 
 ## Modules (index.html load order; boot last)
-steep-data → steep-core → steep-settings → steep-dashboard → steep-teas → steep-shopping →
-steep-passport → steep-social → steep-sessions → steep-boot.
+steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard → steep-teas →
+steep-shopping → steep-passport → steep-social → steep-sessions → steep-boot.
 - **steep-data**: Supabase client, loadKey/saveKey, mappers, per-row CRUD, offline write queue.
+- **steep-knowledge**: curated tea KB; `kbResolve(text)` → {style,type,leafForm,tempC,ratio,first,
+  country}. Feeds inferLeafForm + tea-form prefill. Loads before core (no deps of its own).
 - **steep-core**: state, render() view-router, header/nav, theme, init/refresh, achievements.
 - Feature modules own their view + logic. Plain scripts sharing global scope (functions hoist;
   cross-module calls resolve at runtime, so feature-module order is flexible).
@@ -69,7 +71,10 @@ it) · **v3.36 XSS sweep** (shared `escapeHtml`/`escapeJsArg`; escaped every use
 stored cross-user feed XSS; replaced 4 local escapers) · **v3.37 hygiene** (re-entrancy guards on
 `deleteSession` + the 3 form submits; `teaToDb` preserves `created_at` insert-only so import keeps dates;
 deduped view allowlist → `PERSISTED_VIEWS` and time-of-day → `timeOfDayBuckets()`; cut unused
-`getFollowers`). The v3.34 map legibility pass was built but NOT shipped — map is parked. Cache **v48**.
+`getFollowers`) · **v3.38 tea knowledge base** (new `steep-knowledge.js`; `inferLeafForm` consults
+`kbResolve` on name+cultivar+origin — fixes the parked Japanese-cultivar/silver-bud misses; gentle
+KB type/origin prefill in the tea form). The v3.34 map legibility pass was built but NOT shipped — map
+is parked. Cache **v49**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other
@@ -85,11 +90,10 @@ parked, highest-leverage item — the missing 3rd advice axis + unlock for learn
 pass first, incl. a `capacityMl`-capture precursor since it's sparse; (3) map redesign when there's appetite.
 
 **Beta-feedback bugs still open (batch):**
-- Leaf-form inference misses (PARKED, do together): Japanese cultivar/region names → steamed green
-  (Shincha *Saemidori* *Kagoshima*, *Yutakamidori*, *Kabusecha* went pan-fired); silver-bud whites
-  (*Yunnan Silver Bud*) → `bud`. Broaden `inferLeafForm` (cultivars: saemidori, yutakamidori, yabukita,
-  gokou…; regions: kagoshima, uji, shizuoka…; shincha; silver bud/tips/yaba). NB `teas.cultivar` +
-  `origin` columns exist and are populated — infer from those, not just `name`.
+- ~~Leaf-form inference misses~~ **Fixed v3.38.** `inferLeafForm` now consults `kbResolve` (steep-
+  knowledge.js) on name+cultivar+origin before the name heuristics, so Japanese cultivars/regions →
+  steamed green and silver-bud whites → `bud`. The KB's cultivar/region/style tables are the tunable
+  knob now (add aliases there, not to `inferLeafForm`).
 - In-session "turn off" link gives weird feedback — investigate `d_setBrewMode('off')` mid-session.
 
 **Product backlog from Niklas (capture — discuss/prioritise in the fresh chat):**

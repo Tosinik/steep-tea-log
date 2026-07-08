@@ -273,11 +273,26 @@ const LEAF_PROFILES = {
   compressed: { label:'Compressed / cake',  base:15, mult:[1,1,1.15,1.4,1.8],   growth:1.18, minInc:3, maxInc:40, defInc:5 }
 };
 const LEAF_FORM_KEYS = Object.keys(LEAF_PROFILES);
+// Bridge steep-knowledge.js's leafForm vocabulary → the six LEAF_PROFILES families here.
+// (The KB uses finer names — steamed/pan/roasted green, strip vs open — that collapse onto
+// our curve families.) Any KB leafForm not listed falls through to the name/type heuristics.
+const KB_LEAFFORM_TO_PROFILE = {
+  steamed_green:'green_jp', roasted_green:'green_cn', pan_green:'green_cn', powder:'green_jp',
+  rolled:'rolled', bud:'bud', open_leaf:'open', strip:'open', compressed:'compressed'
+};
 function niceSec(s){ s=Math.round(s); if(s>=60) s=Math.round(s/5)*5; return Math.max(3,Math.min(1800,s)); }
 
 // Infer a leaf form from the tea's name (cultivar/region/leaf words win, since
 // vendor type labels are unreliable), then fall back to the type default.
 function inferLeafForm(tea){
+  // Knowledge base first: it resolves cultivar/region/style names the old name-only
+  // heuristics miss (Japanese cultivars → steamed green, silver-bud whites → bud, etc.).
+  // Consults name + cultivar + origin, then maps the KB's leafForm onto a curve family.
+  if(typeof kbResolve==='function'){
+    const kb = kbResolve([tea&&tea.name, tea&&tea.cultivar, tea&&tea.origin].filter(Boolean).join(' '));
+    const mapped = kb && KB_LEAFFORM_TO_PROFILE[kb.leafForm];
+    if(mapped) return mapped;
+  }
   const n = ((tea&&tea.name)||'').toLowerCase();
   const has = (...ks)=>ks.some(k=>n.includes(k));
   if(has('gyokuro','sencha','kabuse','kabusecha','tamaryokucha','fukamushi','matcha','japan')) return 'green_jp';

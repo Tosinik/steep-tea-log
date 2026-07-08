@@ -79,12 +79,15 @@ hoist and cross-module calls resolve at runtime, so **feature-module order is fl
 Load order (from `index.html`):
 
 ```
-steep-data → steep-core → steep-settings → steep-dashboard → steep-teas →
-steep-shopping → steep-passport → steep-social → steep-sessions → steep-boot
+steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard →
+steep-teas → steep-shopping → steep-passport → steep-social → steep-sessions → steep-boot
 ```
 
 - **steep-data** — Supabase client, `loadKey`/`saveKey`, snake_case↔camelCase mappers,
   per-row CRUD, the offline write queue. Exposed as `window.SteepDB`.
+- **steep-knowledge** — curated tea knowledge base; `kbResolve(text)` returns
+  `{style,type,leafForm,tempC,ratio,first,country}` by longest-alias match. Feeds
+  `inferLeafForm` and the tea-form prefill. No deps; loads before `steep-core`.
 - **steep-core** — the global `state`, `render()` view-router, header/nav, theme,
   `init`/`refresh`, achievements, plus the brew-guide parser & leaf-form logic.
 - Feature modules each own their view + logic (settings, dashboard, teas, shopping,
@@ -137,8 +140,11 @@ they aren't misread as steeps). With no parseable schedule, `generateFormTimes`
 synthesizes one from `LEAF_PROFILES` (six leaf-morphology families) via `inferLeafForm`.
 `computeBrewAdvice` nudges that baseline by past-session `feedback`. This is
 regex-heavy — validate changes with a Node script (see above). `LEAF_PROFILES` is the
-tunable knob. Known open bug: `inferLeafForm` misses some Japanese cultivars/regions;
-it should infer from the populated `cultivar`/`origin` columns, not just `name`.
+tunable knob for the curves. `inferLeafForm` consults `kbResolve` (steep-knowledge.js)
+on name+cultivar+origin *before* its name heuristics, mapping the KB's leafForm onto a
+`LEAF_PROFILES` family via `KB_LEAFFORM_TO_PROFILE` (v3.38 — fixed the old Japanese-
+cultivar/silver-bud misses). To broaden coverage, add aliases to the KB tables, not to
+`inferLeafForm`.
 
 **Tea passport** (`steep-passport.js`): **PARKED.** The shipped dot-map (v3.33/34) was
 rejected as unrecognisable ("just dots"). Do not extend the dot rendering — a redesign

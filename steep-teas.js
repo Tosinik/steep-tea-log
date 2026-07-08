@@ -108,7 +108,48 @@ function openTeaForm(existing){
   state.editingTea = existing || null;
   state._draftImage = existing ? existing.image : null;
   state.teaFormOpen = true;
+  _kbSuggestDismissed = false; _kbSuggest = null;
   render();
+}
+
+/* ---------- gentle knowledge-base prefill (v3.38) ----------
+   As a name is typed on a NEW tea, offer the KB's type/origin as a suggestion the user
+   can accept or ignore — never auto-applied (calm-first). leafForm is left to
+   inferLeafForm (which also consults the KB). Only offers fields that aren't already set. */
+let _kbSuggest = null, _kbSuggestDismissed = false;
+function teaFormNameSuggest(){
+  const box = document.getElementById('teaKbSuggest');
+  if(!box) return;
+  const form = document.getElementById('teaForm');
+  if(!form || state.editingTea || _kbSuggestDismissed || typeof kbResolve!=='function'){ box.innerHTML=''; return; }
+  const name = (form.elements['name'].value||'').trim();
+  const curType = form.elements['type'].value;
+  const curOrigin = (form.elements['origin'].value||'').trim();
+  const curCultivar = (form.elements['cultivar'].value||'').trim();
+  const kb = name ? kbResolve([name, curCultivar, curOrigin].join(' ')) : null;
+  const wantType = (kb && TYPES.some(t=>t.k===kb.type) && kb.type!==curType) ? kb.type : null;
+  const wantOrigin = (kb && kb.country && !curOrigin) ? kb.country : null;
+  if(!wantType && !wantOrigin){ box.innerHTML=''; _kbSuggest=null; return; }
+  _kbSuggest = { type:wantType, origin:wantOrigin };
+  const msg = (wantType && wantOrigin) ? `Looks like ${typeLabel(wantType)} from ${wantOrigin}.`
+    : wantType ? `Looks like ${typeLabel(wantType)}.` : `Looks like it's from ${wantOrigin}.`;
+  box.innerHTML = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--ink-soft);background:var(--jade-pale);border:1px solid var(--line);border-radius:8px;padding:7px 10px;">
+    <span>${escapeHtml(msg)}</span>
+    <button type="button" class="lib-chip" onclick="applyKbSuggest()">Use this</button>
+    <button type="button" class="btn-ghost" style="font-size:12px;padding:2px 4px;" onclick="dismissKbSuggest()">dismiss</button>
+  </div>`;
+}
+function applyKbSuggest(){
+  const form = document.getElementById('teaForm');
+  if(!form || !_kbSuggest) return;
+  if(_kbSuggest.type) form.elements['type'].value = _kbSuggest.type;
+  if(_kbSuggest.origin && !(form.elements['origin'].value||'').trim()) form.elements['origin'].value = _kbSuggest.origin;
+  _kbSuggest = null;
+  const box = document.getElementById('teaKbSuggest'); if(box) box.innerHTML='';
+}
+function dismissKbSuggest(){
+  _kbSuggestDismissed = true; _kbSuggest = null;
+  const box = document.getElementById('teaKbSuggest'); if(box) box.innerHTML='';
 }
 function closeTeaForm(){ state.teaFormOpen=false; state.editingTea=null; state.teaPrefill=null; state._draftImage=null; render(); }
 
@@ -127,7 +168,7 @@ function teaFormModal(){
               <input type="file" accept="image/*" class="js-img-input">
             </div>
           </div>
-          <div class="field"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}"></div>
+          <div class="field"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}" oninput="teaFormNameSuggest()"><div id="teaKbSuggest"></div></div>
           <div class="field"><label>Tea type</label><select name="type">${typeOpts}</select></div>
           <div class="field"><label>Amount on hand (g)</label><input type="number" step="0.1" name="amountGrams" value="${t.amountGrams??''}">
             <label class="checkrow" style="margin-top:6px;font-size:12px;"><input type="checkbox" name="inclPackaging" onchange="var r=document.getElementById('tareRow'); if(r) r.style.display=this.checked?'flex':'none';"> Weighed with packaging</label>
