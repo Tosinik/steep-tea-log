@@ -361,7 +361,7 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
         <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
       </div>
-      ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.brewGuide)}</div></div>`:suggestedBrewHTML(t)}
+      ${t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t)}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div></div>`:''}
 
       <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
@@ -375,6 +375,33 @@ function viewTeaDetail(){
       </div>
     </div>
   `;
+}
+
+// The saved-guide counterpart to suggestedBrewHTML (v3.51): teas WITH a brewGuide render the same
+// structured card — temp / rinse / first steeps — parsed from the guide via effectiveGuideSchedule,
+// with the raw guide text kept underneath (nothing the user wrote disappears). When the guide is
+// temp-only (e.g. "80-90°C") the steeps shown are the leaf-form schedule the timer would actually
+// run, and the footnote says so — generated times are never passed off as the user's own. If brew
+// advice is off, or nothing parses, fall back to the plain "How to brew" text block (pre-v3.51 look).
+function savedBrewHTML(tea){
+  const plain = `<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(tea.brewGuide)}</div></div>`;
+  if(state.settings.brewAdvice===false) return plain;
+  const sched = effectiveGuideSchedule(tea, true);
+  if(!sched || (sched.tempC==null && !(sched.times&&sched.times.length))) return plain;
+  const rows = [];
+  if(sched.tempC!=null) rows.push(`<div><div class="eyebrow">Temp</div><div>${cToDisplay(sched.tempC)}${tempUnitLabel()}</div></div>`);
+  if(sched.rinseSeconds!=null) rows.push(`<div><div class="eyebrow">Rinse</div><div>${sched.rinseSeconds}s</div></div>`);
+  if(sched.times && sched.times.length) rows.push(`<div><div class="eyebrow">First steeps</div><div class="mono">${sched.times.slice(0,6).map(fmtSecShort).join(' / ')}</div></div>`);
+  const note = sched.generated
+    ? 'Steep times come from the leaf type — your guide sets the rest. The session timer uses this schedule.'
+    : 'Parsed from your brew guide — the session timer uses this schedule.';
+  return `
+    <div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
+      <div class="eyebrow">Brew guide · saved</div>
+      <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
+      <div style="font-size:12.5px;white-space:pre-wrap;margin-top:10px;">${escapeHtml(tea.brewGuide)}</div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${note}</div>
+    </div>`;
 }
 
 // A "Suggested brew" card for teas with no saved brewGuide — the same schedule the session timer

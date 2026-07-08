@@ -23,6 +23,29 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.52 — remove the Tea persona card
+Deploy: `service-worker.js` (v62, shared with v3.51), `steep-dashboard.js`, `styles.css`. No SQL.
+- **The "Your tea persona" Home banner is gone** — `computePersona`, the `persona` dashboard card
+  (removed from `DASH_DEFAULT_ORDER`/`DASH_LABELS`/`DASH_SURFACE` and `dashCardsHome`), and the
+  `.persona` CSS block. Saved `dashLayout`s self-heal: `dashLayout()` filters unknown ids, so a
+  persisted `persona` entry in order/hidden/surface is silently dropped on next render.
+- Alternatives to fill that slot (a calmer identity surface) are under discussion — see ROADMAP note.
+
+## v3.51 — tea detail: structured card for saved brew guides
+Deploy: `service-worker.js` (v62), `steep-teas.js`. No SQL.
+- **Teas WITH a saved guide now get the same structured brew card** (temp / rinse / first steeps)
+  the suggested-brew card introduced in v3.48 — new `savedBrewHTML(tea)` parses the guide via
+  `effectiveGuideSchedule(tea, true)`, labeled "Brew guide · saved". The raw guide text stays
+  visible inside the card, so nothing the user wrote disappears.
+- **Temp-only guides** (e.g. Ruby Ruanzhi's "80-90°C") show the leaf-form schedule the timer would
+  actually run, with a footnote saying the times come from the leaf type — generated times are never
+  passed off as the user's own.
+- Gated like the suggested card: `brewAdvice` off, or a guide that parses to nothing, falls back to
+  the old plain "How to brew" text block.
+- Validated in the Node vm sandbox against all 14 real tea rows: 11/11 guides render the card
+  (Shincha's "60-75°C / 15-30s / 3 infusions" → 68°C · 15/23/30s; range-midpoints and the single-range
+  spread behave), temp-only generates with `generated:true`, `brewAdvice=false` falls back to plain.
+
 ## v3.50 — sweep confirm()/alert() → inline UI (sessions + teas)
 Deploy: `service-worker.js` (v61), `steep-core.js`, `steep-sessions.js`, `steep-teas.js`. No SQL.
 - **No more browser popups in steep-sessions/steep-teas.** New shared **`armConfirm(btn, message, onYes)`**

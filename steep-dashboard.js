@@ -144,60 +144,6 @@ function viewSpend(){
   `;
 }
 
-function computePersona(s){
-  const T = s.totalSessions;
-
-  // ---- core title: type mix ----
-  const sorted = Object.entries(s.typeCounts).filter(([k,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
-  const topShare = (sorted.length && T) ? sorted[0][1].count / T : 0;
-  let core;
-  if(sorted.length===0) core = 'New Explorer';
-  else if(sorted.length===1 || topShare>=0.7) core = typeLabel(sorted[0][0])+' Devotee';
-  else if(s.typesUsedCount>=5) core = 'Leaf Wanderer';
-  else core = typeLabel(sorted[0][0])+' & '+typeLabel(sorted[1][0])+' Explorer';
-
-  // ---- signals ----
-  const infPerSession = T ? s.totalSteeps / T : 0;
-  const coldShare  = T ? s.coldBrewCount / T : 0;
-  const nightShare = T ? s.nightSessionCount / T : 0;
-  const morningCount = (s.hourBuckets[3]||0)+(s.hourBuckets[4]||0)+(s.hourBuckets[5]||0); // 6–12h
-  const morningShare = T ? morningCount / T : 0;
-  const gramsPer = T ? s.totalGrams / T : 0;
-  const loyalty  = s.uniqueTeas>0 ? T / s.uniqueTeas : 0; // sessions per distinct tea
-
-  // ---- habit modifier (prefix) — strongest single signal ----
-  let modifier = '';
-  if(T>=6){
-    if(coldShare>=0.4) modifier='Cold-Brew';
-    else if(infPerSession>=4) modifier='Gongfu';
-    else if(nightShare>=0.35) modifier='Nocturnal';
-    else if(morningShare>=0.45) modifier='Morning';
-  }
-  const title = modifier ? `${modifier} ${core}` : core;
-
-  // ---- subtitle: up to two distinctive traits, calm & specific ----
-  const traits = [];
-  if(T===0){
-    traits.push('your story starts with one steep');
-  } else {
-    if(s.streak>=14) traits.push('never misses a steep');
-    else if(s.streak>=5) traits.push('steady by the day');
-    if(coldShare>=0.25 && modifier!=='Cold-Brew') traits.push('cold-brew curious');
-    if(nightShare>=0.3 && modifier!=='Nocturnal') traits.push('brews after dark');
-    if(morningShare>=0.4 && modifier!=='Morning') traits.push('a morning ritualist');
-    if(infPerSession>=5 && modifier!=='Gongfu') traits.push('draws out every infusion');
-    if(gramsPer>=7) traits.push('generous with the leaf');
-    else if(gramsPer>0 && gramsPer<=3) traits.push('a delicate hand');
-    if(s.favorites.length>=3 && loyalty>=3) traits.push('loyal to a cherished few');
-    else if(s.typesUsedCount>=5) traits.push('chasing every leaf');
-    if(s.fiveStarSessions>=3) traits.push('a keeper of perfect cups');
-  }
-  let subtitle;
-  if(!traits.length) subtitle = T>=10 ? 'settling into a rhythm' : 'still finding their rhythm';
-  else subtitle = traits.slice(0,2).join(' · ');
-
-  return {title, subtitle};
-}
 
 function brewingClockHTML(s){
   if(s.totalSessions===0) return '';
@@ -555,13 +501,13 @@ function viewAchievements(){
    persisted in synced settings (settings.dashLayout). Edit mode adds move/hide
    controls; unknown/new cards fall back to the default order (forward-compatible).
    A generic "configurable synced surface" — reusable for other views later. */
-const DASH_DEFAULT_ORDER = ['persona','recap','wrapped','restock','recent','totals','clock','insights','types','mostrated','favorites','cost'];
-const DASH_LABELS = { persona:'Tea persona', recap:'Recap', wrapped:'Steep Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
+const DASH_DEFAULT_ORDER = ['recap','wrapped','restock','recent','totals','clock','insights','types','mostrated','favorites','cost'];
+const DASH_LABELS = { recap:'Recap', wrapped:'Steep Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab;
 // cards don't move between tabs. Migration is automatic — existing saved {order,hidden} keep their
 // visibility and gain a surface from this map (nothing a user hid can reappear).
 const DASH_SURFACE = {
-  persona:'home', cost:'home', restock:'home', clock:'home', recent:'home', totals:'home', favorites:'home',
+  cost:'home', restock:'home', clock:'home', recent:'home', totals:'home', favorites:'home',
   recap:'insights', wrapped:'insights', insights:'insights', mostrated:'insights', types:'insights'
 };
 // Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
@@ -647,8 +593,6 @@ function renderDashboard(cards, surface){
 // Insights builders (dashCardsInsights) live in steep-insights.js — both share one computeStats.
 function dashCards(){ const s=computeStats(); return {...dashCardsHome(s), ...dashCardsInsights(s)}; }
 function dashCardsHome(s){
-  const persona = computePersona(s);
-
   const favHTML = s.favorites.length ? `<div class="grid grid-3">${s.favorites.slice(0,6).map(t=>teaCardHTML(t)).join('')}</div>` : '<div class="empty">No favorites marked yet.</div>';
 
   const lowStockHTML = s.lowStock.length ? s.lowStock.map(t=>`
@@ -686,7 +630,6 @@ function dashCardsHome(s){
     </div>` : '';
 
   return {
-    persona: `<div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>`,
     restock: restockHTML,
     recent: recentHTML,
     totals: `<div class="section grid grid-3">
