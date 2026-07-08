@@ -23,6 +23,24 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.47 — move dashboard cards between Home and Insights
+Deploy: `service-worker.js` (v58), `steep-dashboard.js`, `steep-insights.js`. No SQL.
+- **Edit mode can now move a card to the other tab.** Each card's edit chrome gains a `→ Insights`
+  (on Home) / `→ Home` (on Insights) chip next to ↑ ↓ Hide. `dashMoveToSurface` records a per-user
+  override in `settings.dashLayout.surface` (id→'home'|'insights') that `dashSurface` layers over the
+  built-in `DASH_SURFACE`; moving a card back to its built-in surface clears the override (no-op
+  overrides don't accumulate). The card lands at the bottom of the destination tab; within-tab ↑ ↓
+  reorder then works as before.
+- **Both tabs now build the full card map** via a shared `dashCards()` (= `dashCardsHome(s)` in
+  steep-dashboard + `dashCardsInsights(s)` in steep-insights, one shared `computeStats`). A moved card
+  must have its HTML available on whichever tab it lands on; the old split (each view built only its
+  own cards) couldn't render a card on the other surface. `viewDashboard`/`viewInsights` are now thin
+  wrappers over `renderDashboard(dashCards(), surface)`.
+- **Migration-safe:** old saved `dashLayout` (no `surface` key) falls through to `DASH_SURFACE`
+  unchanged; `saveDashLayout` preserves the override across hide/reorder; `dashResetLayout` clears it.
+- Verified in the Node/browser sandbox: cross-tab move + land-at-bottom, within-tab reorder, move-back
+  clears override, reset, and surface persistence across hide ops. `node --check` green.
+
 ## v3.46 — Vessels folded into the Teas tab
 Deploy: `service-worker.js` (v57), `steep-core.js`, `steep-teas.js`, `steep-sessions.js`. No SQL.
 - **Nav is now Home · Teas · Sessions · Insights** — the Vessels tab is gone. Vessels live under Teas

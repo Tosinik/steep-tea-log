@@ -336,12 +336,9 @@ function viewWrapped(){
 }
 
 /* ---------- the Insights tab view ---------- */
-function viewInsights(){
-  if(state.sessions.length===0){
-    return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Insights</h2></div>
-      <div class="card empty">No sessions yet — your insights, recaps and Wrapped fill in as you log.</div>`;
-  }
-  const s = computeStats();
+// Insights-surface cards, keyed by id. Built by the shared dashCards() (steep-dashboard.js) so a
+// card moved to Home still has its HTML there; takes the shared computeStats result.
+function dashCardsInsights(s){
   const maxTypeCount = Math.max(1, ...Object.values(s.typeCounts).map(t=>t.count));
   const typeBars = TYPES.map(t=>{
     const info = s.typeCounts[t.k];
@@ -361,7 +358,7 @@ function viewInsights(){
     <div class="rank-row"><span class="rank-num">${i+1}.</span><span class="rname">${escapeHtml(t.name)}</span><span class="rval">${fmtStars(t.rating)}/5</span></div>
   `).join('') : '<div class="empty">Rate a tea to see it here.</div>';
 
-  const cards = {
+  return {
     recap: recapHTML(),
     wrapped: wrappedTeaser(),
     insights: insightsHTML(),
@@ -380,5 +377,12 @@ function viewInsights(){
       </div>
     </div>`
   };
-  return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Insights</h2></div>${renderDashboard(cards,'insights')}`;
+}
+
+function viewInsights(){
+  if(state.sessions.length===0){
+    return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Insights</h2></div>
+      <div class="card empty">No sessions yet — your insights, recaps and Wrapped fill in as you log.</div>`;
+  }
+  return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Insights</h2></div>${renderDashboard(dashCards(),'insights')}`;
 }

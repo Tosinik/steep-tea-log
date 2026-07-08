@@ -564,7 +564,11 @@ const DASH_SURFACE = {
   persona:'home', cost:'home', restock:'home', clock:'home', recent:'home', totals:'home', favorites:'home',
   recap:'insights', wrapped:'insights', insights:'insights', mostrated:'insights', types:'insights'
 };
-function dashSurface(id){ return DASH_SURFACE[id] || 'home'; }
+// Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
+// dashLayout.surface maps id→'home'|'insights', overriding the built-in DASH_SURFACE. Absent
+// key = use the built-in; old saved layouts (no surface key) just fall through unchanged.
+function dashSurfaceOverride(){ const L=state.settings.dashLayout; return (L&&L.surface)||{}; }
+function dashSurface(id){ return dashSurfaceOverride()[id] || DASH_SURFACE[id] || 'home'; }
 function dashLayout(){
   const L = state.settings.dashLayout || {};
   let order = Array.isArray(L.order) ? L.order.filter(id=>DASH_DEFAULT_ORDER.includes(id)) : [];
@@ -572,7 +576,7 @@ function dashLayout(){
   const hidden = new Set((Array.isArray(L.hidden)?L.hidden:[]).filter(id=>DASH_DEFAULT_ORDER.includes(id)));
   return { order, hidden };
 }
-function saveDashLayout(order, hidden){ state.settings.dashLayout = { order, hidden:[...hidden] }; persistSettings(); }
+function saveDashLayout(order, hidden){ state.settings.dashLayout = { order, hidden:[...hidden], surface:dashSurfaceOverride() }; persistSettings(); }
 function dashToggleEdit(){ state.dashEdit = !state.dashEdit; render(); }
 function dashMoveCard(id, dir){
   const { order, hidden } = dashLayout();
@@ -586,7 +590,21 @@ function dashMoveCard(id, dir){
 }
 function dashHideCard(id){ const { order, hidden } = dashLayout(); hidden.add(id); saveDashLayout(order, hidden); render(); }
 function dashShowCard(id){ const { order, hidden } = dashLayout(); hidden.delete(id); saveDashLayout(order, hidden); render(); }
-function dashResetLayout(){ state.settings.dashLayout = { order:[...DASH_DEFAULT_ORDER], hidden:[] }; persistSettings(); render(); }
+// Move a card to the other tab. Stores an override (or clears it when moving back to the card's
+// built-in surface, so no-op overrides don't accumulate) and re-lands it at the bottom of the
+// destination tab. Reorder-within-tab (dashMoveCard) then works because dashSurface reflects the override.
+function dashMoveToSurface(id){
+  const { order, hidden } = dashLayout();
+  const dest = dashSurface(id)==='home' ? 'insights' : 'home';
+  const ov = {...dashSurfaceOverride()};
+  if((DASH_SURFACE[id]||'home')===dest) delete ov[id]; else ov[id]=dest;
+  state.settings.dashLayout = { order, hidden:[...hidden], surface:ov }; // set override first so dashSurface below reflects dest
+  const i = order.indexOf(id); if(i>=0) order.splice(i,1);
+  let at = 0; for(let k=0;k<order.length;k++){ if(dashSurface(order[k])===dest) at=k+1; } // land at bottom of destination tab
+  order.splice(at,0,id);
+  saveDashLayout(order, hidden); render();
+}
+function dashResetLayout(){ state.settings.dashLayout = { order:[...DASH_DEFAULT_ORDER], hidden:[], surface:{} }; persistSettings(); render(); }
 function renderDashboard(cards, surface){
   surface = surface || 'home';
   const { order, hidden } = dashLayout();
@@ -607,6 +625,7 @@ function renderDashboard(cards, surface){
         <span style="display:flex;gap:4px;">
           <button class="lib-chip" onclick="dashMoveCard('${id}',-1)" aria-label="Move up">↑</button>
           <button class="lib-chip" onclick="dashMoveCard('${id}',1)" aria-label="Move down">↓</button>
+          <button class="lib-chip" onclick="dashMoveToSurface('${id}')" title="Move to the other tab">${surface==='home'?'→ Insights':'→ Home'}</button>
           <button class="lib-chip" onclick="dashHideCard('${id}')">Hide</button>
         </span>
       </div>
@@ -622,11 +641,12 @@ function renderDashboard(cards, surface){
   return `${editBar}${body}${hiddenPanel}`;
 }
 
-function viewDashboard(){
-  if(state.sessions.length===0){
-    return onboardingHTML();
-  }
-  const s = computeStats();
+// Every dashboard card, keyed by id, built once so either tab can render any of them — cross-tab
+// moves (dashMoveToSurface) need a card's HTML available on whichever surface it lands on.
+// renderDashboard(cards, surface) filters this by effective surface. Home builders live here;
+// Insights builders (dashCardsInsights) live in steep-insights.js — both share one computeStats.
+function dashCards(){ const s=computeStats(); return {...dashCardsHome(s), ...dashCardsInsights(s)}; }
+function dashCardsHome(s){
   const persona = computePersona(s);
 
   const favHTML = s.favorites.length ? `<div class="grid grid-3">${s.favorites.slice(0,6).map(t=>teaCardHTML(t)).join('')}</div>` : '<div class="empty">No favorites marked yet.</div>';
@@ -665,9 +685,7 @@ function viewDashboard(){
       }).join('')}
     </div>` : '';
 
-  // Home surface only — the analytics cards (recap, wrapped, insights, types, mostrated) live in
-  // the Insights tab (steep-insights.js). renderDashboard filters this map by DASH_SURFACE.
-  const cards = {
+  return {
     persona: `<div class="persona"><div class="eyebrow">Your tea persona</div><h2>${persona.title}</h2><div class="persona-sub">${persona.subtitle}</div></div>`,
     restock: restockHTML,
     recent: recentHTML,
@@ -697,8 +715,13 @@ function viewDashboard(){
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
     </div>`
   };
+}
 
-  return renderDashboard(cards, 'home');
+function viewDashboard(){
+  if(state.sessions.length===0){
+    return onboardingHTML();
+  }
+  return renderDashboard(dashCards(), 'home');
 }
 
 /* ================= TEAS ================= */

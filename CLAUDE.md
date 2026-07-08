@@ -118,10 +118,14 @@ steep-sessions → steep-boot
   tabs), split v3.44. Home owns persona/heatmap-adjacent/cost/running-low/clock/recent/
   totals/favorites; Insights owns recap/Wrapped/insights-reading/type-breakdown/most-brewed.
   Both render through the **shared editable-card registry** in steep-dashboard: `DASH_SURFACE`
-  assigns each card id a surface ('home'|'insights'), and `renderDashboard(cards, surface)`
-  filters the saved `dashLayout` per tab (reorder/hide work per-tab; cards don't move between
-  tabs). Adding a card = add its id to `DASH_DEFAULT_ORDER`, `DASH_LABELS`, `DASH_SURFACE`,
-  and build its HTML in the owning view.
+  assigns each card id a *default* surface ('home'|'insights'), and `renderDashboard(cards, surface)`
+  filters by **effective** surface per tab (reorder/hide work per-tab). Since v3.47 edit mode can
+  also **move a card between tabs**: `dashMoveToSurface` writes a per-user override into
+  `dashLayout.surface` (id→surface) that `dashSurface(id)` layers over `DASH_SURFACE`; because a
+  moved card must render on either tab, **both** views build the full card map via the shared
+  `dashCards()` (= `dashCardsHome(s)` + `dashCardsInsights(s)`), and `renderDashboard` picks each
+  tab's cards by effective surface. Adding a card = add its id to `DASH_DEFAULT_ORDER`, `DASH_LABELS`,
+  `DASH_SURFACE`, and build its HTML in the owning surface's `dashCards*` builder.
 - **steep-boot** — `SteepDB.boot(init)` + service-worker registration/update banner.
 
 The v3 split of the old single `app.js` into these modules was purely mechanical — no
