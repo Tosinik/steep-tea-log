@@ -88,7 +88,8 @@ baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insi
 cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
 recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
 capture precursor, then ratio phase 1 (see `SPEC-brew-advice-v2.md`). The v3.34 map legibility pass was
-built but NOT shipped — map is parked. Cache **v55**.
+built but NOT shipped — map is parked. Cache **v56** (v3.45 nav tidy: tabs = Home·Teas·Sessions·Vessels·
+Insights; Friends moved to a 👥 topbar icon).
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other

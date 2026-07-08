@@ -23,6 +23,15 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.45 — nav tidy: Insights last, Friends to the icon row
+Deploy: `service-worker.js` (v56), `steep-core.js`. No SQL.
+- **Tabs now read Home · Teas · Sessions · Vessels · Insights** — the main tab row concentrates on
+  "all things tea", with Insights moved to the end (no longer the second tab).
+- **Friends moved to a 👥 icon in the top action row** (next to shopping / passport / settings), via
+  `goFriends()`. Frees a tab slot and keeps the primary nav tea-focused. Friends stays fully functional.
+- Migration re-validated against Niklas's real saved `dashLayout` (v3.44): his reorder (wrapped before
+  recap) and hidden `recent` are preserved with no cross-tab leakage. `node --check` + render suites green.
+
 ## v3.44 — Insights tab + dashboard split
 Deploy: `index.html`, `service-worker.js` (v55), **new** `steep-insights.js`, `steep-dashboard.js`,
 `steep-core.js`. No SQL.

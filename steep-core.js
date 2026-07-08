@@ -683,6 +683,7 @@ function render(){
       <div class="topbar-brandrow">
         <div class="brand">${steepLogoSVG(30)}<h1>Steep</h1></div>
         <div class="topbar-actions">
+          <button class="icon-btn ${state.view==='friends'?'active':''}" onclick="goFriends()" title="Friends" aria-label="Friends">👥</button>
           <button class="icon-btn ${state.view==='shopping'?'active':''}" onclick="goView('shopping')" title="Shopping list" aria-label="Shopping list">🛒</button>
           <button class="icon-btn ${state.view==='passport'?'active':''}" onclick="goView('passport')" title="Tea passport" aria-label="Tea passport">🌍</button>
           ${state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">🏆</button>` : ''}
@@ -691,11 +692,10 @@ function render(){
       </div>
       <div class="tabs">
         <button class="tab ${state.view==='dashboard'?'active':''}" onclick="goView('dashboard')">Home</button>
-        <button class="tab ${state.view==='insights'||state.view==='wrapped'?'active':''}" onclick="goView('insights')">Insights</button>
         <button class="tab ${state.view==='teas'||state.view==='tea-detail'?'active':''}" onclick="goView('teas')">Teas</button>
         <button class="tab ${state.view==='sessions'?'active':''}" onclick="goView('sessions')">Sessions</button>
         <button class="tab ${state.view==='vessels'?'active':''}" onclick="goView('vessels')">Vessels</button>
-        <button class="tab ${state.view==='friends'?'active':''}" onclick="goFriends()">Friends</button>
+        <button class="tab ${state.view==='insights'||state.view==='wrapped'?'active':''}" onclick="goView('insights')">Insights</button>
       </div>
       ${inSession ? '' : `<button class="btn-log btn-log-wide" onclick="quickLogSession()">＋ Log session</button>`}
     </div></div>
