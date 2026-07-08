@@ -362,7 +362,7 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
         <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
       </div>
-      ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.brewGuide)}</div></div>`:''}
+      ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.brewGuide)}</div></div>`:suggestedBrewHTML(t)}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div></div>`:''}
 
       <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
@@ -376,6 +376,58 @@ function viewTeaDetail(){
       </div>
     </div>
   `;
+}
+
+// A "Suggested brew" card for teas with no saved brewGuide — the same schedule the session timer
+// would generate (effectiveGuideSchedule's KB/leaf-form path), surfaced as a clearly-marked
+// suggestion with a save-as-guide action. Gated on the brew-advice opt-out, like the in-session
+// generated schedule. Temp/ratio come from the KB when a style matched; a leaf-form-only fallback
+// shows just the steeps. Never shown when a real guide exists (that path renders "How to brew").
+function suggestedBrewHTML(tea){
+  if(!tea || tea.brewGuide) return '';
+  if(state.settings.brewAdvice===false) return '';
+  const sched = effectiveGuideSchedule(tea, true);
+  if(!sched || !sched.times || !sched.times.length) return '';
+  const kb = (typeof kbResolve==='function') ? kbResolve([tea.name,tea.cultivar,tea.origin].filter(Boolean).join(' ')) : null;
+  const tempC = sched.tempC!=null ? sched.tempC : (kb && kb.tempC!=null ? kb.tempC : null);
+  const ratio = (kb && Number(kb.ratio)>0) ? Number(kb.ratio) : null;
+  // Source label: a matched KB style names itself ("dancong style"); else the inferred leaf-form
+  // family, flagged "· auto" (same marker leafFormLabel uses when the form wasn't set explicitly).
+  const explicit = tea.leafForm && LEAF_PROFILES[tea.leafForm];
+  const source = (kb && kb.style)
+    ? `${kb.style.replace(/_/g,' ')} style`
+    : `${LEAF_PROFILES[sched.form].label} family${explicit?'':' · auto'}`;
+  const rows = [];
+  if(tempC!=null) rows.push(`<div><div class="eyebrow">Temp</div><div>${cToDisplay(tempC)}${tempUnitLabel()}</div></div>`);
+  if(ratio!=null) rows.push(`<div><div class="eyebrow">Leaf</div><div>${ratio} g / 100 ml</div></div>`);
+  rows.push(`<div><div class="eyebrow">First steeps</div><div class="mono">${sched.times.slice(0,6).map(fmtSecShort).join(' / ')}</div></div>`);
+  return `
+    <div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
+      <div class="eyebrow">Suggested brew · ${escapeHtml(source)}</div>
+      <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:10px;">A starting point from ${kb&&kb.style?'the tea knowledge base':'the leaf type'} — not a saved guide. The session timer uses these times until you save your own.</div>
+      <div style="margin-top:10px;"><button class="btn" onclick="saveSuggestedGuide('${tea.id}')">Save as brew guide</button></div>
+    </div>`;
+}
+// Write the current suggestion into the tea's brewGuide (free text), so it becomes the real guide
+// the timer + advice read from. Format is "90°C, 25s / 18s / 30s, 4g/100ml". Times are emitted in
+// raw seconds (not fmtSecShort's "1m15s", which parseBrewGuide reads back as 60s) so the saved guide
+// round-trips to exactly the schedule shown; the KB ratio is appended (parseBrewGuide strips the
+// grams token on re-read, so it stays informational without corrupting the parse).
+function saveSuggestedGuide(teaId){
+  const tea = teaById(teaId); if(!tea || tea.brewGuide) return;
+  const sched = effectiveGuideSchedule(tea, true);
+  if(!sched || !sched.times || !sched.times.length) return;
+  const kb = (typeof kbResolve==='function') ? kbResolve([tea.name,tea.cultivar,tea.origin].filter(Boolean).join(' ')) : null;
+  const tempC = sched.tempC!=null ? sched.tempC : (kb && kb.tempC!=null ? kb.tempC : null);
+  const parts=[];
+  if(tempC!=null) parts.push(cToDisplay(tempC)+tempUnitLabel());
+  parts.push(sched.times.map(t=>t+'s').join(' / '));
+  if(kb && Number(kb.ratio)>0) parts.push(kb.ratio+'g/100ml');
+  tea.brewGuide = parts.join(', ');
+  persistTea(tea);
+  showToast('Saved brew guide for “'+tea.name+'”');
+  render();
 }
 
 /* ================= FRIENDS (social) ================= */

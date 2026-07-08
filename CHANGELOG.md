@@ -23,6 +23,23 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.48 — Suggested brew on tea detail (for teas without a guide)
+Deploy: `service-worker.js` (v59), `steep-teas.js`. No SQL.
+- **Tea detail now shows a "Suggested brew" card when a tea has no saved brew guide** — the same
+  schedule the session timer would generate (`effectiveGuideSchedule`'s KB/leaf-form path): temp,
+  leaf ratio, and the first steeps. Clearly marked as a suggestion (calm jade-pale card, "not a saved
+  guide" note), never shown when a real guide exists (that path still renders "How to brew").
+- **One-line source label:** a matched KB style names itself (`Suggested brew · dancong style`);
+  otherwise the inferred leaf-form family with the `· auto` marker (`Strip / open leaf family · auto`).
+  Temp + ratio come from the KB when a style matched; a leaf-form-only fallback shows just the steeps.
+- **Save-as-guide button** writes the suggestion into `brewGuide` (`saveSuggestedGuide`), after which
+  the tea reads as a normal guided tea. Times are written in **raw seconds** (`75s`, not `fmtSecShort`'s
+  `1m15s`, which `parseBrewGuide` reads back as 60s) so the saved guide round-trips to exactly the
+  schedule shown; the KB ratio is appended (`4g/100ml`) and harmlessly stripped on re-parse.
+- Gated on the same `brewAdvice` opt-out as the in-session generated schedule (calm-first: no generated
+  guidance when the toggle is off). Verified in the browser sandbox across KB-match / leaf-form-only /
+  already-guided teas + save round-trip; `node --check` green.
+
 ## v3.47 — move dashboard cards between Home and Insights
 Deploy: `service-worker.js` (v58), `steep-dashboard.js`, `steep-insights.js`. No SQL.
 - **Edit mode can now move a card to the other tab.** Each card's edit chrome gains a `→ Insights`
