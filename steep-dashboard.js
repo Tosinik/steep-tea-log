@@ -501,13 +501,13 @@ function viewAchievements(){
    persisted in synced settings (settings.dashLayout). Edit mode adds move/hide
    controls; unknown/new cards fall back to the default order (forward-compatible).
    A generic "configurable synced surface" — reusable for other views later. */
-const DASH_DEFAULT_ORDER = ['recap','wrapped','restock','recent','totals','clock','insights','types','mostrated','favorites','cost'];
-const DASH_LABELS = { recap:'Recap', wrapped:'Steep Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
+const DASH_DEFAULT_ORDER = ['greeting','recap','wrapped','restock','recent','totals','clock','insights','types','mostrated','favorites','cost'];
+const DASH_LABELS = { greeting:'Greeting', recap:'Recap', wrapped:'Steep Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab;
 // cards don't move between tabs. Migration is automatic — existing saved {order,hidden} keep their
 // visibility and gain a surface from this map (nothing a user hid can reappear).
 const DASH_SURFACE = {
-  cost:'home', restock:'home', clock:'home', recent:'home', totals:'home', favorites:'home',
+  greeting:'home', cost:'home', restock:'home', clock:'home', recent:'home', totals:'home', favorites:'home',
   recap:'insights', wrapped:'insights', insights:'insights', mostrated:'insights', types:'insights'
 };
 // Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
@@ -592,6 +592,49 @@ function renderDashboard(cards, surface){
 // renderDashboard(cards, surface) filters this by effective surface. Home builders live here;
 // Insights builders (dashCardsInsights) live in steep-insights.js — both share one computeStats.
 function dashCards(){ const s=computeStats(); return {...dashCardsHome(s), ...dashCardsInsights(s)}; }
+/* ---------- greeting card (v3.54) — the calm replacement for the removed persona banner.
+   A time-of-day greeting + ONE gentle tea suggestion, deterministic per calendar day so it
+   doesn't reshuffle on every render. Ritual-first: no identity label, no streaks/gaps, never
+   "you haven't logged". (Seasonal word from the task is left out — "warm/cold" is hemisphere-
+   dependent and we don't know the user's, so a plain time-of-day line stays safe.) */
+const GREETING_LINE = { morning:'Good morning', afternoon:'Good afternoon', evening:'Good evening', night:'A quiet night' };
+const BUCKET_NOUN   = { morning:'morning', afternoon:'afternoon', evening:'evening', night:'late-night' };
+const BUCKET_WHEN   = { morning:'this morning', afternoon:'this afternoon', evening:'this evening', night:'tonight' };
+// Same hour cutoffs as timeOfDayBuckets (steep-insights.js): 5–12 / 12–17 / 17–22 / else.
+function d_hourBucket(h){ if(h>=5&&h<12) return 'morning'; if(h>=12&&h<17) return 'afternoon'; if(h>=17&&h<22) return 'evening'; return 'night'; }
+// Stable FNV-1a hash — equal-score candidates tie-break the same way all day (no Math.random,
+// which would reshuffle the pick on every re-render).
+function d_hash(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
+function greetingCardHTML(){
+  const now = new Date();
+  const bucket = d_hourBucket(now.getHours());
+  const greet = GREETING_LINE[bucket];
+  const sessions = state.sessions || [];
+  const card = sub => `<div class="card" style="background:var(--jade-pale);border:1px solid var(--line);">
+      <h2 style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;margin:0;">${greet}</h2>
+      ${sub ? `<div style="font-size:13.5px;color:var(--ink-soft);margin-top:6px;">${sub}</div>` : ''}
+    </div>`;
+  if(!sessions.length) return card('The kettle&rsquo;s patient whenever you are.');
+  const todayKey = dayKey(now);
+  const brewedToday = new Set(sessions.filter(se=>dayKey(se.date)===todayKey).map(se=>se.teaId));
+  // candidates: not finished (untracked or amountGrams>0) and not already brewed today.
+  const candidates = (state.teas||[]).filter(t=>!isTeaFinished(t) && !brewedToday.has(t.id));
+  if(!candidates.length) return card('');
+  const scored = candidates.map(t=>{
+    const bucketCount = sessions.filter(se=>se.teaId===t.id && d_hourBucket(new Date(se.date).getHours())===bucket).length;
+    // bucket history dominates; rating/favorite are small nudges; date-seeded hash breaks ties.
+    const score = bucketCount + (Number(t.rating)||0)*0.05 + (t.isFavorite?0.15:0);
+    return { t, bucketCount, score, tie:d_hash(todayKey+'|'+t.id) };
+  }).sort((a,b)=> b.score-a.score || b.tie-a.tie);
+  const pick = scored[0];
+  const name = `<span onclick="openTeaDetail('${escapeJsArg(pick.t.id)}')" style="color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;">${escapeHtml(pick.t.name)}</span>`;
+  // Only claim "your <bucket> pick" when there's real bucket history; otherwise a neutral nudge.
+  const sub = pick.bucketCount>0
+    ? `Maybe the ${name}? It&rsquo;s been your ${BUCKET_NOUN[bucket]} pick.`
+    : `Maybe the ${name} ${BUCKET_WHEN[bucket]}?`;
+  return card(sub);
+}
+
 function dashCardsHome(s){
   const favHTML = s.favorites.length ? `<div class="grid grid-3">${s.favorites.slice(0,6).map(t=>teaCardHTML(t)).join('')}</div>` : '<div class="empty">No favorites marked yet.</div>';
 
@@ -630,6 +673,7 @@ function dashCardsHome(s){
     </div>` : '';
 
   return {
+    greeting: greetingCardHTML(),
     restock: restockHTML,
     recent: recentHTML,
     totals: `<div class="section grid grid-3">

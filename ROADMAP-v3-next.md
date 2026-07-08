@@ -40,8 +40,11 @@ v3.40 tea lifecycle.
 **Open design decisions (2026-07-08) — RESOLVED:**
 - ~~**Pixel-font replacement**~~ ✓ **shipped v3.53** — Pixelify Sans → IBM Plex Mono via `--font-mono`;
   Google-Fonts weight swapped, Pixel/Clean toggle + `monoFont` retired, eyebrow tracking `.1em → .06em`.
-- **Persona-slot replacement** — DECIDED: a ritual-first **greeting card** (greeting line + one gentle
-  same-time-of-day tea suggestion, no identity labels). Shipping as **v3.54** (next). Home works without one.
+- ~~**Persona-slot replacement**~~ ✓ **shipped v3.54** — a ritual-first **greeting card** (greeting line +
+  one deterministic-per-day same-time-of-day tea suggestion, no identity labels). Home works without one.
+  Optional low-priority rider (Niklas OK'd, NOT yet done): where `inventorySparkline` renders nothing
+  because a tea has no `purchaseDate` anchor, show a quiet "add a purchase date to see the stock curve"
+  link to Edit — a separate tiny deploy or its own issue.
 
 3. **Then — the rest of the "forgotten" batch** (small independent deploys, order flexible):
    - ~~**Tea lifecycle / at-0g**~~ ✓ **shipped v3.40** (finished-teas grouping + hidden-in-picker +

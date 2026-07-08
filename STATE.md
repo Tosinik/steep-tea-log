@@ -88,16 +88,20 @@ baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insi
 cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
 recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
 capture precursor, then ratio phase 1 (see `SPEC-brew-advice-v2.md`). The v3.34 map legibility pass was
-built but NOT shipped — map is parked. Cache **v63** (v3.53: **Pixelify Sans retired → IBM Plex Mono**
-via `--font-mono`; Google-Fonts weight swapped, Pixel/Clean Settings toggle + `monoFont` +
+built but NOT shipped — map is parked. Cache **v64** (v3.54: **greeting card** replaces the removed
+persona slot — `greetingCardHTML` (steep-dashboard.js), first in `DASH_DEFAULT_ORDER`, a time-of-day
+greeting + one deterministic-per-day tea suggestion scored by same-bucket history (date-seeded tie-break);
+`isTeaFinished`/brewed-today excluded; calm fallbacks; no seasonal word (hemisphere-ambiguous). Validated
+in the vm sandbox against real CSVs (`fixtures/greeting-test.js`, local). v3.53: **Pixelify Sans retired →
+IBM Plex Mono** via `--font-mono`; Google-Fonts weight swapped, Pixel/Clean Settings toggle + `monoFont` +
 `html[data-mono="clean"]` retired, `applySettings` now a no-op, eyebrow tracking `.1em → .06em` so long
 "Suggested brew · …" eyebrows don't wrap on 375px. v3.51: tea detail renders a structured
 "Brew guide · saved" card for teas WITH a guide — `savedBrewHTML` in steep-teas.js parses via
 `effectiveGuideSchedule`, raw text preserved in the card, temp-only guides show the leaf-form schedule
 flagged as generated, plain-text fallback when brewAdvice is off or nothing parses. v3.52: **Tea persona
 removed** — `computePersona` + the `persona` card + `.persona` CSS deleted; saved dashLayouts self-heal
-via the unknown-id filter. **Next: v3.54 greeting card** in the old persona slot (DECIDED — see ROADMAP),
-then Brew advice v2. v3.50: swept `confirm()`/`alert()` out of
+via the unknown-id filter. **Next: Brew advice v2** — capacity-capture precursor, then ratio phase 1
+(`sql/v3_8-water-ml.sql`; see `SPEC-brew-advice-v2.md`). v3.50: swept `confirm()`/`alert()` out of
 steep-sessions/steep-teas — new shared `armConfirm(btn,message,onYes)` in steep-core.js does an inline
 two-step "Yes / Cancel" via DOM swap (no re-render, so unsaved fields survive); `alert()`s → `showToast`.
 Remaining popups only in steep-settings + steep-core offline error. v3.49: `scheduleToGuideText` emits raw-second times so

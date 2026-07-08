@@ -23,6 +23,30 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.54 — greeting card in the old persona slot
+Deploy: `service-worker.js` (v64), `steep-dashboard.js`. No SQL.
+- **A calm, ritual-first greeting replaces the removed persona banner.** New `greeting` card
+  (`greetingCardHTML` in steep-dashboard.js), first in `DASH_DEFAULT_ORDER`, `DASH_LABELS.greeting`,
+  `DASH_SURFACE.greeting='home'` — hideable/movable like any card; old saved `dashLayout`s pick it up
+  via the unknown-id append.
+- **Greeting line:** four local-hour buckets matching `timeOfDayBuckets` (5–12 / 12–17 / 17–22 / else)
+  → "Good morning / afternoon / evening" / "A quiet night", Fraunces, h2-sized, on a plain `var(--jade-pale)`
+  card (no gradient — quieter than persona).
+- **Suggestion:** one tea, **deterministic per calendar day** (date-seeded FNV-1a tie-break, no `Math.random`
+  so it doesn't reshuffle on re-render). Candidates = not finished (`isTeaFinished` false) and not brewed
+  today; score = sessions in the CURRENT time-of-day bucket + small rating/favorite nudges. Copy: "Maybe the
+  {name}? It's been your {bucket} pick." (name → `openTeaDetail`), or a neutral "Maybe the {name} this
+  {when}?" when the pick has no bucket history — never a false claim, no button, no imperative, no "!".
+- **Fallbacks:** no sessions → "The kettle's patient whenever you are."; no candidate teas → greeting alone.
+  Never mentions streaks, gaps, or "you haven't logged" — calm-first, zero guilt.
+- The task's optional seasonal word ("a warm July evening") is deliberately omitted — warm/cold is
+  hemisphere-dependent and we don't know the user's, so a plain time-of-day line stays safe.
+- Validated in the Node vm sandbox against the real teas/sessions CSVs (`fixtures/greeting-test.js`, local):
+  correct bucket at mocked hours, stable same-day pick, finished/zero-stock never suggested, brewed-today
+  excluded, both empty-state fallbacks. Card styling checked in the preview (Fraunces 22px, jade-pale bg,
+  jade-deep underlined link) in light + dark.
+
+---
 ## v3.53 — retire Pixelify Sans → IBM Plex Mono
 Deploy: `service-worker.js` (v63), `index.html`, `styles.css`, `steep-settings.js`, `steep-core.js`. No SQL.
 - **The pixel font is gone.** `--font-mono` is now `'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace`;
