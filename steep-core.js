@@ -516,6 +516,18 @@ function escapeJsArg(s){
 function fmtStars(v){ return v.toFixed(1).replace('.0',''); }
 function typeLabel(k){ const t = TYPES.find(x=>x.k===k); return t?t.label:k; }
 function teaById(id){ return state.teas.find(t=>t.id===id); }
+// Tea lifecycle (v3.40). A tea's grams are "tracked" only if there's evidence the user manages
+// its quantity: current amount > 0, a recorded purchase quantity, or a session that drew it down.
+// Otherwise amountGrams=0 means "never tracked", NOT "empty" (unknown ≠ empty — the DB defaults
+// amount_grams to 0, so 0 alone is ambiguous). A tea is FINISHED = tracked AND drained to zero;
+// finished teas still count in all stats — only the pickers + Teas-tab default view treat them apart.
+function isAmountTracked(tea){
+  if(!tea) return false;
+  if(Number(tea.amountGrams) > 0) return true;
+  if(Number(tea.costOriginalGrams) > 0) return true;
+  return (state.sessions||[]).some(s=>s.teaId===tea.id && Number(s.gramsUsed)>0);
+}
+function isTeaFinished(tea){ return isAmountTracked(tea) && Number(tea.amountGrams) <= 0; }
 function vesselById(id){ return state.vessels.find(v=>v.id===id); }
 function fmtSec(s){ s=Math.round(s); const m=Math.floor(s/60); const sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
 // A session's infusion count: real steeps if it has them, else the quick-log count.

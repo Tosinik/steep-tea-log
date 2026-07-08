@@ -23,6 +23,27 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.40 — tea lifecycle (finished teas)
+Deploy: `service-worker.js` (v51), `steep-core.js`, `steep-teas.js`, `steep-sessions.js`. No SQL.
+- **Finished vs unknown boundary.** A tea is *finished* only when its grams are **tracked** and ≤0;
+  an untracked amount of 0 is treated as in-stock (unknown ≠ empty — the DB defaults `amount_grams`
+  to 0, so 0 alone is ambiguous). "Tracked" = current amount >0, OR a recorded purchase quantity
+  (`costOriginalGrams`), OR a session that drew it down (`gramsUsed`). New `isAmountTracked` /
+  `isTeaFinished` in steep-core.
+- **Teas tab** — finished teas group at the bottom under a muted "Finished" divider (count shown);
+  their card shows "finished" instead of "0.0g left".
+- **Session tea picker** — finished teas hidden by default behind a quiet "show finished (N)" link;
+  revealed as a trailing "Finished" `<optgroup>`. They stay fully loggable (re-weighed tins, a true
+  last session), and are always shown if the current selection is itself finished. A new session now
+  defaults to an in-stock tea.
+- **One-time "rebuy?" affordance** on a finished tea's card — Yes → shopping list (via
+  `addWishFromTea`) + sets `would_rebuy`; No → dismiss. Device-local memory (`tealog_rebuyAsked`),
+  no banners/modals.
+- **Stats integrity:** finished teas still count everywhere (Wrapped, passport, insights, totals) —
+  only the pickers and the Teas-tab default view treat them apart. No explicit archive state yet.
+- Validated against real `fixtures/` (the untracked "Test" tea stays in-stock, not finished) plus
+  synthetic boundary cases — 9 checks green; XSS/KB/tea-order tests still green; `node --check` clean.
+
 ## v3.39 — tea picker grouped by type
 Deploy: `service-worker.js` (v50), `steep-core.js`, `steep-teas.js`, `steep-sessions.js`. No SQL.
 - **Session tea picker groups teas by type** — green · white · yellow · oolong · black · puerh · herbal

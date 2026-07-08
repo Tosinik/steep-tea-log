@@ -1,16 +1,40 @@
 function teaCardHTML(t){
   const bg = t.image ? `background-image:url(${escapeHtml(t.image)})` : '';
   const sessionsForTea = state.sessions.filter(s=>s.teaId===t.id).length;
-  return `<div class="tea-card" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
+  const fin = isTeaFinished(t);
+  const stockLabel = fin ? '<span class="stock-low">finished</span>'
+    : (Number(t.amountGrams)<lowStockG() ? '<span class="stock-low">'+Number(t.amountGrams).toFixed(1)+'g left</span>'
+      : Number(t.amountGrams).toFixed(1)+'g on hand');
+  // One-time gentle "rebuy?" on a freshly-finished tea (device-local memory; yes → shopping list
+  // + would_rebuy). No banners/modals — a quiet inline row on the card. stopPropagation so tapping
+  // it doesn't open the tea detail.
+  const rebuy = (fin && !rebuyAsked(t.id)) ? `<div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft);" onclick="event.stopPropagation()">
+      <span>Rebuy?</span>
+      <button class="lib-chip" style="padding:1px 8px;font-size:11px;" onclick="event.stopPropagation();rebuyYes('${escapeJsArg(t.id)}')">Yes</button>
+      <button class="btn-ghost" style="font-size:11px;padding:1px 4px;" onclick="event.stopPropagation();rebuyNo('${escapeJsArg(t.id)}')">No</button>
+    </div>` : '';
+  return `<div class="tea-card${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
     <div class="tea-thumb" style="${bg}">${t.isFavorite?'<span class="fav">♥</span>':''}</div>
     <div class="tea-body">
       <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
       <div class="name">${escapeHtml(t.name)}</div>
       ${renderStarsStatic(Number(t.rating)||0,false)}
-      <div class="tea-meta">${Number(t.amountGrams)<lowStockG()?'<span class="stock-low">'+Number(t.amountGrams).toFixed(1)+'g left</span>':Number(t.amountGrams).toFixed(1)+'g on hand'} · ${sessionsForTea} session${sessionsForTea===1?'':'s'}</div>
+      <div class="tea-meta">${stockLabel} · ${sessionsForTea} session${sessionsForTea===1?'':'s'}</div>
+      ${rebuy}
     </div>
   </div>`;
 }
+/* rebuy affordance memory — device-local (localStorage), one-time per tea. "Yes" also records
+   would_rebuy (synced) and drops the tea on the shopping list; "No" just remembers we asked. */
+function rebuyAsked(id){ try{ return JSON.parse(localStorage.getItem('tealog_rebuyAsked')||'[]').includes(id); }catch(e){ return false; } }
+function markRebuyAsked(id){ try{ const a=JSON.parse(localStorage.getItem('tealog_rebuyAsked')||'[]'); if(!a.includes(id)){ a.push(id); localStorage.setItem('tealog_rebuyAsked', JSON.stringify(a)); } }catch(e){} }
+function rebuyYes(id){
+  const t = teaById(id);
+  if(t){ t.wouldRebuy = true; persistTea(t); }
+  markRebuyAsked(id);
+  if(typeof addWishFromTea==='function') addWishFromTea(id); else render(); // addWishFromTea re-renders
+}
+function rebuyNo(id){ markRebuyAsked(id); render(); }
 
 function distinctVendors(){
   return [...new Set(state.teas.map(t=>(t.source||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
@@ -64,8 +88,13 @@ function viewTeas(){
   const F = state.teaFilter;
   const vendors = distinctVendors();
   const list = filteredSortedTeas();
+  const active = list.filter(t=>!isTeaFinished(t));
+  const finished = list.filter(t=>isTeaFinished(t));   // finished teas group at the bottom
+  const finishedBlock = finished.length ? `
+      <div class="section-title" style="margin-top:22px;opacity:.75;"><h2 style="font-family:'Fraunces',serif;font-size:15px;color:var(--ink-soft);">Finished</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${finished.length}</span></div>
+      <div class="grid grid-3" style="opacity:.62;">${finished.map(teaCardHTML).join('')}</div>` : '';
   const cards = list.length
-    ? `<div class="grid grid-3">${list.map(teaCardHTML).join('')}</div>`
+    ? `<div class="grid grid-3">${active.map(teaCardHTML).join('')}</div>${finishedBlock}`
     : `<div class="card empty">${state.teas.length ? 'No teas match these filters.' : 'No teas yet — add your first one.'}</div>`;
   const typeOpts = `<option value="">All types</option>` + TYPES.map(ty=>`<option value="${ty.k}" ${F.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
   const vendorOpts = `<option value="">All vendors</option>` + vendors.map(v=>`<option value="${escapeHtml(v)}" ${F.vendor===v?'selected':''}>${escapeHtml(v)}</option>`).join('');

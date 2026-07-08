@@ -5,31 +5,27 @@ packaging, or a map/vision library; a plain new Supabase table is NOT heavy.
 Anything finished lives under **Shipped**. The **Agreed sequence** below is the
 authoritative order for what's next; everything under it is reference/backlog.
 
-## Agreed sequence (next deploys) — authoritative order
-Agreed with Niklas 2026-07-08. One deploy per numbered item unless noted; follow the
-deploy ritual in CLAUDE.md (bump `CACHE_NAME`, update CHANGELOG/STATE, validate against
-fixtures).
+## Agreed sequence (next deploys) — authoritative ORDER
+Agreed with Niklas 2026-07-08. **Order is authoritative; version numbers are NOT** — they're
+assigned at ship time (see CHANGELOG / Shipped), because items get pulled forward out of order.
+Each item is one deploy unless noted; follow the deploy ritual in CLAUDE.md (bump `CACHE_NAME`,
+update CHANGELOG/STATE, validate against fixtures). Shipped so far: v3.38 KB · v3.39 tea picker ·
+v3.40 tea lifecycle.
 
-1. **v3.38 — Tea knowledge base** ✓ **shipped.** `steep-knowledge.js` + `kbResolve`;
-   `inferLeafForm` consults it (fixes the Japanese-cultivar/silver-bud misses); gentle
-   tea-form type/origin prefill. · **v3.39 — Tea picker grouped by type** ✓ **shipped**
-   (unplanned quick fix; took the v3.39 slot so everything below shifts down one): session
-   picker + Teas-tab default sort group green→white→yellow→oolong→black→puerh→herbal, alpha within.
-
-2. **v3.40 — Insights tab + dashboard split** (review finding #10). **One deploy — the new
+1. **Next — Insights tab + dashboard split** (review finding #10). **One deploy — the new
    tab is the seam that carries the split.** Move the heavier analytics (Insights card,
    most-brewed, top-rated) off Home into their own tab; keep the standard, at-a-glance info
    on Home. `steep-dashboard.js` (~1040 lines) splits along that boundary. Reuse the
    editable-dashboard registry (`dashLayout`/`renderDashboard`). Confirm with Niklas exactly
    which cards move vs stay (cost overview, running-low, brewing-clock likely stay).
 
-3. **v3.41+ — Brew advice v2** (per `SPEC-brew-advice-v2.md`, DECIDED). The missing 3rd advice
+2. **Then — Brew advice v2** (per `SPEC-brew-advice-v2.md`, DECIDED). The missing 3rd advice
    axis: leaf-to-water ratio. Sequenced (D5):
-   - **v3.41 — Capacity-capture precursor** (tiny deploy, ships first). Make vessel `capacityMl`
+   - **Capacity-capture precursor** (tiny deploy, ships first). Make vessel `capacityMl`
      a visible, encouraged (not required) field; quiet "· ml?" affordance on capacity-less
      vessels; an inline "set capacity" link in the (hidden) ratio line at session setup. No
      banners, never blocks logging. Ratio fails silently without capacity, so this comes first.
-   - **v3.42 — Ratio phase 1.** `actualRatio = gramsUsed / (waterMl/100)` vs a baseline
+   - **Ratio phase 1.** `actualRatio = gramsUsed / (waterMl/100)` vs a baseline
      (guide-parsed grams+ml → `kbResolve().ratio` → per-`LEAF_PROFILES` default); scale the
      prefilled schedule by `clamp(1/ratioFactor^k, 0.6, 1.4)`, k=0.6 (tunable constants next to
      LEAF_PROFILES). **Default OFF, strict opt-in** (Settings → Brew guidance → "Ratio
@@ -38,11 +34,10 @@ fixtures).
      CLAUDE.md rule; this absorbs the old "partial vessel fill" item. Temp is NOT ratio-adjusted.
    - *Learned defaults* = phase 2, gated on phase 1 shipping and gathering data (separate spec).
 
-4. **The "forgotten" batch — small, independent deploys** (order flexible, pick by appetite):
-   - **Tea lifecycle / at-0g archive** — when a tea hits 0g, an **archive state**: it leaves the
-     active library but its **history stays fully readable/editable** (never strand data behind a
-     toggle), plus a gentle **"would you rebuy?"** moment that, if yes, drops it onto the shopping
-     list. Calm-first; no nag.
+3. **Then — the rest of the "forgotten" batch** (small independent deploys, order flexible):
+   - ~~**Tea lifecycle / at-0g**~~ ✓ **shipped v3.40** (finished-teas grouping + hidden-in-picker +
+     one-time rebuy? → shopping list). A full **archive/restore workflow** (hide from library entirely,
+     restore later) is deferred — the finished view + rebuy nudge cover the need for now.
    - **Error log + data health** (Settings → Data) — keep the **last N client errors** in
      localStorage, viewable under Settings; plus a read-only **data-integrity report**: orphaned
      steeps, sessions pointing at deleted teas, negative stock, duplicate-session pairs (the v3.35
@@ -80,6 +75,9 @@ restock forecast ("runs out in ~N days").
 - **v3.38** tea knowledge base (`steep-knowledge.js`; KB-backed `inferLeafForm`; tea-form prefill)
 - **v3.39** session tea picker grouped by type + Teas-tab default "By type" sort (`TYPE_ORDER`,
   `groupTeasByType`)
+- **v3.40** tea lifecycle — finished teas (`isTeaFinished`/`isAmountTracked`): group at bottom of Teas
+  tab, hidden-by-default in the session picker, one-time "rebuy?" → shopping list. (No explicit
+  archive state yet — deferred; see below.)
 
 ## Cut from the roadmap (decided 2026-07-08)
 Removed entirely — off-brand for calm-first (gamification-as-engagement is the opposite of

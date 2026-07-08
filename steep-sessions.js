@@ -298,7 +298,7 @@ function quickLogSession(){
 function startSessionFor(teaId){
   if(state.vessels.length===0){ alert('Add a vessel first (Vessels tab) before logging a session.'); state.view='vessels'; render(); return; }
   state.sessionDraft = {
-    teaId: teaId || state.teas[0].id,
+    teaId: teaId || (state.teas.find(t=>!isTeaFinished(t)) || state.teas[0]).id,  // default to an in-stock tea
     vesselId: state.vessels[0].id,
     sessionDate: toLocalDatetimeValue(new Date()),
     isColdBrew: false,
@@ -407,17 +407,25 @@ function sessionQuickHTML(d){
 
 function sessionSetupHTML(d){
   // Grouped by type (green, white, yellow, oolong, black, puerh, herbal), alpha within — each
-  // group an <optgroup> header. Same ordering the Teas tab defaults to.
-  const teaOpts = groupTeasByType(state.teas).map(g=>
-    `<optgroup label="${escapeHtml(g.label)}">${g.teas.map(t=>`<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`).join('')}</optgroup>`
-  ).join('');
+  // group an <optgroup> header. Finished teas are hidden by default behind a "show finished" link,
+  // but stay loggable (re-weighed tins, a true last session) — revealed as a trailing "Finished"
+  // group, and always shown if the current selection is itself finished.
+  const active = state.teas.filter(t=>!isTeaFinished(t));
+  const finished = state.teas.filter(t=>isTeaFinished(t));
+  const showFin = !!d.showFinishedTeas || finished.some(t=>t.id===d.teaId);
+  const optHTML = t => `<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`;
+  let teaOpts = groupTeasByType(active).map(g=>`<optgroup label="${escapeHtml(g.label)}">${g.teas.map(optHTML).join('')}</optgroup>`).join('');
+  if(showFin && finished.length) teaOpts += `<optgroup label="Finished">${sortTeasByTypeThenName(finished).map(optHTML).join('')}</optgroup>`;
+  const showFinLink = (finished.length && !showFin)
+    ? `<button type="button" onclick="d_showFinishedTeas()" style="margin-top:5px;background:none;border:0;padding:0;color:var(--ink-soft);font-size:11px;text-decoration:underline;cursor:pointer;">show finished (${finished.length})</button>`
+    : '';
   const vesselOpts = state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
   return `
     <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
     <div class="card">
       <h2 style="margin-top:0;">Set up your session</h2>
       <div class="form-grid">
-        <div class="field span2"><label>Tea</label><select onchange="d_setTea(this.value)">${teaOpts}</select></div>
+        <div class="field span2"><label>Tea</label><select onchange="d_setTea(this.value)">${teaOpts}</select>${showFinLink}</div>
         <div class="field"><label>Vessel</label><select onchange="d_set('vesselId', this.value)">${vesselOpts}</select></div>
         <div class="field"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
@@ -445,6 +453,7 @@ function d_setcur(key, val){
   state.sessionDraft[key] = val;
 }
 function d_setTea(val){ state.sessionDraft.teaId = val; render(); }   // re-render so the guide preview follows the tea
+function d_showFinishedTeas(){ state.sessionDraft.showFinishedTeas = true; render(); }   // reveal finished teas in the picker (they stay loggable)
 
 // v3.31 optional pre-brew mood/energy — captured at setup so it's tied to the session
 // (and the time of day), the reading the future sleep/caffeine correlation will lean on.
