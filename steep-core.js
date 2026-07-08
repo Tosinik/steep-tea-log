@@ -61,6 +61,8 @@ const TYPES = [
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
 ];
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
+// Top-level views whose selection is remembered across reloads (init restore + saveView).
+const PERSISTED_VIEWS = ['dashboard','teas','sessions','vessels','friends'];
 const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel', brewGuideAutofill:true, brewAdvice:true, showMood:true };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
@@ -99,7 +101,7 @@ async function init(){
     const t = tid && state.teas.find(x=>x.id===tid);
     if(t){ state.view='tea-detail'; state.activeTeaId=tid; state.teaDetailFrom='teas'; }
     else state.view='teas';
-  } else if(savedView && ['dashboard','teas','sessions','vessels','friends'].includes(savedView)) state.view = savedView;
+  } else if(savedView && PERSISTED_VIEWS.includes(savedView)) state.view = savedView;
   state.loaded = true;
   render();
   if(state.view==='friends') loadSocial();
@@ -656,7 +658,7 @@ function render(){
 }
 
 function goView(v){ state.view=v; state.activeTeaId=null; state.dashEdit=false; if(v!=='passport'){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; } saveView(v); render(); }
-function saveView(v){ try{ if(['dashboard','teas','sessions','vessels','friends'].includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); } }catch(e){} }
+function saveView(v){ try{ if(PERSISTED_VIEWS.includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); } }catch(e){} }
 
 function bindDynamic(){
   // image upload

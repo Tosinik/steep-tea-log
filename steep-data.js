@@ -59,18 +59,26 @@
     leafForm: r.leaf_form || null,
     dateAdded: r.created_at
   });
-  const teaToDb = t => ({
-    id: t.id, user_id: userId(), name: t.name || '', type: t.type,
-    amount_grams: t.amountGrams || 0, rating: t.rating || 0,
-    harvest_year: t.harvestYear || null, harvest_season: t.harvestSeason || null,
-    origin: t.origin || null, cultivar: t.cultivar || null, source: t.source || null,
-    cost_total: t.costTotal || 0, cost_original_grams: t.costOriginalGrams || 0,
-    brew_guide: t.brewGuide || null, description: t.description || null,
-    is_favorite: !!t.isFavorite, would_rebuy: !!t.wouldRebuy,
-    purchase_type: t.purchaseType || 'first', image_data: t.image || null,
-    purchase_date: t.purchaseDate || null,
-    leaf_form: t.leafForm || null
-  });
+  const teaToDb = t => {
+    const row = {
+      id: t.id, user_id: userId(), name: t.name || '', type: t.type,
+      amount_grams: t.amountGrams || 0, rating: t.rating || 0,
+      harvest_year: t.harvestYear || null, harvest_season: t.harvestSeason || null,
+      origin: t.origin || null, cultivar: t.cultivar || null, source: t.source || null,
+      cost_total: t.costTotal || 0, cost_original_grams: t.costOriginalGrams || 0,
+      brew_guide: t.brewGuide || null, description: t.description || null,
+      is_favorite: !!t.isFavorite, would_rebuy: !!t.wouldRebuy,
+      purchase_type: t.purchaseType || 'first', image_data: t.image || null,
+      purchase_date: t.purchaseDate || null,
+      leaf_form: t.leafForm || null
+    };
+    // Preserve the original creation date across import/restore. dateAdded mirrors the DB
+    // created_at for existing rows (see teaFromDb), so sending it is a no-op on an update and
+    // an insert-time preserve for imported teas. Omitted when absent, so a genuinely new row
+    // still gets the column default now() rather than a null timestamp.
+    if (t.dateAdded) row.created_at = t.dateAdded;
+    return row;
+  };
 
   const vesselFromDb = r => ({ id: r.id, name: r.name, type: r.type || '', material: r.material || '', capacityMl: r.capacity_ml || null, image: r.image_data || null });
   const vesselToDb = v => ({ id: v.id, user_id: userId(), name: v.name || '', type: v.type || null, material: v.material || null, capacity_ml: v.capacityMl || null, image_data: v.image || null });
@@ -541,7 +549,6 @@
   async function follow(id) { const { error } = await sb.from('follows').insert({ follower_id: userId(), followee_id: id }); if (error && error.code !== '23505') throw error; }
   async function unfollow(id) { const { error } = await sb.from('follows').delete().eq('follower_id', userId()).eq('followee_id', id); if (error) throw error; }
   async function getFollowing() { const { data, error } = await sb.from('follows').select('followee_id').eq('follower_id', userId()); if (error) throw error; return (data || []).map(r => r.followee_id); }
-  async function getFollowers() { const { data, error } = await sb.from('follows').select('follower_id').eq('followee_id', userId()); if (error) throw error; return (data || []).map(r => r.follower_id); }
 
   async function getFeed(limit = 50) {
     const following = await getFollowing();
@@ -708,7 +715,7 @@
     loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signInWithGoogle, signOut, newId, migrateFromLocalStorage,
     putTea, removeTea, putTeas, putVessel, removeVessel, putVessels, putSession, removeSession, addTag,
     putWishItem, removeWishItem,
-    getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFollowers, getFeed,
+    getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFeed,
     getUser: () => currentUser,
     flushQueue, pendingWrites: queueLength
   };

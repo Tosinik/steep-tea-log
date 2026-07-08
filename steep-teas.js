@@ -181,8 +181,12 @@ function setTeaFormRating(v){
   document.getElementById('teaRatingWrap').innerHTML = renderStarsInteractive(v,true,'setTeaFormRating');
 }
 function setPurchaseToday(btn){ const f=btn.closest('form'); if(f&&f.purchaseDate) f.purchaseDate.value = dayKey(new Date()); }
+let _teaFormSaving = false;
 async function submitTeaForm(e){
   e.preventDefault();
+  if(_teaFormSaving) return;   // guard re-entrant double-submit (async gap before state push)
+  _teaFormSaving = true;
+  try {
   const f = e.target;
   const imageUrl = await resolveDraftImage();
   const data = {
@@ -218,6 +222,7 @@ async function submitTeaForm(e){
   state.teaFormOpen = false; state.editingTea = null; state.teaPrefill = null; state._draftImage = null;
   syncAchievements(true);
   render();
+  } finally { _teaFormSaving = false; }
 }
 function deleteTea(id){
   if(!confirm('Delete this tea? Session history stays but will show as an unknown tea.')) return;

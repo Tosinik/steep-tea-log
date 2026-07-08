@@ -66,8 +66,10 @@ session** · **v3.35 fix: double stock decrement** (re-entrant `commitSession`/`
 fire subtracted `gramsUsed` twice; fixed with a shared `_sessionSaving` guard. Offline queue was NOT the
 cause — absolute-value upserts replay idempotently. Deeper fix later: derive stock instead of accumulating
 it) · **v3.36 XSS sweep** (shared `escapeHtml`/`escapeJsArg`; escaped every user-text render site, fixing
-stored cross-user feed XSS; replaced 4 local escapers). The v3.34 map legibility pass was built but NOT
-shipped — map is parked. Cache **v47**.
+stored cross-user feed XSS; replaced 4 local escapers) · **v3.37 hygiene** (re-entrancy guards on
+`deleteSession` + the 3 form submits; `teaToDb` preserves `created_at` insert-only so import keeps dates;
+deduped view allowlist → `PERSISTED_VIEWS` and time-of-day → `timeOfDayBuckets()`; cut unused
+`getFollowers`). The v3.34 map legibility pass was built but NOT shipped — map is parked. Cache **v48**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other

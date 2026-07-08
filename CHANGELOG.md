@@ -23,6 +23,25 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.37 — hygiene: re-entrancy guards, date preservation, dedupes
+Deploy: `service-worker.js` (v48), `steep-sessions.js`, `steep-teas.js`, `steep-social.js`,
+`steep-data.js`, `steep-core.js`, `steep-dashboard.js`. No SQL.
+- **Re-entrancy guards** on `deleteSession` (shared `_sessionSaving`) and the three async form
+  submits — `submitTeaForm`, `submitVesselForm`, `submitProfile` (per-form `_*Saving` flags, set on
+  entry, cleared in `finally`). Each does an `await` before mutating `state`, so a double-tapped
+  Save/Delete could otherwise double-apply (a duplicate tea/vessel, or a double stock add-back on
+  delete — the same class as the v3.35 commitSession fix, which now guards delete too, forward-safe
+  for when the legacy `confirm()` is replaced with inline UI).
+- **Preserve original creation date across import/restore.** `teaToDb` now sends `created_at` when
+  `t.dateAdded` is present (a no-op on update since dateAdded mirrors the DB value; an insert-time
+  preserve for imported teas) and omits it when absent so new rows still get the default `now()`.
+  Fixes restored teas all looking brand-new — wrong "newest" sort and Wrapped "teas you met".
+- **Dedupe:** the persisted-view allowlist is now one `PERSISTED_VIEWS` const (was duplicated in init
+  restore + `saveView`); the time-of-day bucketing is one `timeOfDayBuckets()` helper (was inlined
+  verbatim in Insights + Wrapped). Cut the unused exported `getFollowers`.
+- Validated: `node --check` on all six files; a guard/mapper logic test (guarded double-fire pushes
+  once vs twice; created_at sent/omitted correctly) and the v3.36 XSS render test both green.
+
 ## v3.36 — security: escape all user text in rendered HTML (XSS fix)
 Deploy: `service-worker.js` (v47), `steep-core.js`, `steep-social.js`, `steep-teas.js`,
 `steep-sessions.js`, `steep-dashboard.js`, `steep-shopping.js`, `steep-passport.js`,

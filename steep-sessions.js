@@ -125,27 +125,32 @@ function vesselFormModal(){
     </div>
   </div>`;
 }
+let _vesselFormSaving = false;
 async function submitVesselForm(e){
   e.preventDefault();
-  const f = e.target;
-  const imageUrl = await resolveDraftImage();
-  const data = {
-    id: state.editingVessel?.id || uid(),
-    name: f.name.value.trim(),
-    type: f.type.value,
-    material: f.material.value.trim(),
-    capacityMl: f.capacityMl.value?Number(f.capacityMl.value):null,
-    image: imageUrl
-  };
-  if(state.editingVessel){
-    const idx = state.vessels.findIndex(x=>x.id===data.id);
-    state.vessels[idx] = data;
-  } else {
-    state.vessels.push(data);
-  }
-  persistVessel(data);
-  syncAchievements(true);
-  closeVesselForm();
+  if(_vesselFormSaving) return;   // guard re-entrant double-submit (async gap before state push)
+  _vesselFormSaving = true;
+  try {
+    const f = e.target;
+    const imageUrl = await resolveDraftImage();
+    const data = {
+      id: state.editingVessel?.id || uid(),
+      name: f.name.value.trim(),
+      type: f.type.value,
+      material: f.material.value.trim(),
+      capacityMl: f.capacityMl.value?Number(f.capacityMl.value):null,
+      image: imageUrl
+    };
+    if(state.editingVessel){
+      const idx = state.vessels.findIndex(x=>x.id===data.id);
+      state.vessels[idx] = data;
+    } else {
+      state.vessels.push(data);
+    }
+    persistVessel(data);
+    syncAchievements(true);
+    closeVesselForm();
+  } finally { _vesselFormSaving = false; }
 }
 function deleteVessel(id){
   if(!confirm('Remove this vessel?')) return;
@@ -223,13 +228,17 @@ function saveSessionEdit(){
   } finally { _sessionSaving = false; }
 }
 function deleteSession(){
-  const e = state.editingSession;
-  if(!confirm('Delete this session? Its grams will be added back to the tea stock.')) return;
-  const tea = teaById(e.teaId);
-  if(tea && Number(e.gramsUsed)>0){ tea.amountGrams = (Number(tea.amountGrams)||0) + Number(e.gramsUsed); persistTea(tea); }
-  state.sessions = state.sessions.filter(x=>x.id!==e.id);
-  dropSession(e.id);
-  closeSessionEdit();
+  if(_sessionSaving) return;
+  _sessionSaving = true;
+  try {
+    const e = state.editingSession;
+    if(!confirm('Delete this session? Its grams will be added back to the tea stock.')) return;
+    const tea = teaById(e.teaId);
+    if(tea && Number(e.gramsUsed)>0){ tea.amountGrams = (Number(tea.amountGrams)||0) + Number(e.gramsUsed); persistTea(tea); }
+    state.sessions = state.sessions.filter(x=>x.id!==e.id);
+    dropSession(e.id);
+    closeSessionEdit();
+  } finally { _sessionSaving = false; }
 }
 function sessionEditModal(){
   const e = state.editingSession;

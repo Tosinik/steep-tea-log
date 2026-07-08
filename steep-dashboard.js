@@ -569,6 +569,15 @@ function recapHTML(){
 }
 function setRecapPeriod(p){ state.recapPeriod=p; render(); }
 
+// Sort sessions into four time-of-day buckets by local hour. Shared by Insights and Wrapped.
+function timeOfDayBuckets(sessions){
+  const parts = {morning:0, afternoon:0, evening:0, night:0};
+  sessions.forEach(s=>{ const h=new Date(s.date).getHours();
+    if(h>=5&&h<12) parts.morning++; else if(h>=12&&h<17) parts.afternoon++;
+    else if(h>=17&&h<22) parts.evening++; else parts.night++; });
+  return parts;
+}
+
 /* ================= INSIGHTS =================
    Gentle, self-knowledge readings drawn from session timestamps + grams.
    Calm-first: observational, never guilt. Rows only appear once there's
@@ -607,10 +616,7 @@ function computeInsights(){
   let favDow=-1, favN=0; dow.forEach((n,i)=>{ if(n>favN){ favN=n; favDow=i; } });
 
   // Time of day (four parts) — complements the brewing clock with a one-liner.
-  const parts = {morning:0, afternoon:0, evening:0, night:0};
-  sessions.forEach(s=>{ const h=new Date(s.date).getHours();
-    if(h>=5&&h<12) parts.morning++; else if(h>=12&&h<17) parts.afternoon++;
-    else if(h>=17&&h<22) parts.evening++; else parts.night++; });
+  const parts = timeOfDayBuckets(sessions);
   const topPart = Object.entries(parts).sort((a,b)=>b[1]-a[1])[0];
   const topPartShare = topPart[1]/sessions.length;
 
@@ -759,10 +765,7 @@ function computeWrapped(){
   inSeason.forEach(s=>{ const t=teaById(s.teaId); if(t) typeCounts[t.type]=(typeCounts[t.type]||0)+1; });
   let topType=null, topTypeN=0; Object.entries(typeCounts).forEach(([k,c])=>{ if(c>topTypeN){ topTypeN=c; topType=k; } });
 
-  const parts = {morning:0, afternoon:0, evening:0, night:0};
-  inSeason.forEach(s=>{ const h=new Date(s.date).getHours();
-    if(h>=5&&h<12) parts.morning++; else if(h>=12&&h<17) parts.afternoon++;
-    else if(h>=17&&h<22) parts.evening++; else parts.night++; });
+  const parts = timeOfDayBuckets(inSeason);
   const topPart = Object.entries(parts).sort((a,b)=>b[1]-a[1])[0][0];
 
   // "New this season" = teas whose first-ever session lands in the window.

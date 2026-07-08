@@ -28,6 +28,7 @@ function setProfileDraft(k, v){
   state.social.draft[k] = v;
 }
 function cancelProfileEdit(){ state.social.profileEditOpen=false; state._draftImage=null; state.social.draft=null; render(); }
+let _profileSaving = false;
 async function submitProfile(e){
   e.preventDefault();
   const f=e.target;
@@ -38,6 +39,8 @@ async function submitProfile(e){
     if(msg) msg.textContent='Username must be 3–20 characters: lowercase letters, numbers, or underscore.';
     return;
   }
+  if(_profileSaving) return;   // guard re-entrant double-submit (async gap before save)
+  _profileSaving = true;
   if(btn){ btn.disabled=true; btn.textContent='Saving…'; }
   if(msg){ msg.classList.remove('ok'); msg.textContent='Saving…'; }
   try{
@@ -57,7 +60,7 @@ async function submitProfile(e){
       else if(m.includes('does not exist')||m.includes('relation')||m.includes('schema cache')) msg.textContent='Profiles table not found — run v3_0-social.sql in the Supabase SQL Editor, then try again.';
       else msg.textContent='Could not save: '+((err&&err.message)||err);
     }
-  }
+  }finally{ _profileSaving = false; }
 }
 function profileSetupHTML(){
   const p=state.social.draft || state.social.profile || {};
