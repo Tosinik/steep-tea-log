@@ -26,7 +26,7 @@ const KB_STYLES = {
   tamaryokucha: { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.4, first:60 },
   matcha:       { type:'green',  leafForm:'powder',        tempC:75, ratio:2.0, first:0,  note:'whisked, not steeped' },
   // Chinese greens (pan-fired)
-  longjing:     { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, first:45, note:'aka Dragonwell' },
+  longjing:     { type:'green',  leafForm:'pan_green',     tempC:78, ratio:1.2, first:45, note:'aka Dragonwell' },
   biluochun:    { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, first:40 },
   maofeng:      { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, first:45 },
   gunpowder:    { type:'green',  leafForm:'rolled',        tempC:80, ratio:1.1, first:45 },
@@ -36,7 +36,7 @@ const KB_STYLES = {
   white_peony:  { type:'white',  leafForm:'open_leaf',     tempC:82, ratio:1.4, first:75, note:'aka Bai Mudan' },
   shou_mei:     { type:'white',  leafForm:'open_leaf',     tempC:85, ratio:1.3, first:75 },
   // Oolongs
-  ball_oolong:  { type:'oolong', leafForm:'rolled',        tempC:92, ratio:1.6, first:45, note:'Tie Guan Yin, Ali Shan, Dong Ding, Jin Xuan…' },
+  ball_oolong:  { type:'oolong', leafForm:'rolled',        tempC:95, ratio:3.5, first:45, note:'Tie Guan Yin, Ali Shan, Dong Ding, Jin Xuan…' },
   strip_oolong: { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, first:30, note:'Wuyi yancha' },
   dancong:      { type:'oolong', leafForm:'strip',         tempC:90, ratio:4.0, first:25, note:'Phoenix dancong — unforgiving; cooler (≤85) = sweeter, hotter = stronger. Second steep shorter than first.' },
   dark_oolong:  { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, first:35, note:'Oriental Beauty, GABA, heavier oxidation' },

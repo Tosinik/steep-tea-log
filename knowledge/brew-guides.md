@@ -42,6 +42,56 @@ feedback tuning + (later) learned defaults refine from here.
 
 ---
 
+## West Lake Dragon Well (Xi Hu Longjing) — pan-fired green  — entry 2026-07-08
+**Identity:** Zhejiang · West Lake · cultivar Qun Ti Zhong · pan-fired green.
+**Sources:** Teasenz (structured table).
+| Source | Style | Ratio (g/100ml) | Temp | Steeps |
+|---|---|---|---|---|
+| Teasenz | western | 0.6 (3g/500ml) | 80°C | 60 s; 2nd steep 90–120 s |
+| Teasenz | gongfu  | 5               | 80°C | 20 s, rising |
+**Distilled:** `longjing` stays `pan_green`; **KB tempC raised 75 → 78** (v3.42). Western default
+ratio ~1.2; gongfu-school ratio 5.0 / 20 s noted for later. First steep 20–45 s band.
+
+## Anxi Tie Guan Yin — rolled/ball oolong (green style)  — entry 2026-07-08
+**Identity:** Fujian · Anxi (1535 m) · cultivar Tie Guan Yin · rolled.
+**Sources:** Teasenz (structured table + prose).
+| Source | Style | Ratio (g/100ml) | Temp | Steeps |
+|---|---|---|---|---|
+| Teasenz | western | 0.6 | 100°C | 60 s |
+| Teasenz | gongfu  | 3   | 100°C | 20 s start; 8–9 steeps; **3rd–4th brew peaks** |
+**Curve insight:** longevity 8–9 steeps with a mid-session peak — the `rolled` family's late
+multipliers stay generous (slow growth 1.12, many steeps), unlike quick-fading greens.
+
+## 2014 Alishan Qingxin Dong Pian — aged rolled oolong (Niklas's vendor & family)  — entry 2026-07-08
+**Identity:** Taiwan · Alishan · cultivar Qingxin · Dong Pian (late winter pick) · aged 2014 ·
+Meister Atong Chen. **Sources:** Tee Kontor Kiel (printed gaiwan recommendation + flavor axes).
+| Source | Style | Ratio (g/100ml) | Temp | Steeps |
+|---|---|---|---|---|
+| Tee Kontor Kiel | gaiwan | 3.3–4.2 (4–5g/120ml) | ~95°C | **45 → 25 → 25**, then continue until faded |
+**Decisive rolled-oolong datapoint:** vendor-printed opening dip (45→25→25) at 95°C, ~3.75 g/100ml.
+Matches Niklas's logged Ali Shan session (60→35→60) in shape.
+**Flavor axes (TKK, 0–5):** Komplexität 5 · Süße 5 · Fruchtig 4 · Würzig 3 · Floral 2 · Röstnoten 1 ·
+Oxidation 1 — first live sample for the tasting-chips data model.
+**Format note:** TKK prints Zubereitung as Menge / Temperatur / 1.–3. Aufguss — a stable, parseable
+pattern; worth a dedicated case in `parseBrewGuide` for pasted TKK guides.
+
+## Consolidated retune targets — APPLIED v3.42
+- `ball_oolong` (KB): tempC 95, ratio 3.5, first 45. `LEAF_PROFILES.rolled`: base 45,
+  mult [1, 0.6, 0.6, 0.75, 0.95, 1.2], growth 1.12 (long-lived, mid-peak).
+- `strip_oolong`/`dancong`: dip confirmed; `LEAF_PROFILES.open` base 40, mult [1, 0.7, 0.9, 1.15, 1.45, 1.9].
+- `LEAF_PROFILES.bud` base 55, mult [1, 0.8, 1.0, 1.25, 1.6]; `LEAF_PROFILES.compressed` base 22,
+  mult [1, 0.9, 1.0, 1.2, 1.5, 1.9]. Greens unchanged.
+- `longjing`: tempC 78; gongfu note ratio 5.0 / 20 s.
+- Generation now uses a matched KB style's `first` as the base over the family base.
+- TGY keywords stay `ball_oolong`; 100°C school exists — KB uses 95 (middle).
+
+## Pending vendor fetches (stubs — screenshot the brew block when convenient)
+Oriental Beauty (TKK + Yoshien) · Gyokuro Okabe (Yoshien) · Kabusecha Miyazaki (Yoshien) ·
+Fujian Silver Needle (Teasenz) · Zhu Ye Qing (Teasenz) · sheng/shou baselines (Teasenz pu-erh pages).
+Until fetched, KB canon values stand for these styles.
+
+---
+
 ## Template for new entries
 
 ## <Tea / style name> — entry <date>

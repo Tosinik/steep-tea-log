@@ -23,6 +23,23 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.42 — brew accuracy: leaf-form retune + KB-first generation
+Deploy: `service-worker.js` (v53), `steep-core.js`, `steep-knowledge.js`. Reference: batch-2 entries
+merged into `knowledge/brew-guides.md`. No SQL.
+- **`LEAF_PROFILES` retune** (from `knowledge/brew-guides.md` batch 2). The oolong/bud/compressed
+  families now encode the **opening dip** (2nd steep shorter than 1st) that vendors + Niklas's logs
+  confirm, and bases move to the moderate/gaiwan school: `rolled` base 45 mult [1,0.6,0.6,0.75,0.95,1.2]
+  growth 1.12; `open` base 40 mult [1,0.7,0.9,1.15,1.45,1.9]; `bud` base 55 mult [1,0.8,1.0,1.25,1.6];
+  `compressed` base 22 mult [1,0.9,1.0,1.2,1.5,1.9]. **Greens unchanged.**
+- **KB `first` as generation base.** When `kbResolve` matches a style, its canonical first-steep length
+  is used as the `generateFormTimes` base over the family base (via a new `baseOverride`), so dancong
+  opens at 25s, Tie Guan Yin at 45s, etc. while sharing the family's dip/growth shape.
+- **KB updates:** `ball_oolong` tempC 95 / ratio 3.5 / first 45; `longjing` tempC 78.
+- Validated against real `fixtures/steeps`: generated oolong schedules land in the logged corridor —
+  **Ali Shan generates 45/27/27**, matching TKK's printed 45→25→25 and inside the 60→35→60 shape; every
+  oolong shows the dip. 18 brew-accuracy checks green; KB/lifecycle/tea-order/XSS suites still green;
+  `node --check` clean.
+
 ## v3.41 — dancong brew baseline (knowledge layer)
 Deploy: `service-worker.js` (v52), `steep-knowledge.js`. New reference file `knowledge/brew-guides.md`
 (not app-loaded/cached — a growing vendor-sourced knowledge layer). No SQL.

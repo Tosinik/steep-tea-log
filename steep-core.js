@@ -280,12 +280,15 @@ function parseBrewGuide(text){
    bound the extrapolated increment. Explicit guide times always win — these only
    fill a missing schedule and extend past the last listed steep. */
 const LEAF_PROFILES = {
-  rolled:     { label:'Rolled / balled',   base:15, mult:[1,1,1.2,1.5,1.9],    growth:1.15, minInc:3, maxInc:30, defInc:5 },
-  open:       { label:'Strip / open leaf', base:12, mult:[1,1.35,1.75,2.2],    growth:1.15, minInc:4, maxInc:18, defInc:6 },
-  bud:        { label:'Bud / needle',      base:35, mult:[1,1.15,1.35,1.6,1.9],growth:1.15, minInc:5, maxInc:45, defInc:8 },
+  // v3.42 retune (knowledge/brew-guides.md batch 2): oolong/bud/compressed families now encode the
+  // opening dip (2nd steep shorter than 1st) that vendors + Niklas's logs confirm across oolongs, and
+  // bases are moved to the moderate/gaiwan school so a matched style's KB `first` lands in range.
+  rolled:     { label:'Rolled / balled',   base:45, mult:[1,0.6,0.6,0.75,0.95,1.2], growth:1.12, minInc:3, maxInc:30, defInc:5 },
+  open:       { label:'Strip / open leaf', base:40, mult:[1,0.7,0.9,1.15,1.45,1.9], growth:1.15, minInc:4, maxInc:18, defInc:6 },
+  bud:        { label:'Bud / needle',      base:55, mult:[1,0.8,1.0,1.25,1.6],      growth:1.15, minInc:5, maxInc:45, defInc:8 },
   green_cn:   { label:'Green — pan-fired',  base:12, mult:[1,0.65,1.1,1.6,2.2], growth:1.30, minInc:3, maxInc:45, defInc:6 },
   green_jp:   { label:'Green — steamed',    base:10, mult:[1,0.6,1.05,1.7],     growth:1.35, minInc:3, maxInc:45, defInc:6 },
-  compressed: { label:'Compressed / cake',  base:15, mult:[1,1,1.15,1.4,1.8],   growth:1.18, minInc:3, maxInc:40, defInc:5 }
+  compressed: { label:'Compressed / cake',  base:22, mult:[1,0.9,1.0,1.2,1.5,1.9],   growth:1.18, minInc:3, maxInc:40, defInc:5 }
 };
 const LEAF_FORM_KEYS = Object.keys(LEAF_PROFILES);
 // Bridge steep-knowledge.js's leafForm vocabulary → the six LEAF_PROFILES families here.
@@ -335,14 +338,17 @@ function leafFormLabel(tea){
   const explicit = tea && tea.leafForm && LEAF_PROFILES[tea.leafForm];
   return LEAF_PROFILES[key].label + (explicit ? '' : ' · auto');
 }
-// Generate the opening steep times for a form (seconds), when no guide lists them.
-function generateFormTimes(form, n){
+// Generate the opening steep times for a form (seconds), when no guide lists them. baseOverride
+// (v3.42) lets a matched KB style supply its canonical first-steep length in place of the family
+// base, so e.g. dancong opens at 25s and Tie Guan Yin at 45s while sharing the family's dip/growth.
+function generateFormTimes(form, n, baseOverride){
   const p = LEAF_PROFILES[form] || LEAF_PROFILES.open; n = n || 6;
+  const base = (Number(baseOverride) > 0) ? Number(baseOverride) : p.base;
   const out=[];
   for(let i=0;i<n;i++){
     const m = i<p.mult.length ? p.mult[i]
       : p.mult[p.mult.length-1]*Math.pow(p.growth, i-(p.mult.length-1));
-    out.push(niceSec(p.base*m));
+    out.push(niceSec(base*m));
   }
   return out;
 }
@@ -375,10 +381,13 @@ function effectiveGuideSchedule(tea, allowGenerate){
   const parsed = parseBrewGuide(tea.brewGuide);
   if(parsed && parsed.times && parsed.times.length) return { ...parsed, form, generated:false };
   if(allowGenerate){
+    // A matched KB style contributes its canonical first-steep length as the generation base.
+    const kb = (typeof kbResolve==='function') ? kbResolve([tea.name,tea.cultivar,tea.origin].filter(Boolean).join(' ')) : null;
+    const kbFirst = (kb && Number(kb.first) > 0) ? Number(kb.first) : null;
     return {
       tempC: parsed ? parsed.tempC : null,
       rinseSeconds: parsed ? parsed.rinseSeconds : null,
-      times: generateFormTimes(form, 6),
+      times: generateFormTimes(form, 6, kbFirst),
       form, generated:true
     };
   }

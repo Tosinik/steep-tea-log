@@ -33,11 +33,10 @@ v3.40 tea lifecycle.
      `sql/v3_8-water-ml.sql` (`sessions.water_ml`), mapper pairs + both write paths per the
      CLAUDE.md rule; this absorbs the old "partial vessel fill" item. Temp is NOT ratio-adjusted.
    - *Learned defaults* = phase 2, gated on phase 1 shipping and gathering data (separate spec).
-   - **Oolong opening-dip curve retune** (deferred, small): the dancong sources (v3.41) confirm the
-     **second steep is shorter than the first** — the opening dip — even in the flash-steep gongfu
-     school, and it matches Niklas's logged oolong sessions. The green `LEAF_PROFILES` families already
-     encode this dip (`green_cn`/`green_jp` `mult:[1,0.6…]`); the oolong families (`rolled`, `open`) do
-     not. Extend the dip to them. Cross-check against `knowledge/brew-guides.md` before tuning.
+   - ~~**Oolong opening-dip curve retune**~~ ✓ **shipped v3.42** — `rolled`/`open`/`bud`/`compressed`
+     now encode the opening dip; matched KB style's `first` supplies the generation base. Validated
+     against `fixtures/steeps` (Ali Shan generates 45/27/27, in the logged corridor). Follow-on:
+     learned defaults (brew-advice v2 phase 2) refine these from real "good" sessions.
 
 3. **Then — the rest of the "forgotten" batch** (small independent deploys, order flexible):
    - ~~**Tea lifecycle / at-0g**~~ ✓ **shipped v3.40** (finished-teas grouping + hidden-in-picker +
@@ -85,6 +84,8 @@ restock forecast ("runs out in ~N days").
   archive state yet — deferred; see below.)
 - **v3.41** dancong brew baseline — split Phoenix dancong into its own `KB_STYLES` style (90°C,
   ratio 4); new `knowledge/brew-guides.md` reference layer feeding the KB.
+- **v3.42** brew accuracy — `LEAF_PROFILES` retune (opening dip on oolong/bud/compressed, moderate
+  bases); matched KB style's `first` used as the generation base; KB ball_oolong 95/3.5/45, longjing 78.
 
 ## Cut from the roadmap (decided 2026-07-08)
 Removed entirely — off-brand for calm-first (gamification-as-engagement is the opposite of
