@@ -37,7 +37,8 @@ const KB_STYLES = {
   shou_mei:     { type:'white',  leafForm:'open_leaf',     tempC:85, ratio:1.3, first:75 },
   // Oolongs
   ball_oolong:  { type:'oolong', leafForm:'rolled',        tempC:92, ratio:1.6, first:45, note:'Tie Guan Yin, Ali Shan, Dong Ding, Jin Xuan…' },
-  strip_oolong: { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, first:30, note:'Wuyi yancha, Dan Cong' },
+  strip_oolong: { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, first:30, note:'Wuyi yancha' },
+  dancong:      { type:'oolong', leafForm:'strip',         tempC:90, ratio:4.0, first:25, note:'Phoenix dancong — unforgiving; cooler (≤85) = sweeter, hotter = stronger. Second steep shorter than first.' },
   dark_oolong:  { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, first:35, note:'Oriental Beauty, GABA, heavier oxidation' },
   // Blacks
   black_china:  { type:'black',  leafForm:'strip',         tempC:90, ratio:1.2, first:30, note:'Dian Hong, Keemun, Lapsang, Koucha' },
@@ -84,8 +85,9 @@ const KB_KEYWORDS = {
   // Oolong — strip style
   'da hong pao':'strip_oolong','rou gui':'strip_oolong','shui xian':'strip_oolong',
   'shuixian':'strip_oolong','wuyi':'strip_oolong','yancha':'strip_oolong',
-  'dan cong':'strip_oolong','dancong':'strip_oolong','phoenix':'strip_oolong',
-  'feng huang':'strip_oolong','mi lan xiang':'strip_oolong','ya shi xiang':'strip_oolong',
+  // Phoenix/Feng Huang dancong — its own style (distinct baseline; see knowledge/brew-guides.md).
+  'dan cong':'dancong','dancong':'dancong','phoenix':'dancong','feng huang':'dancong',
+  'mi lan xiang':'dancong','ya shi xiang':'dancong','yashi xiang':'dancong','huang zhi xiang':'dancong',
   'baozhong':'strip_oolong','pouchong':'strip_oolong',
   'oriental beauty':'dark_oolong','bai hao':'dark_oolong','dong fang mei ren':'dark_oolong',
   'gaba':'dark_oolong','ruby 18':'black_china','red jade':'black_china','hong yu':'black_china',

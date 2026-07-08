@@ -165,7 +165,10 @@ tunable knob for the curves. `inferLeafForm` consults `kbResolve` (steep-knowled
 on name+cultivar+origin *before* its name heuristics, mapping the KB's leafForm onto a
 `LEAF_PROFILES` family via `KB_LEAFFORM_TO_PROFILE` (v3.38 — fixed the old Japanese-
 cultivar/silver-bud misses). To broaden coverage, add aliases to the KB tables, not to
-`inferLeafForm`.
+`inferLeafForm`. The **`knowledge/` folder** (`knowledge/brew-guides.md`) is a growing,
+vendor-sourced reference layer that grounds the KB baselines — it is NOT loaded by the app
+(reference only), but consult and extend it when tuning brew defaults (`KB_STYLES`) or the
+`LEAF_PROFILES` curves.
 
 **Tea passport** (`steep-passport.js`): **PARKED.** The shipped dot-map (v3.33/34) was
 rejected as unrecognisable ("just dots"). Do not extend the dot rendering — a redesign

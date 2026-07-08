@@ -33,6 +33,11 @@ v3.40 tea lifecycle.
      `sql/v3_8-water-ml.sql` (`sessions.water_ml`), mapper pairs + both write paths per the
      CLAUDE.md rule; this absorbs the old "partial vessel fill" item. Temp is NOT ratio-adjusted.
    - *Learned defaults* = phase 2, gated on phase 1 shipping and gathering data (separate spec).
+   - **Oolong opening-dip curve retune** (deferred, small): the dancong sources (v3.41) confirm the
+     **second steep is shorter than the first** — the opening dip — even in the flash-steep gongfu
+     school, and it matches Niklas's logged oolong sessions. The green `LEAF_PROFILES` families already
+     encode this dip (`green_cn`/`green_jp` `mult:[1,0.6…]`); the oolong families (`rolled`, `open`) do
+     not. Extend the dip to them. Cross-check against `knowledge/brew-guides.md` before tuning.
 
 3. **Then — the rest of the "forgotten" batch** (small independent deploys, order flexible):
    - ~~**Tea lifecycle / at-0g**~~ ✓ **shipped v3.40** (finished-teas grouping + hidden-in-picker +
@@ -78,6 +83,8 @@ restock forecast ("runs out in ~N days").
 - **v3.40** tea lifecycle — finished teas (`isTeaFinished`/`isAmountTracked`): group at bottom of Teas
   tab, hidden-by-default in the session picker, one-time "rebuy?" → shopping list. (No explicit
   archive state yet — deferred; see below.)
+- **v3.41** dancong brew baseline — split Phoenix dancong into its own `KB_STYLES` style (90°C,
+  ratio 4); new `knowledge/brew-guides.md` reference layer feeding the KB.
 
 ## Cut from the roadmap (decided 2026-07-08)
 Removed entirely — off-brand for calm-first (gamification-as-engagement is the opposite of

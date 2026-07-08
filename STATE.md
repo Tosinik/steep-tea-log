@@ -77,8 +77,11 @@ KB type/origin prefill in the tea form) · **v3.39 tea picker grouped by type** 
 `<optgroup>`s + Teas-tab default "By type" sort; `TYPE_ORDER`/`groupTeasByType` in core) · **v3.40
 tea lifecycle** (`isTeaFinished`/`isAmountTracked`; finished teas group at bottom of Teas tab, hidden
 behind "show finished" in the picker but still loggable, one-time "rebuy?" → shopping list; finished
-teas still count in all stats — tracked-and-≤0 is finished, untracked-0 is in-stock). The v3.34 map
-legibility pass was built but NOT shipped — map is parked. Cache **v51**.
+teas still count in all stats — tracked-and-≤0 is finished, untracked-0 is in-stock) · **v3.41 dancong
+brew baseline** (own `KB_STYLES.dancong` @ 90°C; dancong keywords remapped off `strip_oolong`; new
+`knowledge/brew-guides.md` reference layer — not app-loaded, consult when tuning brew baselines;
+deferred: extend the opening-dip to oolong `LEAF_PROFILES` curves). The v3.34 map legibility pass was
+built but NOT shipped — map is parked. Cache **v52**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other

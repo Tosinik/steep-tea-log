@@ -23,6 +23,26 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.41 — dancong brew baseline (knowledge layer)
+Deploy: `service-worker.js` (v52), `steep-knowledge.js`. New reference file `knowledge/brew-guides.md`
+(not app-loaded/cached — a growing vendor-sourced knowledge layer). No SQL.
+- **Phoenix/Feng Huang dancong split into its own KB style.** New `KB_STYLES.dancong`
+  (`oolong`/`strip`, **90°C**, ratio 4.0, first 25s) distilled from three vendor sources — cooler =
+  sweeter, hotter = stronger; unforgiving; second steep shorter than first. Source table + rationale in
+  `knowledge/brew-guides.md`.
+- **Remapped the dancong-family keywords** (`dan cong`, `dancong`, `ya shi xiang`, `yashi xiang`,
+  `mi lan xiang`, `phoenix`, `feng huang`, `huang zhi xiang`) from `strip_oolong` → `dancong`. Wuyi
+  yancha (`da hong pao`, `rou gui`, `shui xian`, `wuyi`, `yancha`, baozhong/pouchong) stays
+  `strip_oolong`. Leaf form is unchanged (both map to the `open` curve family), so `inferLeafForm`
+  output for existing teas is identical.
+- **`knowledge/` folder** = growing reference layer feeding KB baselines; not loaded by the app.
+  Consult it when tuning brew defaults (noted in CLAUDE.md).
+- Curve-retune note (deferred, in ROADMAP): all three sources — even the flash-steep gongfu school —
+  show the **second steep shorter than the first**, so the opening-dip multipliers should extend to the
+  oolong `LEAF_PROFILES` curves (`rolled`/`open`), not just greens.
+- Validated: `kbResolve("Yashi Xiang Dancong Guandong")` → `dancong` at 90°C; aliases resolve; Wuyi
+  stays strip; 32 KB checks green; `node --check` clean.
+
 ## v3.40 — tea lifecycle (finished teas)
 Deploy: `service-worker.js` (v51), `steep-core.js`, `steep-teas.js`, `steep-sessions.js`. No SQL.
 - **Finished vs unknown boundary.** A tea is *finished* only when its grams are **tracked** and ≤0;
