@@ -43,7 +43,10 @@ Issues are triaged with three labels: **`bug`** (something broken), **`idea`** (
 enhancement), **`feedback`** (beta-tester notes). This queue replaces the old
 "beta-feedback bugs (batch)" lists that used to live in STATE.md — put new bugs/ideas
 in issues, not in the handoff docs. Writing to issues (create/label/close) needs auth,
-so `gh` or a token; unauthenticated is read-only.
+so `gh` or a token; unauthenticated is read-only. To make issue-writing reliably
+available, install the GitHub CLI once and authenticate: `winget install GitHub.cli`
+(Windows), then `gh auth login`. Until then, reads work unauthenticated and writes fall
+back to a token / the OS git credential.
 
 ## Running & validating (no build, no test suite)
 
