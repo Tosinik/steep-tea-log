@@ -87,8 +87,18 @@ generation base; KB ball_oolong 95/3.5/45, longjing 78; validated vs fixtures/st
 baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insights.js` owns the analytics
 cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
 recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
-capture precursor, then ratio phase 1 (see `SPEC-brew-advice-v2.md`). The v3.34 map legibility pass was
-built but NOT shipped — map is parked. Cache **v64** (v3.54: **greeting card** replaces the removed
+capture precursor (v3.56), then ratio phase 1 (v3.57) (see `SPEC-brew-advice-v2.md` + `TASK-brew-advice-v2.md`
+in Downloads — the authoritative work order). Deploy AFTER v3.55: pause after each. The v3.34 map legibility
+pass was built but NOT shipped — map is parked. Cache **v65** (v3.55: **greeting card v2 — window-aware**.
+`greetingCardHTML` (steep-dashboard.js) now checks whether NOW is inside the user's real drinking window: a
+time-of-day bucket is *active* if it holds ≥2 sessions or ≥15% of total, needs ≥5 sessions of signal (else
+v3.54 behaviour). Inactive-bucket → scan `BUCKET_CYCLE` forward to the next active window and suggest FOR it
+with forward-looking copy (night → "waiting for the morning"; wrap → "tomorrow {bucket}"; later-today →
+"{this afternoon/…}"); greeting h2 still truthful to now. Scoring targets the destination bucket;
+`brewedToday` excluded only when target window is still today. Validated `fixtures/greeting-test.js` (now
+reads from `fixtures/`) against fresh CSVs — Niklas's data: morning 7 / afternoon 5 active, evening/night
+inactive → 22:00 forward-to-morning, 19:00 "tomorrow morning", 09:00 now-copy, <5 = v3.54; 21 assertions.
+v3.54: **greeting card** replaces the removed
 persona slot — `greetingCardHTML` (steep-dashboard.js), first in `DASH_DEFAULT_ORDER`, a time-of-day
 greeting + one deterministic-per-day tea suggestion scored by same-bucket history (date-seeded tie-break);
 `isTeaFinished`/brewed-today excluded; calm fallbacks; no seasonal word (hemisphere-ambiguous). Validated

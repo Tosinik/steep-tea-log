@@ -18,8 +18,15 @@ v3.40 tea lifecycle.
    Sessions (they were never on Home). Surface-aware `dashLayout` (`DASH_SURFACE`), per-tab
    reorder/hide, lossless migration. Recap gained an "All time" option (was a Tier backlog item).
 
-2. **Next — Brew advice v2** (per `SPEC-brew-advice-v2.md`, DECIDED). The missing 3rd advice
-   axis: leaf-to-water ratio. Sequenced (D5):
+1b. ~~**Greeting card v2 — window-aware**~~ ✓ **shipped v3.55** (Niklas's idea, per
+   `TASK-brew-advice-v2.md` §1). The greeting no longer suggests a brew at a time the user never
+   brews: buckets are "active" (≥2 sessions or ≥15% of total, ≥5-session floor), and an inactive
+   current bucket redirects the suggestion forward to the next active window with forward-looking
+   copy. `greetingCardHTML` in steep-dashboard.js; validated in `fixtures/greeting-test.js`.
+
+2. **Next — Brew advice v2** (per `SPEC-brew-advice-v2.md` + `TASK-brew-advice-v2.md` in Downloads,
+   DECIDED). The missing 3rd advice axis: leaf-to-water ratio. Sequenced (D5) — **v3.56** capacity
+   precursor, then **v3.57** ratio phase 1 (pause after each deploy):
    - **Capacity-capture precursor** (tiny deploy, ships first). Make vessel `capacityMl`
      a visible, encouraged (not required) field; quiet "· ml?" affordance on capacity-less
      vessels; an inline "set capacity" link in the (hidden) ratio line at session setup. No

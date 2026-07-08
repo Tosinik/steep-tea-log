@@ -23,6 +23,30 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.55 — greeting card v2: respect the user's real drinking window
+Deploy: `service-worker.js` (v65), `steep-dashboard.js`. No SQL.
+- **The greeting no longer nudges a brew at a time the user never brews.** New active-window
+  detection in `greetingCardHTML` (steep-dashboard.js): from all sessions, a time-of-day bucket
+  (same 5–12 / 12–17 / 17–22 / else cutoffs as `timeOfDayBuckets`) is *active* if it holds ≥2
+  sessions **or** ≥15% of the total. Requires ≥5 sessions of signal; below that, unchanged v3.54
+  behaviour (too little to claim "you never brew now").
+- **In an active bucket** → exactly the v3.54 behaviour (suggest for now, "your {bucket} pick").
+- **In an inactive bucket** → scan the daily cycle forward (`BUCKET_CYCLE`) to the next active
+  bucket and suggest FOR that window with forward-looking copy; the greeting line (h2) still tells
+  the truth about now. Night (spans midnight) → "The {name} will be waiting for the morning." (no
+  "tomorrow" claim); a wrap past night into next morning → "Maybe save the {name} for tomorrow
+  {bucket}."; a later-today active window → "Maybe save the {name} for {this afternoon/…}."
+- **Scoring targets the destination bucket** (bucketCount vs the target, not now); `brewedToday`
+  exclusion applies only when the target window is still today (tomorrow's suggestion may repeat
+  today's tea). Date-seeded deterministic pick unchanged.
+- Copy rules unchanged: no imperative, no "!", never "you haven't logged"; tea name → `openTeaDetail`.
+- Validated in the Node vm sandbox against the fresh CSVs (`fixtures/greeting-test.js`, local, now
+  reading from `fixtures/`): with Niklas's real data (morning 7 / afternoon 5 active; evening 0 /
+  night 0 inactive) 22:00 → forward-looking morning copy, 19:00 → "tomorrow morning", 09:00 →
+  unchanged now-copy, <5 sessions → v3.54 behaviour; redirect pick deterministic; brewed-today
+  excluded only in an active (today) window. 21 assertions green.
+
+---
 ## v3.54 — greeting card in the old persona slot
 Deploy: `service-worker.js` (v64), `steep-dashboard.js`. No SQL.
 - **A calm, ritual-first greeting replaces the removed persona banner.** New `greeting` card

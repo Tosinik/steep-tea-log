@@ -592,14 +592,18 @@ function renderDashboard(cards, surface){
 // renderDashboard(cards, surface) filters this by effective surface. Home builders live here;
 // Insights builders (dashCardsInsights) live in steep-insights.js — both share one computeStats.
 function dashCards(){ const s=computeStats(); return {...dashCardsHome(s), ...dashCardsInsights(s)}; }
-/* ---------- greeting card (v3.54) — the calm replacement for the removed persona banner.
-   A time-of-day greeting + ONE gentle tea suggestion, deterministic per calendar day so it
-   doesn't reshuffle on every render. Ritual-first: no identity label, no streaks/gaps, never
-   "you haven't logged". (Seasonal word from the task is left out — "warm/cold" is hemisphere-
-   dependent and we don't know the user's, so a plain time-of-day line stays safe.) */
+/* ---------- greeting card (v3.54, window-aware v3.55) — the calm replacement for the removed
+   persona banner. A time-of-day greeting + ONE gentle tea suggestion, deterministic per calendar
+   day so it doesn't reshuffle on every render. Ritual-first: no identity label, no streaks/gaps,
+   never "you haven't logged". (Seasonal word from the task is left out — "warm/cold" is hemisphere-
+   dependent and we don't know the user's, so a plain time-of-day line stays safe.)
+   v3.55: respect the user's real drinking window. If NOW is outside the buckets they actually brew
+   in (given enough signal), don't nudge a brew now — look forward to the next active window and
+   suggest FOR that one. The greeting line still tells the truth about now. */
 const GREETING_LINE = { morning:'Good morning', afternoon:'Good afternoon', evening:'Good evening', night:'A quiet night' };
 const BUCKET_NOUN   = { morning:'morning', afternoon:'afternoon', evening:'evening', night:'late-night' };
 const BUCKET_WHEN   = { morning:'this morning', afternoon:'this afternoon', evening:'this evening', night:'tonight' };
+const BUCKET_CYCLE  = ['morning','afternoon','evening','night'];
 // Same hour cutoffs as timeOfDayBuckets (steep-insights.js): 5–12 / 12–17 / 17–22 / else.
 function d_hourBucket(h){ if(h>=5&&h<12) return 'morning'; if(h>=12&&h<17) return 'afternoon'; if(h>=17&&h<22) return 'evening'; return 'night'; }
 // Stable FNV-1a hash — equal-score candidates tie-break the same way all day (no Math.random,
@@ -617,21 +621,48 @@ function greetingCardHTML(){
   if(!sessions.length) return card('The kettle&rsquo;s patient whenever you are.');
   const todayKey = dayKey(now);
   const brewedToday = new Set(sessions.filter(se=>dayKey(se.date)===todayKey).map(se=>se.teaId));
-  // candidates: not finished (untracked or amountGrams>0) and not already brewed today.
-  const candidates = (state.teas||[]).filter(t=>!isTeaFinished(t) && !brewedToday.has(t.id));
+
+  // v3.55 active-window detection: a bucket is "active" if it holds ≥2 sessions OR ≥15% of the
+  // total. Needs ≥5 sessions of signal; below that keep v3.54 behaviour (too little to say "you
+  // never brew now"). If the current bucket is inactive, redirect the suggestion to the next
+  // active bucket in the daily cycle and speak forward instead of nudging a brew now.
+  const counts = { morning:0, afternoon:0, evening:0, night:0 };
+  sessions.forEach(se=>{ counts[d_hourBucket(new Date(se.date).getHours())]++; });
+  const isActive = b => counts[b]>=2 || counts[b] >= sessions.length*0.15;
+  let target = bucket, redirected = false;
+  if(sessions.length>=5 && !isActive(bucket)){
+    for(let i=1;i<=3;i++){ const cand = BUCKET_CYCLE[(BUCKET_CYCLE.indexOf(bucket)+i)%4];
+      if(isActive(cand)){ target = cand; redirected = true; break; } }
+  }
+  // Forward within the same day order = still today; a wrap past night into morning = tomorrow.
+  const targetToday = !redirected || BUCKET_CYCLE.indexOf(target) > BUCKET_CYCLE.indexOf(bucket);
+
+  // candidates: not finished (untracked or amountGrams>0); exclude already-brewed-today only when
+  // the target window is still today (tomorrow's suggestion can repeat today's tea).
+  const candidates = (state.teas||[]).filter(t=>!isTeaFinished(t) && !(targetToday && brewedToday.has(t.id)));
   if(!candidates.length) return card('');
   const scored = candidates.map(t=>{
-    const bucketCount = sessions.filter(se=>se.teaId===t.id && d_hourBucket(new Date(se.date).getHours())===bucket).length;
-    // bucket history dominates; rating/favorite are small nudges; date-seeded hash breaks ties.
+    const bucketCount = sessions.filter(se=>se.teaId===t.id && d_hourBucket(new Date(se.date).getHours())===target).length;
+    // target-bucket history dominates; rating/favorite are small nudges; date-seeded hash breaks ties.
     const score = bucketCount + (Number(t.rating)||0)*0.05 + (t.isFavorite?0.15:0);
     return { t, bucketCount, score, tie:d_hash(todayKey+'|'+t.id) };
   }).sort((a,b)=> b.score-a.score || b.tie-a.tie);
   const pick = scored[0];
   const name = `<span onclick="openTeaDetail('${escapeJsArg(pick.t.id)}')" style="color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;">${escapeHtml(pick.t.name)}</span>`;
-  // Only claim "your <bucket> pick" when there's real bucket history; otherwise a neutral nudge.
-  const sub = pick.bucketCount>0
-    ? `Maybe the ${name}? It&rsquo;s been your ${BUCKET_NOUN[bucket]} pick.`
-    : `Maybe the ${name} ${BUCKET_WHEN[bucket]}?`;
+  let sub;
+  if(redirected){
+    const tn = BUCKET_NOUN[target];
+    // Night spans midnight, so "the morning" is safe either way — don't claim "tomorrow" there.
+    sub = bucket==='night'
+      ? `The ${name} will be waiting for the ${tn}.`
+      : (targetToday ? `Maybe save the ${name} for ${BUCKET_WHEN[target]}.`
+                     : `Maybe save the ${name} for tomorrow ${tn}.`);
+  } else {
+    // Only claim "your <bucket> pick" when there's real bucket history; otherwise a neutral nudge.
+    sub = pick.bucketCount>0
+      ? `Maybe the ${name}? It&rsquo;s been your ${BUCKET_NOUN[bucket]} pick.`
+      : `Maybe the ${name} ${BUCKET_WHEN[bucket]}?`;
+  }
   return card(sub);
 }
 
