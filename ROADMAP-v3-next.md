@@ -52,6 +52,36 @@ is REUSABLE — only the rendering (dots → outlines) gets replaced. Old follow
 more zoomable countries, cultivar layer) fold into that redesign.
 
 
+## Stock model — PARKED (derive from a ledger, not a running scalar)
+**Status: parked spec, not scheduled.** Prompted by the v3.35 double-decrement fix.
+**Problem.** `tea.amountGrams` is a single running number, mutated read-modify-write on every
+session save/edit/delete (`commitSession`, `saveSessionEdit`, `deleteSession`). Any double-fire,
+offline-queue replay against a stale baseline, or edit computed off the wrong starting value
+corrupts it — and the error is silent and permanent (there's no source of truth to recompute from).
+v3.35 guarded the specific double-fire, but the whole *class* of bug stays as long as stock is an
+accumulator.
+**Direction.** Stop storing on-hand as a mutable scalar; make it a **fold over an append-only
+ledger** of stock events for each tea, so `on_hand = Σ(ledger)`. Event kinds:
+  - `purchase` / `refill` (+g) — seeded from `purchase_type` + `cost_original_grams`, or a top-up.
+  - `session` (−`gramsUsed`) — *derived directly from the sessions table*, not written separately,
+    so it can never double-count and edits/deletes recompute for free.
+  - `adjustment` (± to an explicit value) — see the caveat; this is load-bearing, not optional.
+Recomputing from the ledger is idempotent under replay, double-fire, and edit **by construction**,
+is auditable, and gives the inventory-over-time sparkline a real series instead of the current guess.
+**CAVEAT — stock cannot be *purely* derived (spec is incomplete without this).** The user manually
+corrects `amountGrams` after **re-weighing on a scale** — physical measurement that overrides any
+computed figure (leaf humidity, spillage, uncounted sampling, guessed session doses all drift the
+math). A pure `purchased − Σ gramsUsed` model would fight those corrections and lose. So the ledger
+**must** include explicit `adjustment` entries: a re-weigh records "measured = X g at time T" as a
+correction event, and the fold treats it as a new anchor (on-hand = measured value at T, then ±
+subsequent events). Today's "edit the grams field" becomes "append an adjustment", never a silent
+overwrite of the scalar.
+**Migration.** Seed one `adjustment` (or `purchase`) per tea from the current `amountGrams` as the
+opening anchor, so no history is fabricated and existing numbers carry over exactly.
+**Effort / infra.** M. New `stock_events` table (or a JSON ledger column) + RLS; a fold helper;
+rework the three mutation sites to append events; backfill migration. No heavy infra. Parked until
+there's appetite — the v3.35 guard holds the line in the meantime.
+
 ## Beta feedback backlog (batch)
 - Leaf-form inference misses (PARKED, together): Japanese cultivars/regions (saemidori, yutakamidori,
   kabusecha, kagoshima, shincha…) → steamed green; silver-bud whites → `bud`. Infer from the existing
