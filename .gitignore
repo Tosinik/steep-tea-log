@@ -1,1 +1,5 @@
-fixtures/
+fixtures/*
+# Keep the data-free, permanent validation tests tracked (they generate from committed
+# source, need no private CSV). The CSV exports + data-driven throwaway scripts stay ignored.
+!fixtures/brew-roundtrip-test.js
+.claude/
