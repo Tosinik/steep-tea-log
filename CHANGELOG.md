@@ -23,6 +23,13 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.43 — silver needle glass note
+Deploy: `service-worker.js` (v54), `steep-knowledge.js`. Reference: `knowledge/brew-guides.md`
+(Fujian Silver Needle entry added; removed from pending stubs). No SQL.
+- `KB_STYLES.silver_needle` keeps its gongfu baseline (80°C / 1.5 / 90 s) but the note now records the
+  classic **glass** method too: "also classic in glass: 80°C, ~4 min" (Teasenz / Fuding). Values
+  unchanged; note only. `node --check` + KB suite green.
+
 ## v3.42 — brew accuracy: leaf-form retune + KB-first generation
 Deploy: `service-worker.js` (v53), `steep-core.js`, `steep-knowledge.js`. Reference: batch-2 entries
 merged into `knowledge/brew-guides.md`. No SQL.

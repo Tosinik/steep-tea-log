@@ -32,7 +32,7 @@ const KB_STYLES = {
   gunpowder:    { type:'green',  leafForm:'rolled',        tempC:80, ratio:1.1, first:45 },
   jasmine:      { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, first:40 },
   // Whites
-  silver_needle:{ type:'white',  leafForm:'bud',           tempC:80, ratio:1.5, first:90, note:'aka Yin Zhen, Silbernadeln' },
+  silver_needle:{ type:'white',  leafForm:'bud',           tempC:80, ratio:1.5, first:90, note:'aka Yin Zhen, Silbernadeln; also classic in glass: 80°C, ~4 min' },
   white_peony:  { type:'white',  leafForm:'open_leaf',     tempC:82, ratio:1.4, first:75, note:'aka Bai Mudan' },
   shou_mei:     { type:'white',  leafForm:'open_leaf',     tempC:85, ratio:1.3, first:75 },
   // Oolongs

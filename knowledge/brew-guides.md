@@ -75,6 +75,15 @@ Oxidation 1 — first live sample for the tasting-chips data model.
 **Format note:** TKK prints Zubereitung as Menge / Temperatur / 1.–3. Aufguss — a stable, parseable
 pattern; worth a dedicated case in `parseBrewGuide` for pasted TKK guides.
 
+## Fujian Silver Needle (Bai Hao Yin Zhen) — bud white  — entry 2026-07-08
+**Identity:** Fujian · Fuding · buds only · white.
+**Sources:** Teasenz (structured; glass-brew recommendation).
+| Source | Style | Ratio (g/100ml) | Temp | Steeps |
+|---|---|---|---|---|
+| Teasenz | glass | 1.5 | 80°C | 4–5 min, single long steep (buds float, then sink) |
+**Distilled:** KB `silver_needle` keeps its gongfu baseline (80°C / 1.5 / 90 s); note added that the
+classic **glass** method is 80°C, ~4 min single steep. Same temp + ratio, one long infusion.
+
 ## Consolidated retune targets — APPLIED v3.42
 - `ball_oolong` (KB): tempC 95, ratio 3.5, first 45. `LEAF_PROFILES.rolled`: base 45,
   mult [1, 0.6, 0.6, 0.75, 0.95, 1.2], growth 1.12 (long-lived, mid-peak).
@@ -87,7 +96,7 @@ pattern; worth a dedicated case in `parseBrewGuide` for pasted TKK guides.
 
 ## Pending vendor fetches (stubs — screenshot the brew block when convenient)
 Oriental Beauty (TKK + Yoshien) · Gyokuro Okabe (Yoshien) · Kabusecha Miyazaki (Yoshien) ·
-Fujian Silver Needle (Teasenz) · Zhu Ye Qing (Teasenz) · sheng/shou baselines (Teasenz pu-erh pages).
+Zhu Ye Qing (Teasenz) · sheng/shou baselines (Teasenz pu-erh pages).
 Until fetched, KB canon values stand for these styles.
 
 ---

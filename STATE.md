@@ -83,8 +83,9 @@ brew baseline** (own `KB_STYLES.dancong` @ 90°C; dancong keywords remapped off 
 deferred: extend the opening-dip to oolong `LEAF_PROFILES` curves) · **v3.42 brew accuracy** (LEAF_PROFILES
 retune — opening dip now on oolong/bud/compressed, moderate bases; matched KB style's `first` is the
 generation base; KB ball_oolong 95/3.5/45, longjing 78; validated vs fixtures/steeps — Ali Shan → 45/27/27).
-**Next: Insights tab + dashboard split** (finding #10). The v3.34 map legibility pass was built but NOT
-shipped — map is parked. Cache **v53**.
+· **v3.43 silver needle glass note** (KB `silver_needle` note adds "also classic in glass: 80°C, ~4 min";
+baseline unchanged). **Next: Insights tab + dashboard split** (finding #10). The v3.34 map legibility pass
+was built but NOT shipped — map is parked. Cache **v54**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other
