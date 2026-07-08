@@ -481,13 +481,18 @@ function adviceSuggestionText(adv){
   }
   return parts.join(' and ');
 }
-// Normalise a schedule back into brew-guide text: "92\u00b0C, 5s rinse, 13s / 17s / 26s".
+// Normalise a schedule back into brew-guide text: "92\u00b0C, 5s rinse, 13s / 17s / 26s". Times are
+// emitted in RAW SECONDS on purpose \u2014 not fmtSecShort's "1m15s", whose compound m+s token
+// parseBrewGuide reads back as 60s (the trailing seconds are dropped), so anything >=60s with a
+// remainder would silently corrupt on the schedule -> text -> parse round-trip. Raw seconds
+// round-trip exactly for every value; fixtures/brew-roundtrip-test.js locks this in for every
+// LEAF_PROFILES / KB-generated schedule so no future emitter change can reintroduce the bug.
 function scheduleToGuideText(sched){
   if(!sched) return '';
   const parts=[];
   if(sched.tempC!=null) parts.push(cToDisplay(sched.tempC)+tempUnitLabel());
   if(sched.rinseSeconds!=null) parts.push(sched.rinseSeconds+'s rinse');
-  if(sched.times && sched.times.length) parts.push(sched.times.map(t=>fmtSecShort(t)).join(' / '));
+  if(sched.times && sched.times.length) parts.push(sched.times.map(t=>Math.round(t)+'s').join(' / '));
   return parts.join(', ');
 }
 

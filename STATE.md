@@ -88,10 +88,15 @@ baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insi
 cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
 recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
 capture precursor, then ratio phase 1 (see `SPEC-brew-advice-v2.md`). The v3.34 map legibility pass was
-built but NOT shipped — map is parked. Cache **v59** (v3.48: tea detail shows a calm "Suggested brew" card
-for teas with no saved guide — `suggestedBrewHTML`/`saveSuggestedGuide` in steep-teas.js surface the timer's
-KB/leaf-form schedule (temp/ratio/first steeps) with a source label and a save-as-guide button that writes
-raw-second times so the guide round-trips exactly; gated on the `brewAdvice` opt-out. v3.47: dashboard edit
+built but NOT shipped — map is parked. Cache **v60** (v3.49: `scheduleToGuideText` emits raw-second times so
+a saved guide round-trips through `parseBrewGuide` exactly — the old `fmtSecShort` "1m15s" reparsed as 60s
+and truncated the run, corrupting any ≥60s+remainder steep in save-tuning-as-guide; `saveSuggestedGuide` now
+reuses that one emitter. Locked in by **`fixtures/brew-roundtrip-test.js`** — the first *committed* fixture
+test (rest of `fixtures/` stays gitignored), asserting schedule→text→parse identity for every LEAF_PROFILES
+family + KB style. v3.48: tea detail shows a calm "Suggested brew" card for teas with no saved guide —
+`suggestedBrewHTML`/`saveSuggestedGuide` in steep-teas.js surface the timer's KB/leaf-form schedule
+(temp/ratio/first steeps) with a source label and a save-as-guide button; gated on the `brewAdvice` opt-out.
+v3.47: dashboard edit
 mode can move a card between Home and Insights — `dashMoveToSurface` writes a per-user `dashLayout.surface`
 override that `dashSurface` layers over `DASH_SURFACE`; both tabs build the full card map via shared
 `dashCards()`. v3.46 folds

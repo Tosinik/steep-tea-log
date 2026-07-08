@@ -23,6 +23,22 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.49 — brew-guide emitter round-trips exactly (+ permanent test)
+Deploy: `service-worker.js` (v60), `steep-core.js`, `steep-teas.js`. No SQL.
+- **`scheduleToGuideText` now emits times in raw seconds** (`75s`, not `fmtSecShort`'s `1m15s`). The
+  compound `1m15s` token was unparseable by `parseBrewGuide`/`bg_extractTimes`: it read back as `60s`
+  *and* truncated the run after it, so any schedule with a steep ≥60s + remainder silently corrupted
+  on the schedule → text → parse round-trip. This bit **`saveTuningToGuide`** (save-tuning-as-guide),
+  not just v3.48's suggestion save. Raw seconds round-trip exactly for every value.
+- **`saveSuggestedGuide` now reuses `scheduleToGuideText`** (was a near-duplicate emitter) so there's a
+  single, tested formatter; the KB ratio is still appended after.
+- **New permanent test `fixtures/brew-roundtrip-test.js`** (82 checks): for every LEAF_PROFILES family
+  (× steep counts) and every KB style, `schedule → scheduleToGuideText → parseBrewGuide` must reproduce
+  the identical times, plus adversarial ≥60s-remainder cases and a guard that the emitter never emits a
+  compound minute token. This is committed (unlike the CSV-driven fixtures) via a `.gitignore` exception,
+  since it generates from committed source and needs no private data — so it catches this bug class for
+  good, including future emitter changes. Negative-control-verified (buggy emitter fails it).
+
 ## v3.48 — Suggested brew on tea detail (for teas without a guide)
 Deploy: `service-worker.js` (v59), `steep-teas.js`. No SQL.
 - **Tea detail now shows a "Suggested brew" card when a tea has no saved brew guide** — the same

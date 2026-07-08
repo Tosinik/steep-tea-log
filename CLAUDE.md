@@ -61,7 +61,15 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
   throwaway Node test script that requires/exercises the pure function with a few cases
   and prints results. This is how the tricky areas (e.g. `parseBrewGuide`,
   leaf-form curves, passport matching) have historically been checked — see CHANGELOG
-  notes like "verified render paths + labels in the Node sandbox."
+  notes like "verified render paths + labels in the Node sandbox." These `fixtures/*-test.js`
+  scripts load the non-modular source in a `vm` context with stubbed browser globals — copy
+  an existing one (e.g. `fixtures/brew-roundtrip-test.js`) for the harness boilerplate.
+- **Permanent, data-free invariant tests are committed** (via a `.gitignore` exception; the
+  rest of `fixtures/` — CSV exports, one-off scripts — stays local). `fixtures/brew-roundtrip-test.js`
+  is the first: it asserts `schedule → scheduleToGuideText → parseBrewGuide` reproduces identical
+  times for every LEAF_PROFILES/KB schedule. **Run `node fixtures/brew-roundtrip-test.js` after any
+  change to the brew-guide emitter/parser** (`scheduleToGuideText`, `parseBrewGuide`, `bg_extractTimes`,
+  `fmtSecShort`) — it must stay green.
 - **Test against real data, not synthetic examples.** Export current rows from Supabase
   as CSV into `fixtures/` (e.g. `teas_rows.csv`; gitignore it if you prefer) and run the
   logic over those. Real data is what catches the actual bugs — Japanese cultivar names,

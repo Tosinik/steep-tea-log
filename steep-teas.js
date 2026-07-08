@@ -410,21 +410,18 @@ function suggestedBrewHTML(tea){
     </div>`;
 }
 // Write the current suggestion into the tea's brewGuide (free text), so it becomes the real guide
-// the timer + advice read from. Format is "90°C, 25s / 18s / 30s, 4g/100ml". Times are emitted in
-// raw seconds (not fmtSecShort's "1m15s", which parseBrewGuide reads back as 60s) so the saved guide
-// round-trips to exactly the schedule shown; the KB ratio is appended (parseBrewGuide strips the
-// grams token on re-read, so it stays informational without corrupting the parse).
+// the timer + advice read from — e.g. "90°C, 25s / 18s / 30s, 4g/100ml". Uses scheduleToGuideText
+// (parser-safe raw-second times, guaranteed round-trip) with the KB temp folded in, then appends the
+// KB ratio (parseBrewGuide strips the grams token on re-read, so it stays informational).
 function saveSuggestedGuide(teaId){
   const tea = teaById(teaId); if(!tea || tea.brewGuide) return;
   const sched = effectiveGuideSchedule(tea, true);
   if(!sched || !sched.times || !sched.times.length) return;
   const kb = (typeof kbResolve==='function') ? kbResolve([tea.name,tea.cultivar,tea.origin].filter(Boolean).join(' ')) : null;
   const tempC = sched.tempC!=null ? sched.tempC : (kb && kb.tempC!=null ? kb.tempC : null);
-  const parts=[];
-  if(tempC!=null) parts.push(cToDisplay(tempC)+tempUnitLabel());
-  parts.push(sched.times.map(t=>t+'s').join(' / '));
-  if(kb && Number(kb.ratio)>0) parts.push(kb.ratio+'g/100ml');
-  tea.brewGuide = parts.join(', ');
+  let text = scheduleToGuideText({ ...sched, tempC });
+  if(kb && Number(kb.ratio)>0) text += (text?', ':'') + kb.ratio + 'g/100ml';
+  tea.brewGuide = text;
   persistTea(tea);
   showToast('Saved brew guide for “'+tea.name+'”');
   render();
