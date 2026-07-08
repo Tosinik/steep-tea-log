@@ -13,7 +13,7 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 3. `steep-dashboard.js` — `computeStats`, persona, brewing clock, achievements
    (compute/badge/sync/confetti), heatmap, streak card, recap, onboarding,
    achievements page, `viewDashboard`.
-4. `steep-teas.js` — tea cards, vendor list, sort/filter, `viewTeas`, tea form, tea detail.
+4. `steep-teas.js` — tea cards, vendor list, sort/filter, `viewTeas` (Teas|Vessels segments), tea form, tea detail.
 5. `steep-social.js` — friends/feed/profile/follow.
 6b. `steep-passport.js` — world dot-map, origin→country matching, tea click-through.
 6. `steep-sessions.js` — sessions calendar, vessels, session-edit modal, session flow
@@ -23,6 +23,19 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.46 — Vessels folded into the Teas tab
+Deploy: `service-worker.js` (v57), `steep-core.js`, `steep-teas.js`, `steep-sessions.js`. No SQL.
+- **Nav is now Home · Teas · Sessions · Insights** — the Vessels tab is gone. Vessels live under Teas
+  behind a segmented control (Teas | Vessels), following the v3.18 vendor-manager precedent of folding a
+  surface into Teas. `state.teaSeg` ('teas'|'vessels') tracks the active segment; `viewTeas` renders the
+  vessels segment via the existing `viewVessels()` (in `steep-sessions.js`), so vessel add/edit/delete are
+  unchanged.
+- **Deep-links preserved.** `goView('vessels')` and any stray `state.view='vessels'` route to
+  `goVessels()` → Teas tab, Vessels segment. The onboarding "Add vessel" button and the "add a vessel
+  first" guard on session start both land there. Pre-v3.46 persisted `tealog_view='vessels'` is remapped
+  at init (dropped from `PERSISTED_VIEWS`). `render()` keeps a defensive `view==='vessels'` guard.
+- `node --check` green on all three touched files.
+
 ## v3.45 — nav tidy: Insights last, Friends to the icon row
 Deploy: `service-worker.js` (v56), `steep-core.js`. No SQL.
 - **Tabs now read Home · Teas · Sessions · Vessels · Insights** — the main tab row concentrates on

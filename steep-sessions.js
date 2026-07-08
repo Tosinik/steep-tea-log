@@ -296,7 +296,7 @@ function quickLogSession(){
   startSessionFor(null);
 }
 function startSessionFor(teaId){
-  if(state.vessels.length===0){ alert('Add a vessel first (Vessels tab) before logging a session.'); state.view='vessels'; render(); return; }
+  if(state.vessels.length===0){ alert('Add a vessel first (Teas → Vessels) before logging a session.'); goVessels(); return; }
   state.sessionDraft = {
     teaId: teaId || (state.teas.find(t=>!isTeaFinished(t)) || state.teas[0]).id,  // default to an in-stock tea
     vesselId: state.vessels[0].id,

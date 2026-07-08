@@ -85,6 +85,14 @@ function filteredSortedTeas(){
   return list;
 }
 function viewTeas(){
+  // Teas + Vessels live under one tab (v3.46) — a segmented control switches between them
+  // (following the v3.18 vendor-manager precedent of folding a surface into Teas).
+  const seg = (state.teaSeg==='vessels') ? 'vessels' : 'teas';
+  const segControl = `<div style="display:flex;gap:8px;margin-bottom:14px;">
+    <button class="lib-chip ${seg==='teas'?'active':''}" onclick="setTeaSeg('teas')">Teas</button>
+    <button class="lib-chip ${seg==='vessels'?'active':''}" onclick="setTeaSeg('vessels')">Vessels</button>
+  </div>`;
+  if(seg==='vessels') return `${segControl}${viewVessels()}`;   // viewVessels lives in steep-sessions.js
   const F = state.teaFilter;
   const vendors = distinctVendors();
   const list = filteredSortedTeas();
@@ -116,6 +124,7 @@ function viewTeas(){
       ${(F.type||F.vendor||F.lowStock||F.favorite) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
     </div>` : '';
   return `
+    ${segControl}
     <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2>
       <div style="display:flex;gap:8px;align-items:center;">
         ${vendors.length ? `<button class="lib-chip ${state.vendorsOpen?'active':''}" onclick="toggleVendors()">${state.vendorsOpen?'✕ Vendors':'Edit vendors'}</button>` : ''}
@@ -128,6 +137,7 @@ function viewTeas(){
     ${cards}
   `;
 }
+function setTeaSeg(seg){ state.teaSeg = (seg==='vessels') ? 'vessels' : 'teas'; state.view='teas'; render(); }
 function setTeaSort(v){ state.teaSort=v; render(); }
 function setTeaFilter(key, val){ state.teaFilter[key]=val; render(); }
 function toggleLowStockFilter(){ state.teaFilter.lowStock=!state.teaFilter.lowStock; render(); }

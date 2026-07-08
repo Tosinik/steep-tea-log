@@ -77,7 +77,7 @@ function groupTeasByType(teas){
 function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g.teas); }
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
-const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','vessels','friends'];
+const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
 const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel', brewGuideAutofill:true, brewAdvice:true, showMood:true };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
@@ -92,7 +92,7 @@ let state = {
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
   calMonth: null, calSelDay: null,
-  teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false },
+  teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false }, teaSeg: 'teas',
   recapPeriod: 'week',
   passportSel: null, passportZoom: null, passportSub: null,
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },
@@ -116,7 +116,8 @@ async function init(){
     const t = tid && state.teas.find(x=>x.id===tid);
     if(t){ state.view='tea-detail'; state.activeTeaId=tid; state.teaDetailFrom='teas'; }
     else state.view='teas';
-  } else if(savedView && PERSISTED_VIEWS.includes(savedView)) state.view = savedView;
+  } else if(savedView==='vessels'){ state.view='teas'; state.teaSeg='vessels'; } // pre-v3.46 persisted 'vessels' → Teas tab, vessels segment
+  else if(savedView && PERSISTED_VIEWS.includes(savedView)) state.view = savedView;
   state.loaded = true;
   render();
   if(state.view==='friends') loadSocial();
@@ -667,7 +668,7 @@ function render(){
   else if(state.view==='insights') body = viewInsights();
   else if(state.view==='teas') body = viewTeas();
   else if(state.view==='tea-detail') body = viewTeaDetail();
-  else if(state.view==='vessels') body = viewVessels();
+  else if(state.view==='vessels'){ state.teaSeg='vessels'; state.view='teas'; body = viewTeas(); } // stray/persisted 'vessels' → Teas tab, vessels segment
   else if(state.view==='sessions') body = viewSessions();
   else if(state.view==='friends') body = viewFriends();
   else if(state.view==='achievements') body = viewAchievements();
@@ -694,7 +695,6 @@ function render(){
         <button class="tab ${state.view==='dashboard'?'active':''}" onclick="goView('dashboard')">Home</button>
         <button class="tab ${state.view==='teas'||state.view==='tea-detail'?'active':''}" onclick="goView('teas')">Teas</button>
         <button class="tab ${state.view==='sessions'?'active':''}" onclick="goView('sessions')">Sessions</button>
-        <button class="tab ${state.view==='vessels'?'active':''}" onclick="goView('vessels')">Vessels</button>
         <button class="tab ${state.view==='insights'||state.view==='wrapped'?'active':''}" onclick="goView('insights')">Insights</button>
       </div>
       ${inSession ? '' : `<button class="btn-log btn-log-wide" onclick="quickLogSession()">＋ Log session</button>`}
@@ -710,7 +710,19 @@ function render(){
   if(themeBtn) themeBtn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙';
 }
 
-function goView(v){ state.view=v; state.activeTeaId=null; state.dashEdit=false; if(v!=='passport'){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; } saveView(v); render(); }
+function goView(v){
+  if(v==='vessels') return goVessels();                 // vessels folded into the Teas tab (v3.46)
+  state.view=v; state.activeTeaId=null; state.dashEdit=false;
+  if(v==='teas') state.teaSeg='teas';                    // tapping Teas shows the teas segment
+  if(v!=='passport'){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; }
+  saveView(v); render();
+}
+// Deep-link target: land on the Teas tab with the Vessels segment active. Anything that used to
+// goView('vessels') (or set view='vessels') routes here, so old call sites keep working.
+function goVessels(){
+  state.teaSeg='vessels'; state.view='teas'; state.activeTeaId=null; state.dashEdit=false;
+  saveView('teas'); render();
+}
 function saveView(v){ try{ if(PERSISTED_VIEWS.includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); } }catch(e){} }
 
 function bindDynamic(){
