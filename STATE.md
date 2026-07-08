@@ -59,7 +59,10 @@ v3.32 forecast coverage + brew-guide parse · **v3.33 curated passport sub-regio
 (curated tea-region map, not full geo — later REJECTED, see below) · **v3.34 settings declutter**
 (settings grouped into sections; new `showMood` toggle to hide the mood check-in — the future Garmin
 on/off; brew-guide + advice grouped under one "Brew guidance" block) **+ change vessel on a saved
-session**. The v3.34 map legibility pass was built but NOT shipped — map is parked. Cache **v45**.
+session** · **v3.35 fix: double stock decrement** (re-entrant `commitSession`/`saveSessionEdit` double-
+fire subtracted `gramsUsed` twice; fixed with a shared `_sessionSaving` guard. Offline queue was NOT the
+cause — absolute-value upserts replay idempotently. Deeper fix later: derive stock instead of accumulating
+it). The v3.34 map legibility pass was built but NOT shipped — map is parked. Cache **v46**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other

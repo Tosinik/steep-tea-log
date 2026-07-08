@@ -1,3 +1,8 @@
+// Guards saveSessionEdit + commitSession against re-entrant double-fire. Both adjust
+// tea stock as a read-modify-write on amountGrams, so a second invocation before the
+// first finishes (e.g. a double-tapped Save, easy on mobile) would subtract gramsUsed
+// twice and push a duplicate session. Set on entry, cleared in finally.
+let _sessionSaving = false;
 function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
 function calShift(delta){
   const m = state.calMonth || startOfMonth(new Date());
@@ -193,25 +198,29 @@ function es_convertToSteeps(){
   render();
 }
 function saveSessionEdit(){
-  const e = state.editingSession;
-  const idx = state.sessions.findIndex(x=>x.id===e.id);
-  if(idx<0) return;
-  const old = state.sessions[idx];
-  const newGrams = e.gramsUsed===''?0:Number(e.gramsUsed)||0;
-  const delta = newGrams - (Number(old.gramsUsed)||0);
-  if(delta!==0){
-    const tea = teaById(e.teaId);
-    if(tea){ tea.amountGrams = Math.max(0,(Number(tea.amountGrams)||0)-delta); persistTea(tea); }
-  }
-  e.gramsUsed = newGrams;
-  e.date = e._localDate ? new Date(e._localDate).toISOString() : e.date;
-  delete e._localDate;
-  const tea = teaById(e.teaId), ves = vesselById(e.vesselId);
-  e.teaName = tea?tea.name:(e.teaName||''); e.teaType = tea?tea.type:(e.teaType||''); e.vesselName = ves?ves.name:(e.vesselName||'');
-  state.sessions[idx] = e;
-  persistSession(e);
-  syncAchievements(true);
-  closeSessionEdit();
+  if(_sessionSaving) return;
+  _sessionSaving = true;
+  try {
+    const e = state.editingSession;
+    const idx = state.sessions.findIndex(x=>x.id===e.id);
+    if(idx<0) return;
+    const old = state.sessions[idx];
+    const newGrams = e.gramsUsed===''?0:Number(e.gramsUsed)||0;
+    const delta = newGrams - (Number(old.gramsUsed)||0);
+    if(delta!==0){
+      const tea = teaById(e.teaId);
+      if(tea){ tea.amountGrams = Math.max(0,(Number(tea.amountGrams)||0)-delta); persistTea(tea); }
+    }
+    e.gramsUsed = newGrams;
+    e.date = e._localDate ? new Date(e._localDate).toISOString() : e.date;
+    delete e._localDate;
+    const tea = teaById(e.teaId), ves = vesselById(e.vesselId);
+    e.teaName = tea?tea.name:(e.teaName||''); e.teaType = tea?tea.type:(e.teaType||''); e.vesselName = ves?ves.name:(e.vesselName||'');
+    state.sessions[idx] = e;
+    persistSession(e);
+    syncAchievements(true);
+    closeSessionEdit();
+  } finally { _sessionSaving = false; }
 }
 function deleteSession(){
   const e = state.editingSession;
@@ -905,43 +914,47 @@ function setSessionFeedback(v){
   render();
 }
 async function commitSession(){
-  const d = state.sessionDraft;
-  const descEl = document.getElementById('sessDesc');
-  if(descEl) d.sessionDesc = descEl.value.trim();
-  const hadInlinePhoto = !!(state._draftImage && String(state._draftImage).startsWith('data:'));
-  const photoUrl = await resolveDraftImage();
-  // If the upload couldn't reach Storage (offline), resolveDraftImage returns the
-  // inline data: URL. Save the session now without the photo — it can be re-added
-  // by editing the session once back online.
-  const photoDeferred = hadInlinePhoto && photoUrl && String(photoUrl).startsWith('data:');
-  const tea = teaById(d.teaId);
-  const ves = vesselById(d.vesselId);
-  const session = {
-    id: uid(), teaId: d.teaId, vesselId: d.vesselId,
-    date: d.sessionDate ? new Date(d.sessionDate).toISOString() : new Date().toISOString(),
-    isColdBrew: d.isColdBrew, waterType: d.waterType, waterTDS: d.waterTDS?Number(d.waterTDS):null,
-    gramsUsed: d.gramsUsed?Number(d.gramsUsed):0,
-    steeps: d.steeps, rating: d.sessionRating, description: d.sessionDesc, tags: d.sessionTags,
-    isShared: !!d.isShared, photoUrl: photoDeferred ? null : (photoUrl || null),
-    infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
-    feedback: d.feedback || null,
-    mood: d.mood || null,
-    teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
-  };
-  state.sessions.push(session);
-  if(tea && session.gramsUsed){
-    tea.amountGrams = Math.max(0, (Number(tea.amountGrams)||0) - session.gramsUsed);
-    persistTea(tea);
-  }
-  persistSession(session);
-  state.sessionDraft=null;
-  state._draftImage=null;
-  state.activeTeaId = d.teaId;
-  state.view='tea-detail';
-  syncAchievements(true);
-  render();
-  if(photoDeferred && typeof showToast === 'function'){
-    showToast('Session saved. Your photo needs a connection — add it later by editing the session.');
-  }
+  if(_sessionSaving) return;
+  _sessionSaving = true;
+  try {
+    const d = state.sessionDraft;
+    const descEl = document.getElementById('sessDesc');
+    if(descEl) d.sessionDesc = descEl.value.trim();
+    const hadInlinePhoto = !!(state._draftImage && String(state._draftImage).startsWith('data:'));
+    const photoUrl = await resolveDraftImage();
+    // If the upload couldn't reach Storage (offline), resolveDraftImage returns the
+    // inline data: URL. Save the session now without the photo — it can be re-added
+    // by editing the session once back online.
+    const photoDeferred = hadInlinePhoto && photoUrl && String(photoUrl).startsWith('data:');
+    const tea = teaById(d.teaId);
+    const ves = vesselById(d.vesselId);
+    const session = {
+      id: uid(), teaId: d.teaId, vesselId: d.vesselId,
+      date: d.sessionDate ? new Date(d.sessionDate).toISOString() : new Date().toISOString(),
+      isColdBrew: d.isColdBrew, waterType: d.waterType, waterTDS: d.waterTDS?Number(d.waterTDS):null,
+      gramsUsed: d.gramsUsed?Number(d.gramsUsed):0,
+      steeps: d.steeps, rating: d.sessionRating, description: d.sessionDesc, tags: d.sessionTags,
+      isShared: !!d.isShared, photoUrl: photoDeferred ? null : (photoUrl || null),
+      infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
+      feedback: d.feedback || null,
+      mood: d.mood || null,
+      teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
+    };
+    state.sessions.push(session);
+    if(tea && session.gramsUsed){
+      tea.amountGrams = Math.max(0, (Number(tea.amountGrams)||0) - session.gramsUsed);
+      persistTea(tea);
+    }
+    persistSession(session);
+    state.sessionDraft=null;
+    state._draftImage=null;
+    state.activeTeaId = d.teaId;
+    state.view='tea-detail';
+    syncAchievements(true);
+    render();
+    if(photoDeferred && typeof showToast === 'function'){
+      showToast('Session saved. Your photo needs a connection — add it later by editing the session.');
+    }
+  } finally { _sessionSaving = false; }
 }
 

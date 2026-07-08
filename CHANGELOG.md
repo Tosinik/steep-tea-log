@@ -23,6 +23,19 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.35 — fix: double stock decrement on save (re-entrancy guard)
+Deploy: `service-worker.js` (v46), `steep-sessions.js`. No SQL.
+- **Logging a session no longer subtracts `gramsUsed` from tea stock twice.** Root cause was a
+  re-entrant double-fire of `commitSession` (async, with an `await resolveDraftImage()` gap before the
+  decrement and `state.sessionDraft` cleared only at the end, and the Save button never disabled): a
+  second tap read the same draft and applied the read-modify-write stock decrement to the same in-memory
+  tea again — subtracting twice and pushing a duplicate session. Fixed with a shared `_sessionSaving`
+  re-entrancy guard (set on entry, cleared in `finally`) on both `commitSession` and `saveSessionEdit`.
+  The offline write-queue was ruled out — it replays absolute-value `putTea` upserts, which are
+  idempotent. Verified against real exported rows (`fixtures/`) with a Node repro: the two-overlapping-
+  saves case went 32g→20g (two sessions) before, 32g→26g (one session) after; the queue-replay case was
+  correct both ways. (`fixtures/` is gitignored — repro not committed.)
+
 ## v3.34 — settings declutter + vessel edit (map parked)
 Deploy: `service-worker.js` (v45), `steep-core.js`, `steep-settings.js`, `steep-sessions.js`. No SQL.
 - **Settings grouped into sections.** The flat list was getting long; now organised under labelled

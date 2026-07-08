@@ -184,10 +184,12 @@ only the rendering gets replaced. See ROADMAP/STATE.
 
 Live issues (see STATE.md / ROADMAP for the full backlog):
 
-- **Double stock decrement (most important).** Logging a session sometimes subtracts
-  `gramsUsed` from tea stock **twice**. Suspected cause: the optimistic local update and
-  the offline-queue replay both decrementing, or a save-path double-fire. Any change to
-  the session-commit or stock-adjustment path should be checked against this.
+- ~~**Double stock decrement.**~~ **Fixed v3.35.** Cause was a re-entrant double-fire of
+  `commitSession` (not the offline queue, which replays idempotent absolute-value
+  upserts). Fixed with a shared `_sessionSaving` guard on `commitSession` +
+  `saveSessionEdit`. Note the deeper smell remains: stock is an accumulated
+  read-modify-write on `amountGrams` rather than derived (`purchased − Σ gramsUsed`) — a
+  future data-model change would make it idempotent by construction (see ROADMAP).
 - **In-session "turn off" link gives weird feedback** — investigate `d_setBrewMode('off')`
   mid-session.
 - **Legacy `alert()`s in sessions** — a couple remain; use inline UI, don't add more.
