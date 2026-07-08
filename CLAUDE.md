@@ -27,6 +27,24 @@ authoritative and **keep them current** as you work:
 When you ship a change, update CHANGELOG.md (new version entry) and reflect it in
 STATE.md / ROADMAP as appropriate. Don't let these drift.
 
+## Open issues are the live inbox
+
+**At session start, fetch the repo's open GitHub issues and treat them as the live
+work queue alongside the ROADMAP** (the ROADMAP holds the planned sequence; issues hold
+incoming bugs/ideas/feedback). The repo is `Tosinik/steep-tea-log` and issues are public
+— one fetch, no auth needed:
+
+- With the `gh` CLI: `gh issue list --state open` (also `gh issue view <n>`).
+- If `gh` isn't installed (it currently isn't): the public REST API —
+  `curl -s "https://api.github.com/repos/Tosinik/steep-tea-log/issues?state=open"`
+  (returns PRs too; filter out entries that have a `pull_request` key).
+
+Issues are triaged with three labels: **`bug`** (something broken), **`idea`** (feature/
+enhancement), **`feedback`** (beta-tester notes). This queue replaces the old
+"beta-feedback bugs (batch)" lists that used to live in STATE.md — put new bugs/ideas
+in issues, not in the handoff docs. Writing to issues (create/label/close) needs auth,
+so `gh` or a token; unauthenticated is read-only.
+
 ## Running & validating (no build, no test suite)
 
 There is no build step, package manager, linter, or test runner. To run locally, serve

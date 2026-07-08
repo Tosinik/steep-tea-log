@@ -89,12 +89,12 @@ Recommended focus order (my call, Niklas hasn't picked yet): (1) **settings decl
 parked, highest-leverage item — the missing 3rd advice axis + unlock for learned defaults) with a design
 pass first, incl. a `capacityMl`-capture precursor since it's sparse; (3) map redesign when there's appetite.
 
-**Beta-feedback bugs still open (batch):**
-- ~~Leaf-form inference misses~~ **Fixed v3.38.** `inferLeafForm` now consults `kbResolve` (steep-
-  knowledge.js) on name+cultivar+origin before the name heuristics, so Japanese cultivars/regions →
-  steamed green and silver-bud whites → `bud`. The KB's cultivar/region/style tables are the tunable
-  knob now (add aliases there, not to `inferLeafForm`).
-- In-session "turn off" link gives weird feedback — investigate `d_setBrewMode('off')` mid-session.
+**Bugs/ideas/feedback now live in GitHub issues, not here.** Open issues (`Tosinik/steep-tea-log`,
+public) are the live queue alongside the ROADMAP — fetch them at session start (see CLAUDE.md
+"Open issues are the live inbox"). Triage labels: `bug` / `idea` / `feedback`. This replaces the
+old beta-feedback batch list. (Leaf-form inference misses — the one previously-listed bug that got
+fixed — shipped v3.38: `inferLeafForm` consults `kbResolve` first, so add coverage to the KB tables,
+not `inferLeafForm`. The remaining in-session `d_setBrewMode('off')` bug is now issue #1.)
 
 **Product backlog from Niklas (capture — discuss/prioritise in the fresh chat):**
 - **Settings declutter:** group settings into sections (getting long). Add a toggle to **hide the mood

@@ -179,6 +179,7 @@ Genuinely open, not sequenced/cut/frozen. Pull into a deploy when it fits:
 - **Brew-guide parser** → reused by brew-advice tuning, "apply guide to steeps", and grams+ml capture
   for ratio (extend `bg_extractGrams` to capture instead of strip).
 
-## Open bug (small)
-- In-session "turn off" link (`d_setBrewMode('off')`) gives weird feedback mid-session — investigate;
-  fold into a batch deploy.
+## Bugs / ideas / feedback → GitHub issues
+Open issues (`Tosinik/steep-tea-log`, public) are the live queue alongside this roadmap — fetch at
+session start (see CLAUDE.md). Labels: `bug` / `idea` / `feedback`. Currently open: **#1** in-session
+`d_setBrewMode('off')` gives weird feedback mid-session (fold into a batch deploy).
