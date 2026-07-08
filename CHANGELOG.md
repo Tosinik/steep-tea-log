@@ -23,6 +23,17 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.39 — tea picker grouped by type
+Deploy: `service-worker.js` (v50), `steep-core.js`, `steep-teas.js`, `steep-sessions.js`. No SQL.
+- **Session tea picker groups teas by type** — green · white · yellow · oolong · black · puerh · herbal
+  (that order), alphabetical within each group, each group a `<optgroup>` header. New shared helpers
+  `TYPE_ORDER` / `groupTeasByType` / `sortTeasByTypeThenName` in steep-core.
+- **Teas tab default sort is now the same "By type" ordering** (new first option in the sort dropdown;
+  `state.teaSort` defaults to `'type'`). Picking any other sort still overrides it — grouping is only
+  the default, not forced. (Note: this took the v3.39 slot; the planned Insights tab shifts to v3.40.)
+- Validated against real `fixtures/teas_rows.csv`: group order = TYPE_ORDER, alpha within, flat sort =
+  grouped concat — 9 checks green; XSS + KB tests still green; `node --check` clean.
+
 ## v3.38 — tea knowledge base (fixes leaf-form inference misses)
 Deploy: `index.html`, `service-worker.js` (v49), **new** `steep-knowledge.js`, `steep-core.js`,
 `steep-teas.js`. No SQL.

@@ -12,22 +12,24 @@ fixtures).
 
 1. **v3.38 — Tea knowledge base** ✓ **shipped.** `steep-knowledge.js` + `kbResolve`;
    `inferLeafForm` consults it (fixes the Japanese-cultivar/silver-bud misses); gentle
-   tea-form type/origin prefill.
+   tea-form type/origin prefill. · **v3.39 — Tea picker grouped by type** ✓ **shipped**
+   (unplanned quick fix; took the v3.39 slot so everything below shifts down one): session
+   picker + Teas-tab default sort group green→white→yellow→oolong→black→puerh→herbal, alpha within.
 
-2. **v3.39 — Insights tab + dashboard split** (review finding #10). **One deploy — the new
+2. **v3.40 — Insights tab + dashboard split** (review finding #10). **One deploy — the new
    tab is the seam that carries the split.** Move the heavier analytics (Insights card,
    most-brewed, top-rated) off Home into their own tab; keep the standard, at-a-glance info
    on Home. `steep-dashboard.js` (~1040 lines) splits along that boundary. Reuse the
    editable-dashboard registry (`dashLayout`/`renderDashboard`). Confirm with Niklas exactly
    which cards move vs stay (cost overview, running-low, brewing-clock likely stay).
 
-3. **v3.40+ — Brew advice v2** (per `SPEC-brew-advice-v2.md`, DECIDED). The missing 3rd advice
+3. **v3.41+ — Brew advice v2** (per `SPEC-brew-advice-v2.md`, DECIDED). The missing 3rd advice
    axis: leaf-to-water ratio. Sequenced (D5):
-   - **v3.40 — Capacity-capture precursor** (tiny deploy, ships first). Make vessel `capacityMl`
+   - **v3.41 — Capacity-capture precursor** (tiny deploy, ships first). Make vessel `capacityMl`
      a visible, encouraged (not required) field; quiet "· ml?" affordance on capacity-less
      vessels; an inline "set capacity" link in the (hidden) ratio line at session setup. No
      banners, never blocks logging. Ratio fails silently without capacity, so this comes first.
-   - **v3.41 — Ratio phase 1.** `actualRatio = gramsUsed / (waterMl/100)` vs a baseline
+   - **v3.42 — Ratio phase 1.** `actualRatio = gramsUsed / (waterMl/100)` vs a baseline
      (guide-parsed grams+ml → `kbResolve().ratio` → per-`LEAF_PROFILES` default); scale the
      prefilled schedule by `clamp(1/ratioFactor^k, 0.6, 1.4)`, k=0.6 (tunable constants next to
      LEAF_PROFILES). **Default OFF, strict opt-in** (Settings → Brew guidance → "Ratio
@@ -76,6 +78,8 @@ restock forecast ("runs out in ~N days").
 - **v3.37** hygiene: re-entrancy guards (deleteSession + 3 form submits), `created_at` preserved
   on import, deduped view-allowlist + time-of-day helper, cut unused `getFollowers`
 - **v3.38** tea knowledge base (`steep-knowledge.js`; KB-backed `inferLeafForm`; tea-form prefill)
+- **v3.39** session tea picker grouped by type + Teas-tab default "By type" sort (`TYPE_ORDER`,
+  `groupTeasByType`)
 
 ## Cut from the roadmap (decided 2026-07-08)
 Removed entirely — off-brand for calm-first (gamification-as-engagement is the opposite of

@@ -51,6 +51,7 @@ function filteredSortedTeas(){
   });
   const time = t => new Date(t.dateAdded||0).getTime();
   const s = state.teaSort;
+  if(s==='type') return sortTeasByTypeThenName(list);   // grouped by type, alpha within (default)
   if(s==='newest') list.sort((a,b)=>time(b)-time(a));
   else if(s==='oldest') list.sort((a,b)=>time(a)-time(b));
   else if(s==='name') list.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
@@ -71,6 +72,7 @@ function viewTeas(){
   const controls = state.teas.length ? `
     <div class="lib-controls">
       <select class="lib-select" onchange="setTeaSort(this.value)" aria-label="Sort teas">
+        <option value="type" ${state.teaSort==='type'?'selected':''}>By type</option>
         <option value="newest" ${state.teaSort==='newest'?'selected':''}>Newest</option>
         <option value="oldest" ${state.teaSort==='oldest'?'selected':''}>Oldest</option>
         <option value="name" ${state.teaSort==='name'?'selected':''}>Name A–Z</option>

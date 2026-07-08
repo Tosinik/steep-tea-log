@@ -73,8 +73,9 @@ stored cross-user feed XSS; replaced 4 local escapers) · **v3.37 hygiene** (re-
 deduped view allowlist → `PERSISTED_VIEWS` and time-of-day → `timeOfDayBuckets()`; cut unused
 `getFollowers`) · **v3.38 tea knowledge base** (new `steep-knowledge.js`; `inferLeafForm` consults
 `kbResolve` on name+cultivar+origin — fixes the parked Japanese-cultivar/silver-bud misses; gentle
-KB type/origin prefill in the tea form). The v3.34 map legibility pass was built but NOT shipped — map
-is parked. Cache **v49**.
+KB type/origin prefill in the tea form) · **v3.39 tea picker grouped by type** (session picker
+`<optgroup>`s + Teas-tab default "By type" sort; `TYPE_ORDER`/`groupTeasByType` in core). The v3.34
+map legibility pass was built but NOT shipped — map is parked. Cache **v50**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other

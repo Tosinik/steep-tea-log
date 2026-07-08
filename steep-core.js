@@ -60,6 +60,21 @@ const TYPES = [
   {k:'green',label:'Green'},{k:'black',label:'Black'},{k:'oolong',label:'Oolong'},
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
 ];
+// Canonical type ordering for grouped displays (session tea picker + Teas-tab default sort).
+const TYPE_ORDER = ['green','white','yellow','oolong','black','puerh','herbal'];
+function typeRank(k){ const i = TYPE_ORDER.indexOf(k); return i<0 ? TYPE_ORDER.length : i; }
+// Teas grouped by type (TYPE_ORDER), alphabetical within each group. Unknown types sort last.
+// Returns [{type,label,teas:[…]}] — the picker renders these as <optgroup>s.
+function groupTeasByType(teas){
+  const groups = {};
+  (teas||[]).forEach(t=>{ (groups[t.type]=groups[t.type]||[]).push(t); });
+  return Object.keys(groups)
+    .sort((a,b)=> (typeRank(a)-typeRank(b)) || a.localeCompare(b))
+    .map(type=>({ type, label: typeLabel(type),
+      teas: groups[type].slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'')) }));
+}
+// Flat version of the same ordering — the Teas-tab default sort.
+function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g.teas); }
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
 const PERSISTED_VIEWS = ['dashboard','teas','sessions','vessels','friends'];
@@ -77,7 +92,7 @@ let state = {
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
   calMonth: null, calSelDay: null,
-  teaSort: 'newest', teaFilter: { type:'', vendor:'', lowStock:false },
+  teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false },
   recapPeriod: 'week',
   passportSel: null, passportZoom: null, passportSub: null,
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },

@@ -406,7 +406,11 @@ function sessionQuickHTML(d){
 }
 
 function sessionSetupHTML(d){
-  const teaOpts = state.teas.map(t=>`<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`).join('');
+  // Grouped by type (green, white, yellow, oolong, black, puerh, herbal), alpha within — each
+  // group an <optgroup> header. Same ordering the Teas tab defaults to.
+  const teaOpts = groupTeasByType(state.teas).map(g=>
+    `<optgroup label="${escapeHtml(g.label)}">${g.teas.map(t=>`<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`).join('')}</optgroup>`
+  ).join('');
   const vesselOpts = state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
   return `
     <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
