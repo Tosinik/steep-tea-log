@@ -23,17 +23,23 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
-## v3.34 — quick-fix batch: vessel edit + passport legibility
-Deploy: `service-worker.js` (v45), `steep-sessions.js`, `steep-passport.js`. No SQL.
-- **Change the vessel on a saved session.** Edit-session modal gains a Vessel selector (shows capacity
-  where set); Save recomputes `vesselName`. If the session's vessel was since deleted, its old name is
-  preserved as the current option so nothing silently changes.
-- **Passport legibility (map fix).** The pins were sized big enough to cover the land grid, and the
-  China/Japan zoom cropped too tight to orient by. Now: gentler sqrt pin sizing (no blobs), wider zoom
-  windows with a minimum span so coastline/context shows, and small name+count labels on both country
-  pins (overview) and sub-region pins (zoom). Japan's Kyushu sub-regions (Kagoshima/Fukuoka/Miyazaki)
-  were near-coincident — spread slightly for legibility (curated map, not survey-accurate). No other
-  map changes. Verified render paths + labels in the Node sandbox.
+## v3.34 — settings declutter + vessel edit (map parked)
+Deploy: `service-worker.js` (v45), `steep-core.js`, `steep-settings.js`, `steep-sessions.js`. No SQL.
+- **Settings grouped into sections.** The flat list was getting long; now organised under labelled
+  headings (`.eyebrow`): Brewing · Brew guidance · Session check-in · Inventory · Appearance ·
+  Calm & achievements · Data. No behaviour change, just scannability.
+- **Hide the mood check-in.** New `showMood` setting (default on) under "Session check-in". Off hides the
+  "how are you feeling?" step in session setup and in the edit modal — but the edit modal still shows it
+  for any session that already has a mood recorded, so nothing gets trapped. (This one switch is the
+  intended future Garmin on/off for the correlation epic.)
+- **Brew-guide + advice grouped.** Both toggles now live under one "Brew guidance" block, each still
+  independently switchable (or both off). Same `brewGuideAutofill` / `brewAdvice` settings, reorganised.
+- **Change the vessel on a saved session** (ships in this batch). Edit-session modal gains a Vessel
+  selector (shows capacity where set); Save recomputes `vesselName`; a since-deleted vessel keeps its
+  old name as the current option so nothing silently changes.
+- **Map: parked, not shipped.** The v3.33 dot-map (and a legibility pass built on it) was rejected —
+  you can't recognise countries/borders, "just dots." Held pending a redesign with drawn country
+  outlines. The parsing layer is reusable; only the dot rendering gets replaced. See ROADMAP/STATE.
 
 ---
 ## v3.33 — curated passport: sub-regions + China/Japan zoom

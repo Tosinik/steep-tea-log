@@ -1,135 +1,131 @@
-# Steep — roadmap after v3 (data layer + quick log shipped)
+# Steep — roadmap (single source of truth, post v3.22)
 
-Tiered by value × ease. Effort: S / M / L. "New infra" = needs something beyond
-the current client + Supabase (BaaS) setup — usually an Edge Function or packaging.
+Tiered by value × ease. Effort: S / M / L. "Heavy infra" = an Edge Function,
+packaging, or a map/vision library; a plain new Supabase table is NOT heavy.
+Anything finished lives under **Shipped** — tiers below hold only open work.
 
-## Shipped since this roadmap was written
-- **Session photos** (Tier 1) — v3.2.
-- **Insights card** — v3.12. Cadence, weekend/weekday, time-of-day, month-vs-month on Home.
-- **Offline write queue (Option B)** — v3.13. Local-first writes; FIFO replay on reconnect;
-  idempotent; photos on offline sessions are deferred (re-add when online). ← the Tier-3 L item.
+## Shipped
+Core: data layer + per-row writes, quick log, modularization, library search/filter/sort,
+first-run onboarding + empty states, basic tea passport, basic meditative focus mode,
+restock forecast ("runs out in ~N days").
+- v3.12 Insights card · v3.13 Offline write queue · v3.14 Insights cadence fix
+- v3.15 Steep Wrapped · v3.16 cold-brew skips steeps + heatmap starts at first session
+- v3.17 pixel font → Pixelify Sans · v3.18 vendor manager → Teas tab
+- v3.19 richer habit-driven persona · v3.20 shopping list (🛒) + restock suggestions
+- v3.21 hotfix: followed users' shared sessions no longer counted in personal stats
+- v3.22 quick-fix batch: favourite-tea filter, light/dark in Settings, Wrapped ignores
+  cold-brew steep time, cost-overview→low-stock link, cost/session on tea detail
+- v3.23 theme toggle removed from header (Settings only)
+- v3.24 brew-guide → prefilled steep schedule (parse brewGuide → temp/times, autofill each
+  steep's timer + temp, per-session opt-out; `parseBrewGuide` in steep-core)
+- v3.25 brew advice (optional "how was it?" per session → gentle capped temp/time tuning of a
+  tea's guide; Guide/Tuning/Off selector, memory line, save-tuning-to-guide; `feedback` column)
+- v3.26 monthly spend overview + purchase-date enabler (tea `purchaseDate` distinct from
+  date-added; Spending view with 12-month bars, this-month list, undated summary)
+- v3.27 update prompt ("new version — Refresh" banner; SW waits for opt-in) + editable dashboard
+  (reorder/hide/restore Home cards, synced `dashLayout`; forward-compatible registry)
+- v3.28 inventory-over-time + restock v2 (`teaForecast` prefers a purchase-date ledger — net
+  drawdown since you bought it — over the session-span guess; inventory drawdown sparkline on tea
+  detail: spine purchase→now + dashed projection to run-out; `inventoryHistory`/`inventorySparkline`)
+- v3.29 leaf-form steep curves + seconds-first advice (six-family `LEAF_PROFILES` by leaf morphology
+  drive the steep progression; `leafForm` field, name-first inference; leaf-form-generated schedules
+  when there's no guide; `parseBrewGuide` handles ranges/ordinals/"add Ns"; advice shows ≈+Ns/steep)
 
-**Up next:** Steep Wrapped → tiny-fix cleanup pass → vendor-into-Teas + richer persona.
+## Brew-guide rework — done ✓
+v3.29 leaf-form curves + `leafForm` field + seconds display + parser hardening ·
+v3.30 in-session micro-adjust (manual edits carry forward via `timeShift`; "How was that pour?" ±5s).
+Later (own items): **learned defaults** (good sessions' real times → family baselines, gated on ratio
+normalization); optional per-form default temps; roll a consistent in-session nudge into saved tuning.
 
-## Tier 1 — Do next (cheap, on-theme, no new infra)
-- **Quiet Mode + dashboard reorder** (S) — lead with persona + recent sessions; one
-  switch hides all gamification. The calm-first promise from the brief. Pure client.
-- **Session photos** (S/M) — Storage exists; attach an image to a session, show in feed.
-- **Library search / filter / sort** (S) — findability as the tea list grows. Client-side.
-- **First-run onboarding + real empty states** (S) — guide add tea → vessel → first log.
-- **Gentle streak grace / freeze** (S) — a grace day so a miss doesn't nuke a streak.
-  Serves "celebrate, never guilt."
+## Passport — PARKED (dot-map approach rejected)
+Shipped as a curated dot-map (v3.33 sub-regions + China/Japan zoom; v3.34 smaller pins + name/count
+labels + wider zoom). **Niklas's verdict (2026-07): not good enough — you can't recognise countries or
+borders, "just dots basically."** The dot-grid was the wrong foundation. **Parked pending a redesign
+toward a real map with drawn country outlines + borders.** Next-attempt decision to make first:
+  - **Approach:** lightweight SVG outline map — a hand-simplified / low-poly outline set for just the
+    tea countries (China, Japan, Taiwan, India, etc.), NOT a full world GeoJSON. Keeps it calm + small,
+    but gives recognisable borders. Alternatively a small pre-simplified TopoJSON of only tea nations.
+  - Then: shade each country by tea count (choropleth), and keep the China/Japan sub-region drill-down
+    (sub-regions as filled areas or labelled points inside the drawn country).
+The parsing/aggregation layer (`passportCountryFor`, `passportSubFor`, `PASSPORT_GEO`, `PASSPORT_SUB`)
+is REUSABLE — only the rendering (dots → outlines) gets replaced. Old follow-ups (heat-shading,
+more zoomable countries, cultivar layer) fold into that redesign.
 
-## Tier 2 — Strong second wave (moderate, within stack)
-- **Brew-guide → prefilled steep schedule** (M) — turn each tea's free-text brewGuide into
-  suggested temp/time that auto-fills each steep. Biggest ritual QoL win.
-- **Per-user profile page** (M) — tap feed author → their shared sessions. RLS supports it.
-- **Feed pagination / infinite scroll** (M) — future-proofs social (currently capped 50).
-- **Likes / reactions** (M) — lighter than comments; small table + RLS.
-- **Tea passport** (M) — regions/origins brewed, list or simple map. Uses existing origin field.
-- **Collection achievements + milestones timeline** (S/M) — types/regions/cultivars. Peripheral.
-- **Accessibility + polish pass** (M) — focus, contrast, haptics, skeletons.
 
-## Tier 3 — Bigger bets (new infrastructure)
-- **Offline write queue (Option B)** (L) — removes "can't save offline". Real correctness work.
-- **Comments + light notifications** (L) — comments table + RLS + notifications surface.
-- **Push notifications (Web Push / VAPID)** (M/L) — installed PWAs (Android; iOS 16.4+ from
-  Home Screen). Needs first Edge Function to send. Pair with gentle brew nudges.
-- **Label scanner** (M/L) — parked idea; first Edge Function + vision model. See IDEA note.
-- **"Steep Wrapped" seasonal recap** (M) — shareable, on-brand, buildable from existing data.
-- **Orphaned-photo cleanup** (M) — scheduled Edge Function or on-delete hook.
+## Beta feedback backlog (batch)
+- Leaf-form inference misses (PARKED, together): Japanese cultivars/regions (saemidori, yutakamidori,
+  kabusecha, kagoshima, shincha…) → steamed green; silver-bud whites → `bud`. Infer from the existing
+  `cultivar`/`origin` columns, not just `name`.
+- In-session "turn off" link gives weird feedback — investigate.
+- ~~Wrong first-steep time on ranges~~ ✓ v3.32 (spread across infusion count). ~~Cold-brew/1-session
+  teas get no forecast~~ ✓ v3.32 (frequency×dose). ~~Reload drops to Home~~ ✓ v3.32.
 
-## Tier 4 — Later / speculative
-Block/report + follow requests, water-profile presets, wishlist/vendor tracking,
-deeper stats, importers from other trackers.
+## Product backlog (Niklas — prioritise in fresh chat)
+- **Settings declutter** — group into sections; toggle to **hide the mood check-in** (one switch,
+  later = Garmin on/off); group **brew-guide + advice** under one block (hide/disable each or both).
+- **Separate Insights tab** to shorten Home — move Insights card / most-brewed / top-rated off Home;
+  keep standard info (cost overview, running-low, brewing-time — confirm). Reuse dashboard registry.
+- **All-time option** for the recap/Wrapped.
+- **Leaf-ratio adaptation** = the missing 3rd advice axis (leaf:water ratio, temperature, time). Still
+  the parked "scale steep times by leaf amount"; central to brew-advice v2 and to learned defaults.
+- **Under-used data to build on:** harvest year/season, cultivar, origin, water TDS/type, mood, feedback.
 
----
+## Up next (map parked — pick the real focus)
+Leaf-ratio design pass (longest-parked, highest-leverage) · settings declutter + Insights tab (quick,
+low-risk warm-up) · then map redesign (drawn outlines) when there's appetite.
 
-## Making it a "real app" (APK) — the ladder, cheapest first
-1. **Installable PWA** — already have it (Add to Home Screen). No store, no APK file.
-2. **TWA via PWABuilder / Bubblewrap → real APK/AAB** (LOW–MED, mostly config). Wraps the
-   existing PWA. Needs: valid PWA (have it), assetlinks.json at /.well-known/ on the domain
-   (GitHub Pages can serve it), a signing key. PWABuilder web UI generates the package.
-   Sideload the APK, or publish to Play Store (Google Play dev account ~$25 one-time +
-   identity verification). **Sweet spot for "an APK in hand."**
-3. **Capacitor → native shell** (MED–HIGH + maintenance). Native APIs: camera, push, share,
-   filesystem. Worth it once committing to the scanner + proper push. Also the path to the
-   iOS App Store (Mac + Apple dev ~$99/yr).
+## Tier 1 — cheap, current stack
+- **Alternative timer animation** [S/M] — cup filling/emptying as the steep runs.
+- **Streak grace day** [S] — one grace/freeze day so a single miss doesn't reset the run.
 
-**Call:** APK now → PWABuilder/TWA. Graduate to Capacitor when scanner/push justify native.
-(Verify store fees/policies at build time — they drift.)
+## Tier 2 — moderate, current stack
+- **Scale steep times by leaf amount** [M] — (parked for discussion) adjust v3.25's schedule by
+  the leaf-to-water ratio (gramsUsed vs vessel capacityMl) vs the guide's assumed ratio, so a
+  heavier or lighter pour shifts the times.
+- **Paused days (holiday / sick / no access)** [M] — mark days exempt; heatmap stripes + legend;
+  exclude from streak/insights or reflect smartly so a break isn't read as a lapse.
+- **Onboarding / feature-discovery pass** [M] — features unlock on thresholds (favourites, low
+  stock, insights, Wrapped); a light guided intro so the app is legible from day one.
+- **Mood / energy check-in** [M] — optional per-session mood/energy; flag late sessions. (Lightweight
+  precursor to the Tier-4 Garmin/sleep epic.)
+- **Per-user profile page** [M] — tap a feed author → their shared sessions (RLS already supports it).
+- **Likes / reactions** [M] · **Feed pagination** [M] (currently capped at 50).
+- **Weight-with-packaging** [S/M] — finish the tare UI (a `defaultPackagingTareG` setting exists).
+- **Partial vessel fill** [S/M] · **Collection achievements + milestones** [S/M] · **Accessibility pass** [M].
 
-## Suggested order
-Offline queue ✓ shipped. Next: **Steep Wrapped** (leans on the recap + insights engines) →
-a **tiny-fix cleanup pass** (8-bit "4", cold-brew steeps, streak start) → **vendor-into-Teas**,
-**richer persona**, and **shopping list** (extends the forecast/restock work). Treat brew-advice,
-the world-map zoom, and meditative-mode focus as the meatier follow-ons. Package an APK with
-PWABuilder whenever you want it on your phone; keep push + scanner + cleanup grouped to amortize
-the first Edge Function.
+## Tier 3 — bigger bets (heavy infra)
+- **Interactive world-map passport** [M/L] — PARKED after the dot-map attempt (v3.33/34) was rejected as
+  unrecognisable ("just dots"). Redo with drawn country outlines + borders (simplified SVG/TopoJSON of tea
+  nations only), choropleth by count, keep China/Japan drill-down. Parsing layer is reusable.
+- **Meditative mode: gong-fu cup + stay-in-focus** [M] — extends the basic focus mode (art = human-made).
+- **Comments + light notifications** [L] · **Push (Web Push / VAPID)** [M/L] — first Edge Function to send.
+- **Label scanner** [M/L] — first Edge Function + vision model. **Cultivar map** [M/L].
+- **German (i18n)** [L] — full string extraction. **XP / levels** [M] (gated). **Orphaned-photo cleanup** [M].
 
----
+## Tier 4 — later / speculative
+- **Garmin Connect + caffeine/sleep** [L, new infra] — pull sleep & activity (OAuth), don't surface
+  actively, correlate with tea (+ coffee as a quick caffeine entry) to hint at sleep effects. Needs a
+  slowly-built **caffeine-content database**. **Normal mode only — never Quiet/Calm.** Build incrementally.
+- 8-bit tea-corner room + rewards shop · colour-shifting theme · high-altitude/old-tree achievement
+  · 8-bit gaiwan logo (art-blocked) · southern-hemisphere Wrapped · block/report · water-profile
+  presets · importers.
 
-## Parked ideas (batch 2)
-- **Nicer empty dashboard for brand-new users** — first thing a new/invited user sees is a
-  bare dashboard. Give it a warm empty state: a short "brew your first cup" prompt, sample
-  of what the dashboard becomes, gentle onboarding. (Overlaps Tier-1 onboarding/empty states.)
-- **World map tea passport (interactive)** — zoomable world/region map; click a region to see
-  the teas you've brewed from there. The visual, richer version of the Tier-2 "tea passport".
-  Effort M/L (map lib + region→tea mapping from the origin field).
-- **"How did this tea make you feel" + sleep effect** — optional post-session check-in (mood/
-  energy), and flag teas drunk late in the day to correlate with sleep. On-theme (ritual +
-  self-knowledge), calm, opt-in. Effort M. Pairs well with the caffeine/night-owl data.
+## Architecture enablers (build these and later features get cheap)
+- ~~**Purchase-date + added-vs-bought flag**~~ ✓ shipped v3.26 (`tea.purchaseDate`; blank = already-had).
+  Now cheap on top: inventory-over-time, restock timing sharpened by real purchase dates.
+- **Caffeine field on teas** (build incrementally now) → the foundation the Garmin/sleep epic sits on.
+- **Mood/energy field on sessions** → makes the sleep/mood correlation cheap later.
+- **Paused-days concept** → holiday-aware stats now; reused by the sleep epic's exempt days.
+- **First Edge Function** (via push OR scanner) → amortizes infra for push + scanner + photo-cleanup + i18n server bits.
+- **Brew-guide parser** → reused by brew-advice tuning and "apply guide to steeps".
+- ~~**Editable-dashboard layout persistence**~~ ✓ shipped v3.27 (`settings.dashLayout` + `renderDashboard`) — the reusable configurable-surface pattern is now in place for other views.
 
----
+## Making it a "real app" (APK)
+1. Installable PWA — already have it. 2. **TWA via PWABuilder/Bubblewrap → APK/AAB** (low–med, mostly
+config; needs assetlinks.json + a signing key) — the sweet spot for "an APK in hand". 3. Capacitor →
+native shell (med–high) once scanner/push justify native; also the iOS App Store path.
 
-## Backlog additions (batch 3)
-- **Cultivar map/passport** — like the origin world map but by cultivar. After sub-regions land.
-- **High-altitude / old-tree achievement or visual** — celebrate gaoshan and ancient-tree teas (needs an altitude/age field on teas). Idea.
-- **Meditative / focus mode during a session** — distraction-free screen; optional 8-bit animation (person drinking tea, tea garden, stream). Mechanic is doable now; character art should be human-made. 
-- **Alternative timer animation** — cup filling/emptying as the steep runs. Very doable, on-theme.
-- **Predictive consumption analysis** — per-tea burn rate from session history → "runs out in ~N days", drinking cadence, favourite-times insights. Feeds low-stock reminders.
-- **Favourites low-stock reminder** — Home section surfacing favourited teas that are low/near-low.
-- **Weight-with-packaging entry** — when adding a tea, option to enter weight incl. packaging with an adjustable tare (~10g default) so you needn't decant to weigh.
-- **Partial vessel fill** — reflect not-filling to capacity (e.g. cold-brew flask 750ml filled to 600ml). Decision: per-vessel default fill vs per-session override.
-- **XP / levels on achievements** — XP scales with rarity + time-to-earn; points from daily use, adding teas, logging. Gated by "show achievements" / quiet mode.
-- **Rewards for levels/points** — 8-bit "tea corner" room you design; shop for kyusu, yixing, furniture, streams, ponds, CN/JP decor. Long-term.
-- **Colour scheme shifting with tea consumption** — long-term ambient theming.
-- **Vendor manager** — edit/rename/merge vendors (currently vendor is free text on teas; renaming is global find-replace).
-- **German language option (i18n)** — full UI translation; sizeable string-extraction effort, needs its own pass.
-- **8-bit gaiwan logo** — pixel version of user's dragon gaiwan. Placeholder until human-made art; keep logo a single swappable asset.
-
----
-
-## Backlog additions (batch 4)
-- **Shopping list** — a dedicated "to buy" list. Two feeders: (1) manual wishlist entries
-  (name + optional vendor/notes, no full tea record needed), (2) auto-suggested restocks from
-  the forecast engine (favourited/low/near-out teas). Check items off; checking a wishlist item
-  can offer "add as tea". Calm, on-theme (extends the existing restock/forecast work rather than
-  a new gamified surface). Effort M, no new infra. Overlaps Tier-4 "wishlist/vendor tracking"
-  and the batch-3 "favourites low-stock reminder" — unify them here.
-- **Brew-advice from session feedback** — after a session, gentle tuning suggestions: too
-  bitter/strong → shorter steep, less leaf, cooler water; not strong enough → the opposite;
-  "liked it? keep your params / something off? try it differently / just experiment — here's
-  what you did last time, change one thing." Start rule-based from a structured "how was it?"
-  pick (bitter / weak / balanced) rather than parsing free text; a model pass over the written
-  description can come later. Pairs with Tier-2 "brew-guide → prefilled steep schedule". Effort M.
-- **World map heat-shading + region zoom** — the passport map, shaded in deepening reds by how
-  much you brew from each region, with zoom into sub-regions of China/Japan. Refines the batch-2
-  "World map tea passport (interactive)"; the sub-region zoom is the new, heavier ask (needs a
-  zoomable map lib + sub-region → origin matching). Effort M/L.
-- **Meditative mode: gong-fu cup + stay-in-focus** — swap the cup art for a small gong-fu cup,
-  and keep focus mode active for the whole session without exiting between steeps. Refines the
-  batch-3 "meditative / focus mode" + "alternative timer animation" entries. Character/cup art
-  stays human-made for public release. Effort M (flow/state work; art blocked on human art).
-- **Richer tea persona** — more distinct persona variations driven by drinking habits (types,
-  times, cadence, strength, cold vs hot), so it feels more personal. Effort S/M, pure client.
-- **Vendor manager → Teas tab** — move vendor management out of Settings (wrong home as the list
-  grows) into the Teas tab as an "edit vendors" control next to "+ add tea". Refines the batch-3
-  "vendor manager" entry with a placement decision. Effort S/M.
-
-### Small fixes (fold into one cleanup pass)
-- **8-bit "4" vs "9"** — the pixel glyph for 4 can read as a 9; redraw it.
-- **Differentiate hot vs cold brew in sessions** — cold-brew sessions shouldn't ask for/keep
-  timed steeps; branch the session flow on isColdBrew. (There's already an isColdBrew flag.)
-- **Streak grid starts at first session** — begin the heatmap/streak at the first-ever logged
-  session, not account/epoch start, so there isn't a long empty run of weeks up front.
+## De-dupe notes
+Predictive stats + nicer empty dashboard = shipped (forecast/insights/onboarding). Favourites low-stock
+reminder + wishlist tracking = folded into the shopping list. World-map and meditative ideas each merged
+to one Tier-3 item. Basic passport + focus mode exist; their Tier-3 entries are the enhancements.
