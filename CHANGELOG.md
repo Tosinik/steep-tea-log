@@ -23,6 +23,22 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.50 — sweep confirm()/alert() → inline UI (sessions + teas)
+Deploy: `service-worker.js` (v61), `steep-core.js`, `steep-sessions.js`, `steep-teas.js`. No SQL.
+- **No more browser popups in steep-sessions/steep-teas.** New shared **`armConfirm(btn, message, onYes)`**
+  (steep-core.js): a destructive button hides itself in place and shows "message · Yes / Cancel" right
+  after it via DOM — non-blocking, and **no re-render**, so unsaved form fields nearby survive (verified:
+  typing an edit in the tea form then arming Delete keeps the text). Any later `render()` just redraws the
+  plain button. The 5 `confirm()`s converted: remove vessel, remove steep, delete session, discard session
+  log, delete tea.
+- **The 5 `alert()`s → `showToast`** (existing non-blocking notice): min-steep guard, "add a tea/vessel
+  first", "enter a steep time", "log at least one steep".
+- **Guards verified per site** (v3.37 re-entrancy): only `deleteSession` has one (`_sessionSaving`), and
+  since the action now fires directly on Yes it still protects the stock-readd on a double-click — no flow
+  depended on `confirm()` blocking. Verified the stock readd (20→26g) still runs exactly once.
+- Remaining popups (out of scope): steep-settings bulk import / photo-migrate, and steep-core's
+  offline-sync error `alert()`.
+
 ## v3.49 — brew-guide emitter round-trips exactly (+ permanent test)
 Deploy: `service-worker.js` (v60), `steep-core.js`, `steep-teas.js`. No SQL.
 - **`scheduleToGuideText` now emits times in raw seconds** (`75s`, not `fmtSecShort`'s `1m15s`). The

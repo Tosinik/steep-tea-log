@@ -730,6 +730,30 @@ function goVessels(){
 }
 function saveView(v){ try{ if(PERSISTED_VIEWS.includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); } }catch(e){} }
 
+// Inline two-step confirm — the calm replacement for blocking confirm() on destructive buttons.
+// Hides the clicked button in place and shows "<message>  Yes / Cancel" right after it, without a
+// re-render, so unsaved fields nearby survive (the tea form + steeping steep inputs read on submit,
+// not per-keystroke). Yes runs onYes() (pass an arrow from the inline handler); Cancel restores the
+// button. Any later full render() just redraws the plain button — no stuck state to track. Since the
+// action fires directly on Yes, sites with sensitive writes keep their own re-entrancy guard
+// (e.g. deleteSession's _sessionSaving) — this never depended on confirm() blocking.
+function armConfirm(btn, message, onYes){
+  if(!btn || btn._confirmOpen) return;
+  btn._confirmOpen = true;
+  btn.style.display = 'none';
+  const box = document.createElement('span');
+  box.className = 'confirm-inline';
+  box.style.cssText = 'display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--ink-soft);';
+  const label = document.createElement('span'); label.textContent = message; box.appendChild(label);
+  const yes = document.createElement('button'); yes.type='button'; yes.className='btn-ghost'; yes.textContent='Yes'; yes.style.color='var(--red)'; yes.style.fontWeight='600';
+  const no = document.createElement('button'); no.type='button'; no.className='btn-ghost'; no.textContent='Cancel';
+  const restore = ()=>{ box.remove(); btn.style.display=''; btn._confirmOpen=false; };
+  yes.addEventListener('click', ()=>{ restore(); try{ onYes(); }catch(e){ console.error('[Steep] confirm action failed', e); } });
+  no.addEventListener('click', restore);
+  box.appendChild(yes); box.appendChild(no);
+  btn.insertAdjacentElement('afterend', box);
+}
+
 function bindDynamic(){
   // image upload
   document.querySelectorAll('.js-img-input').forEach(inp=>{

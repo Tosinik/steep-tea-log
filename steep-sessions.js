@@ -87,7 +87,7 @@ function viewVessels(){
       <span class="rname">${escapeHtml(v.name)} <span style="color:var(--ink-soft);font-weight:400;">— ${escapeHtml(v.type)}${v.material?', '+escapeHtml(v.material):''}</span></span>
       <span class="rval">${v.capacityMl?v.capacityMl+'ml':''}</span>
       <button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))">edit</button>
-      <button class="btn-ghost" onclick="deleteVessel('${v.id}')">remove</button>
+      <button class="btn-ghost" onclick="armConfirm(this,'Remove this vessel?',()=>deleteVessel('${escapeJsArg(v.id)}'))">remove</button>
     </div>
   `).join('') : '<div class="empty">No vessels yet — add your gaiwan, kyusu, or teapot.</div>';
   return `
@@ -153,7 +153,6 @@ async function submitVesselForm(e){
   } finally { _vesselFormSaving = false; }
 }
 function deleteVessel(id){
-  if(!confirm('Remove this vessel?')) return;
   state.vessels = state.vessels.filter(v=>v.id!==id);
   dropVessel(id); render();
 }
@@ -183,9 +182,11 @@ function setEditSessionRating(v){
   state.editingSession.rating = v;
   document.getElementById('editRatingWrap').innerHTML = renderStarsInteractive(v,true,'setEditSessionRating');
 }
+function removeEditSteepClick(btn, i){
+  if(state.editingSession.steeps.length<=1){ showToast('A session needs at least one steep — delete the whole session instead.'); return; }
+  armConfirm(btn, 'Remove steep '+(i+1)+'?', ()=>removeEditSteep(i));
+}
 function removeEditSteep(i){
-  if(state.editingSession.steeps.length<=1){ alert('A session needs at least one steep. Delete the whole session instead if needed.'); return; }
-  if(!confirm('Remove steep '+(i+1)+'?')) return;
   state.editingSession.steeps.splice(i,1);
   render();
 }
@@ -232,7 +233,6 @@ function deleteSession(){
   _sessionSaving = true;
   try {
     const e = state.editingSession;
-    if(!confirm('Delete this session? Its grams will be added back to the tea stock.')) return;
     const tea = teaById(e.teaId);
     if(tea && Number(e.gramsUsed)>0){ tea.amountGrams = (Number(tea.amountGrams)||0) + Number(e.gramsUsed); persistTea(tea); }
     state.sessions = state.sessions.filter(x=>x.id!==e.id);
@@ -244,7 +244,7 @@ function sessionEditModal(){
   const e = state.editingSession;
   const steepsHTML = e.steeps.map((st,i)=>`
     <div class="steep-item">
-      <div class="steep-head"><span>Steep ${i+1}</span><button class="btn-ghost" onclick="removeEditSteep(${i})">remove</button></div>
+      <div class="steep-head"><span>Steep ${i+1}</span><button class="btn-ghost" onclick="removeEditSteepClick(this,${i})">remove</button></div>
       <div class="form-grid" style="margin-top:6px;">
         <div class="field"><label>Temp ${tempUnitLabel()}</label><input type="number" value="${cToDisplay(st.tempC)}" oninput="es_setSteep(${i},'tempC',this.value)"></div>
         <div class="field"><label>Time (sec)</label><input type="number" value="${st.timeSeconds??''}" oninput="es_setSteep(${i},'timeSeconds',this.value)"></div>
@@ -283,7 +283,7 @@ function sessionEditModal(){
       </div>
       <button class="btn" style="margin-top:10px;" onclick="es_convertToSteeps()">Switch to detailed steeps</button>`}
       <div style="display:flex;justify-content:space-between;margin-top:16px;">
-        <button class="btn btn-danger" onclick="deleteSession()">Delete session</button>
+        <button class="btn btn-danger" onclick="armConfirm(this,'Delete this session? Its grams go back to the tea stock.',()=>deleteSession())">Delete session</button>
         <div style="display:flex;gap:8px;"><button class="btn" onclick="closeSessionEdit()">Cancel</button><button class="btn btn-primary" onclick="saveSessionEdit()">Save changes</button></div>
       </div>
     </div>
@@ -292,11 +292,11 @@ function sessionEditModal(){
 
 /* ================= SESSION LOGGING ================= */
 function quickLogSession(){
-  if(state.teas.length===0){ alert('Add a tea first.'); state.view='teas'; render(); return; }
+  if(state.teas.length===0){ showToast('Add a tea first.'); state.view='teas'; render(); return; }
   startSessionFor(null);
 }
 function startSessionFor(teaId){
-  if(state.vessels.length===0){ alert('Add a vessel first (Teas → Vessels) before logging a session.'); goVessels(); return; }
+  if(state.vessels.length===0){ showToast('Add a vessel first — Teas → Vessels.'); goVessels(); return; }
   state.sessionDraft = {
     teaId: teaId || (state.teas.find(t=>!isTeaFinished(t)) || state.teas[0]).id,  // default to an in-stock tea
     vesselId: state.vessels[0].id,
@@ -328,7 +328,6 @@ function startSessionFor(teaId){
   render();
 }
 function cancelSession(){
-  if(!confirm('Discard this session log?')) return;
   clearTimerInterval();
   state.sessionDraft=null; state._draftImage=null; state.view='teas'; render();
 }
@@ -361,7 +360,7 @@ function adjustInfusions(delta){
 function sessionQuickHTML(d){
   const tea = teaById(d.teaId);
   return `
-    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
     <div class="card">
       <h2 style="margin-top:0;">${d.isColdBrew?'Cold brew':'Quick log'}: ${tea?escapeHtml(tea.name):''}</h2>
       <div class="eyebrow">${d.isColdBrew?'A single long steep — just how it went.':'No timed steeps — just how it went.'}</div>
@@ -421,7 +420,7 @@ function sessionSetupHTML(d){
     : '';
   const vesselOpts = state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
   return `
-    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
     <div class="card">
       <h2 style="margin-top:0;">Set up your session</h2>
       <div class="form-grid">
@@ -623,7 +622,7 @@ function sessionSteepingHTML(d){
   const displaySeconds = tm.mode==='timer' ? Math.max(0, tm.target - tm.elapsed) : tm.elapsed;
 
   return `
-    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
     <div class="card">
       <div class="eyebrow">${tea?escapeHtml(tea.name):''} ${d.isColdBrew?'· cold brew':''}</div>
       <h2 style="margin-top:2px;">${dotsRow(d.steeps.length, Math.max(d.steeps.length+1,6))} Steep ${d.steeps.length+1}</h2>
@@ -857,7 +856,7 @@ function saveSteepAndContinue(){
   const temp = document.getElementById('steepTemp').value;
   const time = document.getElementById('steepTime').value;
   const desc = document.getElementById('steepDesc').value;
-  if(!time){ alert('Enter a steep time (or use the timer).'); return; }
+  if(!time){ showToast('Enter a steep time, or use the timer.'); return; }
   const idx = d.steeps.length; // index of the steep being committed
   d.steeps.push({id:uid(), order:d.steeps.length+1, tempC:displayToC(temp), timeSeconds:Number(time), description:desc.trim(), tags:[...d.curSteepTags]});
   // If this steep's time differs from what the schedule predicted, carry that gap
@@ -878,7 +877,7 @@ function finishSteeping(){
   // Auto-capture an in-progress steep (time filled in) — no browser popup.
   const timeVal = document.getElementById('steepTime')?.value;
   if(timeVal && Number(timeVal)>0){ saveSteepAndContinue(); }
-  if(state.sessionDraft.steeps.length===0){ alert('Log at least one steep first.'); return; }
+  if(state.sessionDraft.steeps.length===0){ showToast('Log at least one steep first.'); return; }
   clearTimerInterval();
   state.sessionDraft.stage='finish';
   render();
@@ -887,7 +886,7 @@ function finishSteeping(){
 function sessionFinishHTML(d){
   const tea = teaById(d.teaId);
   return `
-    <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
+    <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
     <div class="card">
       <h2 style="margin-top:0;">Wrap up: ${tea?escapeHtml(tea.name):''}</h2>
       <div class="eyebrow">${d.steeps.length} steep${d.steeps.length===1?'':'s'} logged</div>

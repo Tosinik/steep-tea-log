@@ -199,8 +199,12 @@ only the rendering gets replaced. See ROADMAP/STATE.
   surfaces should default off or live behind a toggle.
 - **Features are opt-in.** e.g. brew-guide autofill, brew advice, and the mood check-in
   each have a settings switch to disable them.
-- **No browser `confirm()` / `prompt()`** — use inline UI. (A couple of legacy
-  `alert()`s remain in sessions; on the backlog, don't add more.)
+- **No browser `confirm()` / `prompt()` / `alert()`** — use inline UI. Destructive actions use
+  the shared **`armConfirm(btn, message, onYes)`** (steep-core.js): a two-step "message · Yes / Cancel"
+  swapped in place of the button via DOM (no re-render, so unsaved fields survive; any later render
+  clears it). Notices use **`showToast(msg)`**. (v3.50 swept steep-sessions/steep-teas clean; a few
+  `alert()`/`confirm()` remain only in steep-settings (bulk import / photo-migrate) and the
+  offline-sync error notice in steep-core — don't add new ones.)
 - **Never strand existing user data behind a settings toggle.** A switch that hides a
   feature must not hide or orphan data the user already entered — data stays readable/
   editable regardless of the toggle state.
@@ -238,4 +242,6 @@ Live issues (see STATE.md / ROADMAP for the full backlog):
   future data-model change would make it idempotent by construction (see ROADMAP).
 - **In-session "turn off" link gives weird feedback** — investigate `d_setBrewMode('off')`
   mid-session.
-- **Legacy `alert()`s in sessions** — a couple remain; use inline UI, don't add more.
+- ~~**Legacy `alert()`s in sessions.**~~ **Swept v3.50** — steep-sessions/steep-teas now use
+  `armConfirm` (inline two-step) + `showToast`. Remaining `alert()`/`confirm()` live only in
+  steep-settings (bulk import/photo-migrate) and steep-core's offline-sync error.

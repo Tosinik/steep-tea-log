@@ -251,7 +251,7 @@ function teaFormModal(){
           </div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:18px;">
-          <div>${t.id?`<button type="button" class="btn-danger btn" onclick="deleteTea('${t.id}')">Delete</button>`:'<span></span>'}</div>
+          <div>${t.id?`<button type="button" class="btn-danger btn" onclick="armConfirm(this,'Delete this tea? Session history stays but shows as an unknown tea.',()=>deleteTea('${escapeJsArg(t.id)}'))">Delete</button>`:'<span></span>'}</div>
           <div style="display:flex;gap:8px;"><button type="button" class="btn" onclick="closeTeaForm()">Cancel</button><button type="submit" class="btn btn-primary">Save tea</button></div>
         </div>
       </form>
@@ -307,7 +307,6 @@ async function submitTeaForm(e){
   } finally { _teaFormSaving = false; }
 }
 function deleteTea(id){
-  if(!confirm('Delete this tea? Session history stays but will show as an unknown tea.')) return;
   state.teas = state.teas.filter(t=>t.id!==id);
   dropTea(id);
   state.teaFormOpen=false; state.editingTea=null; state.view='teas'; state.activeTeaId=null;
