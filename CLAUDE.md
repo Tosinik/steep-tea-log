@@ -101,7 +101,8 @@ Load order (from `index.html`):
 
 ```
 steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard →
-steep-teas → steep-shopping → steep-passport → steep-social → steep-sessions → steep-boot
+steep-insights → steep-teas → steep-shopping → steep-passport → steep-social →
+steep-sessions → steep-boot
 ```
 
 - **steep-data** — Supabase client, `loadKey`/`saveKey`, snake_case↔camelCase mappers,
@@ -113,6 +114,14 @@ steep-teas → steep-shopping → steep-passport → steep-social → steep-sess
   `init`/`refresh`, achievements, plus the brew-guide parser & leaf-form logic.
 - Feature modules each own their view + logic (settings, dashboard, teas, shopping,
   passport, social, sessions).
+- **steep-dashboard** / **steep-insights** — the two dashboard surfaces (Home / Insights
+  tabs), split v3.44. Home owns persona/heatmap-adjacent/cost/running-low/clock/recent/
+  totals/favorites; Insights owns recap/Wrapped/insights-reading/type-breakdown/most-brewed.
+  Both render through the **shared editable-card registry** in steep-dashboard: `DASH_SURFACE`
+  assigns each card id a surface ('home'|'insights'), and `renderDashboard(cards, surface)`
+  filters the saved `dashLayout` per tab (reorder/hide work per-tab; cards don't move between
+  tabs). Adding a card = add its id to `DASH_DEFAULT_ORDER`, `DASH_LABELS`, `DASH_SURFACE`,
+  and build its HTML in the owning view.
 - **steep-boot** — `SteepDB.boot(init)` + service-worker registration/update banner.
 
 The v3 split of the old single `app.js` into these modules was purely mechanical — no

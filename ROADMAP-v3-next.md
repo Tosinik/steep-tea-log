@@ -12,14 +12,13 @@ Each item is one deploy unless noted; follow the deploy ritual in CLAUDE.md (bum
 update CHANGELOG/STATE, validate against fixtures). Shipped so far: v3.38 KB · v3.39 tea picker ·
 v3.40 tea lifecycle.
 
-1. **Next — Insights tab + dashboard split** (review finding #10). **One deploy — the new
-   tab is the seam that carries the split.** Move the heavier analytics (Insights card,
-   most-brewed, top-rated) off Home into their own tab; keep the standard, at-a-glance info
-   on Home. `steep-dashboard.js` (~1040 lines) splits along that boundary. Reuse the
-   editable-dashboard registry (`dashLayout`/`renderDashboard`). Confirm with Niklas exactly
-   which cards move vs stay (cost overview, running-low, brewing-clock likely stay).
+1. ~~**Insights tab + dashboard split**~~ ✓ **shipped v3.44** (review finding #10). New
+   `steep-insights.js`; nav gains Insights (recap/Wrapped/insights/type-breakdown/most-brewed);
+   Home keeps persona/cost/running-low/clock/recent/totals/favorites; heatmap+streak stayed on
+   Sessions (they were never on Home). Surface-aware `dashLayout` (`DASH_SURFACE`), per-tab
+   reorder/hide, lossless migration. Recap gained an "All time" option (was a Tier backlog item).
 
-2. **Then — Brew advice v2** (per `SPEC-brew-advice-v2.md`, DECIDED). The missing 3rd advice
+2. **Next — Brew advice v2** (per `SPEC-brew-advice-v2.md`, DECIDED). The missing 3rd advice
    axis: leaf-to-water ratio. Sequenced (D5):
    - **Capacity-capture precursor** (tiny deploy, ships first). Make vessel `capacityMl`
      a visible, encouraged (not required) field; quiet "· ml?" affordance on capacity-less
@@ -157,7 +156,8 @@ Genuinely open, not sequenced/cut/frozen. Pull into a deploy when it fits:
 - **Paused days (holiday / sick)** [M] — mark days exempt; heatmap stripes; excluded from streak/
   insights. (Also an enabler for the Garmin epic's exempt days.)
 - **Onboarding / feature-discovery pass** [M] — features surface on thresholds; light guided intro.
-- **All-time option** for the recap/Wrapped (currently period-limited).
+- **All-time option** — ✓ recap gained "All time" (v3.44); Wrapped is still season-scoped (a
+  Wrapped all-time/annual view remains open if wanted).
 - **Per-user profile page** [M] — tap a feed author → their shared sessions (RLS already supports it).
 - **Likes / reactions** [M] — small table + RLS; lighter than comments (which are frozen).
 - **Collection achievements + milestones** [S/M] — types/regions/cultivars (gated behind the

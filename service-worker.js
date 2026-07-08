@@ -1,4 +1,4 @@
-const CACHE_NAME = 'steep-tea-log-v54';
+const CACHE_NAME = 'steep-tea-log-v55';
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const FILES_TO_CACHE = [
   './steep-core.js',
   './steep-settings.js',
   './steep-dashboard.js',
+  './steep-insights.js',
   './steep-teas.js',
   './steep-shopping.js',
   './steep-passport.js',

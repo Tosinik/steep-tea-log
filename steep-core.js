@@ -77,7 +77,7 @@ function groupTeasByType(teas){
 function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g.teas); }
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
-const PERSISTED_VIEWS = ['dashboard','teas','sessions','vessels','friends'];
+const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','vessels','friends'];
 const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel', brewGuideAutofill:true, brewAdvice:true, showMood:true };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
@@ -664,6 +664,7 @@ function render(){
   }
   let body = '';
   if(state.view==='dashboard') body = viewDashboard();
+  else if(state.view==='insights') body = viewInsights();
   else if(state.view==='teas') body = viewTeas();
   else if(state.view==='tea-detail') body = viewTeaDetail();
   else if(state.view==='vessels') body = viewVessels();
@@ -690,6 +691,7 @@ function render(){
       </div>
       <div class="tabs">
         <button class="tab ${state.view==='dashboard'?'active':''}" onclick="goView('dashboard')">Home</button>
+        <button class="tab ${state.view==='insights'||state.view==='wrapped'?'active':''}" onclick="goView('insights')">Insights</button>
         <button class="tab ${state.view==='teas'||state.view==='tea-detail'?'active':''}" onclick="goView('teas')">Teas</button>
         <button class="tab ${state.view==='sessions'?'active':''}" onclick="goView('sessions')">Sessions</button>
         <button class="tab ${state.view==='vessels'?'active':''}" onclick="goView('vessels')">Vessels</button>

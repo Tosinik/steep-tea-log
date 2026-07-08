@@ -23,6 +23,27 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.44 — Insights tab + dashboard split
+Deploy: `index.html`, `service-worker.js` (v55), **new** `steep-insights.js`, `steep-dashboard.js`,
+`steep-core.js`. No SQL.
+- **Nav gains an Insights tab.** Home now leads with the calm, at-a-glance cards; the analytics move
+  to Insights. **Home:** persona, cost overview, running-low, brewing clock, recent sessions, totals,
+  favorites. **Insights:** Recap, Steep Wrapped, the Insights reading, "What you brewed" (type
+  breakdown), Most-brewed / Top-rated. (Heatmap + streak stay on the Sessions tab, per Niklas — they
+  were never on Home.)
+- **New module `steep-insights.js`** owns the analytics cards + `viewInsights()` — the tab is the seam
+  that splits `steep-dashboard.js` (~1040 → ~740 lines), addressing review finding #10. Added to
+  `index.html` load order + `FILES_TO_CACHE`; module map in CLAUDE.md.
+- **Surface-aware editable layout.** The `dashLayout` registry gains `DASH_SURFACE` (each card's home
+  surface); `renderDashboard(cards, surface)` filters per tab, and reorder/hide work per-tab. Migration
+  is automatic and lossless: existing saved `{order,hidden}` keep their visibility and gain surfaces
+  from the constant — **nothing a user hid can reappear** (validated).
+- **Recap gains an "All time" option** (alongside This week / This month).
+- Validated in a vm sandbox against real fixtures: a representative pre-split `dashLayout` migrates with
+  hidden cards preserved and no cross-tab leakage; `viewDashboard()`/`viewInsights()` render only their
+  own cards — 16 checks green; all prior suites (XSS/KB/lifecycle/tea-order/brew-accuracy) still green;
+  `node --check` clean.
+
 ## v3.43 — silver needle glass note
 Deploy: `service-worker.js` (v54), `steep-knowledge.js`. Reference: `knowledge/brew-guides.md`
 (Fujian Silver Needle entry added; removed from pending stubs). No SQL.

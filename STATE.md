@@ -84,8 +84,11 @@ deferred: extend the opening-dip to oolong `LEAF_PROFILES` curves) · **v3.42 br
 retune — opening dip now on oolong/bud/compressed, moderate bases; matched KB style's `first` is the
 generation base; KB ball_oolong 95/3.5/45, longjing 78; validated vs fixtures/steeps — Ali Shan → 45/27/27).
 · **v3.43 silver needle glass note** (KB `silver_needle` note adds "also classic in glass: 80°C, ~4 min";
-baseline unchanged). **Next: Insights tab + dashboard split** (finding #10). The v3.34 map legibility pass
-was built but NOT shipped — map is parked. Cache **v54**.
+baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insights.js` owns the analytics
+cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
+recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
+capture precursor, then ratio phase 1 (see `SPEC-brew-advice-v2.md`). The v3.34 map legibility pass was
+built but NOT shipped — map is parked. Cache **v55**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other
