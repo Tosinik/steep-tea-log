@@ -37,13 +37,11 @@ v3.40 tea lifecycle.
      against `fixtures/steeps` (Ali Shan generates 45/27/27, in the logged corridor). Follow-on:
      learned defaults (brew-advice v2 phase 2) refine these from real "good" sessions.
 
-**Open design decisions (2026-07-08, answer before their deploys):**
-- **Pixel-font replacement** — Pixelify Sans is to be REMOVED (Niklas's call; it was v3.17's look).
-  Everything routes through `--font-mono`, so it's a one-line CSS swap + drop the Google-Fonts weight +
-  retire the Pixel/Clean Settings toggle (`monoFont`) once decided. Candidate directions proposed;
-  awaiting Niklas's pick.
-- **Persona-slot replacement** — the Tea persona card was removed in v3.52. Candidate calmer
-  replacements proposed (see chat 2026-07-08); optional, Home works without one.
+**Open design decisions (2026-07-08) — RESOLVED:**
+- ~~**Pixel-font replacement**~~ ✓ **shipped v3.53** — Pixelify Sans → IBM Plex Mono via `--font-mono`;
+  Google-Fonts weight swapped, Pixel/Clean toggle + `monoFont` retired, eyebrow tracking `.1em → .06em`.
+- **Persona-slot replacement** — DECIDED: a ritual-first **greeting card** (greeting line + one gentle
+  same-time-of-day tea suggestion, no identity labels). Shipping as **v3.54** (next). Home works without one.
 
 3. **Then — the rest of the "forgotten" batch** (small independent deploys, order flexible):
    - ~~**Tea lifecycle / at-0g**~~ ✓ **shipped v3.40** (finished-teas grouping + hidden-in-picker +

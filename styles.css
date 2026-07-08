@@ -15,11 +15,7 @@
   --glow:0 0 0 rgba(0,0,0,0);
   --heat-empty:#E4DCC5;
   --heat-fill:#4A7A3F;
-  --font-mono:'Pixelify Sans',monospace;
-}
-/* "Clean" font option (Settings): swap the pixel font for a standard monospace */
-html[data-mono="clean"]{
-  --font-mono:ui-monospace,'SF Mono','Menlo',Consolas,'Roboto Mono',monospace;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
 html[data-theme="dark"]{
   --porcelain:#15140F;
@@ -44,7 +40,7 @@ html,body{margin:0;padding:0;background:var(--porcelain);color:var(--ink);font-f
 body{-webkit-font-smoothing:antialiased;}
 h1,h2,h3,.display{font-family:'Fraunces',serif;}
 .mono{font-family:var(--font-mono);}
-.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
 button{font-family:'Inter',sans-serif;cursor:pointer;}
 #app{max-width:920px;margin:0 auto;padding:0 16px 80px;}
 a{color:inherit;}

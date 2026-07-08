@@ -78,7 +78,7 @@ function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
 const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, monoFont:'pixel', brewGuideAutofill:true, brewAdvice:true, showMood:true };
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
 let state = {
@@ -162,7 +162,6 @@ async function refreshData(){
 
 /* ---------- settings ---------- */
 function applySettings(){
-  document.documentElement.setAttribute('data-mono', state.settings.monoFont==='clean' ? 'clean' : 'pixel');
 }
 function persistSettings(){ window.SteepDB.saveSettings(state.settings).catch(saveErr); }
 function tempUnitLabel(){ return state.settings.tempUnit==='f' ? '°F' : '°C'; }

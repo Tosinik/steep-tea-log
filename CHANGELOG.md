@@ -23,6 +23,21 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.53 — retire Pixelify Sans → IBM Plex Mono
+Deploy: `service-worker.js` (v63), `index.html`, `styles.css`, `steep-settings.js`, `steep-core.js`. No SQL.
+- **The pixel font is gone.** `--font-mono` is now `'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace`;
+  the Google Fonts `<link>` loads `IBM+Plex+Mono:wght@400;500;600;700` (weights used by `.pill`, `.badge-title`,
+  `.stat .num`, `.timer-display`). Every `.mono`/`.eyebrow`/`.stat .num`/`.timer-display` etc. inherits it.
+- **The Pixel/Clean "Display font" toggle is retired** — it only existed to escape the pixel look. Removed the
+  Settings `set-row`, `monoFont` from `DEFAULT_SETTINGS`, the `html[data-mono="clean"]` CSS block, and the
+  `data-mono` `setAttribute` in the theme applier (`applySettings` is now a no-op kept for its call sites). A
+  leftover `monoFont` key in already-synced settings is harmless — no migration.
+- **Eyebrow tracking `.1em → .06em`.** IBM Plex Mono runs wider than Pixelify; at `.1em` the long
+  "Suggested brew · <leaf-form> family · auto" eyebrows wrapped to two lines on 375px. Tightening to `.06em`
+  (still clearly letter-spaced) reclaims the borderline ones without shrinking any font-size. Verified in the
+  preview at 375px: eyebrow computes to IBM Plex Mono, `letter-spacing:0.66px`, and the woff2 loads over the wire.
+
+---
 ## v3.52 — remove the Tea persona card
 Deploy: `service-worker.js` (v62, shared with v3.51), `steep-dashboard.js`, `styles.css`. No SQL.
 - **The "Your tea persona" Home banner is gone** — `computePersona`, the `persona` dashboard card
