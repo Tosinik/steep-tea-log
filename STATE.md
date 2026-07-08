@@ -87,9 +87,14 @@ generation base; KB ball_oolong 95/3.5/45, longjing 78; validated vs fixtures/st
 baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insights.js` owns the analytics
 cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
 recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
-capture precursor (v3.56), then ratio phase 1 (v3.57) (see `SPEC-brew-advice-v2.md` + `TASK-brew-advice-v2.md`
-in Downloads — the authoritative work order). Deploy AFTER v3.55: pause after each. The v3.34 map legibility
-pass was built but NOT shipped — map is parked. Cache **v65** (v3.55: **greeting card v2 — window-aware**.
+capture precursor (v3.56 ✓ shipped), then ratio phase 1 (v3.57 — NEXT) (see `SPEC-brew-advice-v2.md` +
+`TASK-brew-advice-v2.md` in Downloads — the authoritative work order). Pause after each deploy. The v3.34 map
+legibility pass was built but NOT shipped — map is parked. Cache **v66** (v3.56: **capacity-capture
+precursor** — groundwork for the ratio axis. All vessel/session views live in steep-sessions.js. Vessel form
+Capacity field gains a soft hint + example placeholder (still optional); vessels list shows a quiet "· ml?"
+tap-to-edit affordance on capacity-less vessels; session setup shows an inline "set capacity" link under the
+Vessel picker when the chosen vessel lacks one (`selVes`/`capLink`, opens the edit overlay, draft persists).
+Never a banner, never blocks logging. No SQL. v3.55: **greeting card v2 — window-aware**.
 `greetingCardHTML` (steep-dashboard.js) now checks whether NOW is inside the user's real drinking window: a
 time-of-day bucket is *active* if it holds ≥2 sessions or ≥15% of total, needs ≥5 sessions of signal (else
 v3.54 behaviour). Inactive-bucket → scan `BUCKET_CYCLE` forward to the next active window and suggest FOR it

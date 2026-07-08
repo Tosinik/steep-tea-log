@@ -27,10 +27,11 @@ v3.40 tea lifecycle.
 2. **Next — Brew advice v2** (per `SPEC-brew-advice-v2.md` + `TASK-brew-advice-v2.md` in Downloads,
    DECIDED). The missing 3rd advice axis: leaf-to-water ratio. Sequenced (D5) — **v3.56** capacity
    precursor, then **v3.57** ratio phase 1 (pause after each deploy):
-   - **Capacity-capture precursor** (tiny deploy, ships first). Make vessel `capacityMl`
-     a visible, encouraged (not required) field; quiet "· ml?" affordance on capacity-less
-     vessels; an inline "set capacity" link in the (hidden) ratio line at session setup. No
-     banners, never blocks logging. Ratio fails silently without capacity, so this comes first.
+   - ~~**Capacity-capture precursor**~~ ✓ **shipped v3.56** (steep-sessions.js). Vessel form
+     Capacity gains a soft hint + example placeholder (still optional); vessels list shows a quiet
+     "· ml?" tap-to-edit affordance on capacity-less vessels; session setup shows an inline
+     "set capacity" link under the Vessel picker when the chosen vessel lacks one (opens the edit
+     overlay, session draft persists behind it). No banners, never blocks logging.
    - **Ratio phase 1.** `actualRatio = gramsUsed / (waterMl/100)` vs a baseline
      (guide-parsed grams+ml → `kbResolve().ratio` → per-`LEAF_PROFILES` default); scale the
      prefilled schedule by `clamp(1/ratioFactor^k, 0.6, 1.4)`, k=0.6 (tunable constants next to

@@ -85,7 +85,7 @@ function viewVessels(){
     <div class="rank-row">
       <span class="vessel-thumb" style="${v.image?`background-image:url(${escapeHtml(v.image)})`:''}">${v.image?'':'🫖'}</span>
       <span class="rname">${escapeHtml(v.name)} <span style="color:var(--ink-soft);font-weight:400;">— ${escapeHtml(v.type)}${v.material?', '+escapeHtml(v.material):''}</span></span>
-      <span class="rval">${v.capacityMl?v.capacityMl+'ml':''}</span>
+      <span class="rval">${v.capacityMl?v.capacityMl+'ml':`<button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))" style="color:var(--ink-soft);font-size:11px;text-decoration:underline;padding:0;">· ml?</button>`}</span>
       <button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))">edit</button>
       <button class="btn-ghost" onclick="armConfirm(this,'Remove this vessel?',()=>deleteVessel('${escapeJsArg(v.id)}'))">remove</button>
     </div>
@@ -119,7 +119,7 @@ function vesselFormModal(){
         <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan" value="${escapeHtml(v.name||'')}"></div>
         <div class="field" style="margin-bottom:12px;"><label>Type</label><select name="type">${opts}</select></div>
         <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..." value="${escapeHtml(v.material||'')}"></div>
-        <div class="field" style="margin-bottom:12px;"><label>Capacity (ml)</label><input type="number" name="capacityMl" placeholder="120" value="${v.capacityMl??''}"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Capacity (ml) <span style="color:var(--ink-soft);font-weight:400;">— helps tune brew advice by leaf-to-water ratio</span></label><input type="number" name="capacityMl" placeholder="e.g. 110 for a gaiwan, 200 for a kyusu" value="${v.capacityMl??''}"></div>
         <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="closeVesselForm()">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
       </form>
     </div>
@@ -419,13 +419,19 @@ function sessionSetupHTML(d){
     ? `<button type="button" onclick="d_showFinishedTeas()" style="margin-top:5px;background:none;border:0;padding:0;color:var(--ink-soft);font-size:11px;text-decoration:underline;cursor:pointer;">show finished (${finished.length})</button>`
     : '';
   const vesselOpts = state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
+  // v3.56 capacity precursor: a quiet inline nudge when the chosen vessel has no capacity — taps to
+  // its edit form (draft persists behind the overlay). Never a banner, never blocks logging.
+  const selVes = vesselById(d.vesselId);
+  const capLink = (selVes && !selVes.capacityMl)
+    ? `<button type="button" onclick="openVesselForm(vesselById('${escapeJsArg(selVes.id)}'))" style="margin-top:5px;background:none;border:0;padding:0;color:var(--ink-soft);font-size:11px;text-decoration:underline;cursor:pointer;">set capacity — sharpens brew advice</button>`
+    : '';
   return `
     <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
     <div class="card">
       <h2 style="margin-top:0;">Set up your session</h2>
       <div class="form-grid">
         <div class="field span2"><label>Tea</label><select onchange="d_setTea(this.value)">${teaOpts}</select>${showFinLink}</div>
-        <div class="field"><label>Vessel</label><select onchange="d_set('vesselId', this.value)">${vesselOpts}</select></div>
+        <div class="field"><label>Vessel</label><select onchange="d_set('vesselId', this.value)">${vesselOpts}</select>${capLink}</div>
         <div class="field"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
         <div class="field"><label>Water type</label><input type="text" value="${escapeHtml(d.waterType)}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>

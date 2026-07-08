@@ -23,6 +23,24 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.56 — capacity-capture precursor (brew advice v2, step 1)
+Deploy: `service-worker.js` (v66), `steep-sessions.js`. No SQL.
+- **Groundwork for the leaf-to-water ratio axis (v3.57):** ratio needs each vessel's `capacityMl`,
+  which is nullable and sparse. This makes capacity visible and gently encouraged — never required,
+  never a banner, never blocks logging (calm-first). All three vessel/session views live in
+  steep-sessions.js (steep-teas.js only hosts the Teas|Vessels segment that calls `viewVessels`), so
+  this is a one-file behaviour change.
+- **Vessel form:** the Capacity field gains a soft hint ("— helps tune brew advice by leaf-to-water
+  ratio") and an example placeholder ("e.g. 110 for a gaiwan, 200 for a kyusu"). Still optional.
+- **Vessels list:** a capacity-less vessel now shows a quiet "· ml?" affordance in the value slot
+  (instead of blank) that taps straight to its edit form.
+- **Session setup:** when the chosen vessel has no capacity, a quiet inline "set capacity — sharpens
+  brew advice" link appears under the Vessel picker (`selVes`/`capLink`). It opens that vessel's edit
+  form as an overlay; the session draft persists behind it (fields write to `state.sessionDraft`
+  on input) and setup reappears on save/close. Never a modal that demands capacity, never blocks the
+  log — matches the `showFinLink` pattern.
+
+---
 ## v3.55 — greeting card v2: respect the user's real drinking window
 Deploy: `service-worker.js` (v65), `steep-dashboard.js`. No SQL.
 - **The greeting no longer nudges a brew at a time the user never brews.** New active-window
