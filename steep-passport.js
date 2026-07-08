@@ -144,7 +144,6 @@ function viewPassport(){
 
   const cell=9, pad=6;
   const cx = c => pad+c*cell+cell/2, cy = r => pad+r*cell+cell/2;
-  const esc = s => (s||'').replace(/'/g,"\\'");
   // Gentle pin sizing (sqrt) so counts read as a soft ramp without big blobs that
   // hide the land underneath. Labels sit just below each pin so the region is legible.
   const rFor = n => (2.5 + Math.sqrt(Math.max(1,n))*0.95);
@@ -181,7 +180,7 @@ function viewPassport(){
     // faint marker for country-level (region-unspecified) teas
     if(noneCount){
       const nr=rFor(noneCount).toFixed(1);
-      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${nr}" fill="var(--heat-empty)" stroke="var(--line)" stroke-width="1.1" style="cursor:pointer;" onclick="passportSubSelect('${esc(zoom)}',null)"><title>${zoom} · region unspecified · ${noneCount}</title></circle>`;
+      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${nr}" fill="var(--heat-empty)" stroke="var(--line)" stroke-width="1.1" style="cursor:pointer;" onclick="passportSubSelect('${escapeJsArg(zoom)}',null)"><title>${zoom} · region unspecified · ${noneCount}</title></circle>`;
       svg += label(`? ${noneCount}`, g.col, g.row, +nr+4.6, 4.2);
     }
     PASSPORT_SUB[zoom].forEach(s=>{
@@ -189,7 +188,7 @@ function viewPassport(){
       const n=list.length, rad=rFor(n).toFixed(1);
       const on = state.passportSub===s.name;
       const fill = on?'var(--jade)':'var(--clay)', stroke = on?'var(--amber)':'var(--white)', sw = on?2:1.2;
-      svg += `<circle cx="${cx(s.col)}" cy="${cy(s.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSubSelect('${esc(zoom)}','${esc(s.name)}')"><title>${s.name} · ${n} tea${n===1?'':'s'}</title></circle>`;
+      svg += `<circle cx="${cx(s.col)}" cy="${cy(s.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSubSelect('${escapeJsArg(zoom)}','${escapeJsArg(s.name)}')"><title>${s.name} · ${n} tea${n===1?'':'s'}</title></circle>`;
       svg += label(`${s.name} ${n}`, s.col, s.row, +rad+4.6, 4.2);
     });
   } else {
@@ -200,7 +199,7 @@ function viewPassport(){
       const sel = state.passportSel===country;
       const fill = sel?'var(--jade)':'var(--clay)', stroke = sel?'var(--amber)':'var(--white)', sw = sel?2:1.2;
       const zoomable = PASSPORT_ZOOMABLE[country];
-      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSelect('${esc(country)}')"><title>${country} · ${n} tea${n===1?'':'s'}${zoomable?' · tap to zoom':''}</title></circle>`;
+      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSelect('${escapeJsArg(country)}')"><title>${country} · ${n} tea${n===1?'':'s'}${zoomable?' · tap to zoom':''}</title></circle>`;
       if(zoomable){ svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${(+rad+2.2).toFixed(1)}" fill="none" stroke="var(--amber)" stroke-width="0.7" stroke-dasharray="1.6 1.8" opacity="0.5" style="pointer-events:none;"/>`; }
       svg += label(`${country} ${n}`, g.col, g.row, +rad+6, 6.2);
     });
@@ -216,18 +215,18 @@ function viewPassport(){
     const title = state.passportSub ? `${state.passportSub}, ${zoom}` : zoom;
     const list = state.passportSub ? (sd[state.passportSub]||[]) : byCountry[zoom];
     const subChipCss = 'display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0 7px 7px 0;cursor:pointer;';
-    const subChips = named.map(nm=>`<span style="${subChipCss}${state.passportSub===nm?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSubSelect('${esc(zoom)}','${esc(nm)}')">${nm} <b style="color:var(--clay);">${sd[nm].length}</b></span>`).join('')
-      + (sd._none && sd._none.length ? `<span style="${subChipCss}${state.passportSub===null?'':''}" onclick="passportSubSelect('${esc(zoom)}',null)">Region unspecified <b style="color:var(--clay);">${sd._none.length}</b></span>` : '');
+    const subChips = named.map(nm=>`<span style="${subChipCss}${state.passportSub===nm?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSubSelect('${escapeJsArg(zoom)}','${escapeJsArg(nm)}')">${nm} <b style="color:var(--clay);">${sd[nm].length}</b></span>`).join('')
+      + (sd._none && sd._none.length ? `<span style="${subChipCss}${state.passportSub===null?'':''}" onclick="passportSubSelect('${escapeJsArg(zoom)}',null)">Region unspecified <b style="color:var(--clay);">${sd._none.length}</b></span>` : '');
     panel = `<div style="font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);">${title}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'} · tap a tea to open</div>
       ${named.length?`<div style="display:flex;flex-wrap:wrap;margin-bottom:10px;">${subChips}</div>`:''}
-      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${t.id}','passport')">${t.name}</span>`).join('')}</div>`;
+      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${escapeJsArg(t.id)}','passport')">${escapeHtml(t.name)}</span>`).join('')}</div>`;
   } else if(state.passportSel && byCountry[state.passportSel]){
     const list = byCountry[state.passportSel];
     const zoomable = PASSPORT_ZOOMABLE[state.passportSel];
     panel = `<div style="font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);">${state.passportSel}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'}${zoomable?' · tap the pin to zoom into sub-regions':' · tap to open'}</div>
-      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${t.id}','passport')">${t.name}</span>`).join('')}</div>`;
+      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${escapeJsArg(t.id)}','passport')">${escapeHtml(t.name)}</span>`).join('')}</div>`;
   } else {
     panel = `<div style="color:var(--ink-soft);font-size:13px;line-height:1.5;">Tap a pin — or a region below — to see the teas you've brewed from there. China and Japan zoom into sub-regions. Tap a tea to open it.</div>`;
   }
@@ -235,10 +234,10 @@ function viewPassport(){
   // ---- region chips (overview only, sorted by count) ----
   const rchipCss = 'display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0 7px 7px 0;cursor:pointer;';
   const chips = zoom ? '' : owned.sort((a,b)=>byCountry[b].length-byCountry[a].length)
-    .map(c=>`<span style="${rchipCss}${state.passportSel===c?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSelect('${esc(c)}')">${c} <b style="color:var(--clay);">${byCountry[c].length}</b>${PASSPORT_ZOOMABLE[c]?' <span style="color:var(--amber);">⊕</span>':''}</span>`).join('');
+    .map(c=>`<span style="${rchipCss}${state.passportSel===c?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSelect('${escapeJsArg(c)}')">${c} <b style="color:var(--clay);">${byCountry[c].length}</b>${PASSPORT_ZOOMABLE[c]?' <span style="color:var(--amber);">⊕</span>':''}</span>`).join('');
 
   const unmappedNote = (!zoom && unmapped.length)
-    ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;">${unmapped.length} tea${unmapped.length===1?'':'s'} not yet placed${unmapped.length<=6?': '+unmapped.map(t=>t.name).join(', '):''}. Add a country to the origin field to map ${unmapped.length===1?'it':'them'}.</div>`
+    ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;">${unmapped.length} tea${unmapped.length===1?'':'s'} not yet placed${unmapped.length<=6?': '+unmapped.map(t=>escapeHtml(t.name)).join(', '):''}. Add a country to the origin field to map ${unmapped.length===1?'it':'them'}.</div>`
     : '';
 
   const zoomBar = zoom

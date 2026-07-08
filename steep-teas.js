@@ -1,11 +1,11 @@
 function teaCardHTML(t){
-  const bg = t.image ? `background-image:url(${t.image})` : '';
+  const bg = t.image ? `background-image:url(${escapeHtml(t.image)})` : '';
   const sessionsForTea = state.sessions.filter(s=>s.teaId===t.id).length;
-  return `<div class="tea-card" onclick="openTeaDetail('${t.id}')">
+  return `<div class="tea-card" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
     <div class="tea-thumb" style="${bg}">${t.isFavorite?'<span class="fav">♥</span>':''}</div>
     <div class="tea-body">
-      <span class="pill t-${t.type}">${typeLabel(t.type)}</span>
-      <div class="name">${t.name}</div>
+      <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
+      <div class="name">${escapeHtml(t.name)}</div>
       ${renderStarsStatic(Number(t.rating)||0,false)}
       <div class="tea-meta">${Number(t.amountGrams)<lowStockG()?'<span class="stock-low">'+Number(t.amountGrams).toFixed(1)+'g left</span>':Number(t.amountGrams).toFixed(1)+'g on hand'} · ${sessionsForTea} session${sessionsForTea===1?'':'s'}</div>
     </div>
@@ -17,11 +17,10 @@ function distinctVendors(){
 }
 function vendorManagerHTML(){
   const vendors = distinctVendors();
-  const esc = v => v.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
   const rows = vendors.map(v=>{
     const count = state.teas.filter(t=>(t.source||'').trim()===v).length;
     return `<div class="vendor-row">
-      <input type="text" value="${esc(v)}" data-old="${esc(v)}" onchange="renameVendorFromInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      <input type="text" value="${escapeHtml(v)}" data-old="${escapeHtml(v)}" onchange="renameVendorFromInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
       <span class="vendor-count">${count} tea${count===1?'':'s'}</span>
     </div>`;
   }).join('');
@@ -67,9 +66,8 @@ function viewTeas(){
   const cards = list.length
     ? `<div class="grid grid-3">${list.map(teaCardHTML).join('')}</div>`
     : `<div class="card empty">${state.teas.length ? 'No teas match these filters.' : 'No teas yet — add your first one.'}</div>`;
-  const esc = v => v.replace(/"/g,'&quot;');
   const typeOpts = `<option value="">All types</option>` + TYPES.map(ty=>`<option value="${ty.k}" ${F.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
-  const vendorOpts = `<option value="">All vendors</option>` + vendors.map(v=>`<option value="${esc(v)}" ${F.vendor===v?'selected':''}>${v}</option>`).join('');
+  const vendorOpts = `<option value="">All vendors</option>` + vendors.map(v=>`<option value="${escapeHtml(v)}" ${F.vendor===v?'selected':''}>${escapeHtml(v)}</option>`).join('');
   const controls = state.teas.length ? `
     <div class="lib-controls">
       <select class="lib-select" onchange="setTeaSort(this.value)" aria-label="Sort teas">
@@ -129,14 +127,14 @@ function teaFormModal(){
               <input type="file" accept="image/*" class="js-img-input">
             </div>
           </div>
-          <div class="field"><label>Name</label><input type="text" name="name" required value="${t.name||''}"></div>
+          <div class="field"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}"></div>
           <div class="field"><label>Tea type</label><select name="type">${typeOpts}</select></div>
           <div class="field"><label>Amount on hand (g)</label><input type="number" step="0.1" name="amountGrams" value="${t.amountGrams??''}">
             <label class="checkrow" style="margin-top:6px;font-size:12px;"><input type="checkbox" name="inclPackaging" onchange="var r=document.getElementById('tareRow'); if(r) r.style.display=this.checked?'flex':'none';"> Weighed with packaging</label>
             <div id="tareRow" style="display:none;align-items:center;gap:8px;margin-top:6px;"><span style="font-size:12px;color:var(--ink-soft);">subtract</span><input type="number" step="0.1" name="packagingTare" value="${state.settings.defaultPackagingTareG??10}" style="width:64px;"><span style="font-size:12px;color:var(--ink-soft);">g packaging</span></div>
           </div>
           <div class="field"><label>Your rating</label><div id="teaRatingWrap">${renderStarsInteractive(Number(t.rating)||0,true,'setTeaFormRating')}</div><input type="hidden" name="rating" id="teaRatingInput" value="${t.rating||0}"></div>
-          <div class="field"><label>Harvest year</label><input type="text" name="harvestYear" value="${t.harvestYear||''}" placeholder="2025"></div>
+          <div class="field"><label>Harvest year</label><input type="text" name="harvestYear" value="${escapeHtml(t.harvestYear||'')}" placeholder="2025"></div>
           <div class="field"><label>Harvest season</label><select name="harvestSeason">
             <option value="" ${!t.harvestSeason?'selected':''}>—</option>
             <option ${t.harvestSeason==='Spring'?'selected':''}>Spring</option>
@@ -144,14 +142,14 @@ function teaFormModal(){
             <option ${t.harvestSeason==='Autumn'?'selected':''}>Autumn</option>
             <option ${t.harvestSeason==='Winter'?'selected':''}>Winter</option>
           </select></div>
-          <div class="field"><label>Origin</label><input type="text" name="origin" value="${t.origin||''}" placeholder="Fujian, China"></div>
-          <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${t.cultivar||''}" placeholder="Qi Dan"></div>
-          <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${t.source||''}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${v.replace(/"/g,'&quot;')}"></option>`).join('')}</datalist></div>
+          <div class="field"><label>Origin</label><input type="text" name="origin" value="${escapeHtml(t.origin||'')}" placeholder="Fujian, China"></div>
+          <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${escapeHtml(t.cultivar||'')}" placeholder="Qi Dan"></div>
+          <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${escapeHtml(t.source||'')}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}</datalist></div>
           <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
           <div class="field"><label>Grams bought (for that price)</label><input type="number" step="0.1" name="costOriginalGrams" value="${t.costOriginalGrams??''}" placeholder="50"></div>
           <div class="field span2"><label>Purchase date <span style="color:var(--ink-soft);font-weight:400;">— for spend tracking; leave blank if you already had it</span></label>
             <div style="display:flex;gap:6px;align-items:center;">
-              <input type="date" name="purchaseDate" value="${t.purchaseDate||''}" style="flex:1;">
+              <input type="date" name="purchaseDate" value="${escapeHtml(t.purchaseDate||'')}" style="flex:1;">
               <button type="button" class="lib-chip" onclick="setPurchaseToday(this)">Today</button>
             </div>
           </div>
@@ -162,8 +160,8 @@ function teaFormModal(){
             </select>
             ${!t.leafForm?`<div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">Currently reads as <b>${LEAF_PROFILES[effectiveLeafForm(t)].label}</b>.</div>`:''}
           </div>
-          <div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${t.brewGuide||''}</textarea></div>
-          <div class="field span2"><label>Description</label><textarea name="description" placeholder="Tasting notes, character, story...">${t.description||''}</textarea></div>
+          <div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${escapeHtml(t.brewGuide||'')}</textarea></div>
+          <div class="field span2"><label>Description</label><textarea name="description" placeholder="Tasting notes, character, story...">${escapeHtml(t.description||'')}</textarea></div>
           <div class="field span2" style="flex-direction:row;gap:18px;flex-wrap:wrap;">
             <label class="checkrow"><input type="checkbox" name="isFavorite" ${t.isFavorite?'checked':''}> Favorite</label>
             <label class="checkrow"><input type="checkbox" name="wouldRebuy" ${t.wouldRebuy?'checked':''}> Would rebuy</label>
@@ -243,8 +241,8 @@ function viewTeaDetail(){
   const histHTML = mySessions.length ? mySessions.map(s=>{
     const v = vesselById(s.vesselId);
     return `<div class="session-hist-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span style="display:flex;align-items:center;gap:8px;">${s.photoUrl?`<img src="${s.photoUrl}" alt="" class="session-thumb" loading="lazy">`:''}<span><strong>${fmtDateTime(s.date)}</strong> · ${v?v.name:'—'} · ${brewCountLabel(s)} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span></span>
-      <button class="btn-ghost" onclick="openSessionEdit('${s.id}')">edit</button>
+      <span style="display:flex;align-items:center;gap:8px;">${s.photoUrl?`<img src="${escapeHtml(s.photoUrl)}" alt="" class="session-thumb" loading="lazy">`:''}<span><strong>${fmtDateTime(s.date)}</strong> · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span></span>
+      <button class="btn-ghost" onclick="openSessionEdit('${escapeJsArg(s.id)}')">edit</button>
     </div>`;
   }).join('') : '<div class="empty">No sessions logged for this tea yet.</div>';
 
@@ -252,14 +250,14 @@ function viewTeaDetail(){
     <button class="detail-back" onclick="goView('${state.teaDetailFrom==='passport'?'passport':'teas'}')">← Back to ${state.teaDetailFrom==='passport'?'passport':'teas'}</button>
     <div class="card">
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <div style="width:140px;height:140px;border-radius:12px;background:${t.image?`url(${t.image}) center/cover`:'var(--jade-pale)'};flex:0 0 auto;"></div>
+        <div style="width:140px;height:140px;border-radius:12px;background:${t.image?`url(${escapeHtml(t.image)}) center/cover`:'var(--jade-pale)'};flex:0 0 auto;"></div>
         <div style="flex:1;min-width:200px;">
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <span class="pill t-${t.type}">${typeLabel(t.type)}</span>
+            <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
             ${t.isFavorite?'<span class="pill" style="background:#F6E3E2;color:#B5504A;">♥ favorite</span>':''}
             ${t.wouldRebuy?'<span class="pill" style="background:#E4EAE0;color:#3F5E42;">would rebuy</span>':''}
           </div>
-          <h2 style="margin:8px 0 4px;">${t.name}</h2>
+          <h2 style="margin:8px 0 4px;">${escapeHtml(t.name)}</h2>
           ${renderStarsStatic(Number(t.rating)||0,true)}
           <div class="eyebrow" style="margin-top:8px;">On hand</div>
           <div style="font-size:14px;${Number(t.amountGrams)<lowStockG()?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
@@ -269,16 +267,16 @@ function viewTeaDetail(){
       </div>
 
       <div class="grid grid-2" style="margin-top:16px;">
-        <div><div class="eyebrow">Origin</div><div>${t.origin||'—'}</div></div>
-        <div><div class="eyebrow">Cultivar</div><div>${t.cultivar||'—'}</div></div>
-        <div><div class="eyebrow">Harvest</div><div>${[t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—'}</div></div>
+        <div><div class="eyebrow">Origin</div><div>${escapeHtml(t.origin||'—')}</div></div>
+        <div><div class="eyebrow">Cultivar</div><div>${escapeHtml(t.cultivar||'—')}</div></div>
+        <div><div class="eyebrow">Harvest</div><div>${escapeHtml([t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—')}</div></div>
         <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}</div></div>
-        <div><div class="eyebrow">Source</div><div>${t.source||'—'}</div></div>
+        <div><div class="eyebrow">Source</div><div>${escapeHtml(t.source||'—')}</div></div>
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
         <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
       </div>
-      ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.brewGuide}</div></div>`:''}
-      ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${t.description}</div></div>`:''}
+      ${t.brewGuide?`<div style="margin-top:14px;"><div class="eyebrow">How to brew</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.brewGuide)}</div></div>`:''}
+      ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div></div>`:''}
 
       <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="startSessionFor('${t.id}')">Start session</button>

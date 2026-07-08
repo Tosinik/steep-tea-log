@@ -23,6 +23,25 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.36 — security: escape all user text in rendered HTML (XSS fix)
+Deploy: `service-worker.js` (v47), `steep-core.js`, `steep-social.js`, `steep-teas.js`,
+`steep-sessions.js`, `steep-dashboard.js`, `steep-shopping.js`, `steep-passport.js`,
+`steep-settings.js`. No SQL.
+- **One shared `escapeHtml` (+ `escapeJsArg`) in `steep-core.js`**, and every render site that
+  interpolates user-entered text now escapes the data value (never the surrounding markup). Replaces
+  the four inconsistent per-module `esc()` copies (teas ×2, shopping, dashboard, passport).
+- **Fixes stored cross-user XSS in the social feed** (the #1 finding): another user's `displayName`,
+  `bio`, `username`, session `description`, `teaName`, `tags`, `vesselName`, and `photoUrl` were
+  rendered raw into `innerHTML`, so a crafted profile/shared session ran arbitrary JS in every viewer's
+  session. Now escaped. Also swept all own-content surfaces (tea/vessel/session/steep names, notes,
+  origin/cultivar/source, brew guide, tags, wishlist, spend/recap/Wrapped/rankings, form value attrs).
+- **`escapeJsArg` for inline `onclick` string arguments** — JS-string-escape then HTML-escape, so a
+  value dropped into `onclick="fn('…')"` can't break out of the JS string or the attribute.
+- Validated with a fixture-driven render test (`fixtures/xss-render-test.js`, gitignored): a tea named
+  `<img src=x onerror=alert(1)>` plus a quotes/umlauts description renders **inert** (escaped, no live
+  `<img>`/`<script>`) through the real render functions, while umlauts and quotes still display
+  correctly — 24 checks green. `node --check` clean on all nine changed files.
+
 ## v3.35 — fix: double stock decrement on save (re-entrancy guard)
 Deploy: `service-worker.js` (v46), `steep-sessions.js`. No SQL.
 - **Logging a session no longer subtracts `gramsUsed` from tea stock twice.** Root cause was a

@@ -465,6 +465,22 @@ function dropSession(id){ window.SteepDB.removeSession(id).catch(saveErr); }
 function persistTag(tag){ window.SteepDB.addTag(tag).catch(saveErr); }
 
 /* ---------- helpers ---------- */
+// The one HTML escaper. Everything user-entered (tea/vessel/session text, profile fields,
+// tags, feed content from other users) MUST pass through this before going into an innerHTML
+// template — both text content and double-quoted attribute values. Escapes all five of & < > " '
+// so it's safe in either context. Replaced the old per-module esc() copies.
+function escapeHtml(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// For a value dropped into a single-quoted JS string inside an inline handler, e.g.
+// onclick="fn('${escapeJsArg(x)}')". JS-escape first (so a quote/backslash/newline can't
+// break out of the string), THEN HTML-escape (the browser HTML-decodes the attribute before
+// the JS parses, so the entities round-trip back to safe literals).
+function escapeJsArg(s){
+  return escapeHtml(String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r?\n/g,'\\n'));
+}
 function fmtStars(v){ return v.toFixed(1).replace('.0',''); }
 function typeLabel(k){ const t = TYPES.find(x=>x.k===k); return t?t.label:k; }
 function teaById(id){ return state.teas.find(t=>t.id===id); }

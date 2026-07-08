@@ -21,12 +21,12 @@ function sessionsByDay(){
 function sessionRowHTML(s){
   const tea = teaById(s.teaId);
   const v = vesselById(s.vesselId);
-  const tags = (s.tags||[]).slice(0,4).map(t=>`<span class="tagchip">${t}</span>`).join(' ');
-  return `<div class="sess-row" onclick="openSessionEdit('${s.id}')">
-    <div class="sess-thumb" style="${tea&&tea.image?`background-image:url(${tea.image})`:''}">${tea&&tea.image?'':'🍵'}</div>
+  const tags = (s.tags||[]).slice(0,4).map(t=>`<span class="tagchip">${escapeHtml(t)}</span>`).join(' ');
+  return `<div class="sess-row" onclick="openSessionEdit('${escapeJsArg(s.id)}')">
+    <div class="sess-thumb" style="${tea&&tea.image?`background-image:url(${escapeHtml(tea.image)})`:''}">${tea&&tea.image?'':'🍵'}</div>
     <div class="sess-main">
-      <div class="sess-top"><strong>${tea?tea.name:'Unknown tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
-      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?v.name:'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}</div>
+      <div class="sess-top"><strong>${tea?escapeHtml(tea.name):'Unknown tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
+      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}</div>
       ${tags?`<div class="sess-tags">${tags}</div>`:''}
     </div>
     <span class="sess-chev">›</span>
@@ -83,10 +83,10 @@ function viewSessions(){
 function viewVessels(){
   const rows = state.vessels.length ? state.vessels.map(v=>`
     <div class="rank-row">
-      <span class="vessel-thumb" style="${v.image?`background-image:url(${v.image})`:''}">${v.image?'':'🫖'}</span>
-      <span class="rname">${v.name} <span style="color:var(--ink-soft);font-weight:400;">— ${v.type}${v.material?', '+v.material:''}</span></span>
+      <span class="vessel-thumb" style="${v.image?`background-image:url(${escapeHtml(v.image)})`:''}">${v.image?'':'🫖'}</span>
+      <span class="rname">${escapeHtml(v.name)} <span style="color:var(--ink-soft);font-weight:400;">— ${escapeHtml(v.type)}${v.material?', '+escapeHtml(v.material):''}</span></span>
       <span class="rval">${v.capacityMl?v.capacityMl+'ml':''}</span>
-      <button class="btn-ghost" onclick="openVesselForm(vesselById('${v.id}'))">edit</button>
+      <button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))">edit</button>
       <button class="btn-ghost" onclick="deleteVessel('${v.id}')">remove</button>
     </div>
   `).join('') : '<div class="empty">No vessels yet — add your gaiwan, kyusu, or teapot.</div>';
@@ -116,9 +116,9 @@ function vesselFormModal(){
             <input type="file" accept="image/*" class="js-img-input">
           </div>
         </div>
-        <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan" value="${v.name||''}"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan" value="${escapeHtml(v.name||'')}"></div>
         <div class="field" style="margin-bottom:12px;"><label>Type</label><select name="type">${opts}</select></div>
-        <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..." value="${v.material||''}"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..." value="${escapeHtml(v.material||'')}"></div>
         <div class="field" style="margin-bottom:12px;"><label>Capacity (ml)</label><input type="number" name="capacityMl" placeholder="120" value="${v.capacityMl??''}"></div>
         <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="closeVesselForm()">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
       </form>
@@ -239,7 +239,7 @@ function sessionEditModal(){
       <div class="form-grid" style="margin-top:6px;">
         <div class="field"><label>Temp ${tempUnitLabel()}</label><input type="number" value="${cToDisplay(st.tempC)}" oninput="es_setSteep(${i},'tempC',this.value)"></div>
         <div class="field"><label>Time (sec)</label><input type="number" value="${st.timeSeconds??''}" oninput="es_setSteep(${i},'timeSeconds',this.value)"></div>
-        <div class="field span2"><label>Notes</label><textarea oninput="es_setSteep(${i},'description',this.value)">${st.description||''}</textarea></div>
+        <div class="field span2"><label>Notes</label><textarea oninput="es_setSteep(${i},'description',this.value)">${escapeHtml(st.description||'')}</textarea></div>
       </div>
     </div>
   `).join('');
@@ -250,17 +250,17 @@ function sessionEditModal(){
         <div class="field"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${e.gramsUsed??''}" oninput="es_set('gramsUsed', this.value)"></div>
         <div class="field span2"><label>Vessel</label><select onchange="es_set('vesselId', this.value)">${
-          (state.vessels.some(v=>v.id===e.vesselId) ? '' : `<option value="${e.vesselId||''}" selected>${e.vesselName||'(unknown vessel)'}</option>`)
-          + state.vessels.map(v=>`<option value="${v.id}" ${e.vesselId===v.id?'selected':''}>${v.name}${v.capacityMl?` · ${v.capacityMl}ml`:''}</option>`).join('')
+          (state.vessels.some(v=>v.id===e.vesselId) ? '' : `<option value="${escapeHtml(e.vesselId||'')}" selected>${escapeHtml(e.vesselName||'(unknown vessel)')}</option>`)
+          + state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${e.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}${v.capacityMl?` · ${v.capacityMl}ml`:''}</option>`).join('')
         }</select></div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isColdBrew?'checked':''} onchange="es_set('isColdBrew', this.checked)"> Cold brew</label></div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isShared?'checked':''} onchange="es_set('isShared', this.checked)"> Shared with followers</label></div>
         <div class="field span2"><label>Overall rating</label><div id="editRatingWrap">${renderStarsInteractive(Number(e.rating)||0,true,'setEditSessionRating')}</div></div>
         ${(state.settings.showMood || e.mood!=null) ? `<div class="field span2"><label>Mood</label><div id="editMoodWrap">${moodChipsHTML(e.mood||null,'setEditSessionMood')}</div></div>` : ''}
-        <div class="field span2"><label>Overall notes</label><textarea oninput="es_set('description', this.value)">${e.description||''}</textarea></div>
+        <div class="field span2"><label>Overall notes</label><textarea oninput="es_set('description', this.value)">${escapeHtml(e.description||'')}</textarea></div>
         <div class="field span2">
           <label>Tags</label>
-          <div>${e.tags.map(t=>`<span class="tagchip">${t} <button onclick="removeEditTag('${t}')">✕</button></span>`).join(' ')}</div>
+          <div>${e.tags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeEditTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
           ${tagLibraryChipsHTML('edit')}
         </div>
       </div>
@@ -354,7 +354,7 @@ function sessionQuickHTML(d){
   return `
     <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
     <div class="card">
-      <h2 style="margin-top:0;">${d.isColdBrew?'Cold brew':'Quick log'}: ${tea?tea.name:''}</h2>
+      <h2 style="margin-top:0;">${d.isColdBrew?'Cold brew':'Quick log'}: ${tea?escapeHtml(tea.name):''}</h2>
       <div class="eyebrow">${d.isColdBrew?'A single long steep — just how it went.':'No timed steeps — just how it went.'}</div>
       ${d.isColdBrew ? `
       <div class="field" style="margin:14px 0;">
@@ -380,10 +380,10 @@ function sessionQuickHTML(d){
       </div>
       <div class="field" style="margin-bottom:14px;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
       ${feedbackRowHTML(d)}
-      <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
+      <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${escapeHtml(d.sessionDesc)}</textarea></div>
       <div class="field">
         <label>Overall tags</label>
-        <div>${d.sessionTags.map(t=>`<span class="tagchip">${t} <button onclick="removeSessionTag('${t}')">✕</button></span>`).join(' ')}</div>
+        <div>${d.sessionTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeSessionTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
         <div class="tag-input-wrap">
           <input type="text" id="tagInputField" data-target="session" placeholder="Type your own, press Enter...">
           <div id="tagSuggestBox"></div>
@@ -397,8 +397,8 @@ function sessionQuickHTML(d){
 }
 
 function sessionSetupHTML(d){
-  const teaOpts = state.teas.map(t=>`<option value="${t.id}" ${d.teaId===t.id?'selected':''}>${t.name}</option>`).join('');
-  const vesselOpts = state.vessels.map(v=>`<option value="${v.id}" ${d.vesselId===v.id?'selected':''}>${v.name}</option>`).join('');
+  const teaOpts = state.teas.map(t=>`<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`).join('');
+  const vesselOpts = state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
   return `
     <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
     <div class="card">
@@ -408,7 +408,7 @@ function sessionSetupHTML(d){
         <div class="field"><label>Vessel</label><select onchange="d_set('vesselId', this.value)">${vesselOpts}</select></div>
         <div class="field"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
-        <div class="field"><label>Water type</label><input type="text" value="${d.waterType}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
+        <div class="field"><label>Water type</label><input type="text" value="${escapeHtml(d.waterType)}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
         <div class="field"><label>Water TDS (optional)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="ppm"></div>
         ${state.settings.showMood ? `<div class="field span2"><label>How are you feeling? <span style="color:var(--ink-soft);font-weight:400;">— optional, for spotting patterns later</span></label>${moodChipsHTML(d.mood, 'd_setMood')}</div>` : ''}
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
@@ -587,8 +587,8 @@ function sessionSteepingHTML(d){
   const steepsHTML = d.steeps.map((s,i)=>`
     <div class="steep-item">
       <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC)+tempUnitLabel()+' · ':''}${fmtSec(s.timeSeconds)}</span></div>
-      ${s.description?`<div style="margin-top:3px;color:var(--ink-soft);">${s.description}</div>`:''}
-      ${s.tags.length?`<div class="steep-tags">${s.tags.map(t=>`<span class="tagchip">${t}</span>`).join(' ')}</div>`:''}
+      ${s.description?`<div style="margin-top:3px;color:var(--ink-soft);">${escapeHtml(s.description)}</div>`:''}
+      ${s.tags.length?`<div class="steep-tags">${s.tags.map(t=>`<span class="tagchip">${escapeHtml(t)}</span>`).join(' ')}</div>`:''}
     </div>
   `).join('');
 
@@ -603,7 +603,7 @@ function sessionSteepingHTML(d){
   return `
     <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
     <div class="card">
-      <div class="eyebrow">${tea?tea.name:''} ${d.isColdBrew?'· cold brew':''}</div>
+      <div class="eyebrow">${tea?escapeHtml(tea.name):''} ${d.isColdBrew?'· cold brew':''}</div>
       <h2 style="margin-top:2px;">${dotsRow(d.steeps.length, Math.max(d.steeps.length+1,6))} Steep ${d.steeps.length+1}</h2>
 
       ${scheduleStripHTML(d)}
@@ -628,7 +628,7 @@ function sessionSteepingHTML(d){
         <div class="field span2"><label>Notes for this steep</label><textarea id="steepDesc" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
         <div class="field span2">
           <label>Tasting tags</label>
-          <div id="curTagChips">${d.curSteepTags.map(t=>`<span class="tagchip">${t} <button onclick="removeCurTag('${t}')">✕</button></span>`).join(' ')}</div>
+          <div id="curTagChips">${d.curSteepTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeCurTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
           <div class="tag-input-wrap">
             <input type="text" id="tagInputField" data-target="steep" placeholder="Type your own, press Enter...">
             <div id="tagSuggestBox"></div>
@@ -658,7 +658,7 @@ function sessionFocusHTML(d){
   const disp = tm.mode==='timer' ? Math.max(0, tm.target-tm.elapsed) : tm.elapsed;
   return `
     <div class="focus-inner">
-      <div class="focus-name">${tea?tea.name:'Steeping'}</div>
+      <div class="focus-name">${tea?escapeHtml(tea.name):'Steeping'}</div>
       <div class="focus-sub">Infusion ${d.steeps.length+1}${d.isColdBrew?' · cold brew':''}</div>
       <svg class="focus-cup" viewBox="0 0 200 230" role="img" aria-label="Steeping cup">
         <defs><clipPath id="focusCupClip"><path d="M52,90 L148,90 L136,175 Q128,192 100,192 Q72,192 64,175 Z"/></clipPath></defs>
@@ -780,7 +780,7 @@ function renderTagSuggest(query, target){
   if(!box) return;
   if(!query){ box.innerHTML=''; return; }
   const matches = state.tagLibrary.filter(t=>t.toLowerCase().includes(query.toLowerCase())).slice(0,6);
-  box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onclick="pickTagSuggest('${m}','${target}')">${m}</div>`).join('')}</div>` : '';
+  box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onclick="pickTagSuggest('${escapeJsArg(m)}','${target}')">${escapeHtml(m)}</div>`).join('')}</div>` : '';
 }
 function pickTagSuggest(tag, target){
   addTag(tag, target);
@@ -806,7 +806,7 @@ function tagLibraryChipsHTML(target){
   const selected = tagListFor(target);
   const available = state.tagLibrary.filter(t=>!selected.includes(t));
   if(!available.length) return '';
-  return `<div class="taglib">${available.map(t=>`<button type="button" class="taglib-chip" onclick="addTag('${t.replace(/'/g,"\\'")}','${target}')">＋ ${t}</button>`).join('')}</div>`;
+  return `<div class="taglib">${available.map(t=>`<button type="button" class="taglib-chip" onclick="addTag('${escapeJsArg(t)}','${target}')">＋ ${escapeHtml(t)}</button>`).join('')}</div>`;
 }
 function addTag(tag, target){
   if(!state.tagLibrary.includes(tag)){ state.tagLibrary.push(tag); persistTag(tag); }
@@ -867,21 +867,21 @@ function sessionFinishHTML(d){
   return `
     <button class="detail-back" onclick="cancelSession()">✕ Cancel session</button>
     <div class="card">
-      <h2 style="margin-top:0;">Wrap up: ${tea?tea.name:''}</h2>
+      <h2 style="margin-top:0;">Wrap up: ${tea?escapeHtml(tea.name):''}</h2>
       <div class="eyebrow">${d.steeps.length} steep${d.steeps.length===1?'':'s'} logged</div>
       <div class="field span2" style="margin:14px 0;">
         <label>Photo (optional)</label>
-        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
           ${state._draftImage?'':'Tap to add a photo of this cup'}
           <input type="file" accept="image/*" class="js-img-input">
         </div>
       </div>
       <div class="field" style="margin:14px 0;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
       ${feedbackRowHTML(d)}
-      <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${d.sessionDesc}</textarea></div>
+      <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${escapeHtml(d.sessionDesc)}</textarea></div>
       <div class="field">
         <label>Overall tags</label>
-        <div>${d.sessionTags.map(t=>`<span class="tagchip">${t} <button onclick="removeSessionTag('${t}')">✕</button></span>`).join(' ')}</div>
+        <div>${d.sessionTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeSessionTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
         <div class="tag-input-wrap">
           <input type="text" id="tagInputField" data-target="session" placeholder="Type your own, press Enter...">
           <div id="tagSuggestBox"></div>

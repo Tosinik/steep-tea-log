@@ -21,7 +21,6 @@ function computeRestockSuggestions(){
 }
 
 function viewShopping(){
-  const esc = v => (v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
   const rowStyle = 'display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);';
   const items = (state.wishlist||[]).slice().sort((a,b)=>{
     if(!!a.done!==!!b.done) return a.done?1:-1;                 // open first, bought last
@@ -35,7 +34,7 @@ function viewShopping(){
     </div>
     <div class="field" style="margin-top:8px;"><label>Shop / vendor (optional)</label>
       <input type="text" id="wishVendor" list="wishVendorList" placeholder="Where from" onkeydown="if(event.key==='Enter'){event.preventDefault();addWishFromInput();}">
-      <datalist id="wishVendorList">${(typeof distinctVendors==='function'?distinctVendors():[]).map(v=>`<option value="${esc(v)}"></option>`).join('')}</datalist>
+      <datalist id="wishVendorList">${(typeof distinctVendors==='function'?distinctVendors():[]).map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}</datalist>
     </div>
     <button class="btn btn-primary" style="margin-top:12px;width:100%;" onclick="addWishFromInput()">＋ Add</button>
   </div>`;
@@ -47,8 +46,8 @@ function viewShopping(){
       const out = Number(t.amountGrams)<=0;
       return `<div style="${rowStyle}">
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;">${esc(t.name)}${t.isFavorite?' ★':''}</div>
-          <div style="font-size:11px;color:var(--ink-soft);">${out?'out of stock':`${Number(t.amountGrams)}g left`}${t.source?` · ${esc(t.source)}`:''}</div>
+          <div style="font-weight:600;">${escapeHtml(t.name)}${t.isFavorite?' ★':''}</div>
+          <div style="font-size:11px;color:var(--ink-soft);">${out?'out of stock':`${Number(t.amountGrams)}g left`}${t.source?` · ${escapeHtml(t.source)}`:''}</div>
         </div>
         <button class="lib-chip" onclick="addWishFromTea('${t.id}')">Add</button>
       </div>`;
@@ -61,8 +60,8 @@ function viewShopping(){
     ${items.map(w=>`<div style="${rowStyle}">
       <input type="checkbox" ${w.done?'checked':''} onchange="toggleWishDone('${w.id}')" aria-label="Mark bought">
       <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;${w.done?'text-decoration:line-through;opacity:.55;':''}">${esc(w.name)}</div>
-        ${(w.vendor||w.note)?`<div style="font-size:11px;color:var(--ink-soft);">${[esc(w.vendor),esc(w.note)].filter(Boolean).join(' · ')}</div>`:''}
+        <div style="font-weight:600;${w.done?'text-decoration:line-through;opacity:.55;':''}">${escapeHtml(w.name)}</div>
+        ${(w.vendor||w.note)?`<div style="font-size:11px;color:var(--ink-soft);">${[w.vendor,w.note].filter(Boolean).map(escapeHtml).join(' · ')}</div>`:''}
       </div>
       ${w.done?`<button class="lib-chip" onclick="teaFromWishItem('${w.id}')">Add as tea</button>`:''}
       <button class="icon-btn" style="font-size:14px;" onclick="removeWish('${w.id}')" title="Remove" aria-label="Remove">✕</button>

@@ -98,7 +98,6 @@ function computeMonthlySpend(){
 }
 
 function viewSpend(){
-  const esc = v => (v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const ms = computeMonthlySpend();
   const nowK = monthKey(new Date());
   const max = Math.max(1, ...ms.series.map(m=>m.total));
@@ -117,7 +116,7 @@ function viewSpend(){
   const teaRows = ms.thisMonthTeas.slice()
     .sort((a,b)=>(Number(b.costTotal)||0)-(Number(a.costTotal)||0))
     .map(t=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer;" onclick="openTeaDetail('${t.id}','teas')">
-      <div style="min-width:0;"><div style="font-weight:600;">${esc(t.name)}</div><div style="font-size:11px;color:var(--ink-soft);">${t.source?esc(t.source)+' · ':''}${t.purchaseDate?fmtDate(t.purchaseDate):''}</div></div>
+      <div style="min-width:0;"><div style="font-weight:600;">${escapeHtml(t.name)}</div><div style="font-size:11px;color:var(--ink-soft);">${t.source?escapeHtml(t.source)+' · ':''}${t.purchaseDate?fmtDate(t.purchaseDate):''}</div></div>
       <div class="mono" style="white-space:nowrap;">${(Number(t.costTotal)||0).toFixed(2)}</div>
     </div>`).join('');
 
@@ -476,7 +475,7 @@ function inventorySparkline(tea){
   const runout = (projT && projT>now) ? 'runs out ~'+fmtDate(new Date(projT).toISOString()) : (amt<=0 ? 'empty' : '');
   return `
   <div class="inv-spark" style="margin-top:10px;">
-    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;" role="img" aria-label="Stock over time for ${(tea.name||'this tea').replace(/"/g,'&quot;')}">
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;" role="img" aria-label="Stock over time for ${escapeHtml(tea.name||'this tea')}">
       <line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="var(--line)" stroke-width="1"/>
       <path d="${area}" fill="var(--jade-pale)" opacity="0.7"/>
       <path d="${spine}" fill="none" stroke="var(--jade)" stroke-width="2" stroke-linecap="round"/>
@@ -562,8 +561,8 @@ function recapHTML(){
       <div class="stat"><div class="num">${r.liters.toFixed(1)}</div><div class="lbl">Liters</div></div>
       <div class="stat"><div class="num">${r.grams.toFixed(0)}</div><div class="lbl">Grams</div></div>
     </div>
-    ${r.mostBrewed?`<div class="recap-line"><span class="recap-k">Most brewed</span><span class="recap-v">${r.mostBrewed.name} · ${r.mostN}×</span></div>`:''}
-    ${r.topSession?`<div class="recap-line"><span class="recap-k">Top rated</span><span class="recap-v">${(r.topSession.teaName||(teaById(r.topSession.teaId)||{}).name||'—')} ${renderStarsStatic(r.topSession.rating,false)}</span></div>`:''}
+    ${r.mostBrewed?`<div class="recap-line"><span class="recap-k">Most brewed</span><span class="recap-v">${escapeHtml(r.mostBrewed.name)} · ${r.mostN}×</span></div>`:''}
+    ${r.topSession?`<div class="recap-line"><span class="recap-k">Top rated</span><span class="recap-v">${escapeHtml(r.topSession.teaName||(teaById(r.topSession.teaId)||{}).name||'—')} ${renderStarsStatic(r.topSession.rating,false)}</span></div>`:''}
     ${r.newTeas?`<div class="recap-line"><span class="recap-k">New teas added</span><span class="recap-v">${r.newTeas}</span></div>`:''}
     ${typeChips?`<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">${typeChips}</div>`:''}
   </div>`;
@@ -842,7 +841,7 @@ function viewWrapped(){
 
     ${w.topTea ? `<div class="section card">
       <div class="eyebrow">Your ${w.season.name.toLowerCase()} companion</div>
-      <h2 style="margin:6px 0 2px;">${w.topTea.name}</h2>
+      <h2 style="margin:6px 0 2px;">${escapeHtml(w.topTea.name)}</h2>
       <div style="color:var(--ink-soft);font-size:13px;">${typeLabel(w.topTea.type)} · brewed ${w.topTeaN} time${w.topTeaN>1?'s':''}</div>
     </div>` : ''}
 
@@ -850,12 +849,12 @@ function viewWrapped(){
       ${w.topType?`<div class="recap-line"><span class="recap-k">Leaf of the season</span><span class="recap-v">${typeLabel(w.topType)} · ${w.topTypeN}</span></div>`:''}
       <div class="recap-line"><span class="recap-k">Favourite time</span><span class="recap-v">${cap(partWord(w.topPart))}</span></div>
       <div class="recap-line"><span class="recap-k">New this season</span><span class="recap-v">${w.newTeas.length} tea${w.newTeas.length!==1?'s':''}</span></div>
-      ${w.standout?`<div class="recap-line"><span class="recap-k">Standout cup</span><span class="recap-v">${(w.standout.teaName||(teaById(w.standout.teaId)||{}).name||'—')} ${renderStarsStatic(w.standout.rating,false)}</span></div>`:''}
+      ${w.standout?`<div class="recap-line"><span class="recap-k">Standout cup</span><span class="recap-v">${escapeHtml(w.standout.teaName||(teaById(w.standout.teaId)||{}).name||'—')} ${renderStarsStatic(w.standout.rating,false)}</span></div>`:''}
     </div>
 
     ${w.newTeas.length?`<div class="section card">
       <div class="eyebrow">Teas you met this ${w.season.name.toLowerCase()}</div>
-      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${w.newTeas.slice(0,12).map(t=>`<span style="font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;">${t.name}</span>`).join('')}</div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${w.newTeas.slice(0,12).map(t=>`<span style="font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;">${escapeHtml(t.name)}</span>`).join('')}</div>
     </div>`:''}
 
     <div class="section card" style="text-align:center;">
@@ -936,7 +935,7 @@ function viewDashboard(){
     const info = s.typeCounts[t.k];
     if(!info || info.count===0) return '';
     const pct = Math.round(info.count/maxTypeCount*100);
-    const topTeas = Object.entries(info.teas).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([n,c])=>`${n} (${c}x)`).join(', ');
+    const topTeas = Object.entries(info.teas).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([n,c])=>`${escapeHtml(n)} (${c}x)`).join(', ');
     return `<div class="typebar-row">
       <div class="typebar-head"><strong>${t.label}</strong><span class="mono" style="font-size:12px;color:var(--ink-soft)">${info.count}x</span></div>
       <div class="typebar-track"><div class="typebar-fill dot-${t.k}" style="width:${pct}%;background:var(--jade)"></div></div>
@@ -947,15 +946,15 @@ function viewDashboard(){
   const favHTML = s.favorites.length ? `<div class="grid grid-3">${s.favorites.slice(0,6).map(t=>teaCardHTML(t)).join('')}</div>` : '<div class="empty">No favorites marked yet.</div>';
 
   const mostBrewedHTML = s.mostBrewed.length ? s.mostBrewed.map((x,i)=>`
-    <div class="rank-row"><span class="rank-num">${i+1}.</span><span class="rname">${x.tea.name}</span>${dotsRow(x.count,x.count)}<span class="rval">${x.count}x</span></div>
+    <div class="rank-row"><span class="rank-num">${i+1}.</span><span class="rname">${escapeHtml(x.tea.name)}</span>${dotsRow(x.count,x.count)}<span class="rval">${x.count}x</span></div>
   `).join('') : '<div class="empty">Log a session to see your most brewed teas.</div>';
 
   const topRatedHTML = s.topRated.length ? s.topRated.map((t,i)=>`
-    <div class="rank-row"><span class="rank-num">${i+1}.</span><span class="rname">${t.name}</span><span class="rval">${fmtStars(t.rating)}/5</span></div>
+    <div class="rank-row"><span class="rank-num">${i+1}.</span><span class="rname">${escapeHtml(t.name)}</span><span class="rval">${fmtStars(t.rating)}/5</span></div>
   `).join('') : '<div class="empty">Rate a tea to see it here.</div>';
 
   const lowStockHTML = s.lowStock.length ? s.lowStock.map(t=>`
-    <div class="rank-row"><span class="rname">${t.name}</span><span class="rval" style="color:var(--red)">${Number(t.amountGrams).toFixed(1)}g left</span></div>
+    <div class="rank-row"><span class="rname">${escapeHtml(t.name)}</span><span class="rval" style="color:var(--red)">${Number(t.amountGrams).toFixed(1)}g left</span></div>
   `).join('') : '<div class="empty">All stocked up.</div>';
 
   const recent = [...state.sessions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
@@ -964,8 +963,8 @@ function viewDashboard(){
       <div class="section-title"><h2>Recent sessions</h2></div>
       ${recent.map(se=>{
         const tea = teaById(se.teaId);
-        return `<div class="rank-row" onclick="openSessionEdit('${se.id}')" style="cursor:pointer;">
-          <span class="rname">${se.teaName || (tea?tea.name:'—')}${se.rating?' '+renderStarsStatic(se.rating,false):''}</span>
+        return `<div class="rank-row" onclick="openSessionEdit('${escapeJsArg(se.id)}')" style="cursor:pointer;">
+          <span class="rname">${escapeHtml(se.teaName || (tea?tea.name:'—'))}${se.rating?' '+renderStarsStatic(se.rating,false):''}</span>
           <span class="rval" style="color:var(--ink-soft);font-size:12px;">${brewCountLabel(se)} · ${new Date(se.date).toLocaleDateString()}</span>
         </div>`;
       }).join('')}
@@ -981,8 +980,8 @@ function viewDashboard(){
       ${restock.map(t=>{
         const g=Number(t.amountGrams); const low=g<lowStockG();
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
-        return `<div class="rank-row" onclick="openTeaDetail('${t.id}')" style="cursor:pointer;">
-          <span class="rname">${t.isFavorite?'♥ ':''}${t.name}</span>
+        return `<div class="rank-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="cursor:pointer;">
+          <span class="rname">${t.isFavorite?'♥ ':''}${escapeHtml(t.name)}</span>
           <span class="rval" style="color:${low?'var(--red)':'var(--amber)'};font-weight:600;">${g.toFixed(1)}g${est}</span>
         </div>`;
       }).join('')}

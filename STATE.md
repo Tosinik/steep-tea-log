@@ -42,6 +42,9 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Conventions / principles
 - Calm-first; achievements/XP behind Show-achievements + Quiet Mode toggles.
+- **Escape all user text in rendered HTML** (v3.36): use `escapeHtml` (data values, incl. attribute
+  values) and `escapeJsArg` (inline `onclick` string args) from steep-core. Never interpolate raw
+  tea/vessel/session/profile/tag text into an innerHTML template. Escape the data, never the markup.
 - No browser confirm()/prompt() — inline UI (a couple of legacy alert()s remain in sessions; backlog).
 - Generated art is placeholder; **human art for any public release**.
 - Settings are synced; **theme is device-local** (`tealog_theme` in localStorage, not synced).
@@ -62,7 +65,9 @@ on/off; brew-guide + advice grouped under one "Brew guidance" block) **+ change 
 session** · **v3.35 fix: double stock decrement** (re-entrant `commitSession`/`saveSessionEdit` double-
 fire subtracted `gramsUsed` twice; fixed with a shared `_sessionSaving` guard. Offline queue was NOT the
 cause — absolute-value upserts replay idempotently. Deeper fix later: derive stock instead of accumulating
-it). The v3.34 map legibility pass was built but NOT shipped — map is parked. Cache **v46**.
+it) · **v3.36 XSS sweep** (shared `escapeHtml`/`escapeJsArg`; escaped every user-text render site, fixing
+stored cross-user feed XSS; replaced 4 local escapers). The v3.34 map legibility pass was built but NOT
+shipped — map is parked. Cache **v47**.
 **v3.33 detail:** `PASSPORT_SUB` in steep-passport.js holds curated sub-regions per country (China,
 Japan, Taiwan) placed by lat/lon on the existing grid. `passportSubFor(country,tea)` matches within the
 parent country only. Tapping China/Japan zooms the SVG viewBox and shows sub-region pins; other

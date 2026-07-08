@@ -20,7 +20,7 @@ function avatarHTML(p, size){
   size=size||40;
   const url=p&&p.avatarUrl;
   const letter=((p&&(p.displayName||p.username))||'?').slice(0,1).toUpperCase();
-  return `<span class="avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size/2.6)}px;${url?`background-image:url(${url})`:''}">${url?'':letter}</span>`;
+  return `<span class="avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size/2.6)}px;${url?`background-image:url(${escapeHtml(url)})`:''}">${url?'':escapeHtml(letter)}</span>`;
 }
 function editProfile(){ state.social.profileEditOpen=true; state._draftImage=state.social.profile?.avatarUrl||null; render(); }
 function setProfileDraft(k, v){
@@ -69,13 +69,13 @@ function profileSetupHTML(){
       <form onsubmit="submitProfile(event)">
         <div class="field" style="margin-bottom:12px;">
           <label>Avatar</label>
-          <div class="img-upload" id="imgUploadWrap" style="width:90px;height:90px;border-radius:50%;${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+          <div class="img-upload" id="imgUploadWrap" style="width:90px;height:90px;border-radius:50%;${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
             ${state._draftImage?'':'Photo'}<input type="file" accept="image/*" class="js-img-input">
           </div>
         </div>
-        <div class="field" style="margin-bottom:12px;"><label>Username</label><input type="text" name="username" required value="${p.username||''}" oninput="setProfileDraft('username',this.value)" placeholder="teafiend"></div>
-        <div class="field" style="margin-bottom:12px;"><label>Display name</label><input type="text" name="displayName" value="${p.displayName||''}" oninput="setProfileDraft('displayName',this.value)" placeholder="Optional"></div>
-        <div class="field" style="margin-bottom:12px;"><label>Bio</label><textarea name="bio" oninput="setProfileDraft('bio',this.value)" placeholder="Optional">${p.bio||''}</textarea></div>
+        <div class="field" style="margin-bottom:12px;"><label>Username</label><input type="text" name="username" required value="${escapeHtml(p.username||'')}" oninput="setProfileDraft('username',this.value)" placeholder="teafiend"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Display name</label><input type="text" name="displayName" value="${escapeHtml(p.displayName||'')}" oninput="setProfileDraft('displayName',this.value)" placeholder="Optional"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Bio</label><textarea name="bio" oninput="setProfileDraft('bio',this.value)" placeholder="Optional">${escapeHtml(p.bio||'')}</textarea></div>
         <div id="profileMsg" class="auth-msg" style="text-align:left;"></div>
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
           ${editing?`<button type="button" class="btn" onclick="cancelProfileEdit()">Cancel</button>`:''}
@@ -101,8 +101,8 @@ function viewFriends(){
       <button class="btn-ghost" onclick="editProfile()">edit profile</button></div>
     <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       ${avatarHTML(me,48)}
-      <div><div style="font-weight:600;">${me.displayName||me.username}</div>
-      <div style="font-size:12px;color:var(--ink-soft);">@${me.username} · following ${so.following.length}</div></div>
+      <div><div style="font-weight:600;">${escapeHtml(me.displayName||me.username)}</div>
+      <div style="font-size:12px;color:var(--ink-soft);">@${escapeHtml(me.username)} · following ${so.following.length}</div></div>
     </div>
     ${tabs}${body}`;
 }
@@ -114,20 +114,20 @@ function feedHTML(){
   return feed.sessions.map(s=>feedRowHTML(s, feed.profiles[s.userId])).join('');
 }
 function feedRowHTML(s, prof){
-  const tags=(s.tags||[]).slice(0,5).map(t=>`<span class="tagchip">${t}</span>`).join(' ');
-  const typePill = s.teaType?`<span class="pill t-${s.teaType}">${typeLabel(s.teaType)}</span>`:'';
-  const meta=[s.vesselName, brewCountLabel(s), s.isColdBrew?'cold brew':''].filter(Boolean).join(' · ');
+  const tags=(s.tags||[]).slice(0,5).map(t=>`<span class="tagchip">${escapeHtml(t)}</span>`).join(' ');
+  const typePill = s.teaType?`<span class="pill t-${escapeHtml(s.teaType)}">${escapeHtml(typeLabel(s.teaType))}</span>`:'';
+  const meta=[s.vesselName, brewCountLabel(s), s.isColdBrew?'cold brew':''].filter(Boolean).map(escapeHtml).join(' · ');
   const steepChips = s.steeps.length?`<div class="steep-tags" style="margin-top:8px;">${s.steeps.map((st,i)=>`<span class="tagchip">${i+1}: ${cToDisplay(st.tempC)!==''?cToDisplay(st.tempC)+tempUnitLabel()+' ':''}${fmtSec(st.timeSeconds)}</span>`).join(' ')}</div>`:'';
   return `<div class="card" style="margin-bottom:10px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
       ${avatarHTML(prof,36)}
-      <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;">${prof?(prof.displayName||prof.username):'Someone'}</div>
-      <div style="font-size:11px;color:var(--ink-soft);">@${prof?prof.username:'?'} · ${fmtDateTime(s.date)}</div></div>
+      <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;">${prof?escapeHtml(prof.displayName||prof.username):'Someone'}</div>
+      <div style="font-size:11px;color:var(--ink-soft);">@${prof?escapeHtml(prof.username):'?'} · ${fmtDateTime(s.date)}</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">${typePill}<strong>${s.teaName||'a tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
-    ${s.photoUrl?`<img src="${s.photoUrl}" alt="session photo" class="session-photo" loading="lazy">`:''}
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">${typePill}<strong>${escapeHtml(s.teaName||'a tea')}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
+    ${s.photoUrl?`<img src="${escapeHtml(s.photoUrl)}" alt="session photo" class="session-photo" loading="lazy">`:''}
     ${meta?`<div style="font-size:12px;color:var(--ink-soft);margin-top:4px;">${meta}</div>`:''}
-    ${s.description?`<div style="font-size:13px;margin-top:6px;white-space:pre-wrap;">${s.description}</div>`:''}
+    ${s.description?`<div style="font-size:13px;margin-top:6px;white-space:pre-wrap;">${escapeHtml(s.description)}</div>`:''}
     ${steepChips}
     ${tags?`<div class="sess-tags" style="margin-top:6px;">${tags}</div>`:''}
   </div>`;
@@ -148,9 +148,9 @@ function userRowHTML(p){
   const following=state.social.following.includes(p.id);
   return `<div class="user-row">
     ${avatarHTML(p,40)}
-    <div style="flex:1;min-width:0;"><div style="font-weight:600;">${p.displayName||p.username}</div>
-    <div style="font-size:12px;color:var(--ink-soft);">@${p.username}</div></div>
-    ${following?`<button class="btn" onclick="doUnfollow('${p.id}')">Following</button>`:`<button class="btn btn-primary" onclick="doFollow('${p.id}')">Follow</button>`}
+    <div style="flex:1;min-width:0;"><div style="font-weight:600;">${escapeHtml(p.displayName||p.username)}</div>
+    <div style="font-size:12px;color:var(--ink-soft);">@${escapeHtml(p.username)}</div></div>
+    ${following?`<button class="btn" onclick="doUnfollow('${escapeJsArg(p.id)}')">Following</button>`:`<button class="btn btn-primary" onclick="doFollow('${escapeJsArg(p.id)}')">Follow</button>`}
   </div>`;
 }
 function followingHTML(){
@@ -161,9 +161,9 @@ function followingHTML(){
     const p=profs[id];
     return `<div class="user-row">
       ${avatarHTML(p,40)}
-      <div style="flex:1;min-width:0;"><div style="font-weight:600;">${p?(p.displayName||p.username):'…'}</div>
-      <div style="font-size:12px;color:var(--ink-soft);">${p?('@'+p.username):id.slice(0,8)}</div></div>
-      <button class="btn" onclick="doUnfollow('${id}')">Unfollow</button>
+      <div style="flex:1;min-width:0;"><div style="font-weight:600;">${p?escapeHtml(p.displayName||p.username):'…'}</div>
+      <div style="font-size:12px;color:var(--ink-soft);">${p?('@'+escapeHtml(p.username)):escapeHtml(id.slice(0,8))}</div></div>
+      <button class="btn" onclick="doUnfollow('${escapeJsArg(id)}')">Unfollow</button>
     </div>`;
   }).join('')}</div>`;
 }

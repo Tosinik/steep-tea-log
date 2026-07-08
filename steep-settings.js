@@ -3,7 +3,7 @@ function backupSectionHTML(){
   return `<div class="set-row" style="flex-direction:column;align-items:stretch;gap:12px;">
     <div>
       <div class="set-label">Data &amp; account</div>
-      <div class="set-sub">Signed in as <strong>${email}</strong>. Your log syncs across devices; export a JSON backup anytime.</div>
+      <div class="set-sub">Signed in as <strong>${escapeHtml(email)}</strong>. Your log syncs across devices; export a JSON backup anytime.</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <button class="btn btn-primary" onclick="exportData()">Export backup (.json)</button>
