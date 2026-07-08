@@ -71,9 +71,9 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
 
 "Deploy" = push the changed static files to GitHub Pages. There is no CI. Every deploy:
 
-1. **Bump `CACHE_NAME` in `service-worker.js`** (currently `steep-tea-log-v45`).
-   Skipping this leaves users on stale cached files after a push — this is the single
-   most important step.
+1. **Bump `CACHE_NAME` in `service-worker.js`** (check `service-worker.js` for the
+   current value; always bump it). Skipping this leaves users on stale cached files
+   after a push — this is the single most important step.
 2. **If you added a new module/asset, add it to `FILES_TO_CACHE`** in
    `service-worker.js` (and to the `<script>` list in `index.html`).
 3. **Update CHANGELOG.md** with a new version entry: a version heading, a `Deploy:`
@@ -97,13 +97,9 @@ hoist and cross-module calls resolve at runtime, so **feature-module order is fl
 — but two constraints are firm: `steep-data.js` and `steep-core.js` come first, and
 `steep-boot.js` loads **last** (it calls `SteepDB.boot(init)`, so `init` must exist).
 
-Load order (from `index.html`):
-
-```
-steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard →
-steep-insights → steep-teas → steep-shopping → steep-passport → steep-social →
-steep-sessions → steep-boot
-```
+The authoritative load order is the `<script>` tag sequence in `index.html` — read it
+there rather than trusting a copy here (the only firm constraints are the two above:
+data + core first, boot last). The modules and what each owns:
 
 - **steep-data** — Supabase client, `loadKey`/`saveKey`, snake_case↔camelCase mappers,
   per-row CRUD, the offline write queue. Exposed as `window.SteepDB`.
@@ -160,9 +156,8 @@ template-literal HTML; `bindDynamic()` re-wires the few handlers that can't be i
   that touches that table (bulk `loadKey`/`saveKey` and the per-row `put*`).
 
 **Schema management:** migrations live in **`sql/`**, applied by hand in the Supabase
-SQL editor, in order (`schema.sql` → `v2_1-migration` → `v2_2-photos-storage` →
-`v3_0-social` → `v3_1-quick-log` → `v3_2-session-photos` → `v3_3-wishlist` →
-`v3_4-brew-advice` → `v3_5-purchase-date` → `v3_6-leaf-form` → `v3_7-mood`). **Read the
+SQL editor, in filename order (`schema.sql` first, then the `vX_Y-*.sql` files in
+ascending version order — see the `sql/` folder for the current set). **Read the
 actual `sql/` files for real column names/types instead of guessing.** When you add a
 column/table, commit a new `sql/vX_Y-*.sql` file, hand the user the exact SQL to run,
 and note it in the CHANGELOG `Deploy:` line.
@@ -171,7 +166,7 @@ and note it in the CHANGELOG `Deploy:` line.
 parsed by `parseBrewGuide`/`bg_extractTimes` into `{tempC, rinseSeconds, times}` via
 order-sensitive regex (temp/grams/dates are stripped *before* time-token extraction so
 they aren't misread as steeps). With no parseable schedule, `generateFormTimes`
-synthesizes one from `LEAF_PROFILES` (six leaf-morphology families) via `inferLeafForm`.
+synthesizes one from `LEAF_PROFILES` (the leaf-morphology families) via `inferLeafForm`.
 `computeBrewAdvice` nudges that baseline by past-session `feedback`. This is
 regex-heavy — validate changes with a Node script (see above). `LEAF_PROFILES` is the
 tunable knob for the curves. `inferLeafForm` consults `kbResolve` (steep-knowledge.js)
