@@ -26,6 +26,24 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.61 — greeting copy variety + APP_VERSION constant
+Deploy: `steep-dashboard.js`, `steep-core.js`, `steep-settings.js`, `service-worker.js` (v71). No SQL.
+- **Greeting copy variety** (steep-dashboard.js) — each greeting branch now draws from a small pool
+  instead of one fixed line. `d_copyPick(pool, todayKey)` picks via `d_hash(todayKey+'|copy') %
+  pool.length` — **one voice per calendar day**, seeded independently of the tea pick so it never
+  reshuffles on re-render. Pools (Niklas-approved 2026-07-09): active-with-history (4), active-no-
+  history (3), redirected-later-today (3), redirected-tomorrow (3), night (3), empty-state (2).
+  Voice rules unchanged (warm, no exclamation/imperatives/guilt); the tea name stays the tap-target.
+  Note: the active-with-history line "…this {bucket}?" renders "this late-night" for a night-active
+  user (BUCKET_NOUN is 'late-night') — flagged for Niklas at the pause.
+- **`APP_VERSION` constant** (steep-core.js, = 'v3.61') — the single source of truth for the user-
+  visible version. Wired into the feedback mailto subject (was hardcoded 'v3.60') and a quiet
+  "SlowCup v3.61" label in the Settings footer. **Added to the deploy ritual** (CLAUDE.md step 2b):
+  bump it every deploy alongside CACHE_NAME.
+- Extended `fixtures/greeting-test.js` (local) — now 30 assertions: per-branch pool membership across
+  a 20-day sweep, ≥2 distinct lines per branch (variety), exactly one tea-name link per line, and
+  same-day determinism of both the pick and the copy line. All green.
+
 ## v3.60 — error log + data health + feedback (Settings → Data)
 Deploy: `steep-core.js`, `steep-settings.js`, `service-worker.js` (v70). No SQL.
 - **Diagnostics log** (steep-core.js) — a device-local `tealog_errorLog` ring buffer (last 20,

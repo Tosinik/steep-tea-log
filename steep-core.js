@@ -1,3 +1,7 @@
+// App version — the single source of truth for the user-visible version string (Settings footer +
+// the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
+const APP_VERSION = 'v3.61';
+
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
   const saved = localStorage.getItem('tealog_theme');

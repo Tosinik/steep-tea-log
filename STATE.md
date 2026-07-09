@@ -65,7 +65,18 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.60 error log + data health + feedback** (cache **v70**): Settings → Data
+**NOW (just shipped) — v3.61 greeting copy variety + APP_VERSION** (cache **v71**): each greeting
+branch draws from a small approved pool via `d_copyPick(pool,todayKey)` = `d_hash(todayKey+'|copy')
+% len` — one voice per calendar day, seeded apart from the tea pick so it doesn't reshuffle on
+re-render (steep-dashboard.js). New `APP_VERSION` const in steep-core.js (='v3.61') feeds the feedback
+mailto subject + a quiet Settings-footer version label; **deploy ritual now bumps APP_VERSION too**
+(CLAUDE.md step 2b). `fixtures/greeting-test.js` extended to 30 assertions (pool membership + variety
++ one tea-name link/line + same-day determinism). **Note for Niklas:** active-with-history line 3
+renders "this late-night" for a night-active user — strike/reword if it grates. **SlowCup batch
+continues (pause after each):** v3.62 freshness cues (+ sparkline "add a purchase date" rider) ·
+v3.63 feed pagination.
+
+**Earlier — v3.60 error log + data health + feedback** (cache **v70**): Settings → Data
 gains three read-only tools. A device-local `tealog_errorLog` ring buffer (last 20) fed by
 `window.onerror`/`unhandledrejection` + `saveErr` (`logError`/`readErrorLog`/`clearErrorLog` in
 steep-core; hooks installed at load; never surfaces proactively — only viewable/clearable in

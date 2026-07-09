@@ -84,6 +84,10 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
    after a push — this is the single most important step.
 2. **If you added a new module/asset, add it to `FILES_TO_CACHE`** in
    `service-worker.js` (and to the `<script>` list in `index.html`).
+2b. **Bump `APP_VERSION` in `steep-core.js`** (v3.61+) to match the new version. It's the
+   user-visible version string — the Settings footer label and the feedback-mailto subject —
+   so a stale value silently mislabels every feedback email. Keep it in lockstep with the
+   CHANGELOG heading.
 3. **Update CHANGELOG.md** with a new version entry: a version heading, a `Deploy:`
    line naming exactly which files changed (and the new SW cache version), whether any
    SQL must be run, then bullets.

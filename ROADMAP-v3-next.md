@@ -77,10 +77,12 @@ v3.40 tea lifecycle.
      negative stock, empty sessions (client-visible stand-in for DB-orphaned steeps — the sessions
      load drops those), duplicate pairs (same tea ≤10 min, v3.35 signature). `mailto:slowcupapp@gmail.com`
      feedback row. Validated `fixtures/data-health-test.js` (local): real export clean on all 5.
-   - **Greeting copy variety (v3.61)** — small cheekier pool per greeting branch, ONE voice per day
-     (`pool[d_hash(todayKey+'|copy') % len]`, no reshuffle on re-render); voice rules unchanged (warm,
-     no exclamation/imperatives/guilt; tea name stays the tap-target). Pools approved 2026-07-09 (see
-     `TASK-slowcup-batch.md` §3). Extend `fixtures/greeting-test.js`: same day → same line; name span intact.
+   - ~~**Greeting copy variety**~~ ✓ **shipped v3.61** — each greeting branch draws from a small
+     approved pool via `d_copyPick(pool,todayKey)` (`d_hash(todayKey+'|copy') % len`), one voice per
+     calendar day, seeded apart from the tea pick (steep-dashboard.js). Rode with a new `APP_VERSION`
+     const (steep-core.js) → feedback mailto subject + Settings footer label; deploy ritual bumps it
+     now. `fixtures/greeting-test.js` → 30 assertions (pool membership + variety + name-link + same-day
+     determinism). Edge flagged: active-with-history line 3 = "this late-night" for night-active users.
    - **Freshness cues (v3.62)** — surface `harvestYear`/`harvestSeason` **quietly on tea detail only**:
      shincha/first-flush past ~9mo → "at its best young"; aged white/sheng → "deepens with age". Year and
      season independently optional, silent on garbage (only 5/14 teas carry any). Rider: the OK'd

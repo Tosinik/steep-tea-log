@@ -37,7 +37,7 @@ function dataToolsHTML(){
     ${dataHealthHTML()}
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;">
       <div><div class="set-label">Send feedback</div><div class="set-sub">Opens an email to the SlowCup mailbox. Notice anything off above? You can copy it in.</div></div>
-      <a class="btn" href="mailto:slowcupapp@gmail.com?subject=${encodeURIComponent('SlowCup v3.60 feedback')}">Email</a>
+      <a class="btn" href="mailto:slowcupapp@gmail.com?subject=${encodeURIComponent('SlowCup '+APP_VERSION+' feedback')}">Email</a>
     </div>
   </div>`;
 }
@@ -244,6 +244,7 @@ function settingsModal(){
       ${backupSectionHTML()}
       ${dataToolsHTML()}
       <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Settings sync across your devices. Manage vendors from the Teas tab.</p>
+      <p style="font-size:11px;color:var(--ink-soft);margin:8px 0 0;text-align:center;opacity:.75;">SlowCup ${APP_VERSION}</p>
     </div>
   </div>`;
 }

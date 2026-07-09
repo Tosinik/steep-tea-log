@@ -609,6 +609,9 @@ function d_hourBucket(h){ if(h>=5&&h<12) return 'morning'; if(h>=12&&h<17) retur
 // Stable FNV-1a hash — equal-score candidates tie-break the same way all day (no Math.random,
 // which would reshuffle the pick on every re-render).
 function d_hash(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
+// v3.61: pick one line from a pool, stable for the whole calendar day (own '|copy' seed so the copy
+// choice is independent of which tea gets picked). One voice per day, no reshuffle on re-render.
+function d_copyPick(pool, todayKey){ return pool[d_hash(todayKey+'|copy') % pool.length]; }
 function greetingCardHTML(){
   const now = new Date();
   const bucket = d_hourBucket(now.getHours());
@@ -618,8 +621,11 @@ function greetingCardHTML(){
       <h2 style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;margin:0;">${greet}</h2>
       ${sub ? `<div style="font-size:13.5px;color:var(--ink-soft);margin-top:6px;">${sub}</div>` : ''}
     </div>`;
-  if(!sessions.length) return card('The kettle&rsquo;s patient whenever you are.');
   const todayKey = dayKey(now);
+  if(!sessions.length) return card(d_copyPick([
+    `The kettle&rsquo;s patient whenever you are.`,
+    `Nothing brewing yet — the kettle&rsquo;s patient.`,
+  ], todayKey));
   const brewedToday = new Set(sessions.filter(se=>dayKey(se.date)===todayKey).map(se=>se.teaId));
 
   // v3.55 active-window detection: a bucket is "active" if it holds ≥2 sessions OR ≥15% of the
@@ -649,19 +655,46 @@ function greetingCardHTML(){
   }).sort((a,b)=> b.score-a.score || b.tie-a.tie);
   const pick = scored[0];
   const name = `<span onclick="openTeaDetail('${escapeJsArg(pick.t.id)}')" style="color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;">${escapeHtml(pick.t.name)}</span>`;
+  // v3.61: each branch draws from a small pool, ONE voice per calendar day (a copy-seeded hash,
+  // independent of the tea pick, so it doesn't reshuffle on re-render). Tea name stays the tap-target.
   let sub;
   if(redirected){
-    const tn = BUCKET_NOUN[target];
-    // Night spans midnight, so "the morning" is safe either way — don't claim "tomorrow" there.
-    sub = bucket==='night'
-      ? `The ${name} will be waiting for the ${tn}.`
-      : (targetToday ? `Maybe save the ${name} for ${BUCKET_WHEN[target]}.`
-                     : `Maybe save the ${name} for tomorrow ${tn}.`);
+    const tn = BUCKET_NOUN[target], tw = BUCKET_WHEN[target];
+    if(bucket==='night'){
+      // Night spans midnight, so "the morning" is safe either way — don't claim "tomorrow" here.
+      sub = d_copyPick([
+        `The ${name} will be waiting for the ${tn}.`,
+        `Sleep well — the ${name} will keep till ${tn}.`,
+        `The ${name} isn&rsquo;t going anywhere before ${tn}.`,
+      ], todayKey);
+    } else if(targetToday){
+      sub = d_copyPick([
+        `Maybe save the ${name} for ${tw}.`,
+        `How about the ${name} ${tw}?`,
+        `The ${name} could be a good ${tn} plan.`,
+      ], todayKey);
+    } else {
+      sub = d_copyPick([
+        `Maybe save the ${name} for tomorrow ${tn}.`,
+        `How does the ${name} sound for tomorrow ${tn}?`,
+        `Tomorrow ${tn} has the ${name}&rsquo;s name on it.`,
+      ], todayKey);
+    }
   } else {
+    const bn = BUCKET_NOUN[bucket], bw = BUCKET_WHEN[bucket];
     // Only claim "your <bucket> pick" when there's real bucket history; otherwise a neutral nudge.
     sub = pick.bucketCount>0
-      ? `Maybe the ${name}? It&rsquo;s been your ${BUCKET_NOUN[bucket]} pick.`
-      : `Maybe the ${name} ${BUCKET_WHEN[bucket]}?`;
+      ? d_copyPick([
+          `Maybe the ${name}? It&rsquo;s been your ${bn} pick.`,
+          `How about the ${name}? It&rsquo;s been carrying your ${bn}s lately.`,
+          `How do you feel about the ${name} this ${bn}?`,
+          `Your ${bn} usually says ${name}.`,
+        ], todayKey)
+      : d_copyPick([
+          `Maybe the ${name} ${bw}?`,
+          `How about the ${name} ${bw}?`,
+          `Feeling like the ${name} ${bw}?`,
+        ], todayKey);
   }
   return card(sub);
 }
