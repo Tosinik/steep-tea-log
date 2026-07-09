@@ -65,7 +65,25 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.63 WS3 design language** (cache **v73**, APP_VERSION v3.63): first of a
+**NOW (just shipped) — v3.64 WS1 SlowCup Wrapped** (cache **v74**, APP_VERSION v3.64): second of the
+**4-workstream design rework** (order WS3→WS1→WS4→WS2; **pause after each**). `viewWrapped()`
+(steep-insights.js) is now a horizontal scroll-snap sequence of full-width `.wrap-card` story cards
+(seasonal jade/amber/porcelain wash via new `--wc-*` tokens in both theme blocks + catalogue
+numbering + hanko-sealed standout plate; cover ensō, closing seigaiha; reuses the WS3 sprite). Up to
+8 cards — cover · sessions · time-at-the-table · companion · rhythm · new-this-season · standout ·
+kept/share — degrading gracefully: `wrappedKinds()` drops any missing-stat card and the numbering
+re-flows (time card falls back to cold-brew count; cover/sessions/kept always present). Only JS is
+dot-tracking (`bindDynamic` in steep-core, rAF-throttled) + tappable dots (`wrapGo`, respects
+reduced-motion) + share (`shareWrapped`, kept; `wrappedShareText` reworded to the agreed format).
+Empty state + "SlowCup Wrapped" name kept. Validated `fixtures/wrapped-cards-test.js` (committed,
+data-free, 22 — degrade/numbering/footer/cold-fallback/overflow/hanko/share). Browser-verified BOTH
+themes via injected `computeWrapped()` sample (screenshots still time out on the auth gate, so DOM/
+computed-style eval): fields+fonts+accents resolve per theme, dark active dot stays amber (`--wc-enso`).
+**Remaining workstreams (own deploys, pause after each):** WS4 slowcup.app static landing page (new
+file) · WS2 Insights overhaul (viewInsights). Then back to the SlowCup batch's last item: feed
+pagination (+ socialErr inline notice).
+
+**Earlier — v3.63 WS3 design language** (cache **v73**, APP_VERSION v3.63): first of a
 **4-workstream design rework** (`design_handoff/`, order WS3→WS1→WS4→WS2). Display font Fraunces →
 **Shippori Mincho** (new `--font-display` token, headings weight 700, all inline refs swept); header
 emoji → **hairline stroke icons** (hidden `<svg><defs>` sprite in index.html + `icon()` helper in

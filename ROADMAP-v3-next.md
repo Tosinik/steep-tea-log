@@ -100,10 +100,13 @@ v3.40 tea lifecycle.
    - ~~**WS3 — design language**~~ ✓ **shipped v3.63**. Shippori Mincho display font (`--font-display`),
      hairline stroke icon sprite + `icon()` helper (header emoji retired), tea-leaf favourite mark
      (`favLeaf`), ensō timer ring (`--enso`), hanko+seigaiha defs staged for WS1/WS2.
-   - **WS1 — SlowCup Wrapped** [next] — replace the single static Wrapped card with a horizontal
-     CSS scroll-snap sequence of full-width story cards (seasonal wash + catalogue numbering + hanko
-     standout); dot indicators (only JS besides share); degrade gracefully (skip missing-stat cards);
-     keep share-as-text + empty state. `viewWrapped()` in steep-insights.js.
+   - ~~**WS1 — SlowCup Wrapped**~~ ✓ **shipped v3.64**. `viewWrapped()` (steep-insights.js) is now a
+     horizontal CSS scroll-snap sequence of up to 8 full-width `.wrap-card` story cards (seasonal
+     jade/amber/porcelain wash via `--wc-*` tokens + catalogue numbering + hanko-sealed standout).
+     Dot indicators track scroll + are tappable (`wrapGo`, the only JS besides `shareWrapped`, in
+     bindDynamic). `wrappedKinds()` degrades gracefully — missing-stat cards drop and numbering
+     re-flows; time card falls back to cold-brew count. Kept share-as-text (reworded), empty state,
+     the name. Validated `fixtures/wrapped-cards-test.js` (committed, 22); both themes browser-checked.
    - **WS4 — slowcup.app landing** — net-new static page (own `.html` + real CSS, `prefers-color-scheme`,
      no JS frameworks/analytics). Hero + device screenshots + 3 philosophy beats + jade-deep CTA panel
      (`mailto:slowcupapp@gmail.com`). Swap in current screenshots at deploy. Not part of the PWA cache.

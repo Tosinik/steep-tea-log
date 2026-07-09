@@ -26,6 +26,38 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.64 — WS1 SlowCup Wrapped (swipeable story cards)
+Deploy: `styles.css`, `steep-insights.js`, `steep-core.js` (APP_VERSION + carousel wiring),
+`service-worker.js` (v74). No SQL. Second of four design workstreams (WS3 → **WS1** → WS4 → WS2).
+- **Wrapped is now a horizontal scroll-snap sequence of full-width story cards** (was a single static
+  card). `viewWrapped()` (steep-insights.js) builds up to 8 cards — cover · sessions · time at the
+  table · companion · rhythm · new this season · standout · kept/share — as `.wrap-card` panels in a
+  `.wrap-track` (`overflow-x:auto; scroll-snap-type:x mandatory`; each card `flex:0 0 100%;
+  scroll-snap-align:center`). **Seasonal wash**: cards alternate jade-deep / amber fields with
+  porcelain breathers, driven by dedicated `--wc-*` tokens in both theme blocks (dark fields never go
+  full-bright). **Catalogue numbering** (№ 00…) + a **hanko-sealed** standout plate; the cover carries
+  a faint ensō, the closing card a seigaiha wash. Reuses the WS3 sprite (`#fav-leaf`, `#enso`,
+  `#hanko`, `#seigaiha`).
+- **Graceful degradation** — `wrappedKinds()` drops any card whose stat is missing (no timing → the
+  time card falls back to cold-brew count, then drops if neither; no top type / no discoveries / no
+  rating each drop their card) and the numbering **re-flows** so a one-tea, few-session season still
+  reads as a contiguous run. Cover · sessions · kept are always present.
+- **Only JS besides share**: dot indicators track the scroll position (`bindDynamic()` in steep-core:
+  `Math.round(scrollLeft/clientWidth)` → active dot, rAF-throttled) and are tappable (`wrapGo(i)`,
+  respects `prefers-reduced-motion`). Kept the **share-as-text** action (`shareWrapped` unchanged path)
+  — `wrappedShareText` reworded to the agreed format (`SlowCup Wrapped · Summer 2026 / 14 sessions ·
+  43 infusions · 12 teas (5 new) / Companion: … ×6 / Standout: … ★4.5 / Quietly, that's a season.`).
+  Kept the **empty state** ("Your {season} is just beginning") and the **"SlowCup Wrapped"** name.
+- No inline styles added beyond the one data-driven bar height (matches the existing `.typebar-fill`
+  pattern); everything else is `.wrap-*` classes in `styles.css`.
+- Validated `fixtures/wrapped-cards-test.js` (committed, data-free, 22 assertions): degrade drops the
+  right cards, catalogue numbering re-flows with no gaps, footer denominator = surviving count,
+  cold-brew fallback fires, discoveries overflow (+N), standout escapes + seals with the hanko, share
+  text format. Browser-verified both themes via injected `computeWrapped()` sample (screenshots
+  time out on the auth gate): 8 cards / 8 dots, fields + fonts + accents resolve per theme, active dot
+  stays amber (`--wc-enso`) in dark, dot-tracking math 0→0/3→3/7→7, degraded season → 4 contiguous
+  cards, no console errors.
+
 ## v3.63 — WS3 design language (Shippori Mincho · hairline icons · accent vocabulary)
 Deploy: `index.html`, `styles.css`, `steep-core.js`, `steep-dashboard.js`, `steep-insights.js`,
 `steep-passport.js`, `steep-sessions.js`, `steep-shopping.js`, `steep-social.js`, `steep-teas.js`,

@@ -247,7 +247,7 @@ function computeWrapped(){
     .sort((a,b)=> (b.rating-a.rating) || (new Date(b.date)-new Date(a.date)))[0] || null;
 
   return { season, empty:false, n:inSeason.length, infusions, grams, steepSeconds, activeDays,
-    coldN, topTea, topTeaN, distinctTeas, topType, topTypeN, topPart, newTeas, standout };
+    coldN, topTea, topTeaN, distinctTeas, topType, topTypeN, topPart, parts, newTeas, standout };
 }
 function wrappedTeaser(){
   const w = computeWrapped();
@@ -258,12 +258,12 @@ function wrappedTeaser(){
   </div>`;
 }
 function wrappedShareText(w){
-  const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
-  const lines = [`My ${w.season.name} ${w.season.year} in tea · SlowCup`,
-    `${w.n} sessions · ${w.infusions} infusions${w.grams?` · ${w.grams.toFixed(0)}g`:''}`];
-  if(w.topTea) lines.push(`Most brewed: ${w.topTea.name} (${w.topTeaN}×)`);
-  if(w.topType) lines.push(`Mostly ${typeLabel(w.topType).toLowerCase()}, mostly ${partWord(w.topPart)}`);
-  if(w.newTeas.length) lines.push(`${w.newTeas.length} new tea${w.newTeas.length>1?'s':''} discovered`);
+  const lines = [`SlowCup Wrapped · ${w.season.name} ${w.season.year}`];
+  lines.push([`${w.n} session${w.n>1?'s':''}`, `${w.infusions} infusion${w.infusions>1?'s':''}`,
+    `${w.distinctTeas} tea${w.distinctTeas>1?'s':''}${w.newTeas.length?` (${w.newTeas.length} new)`:''}`].join(' · '));
+  if(w.topTea) lines.push(`Companion: ${w.topTea.name} ×${w.topTeaN}`);
+  if(w.standout){ const sn = w.standout.teaName||(teaById(w.standout.teaId)||{}).name||'—'; lines.push(`Standout: ${sn} ★${Number(w.standout.rating)}`); }
+  lines.push(`Quietly, that's a season.`);
   return lines.join('\n');
 }
 async function shareWrapped(){
@@ -279,60 +279,167 @@ async function shareWrapped(){
     showToast('Could not copy — you can screenshot this instead.');
   }
 }
-function viewWrapped(){
-  const w = computeWrapped();
-  const back = `<button class="detail-back" onclick="goView('insights')">← Back to insights</button>`;
-  if(w.empty){
-    return `${back}
-    <div class="section card" style="text-align:center;padding:34px 20px;">
-      <div class="eyebrow">SlowCup Wrapped</div>
-      <h2 style="font-family:var(--font-display);font-size:26px;margin:8px 0 6px;">Your ${w.season.name} is just beginning</h2>
-      <p style="color:var(--ink-soft);font-size:14px;max-width:34ch;margin:0 auto;">No sessions logged this ${w.season.name.toLowerCase()} yet. Brew a few cups and your recap fills in here.</p>
+// WS1 (v3.64) — SlowCup Wrapped as a horizontal scroll-snap sequence of full-width story cards.
+// Cards degrade gracefully: any card whose stat is missing is dropped and the catalogue numbering
+// re-flows (see wrappedKinds). Only JS is dot-tracking (bindDynamic) + share (shareWrapped).
+const WRAP_PART_LABEL = {morning:'AM', afternoon:'MID', evening:'PM', night:'NT'};
+function wrappedKinds(w){
+  const k = ['cover','sessions'];                 // cover + sessions always present (n>=1)
+  if(w.steepSeconds>0 || w.coldN>0) k.push('time');
+  if(w.topTea) k.push('companion');
+  if(w.topType) k.push('rhythm');
+  if(w.newTeas.length) k.push('discoveries');
+  if(w.standout) k.push('standout');
+  k.push('keep');
+  return k;
+}
+function wrappedCardHTML(kind, i, total, w){
+  const pad = n => String(n).padStart(2,'0');
+  const no = pad(i);
+  const foot = `<div class="wrap-foot">${no} / ${pad(total)}</div>`;
+  const cat = (label, right) => `<div class="wrap-cat"><span>№ ${no}</span><span>${right!=null?right:label}</span></div>`;
+  const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+  if(kind==='cover'){
+    const mfmt = d => d.toLocaleDateString(undefined,{month:'short'}).toUpperCase();
+    const months = `${mfmt(w.season.start)} — ${mfmt(new Date(w.season.end.getTime()-86400000))}`;
+    return `<div class="wrap-card wf-jade">
+      <svg class="wrap-enso-bg" viewBox="0 0 120 120" aria-hidden="true"><use href="#enso"/></svg>
+      ${cat(null, `${w.season.name} · ${w.season.year}`)}
+      <div class="wrap-body">
+        <div class="wrap-display wrap-cover-title">${w.season.name}<br>${w.season.year}</div>
+        <div class="wrap-cover-sub">${months} · a quiet season of tea</div>
+      </div>
+      <div class="wrap-cover-foot"><svg class="wrap-leaf" aria-hidden="true"><use href="#fav-leaf"/></svg><span>swipe →</span></div>
     </div>`;
   }
-  const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
-  const sixth = w.steepSeconds>0
-    ? `<div class="stat"><div class="num">${fmtSteepDuration(w.steepSeconds)}</div><div class="lbl">Steeping time</div></div>`
-    : `<div class="stat"><div class="num">${w.coldN}</div><div class="lbl">Cold brews</div></div>`;
-  return `${back}
-    <div class="section card" style="text-align:center;padding:30px 20px;background:linear-gradient(160deg,var(--white,#fff),var(--porcelain,#f4efe4));">
-      <div class="eyebrow">SlowCup Wrapped</div>
-      <h2 style="font-family:var(--font-display);font-size:28px;margin:8px 0 4px;">Your ${w.season.name} in tea</h2>
-      <div class="mono" style="font-size:12px;color:var(--ink-soft);">${w.season.year} · so far</div>
+  if(kind==='sessions'){
+    return `<div class="wrap-card wf-por">
+      ${cat('Sessions')}
+      <div class="wrap-body">
+        <div class="wrap-bignum"><span class="wrap-big">${w.n}</span><span class="wrap-big-unit">session${w.n>1?'s':''}</span></div>
+        <div class="wrap-display wrap-lead">Quietly, that's a season.</div>
+        <div class="wrap-sub">Across ${w.activeDays} day${w.activeDays>1?'s':''} you made the time — no more, no less.</div>
+      </div>
+      ${foot}
+    </div>`;
+  }
+  if(kind==='time'){
+    const body = w.steepSeconds>0
+      ? `<div class="wrap-display wrap-hero">${fmtSteepDuration(w.steepSeconds)}</div>
+         <div class="wrap-display wrap-hero-lead">spent watching leaves unfurl.</div>
+         <div class="wrap-sub-mono">${w.infusions} infusion${w.infusions>1?'s':''} · none of them rushed</div>`
+      : `<div class="wrap-bignum"><span class="wrap-big">${w.coldN}</span><span class="wrap-big-unit">cold brew${w.coldN>1?'s':''}</span></div>
+         <div class="wrap-display wrap-lead">Steeped slow, on their own time.</div>
+         <div class="wrap-sub-mono">${w.infusions} infusion${w.infusions>1?'s':''} in all</div>`;
+    return `<div class="wrap-card wf-amber">
+      ${cat('Time at the table')}
+      <div class="wrap-body">${body}</div>
+      ${foot}
+    </div>`;
+  }
+  if(kind==='companion'){
+    return `<div class="wrap-card wf-jade">
+      ${cat('Your companion')}
+      <div class="wrap-body">
+        <div class="wrap-display wrap-teaname">${escapeHtml(w.topTea.name)}</div>
+        <div class="wrap-count"><span class="wrap-x">×${w.topTeaN}</span><span class="wrap-x-sub">of ${w.n}<br>sessions</span></div>
+        <div class="wrap-display wrap-lead-sm">Mostly ${partWord(w.topPart)}, always first.</div>
+      </div>
+      <svg class="wrap-leaf wrap-leaf-foot" aria-hidden="true"><use href="#fav-leaf"/></svg>
+    </div>`;
+  }
+  if(kind==='rhythm'){
+    const p = w.parts, mx = Math.max(1, p.morning, p.afternoon, p.evening, p.night);
+    const bars = ['morning','afternoon','evening','night'].map(part=>
+      `<div class="wrap-bar-col"><div class="wrap-bar-slot"><div class="wrap-bar-fill" style="height:${Math.round(p[part]/mx*100)}%"></div></div><div class="wrap-bar-lbl">${WRAP_PART_LABEL[part]}</div></div>`
+    ).join('');
+    return `<div class="wrap-card wf-por">
+      ${cat('Your rhythm')}
+      <div class="wrap-body">
+        <div class="wrap-display wrap-lead" style="margin-top:0;">Mostly ${typeLabel(w.topType).toLowerCase()},<br>mostly ${partWord(w.topPart)}.</div>
+        <div class="wrap-bars">${bars}</div>
+        <div class="wrap-sub-mono">${typeLabel(w.topType).toLowerCase()} · ${w.topTypeN} of ${w.n}</div>
+      </div>
+      ${foot}
+    </div>`;
+  }
+  if(kind==='discoveries'){
+    const names = w.newTeas.slice(0,3).map(t=>escapeHtml(t.name)).join('<br>');
+    const more = w.newTeas.length>3 ? `<span class="wrap-names-more"> · +${w.newTeas.length-3}</span>` : '';
+    return `<div class="wrap-card wf-amber">
+      ${cat('New this season')}
+      <div class="wrap-body">
+        <div class="wrap-bignum"><span class="wrap-big">${w.newTeas.length}</span><span class="wrap-display wrap-big-unit-lg">tea${w.newTeas.length>1?'s':''} found<br>their way in.</span></div>
+        <div class="wrap-names">${names}${more}</div>
+      </div>
+      ${foot}
+    </div>`;
+  }
+  if(kind==='standout'){
+    const st = w.standout;
+    const name = escapeHtml(st.teaName || (teaById(st.teaId)||{}).name || '—');
+    const t = teaById(st.teaId) || {};
+    const date = new Date(st.date).toLocaleDateString(undefined,{day:'numeric',month:'short'});
+    const ves = vesselById(st.vesselId);
+    const segs = [date];
+    if(ves && ves.name) segs.push(escapeHtml(ves.name));
+    segs.push(`${steepCountOf(st)} steep${steepCountOf(st)!==1?'s':''}`);
+    const meta = [t.type?typeLabel(t.type).toLowerCase():'', t.origin?escapeHtml(String(t.origin).toLowerCase()):''].filter(Boolean).join(' · ');
+    return `<div class="wrap-card wc-standout">
+      <div class="wrap-plate">
+        <span class="wrap-hanko"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#hanko"/></svg></span>
+        <div class="wrap-cat"><span>№ ${no} · To keep</span></div>
+        <div class="wrap-body">
+          <div class="wrap-eyebrow-clay">The standout</div>
+          <div class="wrap-display wrap-standout-name">${name}</div>
+          <div class="wrap-stars">${renderStarsStatic(st.rating,false)}</div>
+          <div class="wrap-sub">${segs.join(' · ')}. The one you'd brew again tomorrow.</div>
+        </div>
+        ${meta?`<div class="wrap-plate-foot">${meta}</div>`:''}
+      </div>
+    </div>`;
+  }
+  // keep / share
+  const distinct = `${w.distinctTeas} tea${w.distinctTeas>1?'s':''}${w.newTeas.length?`, ${w.newTeas.length} new`:''}.`;
+  return `<div class="wrap-card wf-jade">
+    <div class="wrap-seigaiha"><svg preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="100%" height="100%" fill="url(#seigaiha)"/></svg></div>
+    ${cat('Kept')}
+    <div class="wrap-body">
+      <div class="wrap-display wrap-keep-lines">${w.n} session${w.n>1?'s':''}.<br>${w.infusions} infusion${w.infusions>1?'s':''}.<br>${distinct}</div>
+      <div class="wrap-display wrap-keep-tag">Quietly, that's a season.</div>
     </div>
-
-    <div class="section grid grid-3">
-      <div class="stat"><div class="num">${w.n}</div><div class="lbl">Sessions</div></div>
-      <div class="stat"><div class="num">${w.infusions}</div><div class="lbl">Infusions</div></div>
-      <div class="stat"><div class="num">${w.activeDays}</div><div class="lbl">Days with tea</div></div>
-      <div class="stat"><div class="num">${w.grams.toFixed(0)}</div><div class="lbl">Grams brewed</div></div>
-      <div class="stat"><div class="num">${w.distinctTeas}</div><div class="lbl">Teas explored</div></div>
-      ${sixth}
+    <div class="wrap-share-wrap">
+      <button class="wrap-share" onclick="shareWrapped()">Share your ${w.season.name.toLowerCase()}</button>
+      <div class="wrap-share-note">copies as text · no image, no account</div>
     </div>
-
-    ${w.topTea ? `<div class="section card">
-      <div class="eyebrow">Your ${w.season.name.toLowerCase()} companion</div>
-      <h2 style="margin:6px 0 2px;">${escapeHtml(w.topTea.name)}</h2>
-      <div style="color:var(--ink-soft);font-size:13px;">${typeLabel(w.topTea.type)} · brewed ${w.topTeaN} time${w.topTeaN>1?'s':''}</div>
-    </div>` : ''}
-
-    <div class="section card">
-      ${w.topType?`<div class="recap-line"><span class="recap-k">Leaf of the season</span><span class="recap-v">${typeLabel(w.topType)} · ${w.topTypeN}</span></div>`:''}
-      <div class="recap-line"><span class="recap-k">Favourite time</span><span class="recap-v">${cap(partWord(w.topPart))}</span></div>
-      <div class="recap-line"><span class="recap-k">New this season</span><span class="recap-v">${w.newTeas.length} tea${w.newTeas.length!==1?'s':''}</span></div>
-      ${w.standout?`<div class="recap-line"><span class="recap-k">Standout cup</span><span class="recap-v">${escapeHtml(w.standout.teaName||(teaById(w.standout.teaId)||{}).name||'—')} ${renderStarsStatic(w.standout.rating,false)}</span></div>`:''}
-    </div>
-
-    ${w.newTeas.length?`<div class="section card">
-      <div class="eyebrow">Teas you met this ${w.season.name.toLowerCase()}</div>
-      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${w.newTeas.slice(0,12).map(t=>`<span style="font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;">${escapeHtml(t.name)}</span>`).join('')}</div>
-    </div>`:''}
-
-    <div class="section card" style="text-align:center;">
-      <p style="color:var(--ink-soft);font-size:14px;margin:0 0 14px;">A season of quiet cups. Here's to the next one.</p>
-      <button class="btn btn-primary" onclick="shareWrapped()">Share my ${w.season.name}</button>
-    </div>
-  `;
+  </div>`;
+}
+// Scroll the carousel to card i; respects reduced-motion. Dot state follows via the scroll listener.
+function wrapGo(i){
+  const t = document.getElementById('wrapTrack'); if(!t) return;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  t.scrollTo({left:i*t.clientWidth, behavior:reduce?'auto':'smooth'});
+}
+function viewWrapped(){
+  const w = computeWrapped();
+  if(w.empty){
+    return `<div class="wrap">
+      <div class="wrap-head"><div class="wrap-head-brand"><svg aria-hidden="true"><use href="#fav-leaf"/></svg><span class="wrap-head-lbl">SlowCup Wrapped</span></div><button class="wrap-close" onclick="goView('insights')" aria-label="Close">×</button></div>
+      <div class="section card" style="text-align:center;padding:34px 20px;">
+        <h2 style="font-family:var(--font-display);font-size:26px;margin:0 0 6px;">Your ${w.season.name} is just beginning</h2>
+        <p style="color:var(--ink-soft);font-size:14px;max-width:34ch;margin:0 auto;">No sessions logged this ${w.season.name.toLowerCase()} yet. Brew a few cups and your recap fills in here.</p>
+      </div>
+    </div>`;
+  }
+  const kinds = wrappedKinds(w);
+  const total = kinds.length;
+  const cards = kinds.map((k,i)=>wrappedCardHTML(k,i,total,w)).join('');
+  const dots = kinds.map((_,i)=>`<button class="wrap-dot${i===0?' active':''}" onclick="wrapGo(${i})" aria-label="Go to card ${i+1}"></button>`).join('');
+  return `<div class="wrap">
+    <div class="wrap-head"><div class="wrap-head-brand"><svg aria-hidden="true"><use href="#fav-leaf"/></svg><span class="wrap-head-lbl">SlowCup Wrapped · ${w.season.name} ${w.season.year}</span></div><button class="wrap-close" onclick="goView('insights')" aria-label="Close">×</button></div>
+    <div class="wrap-track" id="wrapTrack">${cards}</div>
+    <div class="wrap-dots">${dots}</div>
+  </div>`;
 }
 
 /* ---------- the Insights tab view ---------- */

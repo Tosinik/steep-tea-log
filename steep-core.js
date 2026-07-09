@@ -1,6 +1,6 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.63';
+const APP_VERSION = 'v3.64';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -903,6 +903,14 @@ function bindDynamic(){
   if(tagInput){
     tagInput.oninput = ()=> renderTagSuggest(tagInput.value, tagInput.dataset.target);
     tagInput.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addTagFromInput(tagInput.dataset.target); } };
+  }
+  // WS1 (v3.64) — SlowCup Wrapped carousel: sync the active dot to the scroll position.
+  const wrapTrack = document.getElementById('wrapTrack');
+  if(wrapTrack){
+    const dots = [...document.querySelectorAll('.wrap-dot')];
+    const upd = ()=>{ const wd = wrapTrack.clientWidth||1; const idx = Math.max(0, Math.min(dots.length-1, Math.round(wrapTrack.scrollLeft/wd))); dots.forEach((d,n)=>d.classList.toggle('active', n===idx)); };
+    wrapTrack.onscroll = ()=> window.requestAnimationFrame(upd);
+    window.requestAnimationFrame(upd);
   }
 }
 
