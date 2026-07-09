@@ -65,7 +65,19 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.61 greeting copy variety + APP_VERSION** (cache **v71**): each greeting
+**NOW (just shipped) — v3.62 freshness cues + sparkline rider + night-copy patch** (cache **v72**,
+APP_VERSION v3.62): tea detail gains one soft italic line under Harvest — fresh greens "at its best
+young", whites/pu-erh "deepens with age" — requiring a valid year (season optional), silent on
+garbage/neutral styles (`freshnessCueHTML` in steep-teas.js; exactly 2 fire on real data). Rider:
+"add a purchase date" link where `inventorySparkline` is absent only for want of a date. Night-copy
+patch: active-with-history line 3 now reads "tonight" not "this late-night" (steep-dashboard.js).
+Validated `fixtures/freshness-test.js` (local, 11) + `greeting-test.js` (now 32). **SlowCup batch —
+last item:** v3.63 feed pagination (`.range()` + quiet "load more"; fold in `socialErr` alert → sticky
+inline notice on the social view, same file, per TASK-cleanup §housekeeping). Then the batch is done
+and `TASK-cleanup-and-issues.md` picks up: v3.64 greeting-after-session (issue #2), v3.65 in-session
+turn-off fix (issue #1), v3.66 "what's new" banner line.
+
+**Earlier — v3.61 greeting copy variety + APP_VERSION** (cache **v71**): each greeting
 branch draws from a small approved pool via `d_copyPick(pool,todayKey)` = `d_hash(todayKey+'|copy')
 % len` — one voice per calendar day, seeded apart from the tea pick so it doesn't reshuffle on
 re-render (steep-dashboard.js). New `APP_VERSION` const in steep-core.js (='v3.61') feeds the feedback

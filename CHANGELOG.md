@@ -26,6 +26,27 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.62 — freshness cues + sparkline rider + night-copy patch
+Deploy: `steep-teas.js`, `steep-dashboard.js`, `steep-core.js` (APP_VERSION), `service-worker.js` (v72). No SQL.
+- **Freshness cues** (steep-teas.js) — one soft, italic, observational line under the Harvest field on
+  tea detail. **Not on Home, not in the picker, no badge/alarm.** Requires a VALID year (1980..now+1;
+  rejects "-", blank, out-of-range) to reason about age — season is optional decoration. Direction by
+  style: fresh greens (+ shincha/sencha/gyokuro/first-flush/longjing keywords) → "…is at its best
+  young"; whites & pu-erh (+ sheng/aged keywords) → "this style deepens with age"; every other style
+  stays silent. On the real export exactly two fire — "Spring 2026 harvest — shincha is at its best
+  young." and "2021 harvest — this style deepens with age." No raw user text is rendered (numeric
+  year, whitelisted season + style word).
+- **Sparkline rider** (steep-teas.js) — where `inventorySparkline` draws nothing *only* because a tea
+  has no `purchaseDate` (but has a bought amount), a quiet "Add a purchase date to see the stock
+  curve" link to Edit. Silent when a date exists or there's no bought amount.
+- **Night-copy patch** (steep-dashboard.js) — the active-with-history line "How do you feel about the
+  {name} this {bucket}?" now uses the BUCKET_WHEN form, so a night-active user reads "…tonight?"
+  instead of the clunky "…this late-night?" (Niklas-approved to ride here).
+- Validated: `fixtures/freshness-test.js` (local, 11) — exactly the two live cues with exact wording,
+  garbage/neutral/season-only all silent; `fixtures/greeting-test.js` (local, now 32) gains a
+  night-active sweep asserting "this late-night" never renders and "tonight?" does. Browser-verified
+  the full tea-detail render (cue + hint present, no console errors).
+
 ## v3.61 — greeting copy variety + APP_VERSION constant
 Deploy: `steep-dashboard.js`, `steep-core.js`, `steep-settings.js`, `service-worker.js` (v71). No SQL.
 - **Greeting copy variety** (steep-dashboard.js) — each greeting branch now draws from a small pool

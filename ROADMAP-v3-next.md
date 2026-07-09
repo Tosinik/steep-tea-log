@@ -83,12 +83,16 @@ v3.40 tea lifecycle.
      const (steep-core.js) → feedback mailto subject + Settings footer label; deploy ritual bumps it
      now. `fixtures/greeting-test.js` → 30 assertions (pool membership + variety + name-link + same-day
      determinism). Edge flagged: active-with-history line 3 = "this late-night" for night-active users.
-   - **Freshness cues (v3.62)** — surface `harvestYear`/`harvestSeason` **quietly on tea detail only**:
-     shincha/first-flush past ~9mo → "at its best young"; aged white/sheng → "deepens with age". Year and
-     season independently optional, silent on garbage (only 5/14 teas carry any). Rider: the OK'd
-     `inventorySparkline` "add a purchase date" link when the chart is absent (steep-teas.js).
+   - ~~**Freshness cues + sparkline rider + night-copy patch**~~ ✓ **shipped v3.62** (steep-teas.js +
+     steep-dashboard.js). One soft italic line under Harvest on tea detail: fresh greens "at its best
+     young", whites/pu-erh "deepens with age"; requires a valid year (season optional), silent on
+     garbage/neutral styles — exactly 2 fire on real data. Rider: "add a purchase date" link where
+     `inventorySparkline` is absent only for want of a date. Night-copy: active-with-history line 3 →
+     "tonight" not "this late-night". Validated `fixtures/freshness-test.js` (local, 11) + greeting (32).
    - **Feed pagination (v3.63)** — `.range()` paging + quiet "load more" (no infinite scroll); page size =
-     current cap; verify the shared-session mapper appends page 2+ without duplicate keys.
+     current cap; verify the shared-session mapper appends page 2+ without duplicate keys. **Fold in**
+     `socialErr`'s `alert()` → a sticky inline notice on the social view (multi-sentence setup
+     diagnostics, so not a toast) — same file, per `TASK-cleanup-and-issues.md` housekeeping.
 
 ## Shipped
 Core: data layer + per-row writes, quick log, modularization, library search/filter/sort,
@@ -138,10 +142,14 @@ Not cut, but explicitly parked with the reason, so we don't re-litigate each ses
 - **Install guide** — SKIPPED for now (decided 2026-07-09). It interacts with the **slowcup.app**
   domain decision: installed PWAs bind to their origin, so pushing installs under `github.io` before
   the domain settles would orphan them. Revisit once the domain is decided (then: install guide →
-  beta package).
-- **Brew-advice phase 2 (learned defaults)** — WAITS on a monitoring window (decided 2026-07-09):
-  let phase-1 ratio adjustment gather a week-plus of ratio'd sessions first, then write the phase-2
-  spec. Sessions already store `brew_style` so phase 2 can normalise real steep times within-method.
+  beta package). **Time-sensitive (2026-07-10):** the SlowCup name is public in a public repo since the
+  v3.59 rename — register `slowcup.app` sooner rather than later to avoid a squat.
+- **Brew-advice phase 2 (learned defaults)** — WAITS on a monitoring window (decided 2026-07-09;
+  gate concretized 2026-07-10). Niklas logs ~2 sessions/day (10–14/week), so the gate — **≥15 ratio'd
+  sessions with feedback answered, spanning both methods** — lands in ~1.5–2 weeks: **review ~2026-07-20
+  to -24**. On that date Niklas sends fresh CSV exports and the phase-2 spec gets drafted (claude.ai
+  side). **Prerequisite:** `ratioAdjust` must be ON for the window to count. Sessions already store
+  `brew_style` so phase 2 can normalise real steep times within-method.
 - **German i18n** [L] — large string-extraction pass; not worth it at private-beta scale (a
   handful of EN/DE-comfortable testers). Revisit only if the audience widens.
 - **TWA / APK (PWABuilder / Bubblewrap) & Capacitor native** — the installable PWA already

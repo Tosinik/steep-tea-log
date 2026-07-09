@@ -317,6 +317,49 @@ function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = fr
   try{ localStorage.setItem('tealog_view','tea-detail'); localStorage.setItem('tealog_activeTea', id); }catch(e){}
   render(); }
 
+// v3.62 freshness cue — one soft, observational line on tea detail (never on Home/the picker, never
+// a badge/alarm). Requires a VALID year to reason about age (season is optional decoration); stays
+// silent on garbage ("-", blank, out of range) and on styles with no clear age story. Direction by
+// style: fresh greens are best young; whites/pu-erh deepen with age. All values here come from a
+// numeric year, a whitelisted season, and a whitelisted style word — no raw user text is rendered.
+const FRESH_SEASONS = { spring:'Spring', summer:'Summer', autumn:'Autumn', winter:'Winter' };
+function freshnessYear(tea){ const y = parseInt(String(tea.harvestYear||'').trim(),10);
+  const nowY = new Date().getFullYear(); return (y>=1980 && y<=nowY+1) ? y : null; }
+function freshnessSeason(tea){ return FRESH_SEASONS[String(tea.harvestSeason||'').trim().toLowerCase()] || null; }
+function freshnessClass(tea){
+  const type = (tea.type||'').toLowerCase();
+  const name = ((tea.name||'')+' '+(tea.cultivar||'')).toLowerCase();
+  if(type==='green' || /shincha|sencha|gyokuro|matcha|first[\s-]?flush|long ?jing|dragon ?well/.test(name)) return 'young';
+  if(type==='white' || type==='puerh' || /sheng|raw pu|hei ?cha|liu ?bao|shou ?mei|aged/.test(name)) return 'ages';
+  return null;
+}
+function freshnessStyleWord(tea){
+  const name = (tea.name||'').toLowerCase();
+  if(/shincha/.test(name)) return 'shincha';
+  if(/sencha/.test(name)) return 'sencha';
+  if(/gyokuro/.test(name)) return 'gyokuro';
+  if(/matcha/.test(name)) return 'matcha';
+  if(/first[\s-]?flush/.test(name)) return 'a first flush';
+  if(/long ?jing|dragon ?well/.test(name)) return 'longjing';
+  return (typeLabel(tea.type)||'green').toLowerCase()+' tea';
+}
+function freshnessCueHTML(tea){
+  const cls = freshnessClass(tea); if(!cls) return '';
+  const year = freshnessYear(tea); if(!year) return '';           // age needs a real year
+  const season = freshnessSeason(tea);
+  const when = (season ? season+' ' : '') + year + ' harvest';
+  const line = cls==='young'
+    ? `${when} — ${freshnessStyleWord(tea)} is at its best young.`
+    : `${when} — this style deepens with age.`;
+  return `<div style="margin-top:10px;font-size:12.5px;color:var(--ink-soft);font-style:italic;">${line}</div>`;
+}
+// v3.62 rider — when the stock curve is absent only because there's no purchase date (but there IS a
+// bought amount to draw from), offer a quiet way to complete it. Silent otherwise.
+function sparklineHintHTML(tea){
+  if(tea.purchaseDate || Number(tea.costOriginalGrams)<=0) return '';
+  return `<div style="margin-top:8px;font-size:12px;color:var(--ink-soft);">Add a <span onclick="openTeaForm(teaById('${escapeJsArg(tea.id)}'))" style="color:var(--jade-deep);cursor:pointer;text-decoration:underline;">purchase date</span> to see the stock curve.</div>`;
+}
+
 function viewTeaDetail(){
   const t = teaById(state.activeTeaId);
   if(!t) return '<div class="empty">Tea not found.</div>';
@@ -348,14 +391,14 @@ function viewTeaDetail(){
           <div class="eyebrow" style="margin-top:8px;">On hand</div>
           <div style="font-size:14px;${Number(t.amountGrams)<lowStockG()?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
           ${forecastLine(t)}
-          ${inventorySparkline(t)}
+          ${inventorySparkline(t) || sparklineHintHTML(t)}
         </div>
       </div>
 
       <div class="grid grid-2" style="margin-top:16px;">
         <div><div class="eyebrow">Origin</div><div>${escapeHtml(t.origin||'—')}</div></div>
         <div><div class="eyebrow">Cultivar</div><div>${escapeHtml(t.cultivar||'—')}</div></div>
-        <div><div class="eyebrow">Harvest</div><div>${escapeHtml([t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—')}</div></div>
+        <div><div class="eyebrow">Harvest</div><div>${escapeHtml([t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—')}</div>${freshnessCueHTML(t)}</div>
         <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}</div></div>
         <div><div class="eyebrow">Source</div><div>${escapeHtml(t.source||'—')}</div></div>
         <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>

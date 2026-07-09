@@ -687,7 +687,7 @@ function greetingCardHTML(){
       ? d_copyPick([
           `Maybe the ${name}? It&rsquo;s been your ${bn} pick.`,
           `How about the ${name}? It&rsquo;s been carrying your ${bn}s lately.`,
-          `How do you feel about the ${name} this ${bn}?`,
+          `How do you feel about the ${name} ${bw}?`, // v3.62: BUCKET_WHEN, so night reads "tonight" not "this late-night"
           `Your ${bn} usually says ${name}.`,
         ], todayKey)
       : d_copyPick([
