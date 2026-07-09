@@ -11,45 +11,50 @@
 
 // --- Style baselines: the "knowledgeable friend" defaults per tea style. ---
 // leafForm keys must match LEAF_PROFILES families in steep-core.js.
+// v3.57 (brew-advice v2): styles carry BOTH brewing methods where the ratios genuinely differ.
+// `ratio` stays the primary/traditional value (western for greens/whites/yellows/blacks/puerh;
+// gongfu for ball_oolong/dancong). The complementary field (`ratioGongfu` or `ratioWestern`) fills
+// the other method. Picker: gongfu ? (ratioGongfu ?? ratio) : (ratioWestern ?? ratio). Japanese-green
+// western values raised toward vendor + Niklas's kyusu practice (sencha/shincha 1.8, kabusecha 2.0).
 const KB_STYLES = {
   // Japanese greens (steamed)
-  gyokuro:      { type:'green',  leafForm:'steamed_green', tempC:55, ratio:2.2, first:120, note:'shaded; cool water, high leaf' },
-  kabusecha:    { type:'green',  leafForm:'steamed_green', tempC:65, ratio:1.6, first:75 },
-  sencha:       { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.4, first:60 },
-  shincha:      { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.4, first:45, note:'drink fresh — spring harvest fades' },
-  fukamushi:    { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.4, first:40, note:'deep-steamed: fine particles, brews fast' },
-  bancha:       { type:'green',  leafForm:'steamed_green', tempC:80, ratio:1.2, first:45 },
-  kukicha:      { type:'green',  leafForm:'steamed_green', tempC:75, ratio:1.4, first:50, note:'stem tea (also: karigane, shiraore)' },
-  genmaicha:    { type:'green',  leafForm:'steamed_green', tempC:80, ratio:1.3, first:45 },
-  houjicha:     { type:'green',  leafForm:'roasted_green', tempC:90, ratio:1.3, first:30, note:'roasted; low caffeine' },
-  kamairicha:   { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.4, first:60, note:'pan-fired Japanese green' },
-  tamaryokucha: { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.4, first:60 },
+  gyokuro:      { type:'green',  leafForm:'steamed_green', tempC:55, ratio:2.2, ratioGongfu:4.0, first:120, note:'shaded; cool water, high leaf' },
+  kabusecha:    { type:'green',  leafForm:'steamed_green', tempC:65, ratio:2.0, ratioGongfu:3.0, first:75 },
+  sencha:       { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.8, ratioGongfu:3.0, first:60 },
+  shincha:      { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.8, ratioGongfu:3.0, first:45, note:'drink fresh — spring harvest fades' },
+  fukamushi:    { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.8, ratioGongfu:3.0, first:40, note:'deep-steamed: fine particles, brews fast' },
+  bancha:       { type:'green',  leafForm:'steamed_green', tempC:80, ratio:1.2, ratioGongfu:3.0, first:45 },
+  kukicha:      { type:'green',  leafForm:'steamed_green', tempC:75, ratio:1.4, ratioGongfu:3.0, first:50, note:'stem tea (also: karigane, shiraore)' },
+  genmaicha:    { type:'green',  leafForm:'steamed_green', tempC:80, ratio:1.3, ratioGongfu:3.0, first:45 },
+  houjicha:     { type:'green',  leafForm:'roasted_green', tempC:90, ratio:1.3, ratioGongfu:3.0, first:30, note:'roasted; low caffeine' },
+  kamairicha:   { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.4, ratioGongfu:3.0, first:60, note:'pan-fired Japanese green' },
+  tamaryokucha: { type:'green',  leafForm:'steamed_green', tempC:70, ratio:1.4, ratioGongfu:3.0, first:60 },
   matcha:       { type:'green',  leafForm:'powder',        tempC:75, ratio:2.0, first:0,  note:'whisked, not steeped' },
   // Chinese greens (pan-fired)
-  longjing:     { type:'green',  leafForm:'pan_green',     tempC:78, ratio:1.2, first:45, note:'aka Dragonwell' },
-  biluochun:    { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, first:40 },
-  maofeng:      { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, first:45 },
-  gunpowder:    { type:'green',  leafForm:'rolled',        tempC:80, ratio:1.1, first:45 },
-  jasmine:      { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, first:40 },
-  // Whites
-  silver_needle:{ type:'white',  leafForm:'bud',           tempC:80, ratio:1.5, first:90, note:'aka Yin Zhen, Silbernadeln; also classic in glass: 80°C, ~4 min' },
-  white_peony:  { type:'white',  leafForm:'open_leaf',     tempC:82, ratio:1.4, first:75, note:'aka Bai Mudan' },
-  shou_mei:     { type:'white',  leafForm:'open_leaf',     tempC:85, ratio:1.3, first:75 },
-  // Oolongs
-  ball_oolong:  { type:'oolong', leafForm:'rolled',        tempC:95, ratio:3.5, first:45, note:'Tie Guan Yin, Ali Shan, Dong Ding, Jin Xuan…' },
-  strip_oolong: { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, first:30, note:'Wuyi yancha' },
-  dancong:      { type:'oolong', leafForm:'strip',         tempC:90, ratio:4.0, first:25, note:'Phoenix dancong — unforgiving; cooler (≤85) = sweeter, hotter = stronger. Second steep shorter than first.' },
-  dark_oolong:  { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, first:35, note:'Oriental Beauty, GABA, heavier oxidation' },
+  longjing:     { type:'green',  leafForm:'pan_green',     tempC:78, ratio:1.2, ratioGongfu:3.0, first:45, note:'aka Dragonwell' },
+  biluochun:    { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, ratioGongfu:3.0, first:40 },
+  maofeng:      { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, ratioGongfu:3.0, first:45 },
+  gunpowder:    { type:'green',  leafForm:'rolled',        tempC:80, ratio:1.1, ratioGongfu:3.0, first:45 },
+  jasmine:      { type:'green',  leafForm:'pan_green',     tempC:75, ratio:1.2, ratioGongfu:3.0, first:40 },
+  // Whites — ratio western; gongfu ~4.5 (v3.57)
+  silver_needle:{ type:'white',  leafForm:'bud',           tempC:80, ratio:1.5, ratioGongfu:4.5, first:90, note:'aka Yin Zhen, Silbernadeln; also classic in glass: 80°C, ~4 min' },
+  white_peony:  { type:'white',  leafForm:'open_leaf',     tempC:82, ratio:1.4, ratioGongfu:4.5, first:75, note:'aka Bai Mudan' },
+  shou_mei:     { type:'white',  leafForm:'open_leaf',     tempC:85, ratio:1.3, ratioGongfu:4.5, first:75 },
+  // Oolongs — ball/dancong `ratio` is GONGFU (+ratioWestern); strip/dark `ratio` is western (+ratioGongfu ~4.5, fixing the old anomaly)
+  ball_oolong:  { type:'oolong', leafForm:'rolled',        tempC:95, ratio:3.5, ratioWestern:0.8, first:45, note:'Tie Guan Yin, Ali Shan, Dong Ding, Jin Xuan…' },
+  strip_oolong: { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, ratioGongfu:4.5, first:30, note:'Wuyi yancha' },
+  dancong:      { type:'oolong', leafForm:'strip',         tempC:90, ratio:4.0, ratioWestern:1.0, first:25, note:'Phoenix dancong — unforgiving; cooler (≤85) = sweeter, hotter = stronger. Second steep shorter than first.' },
+  dark_oolong:  { type:'oolong', leafForm:'strip',         tempC:95, ratio:1.5, ratioGongfu:4.5, first:35, note:'Oriental Beauty, GABA, heavier oxidation' },
   // Blacks
-  black_china:  { type:'black',  leafForm:'strip',         tempC:90, ratio:1.2, first:30, note:'Dian Hong, Keemun, Lapsang, Koucha' },
-  black_india:  { type:'black',  leafForm:'open_leaf',     tempC:95, ratio:1.0, first:150, note:'western-style: Assam, Ceylon; 2-3 min' },
-  darjeeling_ff:{ type:'black',  leafForm:'open_leaf',     tempC:85, ratio:1.0, first:120, note:'first flush: cooler, shorter' },
-  // Yellow
-  yellow:       { type:'yellow', leafForm:'bud',           tempC:75, ratio:1.3, first:60, note:'Huang Ya, Junshan Yinzhen' },
-  // Pu-erh & dark
-  sheng:        { type:'puerh',  leafForm:'compressed',    tempC:90, ratio:1.6, first:20, note:'rinse once; young sheng cooler (85)' },
-  shou:         { type:'puerh',  leafForm:'compressed',    tempC:98, ratio:1.6, first:20, note:'rinse 1-2x' },
-  heicha:       { type:'puerh',  leafForm:'compressed',    tempC:95, ratio:1.5, first:25, note:'Liu Bao, Fu Zhuan' },
+  black_china:  { type:'black',  leafForm:'strip',         tempC:90, ratio:1.2, ratioGongfu:4.0, first:30, note:'Dian Hong, Keemun, Lapsang, Koucha' },
+  black_india:  { type:'black',  leafForm:'open_leaf',     tempC:95, ratio:1.0, ratioGongfu:3.0, first:150, note:'western-style: Assam, Ceylon; 2-3 min' },
+  darjeeling_ff:{ type:'black',  leafForm:'open_leaf',     tempC:85, ratio:1.0, ratioGongfu:3.0, first:120, note:'first flush: cooler, shorter' },
+  // Yellow — western; gongfu ~3.5
+  yellow:       { type:'yellow', leafForm:'bud',           tempC:75, ratio:1.3, ratioGongfu:3.5, first:60, note:'Huang Ya, Junshan Yinzhen' },
+  // Pu-erh & dark — ratio western-ish; gongfu ~5.0
+  sheng:        { type:'puerh',  leafForm:'compressed',    tempC:90, ratio:1.6, ratioGongfu:5.0, first:20, note:'rinse once; young sheng cooler (85)' },
+  shou:         { type:'puerh',  leafForm:'compressed',    tempC:98, ratio:1.6, ratioGongfu:5.0, first:20, note:'rinse 1-2x' },
+  heicha:       { type:'puerh',  leafForm:'compressed',    tempC:95, ratio:1.5, ratioGongfu:5.0, first:25, note:'Liu Bao, Fu Zhuan' },
   // Non-camellia (for completeness in matching)
   rooibos:      { type:'herbal', leafForm:'open_leaf',     tempC:98, ratio:1.2, first:300, note:'Rotbusch' },
   herbal:       { type:'herbal', leafForm:'open_leaf',     tempC:98, ratio:1.0, first:300 }

@@ -78,7 +78,7 @@ function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
 const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true };
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true, ratioAdjust:false };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
 let state = {
@@ -298,6 +298,103 @@ const KB_LEAFFORM_TO_PROFILE = {
   steamed_green:'green_jp', roasted_green:'green_cn', pan_green:'green_cn', powder:'green_jp',
   rolled:'rolled', bud:'bud', open_leaf:'open', strip:'open', compressed:'compressed'
 };
+
+/* ---------- leaf-to-water ratio (brew advice v2, v3.57) ----------
+   The missing 3rd advice axis: how much leaf for how much water. Scales the whole prefilled
+   schedule (curve shape preserved) by a heavier/lighter pour vs a per-method baseline. STRICT
+   OPT-IN (state.settings.ratioAdjust); when off, none of this is reached. All ratios g per 100ml.
+   Tunables live here next to LEAF_PROFILES: */
+const RATIO_K = 0.6;                 // time = 1/ratioFactor^k — how hard leaf amount bends the times
+const RATIO_TIME_MIN = 0.6;         // caps ±40% so a wild ratio can't produce a nonsense schedule
+const RATIO_TIME_MAX = 1.4;
+const GONGFU_VESSEL_MAX_ML = 150;   // vessels at/under this default to gongfu, else western
+const METHOD_MISMATCH_MAX = 2.5;    // if the factor still exceeds this after method-aware resolution,
+                                    // don't scale (a visibly-skipped adjustment beats a wrong one)
+// Last-resort per-LEAF_PROFILES-family baseline ratios, method-split (g/100ml). Only used when
+// neither the guide nor the KB resolves a baseline. Deliberately coarse — the KB is the real source.
+const LEAF_RATIO_DEFAULT = {
+  green_jp:   { western:1.8, gongfu:3.0 },
+  green_cn:   { western:1.4, gongfu:3.0 },
+  rolled:     { western:0.8, gongfu:3.5 },
+  open:       { western:1.3, gongfu:4.0 },
+  bud:        { western:1.5, gongfu:4.5 },
+  compressed: { western:1.6, gongfu:5.0 }
+};
+// Method for a session: explicit brewStyle wins; else infer from the vessel's capacity.
+function brewMethodFor(brewStyle, capacityMl){
+  if(brewStyle==='gongfu'||brewStyle==='western') return brewStyle;
+  const cap = Number(capacityMl);
+  return (cap>0 && cap<=GONGFU_VESSEL_MAX_ML) ? 'gongfu' : 'western';
+}
+// Grams+ml stated in a brew guide → g/100ml (method-agnostic; the guide is the guide). Needs BOTH
+// a grams token and an ml token ("5g auf 200ml", "6 g / 100 ml", "3-4g, 90s" → null: no ml).
+function bg_extractRatio(text){
+  if(!text || typeof text!=='string') return null;
+  const s = ' '+text.toLowerCase().replace(/[–—]/g,'-')+' ';
+  const gm = s.match(/(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?\s*g(?:rams?)?\b/);
+  const mm = s.match(/(\d+(?:\.\d+)?)\s*ml\b/);
+  if(!gm || !mm) return null;
+  const grams = gm[2] ? (parseFloat(gm[1])+parseFloat(gm[2]))/2 : parseFloat(gm[1]);
+  const ml = parseFloat(mm[1]);
+  if(!(grams>0) || !(ml>0)) return null;
+  return grams/(ml/100);
+}
+// Baseline ratio for a tea under a method: (a) guide-stated grams+ml → (b) KB ratio for the method
+// → (c) per-leaf-form default for the method. Returns {ratio, source} or null.
+function baselineRatioFor(tea, method){
+  const g = bg_extractRatio(tea && tea.brewGuide);
+  if(g>0) return { ratio:g, source:'guide' };
+  if(typeof kbResolve==='function'){
+    const kb = kbResolve([tea&&tea.name, tea&&tea.cultivar, tea&&tea.origin].filter(Boolean).join(' '));
+    if(kb){
+      const r = method==='gongfu' ? (Number(kb.ratioGongfu)||Number(kb.ratio)) : (Number(kb.ratioWestern)||Number(kb.ratio));
+      if(r>0) return { ratio:r, source:'kb' };
+    }
+  }
+  const d = LEAF_RATIO_DEFAULT[effectiveLeafForm(tea)];
+  if(d) return { ratio: method==='gongfu'?d.gongfu:d.western, source:'leaf' };
+  return null;
+}
+// The per-session ratio verdict. ctx = {gramsUsed, waterMl, brewStyle, capacityMl}. Returns null when
+// opt-in is off or there isn't enough to compute (calm-first: no grams / no water → silent no-op).
+// When it CAN compute but the factor is implausibly large even after method-aware resolution, returns
+// applied:false with a reason so the UI can say it's holding off rather than scale confidently-wrong.
+function computeSessionRatio(tea, ctx){
+  if(state.settings.ratioAdjust!==true) return null;
+  if(!tea || !ctx || ctx.isColdBrew) return null;
+  const grams = Number(ctx.gramsUsed);
+  const ml = (ctx.waterMl!=null && ctx.waterMl!=='') ? Number(ctx.waterMl) : Number(ctx.capacityMl);
+  if(!(grams>0) || !(ml>0)) return null;
+  const method = brewMethodFor(ctx.brewStyle, ctx.capacityMl);
+  const bl = baselineRatioFor(tea, method);
+  if(!bl || !(bl.ratio>0)) return null;
+  const actualRatio = grams/(ml/100);
+  const ratioFactor = actualRatio/bl.ratio;
+  const overMismatch = ratioFactor>METHOD_MISMATCH_MAX || ratioFactor<1/METHOD_MISMATCH_MAX;
+  const timeFactor = Math.max(RATIO_TIME_MIN, Math.min(RATIO_TIME_MAX, 1/Math.pow(ratioFactor, RATIO_K)));
+  return {
+    method, actualRatio, baselineRatio:bl.ratio, baselineSource:bl.source,
+    ratioFactor, timeFactor, applied: !overMismatch, mismatch: overMismatch
+  };
+}
+// Scale a schedule's steep times by the ratio timeFactor (temp + rinse untouched — temp stays owned
+// by the feedback axis). Returns a new schedule object; never mutates the input.
+function ratioScaleSchedule(sched, timeFactor){
+  if(!sched || !(timeFactor>0) || timeFactor===1) return sched;
+  return { ...sched, times: (sched.times||[]).map(t=>Math.max(3, Math.round(t*timeFactor))) };
+}
+// "Heavier pour than the baseline (2.1 vs 1.4 g/100ml) — times shortened ≈19%."
+function ratioMemoryText(r){
+  if(!r) return '';
+  const g=x=>(Math.round(x*100)/100).toString();
+  const cmp = r.ratioFactor>=1 ? 'Heavier' : 'Lighter';
+  const nums = `(${g(r.actualRatio)} vs ${g(r.baselineRatio)} g/100ml)`;
+  if(r.mismatch) return `${cmp} pour than the baseline ${nums} — too far off to adjust confidently, so times are left as-is.`;
+  const pct = Math.round(Math.abs(1-r.timeFactor)*100);
+  if(pct<1) return `Pour matches the baseline ${nums} — times unchanged.`;
+  const dir = r.timeFactor<1 ? 'shortened' : 'lengthened';
+  return `${cmp} pour than the baseline ${nums} — times ${dir} ≈${pct}%.`;
+}
 function niceSec(s){ s=Math.round(s); if(s>=60) s=Math.round(s/5)*5; return Math.max(3,Math.min(1800,s)); }
 
 // Infer a leaf form from the tea's name (cultivar/region/leaf words win, since
@@ -435,9 +532,11 @@ function adviceSessionsFor(teaId){
     .sort((a,b)=>new Date(b.date)-new Date(a.date))
     .slice(0,6);
 }
-function computeBrewAdvice(tea){
+// baseOverride (v3.57): when the caller has already ratio-scaled the base schedule, pass it in so the
+// feedback nudge tunes ON TOP of the ratio correction (ordering: base → ratio → feedback → timeShift).
+function computeBrewAdvice(tea, baseOverride){
   if(!tea) return null;
-  const base = effectiveGuideSchedule(tea, state.settings.brewAdvice!==false);
+  const base = (baseOverride!==undefined) ? baseOverride : effectiveGuideSchedule(tea, state.settings.brewAdvice!==false);
   const sessions = adviceSessionsFor(tea.id);
   let strong=0, weak=0, good=0;
   sessions.forEach(s=>{ const sig=feedbackSignalOf(s); if(sig==='strong')strong++; else if(sig==='weak')weak++; else if(sig==='good')good++; });

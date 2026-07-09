@@ -32,14 +32,17 @@ v3.40 tea lifecycle.
      "· ml?" tap-to-edit affordance on capacity-less vessels; session setup shows an inline
      "set capacity" link under the Vessel picker when the chosen vessel lacks one (opens the edit
      overlay, session draft persists behind it). No banners, never blocks logging.
-   - **Ratio phase 1.** `actualRatio = gramsUsed / (waterMl/100)` vs a baseline
-     (guide-parsed grams+ml → `kbResolve().ratio` → per-`LEAF_PROFILES` default); scale the
-     prefilled schedule by `clamp(1/ratioFactor^k, 0.6, 1.4)`, k=0.6 (tunable constants next to
-     LEAF_PROFILES). **Default OFF, strict opt-in** (Settings → Brew guidance → "Ratio
-     adjustment") (D2). Optional per-session `waterMl` override (D3) — migration
-     `sql/v3_8-water-ml.sql` (`sessions.water_ml`), mapper pairs + both write paths per the
-     CLAUDE.md rule; this absorbs the old "partial vessel fill" item. Temp is NOT ratio-adjusted.
-   - *Learned defaults* = phase 2, gated on phase 1 shipping and gathering data (separate spec).
+   - ~~**Ratio phase 1.**~~ ✓ **shipped v3.57**. `actualRatio = gramsUsed/(waterMl/100)` vs a per-method
+     baseline (guide grams+ml via `bg_extractRatio` → KB method ratio → per-`LEAF_PROFILES` default);
+     scales the whole schedule by `clamp(1/ratioFactor^0.6, 0.6, 1.4)` before feedback tuning. Temp NOT
+     adjusted. **Default OFF, strict opt-in** (`ratioAdjust`, Settings → Brew guidance). **Dual-method
+     KB** (`ratioGongfu`/`ratioWestern`) + raised JP-green westerns (agreed w/ Niklas 2026-07-09).
+     Per-session Gongfu|Western switch + `waterMl` override; `sql/v3_8-water-ml.sql` (`water_ml` +
+     `brew_style`) applied, mapper pairs + both write paths. Validated `fixtures/ratio-test.js` (local,
+     47) over all 10 real sessions — the two −40% floors became gentle trims. Absorbed "partial fill".
+   - *Learned defaults* = **phase 2**, gated on phase-1 data (separate spec). Now unblocked: sessions
+     store `brew_style` so phase 2 can normalise real steep times within-method. **This is the next
+     brew-advice item.**
    - ~~**Oolong opening-dip curve retune**~~ ✓ **shipped v3.42** — `rolled`/`open`/`bud`/`compressed`
      now encode the opening dip; matched KB style's `first` supplies the generation base. Validated
      against `fixtures/steeps` (Ali Shan generates 45/27/27, in the logged corridor). Follow-on:

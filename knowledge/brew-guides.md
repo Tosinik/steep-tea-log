@@ -7,6 +7,35 @@ Template at the bottom. Niklas feeds new entries via screenshots/links; Claude/C
 
 ---
 
+## Dual-method KB ratios + Japanese-green western tune — entry 2026-07-09 (APPLIED v3.57)
+
+**Why:** brew-advice v2's ratio axis needs a *per-method* baseline. The KB's oolong ratios were
+gongfu-calibrated (ball 3.5, dancong 4.0) but its white/yellow/green ratios were western-calibrated
+(1.2–1.6), so a gongfu-brewed white in a 110 ml gaiwan read as "3.9× too much leaf → −40% floor" —
+right direction, wrong confidence. Fix: every style carries both methods where they differ.
+
+**Convention:** `ratio` stays the *primary/traditional* value; add the complement.
+- greens/whites/yellows/blacks/puerh: `ratio` = western, add `ratioGongfu`.
+- ball_oolong/dancong: `ratio` = gongfu, add `ratioWestern`.
+- strip_oolong/dark_oolong were an anomaly (`ratio` 1.5 = western while ball/dancong were gongfu):
+  kept western 1.5, added `ratioGongfu` 4.5. Picker: `gongfu ? (ratioGongfu ?? ratio) : (ratioWestern ?? ratio)`.
+
+**Numbers agreed with Niklas (2026-07-09), g/100ml** — gongfu adds: greens 3.0, whites **4.5**,
+yellow 3.5, puerh 5.0, Chinese black 4.0; western adds: ball 0.8, dancong 1.0.
+White-gongfu set to **4.5** (not higher) even though his *good*-rated Fujian White logged 5.45 —
+it was a small compressed cake, so the high reading wasn't a deliberate leaf choice.
+
+**Japanese-green western raise:** the old 1.4/1.6 was light vs vendor guidance (~2) and his own kyusu
+practice (1.9–2.4, a "weak" note at 1.9). Raised: **sencha/shincha 1.8, kabusecha 2.0, fukamushi 1.8**.
+Ground truth: his "weak" Kabusecha sat at 1.9 → below a 2.0 baseline → ratio lengthens, as it should.
+
+**Validated** end-to-end over all 10 real timed sessions (`fixtures/ratio-test.js`): every actual
+g/100ml → method baseline → timeFactor matches the dry-run; the two former floors become gentle trims
+(Fujian White 0.89, Huang Ya 0.98). Sources: dancong table below (western 0.6–2 / gongfu 3–5),
+longjing/TGY gongfu figures, vendor consensus elsewhere.
+
+---
+
 ## Ya Shi Xiang Dancong (Phoenix / Feng Huang oolong)  — entry 2026-07-08
 
 **Identity:** Guangdong · Feng Huang Shan (~1200 m) · cultivar Ya Shi · strip oolong.

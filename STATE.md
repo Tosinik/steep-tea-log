@@ -87,9 +87,21 @@ generation base; KB ball_oolong 95/3.5/45, longjing 78; validated vs fixtures/st
 baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insights.js` owns the analytics
 cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
 recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
-capture precursor (v3.56 ✓ shipped), then ratio phase 1 (v3.57 — NEXT) (see `SPEC-brew-advice-v2.md` +
-`TASK-brew-advice-v2.md` in Downloads — the authoritative work order). Pause after each deploy. The v3.34 map
-legibility pass was built but NOT shipped — map is parked. Cache **v66** (v3.56: **capacity-capture
+capture precursor (v3.56 ✓) and ratio phase 1 (v3.57 ✓ shipped). **Brew advice v2 phase 1 is DONE** —
+next is phase 2 (learned defaults, separate spec, gated on phase-1 data), or the "forgotten batch"
+(ROADMAP §3). The v3.34 map legibility pass was built but NOT shipped — map is parked. Cache **v67**
+(v3.57: **leaf-to-water ratio — the 3rd advice axis**. STRICT OPT-IN `ratioAdjust` (default OFF; off =
+byte-identical). `actualRatio=gramsUsed/(waterMl/100)` vs a per-method baseline → `timeFactor=
+clamp(1/ratioFactor^0.6,0.6,1.4)` scales the whole schedule (temp NOT touched). Ordering base→ratio→
+feedback→timeShift (`computeBrewAdvice(tea,baseOverride)`). Engine in steep-core.js: `computeSessionRatio`/
+`baselineRatioFor`/`ratioScaleSchedule`/`bg_extractRatio`/`brewMethodFor`/`ratioMemoryText` + tunables next
+to LEAF_PROFILES. Baseline order: guide grams+ml → KB method ratio → leaf-form default. **Dual-method KB**:
+`ratioGongfu`/`ratioWestern` where methods differ (greens g3.0, whites g4.5, yellow g3.5, puerh g5.0, ball
+w0.8, dancong w1.0, strip/dark g4.5); **JP-green westerns raised** sencha/shincha 1.8, kabusecha 2.0,
+fukamushi 1.8 (agreed w/ Niklas 2026-07-09). Setup (opt-in on): Gongfu|Western switch (prefill cap≤150→gongfu)
++ optional Water(ml) override; `sessions.water_ml`/`brew_style` (`sql/v3_8-water-ml.sql`, applied) via mapper
+pairs + both write paths; method stored for phase-2. Validated `fixtures/ratio-test.js` (local, 47) over all
+10 real sessions — floors→gentle trims (Fujian White 0.89, Huang Ya 0.98). v3.56: **capacity-capture
 precursor** — groundwork for the ratio axis. All vessel/session views live in steep-sessions.js. Vessel form
 Capacity field gains a soft hint + example placeholder (still optional); vessels list shows a quiet "· ml?"
 tap-to-edit affordance on capacity-less vessels; session setup shows an inline "set capacity" link under the

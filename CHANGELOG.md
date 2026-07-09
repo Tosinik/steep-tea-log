@@ -23,6 +23,42 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.57 — leaf-to-water ratio, the 3rd advice axis (brew advice v2, phase 1)
+Deploy: `sql/v3_8-water-ml.sql` (**run once, first — already applied**), `steep-knowledge.js`,
+`steep-core.js`, `steep-data.js`, `steep-sessions.js`, `steep-settings.js`, `service-worker.js` (v67).
+SQL: `sessions.water_ml integer`, `sessions.brew_style text` (both nullable; old code ignores them).
+- **The prefilled schedule now scales to how much leaf you used for the water volume** —
+  `actualRatio = gramsUsed/(waterMl/100)` vs a per-method baseline; `timeFactor =
+  clamp(1/ratioFactor^0.6, 0.6, 1.4)` applied to the whole schedule (curve shape preserved). A
+  heavier pour shortens the times, a lighter one lengthens them. **Temp is NOT ratio-adjusted.**
+- **Strict opt-in, default OFF** — Settings → Brew guidance → "Ratio adjustment" (`ratioAdjust`,
+  in `DEFAULT_SETTINGS`). When off, none of the ratio path is reached and schedules are byte-identical
+  to v3.56 (locked by `fixtures/ratio-test.js`).
+- **Ordering:** base (guide or leaf-form) → **ratio** → feedback tuning (v3.25) → in-session timeShift
+  (v3.30). `computeBrewAdvice(tea, baseOverride)` gained an optional pre-scaled base so feedback tunes
+  the ratio-scaled schedule. Engine in steep-core.js: `computeSessionRatio`, `baselineRatioFor`,
+  `ratioScaleSchedule`, `ratioMemoryText`, `brewMethodFor`, `bg_extractRatio`; tunables (`RATIO_K`,
+  caps, `GONGFU_VESSEL_MAX_ML`, `METHOD_MISMATCH_MAX`, `LEAF_RATIO_DEFAULT`) sit next to LEAF_PROFILES.
+- **Baseline order:** (a) grams+ml stated in the guide (`bg_extractRatio`, method-agnostic — "5g auf
+  200ml" → 2.5) → (b) KB ratio *for the session's method* → (c) per-leaf-form default for the method.
+- **Dual-method KB (steep-knowledge.js):** styles carry both methods where they differ —
+  `ratioGongfu` on western-primary styles (greens 3.0, whites 4.5, yellow 3.5, puerh 5.0), `ratioWestern`
+  on gongfu-primary (ball 0.8, dancong 1.0); strip/dark oolong anomaly fixed (western 1.5 + gongfu 4.5).
+  **Japanese-green western values raised** to match Niklas's kyusu practice: sencha/shincha 1.8,
+  kabusecha 2.0, fukamushi 1.8. Numbers agreed with Niklas 2026-07-09; documented in `knowledge/brew-guides.md`.
+- **Session setup (opt-in on):** a quiet **Gongfu | Western** switch (prefilled from vessel capacity,
+  `capacityMl ≤ 150 → gongfu`; flip per session) + an optional **Water (ml)** override (defaults to
+  vessel capacity — absorbs the parked "partial fill" item). A ratio memory line in the guide preview:
+  "Heavier pour than the baseline (4.5 vs 3.5 g/100ml) — times shortened ≈15%." The **method used is
+  stored** (`brew_style`) for phase-2 learned defaults; cold brew + missing grams/water are silently
+  excluded; a `METHOD_MISMATCH_MAX` (2.5) safety net holds off (and says so) rather than scale confidently-wrong.
+- Mappers (`sessionFromDb`/`sessionToDb`) + both write paths carry `waterMl`/`brewStyle`.
+- Validated in the Node vm sandbox over all 10 real timed sessions (`fixtures/ratio-test.js`, local, 47
+  assertions): every actual→baseline→timeFactor matches the agreed dry-run; the two former −40% floors
+  (Fujian White, Huang Ya) now land as gentle trims (0.89 / 0.98); opt-in-off byte-identical; ordering;
+  cold-brew + missing-input exclusion; mismatch net. Roundtrip/accuracy/kb/greeting fixtures still green.
+
+---
 ## v3.56 — capacity-capture precursor (brew advice v2, step 1)
 Deploy: `service-worker.js` (v66), `steep-sessions.js`. No SQL.
 - **Groundwork for the leaf-to-water ratio axis (v3.57):** ratio needs each vessel's `capacityMl`,

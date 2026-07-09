@@ -305,6 +305,8 @@ function startSessionFor(teaId){
     waterType: '',
     waterTDS: '',
     gramsUsed: '',
+    brewStyle: null,                                    // v3.57 'gongfu'|'western'; null = infer from vessel capacity
+    waterMl: '',                                        // v3.57 optional per-session override; blank = vessel capacity
     steeps: [],
     infusionCount: 1,
     stage: 'setup', // setup -> steeping -> finish  (or setup -> quick)
@@ -436,6 +438,7 @@ function sessionSetupHTML(d){
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
         <div class="field"><label>Water type</label><input type="text" value="${escapeHtml(d.waterType)}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
         <div class="field"><label>Water TDS (optional)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="ppm"></div>
+        ${(state.settings.ratioAdjust===true && !d.isColdBrew) ? ratioSetupHTML(d) : ''}
         ${state.settings.showMood ? `<div class="field span2"><label>How are you feeling? <span style="color:var(--ink-soft);font-weight:400;">— optional, for spotting patterns later</span></label>${moodChipsHTML(d.mood, 'd_setMood')}</div>` : ''}
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
       </div>
@@ -459,6 +462,19 @@ function d_setcur(key, val){
 }
 function d_setTea(val){ state.sessionDraft.teaId = val; render(); }   // re-render so the guide preview follows the tea
 function d_showFinishedTeas(){ state.sessionDraft.showFinishedTeas = true; render(); }   // reveal finished teas in the picker (they stay loggable)
+// v3.57 ratio setup: a quiet gongfu|western switch (prefilled from vessel capacity) + an optional
+// water-volume override. Only rendered when ratio adjustment is on. brewStyle stays null until the
+// user flips it, so changing the vessel re-infers the default until then.
+function ratioSetupHTML(d){
+  const ves = vesselById(d.vesselId);
+  const cap = ves && ves.capacityMl ? Number(ves.capacityMl) : null;
+  const method = brewMethodFor(d.brewStyle, cap);
+  const mBtn = (m,l)=>`<button type="button" class="${method===m?'active':''}" onclick="d_setBrewStyle('${m}')">${l}</button>`;
+  return `<div class="field span2"><label>Brewing method <span style="color:var(--ink-soft);font-weight:400;">— sets the leaf-to-water baseline${d.brewStyle?'':' (from vessel)'}</span></label>
+      <div class="seg">${mBtn('gongfu','Gongfu')}${mBtn('western','Western')}</div></div>
+    <div class="field"><label>Water (ml, optional)</label><input type="number" value="${d.waterMl}" oninput="d_set('waterMl', this.value)" placeholder="${cap?cap:'vessel capacity'}"></div>`;
+}
+function d_setBrewStyle(m){ state.sessionDraft.brewStyle = m; render(); }
 
 // v3.31 optional pre-brew mood/energy — captured at setup so it's tied to the session
 // (and the time of day), the reading the future sleep/caffeine correlation will lean on.
@@ -482,8 +498,13 @@ function brewGuidePreviewHTML(d){
   if(d.isColdBrew) return '';
   const tea = teaById(d.teaId);
   const adviceOn = state.settings.brewAdvice!==false;
-  const base = effectiveGuideSchedule(tea, adviceOn);
-  const adv = adviceOn ? computeBrewAdvice(tea) : (base?{base,tuned:base,hasNudge:false,count:0}:null);
+  const rawBase = effectiveGuideSchedule(tea, adviceOn);
+  // v3.57: ratio scales the base BEFORE feedback tuning (base → ratio → feedback → timeShift).
+  // Null when opt-in is off or grams/water are missing, so this path is byte-identical when off.
+  const ves = vesselById(d.vesselId);
+  const ratio = computeSessionRatio(tea, { gramsUsed:d.gramsUsed, waterMl:d.waterMl, brewStyle:d.brewStyle, capacityMl:ves&&ves.capacityMl, isColdBrew:d.isColdBrew });
+  const base = (ratio && ratio.applied) ? ratioScaleSchedule(rawBase, ratio.timeFactor) : rawBase;
+  const adv = adviceOn ? computeBrewAdvice(tea, base) : (base?{base,tuned:base,hasNudge:false,count:0}:null);
   if(!base && !(adv && adv.hasNudge)) return '';
   // keep brewMode valid for what's available
   if(d.brewMode==='tuned' && !(adv && adv.hasNudge)) d.brewMode = base ? 'guide' : 'off';
@@ -494,6 +515,7 @@ function brewGuidePreviewHTML(d){
   const shownSched = d.brewMode==='tuned' ? (adv&&adv.tuned) : base;
   const summary = shownSched ? `<div class="mono" style="font-size:13px;margin-top:2px;">${brewScheduleSummary(shownSched)}</div>` : '';
   const memory = (adv && adv.count) ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${adviceMemoryText(adv)}${adv.hasNudge?` — suggests ${adviceSuggestionText(adv)}.`:' — landing well; using your guide as-is.'}</div>` : '';
+  const ratioMemo = (ratio && d.brewMode!=='off') ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:6px;">${ratioMemoryText(ratio)}</div>` : '';
   const saveLink = (d.brewMode==='tuned' && adv && adv.hasNudge)
     ? `<div style="margin-top:8px;"><button class="btn-ghost" style="font-size:11.5px;padding:0;" onclick="saveTuningToGuide('${tea.id}')">Save this tuning as the tea\u2019s brew guide →</button></div>` : '';
   const generatedNow = !!(base && base.generated) && d.brewMode!=='tuned';
@@ -507,6 +529,7 @@ function brewGuidePreviewHTML(d){
     ${summary}
     ${seg}
     ${memory}
+    ${ratioMemo}
     <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${hint}</div>
     ${saveLink}
   </div>`;
@@ -560,8 +583,11 @@ function brewNudgeRowHTML(d){
 function beginSteeping(){
   const d = state.sessionDraft;
   const tea = teaById(d.teaId);
-  const base = (!d.isColdBrew) ? effectiveGuideSchedule(tea, state.settings.brewAdvice!==false) : null;
-  d.advice = (!d.isColdBrew && state.settings.brewAdvice!==false) ? computeBrewAdvice(tea) : null;
+  const rawBase = (!d.isColdBrew) ? effectiveGuideSchedule(tea, state.settings.brewAdvice!==false) : null;
+  const ves = vesselById(d.vesselId);
+  const ratio = (!d.isColdBrew) ? computeSessionRatio(tea, { gramsUsed:d.gramsUsed, waterMl:d.waterMl, brewStyle:d.brewStyle, capacityMl:ves&&ves.capacityMl, isColdBrew:d.isColdBrew }) : null;
+  const base = (ratio && ratio.applied) ? ratioScaleSchedule(rawBase, ratio.timeFactor) : rawBase;
+  d.advice = (!d.isColdBrew && state.settings.brewAdvice!==false) ? computeBrewAdvice(tea, base) : null;
   if(d.brewMode==='tuned') d.schedule = (d.advice && d.advice.hasNudge) ? d.advice.tuned : base;
   else if(d.brewMode==='guide') d.schedule = base;
   else d.schedule = null;
@@ -965,6 +991,10 @@ async function commitSession(){
       infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
       feedback: d.feedback || null,
       mood: d.mood || null,
+      // v3.57: capture ratio inputs only when the feature is engaged (off touches nothing). brewStyle
+      // stores the method actually used (explicit pick or vessel inference) for phase-2 learned defaults.
+      waterMl: (state.settings.ratioAdjust===true && d.waterMl) ? Number(d.waterMl) : null,
+      brewStyle: (state.settings.ratioAdjust===true && !d.isColdBrew) ? brewMethodFor(d.brewStyle, ves&&ves.capacityMl) : null,
       teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
     };
     state.sessions.push(session);

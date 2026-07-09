@@ -104,6 +104,10 @@ function settingsModal(){
         <div><div class="set-label">Brew advice</div><div class="set-sub">After a session, an optional "how was it?" that gently tunes future brews for that tea. Sessions stay loose.</div></div>
         ${toggle('brewAdvice')}
       </div>
+      <div class="set-row">
+        <div><div class="set-label">Ratio adjustment</div><div class="set-sub">When on, the prefilled steep times scale to how much leaf you used for the water volume — a heavier pour shortens them, a lighter one lengthens them. Needs a vessel capacity. Off by default.</div></div>
+        ${toggle('ratioAdjust')}
+      </div>
 
       ${sec('Session check-in')}
       <div class="set-row">
