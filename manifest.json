@@ -1,6 +1,6 @@
 {
-  "name": "Steep — Tea Log",
-  "short_name": "Steep",
+  "name": "SlowCup — Tea Log",
+  "short_name": "SlowCup",
   "description": "Personal tea collection and brewing session log",
   "start_url": "./index.html",
   "scope": "./",

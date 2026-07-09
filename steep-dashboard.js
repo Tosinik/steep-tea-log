@@ -466,7 +466,7 @@ function onboardingHTML(){
   return `
     <div class="ob-hero">
       <div style="display:flex;justify-content:center;margin-bottom:14px;">${steepLogoSVG(52)}</div>
-      <h1>Welcome to Steep</h1>
+      <h1>Welcome to SlowCup</h1>
       <p class="ob-lede">A calm home for your tea. Log a few sessions and this space fills with your rhythms — what you brew, your streak, your favourites. No rush.</p>
     </div>
     <div class="card ob-steps">
@@ -502,7 +502,7 @@ function viewAchievements(){
    controls; unknown/new cards fall back to the default order (forward-compatible).
    A generic "configurable synced surface" — reusable for other views later. */
 const DASH_DEFAULT_ORDER = ['greeting','recap','wrapped','restock','recent','totals','clock','insights','types','mostrated','favorites','cost'];
-const DASH_LABELS = { greeting:'Greeting', recap:'Recap', wrapped:'Steep Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
+const DASH_LABELS = { greeting:'Greeting', recap:'Recap', wrapped:'SlowCup Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab;
 // cards don't move between tabs. Migration is automatic — existing saved {order,hidden} keep their
 // visibility and gain a surface from this map (nothing a user hid can reappear).

@@ -259,7 +259,7 @@ function wrappedTeaser(){
 }
 function wrappedShareText(w){
   const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
-  const lines = [`My ${w.season.name} ${w.season.year} in tea · Steep`,
+  const lines = [`My ${w.season.name} ${w.season.year} in tea · SlowCup`,
     `${w.n} sessions · ${w.infusions} infusions${w.grams?` · ${w.grams.toFixed(0)}g`:''}`];
   if(w.topTea) lines.push(`Most brewed: ${w.topTea.name} (${w.topTeaN}×)`);
   if(w.topType) lines.push(`Mostly ${typeLabel(w.topType).toLowerCase()}, mostly ${partWord(w.topPart)}`);
@@ -285,7 +285,7 @@ function viewWrapped(){
   if(w.empty){
     return `${back}
     <div class="section card" style="text-align:center;padding:34px 20px;">
-      <div class="eyebrow">Steep Wrapped</div>
+      <div class="eyebrow">SlowCup Wrapped</div>
       <h2 style="font-family:'Fraunces',serif;font-size:26px;margin:8px 0 6px;">Your ${w.season.name} is just beginning</h2>
       <p style="color:var(--ink-soft);font-size:14px;max-width:34ch;margin:0 auto;">No sessions logged this ${w.season.name.toLowerCase()} yet. Brew a few cups and your recap fills in here.</p>
     </div>`;
@@ -296,7 +296,7 @@ function viewWrapped(){
     : `<div class="stat"><div class="num">${w.coldN}</div><div class="lbl">Cold brews</div></div>`;
   return `${back}
     <div class="section card" style="text-align:center;padding:30px 20px;background:linear-gradient(160deg,var(--white,#fff),var(--porcelain,#f4efe4));">
-      <div class="eyebrow">Steep Wrapped</div>
+      <div class="eyebrow">SlowCup Wrapped</div>
       <h2 style="font-family:'Fraunces',serif;font-size:28px;margin:8px 0 4px;">Your ${w.season.name} in tea</h2>
       <div class="mono" style="font-size:12px;color:var(--ink-soft);">${w.season.year} · so far</div>
     </div>

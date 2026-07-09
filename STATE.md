@@ -1,4 +1,10 @@
-# Steep — STATE (handoff, current @ v3.27)
+# SlowCup — STATE (handoff)
+
+> **App renamed Steep → SlowCup (user-facing brand) in v3.59.** Internal names — `steep-*.js`
+> files, functions, `tealog_*` keys, the `steep-tea-log` repo/URL/cache prefix — keep the old name
+> (the repo/URL rename is deferred to the slowcup.app domain migration). "steep/steeps" tea
+> terminology stays. Below, "Steep" in historical notes = the old brand; don't rewrite them.
+
 
 Seed a fresh chat with: this file + ROADMAP-v3-next.md + CHANGELOG.md + the current
 source files. That keeps each session cheap (a long thread re-reads everything every turn).
@@ -59,7 +65,15 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped):** v3.29 leaf-form curves · v3.30 in-session micro-adjust · v3.31 mood check-in ·
+**NOW (just shipped) — v3.59 rename Steep → SlowCup** (cache **v69**): user-facing brand only,
+per `TASK-slowcup-batch.md` §1 (supersedes the forgotten-batch TASK). Renamed title/manifest/topbar/
+login/onboarding/Wrapped-labels+eyebrows+share-text/backup-filename+import-toast/update-banner/
+migration-screen; internal names + repo/URL + "steep" terminology untouched. **The SlowCup batch
+continues (pause after each deploy):** v3.60 error log + data health + `mailto:slowcupapp@gmail.com`
+feedback row (Settings → Data) · v3.61 greeting copy variety · v3.62 freshness cues (+ sparkline
+"add a purchase date" rider) · v3.63 feed pagination. Feedback mailbox DECIDED: slowcupapp@gmail.com.
+
+**Earlier shipped:** v3.29 leaf-form curves · v3.30 in-session micro-adjust · v3.31 mood check-in ·
 v3.32 forecast coverage + brew-guide parse · **v3.33 curated passport sub-regions + China/Japan zoom**
 (curated tea-region map, not full geo — later REJECTED, see below) · **v3.34 settings declutter**
 (settings grouped into sections; new `showMood` toggle to hide the mood check-in — the future Garmin

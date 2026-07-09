@@ -1,4 +1,6 @@
-# Steep — roadmap (single source of truth)
+# SlowCup — roadmap (single source of truth)
+
+(App renamed Steep → SlowCup, user-facing brand only, v3.59. Internal names/repo/URL keep "steep".)
 
 Tiered by value × ease. Effort: S / M / L. "Heavy infra" = an Edge Function,
 packaging, or a map/vision library; a plain new Supabase table is NOT heavy.
@@ -57,26 +59,34 @@ v3.40 tea lifecycle.
   because a tea has no `purchaseDate` anchor, show a quiet "add a purchase date to see the stock curve"
   link to Edit — a separate tiny deploy or its own issue.
 
-3. **Then — the rest of the "forgotten" batch** (per `TASK-forgotten-batch.md`, agreed 2026-07-09;
-   small independent deploys, **pause after each**):
+3. **Then — the SlowCup batch** (per `TASK-slowcup-batch.md`, agreed 2026-07-09, supersedes the
+   forgotten-batch TASK; small independent deploys, **pause after each**):
+   - ~~**Rename Steep → SlowCup**~~ ✓ **shipped v3.59** — user-facing brand only (title, manifest,
+     topbar/login/onboarding, Wrapped labels+eyebrows+share text, backup filename+import toast,
+     update banner, migration screen). Internal names, `steep-tea-log` repo/URL/cache prefix, and
+     "steep" tea terminology untouched. Repo/URL rename deferred to the slowcup.app migration.
    - ~~**Tea lifecycle / at-0g**~~ ✓ **shipped v3.40** (finished-teas grouping + hidden-in-picker +
      one-time rebuy? → shopping list). A full **archive/restore workflow** (hide from library entirely,
      restore later) is deferred — the finished view + rebuy nudge cover the need for now.
    - ~~**Popup sweep (rider, completes v3.50)**~~ ✓ **shipped v3.58** — last 8 `alert()`/`confirm()`
      gone; import replace-all kept as a state-driven inline confirm row (both counts, full friction);
      offline sync-failure → long-lived toast (`showToast(msg,ms)`). Only `socialErr` remains (online-only).
-   - **Error log + data health** (Settings → Data) — **NEXT (v3.59)**. `window.onerror` +
+   - **Error log + data health + feedback link** (Settings → Data) — **NEXT (v3.60)**. `window.onerror` +
      `unhandledrejection` (+ the v3.58 offline sync failure) → a localStorage ring buffer (~20),
      viewable with a clear button; plus an on-demand **data-integrity report**: orphaned steeps,
      sessions → deleted teas/vessels, negative stock, duplicate-session pairs (v3.35 signature, same
      tea within ~10 min). Counts + expandable details, no auto-repair. Fresh CSVs have ZERO dup pairs —
      test the detectors with synthetic bad rows in the vm sandbox. Rides with a **"Send feedback"
-     `mailto:`** row (version-prefixed subject only; ask Niklas for the recipient address; no error-log auto-attach).
-   - **Freshness cues (v3.60)** — surface `harvestYear`/`harvestSeason` **quietly on tea detail only**:
+     `mailto:slowcupapp@gmail.com`** row (subject "SlowCup v3.60 feedback"; no error-log auto-attach).
+   - **Greeting copy variety (v3.61)** — small cheekier pool per greeting branch, ONE voice per day
+     (`pool[d_hash(todayKey+'|copy') % len]`, no reshuffle on re-render); voice rules unchanged (warm,
+     no exclamation/imperatives/guilt; tea name stays the tap-target). Pools approved 2026-07-09 (see
+     `TASK-slowcup-batch.md` §3). Extend `fixtures/greeting-test.js`: same day → same line; name span intact.
+   - **Freshness cues (v3.62)** — surface `harvestYear`/`harvestSeason` **quietly on tea detail only**:
      shincha/first-flush past ~9mo → "at its best young"; aged white/sheng → "deepens with age". Year and
      season independently optional, silent on garbage (only 5/14 teas carry any). Rider: the OK'd
      `inventorySparkline` "add a purchase date" link when the chart is absent (steep-teas.js).
-   - **Feed pagination (v3.61)** — `.range()` paging + quiet "load more" (no infinite scroll); page size =
+   - **Feed pagination (v3.63)** — `.range()` paging + quiet "load more" (no infinite scroll); page size =
      current cap; verify the shared-session mapper appends page 2+ without duplicate keys.
 
 ## Shipped

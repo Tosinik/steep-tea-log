@@ -642,7 +642,7 @@
   function shell(inner) {
     return `<div class="auth-wrap"><div class="auth-card">
       <div class="brand" style="justify-content:center;margin-bottom:14px;">
-        <div class="brand-mark"></div><h1 style="font-family:'Fraunces',serif;font-size:26px;margin:0;">Steep</h1>
+        <div class="brand-mark"></div><h1 style="font-family:'Fraunces',serif;font-size:26px;margin:0;">SlowCup</h1>
       </div>${inner}</div></div>`;
   }
 
@@ -688,7 +688,7 @@
       counts.s = (JSON.parse(localStorage.getItem('tealog_sessions') || '[]')).length;
     } catch {}
     app.innerHTML = shell(`
-      <p class="auth-sub">This device has a local Steep log (${counts.t} teas, ${counts.s} sessions). Import it into your synced account?</p>
+      <p class="auth-sub">This device has a local SlowCup log (${counts.t} teas, ${counts.s} sessions). Import it into your synced account?</p>
       <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="mDo">Import my existing data</button>
       <button class="btn" style="width:100%;" id="mSkip">Start fresh (keep local backup)</button>
       <div id="mMsg" class="auth-msg"></div>

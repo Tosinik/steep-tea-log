@@ -1,4 +1,7 @@
-# Steep — changelog
+# SlowCup — changelog
+
+(Formerly "Steep" — user-facing brand renamed in v3.59; internal file/function names, the
+`steep-tea-log` repo/cache prefix, and historical entries below keep the old name.)
 
 Newest first. "Deploy" = files to push to GitHub Pages. SQL = run once in the Supabase SQL editor.
 
@@ -23,6 +26,25 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.59 — rename the app: Steep → SlowCup (user-facing brand only)
+Deploy: `index.html`, `manifest.json`, `steep-core.js`, `steep-data.js`, `steep-settings.js`,
+`steep-dashboard.js`, `steep-insights.js`, `steep-boot.js`, `service-worker.js` (v69). No SQL.
+- **Visible product name only** — nothing structural. Repo name, GitHub Pages URL, `steep-*.js`
+  file names, CSS classes, function names (`steepLogoSVG`), `tealog_*` localStorage keys, the
+  `steep-tea-log-vNN` cache prefix, and Supabase are all untouched. The "steep / steeps" tea
+  *terminology* (steep timer, "Steep 1", steep_order) stays — that's the verb, not the brand.
+- Renamed: `index.html` `<title>` + `apple-mobile-web-app-title`; `manifest.json` `name`/`short_name`
+  (fresh installs only); topbar `<h1>` + logo `aria-label` (steep-core); login screen `<h1>`
+  (steep-data); backup filename `steep-tea-log-backup-…` → `slowcup-backup-…` + import toast
+  (steep-settings — import still reads by *shape*, so old backups keep importing); `DASH_LABELS`
+  "Steep Wrapped" → "SlowCup Wrapped" (steep-dashboard).
+- **Beyond the task's audited list** (surfaced by a word-boundary grep, all user-facing brand):
+  onboarding hero "Welcome to Steep" (steep-dashboard); the two Wrapped eyebrows + the Wrapped
+  **share text** "· Steep" (steep-insights); the update banner "A new version of Steep is ready."
+  (steep-boot); the local-data migration screen "This device has a local Steep log" (steep-data).
+- Internal code comments/`[Steep]` console prefixes left as-is (not user-facing). Docs headings
+  (CHANGELOG/STATE/ROADMAP) adopt the new name going forward; historical entries unchanged.
+
 ## v3.58 — finish the popup sweep (completes v3.50)
 Deploy: `steep-settings.js`, `steep-core.js`, `steep-dashboard.js` (`showToast` gains a duration),
 `service-worker.js` (v68). No SQL.

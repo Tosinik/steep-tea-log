@@ -56,7 +56,7 @@ function exportData(){
   const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href=url; a.download = 'steep-tea-log-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.href=url; a.download = 'slowcup-backup-'+new Date().toISOString().slice(0,10)+'.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
@@ -67,7 +67,7 @@ function handleImportFile(e){
   reader.onload = (ev)=>{
     try{
       const data = JSON.parse(ev.target.result);
-      if(!data.teas || !data.vessels || !data.sessions){ showToast("That file doesn't look like a Steep backup."); return; }
+      if(!data.teas || !data.vessels || !data.sessions){ showToast("That file doesn't look like a SlowCup backup."); return; }
       // Stash it and render the inline confirm row (with counts) — the replace happens on confirmImport().
       state.pendingImport = data;
       render();

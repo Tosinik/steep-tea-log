@@ -758,7 +758,7 @@ function steepLogoSVG(px){
   const col = { k:'#C9B48A', l:'#E7D9B8', r:'#CBB07A', b:'#EDE2C6', d:'#6E5637', f:'#C9B48A' };
   let rects='';
   for(let r=0;r<grid.length;r++){ for(let c=0;c<grid[r].length;c++){ const ch=grid[r][c]; if(col[ch]) rects+=`<rect x="${c}" y="${r}" width="1" height="1" fill="${col[ch]}"/>`; } }
-  return `<svg width="${px}" height="${px}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="display:block;" role="img" aria-label="Steep">${rects}</svg>`;
+  return `<svg width="${px}" height="${px}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="display:block;" role="img" aria-label="SlowCup">${rects}</svg>`;
 }
 function render(){
   const app = document.getElementById('app');
@@ -789,7 +789,7 @@ function render(){
   app.innerHTML = `
     <div class="topbar"><div class="topbar-inner">
       <div class="topbar-brandrow">
-        <div class="brand">${steepLogoSVG(30)}<h1>Steep</h1></div>
+        <div class="brand">${steepLogoSVG(30)}<h1>SlowCup</h1></div>
         <div class="topbar-actions">
           <button class="icon-btn ${state.view==='friends'?'active':''}" onclick="goFriends()" title="Friends" aria-label="Friends">👥</button>
           <button class="icon-btn ${state.view==='shopping'?'active':''}" onclick="goView('shopping')" title="Shopping list" aria-label="Shopping list">🛒</button>
