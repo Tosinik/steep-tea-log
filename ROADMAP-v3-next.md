@@ -71,13 +71,12 @@ v3.40 tea lifecycle.
    - ~~**Popup sweep (rider, completes v3.50)**~~ ✓ **shipped v3.58** — last 8 `alert()`/`confirm()`
      gone; import replace-all kept as a state-driven inline confirm row (both counts, full friction);
      offline sync-failure → long-lived toast (`showToast(msg,ms)`). Only `socialErr` remains (online-only).
-   - **Error log + data health + feedback link** (Settings → Data) — **NEXT (v3.60)**. `window.onerror` +
-     `unhandledrejection` (+ the v3.58 offline sync failure) → a localStorage ring buffer (~20),
-     viewable with a clear button; plus an on-demand **data-integrity report**: orphaned steeps,
-     sessions → deleted teas/vessels, negative stock, duplicate-session pairs (v3.35 signature, same
-     tea within ~10 min). Counts + expandable details, no auto-repair. Fresh CSVs have ZERO dup pairs —
-     test the detectors with synthetic bad rows in the vm sandbox. Rides with a **"Send feedback"
-     `mailto:slowcupapp@gmail.com`** row (subject "SlowCup v3.60 feedback"; no error-log auto-attach).
+   - ~~**Error log + data health + feedback link**~~ ✓ **shipped v3.60** (Settings → Data).
+     `window.onerror` + `unhandledrejection` + `saveErr` → device-local `tealog_errorLog` ring buffer
+     (20), View/Clear, never proactive. On-demand `dataHealthReport()`: deleted-tea/-vessel sessions,
+     negative stock, empty sessions (client-visible stand-in for DB-orphaned steeps — the sessions
+     load drops those), duplicate pairs (same tea ≤10 min, v3.35 signature). `mailto:slowcupapp@gmail.com`
+     feedback row. Validated `fixtures/data-health-test.js` (local): real export clean on all 5.
    - **Greeting copy variety (v3.61)** — small cheekier pool per greeting branch, ONE voice per day
      (`pool[d_hash(todayKey+'|copy') % len]`, no reshuffle on re-render); voice rules unchanged (warm,
      no exclamation/imperatives/guilt; tea name stays the tap-target). Pools approved 2026-07-09 (see

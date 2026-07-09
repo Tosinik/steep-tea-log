@@ -29,6 +29,78 @@ function importConfirmHTML(){
     </div>
   </div>`;
 }
+/* ---- v3.60: diagnostics under Settings → Data — an error log, an on-demand data-health
+   report, and a feedback mailto. All read-only; none surfaces proactively (calm-first). ---- */
+function dataToolsHTML(){
+  return `<div class="set-row" style="flex-direction:column;align-items:stretch;gap:0;">
+    ${errorLogHTML()}
+    ${dataHealthHTML()}
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;">
+      <div><div class="set-label">Send feedback</div><div class="set-sub">Opens an email to the SlowCup mailbox. Notice anything off above? You can copy it in.</div></div>
+      <a class="btn" href="mailto:slowcupapp@gmail.com?subject=${encodeURIComponent('SlowCup v3.60 feedback')}">Email</a>
+    </div>
+  </div>`;
+}
+// Diagnostics log viewer. Timestamps + message + source; a clear button. Empty is the happy path.
+function errorLogHTML(){
+  const log = readErrorLog();
+  const head = `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <div><div class="set-label">Diagnostics log</div><div class="set-sub">${log.length?`${log.length} recent error${log.length===1?'':'s'} logged on this device`:'No errors logged on this device'}</div></div>
+      <div style="display:flex;gap:8px;">
+        ${log.length?`<button class="btn" onclick="toggleErrorLog()">${state.showErrorLog?'Hide':'View'}</button>`:''}
+        ${log.length?`<button class="btn" style="color:var(--red);" onclick="clearErrorLogUI(this)">Clear</button>`:''}
+      </div>
+    </div>`;
+  if(!state.showErrorLog || !log.length) return head;
+  const rows = log.slice().reverse().map(e=>`<div style="padding:8px 0;border-top:1px solid var(--line);">
+      <div class="mono" style="font-size:11px;color:var(--ink-soft);">${escapeHtml(new Date(e.ts).toLocaleString())}${e.source?' · '+escapeHtml(e.source):''}</div>
+      <div style="font-size:12.5px;color:var(--ink);word-break:break-word;">${escapeHtml(e.message)}</div>
+    </div>`).join('');
+  return head + `<div style="margin-top:8px;max-height:230px;overflow:auto;">${rows}</div>`;
+}
+function toggleErrorLog(){ state.showErrorLog = !state.showErrorLog; render(); }
+function clearErrorLogUI(btn){ armConfirm(btn, 'Clear the diagnostics log?', ()=>{ clearErrorLog(); state.showErrorLog=false; render(); }); }
+// On-demand data-integrity scan over `state`. Read-only — reports counts + details, never repairs.
+// NOTE: DB-orphaned steeps aren't observable client-side (the sessions load drops steeps whose
+// parent session is gone), so the steep check surfaces the client-visible analog: sessions that
+// recorded no steeps and no infusion count.
+function dataHealthReport(){
+  const teas = state.teas||[], vessels = state.vessels||[], sessions = state.sessions||[];
+  const teaIds = new Set(teas.map(t=>t.id)), vesIds = new Set(vessels.map(v=>v.id));
+  const label = s => escapeHtml((s.teaName||'—') + ' · ' + (s.date? new Date(s.date).toLocaleDateString() : '?'));
+  const orphanTea = sessions.filter(s=>s.teaId && !teaIds.has(s.teaId));
+  const orphanVes = sessions.filter(s=>s.vesselId && !vesIds.has(s.vesselId));
+  const negStock  = teas.filter(t=>Number(t.amountGrams) < 0);
+  const emptySess = sessions.filter(s=>(!s.steeps||!s.steeps.length) && !(Number(s.infusionCount)>0) && !s.isColdBrew);
+  const dupes = []; const byTea = {};
+  sessions.forEach(s=>{ if(!s.teaId||!s.date) return; (byTea[s.teaId]=byTea[s.teaId]||[]).push(s); });
+  Object.keys(byTea).forEach(k=>{ const arr = byTea[k].slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+    for(let i=1;i<arr.length;i++){ if(Math.abs(new Date(arr[i].date)-new Date(arr[i-1].date)) <= 10*60*1000) dupes.push([arr[i-1],arr[i]]); } });
+  return [
+    { key:'orphanTea', label:'Sessions with a deleted tea', items: orphanTea.map(label) },
+    { key:'orphanVes', label:'Sessions with a deleted vessel', items: orphanVes.map(label) },
+    { key:'negStock',  label:'Teas with negative stock', items: negStock.map(t=>escapeHtml(t.name+' ('+Number(t.amountGrams)+'g)')) },
+    { key:'emptySess', label:'Sessions with no steeps recorded', items: emptySess.map(label) },
+    { key:'dupes',     label:'Possible duplicate sessions (same tea within 10 min)', items: dupes.map(p=>label(p[0])) },
+  ];
+}
+function dataHealthHTML(){
+  const head = `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;">
+      <div><div class="set-label">Data health</div><div class="set-sub">A quick read-only integrity check of your log. Nothing is changed.</div></div>
+      <button class="btn" onclick="toggleDataHealth()">${state.showDataHealth?'Hide':'Check'}</button>
+    </div>`;
+  if(!state.showDataHealth) return head;
+  const rep = dataHealthReport();
+  const total = rep.reduce((n,r)=>n+r.items.length,0);
+  if(total===0) return head + `<div class="set-sub" style="padding:8px 0;">Everything checks out — no issues found.</div>`;
+  const rows = rep.filter(r=>r.items.length).map(r=>`<div style="padding:8px 0;border-top:1px solid var(--line);">
+      <div style="font-size:12.5px;color:var(--ink);"><strong>${r.items.length}</strong> · ${escapeHtml(r.label)}</div>
+      <div class="set-sub" style="margin-top:3px;">${r.items.slice(0,8).join('<br>')}${r.items.length>8?`<br>…and ${r.items.length-8} more`:''}</div>
+    </div>`).join('');
+  return head + `<div style="margin-top:4px;">${rows}</div>`;
+}
+function toggleDataHealth(){ state.showDataHealth = !state.showDataHealth; render(); }
+
 async function migratePhotosToStorage(btn){
   const count = [...state.teas, ...state.vessels].filter(x=>x.image && x.image.startsWith('data:')).length;
   if(count===0){ showToast('No inline photos to move — everything is already in cloud storage.'); return; }
@@ -170,6 +242,7 @@ function settingsModal(){
 
       ${sec('Data')}
       ${backupSectionHTML()}
+      ${dataToolsHTML()}
       <p style="font-size:11.5px;color:var(--ink-soft);margin:16px 0 0;">Settings sync across your devices. Manage vendors from the Teas tab.</p>
     </div>
   </div>`;

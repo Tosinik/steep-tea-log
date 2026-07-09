@@ -65,7 +65,19 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.59 rename Steep → SlowCup** (cache **v69**): user-facing brand only,
+**NOW (just shipped) — v3.60 error log + data health + feedback** (cache **v70**): Settings → Data
+gains three read-only tools. A device-local `tealog_errorLog` ring buffer (last 20) fed by
+`window.onerror`/`unhandledrejection` + `saveErr` (`logError`/`readErrorLog`/`clearErrorLog` in
+steep-core; hooks installed at load; never surfaces proactively — only viewable/clearable in
+Settings). An on-demand `dataHealthReport()` (steep-settings): deleted-tea sessions, deleted-vessel
+sessions, negative stock, empty sessions (the client-visible stand-in for DB-orphaned steeps, which
+the sessions load drops), duplicate pairs (same tea ≤10 min). A `mailto:slowcupapp@gmail.com` feedback
+row (subject "SlowCup v3.60 feedback", hardcoded — no APP_VERSION constant yet). Validated
+`fixtures/data-health-test.js` (local): real export clean on all 5, each detector fires on injected
+bad rows. **SlowCup batch continues (pause after each):** v3.61 greeting copy variety · v3.62 freshness
+cues (+ sparkline rider) · v3.63 feed pagination.
+
+**Earlier — v3.59 rename Steep → SlowCup** (cache **v69**): user-facing brand only,
 per `TASK-slowcup-batch.md` §1 (supersedes the forgotten-batch TASK). Renamed title/manifest/topbar/
 login/onboarding/Wrapped-labels+eyebrows+share-text/backup-filename+import-toast/update-banner/
 migration-screen; internal names + repo/URL + "steep" terminology untouched. **The SlowCup batch

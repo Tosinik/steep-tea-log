@@ -26,6 +26,27 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.60 — error log + data health + feedback (Settings → Data)
+Deploy: `steep-core.js`, `steep-settings.js`, `service-worker.js` (v70). No SQL.
+- **Diagnostics log** (steep-core.js) — a device-local `tealog_errorLog` ring buffer (last 20,
+  `{ts,message,source}`). `window.onerror` + `unhandledrejection` global hooks feed it, and `saveErr`
+  now logs too — giving the v3.58 offline sync-failure the durable home its code comment promised.
+  A logging path must never throw, so every access is wrapped. **Never surfaces proactively** — only
+  viewable under Settings → Data (`errorLogHTML`, View/Clear; clear via `armConfirm`).
+- **Data health** (steep-settings.js `dataHealthReport`) — on-demand, read-only, no auto-repair.
+  Scans `state` for: sessions with a deleted tea, sessions with a deleted vessel, teas with negative
+  stock, sessions with no steeps recorded, and possible duplicate pairs (same tea within 10 min —
+  the v3.35 signature). Counts + first-8 details per finding; "everything checks out" when clean.
+  **Note:** DB-orphaned steeps aren't observable client-side (the sessions load drops steeps whose
+  parent session is gone), so the steep check surfaces the client-visible analog (empty sessions).
+- **Send feedback** row — `mailto:slowcupapp@gmail.com`, subject "SlowCup v3.60 feedback"
+  (hardcoded — no app-wide version constant exists yet; a future `APP_VERSION` could centralize it).
+  No error-log auto-attach; the copy hints the log above can be copied in.
+- Validated `fixtures/data-health-test.js` (local, reads the gitignored CSVs) over the real 2026-07-09
+  export: **clean on all five detectors** (ZERO dup pairs, per the task ground truth); each detector fires on an injected bad
+  row; negative controls hold (cold brew ≠ empty; 11 min apart ≠ dupe). Browser-verified the hooks +
+  builders (ring cap 20, both global hooks capture, escaped output, no console errors).
+
 ## v3.59 — rename the app: Steep → SlowCup (user-facing brand only)
 Deploy: `index.html`, `manifest.json`, `steep-core.js`, `steep-data.js`, `steep-settings.js`,
 `steep-dashboard.js`, `steep-insights.js`, `steep-boot.js`, `service-worker.js` (v69). No SQL.

@@ -27,12 +27,32 @@ async function loadKey(key, fallback){
 async function saveKey(key, val){
   return window.SteepDB.saveKey(key, val);
 }
+// Error log (v3.60) — a quiet localStorage ring buffer for after-the-fact diagnostics.
+// It NEVER surfaces proactively; it's only readable under Settings → Data. Device-local like the
+// theme (not synced) — errors are per-device and we don't want them in Postgres. A logging path
+// must never itself throw, so every access is wrapped.
+const ERRLOG_KEY = 'tealog_errorLog', ERRLOG_MAX = 20;
+function logError(message, source){
+  try{
+    const buf = readErrorLog();
+    buf.push({ ts: Date.now(), message: String(message==null?'':message).slice(0,300), source: String(source||'').slice(0,140) });
+    while(buf.length > ERRLOG_MAX) buf.shift();
+    localStorage.setItem(ERRLOG_KEY, JSON.stringify(buf));
+  }catch(e){ /* storage full / private mode — diagnostics are best-effort, never fatal */ }
+}
+function readErrorLog(){ try{ return JSON.parse(localStorage.getItem(ERRLOG_KEY)||'[]')||[]; }catch(e){ return []; } }
+function clearErrorLog(){ try{ localStorage.removeItem(ERRLOG_KEY); }catch(e){} }
+if(typeof window !== 'undefined' && window.addEventListener){
+  window.addEventListener('error', e=>{ logError((e && (e.message || (e.error && e.error.message))) || 'error', ((e && e.filename)||'') + (e && e.lineno ? (':'+e.lineno) : '')); });
+  window.addEventListener('unhandledrejection', e=>{ const r = e && e.reason; logError((r && (r.message||r.error)) || String(r), 'unhandledrejection'); });
+}
+
 let _saveErrShown = false;
 function saveErr(e){
   console.error('[Steep] save failed', e);
+  logError((e && e.message) || 'save failed (offline?)', 'saveErr'); // v3.60: the durable home promised in v3.58
   // v3.58: was a blocking alert(); now a long-lived toast (carries data-loss info — "re-save once
-  // back online" — so it lingers ~12s, not the default 4.2s). v3.59's error log will also capture
-  // this via the global error hooks, giving it a durable home; keep the toast long until then.
+  // back online" — so it lingers ~12s, not the default 4.2s).
   if(!_saveErrShown){
     _saveErrShown = true;
     showToast("Couldn't sync that change — you may be offline. It'll need to be re-saved once you're back online.", 12000);
@@ -94,6 +114,7 @@ let state = {
   sessionDraft: null, // {teaId, vesselId, isColdBrew, waterType, waterTDS, gramsUsed, steeps:[], currentSteep:{}, timer:{...}}
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
+  showErrorLog: false, showDataHealth: false, // Settings → Data diagnostics panels (v3.60)
   pendingImport: null, // parsed backup awaiting the inline replace-all confirm (Settings → Data)
   calMonth: null, calSelDay: null,
   teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false }, teaSeg: 'teas',
