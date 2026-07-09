@@ -39,12 +39,21 @@ accents; generous whitespace; soft 12–14px card radii; hairline borders over s
 only glow is a faint amber one in dark mode).
 
 **Type (three voices, all via Google Fonts):**
-- **Fraunces** (serif, opsz) — display: h1–h3, the greeting line, tea names as headings.
+- **Shippori Mincho** (`--font-display`, serif) — display: h1–h3, the greeting line, tea names as
+  headings, the wordmark. Weight 700 for headings (v3.63 replaced Fraunces; its Latin glyphs carry
+  the calligraphic stroke logic and handle long pinyin/romaji/German tea names).
 - **Inter** — body and UI text.
 - **IBM Plex Mono** (`--font-mono`) — the "ledger" voice: eyebrows/labels (11px, uppercase,
   `.06em` tracking), numbers, the steep timer, schedules. Replaced a pixel font (v3.53); the
   brand logo is still a 16×16 pixel-art teapot (`steepLogoSVG`) — that pixel heritage stays
   in the logo only, never in type.
+
+**Icons & accents (v3.63, WS3):** header/action icons are a **hairline stroke set** (24×24, `fill:none;
+stroke:currentColor`, 1.7 light / 1.9 dark) from the `<svg><defs>` sprite in `index.html`, emitted via
+`icon(id,px,cls)` in steep-core. **Accent vocabulary, one home each:** tea leaf (`fav-leaf`, jade) = the
+favourite mark; hanko seal (`hanko`, `var(--red)`) = the single Wrapped/highest-rated standout; ensō
+ring (`enso`, `--enso`) = the steep-timer/focus ring (fills as the steep completes); seigaiha
+(`seigaiha`) = empty states + the Wrapped closing card. None appear as button trim or general decoration.
 
 **Core tokens (light | dark):** porcelain `#F6F2E9|#15140F` · ink `#2B2320|#EDE6D6` ·
 ink-soft `#5C5148|#A79C87` · jade `#3F5E42|#6F9A66` · jade-pale `#E4EAE0|#233024` ·

@@ -14,7 +14,7 @@ function teaCardHTML(t){
       <button class="btn-ghost" style="font-size:11px;padding:1px 4px;" onclick="event.stopPropagation();rebuyNo('${escapeJsArg(t.id)}')">No</button>
     </div>` : '';
   return `<div class="tea-card${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
-    <div class="tea-thumb" style="${bg}">${t.isFavorite?'<span class="fav">♥</span>':''}</div>
+    <div class="tea-thumb" style="${bg}">${t.isFavorite?`<span class="fav">${icon('fav-leaf',16)}</span>`:''}</div>
     <div class="tea-body">
       <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
       <div class="name">${escapeHtml(t.name)}</div>
@@ -49,7 +49,7 @@ function vendorManagerHTML(){
     </div>`;
   }).join('');
   return `<div class="card" style="margin-bottom:14px;">
-    <div class="section-title" style="margin-bottom:6px;"><h2 style="font-family:'Fraunces',serif;font-size:17px;">Vendors</h2><button class="lib-chip" onclick="toggleVendors()">Done</button></div>
+    <div class="section-title" style="margin-bottom:6px;"><h2 style="font-family:var(--font-display);font-size:17px;">Vendors</h2><button class="lib-chip" onclick="toggleVendors()">Done</button></div>
     <div style="font-size:12px;color:var(--ink-soft);margin-bottom:10px;">Rename to fix a typo, or type an existing name to merge duplicates. Changes apply across every tea from that shop.</div>
     ${vendors.length ? rows : '<div class="empty" style="padding:10px;">No vendors yet — add a shop when you add a tea.</div>'}
   </div>`;
@@ -99,7 +99,7 @@ function viewTeas(){
   const active = list.filter(t=>!isTeaFinished(t));
   const finished = list.filter(t=>isTeaFinished(t));   // finished teas group at the bottom
   const finishedBlock = finished.length ? `
-      <div class="section-title" style="margin-top:22px;opacity:.75;"><h2 style="font-family:'Fraunces',serif;font-size:15px;color:var(--ink-soft);">Finished</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${finished.length}</span></div>
+      <div class="section-title" style="margin-top:22px;opacity:.75;"><h2 style="font-family:var(--font-display);font-size:15px;color:var(--ink-soft);">Finished</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${finished.length}</span></div>
       <div class="grid grid-3" style="opacity:.62;">${finished.map(teaCardHTML).join('')}</div>` : '';
   const cards = list.length
     ? `<div class="grid grid-3">${active.map(teaCardHTML).join('')}</div>${finishedBlock}`
@@ -120,12 +120,12 @@ function viewTeas(){
       <select class="lib-select" onchange="setTeaFilter('type', this.value)" aria-label="Filter by type">${typeOpts}</select>
       ${vendors.length ? `<select class="lib-select" onchange="setTeaFilter('vendor', this.value)" aria-label="Filter by vendor">${vendorOpts}</select>` : ''}
       <button class="lib-chip ${F.lowStock?'active':''}" onclick="toggleLowStockFilter()">Low stock</button>
-      <button class="lib-chip ${F.favorite?'active':''}" onclick="toggleFavoriteFilter()">★ Favorites</button>
+      <button class="lib-chip ${F.favorite?'active':''}" onclick="toggleFavoriteFilter()">${favLeaf(13)} Favorites</button>
       ${(F.type||F.vendor||F.lowStock||F.favorite) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
     </div>` : '';
   return `
     ${segControl}
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My teas</h2>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">My teas</h2>
       <div style="display:flex;gap:8px;align-items:center;">
         ${vendors.length ? `<button class="lib-chip ${state.vendorsOpen?'active':''}" onclick="toggleVendors()">${state.vendorsOpen?'✕ Vendors':'Edit vendors'}</button>` : ''}
         <button class="btn btn-primary" onclick="openTeaForm()">＋ Add tea</button>
@@ -383,8 +383,8 @@ function viewTeaDetail(){
         <div style="flex:1;min-width:200px;">
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
-            ${t.isFavorite?'<span class="pill" style="background:#F6E3E2;color:#B5504A;">♥ favorite</span>':''}
-            ${t.wouldRebuy?'<span class="pill" style="background:#E4EAE0;color:#3F5E42;">would rebuy</span>':''}
+            ${t.isFavorite?`<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">${favLeaf(12)} favourite</span>`:''}
+            ${t.wouldRebuy?'<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">would rebuy</span>':''}
           </div>
           <h2 style="margin:8px 0 4px;">${escapeHtml(t.name)}</h2>
           ${renderStarsStatic(Number(t.rating)||0,true)}

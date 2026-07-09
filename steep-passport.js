@@ -217,14 +217,14 @@ function viewPassport(){
     const subChipCss = 'display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0 7px 7px 0;cursor:pointer;';
     const subChips = named.map(nm=>`<span style="${subChipCss}${state.passportSub===nm?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSubSelect('${escapeJsArg(zoom)}','${escapeJsArg(nm)}')">${nm} <b style="color:var(--clay);">${sd[nm].length}</b></span>`).join('')
       + (sd._none && sd._none.length ? `<span style="${subChipCss}${state.passportSub===null?'':''}" onclick="passportSubSelect('${escapeJsArg(zoom)}',null)">Region unspecified <b style="color:var(--clay);">${sd._none.length}</b></span>` : '');
-    panel = `<div style="font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);">${title}</div>
+    panel = `<div style="font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);">${title}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'} · tap a tea to open</div>
       ${named.length?`<div style="display:flex;flex-wrap:wrap;margin-bottom:10px;">${subChips}</div>`:''}
       <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${escapeJsArg(t.id)}','passport')">${escapeHtml(t.name)}</span>`).join('')}</div>`;
   } else if(state.passportSel && byCountry[state.passportSel]){
     const list = byCountry[state.passportSel];
     const zoomable = PASSPORT_ZOOMABLE[state.passportSel];
-    panel = `<div style="font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);">${state.passportSel}</div>
+    panel = `<div style="font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);">${state.passportSel}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'}${zoomable?' · tap the pin to zoom into sub-regions':' · tap to open'}</div>
       <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${escapeJsArg(t.id)}','passport')">${escapeHtml(t.name)}</span>`).join('')}</div>`;
   } else {
@@ -249,7 +249,7 @@ function viewPassport(){
   return `
     <button class="detail-back" onclick="goView('dashboard')">← Back to home</button>
     <div class="section-title" style="margin-top:6px;">
-      <h2 style="font-family:'Fraunces',serif;font-size:20px;">Tea passport</h2>
+      <h2 style="font-family:var(--font-display);font-size:20px;">Tea passport</h2>
       <span class="mono" style="font-size:12px;color:var(--amber);">${owned.length} region${owned.length===1?'':'s'} · ${totalMapped} tea${totalMapped===1?'':'s'}</span>
     </div>
     ${owned.length===0 && unmapped.length===0

@@ -26,6 +26,32 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.63 — WS3 design language (Shippori Mincho · hairline icons · accent vocabulary)
+Deploy: `index.html`, `styles.css`, `steep-core.js`, `steep-dashboard.js`, `steep-insights.js`,
+`steep-passport.js`, `steep-sessions.js`, `steep-shopping.js`, `steep-social.js`, `steep-teas.js`,
+`steep-data.js`, `service-worker.js` (v73). No SQL. First of four design workstreams (WS3 → WS1 → WS4 → WS2).
+- **Display font → Shippori Mincho** (replaces Fraunces). New `--font-display` token in both theme
+  blocks; `h1,h2,h3,.display` render at weight 700; the wordmark bumped to 700. All inline
+  `'Fraunces',serif` across the JS views swept to `var(--font-display)` (zero Fraunces refs remain).
+  Google-Fonts `<link>` swapped (`Shippori+Mincho:wght@500;600;700;800`). Inter/IBM Plex Mono unchanged.
+- **Header emoji → hairline stroke icons.** A hidden `<svg><defs>` sprite in `index.html` (sibling of
+  `#app`, survives re-renders) holds `i-{friends,shopping,world,achievements,settings,share,edit,camera}-hl`
+  + accent marks. New `icon(id,px,cls)` helper (steep-core) emits `<use>`d SVGs; topbar 👥🛒🌍🏆⚙ and the
+  "Edit layout" pencil now use it. Header-icon symbols omit `stroke-width` so `.hl` sets it via inherited
+  CSS — **1.7 light / 1.9 dark** so thin strokes don't go faint; `.icon-btn.active svg` goes `--white`.
+- **Favourite mark → tea leaf** (`favLeaf()`, `.i-fav` jade). Replaces ♥/★ on tea cards, running-low
+  rows, the tea-detail pill (now jade-family), the favourites filter chip, and shopping-list rows.
+- **Ensō ring on the steep timer.** `.timer-display` is now wrapped in a `.timer-ring` with an inline
+  ensō `<path id="ensoArc">`; the arc fills via `stroke-dashoffset` (`pathLength=100`, offset
+  `100*(1-focusProgress)`) updated each tick in `updateTimerDisplayOnly`, smooth `.9s` transition
+  (respects `prefers-reduced-motion`). New `--enso` token: amber-bright `#E3A15C` on the light-theme
+  dark box, dark-jade `#2A4130` on the dark-theme light-green box.
+- **Hanko + seigaiha** defs added to the sprite (used by WS1/WS2); hanko fill is `var(--red)` so it
+  themes (fixed-red in the prototype). Pixel-teapot logo (`steepLogoSVG`) unchanged — it stays the brand.
+- Verified in-browser (both themes): Shippori loads + applies at weight 700; all sprite symbols resolve
+  and `<use>` icons paint; ensō dashoffset = 50 at 50% progress; `--enso` resolves per theme; no console
+  errors. `node --check` clean on all touched files.
+
 ## v3.62 — freshness cues + sparkline rider + night-copy patch
 Deploy: `steep-teas.js`, `steep-dashboard.js`, `steep-core.js` (APP_VERSION), `service-worker.js` (v72). No SQL.
 - **Freshness cues** (steep-teas.js) — one soft, italic, observational line under the Harvest field on

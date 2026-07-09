@@ -16,6 +16,8 @@
   --heat-empty:#E4DCC5;
   --heat-fill:#4A7A3F;
   --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --font-display:'Shippori Mincho',serif;
+  --enso:#E3A15C; /* WS3: steep-timer ring — amber-bright on the light-theme jade-deep box */
 }
 html[data-theme="dark"]{
   --porcelain:#15140F;
@@ -34,11 +36,12 @@ html[data-theme="dark"]{
   --glow:0 0 18px rgba(227,161,92,.18);
   --heat-empty:#332F24;
   --heat-fill:#E3A15C;
+  --enso:#2A4130; /* WS3: dark-jade ring on the dark-theme light-green timer box */
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--porcelain);color:var(--ink);font-family:'Inter',sans-serif;transition:background .25s,color .25s;}
 body{-webkit-font-smoothing:antialiased;}
-h1,h2,h3,.display{font-family:'Fraunces',serif;}
+h1,h2,h3,.display{font-family:var(--font-display);font-weight:700;}
 .mono{font-family:var(--font-mono);}
 .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
 button{font-family:'Inter',sans-serif;cursor:pointer;}
@@ -52,11 +55,15 @@ a{color:inherit;}
 .topbar-actions{display:flex;gap:8px;align-items:center;}
 .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--line);background:var(--white);border-radius:10px;color:var(--ink);}
 .icon-btn:hover{border-color:var(--jade);}
-.icon-btn.active{border-color:var(--jade);background:var(--jade);}
+.icon-btn.active{border-color:var(--jade);background:var(--jade);color:var(--white);}
+/* WS3 hairline icons — stroke-width via inherited CSS so it can be bumped on dark (thin strokes go faint) */
+.hl{display:inline-block;vertical-align:middle;stroke-width:1.7;}
+html[data-theme="dark"] .hl{stroke-width:1.9;}
+.i-fav{color:var(--jade);flex:0 0 auto;}
 .btn-log-wide{width:100%;justify-content:center;padding:12px;font-size:14px;}
 .brand{display:flex;align-items:center;gap:10px;}
 .brand-mark{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%, var(--amber-pale), var(--amber) 60%, var(--clay));flex:0 0 auto;}
-.brand h1{font-size:22px;margin:0;font-weight:600;letter-spacing:-.01em;}
+.brand h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.01em;}
 .tabs{display:flex;gap:4px;background:var(--porcelain-dim);padding:4px;border-radius:10px;}
 .tabs .tab{flex:1;text-align:center;white-space:nowrap;}
 .tab{padding:8px 14px;border:none;background:transparent;border-radius:7px;font-size:13px;font-weight:600;color:var(--ink-soft);}
@@ -144,7 +151,7 @@ a{color:inherit;}
 .tea-card{background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .1s;}
 .tea-card:hover{border-color:var(--jade);}
 .tea-thumb{width:100%;height:120px;background:var(--jade-pale);background-size:cover;background-position:center;position:relative;}
-.tea-thumb .fav{position:absolute;top:8px;right:8px;font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3));}
+.tea-thumb .fav{position:absolute;top:8px;right:8px;display:flex;color:var(--jade);filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.45));}
 .tea-body{padding:12px;flex:1;display:flex;flex-direction:column;gap:6px;}
 .tea-body .name{font-weight:600;font-size:14px;line-height:1.25;}
 .tea-meta{font-size:11px;color:var(--ink-soft);}
@@ -189,7 +196,12 @@ html[data-theme="dark"] .field input[type=datetime-local]{color-scheme:dark;}
 html[data-theme="dark"] .timer-box{color:#0F1710;}
 html[data-theme="dark"] .timer-box .timer-modebtns button{color:#0F1710;}
 html[data-theme="dark"] .timer-ctrls button{color:var(--jade-deep);}
-.timer-display{font-family:var(--font-mono);font-size:38px;font-weight:600;letter-spacing:.02em;}
+.timer-display{font-family:var(--font-mono);font-size:34px;font-weight:600;letter-spacing:.02em;line-height:1;position:relative;}
+/* WS3: ensō ring around the steep time — arc fills via stroke-dashoffset as the steep runs */
+.timer-ring{position:relative;width:150px;height:150px;margin:10px auto 2px;display:flex;align-items:center;justify-content:center;}
+.timer-enso{position:absolute;inset:0;width:100%;height:100%;color:var(--enso);}
+#ensoArc{transition:stroke-dashoffset .9s linear;}
+@media (prefers-reduced-motion: reduce){ #ensoArc{transition:none;} }
 .timer-modebtns{display:flex;gap:6px;justify-content:center;margin-bottom:10px;}
 .timer-modebtns button{background:rgba(255,255,255,.12);border:none;color:var(--white);padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;}
 .timer-modebtns button.active{background:var(--amber);}
@@ -279,7 +291,7 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 
 /* ---------- calendar ---------- */
 .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.cal-head strong{font-family:'Fraunces',serif;font-size:16px;}
+.cal-head strong{font-family:var(--font-display);font-size:16px;}
 .cal-head .btn-ghost{font-size:22px;text-decoration:none;padding:0 10px;line-height:1;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
 .cal-dows{margin-bottom:4px;}
@@ -310,7 +322,7 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
 
 /* ---------- social ---------- */
-.avatar{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;border-radius:50%;background:var(--jade-pale);background-size:cover;background-position:center;font-family:'Fraunces',serif;font-weight:600;color:var(--jade-deep);font-size:15px;overflow:hidden;}
+.avatar{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;border-radius:50%;background:var(--jade-pale);background-size:cover;background-position:center;font-family:var(--font-display);font-weight:600;color:var(--jade-deep);font-size:15px;overflow:hidden;}
 .user-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
 .user-row:last-child{border-bottom:none;}
 
@@ -335,7 +347,7 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 /* v3 — onboarding + achievements page */
 .ob-hero{text-align:center;padding:34px 16px 10px;}
 .ob-hero .brand-mark{margin:0 auto 14px;width:46px;height:46px;}
-.ob-hero h1{font-family:'Fraunces',serif;font-size:30px;margin:0 0 10px;color:var(--ink);}
+.ob-hero h1{font-family:var(--font-display);font-size:30px;margin:0 0 10px;color:var(--ink);}
 .ob-lede{max-width:440px;margin:0 auto;color:var(--ink-soft);font-size:14px;line-height:1.6;}
 .ob-steps{margin-top:18px;display:flex;flex-direction:column;gap:2px;}
 .ob-step{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--line);}
@@ -372,7 +384,7 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .pp-mark.sel{fill:var(--jade);stroke:var(--amber);stroke-width:2.2;}
 .pp-detail{margin-top:14px;min-height:64px;}
 .pp-detail-empty{color:var(--ink-soft);font-size:13px;line-height:1.5;}
-.pp-rname{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);}
+.pp-rname{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);}
 .pp-rsub{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
 .pp-teachips{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
 .pp-teachip{font-size:12px;background:var(--porcelain-dim);color:var(--jade-deep);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;}
@@ -386,7 +398,7 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 /* v3 — meditative focus mode */
 .focus-screen{position:fixed;inset:0;z-index:60;background:var(--porcelain);display:flex;align-items:center;justify-content:center;padding:24px;}
 .focus-inner{width:100%;max-width:340px;text-align:center;}
-.focus-name{font-family:'Fraunces',serif;font-size:22px;color:var(--ink);line-height:1.2;}
+.focus-name{font-family:var(--font-display);font-size:22px;color:var(--ink);line-height:1.2;}
 .focus-sub{font-size:12px;color:var(--ink-soft);margin-top:3px;letter-spacing:.04em;}
 .focus-cup{width:190px;height:auto;margin:18px auto 0;display:block;}
 #focusCupFill{transition:y 1s linear,height 1s linear;}

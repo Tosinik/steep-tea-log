@@ -642,7 +642,7 @@
   function shell(inner) {
     return `<div class="auth-wrap"><div class="auth-card">
       <div class="brand" style="justify-content:center;margin-bottom:14px;">
-        <div class="brand-mark"></div><h1 style="font-family:'Fraunces',serif;font-size:26px;margin:0;">SlowCup</h1>
+        <div class="brand-mark"></div><h1 style="font-family:var(--font-display);font-size:26px;margin:0;">SlowCup</h1>
       </div>${inner}</div></div>`;
   }
 

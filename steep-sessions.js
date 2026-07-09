@@ -34,7 +34,7 @@ function sessionRowHTML(s){
 }
 function viewSessions(){
   if(state.sessions.length===0){
-    return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Sessions</h2></div>
+    return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Sessions</h2></div>
       <div class="card empty">No sessions yet. Tap <strong>＋ Log session</strong> to record your first brew.</div>`;
   }
   if(!state.calMonth) state.calMonth = startOfMonth(new Date());
@@ -69,7 +69,7 @@ function viewSessions(){
   }
   const rows = listSessions.map(sessionRowHTML).join('');
   return `
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Sessions</h2>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Sessions</h2>
       <span class="mono" style="font-size:12px;color:var(--ink-soft);">${state.sessions.length} total</span></div>
     ${cal}
     ${streakCardHTML()}
@@ -91,7 +91,7 @@ function viewVessels(){
     </div>
   `).join('') : '<div class="empty">No vessels yet — add your gaiwan, kyusu, or teapot.</div>';
   return `
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">My vessels</h2><button class="btn btn-primary" onclick="openVesselForm()">＋ Add vessel</button></div>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">My vessels</h2><button class="btn btn-primary" onclick="openVesselForm()">＋ Add vessel</button></div>
     <div class="card">${rows}</div>
   `;
 }
@@ -666,7 +666,10 @@ function sessionSteepingHTML(d){
       <div class="timer-box">
         ${modeBtns}
         ${tm.mode==='timer' ? `<div style="margin-bottom:8px;"><input type="number" value="${tm.target}" style="width:70px;text-align:center;border-radius:6px;border:none;padding:4px;" oninput="setTimerTarget(this.value)"> sec target</div>` : ''}
-        <div class="timer-display">${fmtSec(displaySeconds)}</div>
+        <div class="timer-ring">
+          <svg class="timer-enso" viewBox="0 0 120 120" aria-hidden="true"><path id="ensoArc" d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${(100*(1-focusProgress(tm))).toFixed(1)}"/></svg>
+          <div class="timer-display">${fmtSec(displaySeconds)}</div>
+        </div>
         <div class="timer-ctrls">
           <button onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
           <button onclick="timerReset()">Reset</button>
@@ -799,6 +802,8 @@ function updateTimerDisplayOnly(){
   const disp = document.querySelector('.timer-display');
   const tm = state.sessionDraft.timer;
   if(disp) disp.textContent = fmtSec(tm.mode==='timer'?Math.max(0,tm.target-tm.elapsed):tm.elapsed);
+  const arc = document.getElementById('ensoArc'); // WS3: fill the ensō ring as the steep runs
+  if(arc) arc.setAttribute('stroke-dashoffset', (100*(1-focusProgress(tm))).toFixed(1));
   const btn = document.querySelector('.timer-ctrls button');
   if(btn) btn.textContent = tm.running?'Pause':'Start';
   // focus mode: animate the cup + calm readout

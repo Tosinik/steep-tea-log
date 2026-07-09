@@ -13,10 +13,27 @@
 <link rel="icon" href="icon-192.png">
 <title>SlowCup — Tea Log</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<!-- WS3 icon/accent sprite: hairline header/action icons + accent marks (leaf/ensō/hanko/seigaiha).
+     Sibling of #app so it survives full re-renders. Header-icon symbols omit stroke-width so CSS
+     (.hl) sets it per theme; accent marks keep their own weights. All use currentColor. -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>
+<symbol id="i-friends-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.2" r="3.1"/><path d="M3.6 19.4c0-3 2.4-5.2 5.4-5.2s5.4 2.2 5.4 5.2"/><circle cx="16.6" cy="7" r="2.3"/><path d="M15.4 12.2c2.7-.3 5.1 1.8 5.1 4.9"/></g></symbol>
+<symbol id="i-shopping-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 8.4h11.6l-.9 11.1a1.2 1.2 0 0 1-1.2 1.1H8.3a1.2 1.2 0 0 1-1.2-1.1z"/><path d="M9.2 8.4V6.6a2.8 2.8 0 0 1 5.6 0v1.8"/></g></symbol>
+<symbol id="i-world-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8"/><path d="M12 3.6c2.3 2.3 3.6 5.3 3.6 8.4S14.3 18.1 12 20.4c-2.3-2.3-3.6-5.3-3.6-8.4S9.7 5.9 12 3.6z"/></g></symbol>
+<symbol id="i-achievements-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.4"/><path d="M8.9 13.6L7.4 20.8l4.6-2.6 4.6 2.6-1.5-7.2"/></g></symbol>
+<symbol id="i-settings-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.6l1.5 2.4 2.8-.7.4 2.9 2.7.9-1.1 2.7 1.9 2.1-1.9 2.1 1.1 2.7-2.7.9-.4 2.9-2.8-.7L12 21.4l-1.5-2.4-2.8.7-.4-2.9-2.7-.9 1.1-2.7L2.9 12l1.9-2.1-1.1-2.7 2.7-.9.4-2.9 2.8.7z"/></g></symbol>
+<symbol id="i-share-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M8.3 10.9l6.5-3.6M8.3 13.1l6.5 3.6"/></g></symbol>
+<symbol id="i-edit-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.1-4.1L16.4 4.6a2 2 0 0 1 2.8 2.8L7.9 18.7 4 20z"/><path d="M14.6 6.4l3 3"/></g></symbol>
+<symbol id="i-camera-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 8.6h3.9L9 6.6h6l1.5 2h3.9v10.7a1 1 0 0 1-1 1H4.6a1 1 0 0 1-1-1z"/><circle cx="12" cy="13.8" r="3.3"/></g></symbol>
+<symbol id="hanko" viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="19" height="19" rx="4.5" fill="var(--red)"/><path d="M8.4 16.2c2.3-1.5 3.5-3.8 3.5-6.7M12.5 8c1.2 3.1.3 6.4-1.9 8.6" fill="none" stroke="#F6F2E9" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="enso" viewBox="0 0 120 120"><path d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></symbol>
+<pattern id="seigaiha" width="44" height="22" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width="1.3"><path d="M0 22a22 22 0 0 1 44 0"/><path d="M7 22a15 15 0 0 1 30 0"/><path d="M14 22a8 8 0 0 1 16 0"/></g></pattern>
+<symbol id="fav-leaf" viewBox="0 0 24 24"><path d="M13.5 3.2 C7 7.5 6.5 15 11.5 20.5 C16.5 15.5 19 8 13.5 3.2 Z" fill="currentColor"/><path d="M12 6.5 C11 11 11.4 15.5 12.6 18.8" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="1.1" stroke-linecap="round"/><path d="M11.5 20.5 C10.8 21.6 10.2 22.2 9.4 22.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</defs></svg>
 <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

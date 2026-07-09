@@ -65,7 +65,19 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.62 freshness cues + sparkline rider + night-copy patch** (cache **v72**,
+**NOW (just shipped) — v3.63 WS3 design language** (cache **v73**, APP_VERSION v3.63): first of a
+**4-workstream design rework** (`design_handoff/`, order WS3→WS1→WS4→WS2). Display font Fraunces →
+**Shippori Mincho** (new `--font-display` token, headings weight 700, all inline refs swept); header
+emoji → **hairline stroke icons** (hidden `<svg><defs>` sprite in index.html + `icon()` helper in
+steep-core; `.hl` stroke 1.7 light/1.9 dark); favourite ♥/★ → **tea leaf** (`favLeaf()`/`.i-fav`) on
+tea cards, running-low, detail pill, filter chip, shopping; **ensō ring** on the steep timer (fills via
+stroke-dashoffset each tick; new `--enso` token amber-light/dark-jade); hanko+seigaiha defs added for
+WS1/WS2. Verified both themes in-browser. **DESIGN.md updated** to Shippori + accent vocab.
+**Remaining workstreams (own deploys, pause after each):** WS1 SlowCup Wrapped swipeable story cards
+(viewWrapped/steep-insights) · WS4 slowcup.app static landing page (new file) · WS2 Insights overhaul
+(viewInsights). Then back to the SlowCup batch's last item: feed pagination (+ socialErr inline notice).
+
+**Earlier — v3.62 freshness cues + sparkline rider + night-copy patch** (cache **v72**,
 APP_VERSION v3.62): tea detail gains one soft italic line under Harvest — fresh greens "at its best
 young", whites/pu-erh "deepens with age" — requiring a valid year (season optional), silent on
 garbage/neutral styles (`freshnessCueHTML` in steep-teas.js; exactly 2 fire on real data). Rider:

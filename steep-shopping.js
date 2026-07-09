@@ -46,7 +46,7 @@ function viewShopping(){
       const out = Number(t.amountGrams)<=0;
       return `<div style="${rowStyle}">
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;">${escapeHtml(t.name)}${t.isFavorite?' ★':''}</div>
+          <div style="font-weight:600;">${escapeHtml(t.name)}${t.isFavorite?' '+favLeaf(12):''}</div>
           <div style="font-size:11px;color:var(--ink-soft);">${out?'out of stock':`${Number(t.amountGrams)}g left`}${t.source?` · ${escapeHtml(t.source)}`:''}</div>
         </div>
         <button class="lib-chip" onclick="addWishFromTea('${t.id}')">Add</button>
@@ -70,7 +70,7 @@ function viewShopping(){
   </div>` : `<div class="card empty">Your shopping list is empty. Add something above, or pull from what's running low.</div>`;
 
   return `
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Shopping list</h2></div>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Shopping list</h2></div>
     ${addRow}
     ${suggBlock}
     ${listBlock}

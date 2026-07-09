@@ -89,10 +89,27 @@ v3.40 tea lifecycle.
      garbage/neutral styles — exactly 2 fire on real data. Rider: "add a purchase date" link where
      `inventorySparkline` is absent only for want of a date. Night-copy: active-with-history line 3 →
      "tonight" not "this late-night". Validated `fixtures/freshness-test.js` (local, 11) + greeting (32).
-   - **Feed pagination (v3.63)** — `.range()` paging + quiet "load more" (no infinite scroll); page size =
+   - **Feed pagination** — `.range()` paging + quiet "load more" (no infinite scroll); page size =
      current cap; verify the shared-session mapper appends page 2+ without duplicate keys. **Fold in**
      `socialErr`'s `alert()` → a sticky inline notice on the social view (multi-sentence setup
      diagnostics, so not a toast) — same file, per `TASK-cleanup-and-issues.md` housekeeping.
+     **(Deferred behind the design rework below — still the SlowCup batch's last item.)**
+
+4. **Design rework — 4 workstreams** (`design_handoff/` in Downloads, high-fidelity prototypes; order
+   WS3 → WS1 → WS4 → WS2; own deploy each, **pause after each**). Shared language in `DESIGN.md`.
+   - ~~**WS3 — design language**~~ ✓ **shipped v3.63**. Shippori Mincho display font (`--font-display`),
+     hairline stroke icon sprite + `icon()` helper (header emoji retired), tea-leaf favourite mark
+     (`favLeaf`), ensō timer ring (`--enso`), hanko+seigaiha defs staged for WS1/WS2.
+   - **WS1 — SlowCup Wrapped** [next] — replace the single static Wrapped card with a horizontal
+     CSS scroll-snap sequence of full-width story cards (seasonal wash + catalogue numbering + hanko
+     standout); dot indicators (only JS besides share); degrade gracefully (skip missing-stat cards);
+     keep share-as-text + empty state. `viewWrapped()` in steep-insights.js.
+   - **WS4 — slowcup.app landing** — net-new static page (own `.html` + real CSS, `prefers-color-scheme`,
+     no JS frameworks/analytics). Hero + device screenshots + 3 philosophy beats + jade-deep CTA panel
+     (`mailto:slowcupapp@gmail.com`). Swap in current screenshots at deploy. Not part of the PWA cache.
+   - **WS2 — Insights overhaul** — remake `viewInsights()` as the reflective room: one hero observation
+     (jade-pale), a reusable tiny data-viz family (sparkline/type-bar/time-of-day/steep-shape), hairline
+     top-borders not boxed cards, observations-not-KPIs copy, quiet Wrapped teaser. Inherits WS3+WS1.
 
 ## Shipped
 Core: data layer + per-row writes, quick log, modularization, library search/filter/sort,

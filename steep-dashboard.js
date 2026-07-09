@@ -124,12 +124,12 @@ function viewSpend(){
 
   return `
     <button class="detail-back" onclick="goView('dashboard')">← Back to dashboard</button>
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Spending</h2></div>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Spending</h2></div>
     ${!hasAny ? `<div class="card empty">No priced purchases yet. Add a tea with a price and a purchase date and it'll show up here.</div>` : `
     <div class="card">
       <div class="eyebrow">${thisMonthName}</div>
       <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px;">
-        <div style="font-size:30px;font-weight:700;font-family:'Fraunces',serif;">${ms.thisMonth.toFixed(2)}</div>
+        <div style="font-size:30px;font-weight:700;font-family:var(--font-display);">${ms.thisMonth.toFixed(2)}</div>
         <div style="font-size:12px;color:var(--ink-soft);">${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} this month</div>
       </div>
       <div style="display:flex;align-items:flex-end;gap:4px;height:130px;margin-top:16px;">${bars}</div>
@@ -485,7 +485,7 @@ function viewAchievements(){
   return `
     <button class="detail-back" onclick="goView('dashboard')">← Back to dashboard</button>
     <div class="section-title" style="margin-top:6px;">
-      <h2 style="font-family:'Fraunces',serif;font-size:20px;">Achievements</h2>
+      <h2 style="font-family:var(--font-display);font-size:20px;">Achievements</h2>
       <span class="mono" style="font-size:12px;color:var(--amber);">${earnedTiers}/${totalTiers} tiers · ${started} started</span>
     </div>
     <div class="card"><div class="badge-grid">${list.map(badgeHTML).join('')}</div></div>
@@ -557,7 +557,7 @@ function renderDashboard(cards, surface){
   const editing = !!state.dashEdit;
   const onSurface = id => dashSurface(id)===surface && cards[id]!=null; // only this tab's cards
   const editBar = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
-    <button class="lib-chip ${editing?'active':''}" onclick="dashToggleEdit()">${editing?'✓ Done':'✎ Edit layout'}</button>
+    <button class="lib-chip ${editing?'active':''}" onclick="dashToggleEdit()">${editing?'✓ Done':`${icon('i-edit-hl',13)} Edit layout`}</button>
   </div>`;
   const visible = order.filter(id=>onSurface(id) && !hidden.has(id));
   const body = visible.map(id=>{
@@ -618,7 +618,7 @@ function greetingCardHTML(){
   const greet = GREETING_LINE[bucket];
   const sessions = state.sessions || [];
   const card = sub => `<div class="card" style="background:var(--jade-pale);border:1px solid var(--line);">
-      <h2 style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;margin:0;">${greet}</h2>
+      <h2 style="font-family:var(--font-display);font-size:22px;font-weight:500;margin:0;">${greet}</h2>
       ${sub ? `<div style="font-size:13.5px;color:var(--ink-soft);margin-top:6px;">${sub}</div>` : ''}
     </div>`;
   const todayKey = dayKey(now);
@@ -730,7 +730,7 @@ function dashCardsHome(s){
         const g=Number(t.amountGrams); const low=g<lowStockG();
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
         return `<div class="rank-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="cursor:pointer;">
-          <span class="rname">${t.isFavorite?'♥ ':''}${escapeHtml(t.name)}</span>
+          <span class="rname" style="display:flex;align-items:center;gap:6px;">${t.isFavorite?favLeaf(14):''}${escapeHtml(t.name)}</span>
           <span class="rval" style="color:${low?'var(--red)':'var(--amber)'};font-weight:600;">${g.toFixed(1)}g${est}</span>
         </div>`;
       }).join('')}

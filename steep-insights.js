@@ -286,7 +286,7 @@ function viewWrapped(){
     return `${back}
     <div class="section card" style="text-align:center;padding:34px 20px;">
       <div class="eyebrow">SlowCup Wrapped</div>
-      <h2 style="font-family:'Fraunces',serif;font-size:26px;margin:8px 0 6px;">Your ${w.season.name} is just beginning</h2>
+      <h2 style="font-family:var(--font-display);font-size:26px;margin:8px 0 6px;">Your ${w.season.name} is just beginning</h2>
       <p style="color:var(--ink-soft);font-size:14px;max-width:34ch;margin:0 auto;">No sessions logged this ${w.season.name.toLowerCase()} yet. Brew a few cups and your recap fills in here.</p>
     </div>`;
   }
@@ -297,7 +297,7 @@ function viewWrapped(){
   return `${back}
     <div class="section card" style="text-align:center;padding:30px 20px;background:linear-gradient(160deg,var(--white,#fff),var(--porcelain,#f4efe4));">
       <div class="eyebrow">SlowCup Wrapped</div>
-      <h2 style="font-family:'Fraunces',serif;font-size:28px;margin:8px 0 4px;">Your ${w.season.name} in tea</h2>
+      <h2 style="font-family:var(--font-display);font-size:28px;margin:8px 0 4px;">Your ${w.season.name} in tea</h2>
       <div class="mono" style="font-size:12px;color:var(--ink-soft);">${w.season.year} · so far</div>
     </div>
 
@@ -381,8 +381,8 @@ function dashCardsInsights(s){
 
 function viewInsights(){
   if(state.sessions.length===0){
-    return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Insights</h2></div>
+    return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Insights</h2></div>
       <div class="card empty">No sessions yet — your insights, recaps and Wrapped fill in as you log.</div>`;
   }
-  return `<div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Insights</h2></div>${renderDashboard(dashCards(),'insights')}`;
+  return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Insights</h2></div>${renderDashboard(dashCards(),'insights')}`;
 }

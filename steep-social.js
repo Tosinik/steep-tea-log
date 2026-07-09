@@ -66,7 +66,7 @@ function profileSetupHTML(){
   const p=state.social.draft || state.social.profile || {};
   const editing=!!state.social.profile;
   return `
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">${editing?'Edit profile':'Create your profile'}</h2></div>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">${editing?'Edit profile':'Create your profile'}</h2></div>
     <div class="card">
       <p style="font-size:12.5px;color:var(--ink-soft);margin-top:0;">Your username lets friends find you. Only your name and avatar are public — your tea log stays private unless you share individual sessions.</p>
       <form onsubmit="submitProfile(event)">
@@ -100,7 +100,7 @@ function viewFriends(){
   else if(so.tab==='find') body=findHTML();
   else body=followingHTML();
   return `
-    <div class="section-title"><h2 style="font-family:'Fraunces',serif;font-size:20px;">Friends</h2>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Friends</h2>
       <button class="btn-ghost" onclick="editProfile()">edit profile</button></div>
     <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       ${avatarHTML(me,48)}

@@ -1,6 +1,6 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.62';
+const APP_VERSION = 'v3.63';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -785,6 +785,12 @@ function steepLogoSVG(px){
   for(let r=0;r<grid.length;r++){ for(let c=0;c<grid[r].length;c++){ const ch=grid[r][c]; if(col[ch]) rects+=`<rect x="${c}" y="${r}" width="1" height="1" fill="${col[ch]}"/>`; } }
   return `<svg width="${px}" height="${px}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="display:block;" role="img" aria-label="SlowCup">${rects}</svg>`;
 }
+// WS3: hairline icon/accent from the index.html <defs> sprite. Inherits color via currentColor and
+// stroke-width via the .hl CSS rule (bumped on dark). Pass the full symbol id (e.g. 'i-settings-hl',
+// 'fav-leaf'); optional size (px) and extra class.
+function icon(id, px, cls){ const s = px||21; return `<svg class="hl${cls?' '+cls:''}" viewBox="0 0 24 24" width="${s}" height="${s}" aria-hidden="true"><use href="#${id}"/></svg>`; }
+// WS3: the tea-leaf favourite mark (jade), replacing ♥/★ everywhere favourites show.
+function favLeaf(px){ return icon('fav-leaf', px||16, 'i-fav'); }
 function render(){
   const app = document.getElementById('app');
   if(!state.loaded){ app.innerHTML = '<div class="empty">Loading your tea log…</div>'; return; }
@@ -816,11 +822,11 @@ function render(){
       <div class="topbar-brandrow">
         <div class="brand">${steepLogoSVG(30)}<h1>SlowCup</h1></div>
         <div class="topbar-actions">
-          <button class="icon-btn ${state.view==='friends'?'active':''}" onclick="goFriends()" title="Friends" aria-label="Friends">👥</button>
-          <button class="icon-btn ${state.view==='shopping'?'active':''}" onclick="goView('shopping')" title="Shopping list" aria-label="Shopping list">🛒</button>
-          <button class="icon-btn ${state.view==='passport'?'active':''}" onclick="goView('passport')" title="Tea passport" aria-label="Tea passport">🌍</button>
-          ${state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">🏆</button>` : ''}
-          <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">⚙</button>
+          <button class="icon-btn ${state.view==='friends'?'active':''}" onclick="goFriends()" title="Friends" aria-label="Friends">${icon('i-friends-hl')}</button>
+          <button class="icon-btn ${state.view==='shopping'?'active':''}" onclick="goView('shopping')" title="Shopping list" aria-label="Shopping list">${icon('i-shopping-hl')}</button>
+          <button class="icon-btn ${state.view==='passport'?'active':''}" onclick="goView('passport')" title="Tea passport" aria-label="Tea passport">${icon('i-world-hl')}</button>
+          ${state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">${icon('i-achievements-hl')}</button>` : ''}
+          <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">${icon('i-settings-hl')}</button>
         </div>
       </div>
       <div class="tabs">
