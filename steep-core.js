@@ -30,9 +30,12 @@ async function saveKey(key, val){
 let _saveErrShown = false;
 function saveErr(e){
   console.error('[Steep] save failed', e);
+  // v3.58: was a blocking alert(); now a long-lived toast (carries data-loss info — "re-save once
+  // back online" — so it lingers ~12s, not the default 4.2s). v3.59's error log will also capture
+  // this via the global error hooks, giving it a durable home; keep the toast long until then.
   if(!_saveErrShown){
     _saveErrShown = true;
-    alert("Couldn't sync that change — you may be offline. It'll need to be re-saved once you're back online.");
+    showToast("Couldn't sync that change — you may be offline. It'll need to be re-saved once you're back online.", 12000);
     setTimeout(()=>{ _saveErrShown = false; }, 4000);
   }
 }
@@ -91,6 +94,7 @@ let state = {
   sessionDraft: null, // {teaId, vesselId, isColdBrew, waterType, waterTDS, gramsUsed, steeps:[], currentSteep:{}, timer:{...}}
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
+  pendingImport: null, // parsed backup awaiting the inline replace-all confirm (Settings → Data)
   calMonth: null, calSelDay: null,
   teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false }, teaSeg: 'teas',
   recapPeriod: 'week',

@@ -88,8 +88,15 @@ baseline unchanged) · **v3.44 Insights tab + dashboard split** (new `steep-insi
 cards; nav gains Insights; `DASH_SURFACE` makes the editable `dashLayout` per-tab with lossless migration;
 recap gains "All time"; heatmap/streak stay on Sessions per Niklas). **Next: Brew advice v2** — capacity-
 capture precursor (v3.56 ✓) and ratio phase 1 (v3.57 ✓ shipped). **Brew advice v2 phase 1 is DONE** —
-next is phase 2 (learned defaults, separate spec, gated on phase-1 data), or the "forgotten batch"
-(ROADMAP §3). The v3.34 map legibility pass was built but NOT shipped — map is parked. Cache **v67**
+phase 2 (learned defaults) WAITS on a monitoring window of ratio'd sessions (separate spec). Now working
+the **forgotten batch** (`TASK-forgotten-batch.md` in Downloads): v3.58 popup sweep ✓, then v3.59 error
+log + data health, v3.60 freshness cues, v3.61 feed pagination — pause after each. Install guide SKIPPED
+(parked-with-reason: slowcup.app domain not decided — installed PWAs bind to origin). Cache **v68**
+(v3.58: **finished the popup sweep** — last 8 `alert()`/`confirm()` gone. steep-settings.js clean:
+photo-migrate confirm → `armConfirm(this)` (+`doMigratePhotos`), import replace-all → state-driven inline
+confirm row `state.pendingImport`/`importConfirmHTML()` keeping both counts + friction (NOT a toast),
+notices → toast. steep-core `saveErr` offline-sync alert → long-lived toast (~12s); `showToast(msg,ms)`
+gained a duration arg. Only `socialErr` alert remains — out of scope, online-only diagnostics.) Cache **v67**
 (v3.57: **leaf-to-water ratio — the 3rd advice axis**. STRICT OPT-IN `ratioAdjust` (default OFF; off =
 byte-identical). `actualRatio=gramsUsed/(waterMl/100)` vs a per-method baseline → `timeFactor=
 clamp(1/ratioFactor^0.6,0.6,1.4)` scales the whole schedule (temp NOT touched). Ordering base→ratio→

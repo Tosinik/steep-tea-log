@@ -57,17 +57,27 @@ v3.40 tea lifecycle.
   because a tea has no `purchaseDate` anchor, show a quiet "add a purchase date to see the stock curve"
   link to Edit — a separate tiny deploy or its own issue.
 
-3. **Then — the rest of the "forgotten" batch** (small independent deploys, order flexible):
+3. **Then — the rest of the "forgotten" batch** (per `TASK-forgotten-batch.md`, agreed 2026-07-09;
+   small independent deploys, **pause after each**):
    - ~~**Tea lifecycle / at-0g**~~ ✓ **shipped v3.40** (finished-teas grouping + hidden-in-picker +
      one-time rebuy? → shopping list). A full **archive/restore workflow** (hide from library entirely,
      restore later) is deferred — the finished view + rebuy nudge cover the need for now.
-   - **Error log + data health** (Settings → Data) — keep the **last N client errors** in
-     localStorage, viewable under Settings; plus a read-only **data-integrity report**: orphaned
-     steeps, sessions pointing at deleted teas, negative stock, duplicate-session pairs (the v3.35
-     double-fire signature). Diagnostic surface, no auto-repair.
-   - **Freshness cues** — surface `harvest_year`/`harvest_season` **quietly**: shincha/first-flush
-     past peak, young sheng puerh improving with age. Observational, calm, opt-in feel — no alarms.
-   - **Feed pagination** — future-proof social (feed is currently capped at 50).
+   - ~~**Popup sweep (rider, completes v3.50)**~~ ✓ **shipped v3.58** — last 8 `alert()`/`confirm()`
+     gone; import replace-all kept as a state-driven inline confirm row (both counts, full friction);
+     offline sync-failure → long-lived toast (`showToast(msg,ms)`). Only `socialErr` remains (online-only).
+   - **Error log + data health** (Settings → Data) — **NEXT (v3.59)**. `window.onerror` +
+     `unhandledrejection` (+ the v3.58 offline sync failure) → a localStorage ring buffer (~20),
+     viewable with a clear button; plus an on-demand **data-integrity report**: orphaned steeps,
+     sessions → deleted teas/vessels, negative stock, duplicate-session pairs (v3.35 signature, same
+     tea within ~10 min). Counts + expandable details, no auto-repair. Fresh CSVs have ZERO dup pairs —
+     test the detectors with synthetic bad rows in the vm sandbox. Rides with a **"Send feedback"
+     `mailto:`** row (version-prefixed subject only; ask Niklas for the recipient address; no error-log auto-attach).
+   - **Freshness cues (v3.60)** — surface `harvestYear`/`harvestSeason` **quietly on tea detail only**:
+     shincha/first-flush past ~9mo → "at its best young"; aged white/sheng → "deepens with age". Year and
+     season independently optional, silent on garbage (only 5/14 teas carry any). Rider: the OK'd
+     `inventorySparkline` "add a purchase date" link when the chart is absent (steep-teas.js).
+   - **Feed pagination (v3.61)** — `.range()` paging + quiet "load more" (no infinite scroll); page size =
+     current cap; verify the shared-session mapper appends page 2+ without duplicate keys.
 
 ## Shipped
 Core: data layer + per-row writes, quick log, modularization, library search/filter/sort,
@@ -114,6 +124,13 @@ ritual-over-metrics):
 
 ## Frozen — not now (with reason)
 Not cut, but explicitly parked with the reason, so we don't re-litigate each session:
+- **Install guide** — SKIPPED for now (decided 2026-07-09). It interacts with the **slowcup.app**
+  domain decision: installed PWAs bind to their origin, so pushing installs under `github.io` before
+  the domain settles would orphan them. Revisit once the domain is decided (then: install guide →
+  beta package).
+- **Brew-advice phase 2 (learned defaults)** — WAITS on a monitoring window (decided 2026-07-09):
+  let phase-1 ratio adjustment gather a week-plus of ratio'd sessions first, then write the phase-2
+  spec. Sessions already store `brew_style` so phase 2 can normalise real steep times within-method.
 - **German i18n** [L] — large string-extraction pass; not worth it at private-beta scale (a
   handful of EN/DE-comfortable testers). Revisit only if the audience widens.
 - **TWA / APK (PWABuilder / Bubblewrap) & Capacitor native** — the installable PWA already

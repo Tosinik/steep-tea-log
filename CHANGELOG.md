@@ -23,6 +23,28 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.58 — finish the popup sweep (completes v3.50)
+Deploy: `steep-settings.js`, `steep-core.js`, `steep-dashboard.js` (`showToast` gains a duration),
+`service-worker.js` (v68). No SQL.
+- **The last 8 browser popups are gone** — same conversions as v3.50 (`armConfirm` for destructive
+  confirms, `showToast` for notices). No `alert()`/`confirm()`/`prompt()` remain in steep-settings.js.
+- **Photo-migration** (steep-settings.js): the "no photos" and "moved N" alerts → toasts; the
+  "Move N photos?" confirm → inline `armConfirm` on the button (`migratePhotosToStorage(this)` splits
+  into an arm step + `doMigratePhotos()`).
+- **Import** (steep-settings.js): the most destructive action (replaces ALL data) keeps its friction —
+  the blocking `confirm()` becomes a **state-driven inline confirm row** in Settings → Data
+  (`state.pendingImport` + `importConfirmHTML()`), still showing both counts ("Replace X teas /
+  Y sessions with A / B?"), with a red "Replace all data" / "Cancel". Fires from a file-picker
+  callback, so it can't use `armConfirm`'s button-in-place pattern — the row is durable in `state`.
+  The invalid-file, read-error, and "Import complete" alerts → toasts.
+- **Offline sync-failure** (steep-core.js `saveErr`): blocking `alert()` → a **long-lived toast**
+  (~12s; it carries data-loss info). `showToast(msg, ms)` now takes an optional duration (default
+  4.2s). v3.59's error log will give this failure a durable home via the global error hooks — noted
+  in the code comment as the hand-off.
+- Out of scope (unchanged): `socialErr` in steep-core.js keeps its `alert()` — social actions are
+  online-only and it surfaces specific setup/permission diagnostics, not a calm notice.
+
+---
 ## v3.57 — leaf-to-water ratio, the 3rd advice axis (brew advice v2, phase 1)
 Deploy: `sql/v3_8-water-ml.sql` (**run once, first — already applied**), `steep-knowledge.js`,
 `steep-core.js`, `steep-data.js`, `steep-sessions.js`, `steep-settings.js`, `service-worker.js` (v67).

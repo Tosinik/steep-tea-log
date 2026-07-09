@@ -254,13 +254,13 @@ function celebrateAchievements(list){
   showToast('🎉 Unlocked: '+names.join(' · '));
   confettiBurst();
 }
-function showToast(msg){
+function showToast(msg, ms){
   let host = document.getElementById('toastHost');
   if(!host){ host=document.createElement('div'); host.id='toastHost'; document.body.appendChild(host); }
   const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
   host.appendChild(t);
   requestAnimationFrame(()=>t.classList.add('show'));
-  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),320); }, 4200);
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),320); }, ms||4200);
 }
 function confettiBurst(){
   const host=document.createElement('div'); host.className='confetti';

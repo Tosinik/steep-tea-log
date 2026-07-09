@@ -8,16 +8,33 @@ function backupSectionHTML(){
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <button class="btn btn-primary" onclick="exportData()">Export backup (.json)</button>
       <button class="btn" onclick="triggerImport()">Import backup</button>
-      <button class="btn" onclick="migratePhotosToStorage()">Move photos to cloud</button>
+      <button class="btn" onclick="migratePhotosToStorage(this)">Move photos to cloud</button>
       <button class="btn" onclick="window.SteepDB.signOut()">Sign out</button>
       <input type="file" id="importFileInput" accept="application/json" style="display:none" onchange="handleImportFile(event)">
     </div>
+    ${importConfirmHTML()}
   </div>`;
 }
-async function migratePhotosToStorage(){
+// v3.58: the parsed backup waits in state.pendingImport and is confirmed via this inline row (with
+// both counts) — NOT a toast. Replacing all data is the app's most destructive action; keep the friction.
+function importConfirmHTML(){
+  const pi = state.pendingImport; if(!pi) return '';
+  return `<div class="set-row" style="flex-direction:column;align-items:stretch;gap:10px;border:1px solid var(--red);border-radius:10px;padding:12px;">
+    <div style="font-size:13px;color:var(--ink);">Replace your current data
+      (<strong>${state.teas.length} teas / ${state.sessions.length} sessions</strong>) with the backup
+      (<strong>${(pi.teas||[]).length} teas / ${(pi.sessions||[]).length} sessions</strong>)? This can&rsquo;t be undone.</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" style="color:var(--red);font-weight:600;" onclick="confirmImport()">Replace all data</button>
+      <button class="btn" onclick="cancelImport()">Cancel</button>
+    </div>
+  </div>`;
+}
+async function migratePhotosToStorage(btn){
   const count = [...state.teas, ...state.vessels].filter(x=>x.image && x.image.startsWith('data:')).length;
-  if(count===0){ alert('No inline photos to move — everything is already in cloud storage.'); return; }
-  if(!confirm(`Move ${count} photo${count===1?'':'s'} to cloud storage? This shrinks each row and speeds up loading.`)) return;
+  if(count===0){ showToast('No inline photos to move — everything is already in cloud storage.'); return; }
+  armConfirm(btn, `Move ${count} photo${count===1?'':'s'} to cloud storage?`, ()=>doMigratePhotos());
+}
+async function doMigratePhotos(){
   let ok=0, fail=0;
   const changedTeas=[], changedVessels=[];
   for(const t of state.teas){
@@ -32,7 +49,7 @@ async function migratePhotosToStorage(){
   }
   try{ await window.SteepDB.putTeas(changedTeas); await window.SteepDB.putVessels(changedVessels); }catch(e){ saveErr(e); }
   render();
-  alert(`Moved ${ok} photo${ok===1?'':'s'} to storage.${fail?` ${fail} failed — try again when online.`:''}`);
+  showToast(`Moved ${ok} photo${ok===1?'':'s'} to storage.${fail?` ${fail} failed — try again when online.`:''}`);
 }
 function exportData(){
   const payload = {teas:state.teas, vessels:state.vessels, sessions:state.sessions, tagLibrary:state.tagLibrary, exportedAt:new Date().toISOString()};
@@ -50,17 +67,24 @@ function handleImportFile(e){
   reader.onload = (ev)=>{
     try{
       const data = JSON.parse(ev.target.result);
-      if(!data.teas || !data.vessels || !data.sessions){ alert("This file doesn't look like a Steep backup."); return; }
-      if(!confirm('Import will replace your current data ('+state.teas.length+' teas, '+state.sessions.length+' sessions) with the backup ('+data.teas.length+' teas, '+data.sessions.length+' sessions). Continue?')) return;
-      state.teas = data.teas||[]; state.vessels=data.vessels||[]; state.sessions=data.sessions||[]; state.tagLibrary=data.tagLibrary||[...DEFAULT_TAGS];
-      persistTeas(); persistVessels(); persistSessions(); persistTags();
+      if(!data.teas || !data.vessels || !data.sessions){ showToast("That file doesn't look like a Steep backup."); return; }
+      // Stash it and render the inline confirm row (with counts) — the replace happens on confirmImport().
+      state.pendingImport = data;
       render();
-      syncAchievements(false);
-      alert('Import complete.');
-    }catch(err){ alert('Could not read that file: '+err.message); }
+    }catch(err){ showToast('Could not read that file: '+err.message); }
   };
   reader.readAsText(f);
   e.target.value='';
+}
+function cancelImport(){ state.pendingImport = null; render(); }
+function confirmImport(){
+  const data = state.pendingImport; if(!data) return;
+  state.pendingImport = null;
+  state.teas = data.teas||[]; state.vessels=data.vessels||[]; state.sessions=data.sessions||[]; state.tagLibrary=data.tagLibrary||[...DEFAULT_TAGS];
+  persistTeas(); persistVessels(); persistSessions(); persistTags();
+  render();
+  syncAchievements(false);
+  showToast('Import complete.');
 }
 
 /* ================= SETTINGS ================= */
