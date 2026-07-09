@@ -23,6 +23,9 @@ authoritative and **keep them current** as you work:
   anything finished moves under "Shipped").
 - **CHANGELOG.md** — newest-first, one entry per version. Its top section holds the
   **module map**.
+- **DESIGN.md** — design guidelines (calm-first principles, voice, look & feel, tokens,
+  layout, hard constraints). Read before any UI/copy/visual work; the token source of truth
+  stays `styles.css` `:root` + `html[data-theme="dark"]`.
 
 When you ship a change, update CHANGELOG.md (new version entry) and reflect it in
 STATE.md / ROADMAP as appropriate. Don't let these drift.
