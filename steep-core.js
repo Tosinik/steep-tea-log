@@ -1,9 +1,9 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.72';
+const APP_VERSION = 'v3.73';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-const WHATS_NEW = 'Achievements are resting for now, pending a redesign that fits SlowCup.';
+const WHATS_NEW = 'Navigation moved to a bottom bar — Log sits in easy reach, mid-brew.';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -136,6 +136,8 @@ let state = {
   recapPeriod: 'week',
   passportSel: null, passportZoom: null, passportSub: null,
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null, err:null, feedLoadingMore:false },
+  hubOpen:false,      // WS6: avatar-opened hub sheet (friends/shopping/passport/achievements/settings)
+  navRestored:false,  // WS6: user swiped the bottom bar back up during steeping (else it recedes)
   loaded:false
 };
 
@@ -827,28 +829,18 @@ function render(){
   else if(state.view==='spend') body = viewSpend();
   else if(state.view==='session') body = viewSessionFlow();
 
-  const inSession = state.view==='session';
+  // WS6: the bottom bar recedes to a handle while a steep is running, unless the user swiped it back up.
+  const navRecessed = state.view==='session' && fd && fd.stage==='steeping' && !state.navRestored;
   app.innerHTML = `
     <div class="topbar"><div class="topbar-inner">
       <div class="topbar-brandrow">
         <div class="brand">${steepLogoSVG(30)}<h1>SlowCup</h1></div>
-        <div class="topbar-actions">
-          <button class="icon-btn ${state.view==='friends'?'active':''}" onclick="goFriends()" title="Friends" aria-label="Friends">${icon('i-friends-hl')}</button>
-          <button class="icon-btn ${state.view==='shopping'?'active':''}" onclick="goView('shopping')" title="Shopping list" aria-label="Shopping list">${icon('i-shopping-hl')}</button>
-          <button class="icon-btn ${state.view==='passport'?'active':''}" onclick="goView('passport')" title="Tea passport" aria-label="Tea passport">${icon('i-world-hl')}</button>
-          ${ACHIEVEMENTS_ENABLED && state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">${icon('i-achievements-hl')}</button>` : ''}
-          <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">${icon('i-settings-hl')}</button>
-        </div>
+        <button class="avatar-btn" onclick="toggleHub()" aria-label="Menu" title="Menu">${escapeHtml(hubIdentity().initial)}</button>
       </div>
-      <div class="tabs">
-        <button class="tab ${state.view==='dashboard'?'active':''}" onclick="goView('dashboard')">Home</button>
-        <button class="tab ${state.view==='teas'||state.view==='tea-detail'?'active':''}" onclick="goView('teas')">Teas</button>
-        <button class="tab ${state.view==='sessions'?'active':''}" onclick="goView('sessions')">Sessions</button>
-        <button class="tab ${state.view==='insights'||state.view==='wrapped'?'active':''}" onclick="goView('insights')">Insights</button>
-      </div>
-      ${inSession ? '' : `<button class="btn-log btn-log-wide" onclick="quickLogSession()">＋ Log session</button>`}
     </div></div>
     <div style="padding-top:18px;">${body}</div>
+    ${navRecessed ? navRecedeHTML() : bottomNavHTML()}
+    ${state.hubOpen ? hubSheetHTML() : ''}
     ${state.teaFormOpen ? teaFormModal() : ''}
     ${state.vesselFormOpen ? vesselFormModal() : ''}
     ${state.sessionEditOpen ? sessionEditModal() : ''}
@@ -857,6 +849,57 @@ function render(){
   bindDynamic();
   const themeBtn = document.getElementById('themeToggleBtn');
   if(themeBtn) themeBtn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙';
+}
+
+// WS6 — the app shell. The bottom bar carries the five primary destinations (Log is the raised
+// centre action, not a persistent tab); the header avatar opens the hub for the secondary features.
+// Active tab is derived from state.view — no parallel nav state.
+function bottomNavHTML(){
+  const v = state.view;
+  const item = (active, ic, label, go) => `<button class="bn-item ${active?'active':''}" onclick="${go}"><span>${icon(ic,24)}</span><span class="bn-lbl">${label}</span></button>`;
+  return `<nav class="bottomnav" aria-label="Primary"><div class="bottomnav-inner">
+    ${item(v==='dashboard','i-home-hl','Home',"goView('dashboard')")}
+    ${item(v==='teas'||v==='tea-detail','i-cup-hl','Teas',"goView('teas')")}
+    <button class="bn-log" onclick="quickLogSession()" aria-label="Log session" title="Log session"><span class="bn-log-circle">${icon('i-plus-hl',27)}</span><span class="bn-log-lbl">Log</span></button>
+    ${item(v==='sessions','i-calendar-hl','Sessions',"goView('sessions')")}
+    ${item(v==='insights'||v==='wrapped','i-chart-hl','Insights',"goView('insights')")}
+  </div></nav>`;
+}
+// Steeping recede: the bar collapses to a handle; tap it (or swipe up — wired in bindDynamic) to restore.
+function navRecedeHTML(){
+  return `<div class="nav-recede" id="navRecede" onclick="restoreNav()" role="button" aria-label="Show navigation"><div class="nav-recede-hint mono">swipe up for navigation</div><div class="nav-recede-handle"></div></div>`;
+}
+function restoreNav(){ state.navRestored = true; render(); }
+// Best-available identity for the avatar/hub — the social profile once loaded, else the auth email's
+// local part. Never blocks: degrades to a plain initial before Friends is ever opened.
+function hubIdentity(){
+  const p = state.social && state.social.profile;
+  let name = (p && (p.displayName || p.username)) || '';
+  if(!name){ const em = ((window.SteepDB.getUser && window.SteepDB.getUser()) || {}).email || ''; name = em ? em.split('@')[0] : 'You'; }
+  return { name, initial: (name.trim()[0] || '?').toUpperCase() };
+}
+function toggleHub(){ state.hubOpen = !state.hubOpen; render(); }
+function closeHub(){ state.hubOpen = false; render(); }
+// Hub row → its route, closing the sheet. Achievements gated on ACHIEVEMENTS_ENABLED (v3.72 hid it).
+function hubGo(dest){
+  state.hubOpen = false;
+  if(dest==='settings') return openSettings();   // each of these calls render() itself
+  if(dest==='friends') return goFriends();
+  goView(dest);
+}
+function hubSheetHTML(){
+  const id = hubIdentity();
+  const row = (dest, ic, label) => `<button class="hub-row" onclick="hubGo('${dest}')">${icon(ic,20)}<span>${label}</span></button>`;
+  return `<div class="hub-scrim" onclick="closeHub()"></div>
+    <div class="hub-sheet" role="dialog" aria-label="Menu">
+      <div class="hub-grab"></div>
+      <div class="hub-id"><div class="hub-id-avatar">${escapeHtml(id.initial)}</div><div><div class="hub-name">${escapeHtml(id.name)}</div><div class="hub-sub">your shelf &amp; circle</div></div></div>
+      ${row('friends','i-friends-hl','Friends')}
+      ${row('shopping','i-shopping-hl','Shopping list')}
+      ${row('passport','i-world-hl','Passport')}
+      ${ACHIEVEMENTS_ENABLED ? row('achievements','i-achievements-hl','Achievements') : ''}
+      ${row('settings','i-settings-hl','Settings')}
+    </div>`;
 }
 
 function goView(v){
@@ -914,6 +957,13 @@ function bindDynamic(){
   if(tagInput){
     tagInput.oninput = ()=> renderTagSuggest(tagInput.value, tagInput.dataset.target);
     tagInput.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addTagFromInput(tagInput.dataset.target); } };
+  }
+  // WS6 — receded steeping bar: a swipe up (or the tap handler on the element) restores the nav.
+  const recede = document.getElementById('navRecede');
+  if(recede){
+    let startY = null;
+    recede.addEventListener('touchstart', (e)=>{ startY = e.touches[0].clientY; }, {passive:true});
+    recede.addEventListener('touchend', (e)=>{ if(startY!=null && (startY - e.changedTouches[0].clientY) > 30) restoreNav(); startY = null; }, {passive:true});
   }
   // WS1 (v3.64) — SlowCup Wrapped carousel: sync the active dot to the scroll position.
   const wrapTrack = document.getElementById('wrapTrack');

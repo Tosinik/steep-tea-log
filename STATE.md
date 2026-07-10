@@ -60,20 +60,39 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v45**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v83**. Keep CHANGELOG.md updated.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NEXT — cleanup tail is EMPTY. The board is now three things (no coded deploy queued):** (1) the **design R2
-session** (Niklas) — feeds Pillar D + the settings overhaul + map/passport redesign + the achievements
-redesign this deploy just made room for; (2) the **domain** (register slowcup.app); (3) the **phase-2 gate**
-(~Jul 20) → phase-2 brew-advice build. Unsequenced inbox from beta: issues **#7–#12** (fold map/passport into
-the design overhaul · Gaiwan-based icon · richer brew-advice "how was it" · settings-screen overhaul · faves
-not visible on tea cards · matcha/matcha-latte session option) — triage these into the R2 work or a fresh tail
-when ready. No `/slowcup-deploy` is pre-approved right now; next deploy needs Niklas to pick from the above.
+**NOW IN FLIGHT — the Round-2 design pass** (`SlowCup R2 bundle handoff/` in the repo root; master plan +
+WS4 brief in `Downloads/files(4)/`). Six locked design workstreams shipping as versioned deploys, build order
+**WS6 → WS2 → WS5 → WS3 → WS1 → WS4**, **pause after each** for Niklas to verify against the remote. Four
+global reconciliations apply (achievements stay gated · greeting is a reskin not a rebuild · method control
+built 3-way-ready for phase-2's `japanese` · ratings already on detail so WS5 is removal). WS4 is the only
+data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existing bilingual `KB_FLAVOR_CHIPS`
+20-term set) — two things to flag at its pause: tag namespacing + arrival-only vs end-of-session mood.
+**WS6 shipped (v3.73, below). NEXT: WS2 — Home** (greeting-led; stat grid removed; editable dashLayout cards;
+reskin the existing `greetingCardHTML` engine — do not rebuild logic or drop greeting-v4 fixtures). Paste the
+WS2 bundle to build it.
 
-**NOW (just shipped) — v3.72 hide achievements app-wide (issue #6)** (cache **v82**, APP_VERSION v3.72): last
+**Parallel / Niklas's:** the **domain** (register slowcup.app); the **phase-2 gate** (~Jul 20) → phase-2
+brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
+naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
+
+**NOW (just shipped) — v3.73 WS6 navigation shell** (cache **v83**, APP_VERSION v3.73): first of the R2 design
+pass. Top tab strip + 5 header icons → **bottom tab bar** (Home · Teas · [Log raised] · Sessions · Insights)
++ header shrinks to **wordmark + avatar → hub sheet** (friends/shopping/passport/**achievements-gated**/
+settings — same routes, new entry point; Achievements gated on `ACHIEVEMENTS_ENABLED`=false, not reintroduced).
+All in `steep-core.js`'s `render()`: new `bottomNavHTML`/`navRecedeHTML`/`hubSheetHTML`/`hubIdentity`/`toggleHub`/
+`closeHub`/`hubGo`/`restoreNav`; `state.hubOpen`/`state.navRestored`. Active tab derived from `state.view` (no
+parallel nav state). **Steeping recede:** the bar collapses to a "swipe up for navigation" handle while a steep
+runs (`navRecessed = view==='session' && draft.stage==='steeping' && !navRestored`); tap/swipe-up (`restoreNav`)
+restores it; `navRestored` resets at `beginSteeping`. 5 new bottom-bar icon symbols in index.html's sprite;
+`--nav-active`/`--nav-inactive` tokens (both themes). Browser-verified both themes at 390px (active/Log colours,
+hub gating, recede+restore), console clean, `node --check` + all 4 committed fixtures green. **NEXT: WS2 Home.**
+
+**Earlier — v3.72 hide achievements app-wide (issue #6)** (cache **v82**, APP_VERSION v3.72): last
 item of the cleanup tail — Pillar F is **done**. The scrapped 8-bit achievements/confetti go dormant for
 everyone via one switch, `ACHIEVEMENTS_ENABLED = false` (steep-core.js), which gates the header 🏆 button, the
 `achievements` route, the whole "Calm & achievements" Settings section (both rows), and the unlock

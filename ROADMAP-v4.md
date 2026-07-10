@@ -141,8 +141,25 @@ Newer beta inbox #7–#12 is unsequenced — fold into design R2 / a fresh tail.
   auth — a token or `gh`; Niklas can do it in the web UI. Labels while there: #2/#4/#5 `idea`, #3
   `question`.)*
 
+## R2 implementation batch (in flight — build order, pause after each)
+Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + WS4 brief in
+`Downloads/files(4)/`). Order: **WS6 → WS2 → WS5 → WS3 → WS1 → WS4**.
+- [x] **WS6 — Navigation shell** (v3.73) — bottom tab bar + avatar hub + steeping recede. Achievements
+  row gated on `ACHIEVEMENTS_ENABLED`. Supersedes the old top nav.
+- [ ] **WS2 — Home** — greeting-led; stat grid removed; editable dashLayout cards; reskin the existing
+  `greetingCardHTML` engine (no logic rebuild, keep greeting-v4 fixtures). **← NEXT**
+- [ ] **WS5 — Library** — photo shelf + grid⇄rows density toggle; `statusLine(tea)` (needs a vm-fixture);
+  ratings move off the card to detail (removal).
+- [ ] **WS3 — Steeping** — ensō ring timer; steeps in the brew-guide pills; opt-in chime; Focus mode.
+- [ ] **WS1 — Forms** — core trio + one "more details" fold; method control built **3-way-ready** for
+  phase-2's `japanese`.
+- [ ] **WS4 — Flavour** (LARGE, only data-model change, build LAST) — inline capture → session story →
+  tea-page honesty ladder. Rides existing tags arrays + `KB_FLAVOR_CHIPS`. Flag at pause: tag namespacing
+  + arrival-only vs end mood.
+
 ## Suggested sequencing (parallel-friendly)
-Now: Design R2 session (Niklas) ∥ v3.67→v3.70 tail (Code) ∥ register domain (Niklas).
-Then: R2 implementation deploys ∥ phase-2 spec (~Jul 20) → phase-2 build.
+Now: **R2 implementation deploys (Code, in flight — WS6 ✓, WS2 next)** ∥ register domain (Niklas) ∥
+phase-2 spec (~Jul 20).
+Then: phase-2 build (wants WS1 method control + WS4 tags in place).
 Then: Pillar C onboarding (with R2 language) → Pillar B migration + beta package → **v4.0**.
 Pillar E ships opportunistically behind its data gates, before or after v4.0.

@@ -597,6 +597,7 @@ function beginSteeping(){
   d.timeShift = 0;
   d.scheduleHidden = false;
   d.stage='steeping';
+  state.navRestored = false; // WS6: the bottom bar recedes for each fresh steep until swiped back up
   applyScheduleToCurrentSteep(d);
   render();
 }

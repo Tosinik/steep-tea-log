@@ -18,6 +18,7 @@
   --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
   --font-display:'Shippori Mincho',serif;
   --enso:#E3A15C; /* WS3: steep-timer ring — amber-bright on the light-theme jade-deep box */
+  --nav-active:#3F5E42; --nav-inactive:#a29a86; /* WS6 bottom bar: active tab / avatar initial | muted inactive tab */
   /* WS1 Wrapped — seasonal-wash story-card fields (deeper than the app tokens on purpose) */
   --wc-jade:#2A4130; --wc-jade-fg:#F6F2E9; --wc-jade-soft:#CDE0C4;
   --wc-amber:#C17A3E; --wc-amber-fg:#2B1206; --wc-amber-soft:#5A3517;
@@ -42,6 +43,7 @@ html[data-theme="dark"]{
   --heat-empty:#332F24;
   --heat-fill:#E3A15C;
   --enso:#2A4130; /* WS3: dark-jade ring on the dark-theme light-green timer box */
+  --nav-active:#8FBE83; --nav-inactive:#8f866f; /* WS6 bottom bar (dark) */
   /* WS1 Wrapped — dark fields never go full-bright */
   --wc-jade:#1E2C1E; --wc-jade-fg:#EDE6D6; --wc-jade-soft:#9DB79A;
   --wc-amber:#3A2415; --wc-amber-fg:#EAD0AE; --wc-amber-soft:#B98B5E;
@@ -55,7 +57,7 @@ h1,h2,h3,.display{font-family:var(--font-display);font-weight:700;}
 .mono{font-family:var(--font-mono);}
 .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
 button{font-family:'Inter',sans-serif;cursor:pointer;}
-#app{max-width:920px;margin:0 auto;padding:0 16px 80px;}
+#app{max-width:920px;margin:0 auto;padding:0 16px 92px;} /* WS6: bottom pad clears the fixed bottom bar + raised Log */
 a{color:inherit;}
 
 /* header */
@@ -80,6 +82,39 @@ html[data-theme="dark"] .hl{stroke-width:1.9;}
 .tab.active{background:var(--white);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);}
 .btn-log{background:var(--jade);color:var(--white);border:none;padding:9px 16px;border-radius:8px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;}
 .btn-log:hover{background:var(--jade-deep);}
+
+/* WS6 nav shell — header shrinks to wordmark + avatar; primary nav moves to a bottom bar; the five
+   former header icons live in an avatar-opened hub sheet. */
+.avatar-btn{width:36px;height:36px;flex:0 0 auto;border-radius:50%;background:var(--jade-pale);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--nav-active);padding:0;}
+.avatar-btn:hover{border-color:var(--jade);}
+
+/* bottom tab bar — Home · Teas · [Log raised] · Sessions · Insights (identical on every content screen) */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--white);border-top:1px solid var(--line);}
+.bottomnav-inner{max-width:480px;margin:0 auto;padding:9px 16px calc(18px + env(safe-area-inset-bottom));display:flex;align-items:flex-end;justify-content:space-between;}
+.bn-item{background:none;border:none;padding:0;width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--nav-inactive);}
+.bn-item .bn-lbl{font-size:10px;font-weight:400;}
+.bn-item.active{color:var(--nav-active);}
+.bn-item.active .bn-lbl{font-weight:600;}
+.bn-log{background:none;border:none;padding:0;width:60px;display:flex;flex-direction:column;align-items:center;}
+.bn-log-circle{width:54px;height:54px;border-radius:50%;background:var(--jade);color:var(--porcelain);display:flex;align-items:center;justify-content:center;margin-top:-26px;box-shadow:0 6px 16px -4px rgba(63,94,66,.6);}
+html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6);}
+.bn-log-lbl{font-size:10px;font-weight:600;color:var(--nav-active);margin-top:3px;}
+
+/* steeping: the bar recedes to a handle so the ritual owns the screen; tap/swipe up restores it */
+.nav-recede{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:26px 0 calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:12px;background:linear-gradient(to top,var(--porcelain),transparent);}
+.nav-recede-hint{font-size:10.5px;letter-spacing:.05em;color:var(--ink-soft);}
+.nav-recede-handle{width:130px;height:4px;border-radius:2px;background:var(--line);}
+
+/* avatar → hub bottom sheet */
+.hub-scrim{position:fixed;inset:0;z-index:50;background:rgba(20,18,12,.32);}
+.hub-sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;max-width:480px;margin:0 auto;background:var(--white);border:1px solid var(--line);border-bottom:none;border-radius:22px 22px 0 0;padding:14px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -16px 36px -26px rgba(60,50,30,.5);}
+.hub-grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px;}
+.hub-id{display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+.hub-id-avatar{width:42px;height:42px;flex:0 0 auto;border-radius:50%;background:var(--jade-pale);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--nav-active);}
+.hub-name{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink);}
+.hub-sub{font-family:var(--font-mono);font-size:11px;color:var(--nav-inactive);}
+.hub-row{display:flex;align-items:center;gap:12px;width:100%;padding:11px 2px;border:none;border-top:1px solid var(--line);background:none;color:var(--ink);font-size:15px;text-align:left;}
+.hub-row .hl{color:var(--ink-soft);flex:0 0 auto;}
 
 /* generic */
 .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;}

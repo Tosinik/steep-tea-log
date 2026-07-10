@@ -9,3 +9,5 @@ fixtures/*
 # committed project skills under .claude/skills/ are tracked so they ship with the repo.
 .claude/*
 !.claude/skills/
+# Design-reference bundles (READMEs + .dc.html + PNGs) live local-only, never shipped.
+SlowCup R2 bundle handoff/
