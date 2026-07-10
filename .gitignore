@@ -4,4 +4,7 @@ fixtures/*
 !fixtures/brew-roundtrip-test.js
 !fixtures/wrapped-cards-test.js
 !fixtures/insights-room-test.js
-.claude/
+# Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
+# committed project skills under .claude/skills/ are tracked so they ship with the repo.
+.claude/*
+!.claude/skills/
