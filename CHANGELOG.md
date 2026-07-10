@@ -26,6 +26,39 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.65 — WS2 Insights overhaul (the reflective room)
+Deploy: `styles.css`, `steep-insights.js`, `steep-dashboard.js`, `steep-core.js` (APP_VERSION),
+`service-worker.js` (v75). No SQL. Last of four design workstreams (WS3 → WS1 → WS4 → **WS2**) — the
+design rework is complete.
+- **Insights is now a curated reflective room**, not a flat stack of same-weight cards. `viewInsights()`
+  leads with the hero and drops its old page title. The five old insights cards (recap, insights, types,
+  most-brewed/top-rated) are replaced by six ordered sections built in `dashCardsInsights` and rendered
+  through the existing dashLayout registry (so Home stays editable and cross-tab moves still work). Since
+  `renderDashboard` concatenates each card's own HTML, the run composes into one room:
+  - **Hero observation** (jade-pale card, the ONE thing) — mono eyebrow that widens honestly by window
+    ("This week, mostly" → "Lately, mostly" → "Mostly" as data thins), a Shippori observation
+    ("Green, and mornings."), a 12-bar time-of-day rhythm (the brewing clock, folded in), and one
+    supporting line ("9 of your 9 steeps came in the morning.").
+  - **Cadence reading** — a Shippori sentence over an 8-week sessions sparkline (jade, no axes).
+  - **Type mix** — one slim stacked bar in the fixed `.dot-*` type colors + a mono legend.
+  - **Steep shape** — an ascending amber polyline of average steep duration by index + a ledger caption
+    ("35s · 45s · 58s").
+  - **Two quiet notes** (not a leaderboard) — leaf = most reached-for, hanko = highest note.
+  - **Wrapped teaser** — a quiet deep-jade strip into the WS1 season sequence.
+  Sections are separated by **hairline top-borders**, not boxed cards. New `.ins-*` classes in styles.css.
+- **Register: observations, not KPIs** — every headline is a sentence; the old "This month vs last ↑ 14
+  vs 12" arrow row is gone. No up/down arrows, no vs-last-week %, no targets anywhere in the room.
+- **Retired:** the recap stats grid + week/month/all-time toggle (superseded by the hero + reading; the
+  Home totals card still carries the raw all-time numbers). `recapHTML`/`computeRecap`/`periodRange`/
+  `setRecapPeriod`/`insightsHTML`/`wrappedTeaser` removed. Saved dashLayouts self-heal — old insights
+  card ids drop out via the existing unknown-id filter, new ids append.
+- Validated `fixtures/insights-room-test.js` (committed, data-free, 33): the brand guardrail (no arrow/%/
+  vs in the hero + four viz observations), graceful degradation (each section drops to '' when its data
+  is missing), and structure (hero top-type + time-of-day, type widths sum ~100%, ascending steep caption,
+  leaf+hanko notes). Browser-verified BOTH themes (computed styles + screenshots): hero jade-pale/ink,
+  jade bars, hairline borders, fixed type colors, amber steep line, deep-jade teaser with light text in
+  dark; no console errors; no horizontal scroll.
+
 ## WS4 — slowcup.app landing page (static; NOT part of the PWA)
 Deploy: **new** `landing.html` + `landing-assets/{app-home,app-tea-detail,app-sessions}.png`. No SQL.
 **No `CACHE_NAME` / `APP_VERSION` bump and no `FILES_TO_CACHE` change on purpose** — this touches zero

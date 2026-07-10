@@ -501,14 +501,17 @@ function viewAchievements(){
    persisted in synced settings (settings.dashLayout). Edit mode adds move/hide
    controls; unknown/new cards fall back to the default order (forward-compatible).
    A generic "configurable synced surface" — reusable for other views later. */
-const DASH_DEFAULT_ORDER = ['greeting','recap','wrapped','restock','recent','totals','clock','insights','types','mostrated','favorites','cost'];
-const DASH_LABELS = { greeting:'Greeting', recap:'Recap', wrapped:'SlowCup Wrapped', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', insights:'Insights', types:'What you brewed', mostrated:'Most brewed & Top rated', favorites:'Favorites', cost:'Cost overview' };
-// Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab;
-// cards don't move between tabs. Migration is automatic — existing saved {order,hidden} keep their
-// visibility and gain a surface from this map (nothing a user hid can reappear).
+// WS2 (v3.65) reworked the Insights surface into the reflective room: the flat recap/insights/types/
+// mostrated cards were replaced by hero → reading → typemix → steepshape → notes → wrapped (built in
+// steep-insights.js). Old ids drop out of saved layouts automatically (dashLayout filters to this list).
+const DASH_DEFAULT_ORDER = ['greeting','restock','recent','totals','clock','favorites','cost','hero','reading','typemix','steepshape','notes','wrapped'];
+const DASH_LABELS = { greeting:'Greeting', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', favorites:'Favorites', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped' };
+// Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab.
+// Migration is automatic — existing saved {order,hidden} keep their visibility and gain a surface
+// from this map (nothing a user hid can reappear); ids no longer present are filtered out.
 const DASH_SURFACE = {
   greeting:'home', cost:'home', restock:'home', clock:'home', recent:'home', totals:'home', favorites:'home',
-  recap:'insights', wrapped:'insights', insights:'insights', mostrated:'insights', types:'insights'
+  hero:'insights', reading:'insights', typemix:'insights', steepshape:'insights', notes:'insights', wrapped:'insights'
 };
 // Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
 // dashLayout.surface maps id→'home'|'insights', overriding the built-in DASH_SURFACE. Absent

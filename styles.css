@@ -538,3 +538,45 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .wrap-dots{display:flex;gap:6px;justify-content:center;align-items:center;padding:15px 0 4px;}
 .wrap-dot{width:6px;height:6px;border-radius:3px;background:var(--line);border:none;padding:0;transition:width .2s,background .2s;}
 .wrap-dot.active{width:20px;background:var(--wc-enso);}
+
+/* ============================================================================
+   WS2 — Insights: the reflective room (v3.65). One hero observation, then quieter
+   readings separated by hairline top-borders (not boxed same-weight cards). A tiny
+   shared data-viz family: one stroke weight, one palette, no axes. Observations in
+   Shippori, numbers in the ledger mono. Rendered as insights-surface dashLayout cards.
+   ============================================================================ */
+.ins-hero{background:var(--jade-pale);border-radius:15px;padding:16px 15px;}
+.ins-hero-eyebrow{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--jade);opacity:.85;}
+.ins-hero-title{font-family:var(--font-display);font-weight:700;font-size:clamp(22px,6.2vw,25px);line-height:1.18;color:var(--ink);margin-top:6px;}
+.ins-hero-sub{font-size:12px;color:var(--ink-soft);margin-top:9px;line-height:1.45;}
+.ins-bars{display:flex;align-items:flex-end;gap:3px;height:38px;margin-top:14px;}
+.ins-bar{flex:1;background:var(--jade);border-radius:2px 2px 0 0;min-height:3px;}
+
+/* hairline-separated observation sections */
+.ins-sec{border-top:1px solid var(--line);padding-top:14px;margin-top:16px;}
+.ins-obs{font-family:var(--font-display);font-weight:600;font-size:15px;line-height:1.35;color:var(--ink);}
+.ins-cap{font-family:var(--font-mono);font-size:9.5px;color:var(--ink-soft);margin-top:2px;}
+.ins-spark{width:100%;height:32px;margin-top:8px;display:block;}
+.ins-shape{width:100%;height:38px;margin-top:8px;display:block;}
+
+/* type distribution — one slim stacked bar in the fixed type colors + mono legend */
+.ins-typebar{height:10px;border-radius:6px;overflow:hidden;display:flex;margin-top:10px;}
+.ins-typebar span{display:block;height:100%;}
+.ins-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-family:var(--font-mono);font-size:9px;color:var(--ink-soft);}
+.ins-legend span{display:inline-flex;align-items:center;}
+.ins-sw{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:4px;}
+
+/* two quiet notes — leaf (most reached-for) + hanko (highest note); not a leaderboard */
+.ins-notes{display:flex;flex-direction:column;gap:12px;}
+.ins-note{display:flex;align-items:center;gap:10px;}
+.ins-note-ic{width:20px;height:20px;flex:0 0 auto;}
+.ins-note-leaf{color:var(--jade);}
+.ins-note-k{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
+.ins-note-v{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px;}
+.ins-note-v .stars svg{width:13px;height:13px;}
+
+/* wrapped teaser — a quiet deep-jade strip (fixed both themes, like the WS1 fields) → WS1 */
+.ins-teaser{margin-top:16px;background:#2A4130;border-radius:13px;padding:14px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.ins-teaser-k{font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#CDE0C4;}
+.ins-teaser-title{font-family:var(--font-display);font-weight:700;font-size:16px;color:#F6F2E9;margin-top:2px;}
+.ins-teaser-arrow{color:#E3A15C;font-size:20px;line-height:1;}

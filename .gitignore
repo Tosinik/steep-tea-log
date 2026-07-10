@@ -3,4 +3,5 @@ fixtures/*
 # source, need no private CSV). The CSV exports + data-driven throwaway scripts stay ignored.
 !fixtures/brew-roundtrip-test.js
 !fixtures/wrapped-cards-test.js
+!fixtures/insights-room-test.js
 .claude/

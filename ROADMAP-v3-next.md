@@ -89,11 +89,15 @@ v3.40 tea lifecycle.
      garbage/neutral styles — exactly 2 fire on real data. Rider: "add a purchase date" link where
      `inventorySparkline` is absent only for want of a date. Night-copy: active-with-history line 3 →
      "tonight" not "this late-night". Validated `fixtures/freshness-test.js` (local, 11) + greeting (32).
-   - **Feed pagination** — `.range()` paging + quiet "load more" (no infinite scroll); page size =
-     current cap; verify the shared-session mapper appends page 2+ without duplicate keys. **Fold in**
-     `socialErr`'s `alert()` → a sticky inline notice on the social view (multi-sentence setup
-     diagnostics, so not a toast) — same file, per `TASK-cleanup-and-issues.md` housekeeping.
-     **(Deferred behind the design rework below — still the SlowCup batch's last item.)**
+   - **Feed pagination → v3.66 (NEXT — the design rework is done, this resumes the batch tail)** —
+     `.range()` paging + quiet "load more" (no infinite scroll); page size = current cap; verify the
+     shared-session mapper appends page 2+ without duplicate keys. **Fold in** `socialErr`'s `alert()` →
+     a sticky inline notice on the social view (multi-sentence setup diagnostics, so not a toast) — same
+     file, per `TASK-cleanup-and-issues.md` housekeeping.
+   - **Then `TASK-cleanup-and-issues.md`, RENUMBERED** — the design rework consumed v3.63–v3.65, which
+     that task had assigned to §1/§2/§3. Real order now: **v3.67** greeting card v3 / react-to-logged-
+     session (issue #2) · **v3.68** in-session "turn off" fix (issue #1) · **v3.69** "what's new" banner
+     line. (The TASK file itself has been renumbered to match.)
 
 4. **Design rework — 4 workstreams** (`design_handoff/` in Downloads, high-fidelity prototypes; order
    WS3 → WS1 → WS4 → WS2; own deploy each, **pause after each**). Shared language in `DESIGN.md`.
@@ -115,9 +119,30 @@ v3.40 tea lifecycle.
      mobile browser-verified. **TODO before slowcup.app goes live:** reshoot the placeholder screenshots
      (bundle ones predate WS3/WS1; the tea-detail one still shows the old "Steep" wordmark), and decide the
      root/index split for the domain (part of the deferred domain migration).
-   - **WS2 — Insights overhaul** — remake `viewInsights()` as the reflective room: one hero observation
-     (jade-pale), a reusable tiny data-viz family (sparkline/type-bar/time-of-day/steep-shape), hairline
-     top-borders not boxed cards, observations-not-KPIs copy, quiet Wrapped teaser. Inherits WS3+WS1.
+   - ~~**WS2 — Insights overhaul**~~ ✓ **shipped v3.65** — the design rework is **complete**.
+     `viewInsights()` is now a curated reflective room: a jade-pale **hero observation** (window-aware
+     eyebrow, Shippori sentence, 12-bar time-of-day rhythm, one supporting line), then hairline-separated
+     readings in a shared tiny data-viz family — cadence **sparkline**, **type bar** + legend, ascending
+     amber **steep-shape** line, two quiet **notes** (leaf + hanko), and a deep-jade **Wrapped teaser**.
+     Observations-not-KPIs enforced (the old "vs last ↑" arrow row is gone). Built as insights-surface
+     dashLayout cards (Home stays editable; saved layouts self-heal). Retired the recap grid + all-time
+     toggle. Validated `fixtures/insights-room-test.js` (committed, 33 — incl. the no-arrow/%/vs guardrail);
+     both themes browser-verified.
+
+## slowcup.app launch checklist (consolidated — do before pointing the domain at the page)
+Gathered here (2026-07-10) from scattered HTML comments / CHANGELOG notes / Frozen flags so launch day is
+a checklist read, not an archaeology dig. None are blocking the beta *app*; all block the public *landing*.
+- [ ] **Register `slowcup.app`.** Time-sensitive — the name is public in a public repo since the v3.59
+  rename; register before someone squats it. (Was under Frozen § install-guide.)
+- [ ] **Reshoot the 3 landing screenshots** (`landing-assets/{app-home,app-tea-detail,app-sessions}.png`).
+  The current ones are handoff placeholders that predate WS3/WS1, and `app-tea-detail.png` still shows the
+  old **"Steep"** wordmark (pre-v3.59). Capture Home / tea detail / Sessions on the current build. (Flagged
+  in an HTML comment in `landing.html`.)
+- [ ] **Decide the root / `index.html` split.** The app and the landing page can't both be `index.html` on
+  one Pages site. Likely: `slowcup.app` → landing, app moves to a subpath/subdomain. `landing.html` is
+  staged at repo root meanwhile (`.../steep-tea-log/landing.html`, not linked from the app).
+- [ ] **Install guide → beta package** (was Frozen "SKIPPED until the domain settles" — installed PWAs
+  bind to their origin, so this unblocks once the domain is decided).
 
 ## Shipped
 Core: data layer + per-row writes, quick log, modularization, library search/filter/sort,

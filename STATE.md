@@ -65,7 +65,25 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — WS4 slowcup.app landing page** (NO cache/APP_VERSION bump — stays cache **v74**,
+**NOW (just shipped) — v3.65 WS2 Insights overhaul** (cache **v75**, APP_VERSION v3.65): the LAST of the
+4-workstream design rework — **the rework is complete**. `viewInsights()` is now a curated reflective room
+built from insights-surface dashLayout cards (Home stays editable): a jade-pale **hero observation**
+(window-aware eyebrow "This week, mostly"→"Lately"→"Mostly"; Shippori sentence "Green, and mornings.";
+12-bar time-of-day rhythm folding in the brewing clock; one supporting line), then hairline-separated
+readings in a shared tiny data-viz family — cadence **sparkline** (8 weeks, jade), **type bar** (fixed
+`.dot-*` colors) + mono legend, ascending amber **steep-shape** line + ledger caption, two quiet **notes**
+(leaf = most reached-for, hanko = highest note), and a deep-jade **Wrapped teaser** into WS1. **Register:
+observations, not KPIs** — the old "vs last ↑" arrow row is gone; no arrows/%/targets anywhere (guarded by
+`fixtures/insights-room-test.js`, 33). Retired the recap grid + all-time toggle (`recapHTML`/`computeRecap`/
+`insightsHTML`/`wrappedTeaser` removed; Home totals still carry raw numbers). New `.ins-*` classes. Both
+themes browser-verified (computed styles + screenshots). **NEXT — v3.66 feed pagination** (+ fold `socialErr`
+`alert()` → sticky inline notice), resuming the SlowCup batch tail; then the renumbered cleanup order
+(v3.67 greeting-v3/issue #2 · v3.68 in-session turn-off/issue #1 · v3.69 what's-new banner). A **slowcup.app
+launch checklist** now lives in ROADMAP (register domain · reshoot the 3 landing screenshots · root/index
+split · install guide). Niklas: after v3.65, a slow scroll through the whole app on your phone (both themes)
+is worth it — the Insights tab's Wrapped teaser is now one tap from the swipeable season.
+
+**Earlier — WS4 slowcup.app landing page** (NO cache/APP_VERSION bump — was cache **v74**,
 APP_VERSION v3.64): third of the 4-workstream design rework. New self-contained **`landing.html`** at repo
 root + **`landing-assets/*.png`** — a static marketing page: inline CSS + inline SVG sprite, Google Fonts,
 **no JS/cookies/analytics**, theme via `@media (prefers-color-scheme: dark)` over the `:root` token set.
@@ -119,11 +137,10 @@ young", whites/pu-erh "deepens with age" — requiring a valid year (season opti
 garbage/neutral styles (`freshnessCueHTML` in steep-teas.js; exactly 2 fire on real data). Rider:
 "add a purchase date" link where `inventorySparkline` is absent only for want of a date. Night-copy
 patch: active-with-history line 3 now reads "tonight" not "this late-night" (steep-dashboard.js).
-Validated `fixtures/freshness-test.js` (local, 11) + `greeting-test.js` (now 32). **SlowCup batch —
-last item:** v3.63 feed pagination (`.range()` + quiet "load more"; fold in `socialErr` alert → sticky
-inline notice on the social view, same file, per TASK-cleanup §housekeeping). Then the batch is done
-and `TASK-cleanup-and-issues.md` picks up: v3.64 greeting-after-session (issue #2), v3.65 in-session
-turn-off fix (issue #1), v3.66 "what's new" banner line.
+Validated `fixtures/freshness-test.js` (local, 11) + `greeting-test.js` (now 32). **[Superseded — these
+version numbers were reassigned when the design rework (v3.63 WS3 · v3.64 WS1 · v3.65 WS2) pulled ahead;
+see "Continue here" + ROADMAP for the real order: v3.66 feed pagination · v3.67 greeting-v3 · v3.68
+in-session turn-off · v3.69 what's-new banner.]**
 
 **Earlier — v3.61 greeting copy variety + APP_VERSION** (cache **v71**): each greeting
 branch draws from a small approved pool via `d_copyPick(pool,todayKey)` = `d_hash(todayKey+'|copy')

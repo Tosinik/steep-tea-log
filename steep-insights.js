@@ -6,77 +6,9 @@
    the shared dashLayout registry with surface='insights' (see steep-dashboard.js).
    ============================================================================ */
 
-/* ---------- recap ---------- */
-function periodRange(period){
-  const now = new Date();
-  const end = new Date(now); end.setHours(23,59,59,999);
-  let start;
-  if(period==='all'){
-    start = new Date(0);                        // everything up to now
-  } else if(period==='month'){
-    start = new Date(now.getFullYear(), now.getMonth(), 1);
-  } else {
-    start = new Date(now); start.setHours(0,0,0,0);
-    const monFirst = (start.getDay()+6)%7; // Mon=0 … Sun=6
-    start.setDate(start.getDate()-monFirst);
-  }
-  return { start, end };
-}
-function computeRecap(period){
-  const { start, end } = periodRange(period);
-  const inRange = state.sessions.filter(s=>{ const d=new Date(s.date); return d>=start && d<=end; });
-  const infusions = inRange.reduce((a,s)=>a+steepCountOf(s),0);
-  const grams = inRange.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0);
-  const liters = inRange.reduce((a,s)=>{ const v=vesselById(s.vesselId); const cap=v?Number(v.capacityMl)||0:0; return a+(cap*steepCountOf(s))/1000; },0);
-  const counts={}; inRange.forEach(s=>{ if(s.teaId) counts[s.teaId]=(counts[s.teaId]||0)+1; });
-  let mostBrewed=null, mostN=0;
-  Object.entries(counts).forEach(([id,n])=>{ if(n>mostN){ mostN=n; mostBrewed=teaById(id); } });
-  const topSession = inRange.filter(s=>Number(s.rating)>0).sort((a,b)=>b.rating-a.rating)[0]||null;
-  const typeCounts={}; inRange.forEach(s=>{ const t=s.teaType||(teaById(s.teaId)||{}).type; if(t) typeCounts[t]=(typeCounts[t]||0)+1; });
-  const days = new Set(inRange.map(s=>dayKey(s.date)));
-  const newTeas = state.teas.filter(t=>{ const d=new Date(t.dateAdded||0); return d>=start && d<=end; }).length;
-  return { start, end, sessions:inRange.length, infusions, grams, liters, uniqueTeas:new Set(inRange.map(s=>s.teaId).filter(Boolean)).size, mostBrewed, mostN, topSession, typeCounts, daysActive:days.size, newTeas };
-}
-function recapHTML(){
-  const period = state.recapPeriod || 'week';
-  const r = computeRecap(period);
-  const label = period==='all'
-    ? 'All time'
-    : period==='month'
-    ? r.start.toLocaleDateString(undefined,{month:'long',year:'numeric'})
-    : `${r.start.toLocaleDateString(undefined,{month:'short',day:'numeric'})} – today`;
-  const toggle = `<div class="recap-toggle">
-    <button class="${period==='week'?'active':''}" onclick="setRecapPeriod('week')">This week</button>
-    <button class="${period==='month'?'active':''}" onclick="setRecapPeriod('month')">This month</button>
-    <button class="${period==='all'?'active':''}" onclick="setRecapPeriod('all')">All time</button>
-  </div>`;
-  if(r.sessions===0){
-    const none = period==='week' ? 'this week' : period==='month' ? 'this month' : 'yet';
-    return `<div class="section card recap-card">
-      <div class="section-title"><h2>Recap</h2>${toggle}</div>
-      <div class="recap-range">${label}</div>
-      <div class="empty" style="padding:10px 0 2px;">No sessions logged ${none} — the pot's waiting.</div>
-    </div>`;
-  }
-  const typeChips = TYPES.filter(t=>r.typeCounts[t.k]).map(t=>`<span class="pill t-${t.k}">${typeLabel(t.k)} ${r.typeCounts[t.k]}</span>`).join(' ');
-  return `<div class="section card recap-card">
-    <div class="section-title"><h2>Recap</h2>${toggle}</div>
-    <div class="recap-range">${label}</div>
-    <div class="grid grid-3" style="margin-top:10px;">
-      <div class="stat"><div class="num">${r.sessions}</div><div class="lbl">Sessions</div></div>
-      <div class="stat"><div class="num">${r.infusions}</div><div class="lbl">Infusions</div></div>
-      <div class="stat"><div class="num">${r.daysActive}</div><div class="lbl">Days</div></div>
-      <div class="stat"><div class="num">${r.uniqueTeas}</div><div class="lbl">Teas</div></div>
-      <div class="stat"><div class="num">${r.liters.toFixed(1)}</div><div class="lbl">Liters</div></div>
-      <div class="stat"><div class="num">${r.grams.toFixed(0)}</div><div class="lbl">Grams</div></div>
-    </div>
-    ${r.mostBrewed?`<div class="recap-line"><span class="recap-k">Most brewed</span><span class="recap-v">${escapeHtml(r.mostBrewed.name)} · ${r.mostN}×</span></div>`:''}
-    ${r.topSession?`<div class="recap-line"><span class="recap-k">Top rated</span><span class="recap-v">${escapeHtml(r.topSession.teaName||(teaById(r.topSession.teaId)||{}).name||'—')} ${renderStarsStatic(r.topSession.rating,false)}</span></div>`:''}
-    ${r.newTeas?`<div class="recap-line"><span class="recap-k">New teas added</span><span class="recap-v">${r.newTeas}</span></div>`:''}
-    ${typeChips?`<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">${typeChips}</div>`:''}
-  </div>`;
-}
-function setRecapPeriod(p){ state.recapPeriod=p; render(); }
+/* recap (period stats grid + week/month/all-time toggle) was retired in WS2 (v3.65) — the Insights
+   reflective room replaces it with the hero observation + the "vs last month" reading. Home's totals
+   card still carries the raw all-time numbers. */
 
 /* ---------- insights reading ---------- */
 // Sort sessions into four time-of-day buckets by local hour. Shared by Insights and Wrapped.
@@ -141,53 +73,134 @@ function computeInsights(){
     weekendShare, favDow, favN, topPart:topPart[0], topPartShare, month,
     enough: sessions.length>=8, total:sessions.length };
 }
-function insightsHTML(){
-  const n = computeInsights();
-  if(!n) return '';
-  const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const partLabel = {morning:'mornings', afternoon:'afternoons', evening:'evenings', night:'late nights'};
+/* ---------- WS2 (v3.65): the reflective room ----------
+   Insights is now a curated, hierarchical surface — one observation to land on, then quieter
+   readings in a shared tiny data-viz family (sparkline / type-bar / time-of-day / steep-shape).
+   Register: observations AS SENTENCES, never KPIs — no up/down arrows, no vs-last-week %, no
+   targets. Each builder degrades to '' when its data is missing (renderDashboard skips empties).
+   These render as insights-surface dashLayout cards whose HTML carries its own styling, so the
+   concatenation reads as one room: jade-pale hero, hairline-topped sections, deep-jade teaser. */
 
-  let lead;
-  if(n.last28n===0){
-    lead = `It's been a quiet month — nothing logged in the last 28 days. The pot's here whenever you are.`;
-  } else {
-    let cadence;
-    if(n.perWeek >= 6.5){
-      const perDay = n.perWeek/7;
-      cadence = perDay >= 1.5 ? `about <b>${Math.round(perDay)}×</b> a day` : `about <b>once</b> a day`;
-    } else if(n.perWeek >= 1){
-      cadence = `about <b>${Math.round(n.perWeek)}×</b> a week`;
-    } else {
-      cadence = `about <b>${n.perWeek.toFixed(1)}×</b> a week`;
-    }
-    const trendPhrase = n.trend==='up' ? ', a little more than the month before'
-      : n.trend==='down' ? ', a touch less than the month before — no pressure'
-      : n.trend==='steady' ? ', holding steady with the month before' : '';
-    lead = `You've been steeping ${cadence} lately${trendPhrase} — tea on ${n.activeDays28} of the last 28 days.`;
+// Hero window: the last 7 days if it holds enough signal, else widen (28d, then all-time) with an
+// honest eyebrow, so a sparse logger still gets a truthful observation. null = nothing to observe.
+function insHeroData(){
+  const sessions = state.sessions; if(!sessions.length) return null;
+  const now = Date.now(), DAY = 86400000;
+  const windows = [[7,'This week, mostly'],[28,'Lately, mostly'],[Infinity,'Mostly']];
+  let eyebrow = 'Mostly', inWin = [];
+  for(const [days,lbl] of windows){
+    inWin = days===Infinity ? sessions.slice() : sessions.filter(s=> (now-new Date(s.date))<=days*DAY);
+    if(inWin.length>=3 || days===Infinity){ eyebrow = lbl; break; }
   }
+  if(!inWin.length) return null;
+  const tc = {}; inWin.forEach(s=>{ const t=teaById(s.teaId); if(t&&t.type) tc[t.type]=(tc[t.type]||0)+1; });
+  let topType=null, tn=0; Object.entries(tc).forEach(([k,c])=>{ if(c>tn){ tn=c; topType=k; } });
+  const parts = timeOfDayBuckets(inWin);
+  const topPart = Object.entries(parts).sort((a,b)=>b[1]-a[1])[0][0];
+  const hours = new Array(12).fill(0); inWin.forEach(s=>{ hours[Math.floor(new Date(s.date).getHours()/2)]++; });
+  const ranges = {morning:[5,12], afternoon:[12,17], evening:[17,22]};
+  const inPart = s=>{ const h=new Date(s.date).getHours();
+    if(topPart==='night') return h>=22||h<5;
+    const [a,b]=ranges[topPart]; return h>=a && h<b; };
+  const partSteeps = inWin.filter(inPart).reduce((a,s)=>a+steepCountOf(s),0);
+  const totalSteeps = inWin.reduce((a,s)=>a+steepCountOf(s),0);
+  return { eyebrow, topType, topPart, hours, partSteeps, totalSteeps };
+}
+function insHeroHTML(){
+  const h = insHeroData(); if(!h || !h.topType) return '';
+  const max = Math.max(1, ...h.hours);
+  const bars = h.hours.map(v=>`<div class="ins-bar" style="height:${v>0?Math.max(8,Math.round(v/max*100)):8}%;opacity:${v>0?(0.3+0.7*v/max).toFixed(2):0.18}"></div>`).join('');
+  const partWhen = {morning:'in the morning', afternoon:'in the afternoon', evening:'in the evening', night:'late'};
+  const sub = h.totalSteeps ? `${h.partSteeps} of your ${h.totalSteeps} steep${h.totalSteeps!==1?'s':''} came ${partWhen[h.topPart]}.` : '';
+  return `<div class="ins-hero">
+    <div class="ins-hero-eyebrow">${h.eyebrow}</div>
+    <div class="ins-hero-title">${typeLabel(h.topType)}, and ${partWord(h.topPart)}.</div>
+    <div class="ins-bars">${bars}</div>
+    ${sub?`<div class="ins-hero-sub">${sub}</div>`:''}
+  </div>`;
+}
 
+// Sessions per week for the last N weeks (oldest → newest), for the sparkline.
+function insWeeklySeries(weeks){
+  const now = new Date(), DAY = 86400000, counts = new Array(weeks).fill(0);
+  state.sessions.forEach(s=>{ const age=(now-new Date(s.date))/DAY; if(age<0) return; const w=Math.floor(age/7); if(w<weeks) counts[weeks-1-w]++; });
+  return counts;
+}
+function insReadingHTML(){
+  const n = computeInsights(); if(!n) return '';
+  const series = insWeeklySeries(8);
+  if(series.filter(v=>v>0).length < 2) return '';           // too few weeks to draw a line
+  const obs = n.trend==='down' ? 'A touch less than last month — and unhurried about it.'
+    : n.trend==='up' ? 'A little more than last month — the pot’s seeing you often.'
+    : n.trend==='steady' ? 'About the same as last month — a steady rhythm.'
+    : 'Your cups, week by week.';
+  const max = Math.max(1, ...series), step = 200/(series.length-1);
+  const pts = series.map((v,i)=>`${Math.round(i*step)},${(30-v/max*26).toFixed(1)}`).join(' ');
+  return `<div class="ins-sec">
+    <div class="ins-obs">${obs}</div>
+    <svg class="ins-spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--jade)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="ins-cap">sessions · last 8 weeks</div>
+  </div>`;
+}
+
+// Type mix as one slim stacked bar in the fixed type colors (.dot-*) + a mono legend.
+function insTypeMixHTML(s){
+  const entries = TYPES.map(t=>[t.k,(s.typeCounts[t.k]||{}).count||0]).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+  if(entries.length < 2) return '';                          // needs an actual mix
+  const total = entries.reduce((a,[,c])=>a+c,0);
+  const [k1,c1] = entries[0], [k2,c2] = entries[1];
+  const obs = (c1-c2) <= Math.max(1, Math.round(c1*0.15))
+    ? `${typeLabel(k1)} leads; ${typeLabel(k2).toLowerCase()}’s catching up.`
+    : `${typeLabel(k1)} leads the cup.`;
+  const segs = entries.map(([k,c])=>`<span class="dot-${k}" style="width:${(c/total*100).toFixed(1)}%"></span>`).join('');
+  const legend = entries.map(([k])=>`<span><span class="ins-sw dot-${k}"></span>${typeLabel(k).toLowerCase()}</span>`).join('');
+  return `<div class="ins-sec">
+    <div class="ins-obs">${obs}</div>
+    <div class="ins-typebar">${segs}</div>
+    <div class="ins-legend">${legend}</div>
+  </div>`;
+}
+
+// Steep-shape — average steep duration by steep index across timed sessions; an ascending amber line.
+function insSteepShape(){
+  const byIdx = [];
+  state.sessions.forEach(s=>{ if(s.isColdBrew) return; (s.steeps||[]).forEach((x,i)=>{ const sec=Number(x.timeSeconds)||0; if(sec<=0) return; (byIdx[i]=byIdx[i]||{sum:0,n:0}); byIdx[i].sum+=sec; byIdx[i].n++; }); });
+  const series = [];
+  for(let i=0;i<byIdx.length && i<8;i++){ if(byIdx[i] && byIdx[i].n>=2) series.push(byIdx[i].sum/byIdx[i].n); else break; }
+  return series;
+}
+function insSteepShapeHTML(){
+  const series = insSteepShape(); if(series.length < 3) return '';
+  const min = Math.min(...series), rng = Math.max(1, Math.max(...series)-min), step = 190/(series.length-1);
+  const y = v => (34-(v-min)/rng*29).toFixed(1);
+  const pts = series.map((v,i)=>`${Math.round(6+i*step)},${y(v)}`).join(' ');
+  const dots = series.map((v,i)=> i%2===0 ? `<circle cx="${Math.round(6+i*step)}" cy="${y(v)}" r="2.4"/>` : '').join('');
+  const obs = series[series.length-1] > series[0] ? 'Your steeps stretch as the session settles.' : 'Your steeps keep an even measure.';
+  const caption = series.slice(0,5).map(v=>fmtSecShort(Math.round(v))).join(' · ') + (series.length>5?' …':'');
+  return `<div class="ins-sec">
+    <div class="ins-obs">${obs}</div>
+    <svg class="ins-shape" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><g fill="var(--amber)">${dots}</g></svg>
+    <div class="ins-cap">${caption}</div>
+  </div>`;
+}
+
+// Two quiet notes (leaf = most reached-for, hanko = highest note) — not a leaderboard.
+function insNotesHTML(s){
   const rows = [];
-  if(n.enough){
-    const wePct = Math.round(n.weekendShare*100);
-    if(n.weekendShare>=0.4) rows.push(['Weekends', `your ritual — ${wePct}% of sessions`]);
-    else if(n.weekendShare<=0.18) rows.push(['Rhythm', `a weekday habit — ${wePct}% land on weekends`]);
-    else rows.push(['Weekends', `${wePct}% of your sessions`]);
+  if(s.mostBrewed.length){ const m=s.mostBrewed[0];
+    rows.push(`<div class="ins-note"><svg class="ins-note-ic ins-note-leaf" viewBox="0 0 24 24" aria-hidden="true"><use href="#fav-leaf"/></svg><div><div class="ins-note-k">Most reached-for</div><div class="ins-note-v">${escapeHtml(m.tea.name)} · ×${m.count}</div></div></div>`); }
+  if(s.topRated.length){ const t=s.topRated[0];
+    rows.push(`<div class="ins-note"><svg class="ins-note-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#hanko"/></svg><div><div class="ins-note-k">Highest note</div><div class="ins-note-v">${escapeHtml(t.name)} ${renderStarsStatic(t.rating,false)}</div></div></div>`); }
+  if(!rows.length) return '';
+  return `<div class="ins-sec ins-notes">${rows.join('')}</div>`;
+}
 
-    if(n.topPartShare>=0.35) rows.push(['Time of day', `mostly ${partLabel[n.topPart]} — ${Math.round(n.topPartShare*100)}%`]);
-
-    if(n.favN>=3 && n.favDow>=0) rows.push(['Steepiest day', `${DOW[n.favDow]} · ${n.favN} sessions`]);
-  }
-  if(n.month.hasCompare){
-    const arrow = n.month.thisN>n.month.lastN ? '↑' : n.month.thisN<n.month.lastN ? '↓' : '→';
-    const g = (n.month.thisG>0||n.month.lastG>0) ? ` · ${n.month.thisG.toFixed(0)}g vs ${n.month.lastG.toFixed(0)}g` : '';
-    rows.push(['This month vs last', `<span style="color:var(--ink-soft);">${arrow}</span> ${n.month.thisN} vs ${n.month.lastN} sessions${g}`]);
-  }
-
-  const rowsHTML = rows.map(([k,v])=>`<div class="recap-line"><span class="recap-k">${k}</span><span class="recap-v">${v}</span></div>`).join('');
-  return `<div class="section card">
-    <div class="section-title"><h2>Insights</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">your patterns</span></div>
-    <div style="font-size:14px;line-height:1.55;color:var(--ink);margin-top:2px;">${lead}</div>
-    ${rowsHTML}
+// Wrapped teaser — a single quiet deep-jade strip into the WS1 season sequence.
+function insWrappedTeaserHTML(){
+  const w = computeWrapped(); if(w.empty) return '';
+  return `<div class="ins-teaser" onclick="goView('wrapped')">
+    <div><div class="ins-teaser-k">Seasonal</div><div class="ins-teaser-title">Your ${w.season.name}, wrapped</div></div>
+    <span class="ins-teaser-arrow">→</span>
   </div>`;
 }
 
@@ -248,14 +261,6 @@ function computeWrapped(){
 
   return { season, empty:false, n:inSeason.length, infusions, grams, steepSeconds, activeDays,
     coldN, topTea, topTeaN, distinctTeas, topType, topTypeN, topPart, parts, newTeas, standout };
-}
-function wrappedTeaser(){
-  const w = computeWrapped();
-  if(w.empty) return '';
-  return `<div class="section card" style="cursor:pointer;" onclick="goView('wrapped')">
-    <div class="section-title"><h2>Your ${w.season.name} in tea</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">wrapped →</span></div>
-    <div style="font-size:14px;color:var(--ink-soft);margin-top:2px;">${w.n} session${w.n>1?'s':''} this ${w.season.name.toLowerCase()} so far — tap for your recap.</div>
-  </div>`;
 }
 function wrappedShareText(w){
   const lines = [`SlowCup Wrapped · ${w.season.name} ${w.season.year}`];
@@ -442,54 +447,27 @@ function viewWrapped(){
   </div>`;
 }
 
-/* ---------- the Insights tab view ---------- */
+/* ---------- the Insights tab view (WS2, v3.65 — the reflective room) ---------- */
 // Insights-surface cards, keyed by id. Built by the shared dashCards() (steep-dashboard.js) so a
-// card moved to Home still has its HTML there; takes the shared computeStats result.
+// card moved to Home still has its HTML there; takes the shared computeStats result. renderDashboard
+// concatenates these in order, so each carries its own styling and the run reads as one room:
+// hero (jade-pale, the ONE thing) → hairline-topped observations → deep-jade Wrapped teaser.
 function dashCardsInsights(s){
-  const maxTypeCount = Math.max(1, ...Object.values(s.typeCounts).map(t=>t.count));
-  const typeBars = TYPES.map(t=>{
-    const info = s.typeCounts[t.k];
-    if(!info || info.count===0) return '';
-    const pct = Math.round(info.count/maxTypeCount*100);
-    const topTeas = Object.entries(info.teas).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([n,c])=>`${escapeHtml(n)} (${c}x)`).join(', ');
-    return `<div class="typebar-row">
-      <div class="typebar-head"><strong>${t.label}</strong><span class="mono" style="font-size:12px;color:var(--ink-soft)">${info.count}x</span></div>
-      <div class="typebar-track"><div class="typebar-fill dot-${t.k}" style="width:${pct}%;background:var(--jade)"></div></div>
-      ${topTeas?`<div class="typebar-sub">top: ${topTeas}</div>`:''}
-    </div>`;
-  }).join('');
-  const mostBrewedHTML = s.mostBrewed.length ? s.mostBrewed.map((x,i)=>`
-    <div class="rank-row"><span class="rank-num">${i+1}.</span><span class="rname">${escapeHtml(x.tea.name)}</span>${dotsRow(x.count,x.count)}<span class="rval">${x.count}x</span></div>
-  `).join('') : '<div class="empty">Log a session to see your most brewed teas.</div>';
-  const topRatedHTML = s.topRated.length ? s.topRated.map((t,i)=>`
-    <div class="rank-row"><span class="rank-num">${i+1}.</span><span class="rname">${escapeHtml(t.name)}</span><span class="rval">${fmtStars(t.rating)}/5</span></div>
-  `).join('') : '<div class="empty">Rate a tea to see it here.</div>';
-
   return {
-    recap: recapHTML(),
-    wrapped: wrappedTeaser(),
-    insights: insightsHTML(),
-    types: `<div class="section card">
-      <div class="section-title"><h2>What you brewed</h2></div>
-      ${typeBars || '<div class="empty">No sessions yet.</div>'}
-    </div>`,
-    mostrated: `<div class="section grid grid-2">
-      <div class="card">
-        <div class="section-title"><h2>Most brewed</h2></div>
-        ${mostBrewedHTML}
-      </div>
-      <div class="card">
-        <div class="section-title"><h2>Top rated</h2></div>
-        ${topRatedHTML}
-      </div>
-    </div>`
+    hero: insHeroHTML(),
+    reading: insReadingHTML(),
+    typemix: insTypeMixHTML(s),
+    steepshape: insSteepShapeHTML(),
+    notes: insNotesHTML(s),
+    wrapped: insWrappedTeaserHTML()
   };
 }
 
 function viewInsights(){
   if(state.sessions.length===0){
     return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Insights</h2></div>
-      <div class="card empty">No sessions yet — your insights, recaps and Wrapped fill in as you log.</div>`;
+      <div class="card empty">No sessions yet — your insights and Wrapped fill in as you log.</div>`;
   }
-  return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Insights</h2></div>${renderDashboard(dashCards(),'insights')}`;
+  // No page title — the hero observation leads (matches Home, whose greeting leads). WS2.
+  return renderDashboard(dashCards(),'insights');
 }
