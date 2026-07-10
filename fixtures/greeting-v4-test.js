@@ -42,7 +42,8 @@ const call=(expr)=>vm.runInContext(expr, ctx);
 let passed=0; const fail=(m)=>{ console.error('FAIL: '+m); process.exit(1); };
 const ok=(c,m)=>{ if(!c) fail(m); passed++; };
 const hasTap=(html)=>/openTeaDetail\(/.test(html);   // a suggested tea is always a tap-target
-const sub=(html)=>{ const m=html.match(/margin-top:6px;">([\s\S]*?)<\/div>/); return m?m[1]:''; };
+// WS2 (v3.74) reskinned the greeting card: the body moved from an inline-styled div to .greeting-body.
+const sub=(html)=>{ const m=html.match(/class="greeting-body">([\s\S]*?)<\/div>/); return m?m[1]:''; };
 
 // ===== A. Zero-session EVENING line (issue #4) — guilt-free, evening-only, no counts =====
 (function(){
@@ -181,7 +182,7 @@ const sub=(html)=>{ const m=html.match(/margin-top:6px;">([\s\S]*?)<\/div>/); re
   for(const [d,h] of [[10,8],[10,14],[10,20],[10,2]]){
     setNow(localMs(2026,7,d,h));
     let html; try { html=greet(); } catch(e){ fail('D real-data render threw at hour '+h+': '+e.message); }
-    ok(/<div class="card"/.test(html) && /<h2/.test(html), 'D render is a well-formed card at hour '+h);
+    ok(/<div class="greeting-card"/.test(html) && /<h2/.test(html), 'D render is a well-formed card at hour '+h);
     ok(html===greet(), 'D render is deterministic at hour '+h);
     if(hasTap(html)) ok(/openTeaDetail\('[^']+'\)/.test(html), 'D any suggested tea has a real tap-target at hour '+h);
     n++;

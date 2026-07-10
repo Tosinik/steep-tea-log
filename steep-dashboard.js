@@ -504,13 +504,17 @@ function viewAchievements(){
 // WS2 (v3.65) reworked the Insights surface into the reflective room: the flat recap/insights/types/
 // mostrated cards were replaced by hero → reading → typemix → steepshape → notes → wrapped (built in
 // steep-insights.js). Old ids drop out of saved layouts automatically (dashLayout filters to this list).
-const DASH_DEFAULT_ORDER = ['greeting','restock','recent','totals','clock','favorites','cost','hero','reading','typemix','steepshape','notes','wrapped'];
-const DASH_LABELS = { greeting:'Greeting', restock:'Running low', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', favorites:'Favorites', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped' };
+// WS2 (v3.74): Home reduced to glance cards only — greeting · running low · favourites · one number
+// ('week'). The stat grid + brewing clock + cost + recent moved to Insights (reflection lives there
+// now). Nothing deleted — the relocated cards stay editable/hideable, so no data or view is stranded.
+const DASH_DEFAULT_ORDER = ['greeting','restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost'];
+const DASH_LABELS = { greeting:'Greeting', restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab.
 // Migration is automatic — existing saved {order,hidden} keep their visibility and gain a surface
 // from this map (nothing a user hid can reappear); ids no longer present are filtered out.
 const DASH_SURFACE = {
-  greeting:'home', cost:'home', restock:'home', clock:'home', recent:'home', totals:'home', favorites:'home',
+  greeting:'home', restock:'home', favorites:'home', week:'home',
+  recent:'insights', totals:'insights', clock:'insights', cost:'insights',
   hero:'insights', reading:'insights', typemix:'insights', steepshape:'insights', notes:'insights', wrapped:'insights'
 };
 // Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
@@ -675,9 +679,15 @@ function greetingCardHTML(){
   const bucket = d_hourBucket(now.getHours());
   const greet = GREETING_LINE[bucket];
   const sessions = state.sessions || [];
-  const card = sub => `<div class="card" style="background:var(--jade-pale);border:1px solid var(--line);">
-      <h2 style="font-family:var(--font-display);font-size:22px;font-weight:500;margin:0;">${greet}</h2>
-      ${sub ? `<div style="font-size:13.5px;color:var(--ink-soft);margin-top:6px;">${sub}</div>` : ''}
+  // WS2 (v3.74): greeting is the hero — mono eyebrow (weekday + time-of-day) over a full-voice Shippori
+  // headline, then the engine's line as the body. Reskin only; the copy in `greet`/`sub` is unchanged.
+  // Force English for this UI chrome (bucket words are English too) — a locale-mixed "Freitag evening"
+  // reads broken. User INPUT (notes/tags) stays whatever the user types; this is chrome only.
+  const eyebrow = `${now.toLocaleDateString('en-US',{weekday:'long'})} ${bucket}`;
+  const card = sub => `<div class="greeting-card">
+      <div class="greeting-eyebrow">${escapeHtml(eyebrow)}</div>
+      <h2 class="greeting-head">${greet}.</h2>
+      ${sub ? `<div class="greeting-body">${sub}</div>` : ''}
     </div>`;
   const todayKey = dayKey(now);
   if(!sessions.length) return card(d_copyPick([
@@ -882,8 +892,6 @@ function greetingCardHTML(){
 }
 
 function dashCardsHome(s){
-  const favHTML = s.favorites.length ? `<div class="grid grid-3">${s.favorites.slice(0,6).map(t=>teaCardHTML(t)).join('')}</div>` : '<div class="empty">No favorites marked yet.</div>';
-
   const lowStockHTML = s.lowStock.length ? s.lowStock.map(t=>`
     <div class="rank-row"><span class="rname">${escapeHtml(t.name)}</span><span class="rval" style="color:var(--red)">${Number(t.amountGrams).toFixed(1)}g left</span></div>
   `).join('') : '<div class="empty">All stocked up.</div>';
@@ -909,11 +917,11 @@ function dashCardsHome(s){
     <div class="section card">
       <div class="section-title"><h2>Running low</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">favourites & rebuys</span></div>
       ${restock.map(t=>{
-        const g=Number(t.amountGrams); const low=g<lowStockG();
+        const g=Number(t.amountGrams);
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
         return `<div class="rank-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="cursor:pointer;">
-          <span class="rname" style="display:flex;align-items:center;gap:6px;">${t.isFavorite?favLeaf(14):''}${escapeHtml(t.name)}</span>
-          <span class="rval" style="color:${low?'var(--red)':'var(--amber)'};font-weight:600;">${g.toFixed(1)}g${est}</span>
+          <span class="rname" style="display:flex;align-items:center;gap:9px;">${favLeaf(15)}${escapeHtml(t.name)}</span>
+          <span class="rval mono" style="color:var(--clay);font-size:13px;">${g.toFixed(1)}g${est}</span>
         </div>`;
       }).join('')}
     </div>` : '';
@@ -931,10 +939,18 @@ function dashCardsHome(s){
       <div class="stat"><div class="num">${s.uniqueTeas}</div><div class="lbl">Teas brewed</div></div>
     </div>`,
     clock: brewingClockHTML(s),
-    favorites: `<div class="section">
-      <div class="section-title"><h2>Favorites</h2></div>
-      ${favHTML}
+    favorites: `<div class="section card">
+      <div class="eyebrow" style="margin-bottom:12px;">Favourites</div>
+      ${s.favorites.length
+        ? s.favorites.slice(0,6).map(t=>`<div class="fav-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')">${favLeaf(15)}<span>${escapeHtml(t.name)}</span></div>`).join('')
+        : '<div class="empty">No favourites marked yet.</div>'}
     </div>`,
+    // WS2 (v3.74) — the one number that earns Home: sessions since the start of this week (Mon-anchored).
+    week: (function(){
+      const ws = new Date(); ws.setHours(0,0,0,0); ws.setDate(ws.getDate() - ((ws.getDay()+6)%7));
+      const n = state.sessions.filter(se=> new Date(se.date) >= ws).length;
+      return `<div class="section card week-card"><div class="week-num">${n}</div><div class="week-cap">sessions<br>this week</div></div>`;
+    })(),
     cost: `<div class="section card">
       <div class="section-title"><h2>Cost overview</h2></div>
       <div class="grid grid-3">

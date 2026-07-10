@@ -60,7 +60,7 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v83**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v84**. Keep CHANGELOG.md updated.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
@@ -72,15 +72,30 @@ global reconciliations apply (achievements stay gated · greeting is a reskin no
 built 3-way-ready for phase-2's `japanese` · ratings already on detail so WS5 is removal). WS4 is the only
 data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existing bilingual `KB_FLAVOR_CHIPS`
 20-term set) — two things to flag at its pause: tag namespacing + arrival-only vs end-of-session mood.
-**WS6 shipped (v3.73, below). NEXT: WS2 — Home** (greeting-led; stat grid removed; editable dashLayout cards;
-reskin the existing `greetingCardHTML` engine — do not rebuild logic or drop greeting-v4 fixtures). Paste the
-WS2 bundle to build it.
+**WS6 + WS2 shipped (v3.73/v3.74, below). NEXT: WS5 — Library ("My teas")** (photo shelf + grid⇄rows density
+toggle that persists; the core is `statusLine(tea)` → `{text,tone}` branching logic — build it with a
+`/vm-fixture` suite over the real 14 teas; ratings move OFF the card to detail — removal, not new work; kanji/
+striped photo fallbacks per the README). Paste the WS5 bundle to build it.
 
 **Parallel / Niklas's:** the **domain** (register slowcup.app); the **phase-2 gate** (~Jul 20) → phase-2
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.73 WS6 navigation shell** (cache **v83**, APP_VERSION v3.73): first of the R2 design
+**NOW (just shipped) — v3.74 WS2 Home: greeting-led, glance-only** (cache **v84**, APP_VERSION v3.74): second of
+the R2 design pass. Home is **glanceable ritual state, not a dashboard** — default cards reduced to **greeting ·
+running low · favourites · one number**. The greeting is a **reskin, not a rebuild** (reconciliation #2): the
+`greetingCardHTML` engine is untouched (buckets/ack/variety/rediscovery + all greeting-v4 coverage stay); only
+the `card()` wrapper changed — mono eyebrow (`weekday + bucket`, weekday forced to English e.g. "Friday
+evening" — chrome only, user input untouched) over a Shippori 700 32px headline, engine line as body (`.greeting-*` classes + `--greeting-eye`/
+`--greeting-body` tokens). **Stat grid gone from Home:** `DASH_SURFACE` relocates `totals`/`clock`/`cost`/`recent`
+to **Insights** (moved, not deleted — still editable/hideable, nothing stranded). New `week` card = sessions since
+Monday (the one number). Favourites → quiet leaf+name list; running-low amounts → clay (red/amber urgency
+dropped). Fixtures needed a 2-line update (the body extractor + well-formed-card assertion re-pointed at the new
+markup — copy assertions unchanged). Verified both themes at 390px via computed styles + DOM (tokens exact;
+relocation confirmed); console clean; `node --check` + all 4 fixtures green. Screenshots time out on the auth
+gate (known) — verified by computed-style/DOM. **NEXT: WS5 Library.**
+
+**Earlier — v3.73 WS6 navigation shell** (cache **v83**, APP_VERSION v3.73): first of the R2 design
 pass. Top tab strip + 5 header icons → **bottom tab bar** (Home · Teas · [Log raised] · Sessions · Insights)
 + header shrinks to **wordmark + avatar → hub sheet** (friends/shopping/passport/**achievements-gated**/
 settings — same routes, new entry point; Achievements gated on `ACHIEVEMENTS_ENABLED`=false, not reintroduced).
