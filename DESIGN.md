@@ -2,7 +2,8 @@
 
 For any design tool or session working on SlowCup (and for `/design-sync`). The token source
 of truth is `styles.css` `:root` + `html[data-theme="dark"]`; this file carries what a token
-scan can't: the principles, the voice, and the constraints. App state as of v3.62.
+scan can't: the principles, the voice, and the constraints. App state as of v3.65 (design round 1
+complete: v3.63 WS3 language · v3.64 WS1 Wrapped · WS4 landing · v3.65 WS2 Insights).
 
 ## What SlowCup is
 A personal tea-logging PWA — a quiet companion for a daily brewing ritual (sessions, steeps,
@@ -48,12 +49,21 @@ only glow is a faint amber one in dark mode).
   brand logo is still a 16×16 pixel-art teapot (`steepLogoSVG`) — that pixel heritage stays
   in the logo only, never in type.
 
-**Icons & accents (v3.63, WS3):** header/action icons are a **hairline stroke set** (24×24, `fill:none;
-stroke:currentColor`, 1.7 light / 1.9 dark) from the `<svg><defs>` sprite in `index.html`, emitted via
-`icon(id,px,cls)` in steep-core. **Accent vocabulary, one home each:** tea leaf (`fav-leaf`, jade) = the
-favourite mark; hanko seal (`hanko`, `var(--red)`) = the single Wrapped/highest-rated standout; ensō
-ring (`enso`, `--enso`) = the steep-timer/focus ring (fills as the steep completes); seigaiha
-(`seigaiha`) = empty states + the Wrapped closing card. None appear as button trim or general decoration.
+**Icons & accents (v3.63 WS3; placements extended by WS1/WS2/WS4):** header/action icons are a **hairline
+stroke set** (24×24, `fill:none; stroke:currentColor`, 1.7 light / 1.9 dark) from the `<svg><defs>` sprite
+in `index.html`, emitted via `icon(id,px,cls)` in steep-core. **Emoji are banned in UI** — WS3 replaced the
+header set. *Known leftover exception:* the 🧘 on the steeping screen's Focus-mode button
+(`steep-sessions.js`, `toggleFocusMode`) — slated for a hairline replacement, not yet swept; don't add new
+emoji anywhere. **Accent vocabulary — one home each, placement rules as shipped** (never button trim, card
+borders, spinners, or general decoration):
+- **tea leaf** (`fav-leaf`, jade) — the favourite mark (tea cards/rows, running-low, favourites filter,
+  shopping) and the Insights "most reached-for" note.
+- **hanko seal** (`hanko`, `var(--red)`) — the single standout / highest mark only: the Wrapped "to keep"
+  card and the Insights "highest note".
+- **ensō ring** (`enso`, `--enso`) — the steep-timer / focus ring (fills as the steep completes) and, faint
+  and oversized, a **hero backdrop** on the Wrapped cover card and the landing hero.
+- **seigaiha** (`seigaiha`) — reserved for **empty states, the Wrapped closing card, and the landing CTA
+  wash** only; kept faint (≤7% light / ≤14% dark).
 
 **Core tokens (light | dark):** porcelain `#F6F2E9|#15140F` · ink `#2B2320|#EDE6D6` ·
 ink-soft `#5C5148|#A79C87` · jade `#3F5E42|#6F9A66` · jade-pale `#E4EAE0|#233024` ·
@@ -79,8 +89,8 @@ is the same column, centered, max-width — no multi-column layouts exist. Touch
   directly; framework-flavored exports don't.
 - Single-page, full-render-on-state-change architecture; styles live in one `styles.css`
   with CSS custom properties. New components must be expressible there.
-- System webfonts limited to the three families above (weights already loaded: Fraunces
-  400–600, Inter 400–700, Plex Mono 400–700).
+- System webfonts limited to the three families above (weights loaded in `index.html`: Shippori
+  Mincho 500/600/700/800, Inter 400–700, IBM Plex Mono 400–700). Fraunces is retired (v3.63).
 - PWA served from GitHub Pages; no server-side anything. Images are user photos (Supabase
   storage) — design must tolerate their absence.
 - Auth-gated app: design references come from screenshots + this repo, not a live URL.
@@ -88,10 +98,15 @@ is the same column, centered, max-width — no multi-column layouts exist. Touch
 ## Current surfaces (screens to know)
 Home (greeting card, running low, recent, totals, clock — user-reorderable) · Teas (library
 grouped by type, tea detail with brew card + freshness cue + stock forecast, vessels) ·
-Sessions (setup → steeping with timer + chips → summary; history w/ heatmap) · Insights
-(recap, "SlowCup Wrapped", type breakdown) · Settings (appearance, brew guidance, data:
-export/import/error log/data health/feedback) · light social feed · shopping list ·
-passport (parked).
+Sessions (setup → steeping with timer + chips → summary; history w/ heatmap) · **Insights — the
+reflective room** (WS2: one jade-pale hero observation, then hairline-separated readings in a tiny
+shared data-viz family — sparkline / type-bar / time-of-day / steep-shape — plus two quiet leaf+hanko
+notes and a deep-jade Wrapped teaser; **observation register, not KPIs** — no arrows/%/targets, guarded
+by `fixtures/insights-room-test.js`) · **SlowCup Wrapped** (WS1: a horizontal scroll-snap sequence of
+full-width seasonal story cards, reached from the Insights teaser) · Settings (appearance, brew guidance,
+data: export/import/error log/data health/feedback) · light social feed · shopping list · passport
+(parked). **Off-app:** `landing.html` — the static `slowcup.app` marketing page (WS4; own tokens, not part
+of the PWA).
 
 ## What a design session may NOT change casually
 The calm-first rules above; the three-font system; the pixel teapot logo; the porcelain/jade

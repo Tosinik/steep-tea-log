@@ -26,6 +26,18 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## docs — DESIGN.md refreshed to post-round-1 reality
+Deploy: `DESIGN.md` only. No app change, no SQL, no cache/APP_VERSION bump. Prep for design round 2.
+- Version stamp → v3.65; noted design round 1 complete (WS3 language · WS1 Wrapped · WS4 landing · WS2 Insights).
+- Retired the last **Fraunces** reference (the loaded-weights line → Shippori Mincho 500/600/700/800).
+- **Emoji-ban** made explicit, with the one known leftover recorded: the 🧘 on the steeping Focus-mode
+  button (`steep-sessions.js`) — slated for a hairline replacement, not yet swept.
+- **Accent placement rules as shipped** — leaf (favourite + "most reached-for" note), hanko (Wrapped "to
+  keep" + Insights "highest note"), ensō (timer/focus ring + faint hero backdrop on Wrapped cover & landing
+  hero), seigaiha (reserved: empty states, Wrapped closing card, landing CTA wash).
+- **Current surfaces** updated: Insights is the reflective room (observation register, guarded by the
+  fixture); Wrapped is the swipeable seasonal sequence; added `landing.html` as an off-app surface.
+
 ## v3.65 — WS2 Insights overhaul (the reflective room)
 Deploy: `styles.css`, `steep-insights.js`, `steep-dashboard.js`, `steep-core.js` (APP_VERSION),
 `service-worker.js` (v75). No SQL. Last of four design workstreams (WS3 → WS1 → WS4 → **WS2**) — the
