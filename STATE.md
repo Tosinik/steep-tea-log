@@ -65,15 +65,27 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NEXT — v3.71 achievements hide (issue #6; drive via `/slowcup-deploy`).** Last item in the cleanup tail.
-Issue #6 asks to remove/hide the achievements + confetti surfaces (read the issue body via `gh issue view 6`
-at build time and reconcile). Calm-first, so likely a clean hide-behind-toggle or removal — batch any
-consequential product call for Niklas at the pause. After v3.71 the cleanup tail is **empty** — board reduces
-to the design R2 session, the domain (slowcup.app), and the phase-2 gate (~10 days out). Also in the inbox:
-issues #7–#11 (Gaiwan icon · brew-advice "how was it" richer · settings overhaul · map/passport into design ·
-favorite-leaf visibility) — not yet sequenced.
+**NEXT — v3.72 achievements hide (issue #6; drive via `/slowcup-deploy`).** Last item in the cleanup tail
+(renumbered from v3.71 — that number went to the greeting follow-up). Issue #6 asks to remove/hide the
+achievements + confetti surfaces; the pre-baked spec: flip `showAchievements` default to false and gate the
+header button + both Settings rows ('Quiet mode', 'Show achievements') behind a single `ACHIEVEMENTS_ENABLED
+= false` constant so the feature goes dormant regardless of stored settings (code stays for a future
+redesign). Read #6's body via `gh issue view 6` and reconcile first; batch any consequential product call for
+Niklas at the pause. After v3.72 the cleanup tail is **empty** — board reduces to the design R2 session, the
+domain (slowcup.app), and the phase-2 gate (~10 days out). Also in the inbox: issues #7–#12 (Gaiwan icon ·
+brew-advice richer · settings overhaul · map/passport into design · favorite-leaf visibility · matcha session
+option) — not yet sequenced.
 
-**NOW (just shipped) — v3.70 greeting v4, habit-aware (issues #4 + #5)** (cache **v80**, APP_VERSION v3.70):
+**NOW (just shipped) — v3.71 greeting v4 follow-up** (cache **v81**, APP_VERSION v3.71): copy polish + test
+hardening on the v3.70 greeting. (1) Reworded the more-than-usual line `"leaves are spoiled today"` →
+`"well looked-after today"` ("spoiled" reads as *gone off*). (2) The pre-v4 greeting invariants lived only in
+a local, never-committed `greeting-test.js`, which v3.70 correctly made stale (expanded pools + rediscovery
+break its exact-pool sweeps — intended). Absorbed the durable v3.67/v3.55 cases into the **committed** suite:
+predicted-vs-actual ack, same-day variety guard (+ fallback), window-aware redirect (determinism + <5-session
+gate). `greeting-v4-test.js` now 47 checks (36 on a bare checkout). Issues #4 + #5 **closed** against v3.70.
+The stale local `greeting-test.js` is now superseded — safe to delete (left in place; not mine to remove).
+
+**Earlier — v3.70 greeting v4, habit-aware (issues #4 + #5)** (cache **v80**, APP_VERSION v3.70):
 the biggest deploy in the tail. Three ingredients in `greetingCardHTML` (steep-dashboard.js): (1) **zero-session
 evening** — history exists, nothing today, brewing windows passed unused → a **guilt-free, playful** line
 (tea/kettle/shelf as the character, never the user's absence; evening-only, gone by morning, never counts).

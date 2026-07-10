@@ -124,8 +124,14 @@ each issue's body via the REST API at build time and reconcile before building.
   3. **Rediscovery** (issue #5) — deterministic ~1-in-4 days (`d_hash(todayKey+'|shelf') % REDISCOVERY_ODDS`),
      the day's pick becomes the most-neglected in-stock tea (never brewed / quiet ≥ `REDISCOVERY_WEEKS`=3),
      own "remember this?" register; honours variety guard + exclusions. Normal pools expanded 2–3 lines each.
-  Committed suite `fixtures/greeting-v4-test.js` (35 checks) guards it. Close issues #4 + #5.
-- **Issue #3** (workflow question — "do issues resolve themselves?") — **close now, no build**: post a
+  Committed suite `fixtures/greeting-v4-test.js` guards it. Issues #4 + #5 **closed** (against v3.70).
+- **v3.71 — greeting v4 follow-up. ✅ SHIPPED** (cache v81). Reworded one more-than-usual line ("spoiled" →
+  "well looked-after") and absorbed the pre-v4 greeting invariants (predicted-vs-actual, variety guard,
+  window-aware redirect) from the local `greeting-test.js` into the committed suite — now 47 checks.
+- **v3.72 — hide achievements app-wide (issue #6), NEXT** *(renumbered from v3.71).* Flip `showAchievements`
+  default false; gate the header button + both Settings rows behind one `ACHIEVEMENTS_ENABLED = false` so the
+  feature goes dormant regardless of stored settings (code stays for a future redesign). Read #6 + reconcile.
+- **Issue #3** (workflow question — "do issues resolve themselves?") — **closed**: post a
   comment stating issues close manually, with a CHANGELOG-linking comment, when the fix ships (and note
   #2/#4 are sequenced as v3.67/v3.70). Documents the convention for future reporters. *(Closing needs
   auth — a token or `gh`; Niklas can do it in the web UI. Labels while there: #2/#4/#5 `idea`, #3

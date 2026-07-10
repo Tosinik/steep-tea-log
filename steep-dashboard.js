@@ -757,7 +757,7 @@ function greetingCardHTML(){
         `${ord} pour today — a proper tea day.`,
         `The kettle&rsquo;s earning its keep today.`,
         `A generous tea day; the shelf approves.`,
-        `${ord} steep in — the leaves are spoiled today.`,
+        `${ord} steep in — the leaves are well looked-after today.`,
         `Big tea day — the kettle&rsquo;s humming.`,
         `More tea than usual today. Lovely.`,
         `A day of many pours; the kettle&rsquo;s glad of it.`,

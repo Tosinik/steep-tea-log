@@ -26,6 +26,12 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.71 — greeting v4 follow-up: copy polish + committed v3.67 coverage
+Deploy: `steep-dashboard.js` (one greeting line reworded), `steep-core.js` (APP_VERSION), `service-worker.js` (v81), `fixtures/greeting-v4-test.js` (absorbed the durable v3.67 cases). No SQL. `WHATS_NEW` unchanged — the greeting feature is still the freshest user-facing line; this polish is invisible.
+- **Copy:** the more-than-usual pool's `"…the leaves are spoiled today."` → `"…well looked-after today."` — "spoiled" reads as *gone off* in a tea context even though *pampered* was intended (flagged at the v3.70 pause).
+- **Test coverage:** the pre-v4 greeting invariants lived only in a **local, never-committed** `greeting-test.js`, which v3.70 correctly turned stale (expanded pools + the rediscovery branch break its exact-pool "every line" sweeps — those are intended changes, not regressions). Absorbed the still-valid v3.67/v3.55 cases into the committed suite: **predicted-vs-actual ack** (took-predicted vs warm-surprise register), **same-day variety guard** (+ all-same-type rest fallback), and **window-aware redirect** (tomorrow-morning + determinism + the <5-session signal gate). `greeting-v4-test.js` now 47 checks with the real-CSV export present, 36 on a bare checkout (the grounding block skips without the private CSVs).
+- Issues #4 + #5 closed against v3.70 with changelog-linking comments.
+
 ## v3.70 — greeting v4, habit-aware (issues #4 + #5)
 Deploy: `steep-dashboard.js` (greeting engine), `steep-core.js` (APP_VERSION + WHATS_NEW), `service-worker.js` (v80), `fixtures/greeting-v4-test.js` (**new committed suite**), `.gitignore` (track it). No SQL.
 Fourth of the cleanup tail (ROADMAP-v4 Pillar F). Closes issues #4 + #5. Copy pools are Niklas-strikable at the pause.
