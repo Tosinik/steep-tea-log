@@ -19,8 +19,10 @@ authoritative and **keep them current** as you work:
 
 - **STATE.md** — current handoff: what's shipped, the deploy ritual, conventions, open
   bugs, and "continue here" notes. The single best starting point.
-- **ROADMAP-v3-next.md** — the tiered roadmap (single source of truth for open work;
-  anything finished moves under "Shipped").
+- **ROADMAP-v4.md** — the active forward roadmap ("ready for strangers", signed off 2026-07-10):
+  single source of truth for open work, incl. the v3.67→v3.70 cleanup tail (Pillar F).
+- **ROADMAP-v3-next.md** — v3-series roadmap, now superseded by v4 for forward work; retained for
+  the Shipped log, frozen/parked specs, and the slowcup.app launch checklist.
 - **CHANGELOG.md** — newest-first, one entry per version. Its top section holds the
   **module map**.
 - **DESIGN.md** — design guidelines (calm-first principles, voice, look & feel, tokens,

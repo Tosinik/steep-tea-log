@@ -26,6 +26,20 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## docs — reconcile v4 roadmap into the repo
+Deploy: **new** `ROADMAP-v4.md`, `ROADMAP-v3-next.md` (superseded banner), `CLAUDE.md` (doc pointers).
+No app change, no SQL, no cache/APP_VERSION bump.
+- **`ROADMAP-v4.md`** is now the active forward roadmap ("ready for strangers", signed off 2026-07-10) —
+  reconciled from the claude.ai strawman + `TASK-issues-triage-addendum.md`. Pillars A–F: brew-advice
+  phase 2 (+ the new `japanese`/senchadō method), launch infra, first-run experience, design round 2 (+
+  flavor experience), the smarter-over-time backlog, and the **cleanup tail with all 5 issues triaged**.
+  Pillar F carries the sequenced tail: v3.66 ✓ · **v3.67** greeting v3 session-aware (issue #2, extended:
+  predicted-vs-actual + same-day type-variety guard) · **v3.68** in-session turn-off (issue #1) · **v3.69**
+  what's-new banner · **v3.70** greeting v4 habit-aware (issues #4+#5; zero-session line decided guilt-free/
+  playful). Issue #3 = workflow question, close-now-no-build (needs auth — Niklas via web UI or a token).
+- `ROADMAP-v3-next.md` keeps the Shipped log, frozen/parked specs, and the launch checklist; CLAUDE.md's
+  doc list now points at v4 first.
+
 ## v3.66 — feed pagination + social error becomes an inline notice
 Deploy: `steep-data.js`, `steep-social.js`, `steep-core.js` (socialErr + APP_VERSION + state), `styles.css`,
 `service-worker.js` (v76). No SQL. Resumes the SlowCup batch tail after the design rework.

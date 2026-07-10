@@ -1,4 +1,9 @@
-# SlowCup — roadmap (single source of truth)
+# SlowCup — roadmap (v3 series)
+
+> **➡ Forward work now lives in `ROADMAP-v4.md`** (signed off 2026-07-10 — "ready for strangers").
+> This file is retained for the **Shipped** log, the **frozen/parked** specs (passport, stock-model,
+> brew-advice phase-2 gate), the **slowcup.app launch checklist**, and the v3-series cleanup tail
+> (v3.66 done; v3.67→v3.70 are also tracked in ROADMAP-v4 Pillar F). Read v4 first for what's next.
 
 (App renamed Steep → SlowCup, user-facing brand only, v3.59. Internal names/repo/URL keep "steep".)
 
