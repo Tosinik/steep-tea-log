@@ -1,9 +1,9 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.71';
+const APP_VERSION = 'v3.72';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-const WHATS_NEW = 'The greeting now nods to big tea days, quiet ones, and teas you&rsquo;ve not reached for lately.';
+const WHATS_NEW = 'Achievements are resting for now, pending a redesign that fits SlowCup.';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -111,7 +111,12 @@ function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g
 const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
 const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:true, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true, ratioAdjust:false };
+// v3.72 (issue #6) — achievements/confetti are dormant app-wide: the 8-bit system was scrapped and a
+// redesign is TBD, so we're not using it. This single switch gates every surface (header button, the
+// Settings rows, unlock confetti) regardless of any stored showAchievements/quietMode, so the feature
+// goes quiet for everyone. All the code stays intact for a future redesign — flip to true to revive.
+const ACHIEVEMENTS_ENABLED = false;
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:false, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true, ratioAdjust:false };
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
 let state = {
@@ -815,7 +820,7 @@ function render(){
   else if(state.view==='vessels'){ state.teaSeg='vessels'; state.view='teas'; body = viewTeas(); } // stray/persisted 'vessels' → Teas tab, vessels segment
   else if(state.view==='sessions') body = viewSessions();
   else if(state.view==='friends') body = viewFriends();
-  else if(state.view==='achievements') body = viewAchievements();
+  else if(state.view==='achievements' && ACHIEVEMENTS_ENABLED) body = viewAchievements();
   else if(state.view==='passport') body = viewPassport();
   else if(state.view==='wrapped') body = viewWrapped();
   else if(state.view==='shopping') body = viewShopping();
@@ -831,7 +836,7 @@ function render(){
           <button class="icon-btn ${state.view==='friends'?'active':''}" onclick="goFriends()" title="Friends" aria-label="Friends">${icon('i-friends-hl')}</button>
           <button class="icon-btn ${state.view==='shopping'?'active':''}" onclick="goView('shopping')" title="Shopping list" aria-label="Shopping list">${icon('i-shopping-hl')}</button>
           <button class="icon-btn ${state.view==='passport'?'active':''}" onclick="goView('passport')" title="Tea passport" aria-label="Tea passport">${icon('i-world-hl')}</button>
-          ${state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">${icon('i-achievements-hl')}</button>` : ''}
+          ${ACHIEVEMENTS_ENABLED && state.settings.showAchievements ? `<button class="icon-btn ${state.view==='achievements'?'active':''}" onclick="goView('achievements')" title="Achievements" aria-label="Achievements">${icon('i-achievements-hl')}</button>` : ''}
           <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">${icon('i-settings-hl')}</button>
         </div>
       </div>

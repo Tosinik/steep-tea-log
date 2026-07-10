@@ -246,7 +246,7 @@ function syncAchievements(animate){
   if(fresh.length){
     state.settings.seenAchievements = Array.from(new Set([...seen, ...keys])); // accumulate, so drops don't re-fire
     persistSettings();
-    if(animate && !state.settings.quietMode) celebrateAchievements(fresh);
+    if(animate && !state.settings.quietMode && ACHIEVEMENTS_ENABLED) celebrateAchievements(fresh);
   }
 }
 function celebrateAchievements(list){

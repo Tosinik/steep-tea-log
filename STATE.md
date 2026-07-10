@@ -65,25 +65,29 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NEXT — v3.72 achievements hide (issue #6; drive via `/slowcup-deploy`).** Last item in the cleanup tail
-(renumbered from v3.71 — that number went to the greeting follow-up). Issue #6 asks to remove/hide the
-achievements + confetti surfaces; the pre-baked spec: flip `showAchievements` default to false and gate the
-header button + both Settings rows ('Quiet mode', 'Show achievements') behind a single `ACHIEVEMENTS_ENABLED
-= false` constant so the feature goes dormant regardless of stored settings (code stays for a future
-redesign). Read #6's body via `gh issue view 6` and reconcile first; batch any consequential product call for
-Niklas at the pause. After v3.72 the cleanup tail is **empty** — board reduces to the design R2 session, the
-domain (slowcup.app), and the phase-2 gate (~10 days out). Also in the inbox: issues #7–#12 (Gaiwan icon ·
-brew-advice richer · settings overhaul · map/passport into design · favorite-leaf visibility · matcha session
-option) — not yet sequenced.
+**NEXT — cleanup tail is EMPTY. The board is now three things (no coded deploy queued):** (1) the **design R2
+session** (Niklas) — feeds Pillar D + the settings overhaul + map/passport redesign + the achievements
+redesign this deploy just made room for; (2) the **domain** (register slowcup.app); (3) the **phase-2 gate**
+(~Jul 20) → phase-2 brew-advice build. Unsequenced inbox from beta: issues **#7–#12** (fold map/passport into
+the design overhaul · Gaiwan-based icon · richer brew-advice "how was it" · settings-screen overhaul · faves
+not visible on tea cards · matcha/matcha-latte session option) — triage these into the R2 work or a fresh tail
+when ready. No `/slowcup-deploy` is pre-approved right now; next deploy needs Niklas to pick from the above.
 
-**NOW (just shipped) — v3.71 greeting v4 follow-up** (cache **v81**, APP_VERSION v3.71): copy polish + test
-hardening on the v3.70 greeting. (1) Reworded the more-than-usual line `"leaves are spoiled today"` →
-`"well looked-after today"` ("spoiled" reads as *gone off*). (2) The pre-v4 greeting invariants lived only in
-a local, never-committed `greeting-test.js`, which v3.70 correctly made stale (expanded pools + rediscovery
-break its exact-pool sweeps — intended). Absorbed the durable v3.67/v3.55 cases into the **committed** suite:
-predicted-vs-actual ack, same-day variety guard (+ fallback), window-aware redirect (determinism + <5-session
-gate). `greeting-v4-test.js` now 47 checks (36 on a bare checkout). Issues #4 + #5 **closed** against v3.70.
-The stale local `greeting-test.js` is now superseded — safe to delete (left in place; not mine to remove).
+**NOW (just shipped) — v3.72 hide achievements app-wide (issue #6)** (cache **v82**, APP_VERSION v3.72): last
+item of the cleanup tail — Pillar F is **done**. The scrapped 8-bit achievements/confetti go dormant for
+everyone via one switch, `ACHIEVEMENTS_ENABLED = false` (steep-core.js), which gates the header 🏆 button, the
+`achievements` route, the whole "Calm & achievements" Settings section (both rows), and the unlock
+confetti/toast — **regardless of any stored `showAchievements`/`quietMode`** (default also flipped false).
+`quietMode` only ever affected achievements, so nothing else is stranded. Code kept intact (`ACHIEVEMENTS`,
+`computeAchievements`, `viewAchievements`, `syncAchievements`); `syncAchievements` still runs its
+`seenAchievements` bookkeeping so a future re-enable won't burst old unlocks — flip the constant to revive.
+Browser-verified dormant with `showAchievements:true` forced on. **Issue #6 → close with a changelog link.**
+
+**Earlier — v3.71 greeting v4 follow-up** (cache **v81**, APP_VERSION v3.71): copy polish (`"leaves are spoiled
+today"` → `"well looked-after today"`) + absorbed the durable pre-v4 greeting invariants (predicted-vs-actual,
+variety guard + fallback, window-aware redirect) from the local never-committed `greeting-test.js` into the
+**committed** `greeting-v4-test.js` (now 47 checks / 36 bare). Issues #4 + #5 **closed** against v3.70. The
+stale local `greeting-test.js` is superseded — safe to delete (left in place; not mine to remove).
 
 **Earlier — v3.70 greeting v4, habit-aware (issues #4 + #5)** (cache **v80**, APP_VERSION v3.70):
 the biggest deploy in the tail. Three ingredients in `greetingCardHTML` (steep-dashboard.js): (1) **zero-session

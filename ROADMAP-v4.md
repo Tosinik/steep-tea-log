@@ -79,9 +79,12 @@ Each with its data prerequisite — the point is they get better every season:
 - **Insights v2 interactivity** [small, near-term]: tap-the-type-bar reveal · mood card · vessel note ·
   steep-depth habit · cost sentence. All optional/hideable. (Builds on the WS2 reflective room.)
 
-## Pillar F — cleanup tail (all 5 open issues triaged 2026-07-10; pause after each deploy)
+## Pillar F — cleanup tail ✅ COMPLETE (all 5 triaged issues shipped; v3.66→v3.72)
 Detailed build specs: `TASK-cleanup-and-issues.md` + `TASK-issues-triage-addendum.md` (Downloads). Read
 each issue's body via the REST API at build time and reconcile before building.
+Tail done: v3.66 pagination · v3.67 greeting v3 (#2) · v3.68 in-session hide (#1) · v3.69 what's-new banner ·
+v3.70 greeting v4 (#4+#5) · v3.71 greeting follow-up · v3.72 hide achievements (#6). Issues #1–#6 all closed.
+Newer beta inbox #7–#12 is unsequenced — fold into design R2 / a fresh tail.
 - ~~**v3.66 feed pagination + socialErr inline notice**~~ ✓ **shipped** (`.range()` paging + "Load more";
   `socialErr` → sticky `.social-notice`, the app's last `alert()` gone).
 - ~~**v3.67 — greeting v3, session-aware (issue #2), EXTENDED.**~~ ✓ **shipped.** Session-aware branch in
@@ -128,9 +131,10 @@ each issue's body via the REST API at build time and reconcile before building.
 - **v3.71 — greeting v4 follow-up. ✅ SHIPPED** (cache v81). Reworded one more-than-usual line ("spoiled" →
   "well looked-after") and absorbed the pre-v4 greeting invariants (predicted-vs-actual, variety guard,
   window-aware redirect) from the local `greeting-test.js` into the committed suite — now 47 checks.
-- **v3.72 — hide achievements app-wide (issue #6), NEXT** *(renumbered from v3.71).* Flip `showAchievements`
-  default false; gate the header button + both Settings rows behind one `ACHIEVEMENTS_ENABLED = false` so the
-  feature goes dormant regardless of stored settings (code stays for a future redesign). Read #6 + reconcile.
+- **v3.72 — hide achievements app-wide (issue #6). ✅ SHIPPED** (cache v82). One switch `ACHIEVEMENTS_ENABLED
+  = false` (steep-core.js) gates the header button, the `achievements` route, the whole Settings section (both
+  rows), and unlock confetti — dormant regardless of stored `showAchievements`/`quietMode` (default flipped
+  false). Code kept intact (bookkeeping still runs, so re-enabling won't burst old unlocks). Close issue #6.
 - **Issue #3** (workflow question — "do issues resolve themselves?") — **closed**: post a
   comment stating issues close manually, with a CHANGELOG-linking comment, when the fix ships (and note
   #2/#4 are sequenced as v3.67/v3.70). Documents the convention for future reporters. *(Closing needs

@@ -230,6 +230,7 @@ function settingsModal(){
         </div>
       </div>
 
+      ${ACHIEVEMENTS_ENABLED ? `
       ${sec('Calm & achievements')}
       <div class="set-row">
         <div><div class="set-label">Quiet mode</div><div class="set-sub">Calm-first: hides achievements and skips unlock confetti. Tea, not a scoreboard.</div></div>
@@ -238,7 +239,7 @@ function settingsModal(){
       <div class="set-row">
         <div><div class="set-label">Show achievements</div><div class="set-sub">Adds a 🏆 button in the header that opens your achievements page</div></div>
         ${toggle('showAchievements')}
-      </div>
+      </div>` : ''}
 
       ${sec('Data')}
       ${backupSectionHTML()}

@@ -26,6 +26,14 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.72 — hide achievements app-wide (issue #6)
+Deploy: `steep-core.js` (constant + default + header/route gates, APP_VERSION, WHATS_NEW), `steep-settings.js` (Settings section gate), `steep-dashboard.js` (confetti gate), `service-worker.js` (v82). No SQL.
+Last item of the cleanup tail (ROADMAP-v4 Pillar F). Closes issue #6. The 8-bit achievement system was scrapped and a redesign is TBD, so the surfaces go dormant for everyone rather than lingering half-used.
+- **One switch:** `ACHIEVEMENTS_ENABLED = false` (steep-core.js) gates every surface **regardless of any stored `showAchievements`/`quietMode`** — so it's off for everyone, including users who'd toggled it on. `showAchievements` default also flipped to `false` for new installs.
+- **Gated surfaces:** the header 🏆 button (`ACHIEVEMENTS_ENABLED && showAchievements`), the `achievements` route (`viewAchievements` unreachable), the whole "Calm & achievements" Settings section (both rows — Quiet mode + Show achievements — vanish; `quietMode` only ever affected achievements/confetti, so nothing else is stranded), and the unlock **confetti/toast** (`celebrateAchievements` no longer fires).
+- **Code kept intact** for the future redesign: `ACHIEVEMENTS`, `computeAchievements`, `viewAchievements`, `syncAchievements`. `syncAchievements` still runs its `seenAchievements` bookkeeping (only the celebration is gated), so a future re-enable won't dump a burst of old unlocks. Flip the one constant to `true` to revive.
+- No user data stranded (achievements are derived, not entered). Verified in the browser with `showAchievements:true` forced on: no header button, no Settings section, no confetti. `node --check` clean; all committed fixtures green.
+
 ## v3.71 — greeting v4 follow-up: copy polish + committed v3.67 coverage
 Deploy: `steep-dashboard.js` (one greeting line reworded), `steep-core.js` (APP_VERSION), `service-worker.js` (v81), `fixtures/greeting-v4-test.js` (absorbed the durable v3.67 cases). No SQL. `WHATS_NEW` unchanged — the greeting feature is still the freshest user-facing line; this polish is invisible.
 - **Copy:** the more-than-usual pool's `"…the leaves are spoiled today."` → `"…well looked-after today."` — "spoiled" reads as *gone off* in a tea context even though *pampered* was intended (flagged at the v3.70 pause).
