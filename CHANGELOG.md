@@ -26,6 +26,15 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.70 — greeting v4, habit-aware (issues #4 + #5)
+Deploy: `steep-dashboard.js` (greeting engine), `steep-core.js` (APP_VERSION + WHATS_NEW), `service-worker.js` (v80), `fixtures/greeting-v4-test.js` (**new committed suite**), `.gitignore` (track it). No SQL.
+Fourth of the cleanup tail (ROADMAP-v4 Pillar F). Closes issues #4 + #5. Copy pools are Niklas-strikable at the pause.
+- **Zero-session evening (issue #4).** When history exists, nothing's logged today, and the user's brewing windows have passed unused (evening/night aren't windows they brew in), the card shows a **guilt-free, playful** line — the tea/kettle/shelf is the character, never the user's absence ("The gaiwan enjoyed the day off."). HARD RULES enforced: evening-only, self-limiting (a new day resets `todayKey`, so it's gone by morning), **never references counts or consecutive days**, no sad-emoji register. An evening *drinker* still gets a normal suggestion (evening is active for them). Deliberately overrides issue #4's raw "no time for tea today?" wording — the triage addendum (2026-07-10) decided guilt-free.
+- **More-than-usual day (issue #4).** `d_typicalPerDay(todayKey)` computes the user's typical sessions/day from history **excluding today** (needs a 5-distinct-day signal); when today beats it (and ≥2), the session-aware ack becomes a celebratory, count-aware line ("Third pour today — a proper tea day.") — never nagging for more.
+- **Rediscovery (issue #5).** On a deterministic ~1-in-4 days (`d_hash(todayKey+'|shelf') % REDISCOVERY_ODDS === 0`), the day's pick becomes the most-neglected in-stock tea — never brewed, or quiet ≥ `REDISCOVERY_WEEKS` (ship 3) — in its own "remember this?" register (weeks-aware). `d_rediscoveryPick` honours the brewed-today + variety-guard exclusions; the seed is date-only so the choice is stable across the day.
+- Expanded every normal greeting pool by 2–3 lines (Niklas: "would love lots of instances… so it's not boring").
+- **New tunables** (all in steep-dashboard.js): `REDISCOVERY_WEEKS`, `REDISCOVERY_ODDS`. Verified in the Node vm sandbox — `fixtures/greeting-v4-test.js` (35 checks) covers evening-fires-once/evening-only/no-counts, threshold math + signal gate, rediscovery determinism + ≥N-weeks predicate, tap-targets intact, and renders over the real CSV export at every bucket.
+
 ## v3.69 — the update banner now says what changed
 Deploy: `steep-core.js` (APP_VERSION + new `WHATS_NEW` const), `steep-boot.js` (banner render), `service-worker.js` (v79). No SQL.
 Third of the cleanup tail (ROADMAP-v4 Pillar F) — a small rider.

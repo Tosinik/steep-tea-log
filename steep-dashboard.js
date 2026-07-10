@@ -638,6 +638,38 @@ function d_scorePick(target, todayKey, excludeIds, excludeType){
   }).sort((a,b)=> b.score-a.score || b.tie-a.tie);
   return scored[0];
 }
+// v3.70 — habit-aware ingredients (issues #4 + #5). All tunable; register is guilt-free / celebratory,
+// never caffeine-nagging or absence-scolding (see triage addendum, Niklas 2026-07-10).
+const REDISCOVERY_WEEKS = 3;   // an in-stock tea unbrewed this long may resurface as the day's pick
+const REDISCOVERY_ODDS  = 4;   // deterministic 1-in-N days it may fire (d_hash(todayKey+'|shelf') % N === 0)
+const ORDINALS = ['zeroth','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth'];
+function d_ordinal(n){ return ORDINALS[n] || (n+'th'); }
+function d_cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+// Typical sessions/day from history EXCLUDING today (so today's excess actually reads as excess); null
+// until a 5-distinct-day signal exists — below that we can't call any count "more than usual".
+function d_typicalPerDay(todayKey){
+  const sessions = state.sessions||[]; const byDay={};
+  sessions.forEach(se=>{ const k=dayKey(se.date); if(k===todayKey) return; byDay[k]=(byDay[k]||0)+1; });
+  const days = Object.keys(byDay); if(days.length<5) return null;
+  let total=0; days.forEach(k=>total+=byDay[k]); return total/days.length;
+}
+// Most-neglected in-stock tea: never brewed OR last brew ≥ REDISCOVERY_WEEKS ago. Oldest-waiting first,
+// date-seeded hash tie-break. Honours the same exclusions as d_scorePick. Returns {t,weeks|null} or null.
+function d_rediscoveryPick(todayKey, excludeIds, excludeType){
+  const sessions = state.sessions||[]; const now=Date.now();
+  const cutoff = REDISCOVERY_WEEKS*7*24*3600*1000;
+  const lastBrew = {};
+  sessions.forEach(se=>{ const t=+new Date(se.date); if(!(se.teaId in lastBrew)||t>lastBrew[se.teaId]) lastBrew[se.teaId]=t; });
+  const cands = (state.teas||[]).filter(t=> !isTeaFinished(t)
+    && !(excludeIds && excludeIds.has(t.id))
+    && !(excludeType && t.type===excludeType)
+    && (!(t.id in lastBrew) || (now-lastBrew[t.id])>=cutoff));
+  if(!cands.length) return null;
+  cands.sort((a,b)=>{ const la=(a.id in lastBrew)?lastBrew[a.id]:0, lb=(b.id in lastBrew)?lastBrew[b.id]:0;
+    return la-lb || d_hash(todayKey+'|'+b.id)-d_hash(todayKey+'|'+a.id); });
+  const top=cands[0]; const weeks=(top.id in lastBrew)?Math.floor((now-lastBrew[top.id])/(7*24*3600*1000)):null;
+  return { t:top, weeks };
+}
 function greetingCardHTML(){
   const now = new Date();
   const bucket = d_hourBucket(now.getHours());
@@ -651,10 +683,16 @@ function greetingCardHTML(){
   if(!sessions.length) return card(d_copyPick([
     `The kettle&rsquo;s patient whenever you are.`,
     `Nothing brewing yet — the kettle&rsquo;s patient.`,
+    `A fresh shelf and a warm kettle. No rush.`,
+    `Whenever you&rsquo;re ready, the first steep is waiting.`,
   ], todayKey));
   const teaLink = t => `<span onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;">${escapeHtml(t.name)}</span>`;
   const todaySessions = sessions.filter(se=>dayKey(se.date)===todayKey);
   const brewedToday = new Set(todaySessions.map(se=>se.teaId));
+  // v3.70 (issue #4) — a "more than usual" day: today's session count beats the user's typical per-day
+  // (5-day signal, today excluded from the baseline). Celebratory, count-aware; surfaced in the ack below.
+  const typicalPerDay = d_typicalPerDay(todayKey);
+  const bigDay = typicalPerDay!=null && todaySessions.length>=2 && todaySessions.length>typicalPerDay;
 
   // v3.55 active-window detection: a bucket is "active" if it holds ≥2 sessions OR ≥15% of the
   // total. Needs ≥5 sessions of signal; below that keep v3.54 behaviour (too little to say "you
@@ -663,6 +701,24 @@ function greetingCardHTML(){
   sessions.forEach(se=>{ counts[d_hourBucket(new Date(se.date).getHours())]++; });
   const isActive = b => counts[b]>=2 || counts[b] >= sessions.length*0.15;
   const enoughSignal = sessions.length>=5;
+
+  // v3.70 (issue #4) — zero-session EVENING: history exists, nothing logged today, and the user's
+  // brewing windows have passed unused (evening/night aren't windows they brew in). A guilt-free,
+  // playful line — the tea/kettle/shelf is the character, never the user's absence. Evening-only and
+  // self-limiting: a new day resets todayKey so it's gone by morning; never references counts or
+  // consecutive days (DECIDED guilt-free register, triage addendum 2026-07-10).
+  if(enoughSignal && !todaySessions.length && bucket==='evening' && !isActive('evening') && !isActive('night')){
+    return card(d_copyPick([
+      `The gaiwan enjoyed the day off.`,
+      `Quiet day — the shelf held the fort.`,
+      `The kettle took the evening easy.`,
+      `A still day on the shelf; it suits the leaves fine.`,
+      `The teas kept each other company today.`,
+      `No steam today — the kettle caught up on rest.`,
+      `The shelf had a slow, unhurried day.`,
+      `Leaves rested, kettle cooled — all&rsquo;s well.`,
+    ], todayKey, 'off'));
+  }
 
   // v3.67 — SESSION-AWARE (issue #2): a session already logged in the CURRENT bucket today. Don't
   // nudge another same-bucket brew. Acknowledge the ritual (referencing the day's deterministic
@@ -681,12 +737,31 @@ function greetingCardHTML(){
       ack = tookPredicted
         ? d_copyPick([ `Good choice — the ${teaLink(loggedTea)} it is.`,
                        `The ${teaLink(loggedTea)} — a lovely start.`,
-                       `The ${teaLink(loggedTea)} in the pot already. Nice.` ], todayKey, 'ack')
+                       `The ${teaLink(loggedTea)} in the pot already. Nice.`,
+                       `The ${teaLink(loggedTea)}, just as the day called for.`,
+                       `Right on cue — the ${teaLink(loggedTea)}.` ], todayKey, 'ack')
         : d_copyPick([ `The ${teaLink(loggedTea)} instead — didn&rsquo;t see that coming.`,
                        `The ${teaLink(loggedTea)} today — a nice surprise.`,
-                       `Ooh, the ${teaLink(loggedTea)} — not what I&rsquo;d have guessed.` ], todayKey, 'ack');
+                       `Ooh, the ${teaLink(loggedTea)} — not what I&rsquo;d have guessed.`,
+                       `The ${teaLink(loggedTea)} — a turn off the usual path.`,
+                       `The ${teaLink(loggedTea)}? Lovely, and unexpected.` ], todayKey, 'ack');
     } else {
-      ack = d_copyPick([ `Nicely steeped already.`, `Well steeped this ${BUCKET_NOUN[bucket]}.` ], todayKey, 'ack');
+      ack = d_copyPick([ `Nicely steeped already.`, `Well steeped this ${BUCKET_NOUN[bucket]}.`,
+                         `A good pour already behind you.` ], todayKey, 'ack');
+    }
+    // v3.70 (issue #4) — on a more-than-usual day the count itself is worth a warm nod; it overrides the
+    // predicted-vs-actual ack (celebratory, count-aware, never nagging for more). Tail below still runs.
+    if(bigDay){
+      const ord = d_cap(d_ordinal(todaySessions.length));
+      ack = d_copyPick([
+        `${ord} pour today — a proper tea day.`,
+        `The kettle&rsquo;s earning its keep today.`,
+        `A generous tea day; the shelf approves.`,
+        `${ord} steep in — the leaves are spoiled today.`,
+        `Big tea day — the kettle&rsquo;s humming.`,
+        `More tea than usual today. Lovely.`,
+        `A day of many pours; the kettle&rsquo;s glad of it.`,
+      ], todayKey, 'ack');
     }
     // A later ACTIVE window today that has no session yet? (needs signal to call a window "active".)
     let laterWindow = null;
@@ -704,11 +779,38 @@ function greetingCardHTML(){
     const tail = fwd
       ? d_copyPick([ `Maybe the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?`,
                      `The ${teaLink(fwd.t)} could round out ${BUCKET_WHEN[laterWindow]}.`,
-                     `How about the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?` ], todayKey, 'tail')
+                     `How about the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?`,
+                     `Perhaps the ${teaLink(fwd.t)} to come ${BUCKET_WHEN[laterWindow]}.`,
+                     `The ${teaLink(fwd.t)} would sit well ${BUCKET_WHEN[laterWindow]}.` ], todayKey, 'tail')
       : d_copyPick([ `That&rsquo;s the day&rsquo;s brewing — the kettle can rest.`,
                      `Well steeped today; the shelf can rest now.`,
-                     `The kettle&rsquo;s earned its quiet.` ], todayKey, 'tail');
+                     `The kettle&rsquo;s earned its quiet.`,
+                     `A good day&rsquo;s steeping. Let it settle.`,
+                     `The leaves have done their part today.` ], todayKey, 'tail');
     return card(ack + ' ' + tail);
+  }
+
+  // v3.70 (issue #5) — rediscovery: on a deterministic ~1-in-N days, the day's pick becomes the most-
+  // neglected in-stock tea (never brewed, or quiet ≥ REDISCOVERY_WEEKS) instead of the habitual one, in
+  // its own "remember this?" register. Needs shelf signal; excludes brewed-today; the seed is date-only
+  // so the choice is stable across the day and independent of the copy pick.
+  if(enoughSignal && d_hash(todayKey+'|shelf') % REDISCOVERY_ODDS === 0){
+    const redis = d_rediscoveryPick(todayKey, brewedToday, null);
+    if(redis){
+      const rname = teaLink(redis.t);
+      return card(redis.weeks!=null
+        ? d_copyPick([
+            `The ${rname} has been waiting ${redis.weeks} weeks — remember it?`,
+            `Remember the ${rname}? It&rsquo;s been about ${redis.weeks} weeks.`,
+            `The ${rname}&rsquo;s been quiet on the shelf for ${redis.weeks} weeks. Today?`,
+            `It&rsquo;s been ${redis.weeks} weeks since the ${rname} — maybe today.`,
+          ], todayKey, 'shelf')
+        : d_copyPick([
+            `The ${rname} is still unopened — today could be the day.`,
+            `You&rsquo;ve not brewed the ${rname} yet; it&rsquo;s waited patiently.`,
+            `The ${rname}&rsquo;s never been steeped — shall we?`,
+          ], todayKey, 'shelf'));
+    }
   }
 
   // ---- no session in the current bucket yet: v3.55 window-aware suggestion (unchanged) ----
@@ -736,18 +838,24 @@ function greetingCardHTML(){
         `The ${name} will be waiting for the ${tn}.`,
         `Sleep well — the ${name} will keep till ${tn}.`,
         `The ${name} isn&rsquo;t going anywhere before ${tn}.`,
+        `The ${name} will still be there come ${tn}.`,
+        `Rest easy; the ${name} holds till ${tn}.`,
       ], todayKey);
     } else if(targetToday){
       sub = d_copyPick([
         `Maybe save the ${name} for ${tw}.`,
         `How about the ${name} ${tw}?`,
         `The ${name} could be a good ${tn} plan.`,
+        `The ${name} might suit ${tw} nicely.`,
+        `Perhaps the ${name} when ${tn} comes.`,
       ], todayKey);
     } else {
       sub = d_copyPick([
         `Maybe save the ${name} for tomorrow ${tn}.`,
         `How does the ${name} sound for tomorrow ${tn}?`,
         `Tomorrow ${tn} has the ${name}&rsquo;s name on it.`,
+        `The ${name} could open tomorrow ${tn}.`,
+        `Pencil in the ${name} for tomorrow ${tn}.`,
       ], todayKey);
     }
   } else {
@@ -759,11 +867,15 @@ function greetingCardHTML(){
           `How about the ${name}? It&rsquo;s been carrying your ${bn}s lately.`,
           `How do you feel about the ${name} ${bw}?`, // v3.62: BUCKET_WHEN, so night reads "tonight" not "this late-night"
           `Your ${bn} usually says ${name}.`,
+          `The ${name} has your ${bn}s&rsquo; measure.`,
+          `A ${bn} like this often wants the ${name}.`,
         ], todayKey)
       : d_copyPick([
           `Maybe the ${name} ${bw}?`,
           `How about the ${name} ${bw}?`,
           `Feeling like the ${name} ${bw}?`,
+          `The ${name} could be lovely ${bw}.`,
+          `Perhaps the ${name} to ease into ${bw}.`,
         ], todayKey);
   }
   return card(sub);

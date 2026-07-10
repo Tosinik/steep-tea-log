@@ -65,18 +65,28 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NEXT — v3.70 greeting v4, habit-aware (issues #4 + #5; drive via `/slowcup-deploy`).** The biggest deploy
-in the tail — the place the `/slowcup-deploy` checklist earns the most. Two ingredients + pool expansion
-(see ROADMAP-v4 L118+): out-of-habit situations (issue #4, generous 6–8 line pools, one voice/day via
-`d_copyPick`) + rediscovery. **Before writing copy, re-read the triage addendum's guilt-free zero-session
-decision (Niklas 2026-07-10):** the zero-session evening line is **guilt-free/playful** — the tea/kettle/
-shelf is the character, never the user's absence; fires at most once, evening-only, **never references
-counts or consecutive days**, gone by next morning, no sad-emoji energy. Good: "The gaiwan enjoyed the day
-off." Banned: "no time for tea today?", "we missed you." After v3.70 the tail is just **v3.71** achievements
-hide (issue #6), then the cleanup tail is **empty** — board reduces to the design session, the domain, and
-the phase-2 gate (~10 days out).
+**NEXT — v3.71 achievements hide (issue #6; drive via `/slowcup-deploy`).** Last item in the cleanup tail.
+Issue #6 asks to remove/hide the achievements + confetti surfaces (read the issue body via `gh issue view 6`
+at build time and reconcile). Calm-first, so likely a clean hide-behind-toggle or removal — batch any
+consequential product call for Niklas at the pause. After v3.71 the cleanup tail is **empty** — board reduces
+to the design R2 session, the domain (slowcup.app), and the phase-2 gate (~10 days out). Also in the inbox:
+issues #7–#11 (Gaiwan icon · brew-advice "how was it" richer · settings overhaul · map/passport into design ·
+favorite-leaf visibility) — not yet sequenced.
 
-**NOW (just shipped) — v3.69 what's-new line on the update banner** (cache **v79**, APP_VERSION v3.69):
+**NOW (just shipped) — v3.70 greeting v4, habit-aware (issues #4 + #5)** (cache **v80**, APP_VERSION v3.70):
+the biggest deploy in the tail. Three ingredients in `greetingCardHTML` (steep-dashboard.js): (1) **zero-session
+evening** — history exists, nothing today, brewing windows passed unused → a **guilt-free, playful** line
+(tea/kettle/shelf as the character, never the user's absence; evening-only, gone by morning, never counts).
+Deliberately overrides issue #4's raw "no time for tea today?" — the addendum decided guilt-free. (2)
+**more-than-usual day** — `d_typicalPerDay` (today excluded, 5-day signal); today beats it → celebratory
+count-aware ack, never nagging. (3) **rediscovery** — deterministic ~1-in-4 days (`d_hash(todayKey+'|shelf')
+% REDISCOVERY_ODDS`), the day's pick becomes the most-neglected in-stock tea (never brewed / quiet ≥
+`REDISCOVERY_WEEKS`=3) in a "remember this?" register. All normal pools expanded 2–3 lines. New committed
+suite `fixtures/greeting-v4-test.js` (35 checks, incl. real-CSV grounding) — must stay green. `node --check`
+clean; browser-verified the branches render + console clean. **Copy pools await Niklas's strike.** **Issues
+#4 + #5 → close with a CHANGELOG-linking comment (needs auth/`gh`).**
+
+**Earlier — v3.69 what's-new line on the update banner** (cache **v79**, APP_VERSION v3.69):
 third of the cleanup tail (ROADMAP-v4 Pillar F), a small rider — and the first *live* `/slowcup-deploy` run
 (dry-run first proved the registry loaded, then dropped `dry`). The v3.27 update banner showed only "A new
 version of SlowCup is ready." with no hint of the contents; now a `WHATS_NEW` constant beside `APP_VERSION`

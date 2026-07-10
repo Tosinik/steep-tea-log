@@ -116,21 +116,15 @@ each issue's body via the REST API at build time and reconcile before building.
   (steep-boot.js) — `typeof`-guarded. Bumping it joined the deploy ritual (step 2c, CLAUDE.md). One line, no
   list, no link-out. Copy: "Updates now tell you what changed — like this." Deploy: `steep-core.js`,
   `steep-boot.js`, `service-worker.js` (v79).
-- **v3.70 — greeting v4, habit-aware (issues #4 + #5), NEW.** Two ingredients + pool expansion:
-  1. **Out-of-habit situations** (issue #4), each a generous 6–8 line pool (one voice/day via `d_copyPick`):
-     - **Zero-session day, evening only** — DECIDED (Niklas 2026-07-10): **guilt-free, playful** — the
-       tea/kettle/shelf is the character, never the user's absence. Good: "The gaiwan enjoyed the day off."
-       / "Quiet day — the shelf held the fort." Banned register: "no time for tea today?", "we missed you",
-       anything owing the app an explanation. HARD RULES: fires at most once, evening-only, **never
-       references counts or consecutive days**, gone by the next morning, no sad-emoji energy.
-     - **More-than-usual day** (sessions today > the user's typical per-day from history, ≥5-day signal):
-       celebratory-warm, never consumption-pushing / caffeine-nagging. e.g. "Third pot — big tea day."
-  2. **Rediscovery ingredient** (issue #5): teas in stock but unbrewed for ≥N weeks (tunable, ship 3)
-     occasionally become the day's pick — deterministic (e.g. `d_hash(todayKey+'|shelf') % 4 === 0`) with
-     its own register ("The {name} has been waiting three weeks — remember it?"). Respects the variety
-     guard + all exclusions. Also expand the normal pools (all branches) by 2–3 lines each.
-  Fixtures: zero-session evening fires once + evening-only + never mentions counts; more-than-usual
-  threshold math; rediscovery determinism + ≥N-weeks predicate; pools keep intact tap-targets.
+- **v3.70 — greeting v4, habit-aware (issues #4 + #5). ✅ SHIPPED** (cache v80). All three ingredients landed
+  in `greetingCardHTML` (steep-dashboard.js), copy Niklas-strikable:
+  1. **Zero-session evening** — guilt-free/playful (tea/kettle/shelf as character); evening-only, gone by
+     morning, never counts. An evening *drinker* still gets a suggestion. Overrides issue #4's raw wording.
+  2. **More-than-usual day** — `d_typicalPerDay` (today excluded, 5-day signal) → celebratory count-aware ack.
+  3. **Rediscovery** (issue #5) — deterministic ~1-in-4 days (`d_hash(todayKey+'|shelf') % REDISCOVERY_ODDS`),
+     the day's pick becomes the most-neglected in-stock tea (never brewed / quiet ≥ `REDISCOVERY_WEEKS`=3),
+     own "remember this?" register; honours variety guard + exclusions. Normal pools expanded 2–3 lines each.
+  Committed suite `fixtures/greeting-v4-test.js` (35 checks) guards it. Close issues #4 + #5.
 - **Issue #3** (workflow question — "do issues resolve themselves?") — **close now, no build**: post a
   comment stating issues close manually, with a CHANGELOG-linking comment, when the fix ships (and note
   #2/#4 are sequenced as v3.67/v3.70). Documents the convention for future reporters. *(Closing needs
