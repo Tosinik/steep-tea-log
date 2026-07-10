@@ -41,7 +41,10 @@ function showUpdateBanner(worker){
     + 'border-radius:12px;background:var(--jade,#3F5E42);color:#fff;box-shadow:0 6px 24px rgba(0,0,0,.25);'
     + 'max-width:520px;margin:0 auto;font-size:13.5px;');
   bar.innerHTML =
-    '<span>A new version of SlowCup is ready.</span>'
+    '<span style="display:flex;flex-direction:column;gap:2px;">'
+    +   '<span>A new version of SlowCup is ready.</span>'
+    +   (typeof WHATS_NEW==='string' && WHATS_NEW ? '<span style="opacity:.72;font-size:12px;">'+WHATS_NEW+'</span>' : '')
+    + '</span>'
     + '<span style="display:flex;gap:8px;flex-shrink:0;">'
     +   '<button id="updateLater" style="background:transparent;border:0;color:#fff;opacity:.8;font-size:13px;cursor:pointer;">Later</button>'
     +   '<button id="updateNow" style="background:#fff;color:var(--jade,#3F5E42);border:0;border-radius:8px;padding:7px 13px;font-weight:600;font-size:13px;cursor:pointer;">Refresh</button>'

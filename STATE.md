@@ -65,20 +65,29 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NEXT — v3.69 what's-new line (pre-approved; drive via `/slowcup-deploy`).** New project skills live in
-`.claude/skills/` (`slowcup-deploy`, `vm-fixture`; committed via a scoped `.gitignore` exception). **A skill
-added mid-session isn't invocable until the session reloads its registry** — so v3.69 is the first *live*
-`/slowcup-deploy` run: `/slowcup-deploy v3.69 — "what's new" line on the update banner dry` once to confirm
-the registry loaded, then drop `dry`. **Decisions locked (Niklas 2026-07-10):** (1) `WHATS_NEW` copy =
-**"Updates now tell you what changed — like this."** (self-referential — demonstrates the feature it
-announces). (2) File list = **three** app files: `steep-core.js` (APP_VERSION + new `WHATS_NEW` const beside
-it), `steep-boot.js` (banner render — the second quiet line goes under "A new version of SlowCup is ready."
-at ~L44, NOT steep-core as ROADMAP-v4 loosely guessed), `service-worker.js` (v78→v79). (3) Add a **step 2c**
-to CLAUDE.md's deploy ritual (WHATS_NEW joins the bumps) — rides along in this same deploy. After v3.69 the
-tail is **v3.70** greeting v4 (issues #4+#5) → **v3.71** achievements hide (issue #6), then the tail's done —
-leaving the design session, the domain, and the phase-2 gate (~10 days out) as the board.
+**NEXT — v3.70 greeting v4, habit-aware (issues #4 + #5; drive via `/slowcup-deploy`).** The biggest deploy
+in the tail — the place the `/slowcup-deploy` checklist earns the most. Two ingredients + pool expansion
+(see ROADMAP-v4 L118+): out-of-habit situations (issue #4, generous 6–8 line pools, one voice/day via
+`d_copyPick`) + rediscovery. **Before writing copy, re-read the triage addendum's guilt-free zero-session
+decision (Niklas 2026-07-10):** the zero-session evening line is **guilt-free/playful** — the tea/kettle/
+shelf is the character, never the user's absence; fires at most once, evening-only, **never references
+counts or consecutive days**, gone by next morning, no sad-emoji energy. Good: "The gaiwan enjoyed the day
+off." Banned: "no time for tea today?", "we missed you." After v3.70 the tail is just **v3.71** achievements
+hide (issue #6), then the cleanup tail is **empty** — board reduces to the design session, the domain, and
+the phase-2 gate (~10 days out).
 
-**NOW (just shipped) — v3.68 in-session brew guide "hide" (issue #1)** (cache **v78**, APP_VERSION v3.68):
+**NOW (just shipped) — v3.69 what's-new line on the update banner** (cache **v79**, APP_VERSION v3.69):
+third of the cleanup tail (ROADMAP-v4 Pillar F), a small rider — and the first *live* `/slowcup-deploy` run
+(dry-run first proved the registry loaded, then dropped `dry`). The v3.27 update banner showed only "A new
+version of SlowCup is ready." with no hint of the contents; now a `WHATS_NEW` constant beside `APP_VERSION`
+(steep-core.js) renders as a second quiet line under the headline in `showUpdateBanner` (steep-boot.js) — one
+line, no list, no link-out, `typeof`-guarded for clients on a stale cached core. This deploy's copy is
+self-referential: **"Updates now tell you what changed — like this."** Deploy ritual gained **step 2c**
+(CLAUDE.md): bump `WHATS_NEW` each deploy alongside `CACHE_NAME` + `APP_VERSION`. `node --check` clean on all
+three touched files; committed fixture suites green. **NEXT in the tail:** **v3.70** greeting v4 habit-aware
+(issues #4+#5) → **v3.71** achievements hide (issue #6), then the tail is empty.
+
+**Earlier — v3.68 in-session brew guide "hide" (issue #1)** (cache **v78**, APP_VERSION v3.68):
 second of the cleanup tail (ROADMAP-v4 Pillar F). Fixes the "in-session turn off link gives weird feedback"
 bug. Mid-steeping, the schedule strip's **"turn off"** called `d_setBrewMode('off')` — which reset
 `timeShift` to 0 (silently discarding the accumulated "+Xs vs guide" nudge) and set `brewMode='off'`, but

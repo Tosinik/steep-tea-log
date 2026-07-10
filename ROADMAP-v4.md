@@ -111,10 +111,11 @@ each issue's body via the REST API at build time and reconcile before building.
   touched). The nudge row hides with it and returns with its `+Xs` carry. `d.scheduleHidden` resets at
   `beginSteeping`; setup preview's **Off** segment unchanged. Deploy: `steep-sessions.js`, `steep-core.js`
   (APP_VERSION), `service-worker.js` (v78). Close issue #1.
-- **v3.69 — "what's new" line on the update banner (rider, [S]).** Add a `WHATS_NEW` constant next to
-  `APP_VERSION` (one short human sentence), rendered as a second quiet line on the v3.27 update banner.
-  Bumping it joins the deploy ritual (step 2c). One line only, no changelog list, no link-out.
-  Deploy: `steep-core.js` (or wherever the banner renders), `service-worker.js`.
+- **v3.69 — "what's new" line on the update banner (rider, [S]). ✅ SHIPPED.** `WHATS_NEW` constant next to
+  `APP_VERSION` (steep-core.js), rendered as a second quiet line under the headline in `showUpdateBanner`
+  (steep-boot.js) — `typeof`-guarded. Bumping it joined the deploy ritual (step 2c, CLAUDE.md). One line, no
+  list, no link-out. Copy: "Updates now tell you what changed — like this." Deploy: `steep-core.js`,
+  `steep-boot.js`, `service-worker.js` (v79).
 - **v3.70 — greeting v4, habit-aware (issues #4 + #5), NEW.** Two ingredients + pool expansion:
   1. **Out-of-habit situations** (issue #4), each a generous 6–8 line pool (one voice/day via `d_copyPick`):
      - **Zero-session day, evening only** — DECIDED (Niklas 2026-07-10): **guilt-free, playful** — the

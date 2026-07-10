@@ -26,6 +26,14 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.69 — the update banner now says what changed
+Deploy: `steep-core.js` (APP_VERSION + new `WHATS_NEW` const), `steep-boot.js` (banner render), `service-worker.js` (v79). No SQL.
+Third of the cleanup tail (ROADMAP-v4 Pillar F) — a small rider.
+- The v3.27 "new version" banner showed only "A new version of SlowCup is ready." — no hint of what the update contained.
+- Adds a `WHATS_NEW` constant beside `APP_VERSION` (one human sentence), rendered as a second quiet line under the headline in `showUpdateBanner` (steep-boot.js). One line — no changelog list, no link-out. A `typeof` guard keeps the banner valid if a client is still on a stale cached `steep-core.js` without the const.
+- This deploy's copy is self-referential: "Updates now tell you what changed — like this." — it demonstrates the feature it announces.
+- Deploy ritual: `WHATS_NEW` now joins the version bumps (new step 2c in CLAUDE.md) — bump it each deploy alongside `CACHE_NAME` and `APP_VERSION`.
+
 ## v3.68 — in-session brew guide: reversible "hide", not a lossy "turn off" (issue #1)
 Deploy: `steep-sessions.js`, `steep-core.js` (APP_VERSION), `service-worker.js` (v78). No SQL.
 Second of the cleanup tail (ROADMAP-v4 Pillar F). Fixes the reported "in-session turn off link gives

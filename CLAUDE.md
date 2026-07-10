@@ -93,6 +93,9 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
    user-visible version string — the Settings footer label and the feedback-mailto subject —
    so a stale value silently mislabels every feedback email. Keep it in lockstep with the
    CHANGELOG heading.
+2c. **Bump `WHATS_NEW` in `steep-core.js`** (v3.69+) to a one-sentence, human summary of what
+   this version changed. It renders as a second quiet line on the update banner (`showUpdateBanner`,
+   steep-boot.js), so a stale value mislabels what users just received. One line — no list, no link.
 3. **Update CHANGELOG.md** with a new version entry: a version heading, a `Deploy:`
    line naming exactly which files changed (and the new SW cache version), whether any
    SQL must be run, then bullets.
