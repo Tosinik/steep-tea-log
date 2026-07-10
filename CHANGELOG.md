@@ -26,6 +26,31 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.67 — greeting v3, session-aware (issue #2)
+Deploy: `steep-dashboard.js`, `steep-core.js` (APP_VERSION), `service-worker.js` (v77). No SQL.
+First of the renumbered cleanup tail (ROADMAP-v4 Pillar F).
+- **The card now reacts to a session logged in the current bucket** instead of nudging another
+  same-bucket brew (the reported bug: "I logged the predicted tea and it suggested another green").
+  `greetingCardHTML` gains a session-aware branch (steep-dashboard.js): if there's a session in the
+  current time-of-day bucket today, it **acknowledges** the ritual, then either **suggests forward**
+  for a later active window or lets the card **rest** — never a third-cup nudge.
+- **Predicted-vs-actual acknowledgment** — the day's pick is recomputable (same seed), so the card
+  knows what it suggested. Took the predicted tea → "Good choice — the {name} it is." register; took
+  something else → warm surprise, never correction: "The {name} instead — didn't see that coming."
+  Small pools each via `d_copyPick` (now takes a `salt` so the ack + tail draw independently yet stay
+  one-voice-per-day). It never scores the prediction ("I was right/wrong" is out).
+- **Same-day type-variety guard** (`VARIETY_GUARD_SAME_DAY`, on) — a forward suggestion for later
+  *today* won't repeat the just-logged type ("not two greens in a row in the morning"). Implemented as
+  a scoring exclusion in the new shared `d_scorePick(target, todayKey, excludeIds, excludeType)`; if
+  every candidate shares the type, the card **rests** rather than break the rule loudly.
+- The no-session branch (v3.55 window-aware redirect + v3.61 copy pools) is unchanged; the greeting h2
+  stays truthful to now; brewed-today is still excluded in other buckets (normal branch).
+- Validated `fixtures/greeting-test.js` (local, now 44): predicted-taken vs surprise copy, forward
+  vs rest, the variety guard + all-same-type fallback, cross-bucket brewed-today exclusion, and
+  determinism; normal/redirect sweeps moved to a sessionless mocked day so they exercise the intended
+  branch. Browser-verified both themes (jade-pale card, jade links, warm copy; no console errors).
+- **Issue #2 is fixed** — close it with a comment linking this entry (needs auth; Niklas via web UI).
+
 ## docs — reconcile v4 roadmap into the repo
 Deploy: **new** `ROADMAP-v4.md`, `ROADMAP-v3-next.md` (superseded banner), `CLAUDE.md` (doc pointers).
 No app change, no SQL, no cache/APP_VERSION bump.

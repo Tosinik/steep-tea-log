@@ -65,7 +65,24 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.66 feed pagination + social inline notice** (cache **v76**, APP_VERSION v3.66):
+**NOW (just shipped) — v3.67 greeting v3, session-aware** (cache **v77**, APP_VERSION v3.67): first of the
+renumbered cleanup tail (ROADMAP-v4 Pillar F). `greetingCardHTML` (steep-dashboard.js) gains a
+**session-aware branch** (fixes issue #2): a session logged in the current time-of-day bucket → the card
+**acknowledges** it (predicted-vs-actual — "Good choice — the {name} it is." if the day's deterministic
+pick was taken, warm surprise "The {name} instead — didn't see that coming." if not; never scores the
+prediction) → then **forward-suggests** for a later active window or **rests**, never a third-cup nudge.
+**Same-day type-variety guard** (`VARIETY_GUARD_SAME_DAY`, on) keeps it from suggesting the just-logged
+type again today ("not two greens in a row"); falls back to rest if every candidate shares the type.
+Shared `d_scorePick(target,todayKey,excludeIds,excludeType)` extracted; `d_copyPick` gained a `salt` so
+ack + tail draw independently. No-session branch unchanged. Validated local `fixtures/greeting-test.js`
+(now 44; normal-branch sweeps moved to a sessionless mocked day); both themes browser-verified.
+**Issue #2 → close with a comment (needs auth).** **NEXT in the tail:** **v3.68** in-session "turn off"
+fix (issue #1, `bug` — `d_setBrewMode('off')` in steep-sessions.js removes the card with no way back +
+resets `timeShift`; make it a reversible "guide hidden · show" ghost row, don't reset timeShift on hide)
+· **v3.69** what's-new banner (`WHATS_NEW` const) · **v3.70** greeting v4 habit-aware (issues #4+#5).
+Also still open: close issue #3 (workflow Q). Launch checklist lives in ROADMAP-v3-next.md.
+
+**Earlier — v3.66 feed pagination + social inline notice** (cache **v76**, APP_VERSION v3.66):
 resumes the SlowCup batch tail after the design rework. `getFeed(limit,offset)` (steep-data.js) paginates
 via `.range()` + secondary `.order('id')` tiebreak and returns `hasMore`; `loadMoreFeed()` (steep-social.js)
 appends the next page de-duped by session id; a quiet "Load more" ghost button (no infinite scroll). The

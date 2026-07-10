@@ -614,7 +614,30 @@ function d_hourBucket(h){ if(h>=5&&h<12) return 'morning'; if(h>=12&&h<17) retur
 function d_hash(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
 // v3.61: pick one line from a pool, stable for the whole calendar day (own '|copy' seed so the copy
 // choice is independent of which tea gets picked). One voice per day, no reshuffle on re-render.
-function d_copyPick(pool, todayKey){ return pool[d_hash(todayKey+'|copy') % pool.length]; }
+// v3.67: optional `salt` lets two pools on the same card draw independently (ack + tail) yet stay
+// stable per day — without it both would land on the same index.
+function d_copyPick(pool, todayKey, salt){ return pool[d_hash(todayKey+'|copy'+(salt||'')) % pool.length]; }
+// v3.67: same-day type-variety guard — after a session, a forward suggestion for LATER TODAY won't
+// repeat the just-logged type (Niklas: "not two greens in a row in the morning"). Tunable so a later
+// phase-2 pass can replace the hard rule with the user's observed repeat behaviour.
+const VARIETY_GUARD_SAME_DAY = true;
+// Deterministic top pick for a target time-of-day bucket. `excludeIds` (Set) drops brewed-today teas;
+// `excludeType` drops one leaf type (the variety guard). Same scoring as the greeting always used —
+// target-bucket history dominates, rating/favourite are small nudges, a date-seeded hash breaks ties.
+// Returns {t,bucketCount,score,tie} or null when nothing qualifies.
+function d_scorePick(target, todayKey, excludeIds, excludeType){
+  const sessions = state.sessions || [];
+  const candidates = (state.teas||[]).filter(t=> !isTeaFinished(t)
+    && !(excludeIds && excludeIds.has(t.id))
+    && !(excludeType && t.type===excludeType));
+  if(!candidates.length) return null;
+  const scored = candidates.map(t=>{
+    const bucketCount = sessions.filter(se=>se.teaId===t.id && d_hourBucket(new Date(se.date).getHours())===target).length;
+    const score = bucketCount + (Number(t.rating)||0)*0.05 + (t.isFavorite?0.15:0);
+    return { t, bucketCount, score, tie:d_hash(todayKey+'|'+t.id) };
+  }).sort((a,b)=> b.score-a.score || b.tie-a.tie);
+  return scored[0];
+}
 function greetingCardHTML(){
   const now = new Date();
   const bucket = d_hourBucket(now.getHours());
@@ -629,35 +652,79 @@ function greetingCardHTML(){
     `The kettle&rsquo;s patient whenever you are.`,
     `Nothing brewing yet — the kettle&rsquo;s patient.`,
   ], todayKey));
-  const brewedToday = new Set(sessions.filter(se=>dayKey(se.date)===todayKey).map(se=>se.teaId));
+  const teaLink = t => `<span onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;">${escapeHtml(t.name)}</span>`;
+  const todaySessions = sessions.filter(se=>dayKey(se.date)===todayKey);
+  const brewedToday = new Set(todaySessions.map(se=>se.teaId));
 
   // v3.55 active-window detection: a bucket is "active" if it holds ≥2 sessions OR ≥15% of the
   // total. Needs ≥5 sessions of signal; below that keep v3.54 behaviour (too little to say "you
-  // never brew now"). If the current bucket is inactive, redirect the suggestion to the next
-  // active bucket in the daily cycle and speak forward instead of nudging a brew now.
+  // never brew now").
   const counts = { morning:0, afternoon:0, evening:0, night:0 };
   sessions.forEach(se=>{ counts[d_hourBucket(new Date(se.date).getHours())]++; });
   const isActive = b => counts[b]>=2 || counts[b] >= sessions.length*0.15;
+  const enoughSignal = sessions.length>=5;
+
+  // v3.67 — SESSION-AWARE (issue #2): a session already logged in the CURRENT bucket today. Don't
+  // nudge another same-bucket brew. Acknowledge the ritual (referencing the day's deterministic
+  // prediction — predicted-vs-actual), then either suggest FORWARD for a later active window (with
+  // the same-day variety guard) or let the card rest.
+  const bucketSessions = todaySessions.filter(se=>d_hourBucket(new Date(se.date).getHours())===bucket);
+  if(bucketSessions.length){
+    const last = bucketSessions.reduce((a,b)=> new Date(b.date)>new Date(a.date)?b:a);
+    const loggedTea = teaById(last.teaId);
+    // Prediction is recomputable (same seed); compare WITHOUT excluding brewed-today so it's stable
+    // before/after the log — otherwise logging the predicted tea would silently change the answer.
+    const predicted = d_scorePick(bucket, todayKey, null, null);
+    const tookPredicted = !!(predicted && loggedTea && predicted.t.id===loggedTea.id);
+    let ack;
+    if(loggedTea){
+      ack = tookPredicted
+        ? d_copyPick([ `Good choice — the ${teaLink(loggedTea)} it is.`,
+                       `The ${teaLink(loggedTea)} — a lovely start.`,
+                       `The ${teaLink(loggedTea)} in the pot already. Nice.` ], todayKey, 'ack')
+        : d_copyPick([ `The ${teaLink(loggedTea)} instead — didn&rsquo;t see that coming.`,
+                       `The ${teaLink(loggedTea)} today — a nice surprise.`,
+                       `Ooh, the ${teaLink(loggedTea)} — not what I&rsquo;d have guessed.` ], todayKey, 'ack');
+    } else {
+      ack = d_copyPick([ `Nicely steeped already.`, `Well steeped this ${BUCKET_NOUN[bucket]}.` ], todayKey, 'ack');
+    }
+    // A later ACTIVE window today that has no session yet? (needs signal to call a window "active".)
+    let laterWindow = null;
+    if(enoughSignal){
+      const idx = BUCKET_CYCLE.indexOf(bucket);
+      for(let i=idx+1;i<BUCKET_CYCLE.length;i++){ const b=BUCKET_CYCLE[i];
+        if(isActive(b) && !todaySessions.some(se=>d_hourBucket(new Date(se.date).getHours())===b)){ laterWindow=b; break; } }
+    }
+    // Forward pick for that window, minus brewed-today and (variety guard) the just-logged type.
+    let fwd = null;
+    if(laterWindow){
+      const excludeType = (VARIETY_GUARD_SAME_DAY && loggedTea) ? loggedTea.type : null;
+      fwd = d_scorePick(laterWindow, todayKey, brewedToday, excludeType);
+    }
+    const tail = fwd
+      ? d_copyPick([ `Maybe the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?`,
+                     `The ${teaLink(fwd.t)} could round out ${BUCKET_WHEN[laterWindow]}.`,
+                     `How about the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?` ], todayKey, 'tail')
+      : d_copyPick([ `That&rsquo;s the day&rsquo;s brewing — the kettle can rest.`,
+                     `Well steeped today; the shelf can rest now.`,
+                     `The kettle&rsquo;s earned its quiet.` ], todayKey, 'tail');
+    return card(ack + ' ' + tail);
+  }
+
+  // ---- no session in the current bucket yet: v3.55 window-aware suggestion (unchanged) ----
+  // If the current bucket is inactive, redirect the suggestion to the next active bucket and speak
+  // forward instead of nudging a brew now.
   let target = bucket, redirected = false;
-  if(sessions.length>=5 && !isActive(bucket)){
+  if(enoughSignal && !isActive(bucket)){
     for(let i=1;i<=3;i++){ const cand = BUCKET_CYCLE[(BUCKET_CYCLE.indexOf(bucket)+i)%4];
       if(isActive(cand)){ target = cand; redirected = true; break; } }
   }
   // Forward within the same day order = still today; a wrap past night into morning = tomorrow.
   const targetToday = !redirected || BUCKET_CYCLE.indexOf(target) > BUCKET_CYCLE.indexOf(bucket);
-
-  // candidates: not finished (untracked or amountGrams>0); exclude already-brewed-today only when
-  // the target window is still today (tomorrow's suggestion can repeat today's tea).
-  const candidates = (state.teas||[]).filter(t=>!isTeaFinished(t) && !(targetToday && brewedToday.has(t.id)));
-  if(!candidates.length) return card('');
-  const scored = candidates.map(t=>{
-    const bucketCount = sessions.filter(se=>se.teaId===t.id && d_hourBucket(new Date(se.date).getHours())===target).length;
-    // target-bucket history dominates; rating/favorite are small nudges; date-seeded hash breaks ties.
-    const score = bucketCount + (Number(t.rating)||0)*0.05 + (t.isFavorite?0.15:0);
-    return { t, bucketCount, score, tie:d_hash(todayKey+'|'+t.id) };
-  }).sort((a,b)=> b.score-a.score || b.tie-a.tie);
-  const pick = scored[0];
-  const name = `<span onclick="openTeaDetail('${escapeJsArg(pick.t.id)}')" style="color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;">${escapeHtml(pick.t.name)}</span>`;
+  // exclude already-brewed-today only when the target window is still today (tomorrow can repeat).
+  const pick = d_scorePick(target, todayKey, (targetToday?brewedToday:null), null);
+  if(!pick) return card('');
+  const name = teaLink(pick.t);
   // v3.61: each branch draws from a small pool, ONE voice per calendar day (a copy-seeded hash,
   // independent of the tea pick, so it doesn't reshuffle on re-render). Tea name stays the tap-target.
   let sub;

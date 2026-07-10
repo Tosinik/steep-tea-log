@@ -84,9 +84,14 @@ Detailed build specs: `TASK-cleanup-and-issues.md` + `TASK-issues-triage-addendu
 each issue's body via the REST API at build time and reconcile before building.
 - ~~**v3.66 feed pagination + socialErr inline notice**~~ ✓ **shipped** (`.range()` paging + "Load more";
   `socialErr` → sticky `.social-notice`, the app's last `alert()` gone).
-- **v3.67 — greeting v3, session-aware (issue #2), EXTENDED.** Base spec: acknowledge a logged session in
-  the current bucket; if a later active window is unsessioned, redirect forward; if the day's windows are
-  done, rest with a closing line (no third-session nudge). The issue body adds two requirements:
+- ~~**v3.67 — greeting v3, session-aware (issue #2), EXTENDED.**~~ ✓ **shipped.** Session-aware branch in
+  `greetingCardHTML`: a session in the current bucket → acknowledge (predicted-vs-actual, never scored) →
+  forward-suggest for a later active window (same-day type-variety guard via `VARIETY_GUARD_SAME_DAY` +
+  shared `d_scorePick`) or rest. `d_copyPick` gained a `salt`. Local `greeting-test.js` → 44. Issue #2
+  fixed (close with a comment). Original spec, for reference:
+  Base spec: acknowledge a logged session in the current bucket; if a later active window is unsessioned,
+  redirect forward; if the day's windows are done, rest with a closing line (no third-session nudge). The
+  issue body added two requirements:
   1. **Predicted-vs-actual acknowledgment** — the card knows its own deterministic pick (same seed). After
      a session in the current bucket: picked the predicted tea → "Good choice — the {name} it is." register;
      picked something else → warm surprise, never correction: "The {name} instead — didn't see that
