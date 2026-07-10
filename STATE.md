@@ -65,7 +65,23 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.67 greeting v3, session-aware** (cache **v77**, APP_VERSION v3.67): first of the
+**NOW (just shipped) — v3.68 in-session brew guide "hide" (issue #1)** (cache **v78**, APP_VERSION v3.68):
+second of the cleanup tail (ROADMAP-v4 Pillar F). Fixes the "in-session turn off link gives weird feedback"
+bug. Mid-steeping, the schedule strip's **"turn off"** called `d_setBrewMode('off')` — which reset
+`timeShift` to 0 (silently discarding the accumulated "+Xs vs guide" nudge) and set `brewMode='off'`, but
+never nulled `d.schedule`, so the card stayed put: you tapped it, nothing turned off, and your nudge
+vanished. Now the link is **"hide"** (`d_hideStrip()`, steep-sessions.js) — a reversible visual collapse
+that leaves `brewMode`/`d.schedule`/`timeShift` intact and sets `d.scheduleHidden=true`; `scheduleStripHTML`
+shows a one-line "Brew guide · hidden · show" ghost (`d_showStrip()` restores it), and the nudge row hides
+with it and comes back with the same carry. `scheduleHidden` resets at `beginSteeping`. Setup preview's
+**Off** segment (`d_setBrewMode('off')`) unchanged. `node --check` clean; both themes browser-verified.
+**Issue #1 → close with a comment (needs auth).** **NEXT in the tail:** **v3.69** what's-new banner
+(`WHATS_NEW` const) · **v3.70** greeting v4 habit-aware (issues #4+#5). Also newer inbox: issues #6–#11
+(remove achievements/confetti · Gaiwan icon · brew-advice "how was it" richer · settings overhaul ·
+map/passport into design · favorite-leaf visibility). Close issue #3 (workflow Q). Launch checklist in
+ROADMAP-v3-next.md.
+
+**Earlier — v3.67 greeting v3, session-aware** (cache **v77**, APP_VERSION v3.67): first of the
 renumbered cleanup tail (ROADMAP-v4 Pillar F). `greetingCardHTML` (steep-dashboard.js) gains a
 **session-aware branch** (fixes issue #2): a session logged in the current time-of-day bucket → the card
 **acknowledges** it (predicted-vs-actual — "Good choice — the {name} it is." if the day's deterministic
@@ -76,11 +92,7 @@ type again today ("not two greens in a row"); falls back to rest if every candid
 Shared `d_scorePick(target,todayKey,excludeIds,excludeType)` extracted; `d_copyPick` gained a `salt` so
 ack + tail draw independently. No-session branch unchanged. Validated local `fixtures/greeting-test.js`
 (now 44; normal-branch sweeps moved to a sessionless mocked day); both themes browser-verified.
-**Issue #2 → close with a comment (needs auth).** **NEXT in the tail:** **v3.68** in-session "turn off"
-fix (issue #1, `bug` — `d_setBrewMode('off')` in steep-sessions.js removes the card with no way back +
-resets `timeShift`; make it a reversible "guide hidden · show" ghost row, don't reset timeShift on hide)
-· **v3.69** what's-new banner (`WHATS_NEW` const) · **v3.70** greeting v4 habit-aware (issues #4+#5).
-Also still open: close issue #3 (workflow Q). Launch checklist lives in ROADMAP-v3-next.md.
+**Issue #2 → close with a comment (needs auth).** (v3.68 above superseded this block's "NEXT" tail.)
 
 **Earlier — v3.66 feed pagination + social inline notice** (cache **v76**, APP_VERSION v3.66):
 resumes the SlowCup batch tail after the design rework. `getFeed(limit,offset)` (steep-data.js) paginates

@@ -489,6 +489,9 @@ function d_setMood(m){ const d=state.sessionDraft; d.mood = (d.mood===m)?null:m;
 function setEditSessionMood(m){ const e=state.editingSession; e.mood = (e.mood===m)?null:m;
   const w=document.getElementById('editMoodWrap'); if(w) w.innerHTML=moodChipsHTML(e.mood||null,'setEditSessionMood'); }
 function d_setBrewMode(mode){ state.sessionDraft.brewMode = mode; state.sessionDraft.timeShift = 0; render(); }
+// v3.68: reversible in-session hide of the schedule strip — leaves brewMode/schedule/timeShift intact.
+function d_hideStrip(){ if(state.sessionDraft){ state.sessionDraft.scheduleHidden = true; render(); } }
+function d_showStrip(){ if(state.sessionDraft){ state.sessionDraft.scheduleHidden = false; render(); } }
 
 // Setup preview: the tea's brew guide plus, once there's session feedback, a
 // gently tuned "your tuning" option and a memory of how past cups landed.
@@ -569,7 +572,7 @@ function d_nudgeNextSteep(kind){
   render();
 }
 function brewNudgeRowHTML(d){
-  if(!d.schedule || !d.steeps.length) return '';
+  if(!d.schedule || !d.steeps.length || d.scheduleHidden) return '';
   const shift = d.timeShift||0;
   const chip=(k,l)=>`<button type="button" class="lib-chip" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;
   const note = shift ? `<span style="font-size:11px;color:var(--ink-soft);">next steep ${shift>0?'+':''}${shift}s vs guide</span>` : '';
@@ -592,6 +595,7 @@ function beginSteeping(){
   else if(d.brewMode==='guide') d.schedule = base;
   else d.schedule = null;
   d.timeShift = 0;
+  d.scheduleHidden = false;
   d.stage='steeping';
   applyScheduleToCurrentSteep(d);
   render();
@@ -608,6 +612,12 @@ function beginColdBrewLog(){
 // current step marked and extended steeps flagged "~". A quiet link turns it off.
 function scheduleStripHTML(d){
   if(!d.schedule) return '';
+  // v3.68: a quiet, reversible hide (not the old "turn off" that silently reset the
+  // in-session nudge and left the card on screen). Collapses to a one-line "show" ghost.
+  if(d.scheduleHidden) return `<div class="card" style="margin-bottom:14px;background:var(--jade-pale);border:1px solid var(--line);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div class="eyebrow" style="opacity:.65;">Brew guide · hidden</div>
+      <button class="btn-ghost" style="font-size:11.5px;" onclick="d_showStrip()">show</button>
+    </div>`;
   const sched = d.schedule;
   const cur = d.steeps.length; // index of the steep being brewed now
   const shownCount = Math.max(sched.times.length, cur+1);
@@ -628,7 +638,7 @@ function scheduleStripHTML(d){
   return `<div class="card" style="margin-bottom:14px;background:var(--jade-pale);border:1px solid var(--line);padding:12px 14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
       <div class="eyebrow">${label}${meta.length?' · '+meta.join(' · '):''}</div>
-      <button class="btn-ghost" style="font-size:11.5px;" onclick="d_setBrewMode('off')">turn off</button>
+      <button class="btn-ghost" style="font-size:11.5px;" onclick="d_hideStrip()">hide</button>
     </div>
     <div style="margin-top:8px;">${chips}</div>
   </div>`;

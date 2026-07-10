@@ -26,6 +26,25 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.68 — in-session brew guide: reversible "hide", not a lossy "turn off" (issue #1)
+Deploy: `steep-sessions.js`, `steep-core.js` (APP_VERSION), `service-worker.js` (v78). No SQL.
+Second of the cleanup tail (ROADMAP-v4 Pillar F). Fixes the reported "in-session turn off link gives
+weird feedback."
+- **The bug:** mid-steeping, the schedule strip's "turn off" link called `d_setBrewMode('off')`, which
+  reset `timeShift` to 0 (silently discarding the user's accumulated "+Xs vs guide" nudge) and set
+  `brewMode='off'` — but `d.schedule` was never nulled, so the card stayed on screen. You tapped
+  "turn off," nothing turned off, and your nudge quietly vanished.
+- **The fix:** the link is now **"hide"** (`d_hideStrip()`), a purely visual, reversible collapse.
+  It leaves `brewMode`, `d.schedule`, and `timeShift` untouched and sets `d.scheduleHidden=true`;
+  `scheduleStripHTML` renders a one-line "Brew guide · hidden · show" ghost row (`d_showStrip()`
+  restores it). The "How was that pour?" nudge row hides with it and returns intact — the carried
+  `timeShift` survives the round-trip. `scheduleHidden` resets to false at `beginSteeping`.
+- The setup preview's **Off** segment (`d_setBrewMode('off')`) is unchanged — that's a legitimate
+  pre-steeping choice; only the in-session link changed.
+- `node --check` clean; browser-verified both themes (hide → ghost row → show restores strip + nudge
+  with the same `+Xs` carry).
+- **Issue #1 is fixed** — close it with a comment linking this entry (needs auth; Niklas via web UI).
+
 ## v3.67 — greeting v3, session-aware (issue #2)
 Deploy: `steep-dashboard.js`, `steep-core.js` (APP_VERSION), `service-worker.js` (v77). No SQL.
 First of the renumbered cleanup tail (ROADMAP-v4 Pillar F).

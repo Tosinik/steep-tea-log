@@ -104,12 +104,13 @@ each issue's body via the REST API at build time and reconcile before building.
      Keep a tunable `VARIETY_GUARD_SAME_DAY = true` (phase-2 learning may later replace the hard rule).
   Fixtures: predicted-taken vs not-taken branches; variety guard excludes same-type; all-same-type
   fallback; determinism unchanged. Deploy: `steep-dashboard.js`, `service-worker.js`. Close issue #2.
-- **v3.68 — in-session "turn off" fix (issue #1, `bug`).** The in-session guide card's "turn off"
-  (`d_setBrewMode('off')`, steep-sessions.js) removes the whole card with no way back AND resets
-  `timeShift` (discarding the user's ±5s pour adjustment). Fix, reversible + calm: render a one-line ghost
-  "Brew guide hidden · show" (remember `d.lastBrewMode` to restore Guide vs Your tuning); do NOT reset
-  `timeShift` on an in-session hide (keep the reset only on setup-level mode switches); no confirm needed.
-  Deploy: `steep-sessions.js`, `service-worker.js`. Close issue #1.
+- **v3.68 — in-session "turn off" fix (issue #1, `bug`). ✅ SHIPPED 2026-07-10 (cache v78).** The link is
+  now **"hide"** (`d_hideStrip()`/`d_showStrip()`, steep-sessions.js): a reversible visual collapse to a
+  one-line "Brew guide · hidden · show" ghost that leaves `brewMode`/`d.schedule`/`timeShift` fully intact
+  (simpler than the planned `d.lastBrewMode` restore — nothing to restore since the mode is never
+  touched). The nudge row hides with it and returns with its `+Xs` carry. `d.scheduleHidden` resets at
+  `beginSteeping`; setup preview's **Off** segment unchanged. Deploy: `steep-sessions.js`, `steep-core.js`
+  (APP_VERSION), `service-worker.js` (v78). Close issue #1.
 - **v3.69 — "what's new" line on the update banner (rider, [S]).** Add a `WHATS_NEW` constant next to
   `APP_VERSION` (one short human sentence), rendered as a second quiet line on the v3.27 update banner.
   Bumping it joins the deploy ritual (step 2c). One line only, no changelog list, no link-out.
