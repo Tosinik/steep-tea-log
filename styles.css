@@ -580,3 +580,9 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .ins-teaser-k{font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#CDE0C4;}
 .ins-teaser-title{font-family:var(--font-display);font-weight:700;font-size:16px;color:#F6F2E9;margin-top:2px;}
 .ins-teaser-arrow{color:#E3A15C;font-size:20px;line-height:1;}
+
+/* social — sticky inline notice (v3.66, replaces the socialErr alert) + quiet feed "load more" */
+.social-notice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--red);border-radius:12px;padding:12px 14px;margin-bottom:16px;background:var(--porcelain-dim);}
+.social-notice-msg{flex:1;font-size:13px;line-height:1.5;color:var(--ink);}
+.social-notice-x{background:none;border:none;color:var(--ink-soft);font-size:18px;line-height:1;padding:0 4px;cursor:pointer;}
+.feed-more{text-align:center;margin:4px 0 12px;}

@@ -99,9 +99,16 @@ function viewFriends(){
   if(so.tab==='feed') body=feedHTML();
   else if(so.tab==='find') body=findHTML();
   else body=followingHTML();
+  // Sticky inline notice (v3.66) — replaces the old socialErr alert(). Setup diagnostics are
+  // multi-sentence, so a toast is wrong; this stays until dismissed or the next action clears it.
+  const notice = so.err ? `<div class="social-notice">
+    <div class="social-notice-msg">${escapeHtml(so.err)}</div>
+    <button class="social-notice-x" onclick="dismissSocialErr()" aria-label="Dismiss">×</button>
+  </div>` : '';
   return `
     <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Friends</h2>
       <button class="btn-ghost" onclick="editProfile()">edit profile</button></div>
+    ${notice}
     <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       ${avatarHTML(me,48)}
       <div><div style="font-weight:600;">${escapeHtml(me.displayName||me.username)}</div>
@@ -109,12 +116,34 @@ function viewFriends(){
     </div>
     ${tabs}${body}`;
 }
+function dismissSocialErr(){ state.social.err=null; render(); }
+const FEED_PAGE = 50; // page size for the shared-session feed (v3.66)
 function feedHTML(){
   const so=state.social;
   if(!so.following.length) return `<div class="card empty">You're not following anyone yet. Use <strong>Find</strong> to search by username.</div>`;
   const feed=so.feed;
   if(!feed || !feed.sessions.length) return `<div class="card empty">No shared sessions yet from the people you follow.</div>`;
-  return feed.sessions.map(s=>feedRowHTML(s, feed.profiles[s.userId])).join('');
+  const rows = feed.sessions.map(s=>feedRowHTML(s, feed.profiles[s.userId])).join('');
+  const more = feed.hasMore
+    ? `<div class="feed-more"><button class="btn-ghost" onclick="loadMoreFeed()"${so.feedLoadingMore?' disabled':''}>${so.feedLoadingMore?'Loading…':'Load more'}</button></div>`
+    : '';
+  return rows + more;
+}
+// Fetch the next page and APPEND, de-duping by session id so a row that shifted across the page
+// boundary (a new session inserted up top between fetches) can't render twice. Manual, not infinite.
+async function loadMoreFeed(){
+  const so=state.social;
+  if(so.feedLoadingMore || !so.feed || !so.feed.hasMore) return;
+  so.err=null; so.feedLoadingMore=true; render();
+  try{
+    const next = await window.SteepDB.getFeed(FEED_PAGE, so.feed.sessions.length);
+    const seen = new Set(so.feed.sessions.map(s=>s.id));
+    const fresh = (next.sessions||[]).filter(s=>!seen.has(s.id));
+    so.feed.sessions = so.feed.sessions.concat(fresh);
+    so.feed.profiles = {...so.feed.profiles, ...(next.profiles||{})};
+    so.feed.hasMore = next.hasMore;
+  }catch(e){ so.feedLoadingMore=false; return socialErr(e, 'load more'); }
+  so.feedLoadingMore=false; render();
 }
 function feedRowHTML(s, prof){
   const tags=(s.tags||[]).slice(0,5).map(t=>`<span class="tagchip">${escapeHtml(t)}</span>`).join(' ');
@@ -177,6 +206,7 @@ async function doSearch(){
   setTimeout(()=>{ const i=document.getElementById('userSearch'); if(i){ i.value=q; i.focus(); } },0);
 }
 async function doFollow(id){
+  state.social.err=null;
   try{ await window.SteepDB.follow(id); }
   catch(e){ return socialErr(e, 'follow'); }
   if(!state.social.following.includes(id)) state.social.following.push(id);
@@ -184,6 +214,7 @@ async function doFollow(id){
   try{ await refreshFeed(); }catch(e){ console.warn('[Steep] feed refresh after follow failed', e); }
 }
 async function doUnfollow(id){
+  state.social.err=null;
   try{ await window.SteepDB.unfollow(id); }
   catch(e){ return socialErr(e, 'unfollow'); }
   state.social.following=state.social.following.filter(x=>x!==id);

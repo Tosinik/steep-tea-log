@@ -550,12 +550,16 @@
   async function unfollow(id) { const { error } = await sb.from('follows').delete().eq('follower_id', userId()).eq('followee_id', id); if (error) throw error; }
   async function getFollowing() { const { data, error } = await sb.from('follows').select('followee_id').eq('follower_id', userId()); if (error) throw error; return (data || []).map(r => r.followee_id); }
 
-  async function getFeed(limit = 50) {
+  // Paged with .range() (v3.66) — `offset` skips already-loaded rows; `hasMore` is true when the
+  // page came back full, so the UI can show a quiet "load more". A secondary sort on `id` makes the
+  // order deterministic (a session_date tie can't reshuffle across page boundaries).
+  async function getFeed(limit = 50, offset = 0) {
     const following = await getFollowing();
-    if (!following.length) return { sessions: [], profiles: {}, following: [] };
+    if (!following.length) return { sessions: [], profiles: {}, following: [], hasMore: false };
     const { data: ses, error } = await sb.from('sessions').select('*')
       .in('user_id', following).eq('is_shared', true)
-      .order('session_date', { ascending: false }).limit(limit);
+      .order('session_date', { ascending: false }).order('id', { ascending: false })
+      .range(offset, offset + limit - 1);
     if (error) throw error;
     const sessions = (ses || []).map(sessionFromDb);
     const ids = sessions.map(s => s.id);
@@ -565,7 +569,7 @@
       (st || []).forEach(r => { const s = byId[r.session_id]; if (s) s.steeps.push(steepFromDb(r)); });
     }
     const profiles = await getProfilesByIds(following);
-    return { sessions, profiles, following };
+    return { sessions, profiles, following, hasMore: sessions.length === limit };
   }
 
   /* ============================ settings (synced) ============================ */

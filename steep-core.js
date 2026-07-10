@@ -1,6 +1,6 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.65';
+const APP_VERSION = 'v3.66';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -78,7 +78,10 @@ function socialErr(e, action){
     msg = "Couldn't reach the server — you may be offline. Try again once you're back online.";
   else
     msg = "Could not "+action+": "+((e&&e.message)||e);
-  alert(msg);
+  // v3.66: surface as a sticky inline notice on the social view (not a browser alert). These are
+  // multi-sentence setup diagnostics, so a toast would be wrong; dismissed via dismissSocialErr().
+  if(state && state.social){ state.social.err = msg; render(); }
+  else showToast(msg, 12000);
 }
 
 /* ---------- state ---------- */
@@ -124,7 +127,7 @@ let state = {
   teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false }, teaSeg: 'teas',
   recapPeriod: 'week',
   passportSel: null, passportZoom: null, passportSub: null,
-  social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null },
+  social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null, err:null, feedLoadingMore:false },
   loaded:false
 };
 

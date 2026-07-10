@@ -26,6 +26,26 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## v3.66 — feed pagination + social error becomes an inline notice
+Deploy: `steep-data.js`, `steep-social.js`, `steep-core.js` (socialErr + APP_VERSION + state), `styles.css`,
+`service-worker.js` (v76). No SQL. Resumes the SlowCup batch tail after the design rework.
+- **Feed pagination** (`getFeed(limit=50, offset=0)`, steep-data.js) — switched `.limit()` → `.range(offset,
+  offset+limit-1)` with a secondary `.order('id')` so a `session_date` tie can't reshuffle rows across a page
+  boundary. Returns `hasMore` (page came back full). `loadMoreFeed()` (steep-social.js) fetches the next page
+  and **appends**, de-duping by session id so a row that shifted across the boundary (a session inserted up
+  top between fetches) can't render twice. Manual, quiet **"Load more"** ghost button under the feed — no
+  infinite scroll; hidden when `hasMore` is false. Page size stays the old cap (50). Personal-stats scoping
+  (`loadKey` `user_id` filter) is untouched — the feed still uses `getFeed()` separately.
+- **`socialErr` → sticky inline notice** (steep-core.js) — the last `alert()` in the app is gone. The same
+  message branches (missing tables / RLS policy / offline / generic) now set `state.social.err` and render a
+  dismissible `.social-notice` at the top of the Friends view (red hairline border, porcelain-dim, themes in
+  both). These are multi-sentence setup diagnostics, so a toast would be wrong. Cleared on the next
+  follow/unfollow attempt or via the × (`dismissSocialErr`). Falls back to a long toast if `state` isn't ready.
+- Browser-verified (both themes): the notice renders + themes + dismisses, RLS/missing-table branches pick
+  the right copy, "Load more" shows only when `hasMore` and wires `loadMoreFeed`, de-dupe append holds. No
+  console errors (the `[Steep] follow failed` lines were the test harness exercising `socialErr`). `node
+  --check` clean on all touched files.
+
 ## docs — DESIGN.md refreshed to post-round-1 reality
 Deploy: `DESIGN.md` only. No app change, no SQL, no cache/APP_VERSION bump. Prep for design round 2.
 - Version stamp → v3.65; noted design round 1 complete (WS3 language · WS1 Wrapped · WS4 landing · WS2 Insights).

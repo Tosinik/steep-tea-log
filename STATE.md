@@ -65,7 +65,22 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.65 WS2 Insights overhaul** (cache **v75**, APP_VERSION v3.65): the LAST of the
+**NOW (just shipped) — v3.66 feed pagination + social inline notice** (cache **v76**, APP_VERSION v3.66):
+resumes the SlowCup batch tail after the design rework. `getFeed(limit,offset)` (steep-data.js) paginates
+via `.range()` + secondary `.order('id')` tiebreak and returns `hasMore`; `loadMoreFeed()` (steep-social.js)
+appends the next page de-duped by session id; a quiet "Load more" ghost button (no infinite scroll). The
+**last `alert()` in the app is gone** — `socialErr` now sets `state.social.err` → a dismissible sticky
+`.social-notice` on the Friends view (same message branches; themes both; cleared on next action or ×;
+`dismissSocialErr`). Both themes browser-verified; `node --check` clean. **NEXT:** a **docs commit**
+reconciling `ROADMAP-v4.md` + `TASK-issues-triage-addendum.md` (Downloads) into the repo, then the cleanup
+tail continues: **v3.67** greeting v3 session-aware (issue #2, EXTENDED — predicted-vs-actual acknowledgment
++ same-day type-variety guard) · **v3.68** in-session turn-off fix (issue #1) · **v3.69** what's-new banner
+· **v3.70** greeting v4 habit-aware (issues #4+#5 — out-of-habit lines + rediscovery pick; zero-session
+line DECIDED guilt-free/playful). Close issue #3 (workflow question) with the convention comment. The
+**slowcup.app launch checklist** lives in ROADMAP (register domain · reshoot 3 screenshots · root/index
+split · install guide).
+
+**Earlier — v3.65 WS2 Insights overhaul** (cache **v75**, APP_VERSION v3.65): the LAST of the
 4-workstream design rework — **the rework is complete**. `viewInsights()` is now a curated reflective room
 built from insights-surface dashLayout cards (Home stays editable): a jade-pale **hero observation**
 (window-aware eyebrow "This week, mostly"→"Lately"→"Mostly"; Shippori sentence "Green, and mornings.";

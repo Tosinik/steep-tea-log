@@ -89,11 +89,10 @@ v3.40 tea lifecycle.
      garbage/neutral styles — exactly 2 fire on real data. Rider: "add a purchase date" link where
      `inventorySparkline` is absent only for want of a date. Night-copy: active-with-history line 3 →
      "tonight" not "this late-night". Validated `fixtures/freshness-test.js` (local, 11) + greeting (32).
-   - **Feed pagination → v3.66 (NEXT — the design rework is done, this resumes the batch tail)** —
-     `.range()` paging + quiet "load more" (no infinite scroll); page size = current cap; verify the
-     shared-session mapper appends page 2+ without duplicate keys. **Fold in** `socialErr`'s `alert()` →
-     a sticky inline notice on the social view (multi-sentence setup diagnostics, so not a toast) — same
-     file, per `TASK-cleanup-and-issues.md` housekeeping.
+   - ~~**Feed pagination**~~ ✓ **shipped v3.66** — `getFeed(limit,offset)` uses `.range()` + a secondary
+     `.order('id')` tiebreak; returns `hasMore`; `loadMoreFeed()` appends the next page de-duped by id
+     (no boundary dupes); quiet "Load more" ghost button, no infinite scroll. **Folded in:** `socialErr`'s
+     `alert()` → a dismissible sticky `.social-notice` on the Friends view (the app's last `alert()` — gone).
    - **Then `TASK-cleanup-and-issues.md`, RENUMBERED** — the design rework consumed v3.63–v3.65, which
      that task had assigned to §1/§2/§3. Real order now: **v3.67** greeting card v3 / react-to-logged-
      session (issue #2) · **v3.68** in-session "turn off" fix (issue #1) · **v3.69** "what's new" banner
