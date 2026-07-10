@@ -107,9 +107,14 @@ v3.40 tea lifecycle.
      bindDynamic). `wrappedKinds()` degrades gracefully — missing-stat cards drop and numbering
      re-flows; time card falls back to cold-brew count. Kept share-as-text (reworded), empty state,
      the name. Validated `fixtures/wrapped-cards-test.js` (committed, 22); both themes browser-checked.
-   - **WS4 — slowcup.app landing** — net-new static page (own `.html` + real CSS, `prefers-color-scheme`,
-     no JS frameworks/analytics). Hero + device screenshots + 3 philosophy beats + jade-deep CTA panel
-     (`mailto:slowcupapp@gmail.com`). Swap in current screenshots at deploy. Not part of the PWA cache.
+   - ~~**WS4 — slowcup.app landing**~~ ✓ **shipped**. New self-contained `landing.html` at repo root +
+     `landing-assets/*.png` — inline CSS/SVG, Google Fonts, **no JS/cookies/analytics**, theme via
+     `@media (prefers-color-scheme)`. Nav · hero (Shippori "The calm tea log." + amber ensō) · 3 device
+     screenshots · 3 philosophy beats · jade-deep CTA panel (seigaiha + amber button) · footer. CTAs are
+     `mailto:slowcupapp@gmail.com`. **No cache/APP_VERSION bump** (zero PWA files touched). Both themes +
+     mobile browser-verified. **TODO before slowcup.app goes live:** reshoot the placeholder screenshots
+     (bundle ones predate WS3/WS1; the tea-detail one still shows the old "Steep" wordmark), and decide the
+     root/index split for the domain (part of the deferred domain migration).
    - **WS2 — Insights overhaul** — remake `viewInsights()` as the reflective room: one hero observation
      (jade-pale), a reusable tiny data-viz family (sparkline/type-bar/time-of-day/steep-shape), hairline
      top-borders not boxed cards, observations-not-KPIs copy, quiet Wrapped teaser. Inherits WS3+WS1.

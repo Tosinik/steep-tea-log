@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F6F2E9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15140F" media="(prefers-color-scheme: dark)">
+<title>SlowCup — the calm tea log</title>
+<meta name="description" content="A quiet companion for your daily brewing ritual — sessions, steeps, and gentle guidance that learns how you pour. No streaks, no scores, no noise. Private beta.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.5 3.2 C7 7.5 6.5 15 11.5 20.5 C16.5 15.5 19 8 13.5 3.2 Z' fill='%233F5E42'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* SlowCup landing — WS4. Static, self-contained, no JS, no cookies, no tracking.
+     Theme follows the OS via prefers-color-scheme; tokens mirror the app's styles.css. */
+  :root{
+    --bg:#F6F2E9; --surface:#FFFEFB; --fg:#2B2320; --soft:#5C5148; --line:#D8CFB9;
+    --jade:#3F5E42; --jade-deep:#2A4130; --amber:#C17A3E; --leaf:#3F5E42;
+    --font-display:'Shippori Mincho',serif; --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15140F; --surface:#1C1A14; --fg:#EDE6D6; --soft:#A79C87; --line:#332F24;
+      --jade:#6F9A66; --jade-deep:#2A4130; --amber:#E3A15C; --leaf:#8FBE83;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6;}
+  a{text-decoration:none;color:inherit;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:700;margin:0;}
+  .mono{font-family:var(--font-mono);}
+  .wrap{max-width:720px;margin:0 auto;padding-left:24px;padding-right:24px;}
+
+  /* nav */
+  .nav{max-width:1000px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:9px;}
+  .brand .logo{width:28px;height:28px;}
+  .brand-name{font-family:var(--font-display);font-weight:700;font-size:21px;}
+  .nav-link{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;color:var(--soft);border-bottom:1px solid var(--line);padding-bottom:2px;transition:color .15s,border-color .15s;}
+  .nav-link:hover{color:var(--fg);border-color:var(--soft);}
+
+  /* hero */
+  .hero{max-width:720px;margin:0 auto;padding:60px 24px 40px;text-align:center;position:relative;}
+  .hero-enso{position:absolute;left:50%;top:20px;transform:translateX(-50%);width:300px;height:300px;max-width:90vw;color:var(--amber);opacity:.10;pointer-events:none;}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);position:relative;}
+  .hero h1{font-size:clamp(44px,11vw,64px);line-height:1.04;letter-spacing:-.01em;margin-top:18px;position:relative;}
+  .hero-sub{font-size:17px;color:var(--soft);max-width:520px;margin:22px auto 0;position:relative;}
+  .btn{display:inline-block;font-weight:600;font-size:15px;padding:14px 28px;border-radius:11px;transition:background .15s,filter .15s;}
+  .btn-jade{background:var(--jade);color:#fff;}
+  .btn-jade:hover{filter:brightness(.93);}
+  .btn-amber{background:#E3A15C;color:#2B1206;}
+  .btn-amber:hover{filter:brightness(.95);}
+  .hero-cta{margin-top:32px;position:relative;}
+  .micro{font-family:var(--font-mono);font-size:11.5px;color:var(--soft);margin-top:14px;position:relative;}
+
+  /* device screenshots */
+  .devices{max-width:1000px;margin:0 auto;padding:30px 24px 20px;display:flex;gap:26px;justify-content:center;align-items:flex-start;flex-wrap:wrap;}
+  .device{width:224px;max-width:70vw;border-radius:30px;border:6px solid #17150F;background:#17150F;overflow:hidden;box-shadow:0 20px 44px rgba(0,0,0,.20);}
+  .device img{width:100%;display:block;}
+  .device-raised{margin-top:-24px;}
+  @media (max-width:719px){ .device-raised{margin-top:0;} }
+
+  /* philosophy */
+  .beliefs{max-width:720px;margin:0 auto;padding:56px 24px 30px;}
+  .beliefs-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);text-align:center;margin-bottom:36px;}
+  .beats{display:flex;flex-direction:column;gap:34px;}
+  .beat{display:flex;gap:18px;align-items:flex-start;}
+  .beat-icon{flex:0 0 auto;width:46px;height:46px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+  .beat-icon svg{width:24px;height:24px;}
+  .beat h3{font-size:22px;margin:0 0 6px;}
+  .beat p{font-size:15px;color:var(--soft);margin:0;}
+  .beat em{font-style:italic;}
+
+  /* CTA panel */
+  .cta{max-width:720px;margin:0 auto;padding:40px 24px 60px;}
+  .cta-panel{position:relative;overflow:hidden;background:var(--jade-deep);border-radius:20px;padding:48px 32px;text-align:center;}
+  .cta-seigaiha{position:absolute;inset:0;color:#8FBE83;opacity:.10;pointer-events:none;}
+  .cta-seigaiha svg{width:100%;height:100%;}
+  .cta h2{font-size:clamp(26px,7vw,32px);color:#F6F2E9;position:relative;line-height:1.15;}
+  .cta p{font-size:15px;color:#CDE0C4;max-width:440px;margin:16px auto 0;position:relative;}
+  .cta-btn{margin-top:26px;position:relative;}
+  .cta-mail{font-family:var(--font-mono);font-size:11.5px;color:#CDE0C4;margin-top:14px;position:relative;}
+
+  /* footer */
+  .foot{max-width:720px;margin:0 auto;padding:24px 24px 48px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);flex-wrap:wrap;}
+  .foot .logo{width:20px;height:20px;}
+  .foot-name{font-family:var(--font-display);font-weight:600;font-size:15px;}
+  .foot-note{font-family:var(--font-mono);font-size:11px;color:var(--soft);}
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>
+<symbol id="logo" viewBox="0 0 16 16"><rect x="7" y="1" width="2" height="1" fill="#C9B48A"/><rect x="7" y="2" width="2" height="1" fill="#C9B48A"/><rect x="4" y="3" width="8" height="1" fill="#E7D9B8"/><rect x="3" y="4" width="10" height="1" fill="#E7D9B8"/><rect x="2" y="5" width="12" height="1" fill="#E7D9B8"/><rect x="1" y="6" width="14" height="1" fill="#CBB07A"/><rect x="2" y="7" width="12" height="1" fill="#EDE2C6"/><rect x="2" y="8" width="3" height="1" fill="#EDE2C6"/><rect x="5" y="8" width="1" height="1" fill="#6E5637"/><rect x="6" y="8" width="4" height="1" fill="#EDE2C6"/><rect x="10" y="8" width="1" height="1" fill="#6E5637"/><rect x="11" y="8" width="3" height="1" fill="#EDE2C6"/><rect x="2" y="9" width="12" height="1" fill="#EDE2C6"/><rect x="3" y="10" width="10" height="1" fill="#EDE2C6"/><rect x="4" y="11" width="8" height="1" fill="#EDE2C6"/><rect x="6" y="12" width="4" height="1" fill="#C9B48A"/></symbol>
+<symbol id="fav-leaf" viewBox="0 0 24 24"><path d="M13.5 3.2 C7 7.5 6.5 15 11.5 20.5 C16.5 15.5 19 8 13.5 3.2 Z" fill="currentColor"/><path d="M12 6.5 C11 11 11.4 15.5 12.6 18.8" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="1.1" stroke-linecap="round"/></symbol>
+<symbol id="enso" viewBox="0 0 120 120"><path d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></symbol>
+<symbol id="i-share-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M8.3 10.9l6.5-3.6M8.3 13.1l6.5 3.6"/></g></symbol>
+<pattern id="seigaiha" width="44" height="22" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width="1.3"><path d="M0 22a22 22 0 0 1 44 0"/><path d="M7 22a15 15 0 0 1 30 0"/><path d="M14 22a8 8 0 0 1 16 0"/></g></pattern>
+</defs></svg>
+
+<nav class="nav">
+  <div class="brand"><svg class="logo" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#logo"/></svg><span class="brand-name">SlowCup</span></div>
+  <a class="nav-link" href="mailto:slowcupapp@gmail.com?subject=SlowCup%20invite%20request">request an invite</a>
+</nav>
+
+<header class="hero">
+  <svg class="hero-enso" viewBox="0 0 120 120" aria-hidden="true"><use href="#enso"/></svg>
+  <div class="eyebrow">A tea log for the ritual</div>
+  <h1>The calm<br>tea log.</h1>
+  <p class="hero-sub">A quiet companion for your daily brewing — sessions, steeps, and gentle guidance that learns how you pour. No streaks, no scores, no noise.</p>
+  <div class="hero-cta"><a class="btn btn-jade" href="mailto:slowcupapp@gmail.com?subject=SlowCup%20invite%20request">Request an invite</a></div>
+  <div class="micro">private beta · a handful of testers at a time</div>
+</header>
+
+<!-- PLACEHOLDER SCREENSHOTS (from the WS4 handoff bundle) — swap before pointing slowcup.app here.
+     They predate WS3/WS1, and app-tea-detail.png still shows the old "Steep" wordmark (pre-v3.59 rename).
+     Reshoot Home / tea detail / Sessions on the current build and replace the three files in landing-assets/. -->
+<section class="devices" aria-label="Screens from the app">
+  <div class="device"><img src="landing-assets/app-home.png" alt="SlowCup home screen — greeting, running-low teas, and season totals" width="224"></div>
+  <div class="device device-raised"><img src="landing-assets/app-tea-detail.png" alt="A tea's detail screen with its brew guide" width="224"></div>
+  <div class="device"><img src="landing-assets/app-sessions.png" alt="The sessions history with its brewing heatmap" width="224"></div>
+</section>
+
+<section class="beliefs">
+  <div class="beliefs-eyebrow">What SlowCup believes</div>
+  <div class="beats">
+    <div class="beat">
+      <span class="beat-icon" style="color:var(--leaf)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#fav-leaf"/></svg></span>
+      <div><h3>Ritual over metrics</h3><p>The app serves the brew; it never gamifies it. No streaks to protect, no badges pushed at you, nothing to chase. When the day's tea is logged, it rests.</p></div>
+    </div>
+    <div class="beat">
+      <span class="beat-icon" style="color:var(--amber)"><svg viewBox="0 0 120 120" aria-hidden="true"><use href="#enso"/></svg></span>
+      <div><h3>Advice that learns your pours</h3><p>Suggestions drawn from your own sessions — <em>“heavier pour than your baseline; times shortened ≈19%.”</em> Always labelled as an estimate, never a guess dressed as your data.</p></div>
+    </div>
+    <div class="beat">
+      <span class="beat-icon" style="color:var(--jade)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-share-hl"/></svg></span>
+      <div><h3>Your data, exportable</h3><p>Everything you log is yours. Export the whole library to a file any time and take it anywhere. No lock-in, no account you can't leave.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-panel">
+    <div class="cta-seigaiha" aria-hidden="true"><svg preserveAspectRatio="xMidYMid slice"><rect width="100%" height="100%" fill="url(#seigaiha)"/></svg></div>
+    <h2>The kettle's patient<br>whenever you are.</h2>
+    <p>SlowCup is in private beta — opened to a few tea people at a time. If it sounds like your kind of quiet, ask for a key.</p>
+    <div class="cta-btn"><a class="btn btn-amber" href="mailto:slowcupapp@gmail.com?subject=SlowCup%20invite%20request">Request an invite</a></div>
+    <div class="cta-mail">slowcupapp@gmail.com</div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="brand"><svg class="logo" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#logo"/></svg><span class="foot-name">SlowCup</span></div>
+  <div class="foot-note">a static page · no cookies, no tracking, nothing to accept</div>
+</footer>
+
+</body>
+</html>

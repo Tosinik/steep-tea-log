@@ -26,6 +26,32 @@ Concatenating them in this order reproduces the old `app.js` byte-for-byte.
 Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
 
 ---
+## WS4 — slowcup.app landing page (static; NOT part of the PWA)
+Deploy: **new** `landing.html` + `landing-assets/{app-home,app-tea-detail,app-sessions}.png`. No SQL.
+**No `CACHE_NAME` / `APP_VERSION` bump and no `FILES_TO_CACHE` change on purpose** — this touches zero
+PWA files, so invalidating every tester's app cache for a page the app never loads would be wrong. Third
+of four design workstreams (WS3 → WS1 → **WS4** → WS2).
+- **New standalone marketing page** (`landing.html`) — a single self-contained static file: inline
+  `<style>` + inline `<svg><defs>` sprite (logo · fav-leaf · ensō · i-share-hl · seigaiha), Google Fonts
+  link (Shippori Mincho / Inter / IBM Plex Mono), **no JS, no cookies, no analytics**. Theme follows the OS
+  via `@media (prefers-color-scheme: dark)` overriding the `:root` token set (the prototype's JS light/dark
+  toggle was dropped per the handoff). All CTAs are `mailto:slowcupapp@gmail.com?subject=SlowCup%20invite%20request`.
+- **Sections** (single column, centered, text capped ~720px): nav (pixel logo + "request an invite") ·
+  hero ("A TEA LOG FOR THE RITUAL" eyebrow → Shippori "The calm tea log." at `clamp(44px,11vw,64px)` with
+  a ~10% amber ensō behind → promise subline → jade **Request an invite** → "private beta" micro) · three
+  dark-bezel device screenshots (middle raised 24px, zeroed when they stack) · three philosophy beats
+  (leaf/ensō/share-icon chips) · jade-deep CTA panel with faint seigaiha + amber button + mono email ·
+  footer ("a static page · no cookies, no tracking, nothing to accept").
+- **Screenshots are placeholders from the handoff bundle** (`landing-assets/`, flagged in an HTML comment):
+  they predate WS3/WS1 and `app-tea-detail.png` still shows the old **"Steep"** wordmark (pre-v3.59). They
+  MUST be reshot on the current build before slowcup.app points here.
+- **Staging note:** placed as `landing.html` at the repo root (reachable at
+  `tosinik.github.io/steep-tea-log/landing.html`) — not linked from the app. The root/`index.html` split for
+  the actual slowcup.app domain is part of the deferred domain migration.
+- Browser-verified both themes (light via CSSOM tokens, dark visually), desktop + mobile 375px (single
+  column, devices wrap, h1 clamps to 44px, **no horizontal scroll**), all three screenshots load, no console
+  errors.
+
 ## v3.64 — WS1 SlowCup Wrapped (swipeable story cards)
 Deploy: `styles.css`, `steep-insights.js`, `steep-core.js` (APP_VERSION + carousel wiring),
 `service-worker.js` (v74). No SQL. Second of four design workstreams (WS3 → **WS1** → WS4 → WS2).

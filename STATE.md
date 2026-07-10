@@ -65,7 +65,25 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW (just shipped) — v3.64 WS1 SlowCup Wrapped** (cache **v74**, APP_VERSION v3.64): second of the
+**NOW (just shipped) — WS4 slowcup.app landing page** (NO cache/APP_VERSION bump — stays cache **v74**,
+APP_VERSION v3.64): third of the 4-workstream design rework. New self-contained **`landing.html`** at repo
+root + **`landing-assets/*.png`** — a static marketing page: inline CSS + inline SVG sprite, Google Fonts,
+**no JS/cookies/analytics**, theme via `@media (prefers-color-scheme: dark)` over the `:root` token set.
+Sections: nav · hero (Shippori "The calm tea log." + faint amber ensō, jade "Request an invite") · 3
+dark-bezel device screenshots (middle raised) · 3 philosophy beats (leaf/ensō/share chips) · jade-deep CTA
+panel (seigaiha + amber button) · footer. All CTAs `mailto:slowcupapp@gmail.com`. **Deliberately no PWA
+cache / APP_VERSION bump / FILES_TO_CACHE change** — it touches zero app files, so invalidating testers'
+caches would be wrong (flag this reasoning if a future session expects a bump). **Two TODOs before
+slowcup.app goes live** (flagged in an HTML comment + CHANGELOG): (1) reshoot the placeholder screenshots —
+the bundle ones predate WS3/WS1 and `app-tea-detail.png` still shows the old **"Steep"** wordmark
+(pre-v3.59 rename); (2) decide the root/`index.html` split for the domain (part of the deferred domain
+migration — slowcup.app not yet registered). Browser-verified both themes + mobile, no console errors.
+**Last workstream (own deploy, pause after):** WS2 Insights overhaul (`viewInsights` in steep-insights.js;
+inherits WS3+WS1 — hairline top-borders not boxed cards, one jade-pale hero observation, a tiny reusable
+data-viz family, observations-not-KPIs copy, quiet Wrapped teaser). Then back to the SlowCup batch's last
+item: feed pagination (+ socialErr inline notice).
+
+**Earlier — v3.64 WS1 SlowCup Wrapped** (cache **v74**, APP_VERSION v3.64): second of the
 **4-workstream design rework** (order WS3→WS1→WS4→WS2; **pause after each**). `viewWrapped()`
 (steep-insights.js) is now a horizontal scroll-snap sequence of full-width `.wrap-card` story cards
 (seasonal jade/amber/porcelain wash via new `--wc-*` tokens in both theme blocks + catalogue
