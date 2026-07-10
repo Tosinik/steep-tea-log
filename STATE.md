@@ -65,6 +65,19 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
+**NEXT — v3.69 what's-new line (pre-approved; drive via `/slowcup-deploy`).** New project skills live in
+`.claude/skills/` (`slowcup-deploy`, `vm-fixture`; committed via a scoped `.gitignore` exception). **A skill
+added mid-session isn't invocable until the session reloads its registry** — so v3.69 is the first *live*
+`/slowcup-deploy` run: `/slowcup-deploy v3.69 — "what's new" line on the update banner dry` once to confirm
+the registry loaded, then drop `dry`. **Decisions locked (Niklas 2026-07-10):** (1) `WHATS_NEW` copy =
+**"Updates now tell you what changed — like this."** (self-referential — demonstrates the feature it
+announces). (2) File list = **three** app files: `steep-core.js` (APP_VERSION + new `WHATS_NEW` const beside
+it), `steep-boot.js` (banner render — the second quiet line goes under "A new version of SlowCup is ready."
+at ~L44, NOT steep-core as ROADMAP-v4 loosely guessed), `service-worker.js` (v78→v79). (3) Add a **step 2c**
+to CLAUDE.md's deploy ritual (WHATS_NEW joins the bumps) — rides along in this same deploy. After v3.69 the
+tail is **v3.70** greeting v4 (issues #4+#5) → **v3.71** achievements hide (issue #6), then the tail's done —
+leaving the design session, the domain, and the phase-2 gate (~10 days out) as the board.
+
 **NOW (just shipped) — v3.68 in-session brew guide "hide" (issue #1)** (cache **v78**, APP_VERSION v3.68):
 second of the cleanup tail (ROADMAP-v4 Pillar F). Fixes the "in-session turn off link gives weird feedback"
 bug. Mid-steeping, the schedule strip's **"turn off"** called `d_setBrewMode('off')` — which reset
