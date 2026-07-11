@@ -60,7 +60,7 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v86**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v87**. Keep CHANGELOG.md updated.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
@@ -72,11 +72,16 @@ global reconciliations apply (achievements stay gated · greeting is a reskin no
 built 3-way-ready for phase-2's `japanese` · ratings already on detail so WS5 is removal). WS4 is the only
 data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existing bilingual `KB_FLAVOR_CHIPS`
 20-term set) — two things to flag at its pause: tag namespacing + arrival-only vs end-of-session mood.
-**WS6 + WS2 + WS5 + WS3 shipped (v3.73–v3.76, below). NEXT: WS1 — Forms** (session setup + add-tea → core trio
-tea·vessel·method + one "more details"/"specifics" fold, single boolean, render-on-state, every field ≤2 taps;
-amber-pale mood moment; **method control built 3-way-ready** — phase-2 adds `japanese` ~Jul 20 as a data change,
-not a layout rebuild; keep method conditional on vessel; "Begin steeping" validates only tea chosen, "Save tea"
-only name+type). WS3 bundle was already in the repo — WS1's is too (`design_handoff_ws1_forms/`).
+**WS6 + WS2 + WS5 + WS3 + WS1 shipped (v3.73–v3.77, below). NEXT — the LAST R2 workstream: WS4 — Flavour**
+(LARGE, the only data-model change; build on the settled surfaces). Uses the existing bilingual
+`KB_FLAVOR_CHIPS` (20 EN-key→DE-label terms) as the chip vocabulary — map into 4 families as presentation;
+writes to the existing `steeps.tags`/`sessions.tags` arrays (**no SQL**). Three moments: inline capture under
+the steeping timer (chips, saved live, no submit) → session story (summary + history cards) → tea-page profile
+on the **honesty ladder** (1–2 sessions → counted chips · 3+ → ranked bars [default] · 5+ & ≥4 distinct terms →
+radar unlock; never render a rung the data doesn't earn) — needs a `/vm-fixture`. **Two things to flag at the
+WS4 pause** (per `TASK-ws4-flavor.md`): (1) tag namespacing (bare key for vocab vs `free:` prefix), (2) the mood
+question — app captures arrival mood only, so ship arrival-only or propose an explicit end-of-session mood, don't
+invent a field. Bundle `design_handoff_ws4_flavor/` + `TASK-ws4-flavor.md` both already local.
 
 **Design Round 3 material stored:** `design-r3/` (gitignored) holds `DESIGN-R3-INSPIRATION.md` + a copy of
 `R2-STATUS.md` + `images/` (with a README — Niklas still needs to drop the 5 board PNGs there; Code can't write
@@ -87,7 +92,18 @@ saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.76 WS3 Steeping: the ensō is the timer** (cache **v86**, APP_VERSION v3.76): fourth of
+**NOW (just shipped) — v3.77 WS1 Forms: core trio + one fold** (cache **v87**, APP_VERSION v3.77): fifth of the R2
+design pass. Both first-run forms reshaped to **core essentials up front + one boolean fold**. Session setup: a
+core-trio card (Tea·Vessel styled selects · Method segment) + brew readout + **amber-pale "How are you arriving?"
+mood card** + "More details" fold (leaf/water/type/TDS/when/coldbrew, `d.showMoreDetails` render-on-state).
+**Method 3-way-ready** via `SESSION_METHODS` array (phase-2 appends `japanese`); inferred from vessel capacity,
+hidden for cold brew. Add/edit tea: photo dropzone·name·type up front + **"Specifics" fold** — a **DOM toggle**
+(`toggleSpecifics`, not render) because the tea form reads fields on submit, so folded inputs must stay in the DOM
+(caught+fixed a bug where the fold only opened). Mood chips now amber-selected. **Folded-in rider:** removed the
+WS3 chime's `navigator.vibrate` (chime-only). Verified both themes (computed styles+DOM: mood `#F1DFC7`/`#3A2C1A`,
+fold open/close + value survival). `node --check` + all 6 fixtures green. **NEXT: WS4 Flavour (last).**
+
+**Earlier — v3.76 WS3 Steeping: the ensō is the timer** (cache **v86**, APP_VERSION v3.76): fourth of
 the R2 design pass, the ritual hero. Reskins the existing timer engine (start/pause/tick/use-time unchanged). The
 **ensō ring is the timer** — two SVG arcs (track + `--enso`), 236px, `sc-breathe`, arc closes via `stroke-dashoffset`
 off `focusProgress`; deliberate theme inversion (amber arc on dark-green box light / ink-jade arc on light-green

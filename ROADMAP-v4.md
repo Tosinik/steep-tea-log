@@ -153,14 +153,14 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
 - [x] **WS3 — Steeping** (v3.76) — ensō-ring timer (breathing, arc closes); steeps in the brew-guide
   pills (`d_setActiveSteep`); breath-led focus mode; opt-in single chime; retired the 🧘 emoji.
   Committed `steeping-timer-test.js` (17).
-- [ ] **WS1 — Forms** — core trio + one "more details" fold; method control built **3-way-ready** for
-  phase-2's `japanese`. **← NEXT**
-- [ ] **WS4 — Flavour** (LARGE, only data-model change, build LAST) — inline capture → session story →
+- [x] **WS1 — Forms** (v3.77) — core trio + one fold (session setup render-on-state; add-tea "specifics"
+  a DOM toggle); method 3-way-ready via `SESSION_METHODS`; amber-pale mood moment.
+- [ ] **WS4 — Flavour** (LARGE, only data-model change, build LAST) **← NEXT (last)** — inline capture → session story →
   tea-page honesty ladder. Rides existing tags arrays + `KB_FLAVOR_CHIPS`. Flag at pause: tag namespacing
   + arrival-only vs end mood.
 
 ## Suggested sequencing (parallel-friendly)
-Now: **R2 implementation deploys (Code, in flight — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 next)** ∥ register domain (Niklas) ∥
+Now: **R2 implementation deploys (Code, in flight — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 last)** ∥ register domain (Niklas) ∥
 phase-2 spec (~Jul 20).
 Then: phase-2 build (wants WS1 method control + WS4 tags in place).
 Then: Pillar C onboarding (with R2 language) → Pillar B migration + beta package → **v4.0**.

@@ -427,33 +427,61 @@ function sessionSetupHTML(d){
   const capLink = (selVes && !selVes.capacityMl)
     ? `<button type="button" onclick="openVesselForm(vesselById('${escapeJsArg(selVes.id)}'))" style="margin-top:5px;background:none;border:0;padding:0;color:var(--ink-soft);font-size:11px;text-decoration:underline;cursor:pointer;">set capacity — sharpens brew advice</button>`
     : '';
+  // WS1: method is 3-way-ready — phase-2 adds {k:'japanese',label:'Japanese'} here and teaches
+  // brewMethodFor to return it; the segment and storage need no layout change.
+  const cap = (selVes||{}).capacityMl || null;
+  const curMethod = brewMethodFor(d.brewStyle, cap);
+  const methodBtns = SESSION_METHODS.map(m=>`<button type="button" class="${curMethod===m.k?'active':''}" onclick="d_setBrewStyle('${m.k}')">${escapeHtml(m.label)}</button>`).join('');
+  const caret = `<span class="trio-caret">${icon('i-caret-hl',20)}</span>`;
   return `
     <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
-    <div class="card">
-      <h2 style="margin-top:0;">Set up your session</h2>
-      <div class="form-grid">
-        <div class="field span2"><label>Tea</label><select onchange="d_setTea(this.value)">${teaOpts}</select>${showFinLink}</div>
-        <div class="field"><label>Vessel</label><select onchange="d_set('vesselId', this.value)">${vesselOpts}</select>${capLink}</div>
-        <div class="field"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
-        <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
-        <div class="field"><label>Water type</label><input type="text" value="${escapeHtml(d.waterType)}" oninput="d_set('waterType', this.value)" placeholder="Filtered, spring, tap..."></div>
-        <div class="field"><label>Water TDS (optional)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="ppm"></div>
-        ${(state.settings.ratioAdjust===true && !d.isColdBrew) ? ratioSetupHTML(d) : ''}
-        ${state.settings.showMood ? `<div class="field span2"><label>How are you feeling? <span style="color:var(--ink-soft);font-weight:400;">— optional, for spotting patterns later</span></label>${moodChipsHTML(d.mood, 'd_setMood')}</div>` : ''}
-        <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
+    <h2 style="margin:2px 0 16px;">Set up your session</h2>
+    <div class="trio-card">
+      <div class="trio-row">
+        <div class="trio-eyebrow">Tea</div>
+        <div class="trio-line"><select class="trio-select trio-tea" onchange="d_setTea(this.value)" aria-label="Tea">${teaOpts}</select>${caret}</div>
+        ${showFinLink}
       </div>
-      ${d.isColdBrew ? `
-      <button class="btn btn-primary" style="margin-top:16px;" onclick="beginColdBrewLog()">Log cold brew →</button>
-      <div class="hint" style="margin-top:8px;">Cold brew is logged as a single long steep — no per-steep timer.</div>
-      ` : `
-      ${brewGuidePreviewHTML(d)}
-      <button class="btn btn-primary" style="margin-top:16px;" onclick="beginSteeping()">Begin steeping →</button>
-      <button class="btn" style="margin-top:8px;width:100%;" onclick="beginQuickLog()">Quick log — just infusions & notes</button>
-      <div class="hint" style="margin-top:8px;">Quick log skips the per-steep timer — for when you'd rather drink than babysit a form.</div>
-      `}
+      <div class="trio-row">
+        <div class="trio-eyebrow">Vessel</div>
+        <div class="trio-line"><select class="trio-select" onchange="d_set('vesselId', this.value)" aria-label="Vessel">${vesselOpts}</select>${caret}</div>
+        ${capLink}
+      </div>
+      ${!d.isColdBrew ? `<div class="trio-row trio-method-row">
+        <div class="trio-eyebrow">Method</div>
+        <div class="seg seg-sm">${methodBtns}</div>
+      </div>` : ''}
     </div>
+    ${!d.isColdBrew ? brewGuidePreviewHTML(d) : ''}
+    ${state.settings.showMood ? `<div class="mood-card">
+      <div class="mood-title">How are you arriving?</div>
+      <div class="mood-sub">optional — quietly helps spot patterns later</div>
+      ${moodChipsHTML(d.mood, 'd_setMood')}
+    </div>` : ''}
+    <div class="fold-row" onclick="d_toggleMoreDetails()" role="button" aria-expanded="${!!d.showMoreDetails}">
+      <span class="fold-label">More details <span class="fold-sub">· leaf, water, cold brew</span></span>
+      <span class="fold-caret">${icon(d.showMoreDetails?'i-caret-up-hl':'i-caret-hl',22)}</span>
+    </div>
+    ${d.showMoreDetails ? `<div class="form-grid fold-grid">
+      <div class="field"><label>Leaf (g)</label><input type="number" step="0.1" value="${d.gramsUsed}" oninput="d_set('gramsUsed', this.value)"></div>
+      <div class="field"><label>Water (ml)</label><input type="number" value="${d.waterMl}" oninput="d_set('waterMl', this.value)" placeholder="${cap||''}"></div>
+      <div class="field"><label>Water type</label><input type="text" value="${escapeHtml(d.waterType)}" oninput="d_set('waterType', this.value)" placeholder="filtered, spring…"></div>
+      <div class="field"><label>TDS (ppm)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="—"></div>
+      <div class="field span2"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
+      <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
+    </div>` : ''}
+    ${d.isColdBrew ? `
+      <button class="btn btn-primary begin-btn" onclick="beginColdBrewLog()">Log cold brew →</button>
+      <div class="hint" style="margin-top:8px;">Cold brew is logged as a single long steep — no per-steep timer.</div>
+    ` : `
+      <button class="btn btn-primary begin-btn" onclick="beginSteeping()">Begin steeping</button>
+      <button class="btn" style="margin-top:8px;width:100%;" onclick="beginQuickLog()">Quick log — just infusions & notes</button>
+    `}
   `;
 }
+// WS1: the session method segment — 3-way-ready (phase-2 appends japanese; a data change, no rebuild).
+const SESSION_METHODS = [{k:'gongfu',label:'Gongfu'},{k:'western',label:'Western'}];
+function d_toggleMoreDetails(){ const d=state.sessionDraft; if(d){ d.showMoreDetails=!d.showMoreDetails; render(); } }
 function d_set(key, val){
   state.sessionDraft[key] = val;
 }
@@ -480,9 +508,10 @@ function d_setBrewStyle(m){ state.sessionDraft.brewStyle = m; render(); }
 // (and the time of day), the reading the future sleep/caffeine correlation will lean on.
 const MOODS = ['Drained','Low','Steady','Lively','Wired'];
 function moodChipsHTML(current, cb){
-  return `<div style="display:flex;gap:6px;flex-wrap:wrap;">` + MOODS.map(m=>{
+  // WS1: single-select arrival mood, amber when chosen (the "how are you arriving?" moment).
+  return `<div class="mood-chips">` + MOODS.map(m=>{
     const on = current===m;
-    return `<button type="button" onclick="${cb}('${m}')" style="border:1px solid ${on?'var(--jade)':'var(--line)'};border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;${on?'background:var(--jade);color:#fff;':'background:transparent;color:var(--ink-soft);'}">${m}</button>`;
+    return `<button type="button" class="mood-chip${on?' on':''}" onclick="${cb}('${m}')">${m}</button>`;
   }).join('') + `</div>`;
 }
 function d_setMood(m){ const d=state.sessionDraft; d.mood = (d.mood===m)?null:m; render(); }
@@ -816,7 +845,6 @@ function playTimerDone(){
       gain.gain.exponentialRampToValueAtTime(0.0001, now+1.1);
       osc.connect(gain); gain.connect(ctx.destination);
       osc.start(now); osc.stop(now+1.2);
-      if(navigator.vibrate) navigator.vibrate(60);
     }
   }catch(e){ /* audio not available */ }
 }

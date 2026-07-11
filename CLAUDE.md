@@ -242,6 +242,13 @@ only the rendering gets replaced. See ROADMAP/STATE.
   `html[data-theme="dark"]` (and `html[data-mono="clean"]` for the non-pixel font). Add
   new UI colors as variables in both blocks — never hardcode.
 
+## Cleanup backlog (dead / superseded code — remove when touching the area)
+
+- **`ratioSetupHTML` (steep-sessions.js) is dead as of v3.77.** WS1 moved the method segment into the
+  session-setup core-trio card (`SESSION_METHODS` + `brewMethodFor`) and the optional water(ml) field
+  into the "More details" fold, so nothing calls `ratioSetupHTML` any more. Left in place to keep the
+  WS1 diff focused; delete it next time steep-sessions.js setup code is edited.
+
 ## Known open bugs
 
 Live issues (see STATE.md / ROADMAP for the full backlog):

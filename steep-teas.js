@@ -228,7 +228,18 @@ function openTeaForm(existing){
   state._draftImage = existing ? existing.image : null;
   state.teaFormOpen = true;
   _kbSuggestDismissed = false; _kbSuggest = null;
+  _teaFormTouched = false; // WS1: reset dirty-tracking so a fresh form closes freely
   render();
+}
+// WS1: guard against losing a half-filled form. Dropping the explicit Cancel button (× + tap-outside)
+// means a stray backdrop tap must NOT silently discard typed work. `_teaFormTouched` flips true on the
+// first edit (form-level oninput, which also catches the photo file input). Backdrop tap is inert while
+// dirty; the × arms an inline confirm while dirty; a clean form closes freely either way.
+let _teaFormTouched = false;
+function teaFormBackdrop(){ if(!_teaFormTouched) closeTeaForm(); } // dirty → do nothing (no accidental discard)
+function teaFormCloseGuard(btn){
+  if(_teaFormTouched) armConfirm(btn, 'Discard changes?', ()=>closeTeaForm());
+  else closeTeaForm();
 }
 
 /* ---------- gentle knowledge-base prefill (v3.38) ----------
@@ -275,21 +286,25 @@ function closeTeaForm(){ state.teaFormOpen=false; state.editingTea=null; state.t
 function teaFormModal(){
   const t = state.editingTea || state.teaPrefill || {};
   const typeOpts = TYPES.map(ty=>`<option value="${ty.k}" ${t.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
-  return `<div class="overlay" onclick="if(event.target===this) closeTeaForm()">
+  return `<div class="overlay" onclick="if(event.target===this) teaFormBackdrop()">
     <div class="modal">
-      <div class="modal-head"><h2>${t.id?'Edit tea':'Add a tea'}</h2><button class="close-x" onclick="closeTeaForm()">✕</button></div>
-      <form id="teaForm" onsubmit="submitTeaForm(event)">
-        <div class="form-grid">
-          <div class="field span2">
-            <label>Photo</label>
-            <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
-              ${state._draftImage?'':'Tap to upload photo'}
-              <input type="file" accept="image/*" class="js-img-input">
-            </div>
-          </div>
-          <div class="field"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}" oninput="teaFormNameSuggest()"><div id="teaKbSuggest"></div></div>
-          <div class="field"><label>Tea type</label><select name="type">${typeOpts}</select></div>
-          <div class="field"><label>Amount on hand (g)</label><input type="number" step="0.1" name="amountGrams" value="${t.amountGrams??''}">
+      <div class="modal-head"><h2>${t.id?'Edit tea':'Add a tea'}</h2><button class="close-x" onclick="teaFormCloseGuard(this)">✕</button></div>
+      <form id="teaForm" onsubmit="submitTeaForm(event)" oninput="_teaFormTouched=true">
+        <!-- WS1: photo · name · type up front (the minimum to save); everything else folds behind
+             "Specifics". The fold is a DOM toggle, NOT a re-render — submitTeaForm reads the fields on
+             submit, so they must stay in the DOM (display:none inputs still submit their values). -->
+        <div class="img-upload dropzone${state._draftImage?' has-img':''}" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+          ${state._draftImage?'':`${icon('i-camera-hl',26)}<span>Tap to add a photo</span>`}
+          <input type="file" accept="image/*" class="js-img-input">
+        </div>
+        <div class="field" style="margin-top:14px;"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}" oninput="teaFormNameSuggest()" placeholder="e.g. Sencha Kagoshima"><div id="teaKbSuggest"></div></div>
+        <div class="field" style="margin-top:12px;"><label>Tea type</label><select name="type">${typeOpts}</select></div>
+        <div class="fold-row" onclick="toggleSpecifics(this)" role="button" aria-expanded="false" style="margin-top:14px;">
+          <span class="fold-label">Specifics <span class="fold-sub">· amount, harvest, origin…</span></span>
+          <span class="fold-caret">${icon('i-caret-hl',22)}</span>
+        </div>
+        <div class="form-grid specifics-body" id="teaSpecifics" style="display:none;">
+          <div class="field span2"><label>Amount on hand (g)</label><input type="number" step="0.1" name="amountGrams" value="${t.amountGrams??''}">
             <label class="checkrow" style="margin-top:6px;font-size:12px;"><input type="checkbox" name="inclPackaging" onchange="var r=document.getElementById('tareRow'); if(r) r.style.display=this.checked?'flex':'none';"> Weighed with packaging</label>
             <div id="tareRow" style="display:none;align-items:center;gap:8px;margin-top:6px;"><span style="font-size:12px;color:var(--ink-soft);">subtract</span><input type="number" step="0.1" name="packagingTare" value="${state.settings.defaultPackagingTareG??10}" style="width:64px;"><span style="font-size:12px;color:var(--ink-soft);">g packaging</span></div>
           </div>
@@ -328,13 +343,23 @@ function teaFormModal(){
             <label class="checkrow"><input type="checkbox" name="isRepeat" ${t.purchaseType==='repeat'?'checked':''}> Repeat buy (unchecked = first time)</label>
           </div>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-top:18px;">
-          <div>${t.id?`<button type="button" class="btn-danger btn" onclick="armConfirm(this,'Delete this tea? Session history stays but shows as an unknown tea.',()=>deleteTea('${escapeJsArg(t.id)}'))">Delete</button>`:'<span></span>'}</div>
-          <div style="display:flex;gap:8px;"><button type="button" class="btn" onclick="closeTeaForm()">Cancel</button><button type="submit" class="btn btn-primary">Save tea</button></div>
-        </div>
+        <button type="submit" class="btn btn-primary begin-btn" style="margin-top:20px;">Save tea</button>
+        <div class="form-helper">name and type are all you need</div>
+        ${t.id?`<div style="text-align:center;margin-top:14px;"><button type="button" class="btn-danger btn" onclick="armConfirm(this,'Delete this tea? Session history stays but shows as an unknown tea.',()=>deleteTea('${escapeJsArg(t.id)}'))">Delete tea</button></div>`:''}
       </form>
     </div>
   </div>`;
+}
+// WS1: reveal the "specifics" fold via DOM (not render) so in-progress inputs survive — the tea form
+// reads its fields on submit, not per-keystroke, so a re-render here would wipe unsaved values.
+function toggleSpecifics(row){
+  const body = document.getElementById('teaSpecifics');
+  if(!body) return;
+  const hidden = getComputedStyle(body).display==='none'; // currently collapsed → open it
+  body.style.display = hidden ? '' : 'none';
+  const use = row.querySelector('.fold-caret use');
+  if(use) use.setAttribute('href', hidden ? '#i-caret-up-hl' : '#i-caret-hl');
+  row.setAttribute('aria-expanded', hidden?'true':'false');
 }
 function setTeaFormRating(v){
   document.getElementById('teaRatingInput').value = v;

@@ -182,6 +182,40 @@ html[data-theme="dark"] .shelf-kanji.t-puerh{background:#2a241c;} html[data-them
 .shelf-row-meta{display:flex;align-items:center;gap:7px;margin-top:5px;}
 .shelf-caret{color:var(--ink-soft);display:flex;transform:rotate(-90deg);flex:0 0 auto;opacity:.55;}
 
+/* WS1 Forms — core trio + one fold (session setup); add-tea reuses the shape */
+.trio-card{border:1px solid var(--line);background:var(--white);border-radius:16px;overflow:hidden;}
+.trio-row{padding:13px 16px;border-top:1px solid var(--line);}
+.trio-row:first-child{border-top:none;}
+.trio-eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px;}
+.trio-line{position:relative;display:flex;align-items:center;}
+.trio-select{appearance:none;-webkit-appearance:none;width:100%;border:none;background:transparent;padding:0 26px 0 0;font-family:'Inter',sans-serif;font-size:16px;color:var(--ink);cursor:pointer;}
+.trio-select.trio-tea{font-family:var(--font-display);font-weight:600;font-size:20px;line-height:1.22;}
+.trio-caret{position:absolute;right:0;display:flex;color:var(--ink-soft);pointer-events:none;}
+.trio-method-row{display:flex;align-items:center;justify-content:space-between;}
+.trio-method-row .trio-eyebrow{margin-bottom:0;}
+.seg-sm button{padding:6px 14px;font-size:13.5px;}
+/* the "how are you arriving?" mood moment — amber-pale */
+.mood-card{margin-top:14px;background:var(--amber-pale);border-radius:16px;padding:16px 16px 15px;}
+.mood-title{font-family:var(--font-display);font-weight:600;font-size:19px;color:var(--ink);}
+.mood-sub{font-size:12.5px;color:var(--clay);margin:3px 0 12px;}
+.mood-chips{display:flex;gap:7px;flex-wrap:wrap;}
+.mood-chip{border:1px solid var(--line);background:transparent;color:var(--ink-soft);border-radius:999px;padding:7px 13px;font-size:13.5px;cursor:pointer;font-family:'Inter',sans-serif;}
+.mood-chip.on{background:var(--amber);border-color:var(--amber);color:#fff;}
+html[data-theme="dark"] .mood-chip.on{color:#15140F;}
+/* the single-boolean disclosure (More details / Specifics) */
+.fold-row{display:flex;align-items:center;justify-content:space-between;padding:15px 4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:14px;cursor:pointer;}
+.fold-label{font-size:15px;color:var(--ink-soft);font-weight:500;}
+.fold-sub{color:var(--nav-inactive);font-weight:400;}
+.fold-caret{display:flex;color:var(--ink-soft);}
+.fold-grid,.specifics-body{margin-top:12px;}
+/* primary form button + helper */
+.begin-btn{width:100%;padding:16px 0;border-radius:14px;font-size:16px;font-weight:600;margin-top:20px;}
+.form-helper{text-align:center;margin-top:10px;font-size:13px;color:var(--nav-inactive);}
+/* add-tea photo dropzone */
+.img-upload.dropzone{height:140px;flex-direction:column;gap:8px;border-radius:16px;font-size:14px;border-color:var(--line);}
+.img-upload.dropzone.has-img{border-style:solid;}
+.img-upload .hl{color:var(--ink-soft);}
+
 /* generic */
 .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;}
 .section{margin-top:22px;}
