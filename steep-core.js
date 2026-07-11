@@ -1,9 +1,9 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.75';
+const APP_VERSION = 'v3.76';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-const WHATS_NEW = 'Your teas get a photo shelf, a grid/list toggle, and one clear status line.';
+const WHATS_NEW = 'The steeping screen breathes now — the ensō ring is the timer, with a real focus mode.';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -116,7 +116,7 @@ const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
 // Settings rows, unlock confetti) regardless of any stored showAchievements/quietMode, so the feature
 // goes quiet for everyone. All the code stays intact for a future redesign — flip to true to revive.
 const ACHIEVEMENTS_ENABLED = false;
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:true, showAchievements:false, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true, ratioAdjust:false };
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:false, showAchievements:false, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true, ratioAdjust:false }; // WS3: sound OFF by default — opt-in via the steeping mute glyph
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
 
 let state = {
@@ -957,6 +957,13 @@ function bindDynamic(){
   if(tagInput){
     tagInput.oninput = ()=> renderTagSuggest(tagInput.value, tagInput.dataset.target);
     tagInput.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); addTagFromInput(tagInput.dataset.target); } };
+  }
+  // WS3 — focus mode: swipe up anywhere to leave (a plain tap stays a pause via the ring's handler).
+  const focusScreen = document.querySelector('.focus-screen');
+  if(focusScreen){
+    let fy = null;
+    focusScreen.addEventListener('touchstart', (e)=>{ fy = e.touches[0].clientY; }, {passive:true});
+    focusScreen.addEventListener('touchend', (e)=>{ if(fy!=null && (fy - e.changedTouches[0].clientY) > 60 && typeof toggleFocusMode==='function') toggleFocusMode(); fy = null; }, {passive:true});
   }
   // WS6 — receded steeping bar: a swipe up (or the tap handler on the element) restores the nav.
   const recede = document.getElementById('navRecede');

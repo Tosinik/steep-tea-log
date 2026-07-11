@@ -557,9 +557,23 @@ function saveTuningToGuide(teaId){
 function applyScheduleToCurrentSteep(d){
   if(!d || !d.schedule) return;
   const i = d.steeps.length;
+  d.activeSteep = i; // WS3: the pill for the steep you're about to brew is the active one
   const t = scheduleTimeForIndex(d.schedule, i);
   if(t!=null){ const adj=Math.max(3, Math.round(t + (d.timeShift||0))); d.timer.mode='timer'; d.timer.target=adj; d.curTime=String(adj); }
   if(d.schedule.tempC!=null){ const disp=cToDisplay(d.schedule.tempC); if(disp!=='') d.curTemp=String(disp); }
+}
+// WS3: tap a brew-guide pill → time that steep. Sets the ring's target + the "steep N" label; the
+// countdown resets so the ring reads that steep's duration. Purely a timer selector — logging still
+// happens sequentially via Save steep. Ignores pills at/behind an already-logged steep index only for
+// the target math (a tapped index past the schedule falls back to the last known time).
+function d_setActiveSteep(i){
+  const d = state.sessionDraft; if(!d || !d.schedule) return;
+  const t = scheduleTimeForIndex(d.schedule, i); if(t==null) return;
+  d.activeSteep = i;
+  const adj = Math.max(3, Math.round(t + (d.timeShift||0)));
+  clearTimerInterval();
+  d.timer.mode = 'timer'; d.timer.target = adj; d.timer.elapsed = 0; d.timer.running = false;
+  render();
 }
 // Nudge the *next* steep from how the last pour tasted (ephemeral to this session).
 function d_nudgeNextSteep(kind){
@@ -620,28 +634,31 @@ function scheduleStripHTML(d){
       <button class="btn-ghost" style="font-size:11.5px;" onclick="d_showStrip()">show</button>
     </div>`;
   const sched = d.schedule;
-  const cur = d.steeps.length; // index of the steep being brewed now
-  const shownCount = Math.max(sched.times.length, cur+1);
-  let chips='';
+  const cur = d.activeSteep!=null ? d.activeSteep : d.steeps.length; // WS3: the selected pill
+  const shownCount = Math.max(sched.times.length, d.steeps.length+1);
+  // WS3: the brew-guide pills ARE the steep schedule — no separate dot row. Tap a pill to time it.
+  let pills='';
   for(let i=0;i<shownCount;i++){
     const secs = scheduleTimeForIndex(sched, i);
     if(secs==null) break;
     const beyond = i>=sched.times.length;
     const isCur = i===cur;
-    chips += `<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;margin:0 4px 4px 0;`
-      + (isCur ? 'background:var(--amber);color:#3a2a12;font-weight:600;' : 'background:transparent;color:var(--ink-soft);border:1px solid var(--line);')
-      + `">${beyond?'~':''}${fmtSecShort(secs)}</span>`;
+    pills += `<button type="button" class="steep-pill${isCur?' active':''}" onclick="d_setActiveSteep(${i})">
+      <span class="sp-idx">${isCur?('steep '+(i+1)):(i+1)}</span>
+      <span class="sp-dur">${beyond?'~':''}${fmtSecShort(secs)}</span>
+    </button>`;
   }
   const meta=[];
   if(sched.tempC!=null) meta.push(cToDisplay(sched.tempC)+tempUnitLabel());
-  if(sched.rinseSeconds!=null) meta.push('rinse '+sched.rinseSeconds+'s');
+  if(Number(d.gramsUsed)>0) meta.push(Number(d.gramsUsed)+'g');
+  else if(sched.rinseSeconds!=null) meta.push('rinse '+sched.rinseSeconds+'s');
   const label = d.brewMode==='tuned' ? 'Your tuning' : (sched.generated ? 'Suggested' : 'Brew guide');
-  return `<div class="card" style="margin-bottom:14px;background:var(--jade-pale);border:1px solid var(--line);padding:12px 14px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-      <div class="eyebrow">${label}${meta.length?' · '+meta.join(' · '):''}</div>
-      <button class="btn-ghost" style="font-size:11.5px;" onclick="d_hideStrip()">hide</button>
+  return `<div class="bg-card">
+    <div class="bg-head">
+      <div class="eyebrow" style="color:var(--jade-deep);">${label}${meta.length?' · '+meta.join(' · '):''}</div>
+      <button class="btn-ghost bg-hide" onclick="d_hideStrip()">hide</button>
     </div>
-    <div style="margin-top:8px;">${chips}</div>
+    <div class="steep-pills">${pills}</div>
   </div>`;
 }
 
@@ -663,31 +680,44 @@ function sessionSteepingHTML(d){
     </div>`;
 
   const displaySeconds = tm.mode==='timer' ? Math.max(0, tm.target - tm.elapsed) : tm.elapsed;
+  const active = (d.activeSteep!=null ? d.activeSteep : d.steeps.length);
+  const subLabel = tm.mode==='timer' ? `of ${tm.target}s · steep ${active+1}` : `steep ${active+1}`;
+  const soundOn = !!state.settings.soundEnabled;
 
   return `
-    <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
-    <div class="card">
-      <div class="eyebrow">${tea?escapeHtml(tea.name):''} ${d.isColdBrew?'· cold brew':''}</div>
-      <h2 style="margin-top:2px;">${dotsRow(d.steeps.length, Math.max(d.steeps.length+1,6))} Steep ${d.steeps.length+1}</h2>
+    <div class="steep-titlebar">
+      <button class="steep-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())" aria-label="Cancel session">${icon('i-chevron-hl',23)}</button>
+      <span class="steep-title">${tea?escapeHtml(tea.name):'Steeping'}${d.isColdBrew?' · cold brew':''}</span>
+      <button class="steep-mute" onclick="toggleSound()" aria-label="${soundOn?'Sound on':'Sound off'}" title="${soundOn?'Chime on — tap to mute':'Muted — tap for a single gentle chime at 0:00'}">${icon(soundOn?'i-sound-hl':'i-mute-hl',21)}</button>
+    </div>
 
-      ${scheduleStripHTML(d)}
-      ${brewNudgeRowHTML(d)}
-      ${d.steeps.length ? `<div style="margin-bottom:14px;">${steepsHTML}</div>` : ''}
+    ${scheduleStripHTML(d)}
+    ${brewNudgeRowHTML(d)}
 
-      <div class="timer-box">
-        ${modeBtns}
-        ${tm.mode==='timer' ? `<div style="margin-bottom:8px;"><input type="number" value="${tm.target}" style="width:70px;text-align:center;border-radius:6px;border:none;padding:4px;" oninput="setTimerTarget(this.value)"> sec target</div>` : ''}
-        <div class="timer-ring">
-          <svg class="timer-enso" viewBox="0 0 120 120" aria-hidden="true"><path id="ensoArc" d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${(100*(1-focusProgress(tm))).toFixed(1)}"/></svg>
+    <div class="timer-box">
+      ${modeBtns}
+      ${(tm.mode==='timer' && !d.schedule) ? `<div style="margin-bottom:10px;text-align:center;"><input type="number" value="${tm.target}" class="timer-target-input" oninput="setTimerTarget(this.value)"> <span style="opacity:.7;font-size:12px;">sec</span></div>` : ''}
+      <div class="timer-ring">
+        <div class="timer-enso-wrap">
+          <svg class="timer-enso" viewBox="0 0 120 120" aria-hidden="true">
+            <path class="enso-track" d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke-width="5.5" stroke-linecap="round" pathLength="100"/>
+            <path id="ensoArc" class="enso-arc" d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke-width="6.5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${(100*(1-focusProgress(tm))).toFixed(1)}"/>
+          </svg>
+        </div>
+        <div class="timer-center">
           <div class="timer-display">${fmtSec(displaySeconds)}</div>
+          <div class="timer-sub">${subLabel}</div>
         </div>
-        <div class="timer-ctrls">
-          <button onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
-          <button onclick="timerReset()">Reset</button>
-          <button onclick="useTimerValue()">Use this time</button>
-        </div>
-        <button class="btn" style="margin-top:10px;width:100%;" onclick="toggleFocusMode()">🧘 Focus mode — just the timer</button>
       </div>
+      <div class="timer-ctrls">
+        <button onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
+        <button class="soft" onclick="timerReset()">Reset</button>
+        <button class="soft wide" onclick="useTimerValue()">Use time</button>
+      </div>
+      <div class="timer-focus" onclick="toggleFocusMode()" role="button">${icon('i-focus-hl',18)}<span>Enter focus mode</span></div>
+    </div>
+
+    ${d.steeps.length ? `<div style="margin-top:14px;">${steepsHTML}</div>` : ''}
 
       <div class="form-grid" style="margin-top:14px;">
         <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
@@ -708,47 +738,48 @@ function sessionSteepingHTML(d){
         <button class="btn btn-primary" onclick="saveSteepAndContinue()">Save steep & brew another</button>
         <button class="btn" onclick="finishSteeping()">Finish session</button>
       </div>
-    </div>
   `;
 }
 
 function toggleFocusMode(){ state.sessionDraft.focusMode=!state.sessionDraft.focusMode; render(); }
 function focusProgress(tm){ return tm.mode==='timer' ? (tm.target>0?Math.min(1,tm.elapsed/tm.target):0) : Math.min(1,tm.elapsed/60); }
+// WS3: opt-in sound. The steeping mute glyph toggles the synced soundEnabled setting; default OFF.
+function toggleSound(){
+  state.settings.soundEnabled = !state.settings.soundEnabled;
+  if(typeof persistSettings==='function') persistSettings(); else if(window.SteepDB) window.SteepDB.saveSettings(state.settings);
+  if(state.settings.soundEnabled){ try{ if(!_audioCtx) _audioCtx=new (window.AudioContext||window.webkitAudioContext)(); _audioCtx.resume&&_audioCtx.resume(); }catch(e){} } // unlock audio on the enabling tap
+  render();
+}
+// WS3: Focus mode is a real breath-led place, not a header-hide. The ring breathes; steeps become a
+// mala down the edge; the arc still fills with the steep. Always dark (a meditative night state),
+// independent of theme. Tap the ring to pause; swipe up (or tap the hint) to leave.
 function sessionFocusHTML(d){
   const tea = teaById(d.teaId);
   const tm = d.timer;
-  const bowlH = 102, bowlBottom = 192;
-  const prog = focusProgress(tm);
-  const fillH = (prog*bowlH).toFixed(1);
-  const fillY = (bowlBottom - prog*bowlH).toFixed(1);
-  const done = tm.mode==='timer' && tm.target>0 && tm.elapsed>=tm.target;
+  const active = (d.activeSteep!=null ? d.activeSteep : d.steeps.length);
   const disp = tm.mode==='timer' ? Math.max(0, tm.target-tm.elapsed) : tm.elapsed;
+  const n = d.schedule ? Math.max(d.schedule.times.length, active+1) : Math.max(active+1, 4);
+  let mala=''; for(let i=0;i<n;i++) mala += `<span class="mala-dot${i===active?' on':''}"></span>`;
   return `
-    <div class="focus-inner">
-      <div class="focus-name">${tea?escapeHtml(tea.name):'Steeping'}</div>
-      <div class="focus-sub">Infusion ${d.steeps.length+1}${d.isColdBrew?' · cold brew':''}</div>
-      <svg class="focus-cup" viewBox="0 0 200 230" role="img" aria-label="Steeping cup">
-        <defs><clipPath id="focusCupClip"><path d="M52,90 L148,90 L136,175 Q128,192 100,192 Q72,192 64,175 Z"/></clipPath></defs>
-        <g class="focus-steam" opacity="0.55">
-          <path d="M88,70 q-8,-12 0,-24" fill="none" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M100,66 q8,-12 0,-26" fill="none" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M112,70 q-8,-12 0,-24" fill="none" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round"/>
-        </g>
-        <g clip-path="url(#focusCupClip)">
-          <rect id="focusCupFill" x="48" width="104" y="${fillY}" height="${fillH}" fill="var(--amber)"/>
-        </g>
-        <path d="M52,90 L148,90 L136,175 Q128,192 100,192 Q72,192 64,175 Z" fill="none" stroke="var(--ink)" stroke-width="3.5"/>
-        <path d="M148,104 q26,4 20,30 q-6,18 -26,16" fill="none" stroke="var(--ink)" stroke-width="3.5"/>
-        <ellipse cx="100" cy="201" rx="60" ry="9" fill="none" stroke="var(--line)" stroke-width="3"/>
-      </svg>
-      <div class="focus-time" id="focusTime">${fmtSec(disp)}</div>
-      <div class="focus-status" id="focusStatus">${done?'ready — pour':(tm.running?'steeping…':'paused')}</div>
-      <div class="focus-ctrls">
-        <button class="btn btn-primary" id="focusStartBtn" onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
-        <button class="btn" onclick="timerReset()">Reset</button>
-        <button class="btn" onclick="focusLogSteep()">Log this infusion →</button>
+    <div class="focus-glow"></div>
+    <div class="focus-mala">${mala}</div>
+    <div class="focus-head">${tea?escapeHtml(tea.name):'Steeping'} · steep ${active+1}</div>
+    <div class="focus-ringwrap" id="focusRing" onclick="timerStartPause()" role="button" aria-label="Tap to pause or resume">
+      <div class="focus-halo"></div>
+      <div class="focus-enso-breathe">
+        <svg class="focus-enso" viewBox="0 0 120 120" aria-hidden="true">
+          <path class="enso-track" d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke-width="5" stroke-linecap="round" pathLength="100"/>
+          <path id="focusEnsoArc" class="enso-arc" d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke-width="6" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${(100*(1-focusProgress(tm))).toFixed(1)}"/>
+        </svg>
       </div>
-      <button class="focus-exit" onclick="toggleFocusMode()">exit focus mode</button>
+      <div class="focus-center">
+        <div class="focus-digit" id="focusTime">${fmtSec(disp)}</div>
+        <div class="focus-cue">${tm.running?'breathe out':'paused'}</div>
+      </div>
+    </div>
+    <div class="focus-foot">
+      <div class="focus-foot-chip">${icon('i-focus-hl',16)}<span class="mono">focus mode</span></div>
+      <div class="focus-foot-hint mono" onclick="toggleFocusMode()">tap to pause · swipe up to leave</div>
     </div>
   `;
 }
@@ -774,19 +805,18 @@ function playTimerDone(){
       if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
       const ctx = _audioCtx;
       if(ctx.state==='suspended') ctx.resume();
+      // WS3: ONE gentle chime, never a buzz you didn't ask for — a single soft sine that fades out.
       const now = ctx.currentTime;
-      [0, 0.22, 0.44].forEach((offset,i)=>{
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = i===2 ? 1046 : 784;
-        gain.gain.setValueAtTime(0.0001, now+offset);
-        gain.gain.exponentialRampToValueAtTime(0.25, now+offset+0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now+offset+0.18);
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.start(now+offset); osc.stop(now+offset+0.2);
-      });
-      if(navigator.vibrate) navigator.vibrate([150,80,150]);
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.18, now+0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now+1.1);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now); osc.stop(now+1.2);
+      if(navigator.vibrate) navigator.vibrate(60);
     }
   }catch(e){ /* audio not available */ }
 }
@@ -817,19 +847,13 @@ function updateTimerDisplayOnly(){
   if(arc) arc.setAttribute('stroke-dashoffset', (100*(1-focusProgress(tm))).toFixed(1));
   const btn = document.querySelector('.timer-ctrls button');
   if(btn) btn.textContent = tm.running?'Pause':'Start';
-  // focus mode: animate the cup + calm readout
-  const cup = document.getElementById('focusCupFill');
-  if(cup){
-    const bowlH=102, bowlBottom=192, prog=focusProgress(tm);
-    cup.setAttribute('height',(prog*bowlH).toFixed(1));
-    cup.setAttribute('y',(bowlBottom-prog*bowlH).toFixed(1));
-  }
+  // WS3 focus mode: fill the breathing ring's arc + update the dimmed digit + the breath cue.
+  const farc = document.getElementById('focusEnsoArc');
+  if(farc) farc.setAttribute('stroke-dashoffset', (100*(1-focusProgress(tm))).toFixed(1));
   const ft = document.getElementById('focusTime');
   if(ft) ft.textContent = fmtSec(tm.mode==='timer'?Math.max(0,tm.target-tm.elapsed):tm.elapsed);
-  const fbtn = document.getElementById('focusStartBtn');
-  if(fbtn) fbtn.textContent = tm.running?'Pause':'Start';
-  const fstat = document.getElementById('focusStatus');
-  if(fstat){ const done = tm.mode==='timer' && tm.target>0 && tm.elapsed>=tm.target; fstat.textContent = done?'ready — pour':(tm.running?'steeping…':'paused'); }
+  const fcue = document.querySelector('.focus-cue');
+  if(fcue) fcue.textContent = tm.running?'breathe out':'paused';
 }
 function timerReset(){
   const tm = state.sessionDraft.timer;

@@ -6,9 +6,11 @@ fixtures/*
 !fixtures/insights-room-test.js
 !fixtures/greeting-v4-test.js
 !fixtures/status-line-test.js
+!fixtures/steeping-timer-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ are tracked so they ship with the repo.
 .claude/*
 !.claude/skills/
 # Design-reference bundles (READMEs + .dc.html + PNGs) live local-only, never shipped.
 SlowCup R2 bundle handoff/
+design-r3/

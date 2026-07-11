@@ -20,6 +20,7 @@
   --enso:#E3A15C; /* WS3: steep-timer ring — amber-bright on the light-theme jade-deep box */
   --nav-active:#3F5E42; --nav-inactive:#a29a86; /* WS6 bottom bar: active tab / avatar initial | muted inactive tab */
   --greeting-eye:#5c7a5e; --greeting-body:#47533f; /* WS2 greeting hero: eyebrow (muted jade) | body (green-ink on jade-pale) */
+  --enso-track:rgba(255,255,255,.15); --timer-sub:#a9b8a2; --timer-soft:rgba(255,255,255,.14); /* WS3 timer box (foreground over the dark-green box) */
   /* WS1 Wrapped — seasonal-wash story-card fields (deeper than the app tokens on purpose) */
   --wc-jade:#2A4130; --wc-jade-fg:#F6F2E9; --wc-jade-soft:#CDE0C4;
   --wc-amber:#C17A3E; --wc-amber-fg:#2B1206; --wc-amber-soft:#5A3517;
@@ -46,6 +47,7 @@ html[data-theme="dark"]{
   --enso:#2A4130; /* WS3: dark-jade ring on the dark-theme light-green timer box */
   --nav-active:#8FBE83; --nav-inactive:#8f866f; /* WS6 bottom bar (dark) */
   --greeting-eye:#7f9a78; --greeting-body:#c3cdb9; /* WS2 greeting hero (dark) */
+  --enso-track:rgba(42,65,48,.26); --timer-sub:#2A4130; --timer-soft:rgba(21,20,15,.14); /* WS3 timer box (foreground over the light-green box) */
   /* WS1 Wrapped — dark fields never go full-bright */
   --wc-jade:#1E2C1E; --wc-jade-fg:#EDE6D6; --wc-jade-soft:#9DB79A;
   --wc-amber:#3A2415; --wc-amber-fg:#EAD0AE; --wc-amber-soft:#B98B5E;
@@ -301,21 +303,53 @@ html[data-theme="dark"] .field input[type=datetime-local]{color-scheme:dark;}
 .tag-suggest div:hover{background:var(--jade-pale);}
 
 /* timer */
-.timer-box{background:var(--jade-deep);color:var(--white);border-radius:12px;padding:16px;text-align:center;box-shadow:var(--glow);}
-html[data-theme="dark"] .timer-box{color:#0F1710;}
-html[data-theme="dark"] .timer-box .timer-modebtns button{color:#0F1710;}
-html[data-theme="dark"] .timer-ctrls button{color:var(--jade-deep);}
-.timer-display{font-family:var(--font-mono);font-size:34px;font-weight:600;letter-spacing:.02em;line-height:1;position:relative;}
-/* WS3: ensō ring around the steep time — arc fills via stroke-dashoffset as the steep runs */
-.timer-ring{position:relative;width:150px;height:150px;margin:10px auto 2px;display:flex;align-items:center;justify-content:center;}
-.timer-enso{position:absolute;inset:0;width:100%;height:100%;color:var(--enso);}
-#ensoArc{transition:stroke-dashoffset .9s linear;}
-@media (prefers-reduced-motion: reduce){ #ensoArc{transition:none;} }
-.timer-modebtns{display:flex;gap:6px;justify-content:center;margin-bottom:10px;}
-.timer-modebtns button{background:rgba(255,255,255,.12);border:none;color:var(--white);padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;}
-.timer-modebtns button.active{background:var(--amber);}
-.timer-ctrls{display:flex;gap:8px;justify-content:center;margin-top:12px;}
-.timer-ctrls button{background:var(--white);color:var(--jade-deep);border:none;padding:7px 16px;border-radius:8px;font-weight:600;font-size:12.5px;}
+/* WS3 breathing keyframes (ambient, CSS-only; honoured off under reduced-motion) */
+@keyframes sc-breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+@keyframes sc-breathe-slow{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+@keyframes sc-halo{0%{transform:scale(.92);opacity:.45;}70%{opacity:0;}100%{transform:scale(1.4);opacity:0;}}
+@keyframes sc-digit{0%,100%{opacity:.62;}50%{opacity:.82;}}
+
+/* WS3 steeping — title bar (chevron · tea name · opt-in sound) */
+.steep-titlebar{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:14px;}
+.steep-back{background:none;border:none;padding:0;display:flex;color:var(--jade);}
+.steep-title{flex:1;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);}
+.steep-mute{background:none;border:none;padding:0;display:flex;color:var(--ink-soft);opacity:.85;}
+
+/* WS3 brew-guide card — the steep schedule lives in these pills; tap one to time it */
+.bg-card{background:var(--jade-pale);border-radius:15px;padding:13px 15px 14px;margin-bottom:13px;}
+.bg-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.bg-hide{font-size:12px;color:var(--ink-soft);}
+.steep-pills{display:flex;gap:7px;margin-top:11px;}
+.steep-pill{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--font-mono);border:1px solid var(--line);background:transparent;color:var(--ink-soft);border-radius:11px;padding:7px 0;cursor:pointer;}
+.steep-pill .sp-idx{font-size:10px;color:var(--ink-soft);}
+.steep-pill .sp-dur{font-size:13.5px;}
+.steep-pill.active{background:var(--amber);border-color:var(--amber);color:#fff;} /* amber both themes — sits on the pale guide card, not the inverting timer box */
+html[data-theme="dark"] .steep-pill.active{color:#15140F;}
+.steep-pill.active .sp-idx{color:inherit;opacity:.85;}
+.steep-pill.active .sp-dur{font-weight:600;}
+
+/* WS3 timer box — the glazed box stays; the ensō ring is its centre of gravity.
+   Box bg flips (dark-green light / light-green dark) via --jade-deep; --porcelain is the on-box
+   foreground (light on the dark box, dark on the light box). */
+.timer-box{background:var(--jade-deep);color:var(--porcelain);border-radius:20px;padding:18px 18px 16px;box-shadow:var(--glow);}
+.timer-modebtns{display:flex;gap:6px;justify-content:center;background:rgba(0,0,0,.2);border-radius:10px;padding:4px;margin:0 auto;width:max-content;}
+.timer-modebtns button{background:none;border:none;color:var(--porcelain);opacity:.72;padding:6px 16px;border-radius:7px;font-size:13px;font-weight:600;}
+.timer-modebtns button.active{background:var(--porcelain);color:var(--jade-deep);opacity:1;}
+.timer-target-input{width:70px;text-align:center;border-radius:6px;border:none;padding:4px;font-family:var(--font-mono);}
+.timer-ring{position:relative;width:236px;height:236px;max-width:78vw;max-height:78vw;margin:14px auto 0;display:flex;align-items:center;justify-content:center;}
+.timer-enso-wrap{position:absolute;inset:0;animation:sc-breathe 5.5s ease-in-out infinite;}
+.timer-enso{width:100%;height:100%;transform:rotate(-4deg);}
+.timer-enso .enso-track{stroke:var(--enso-track);}
+.timer-enso .enso-arc{stroke:var(--enso);transition:stroke-dashoffset .9s linear;}
+.timer-center{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.timer-display{font-family:var(--font-mono);font-weight:500;font-size:46px;line-height:1;letter-spacing:.01em;color:var(--porcelain);}
+.timer-sub{font-family:var(--font-mono);font-size:11px;color:var(--timer-sub);margin-top:9px;letter-spacing:.09em;}
+.timer-ctrls{display:flex;gap:8px;margin-top:16px;}
+.timer-ctrls button{flex:1;background:var(--porcelain);color:var(--jade-deep);border:none;padding:12px 0;border-radius:11px;font-weight:600;font-size:14px;}
+.timer-ctrls button.soft{background:var(--timer-soft);color:var(--porcelain);}
+.timer-ctrls button.wide{flex:1.4;}
+.timer-focus{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;padding-top:13px;border-top:1px solid var(--timer-soft);color:var(--porcelain);opacity:.85;font-size:13.5px;font-weight:600;cursor:pointer;}
+@media (prefers-reduced-motion: reduce){ .timer-enso-wrap{animation:none;} .timer-enso .enso-arc{transition:none;} }
 
 /* steep list */
 .steep-item{border:1px solid var(--line);background:var(--white);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;}
@@ -504,21 +538,27 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .pp-chip.sel{border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);}
 .pp-unmapped{font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;}
 
-/* v3 — meditative focus mode */
-.focus-screen{position:fixed;inset:0;z-index:60;background:var(--porcelain);display:flex;align-items:center;justify-content:center;padding:24px;}
-.focus-inner{width:100%;max-width:340px;text-align:center;}
-.focus-name{font-family:var(--font-display);font-size:22px;color:var(--ink);line-height:1.2;}
-.focus-sub{font-size:12px;color:var(--ink-soft);margin-top:3px;letter-spacing:.04em;}
-.focus-cup{width:190px;height:auto;margin:18px auto 0;display:block;}
-#focusCupFill{transition:y 1s linear,height 1s linear;}
-.focus-time{font-family:var(--font-mono);font-size:44px;color:var(--ink);margin-top:6px;line-height:1;}
-.focus-status{font-size:11px;color:var(--ink-soft);letter-spacing:.14em;text-transform:uppercase;margin-top:6px;}
-.focus-ctrls{display:flex;gap:8px;justify-content:center;margin-top:22px;flex-wrap:wrap;}
-.focus-exit{margin-top:18px;font-size:12px;color:var(--ink-soft);background:none;border:none;text-decoration:underline;cursor:pointer;}
-@keyframes steamRise{0%{opacity:0;transform:translateY(3px)}35%{opacity:.55}100%{opacity:0;transform:translateY(-12px)}}
-.focus-steam path{animation:steamRise 3.4s ease-in-out infinite;}
-.focus-steam path:nth-child(2){animation-delay:1.1s;}
-.focus-steam path:nth-child(3){animation-delay:2.2s;}
+/* WS3 — focus mode: a breath-led place. Always dark (a meditative night state), not theme-flipped. */
+.focus-screen{position:fixed;inset:0;z-index:60;background:#100F0B;overflow:hidden;}
+.focus-glow{position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, rgba(227,161,92,.14), transparent 60%);pointer-events:none;}
+.focus-mala{position:absolute;top:150px;right:26px;display:flex;flex-direction:column;gap:13px;align-items:center;}
+.mala-dot{width:8px;height:8px;border-radius:50%;background:#332F24;}
+.mala-dot.on{background:#E3A15C;}
+.focus-head{position:relative;text-align:center;padding:44px 24px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7c745f;}
+.focus-ringwrap{position:relative;width:276px;height:276px;max-width:82vw;max-height:82vw;margin:96px auto 0;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.focus-halo{position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid #E3A15C;animation:sc-halo 6s ease-out infinite;}
+.focus-enso-breathe{position:absolute;inset:0;filter:drop-shadow(0 0 20px rgba(227,161,92,.4));animation:sc-breathe-slow 6s ease-in-out infinite;}
+.focus-enso{width:100%;height:100%;transform:rotate(-4deg);}
+.focus-enso .enso-track{stroke:#2a271e;}
+.focus-enso .enso-arc{stroke:#E3A15C;transition:stroke-dashoffset .9s linear;}
+.focus-center{position:relative;text-align:center;}
+.focus-digit{font-family:var(--font-mono);font-weight:400;font-size:36px;color:#8f866f;line-height:1;animation:sc-digit 6s ease-in-out infinite;}
+.focus-cue{font-family:var(--font-display);font-size:16px;color:#A79C87;margin-top:16px;}
+.focus-foot{position:absolute;left:0;right:0;bottom:44px;text-align:center;}
+.focus-foot-chip{display:inline-flex;align-items:center;gap:7px;color:#6b6455;font-size:13px;margin-bottom:12px;}
+.focus-foot-chip .mono{letter-spacing:.05em;}
+.focus-foot-hint{font-size:12px;color:#7c745f;letter-spacing:.04em;cursor:pointer;}
+@media (prefers-reduced-motion: reduce){ .focus-halo,.focus-enso-breathe,.focus-digit{animation:none;} .focus-enso .enso-arc{transition:none;} }
 
 /* v3 — consumption forecast */
 .forecast-line{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.45;}

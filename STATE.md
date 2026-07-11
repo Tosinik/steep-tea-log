@@ -60,7 +60,7 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v85**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v86**. Keep CHANGELOG.md updated.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
@@ -72,17 +72,34 @@ global reconciliations apply (achievements stay gated · greeting is a reskin no
 built 3-way-ready for phase-2's `japanese` · ratings already on detail so WS5 is removal). WS4 is the only
 data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existing bilingual `KB_FLAVOR_CHIPS`
 20-term set) — two things to flag at its pause: tag namespacing + arrival-only vs end-of-session mood.
-**WS6 + WS2 + WS5 shipped (v3.73/v3.74/v3.75, below). NEXT: WS3 — Steeping** (the ritual hero: ensō ring becomes
-the timer — two SVG arcs, `stroke-dashoffset`=progress, CSS `sc-breathe`; steep schedule lives in the brew-guide
-PILLS, tap a pill → active steep, no separate dot row; sound OFF by default, opt-in single chime at 0:00; Focus
-mode = real full-screen breath-led state, replaces the 🧘 emoji flagged in DESIGN.md; nav recedes here — already
-wired via WS6's `navRecessed`). Paste the WS3 bundle to build it.
+**WS6 + WS2 + WS5 + WS3 shipped (v3.73–v3.76, below). NEXT: WS1 — Forms** (session setup + add-tea → core trio
+tea·vessel·method + one "more details"/"specifics" fold, single boolean, render-on-state, every field ≤2 taps;
+amber-pale mood moment; **method control built 3-way-ready** — phase-2 adds `japanese` ~Jul 20 as a data change,
+not a layout rebuild; keep method conditional on vessel; "Begin steeping" validates only tea chosen, "Save tea"
+only name+type). WS3 bundle was already in the repo — WS1's is too (`design_handoff_ws1_forms/`).
+
+**Design Round 3 material stored:** `design-r3/` (gitignored) holds `DESIGN-R3-INSPIRATION.md` + a copy of
+`R2-STATUS.md` + `images/` (with a README — Niklas still needs to drop the 5 board PNGs there; Code can't write
+pasted-in images to disk). R3 is the post-batch visual level-up; two directions captured (warm atelier vs
+saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land.
 
 **Parallel / Niklas's:** the **domain** (register slowcup.app); the **phase-2 gate** (~Jul 20) → phase-2
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.75 WS5 Library: photo shelf + one status line** (cache **v85**, APP_VERSION v3.75): third
+**NOW (just shipped) — v3.76 WS3 Steeping: the ensō is the timer** (cache **v86**, APP_VERSION v3.76): fourth of
+the R2 design pass, the ritual hero. Reskins the existing timer engine (start/pause/tick/use-time unchanged). The
+**ensō ring is the timer** — two SVG arcs (track + `--enso`), 236px, `sc-breathe`, arc closes via `stroke-dashoffset`
+off `focusProgress`; deliberate theme inversion (amber arc on dark-green box light / ink-jade arc on light-green
+box dark, `--jade-deep` box + `--porcelain` foreground). **Steeps are the brew-guide pills** (`d_setActiveSteep`
+retargets the ring + "of Ns · steep N" label; active pill amber both themes) — `dotsRow` header gone. **Focus mode
+rebuilt** as a real breath-led dark state (`#100F0B` glow + mala down the edge + halo/breathe-slow/digit + "breathe
+out" cue; tap ring=pause, swipe-up=leave via bindDynamic); **retires the 🧘 emoji**. **Sound OFF by default**
+(`soundEnabled` flipped); mute glyph `toggleSound` → one gentle 880Hz chime (was 3-beep+vibrate). New committed
+`fixtures/steeping-timer-test.js` (17). Reduced-motion honoured. Verified both themes (computed styles+DOM). Kept
+v3.68's reversible "hide" over the mock's lossy "turn off". **NEXT: WS1 Forms.**
+
+**Earlier — v3.75 WS5 Library: photo shelf + one status line** (cache **v85**, APP_VERSION v3.75): third
 of the R2 design pass. The tea library is a **photo shelf** with **one type-aware status line per card** (same
 slot/weight; only words + tone change). Core logic `statusLine(tea)`→`{text,tone}` (steep-teas.js), tone ∈
 low(clay·sorts-top)/freshness(ink-soft)/plenty(jade)/ages(jade): low→"running low"; white/pu'er→"ages
