@@ -1,29 +1,102 @@
+/* ============ WS5 shelf status line (the core rule) ============
+   ONE status line, same slot + weight on every card — only the words + tone change, by type.
+   tone ∈ { low(clay·sorts top) · freshness(ink-soft) · plenty(jade) · ages(jade) }. Computed from
+   type + amount + a harvest-grounded freshness window (reuses lowStockG + freshnessYear/Season) —
+   never free text. Design note (2026-07-11): the mock renders oolong as "plenty", not "ages", so
+   the ages bucket is white + pu'er only here (the README prose grouped oolong in — resolved toward
+   the mock + the app's existing freshnessClass, which never calls oolong 'ages'). Flagged at pause. */
+const FRESH_WINDOW_MONTHS = 12;   // a delicate green stays "best within" ~a year of harvest
+const FRESH_NEAR_WEEKS = 26;      // only show a countdown once ≤ ~6 months of that window remain
+function statusCategory(tea){
+  const type = (tea.type||'').toLowerCase();
+  if(type==='white' || type==='puerh') return 'ages';       // age is a feature — no clock
+  if(type==='green' || type==='yellow') return 'delicate';  // time-to-drink leaf
+  return 'neutral';                                          // oolong, black, herbal, unknown
+}
+function fmtStockG(g){ g = Number(g)||0; return (Math.round(g)===g ? String(g) : g.toFixed(1)) + 'g'; }
+// Weeks left in a delicate tea's freshness window, or null when it can't be grounded in a real harvest.
+function freshnessWeeksLeft(tea){
+  const y = freshnessYear(tea); if(!y) return null;
+  const seasonMonth = { spring:3, summer:6, autumn:9, fall:9, winter:0 };
+  const s = String(tea.harvestSeason||'').trim().toLowerCase();
+  const bestBy = new Date(y, (s in seasonMonth) ? seasonMonth[s] : 5, 1); // no season → mid-year anchor
+  bestBy.setMonth(bestBy.getMonth() + FRESH_WINDOW_MONTHS);
+  return Math.round((bestBy - Date.now()) / (7*86400000));
+}
+function statusLine(tea){
+  const amt = Number(tea.amountGrams)||0;
+  const g = fmtStockG(amt);
+  if(amt>0 && amt<lowStockG()) return { text:`${g} · running low`, tone:'low' };
+  const cat = statusCategory(tea);
+  if(cat==='ages'){
+    const phrase = (tea.type||'').toLowerCase()==='puerh' ? 'ages gracefully' : 'ages well';
+    return { text:`${g} · ${phrase}`, tone:'ages' };
+  }
+  if(cat==='delicate'){
+    const wk = freshnessWeeksLeft(tea);
+    if(wk!=null && wk<=FRESH_NEAR_WEEKS)
+      return wk>=1 ? { text:`${g} · best within ${wk} wk${wk===1?'':'s'}`, tone:'freshness' }
+                   : { text:`${g} · best enjoyed soon`, tone:'freshness' };
+    return { text:`${g} · fresh, plenty`, tone:'plenty' };
+  }
+  return { text:`${g} · plenty`, tone:'plenty' };
+}
+const STATUS_TONE_COLOR = { low:'var(--clay)', freshness:'var(--ink-soft)', plenty:'var(--jade)', ages:'var(--jade)' };
+// running-low teas sort to the top of the shelf, in any density/filter (WS5 rule).
+function isRunningLow(tea){ const a=Number(tea.amountGrams)||0; return a>0 && a<lowStockG(); }
+function shelfSort(list){ return [...list].sort((a,b)=> (isRunningLow(b)?1:0)-(isRunningLow(a)?1:0)); }
+
+// Photo area (grid ~100px / row 50px): the user's image, else a type-tinted stripe, else a kanji
+// plate for white (白) / pu'er (餅). CSS owns the tints so both themes stay calm.
+function shelfPhoto(tea, kind){
+  const type = (tea.type||'').toLowerCase();
+  const kanji = type==='white' ? '白' : (type==='puerh' ? '餅' : '');
+  if(tea.image) return `<div class="shelf-${kind} shelf-img" style="background-image:url(${escapeHtml(tea.image)})"></div>`;
+  if(kanji) return `<div class="shelf-${kind} shelf-kanji t-${escapeHtml(type)}"><span>${kanji}</span></div>`;
+  return `<div class="shelf-${kind} shelf-ph t-${escapeHtml(type||'unknown')}"></div>`;
+}
+function shelfPill(tea){ return `<span class="shelf-pill t-${escapeHtml(tea.type||'')}">${escapeHtml(typeLabel(tea.type))}</span>`; }
+function statusLineHTML(tea){
+  const st = statusLine(tea);
+  // plain fav-leaf (no .i-fav jade override) so it inherits the clay status colour on 'low'.
+  const leaf = st.tone==='low' ? icon('fav-leaf',13) : '';
+  return `<span class="shelf-status" style="color:${STATUS_TONE_COLOR[st.tone]||'var(--ink-soft)'}">${leaf}${escapeHtml(st.text)}</span>`;
+}
+
+// Grid card (density = grid) — photo + type pill over name + the one status line. Ratings live on
+// detail now (WS5), not here. Favourite still gets a quiet leaf on the photo (keeps issue #11 met).
 function teaCardHTML(t){
-  const bg = t.image ? `background-image:url(${escapeHtml(t.image)})` : '';
-  const sessionsForTea = state.sessions.filter(s=>s.teaId===t.id).length;
   const fin = isTeaFinished(t);
-  const stockLabel = fin ? '<span class="stock-low">finished</span>'
-    : (Number(t.amountGrams)<lowStockG() ? '<span class="stock-low">'+Number(t.amountGrams).toFixed(1)+'g left</span>'
-      : Number(t.amountGrams).toFixed(1)+'g on hand');
-  // One-time gentle "rebuy?" on a freshly-finished tea (device-local memory; yes → shopping list
-  // + would_rebuy). No banners/modals — a quiet inline row on the card. stopPropagation so tapping
-  // it doesn't open the tea detail.
-  const rebuy = (fin && !rebuyAsked(t.id)) ? `<div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft);" onclick="event.stopPropagation()">
+  const fav = t.isFavorite ? `<span class="fav">${icon('fav-leaf',15)}</span>` : '';
+  const rebuy = (fin && !rebuyAsked(t.id)) ? `<div class="shelf-rebuy" onclick="event.stopPropagation()">
       <span>Rebuy?</span>
       <button class="lib-chip" style="padding:1px 8px;font-size:11px;" onclick="event.stopPropagation();rebuyYes('${escapeJsArg(t.id)}')">Yes</button>
       <button class="btn-ghost" style="font-size:11px;padding:1px 4px;" onclick="event.stopPropagation();rebuyNo('${escapeJsArg(t.id)}')">No</button>
     </div>` : '';
-  return `<div class="tea-card${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
-    <div class="tea-thumb" style="${bg}">${t.isFavorite?`<span class="fav">${icon('fav-leaf',16)}</span>`:''}</div>
-    <div class="tea-body">
-      <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
-      <div class="name">${escapeHtml(t.name)}</div>
-      ${renderStarsStatic(Number(t.rating)||0,false)}
-      <div class="tea-meta">${stockLabel} · ${sessionsForTea} session${sessionsForTea===1?'':'s'}</div>
+  return `<div class="shelf-card${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
+    <div class="shelf-photo-wrap">${shelfPhoto(t,'photo')}${shelfPill(t)}${fav}</div>
+    <div class="shelf-cbody">
+      <div class="shelf-name">${escapeHtml(t.name)}</div>
+      ${fin ? '<span class="shelf-status" style="color:var(--ink-soft)">finished</span>' : statusLineHTML(t)}
       ${rebuy}
     </div>
   </div>`;
 }
+// Row (density = rows) — thumbnail + name + [type pill · status] + caret.
+function shelfRowHTML(t){
+  const fin = isTeaFinished(t);
+  return `<div class="shelf-row${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
+    ${shelfPhoto(t,'thumb')}
+    <div class="shelf-row-mid">
+      <div class="shelf-name">${escapeHtml(t.name)}</div>
+      <div class="shelf-row-meta">${shelfPill(t)}${fin ? '<span class="shelf-status" style="color:var(--ink-soft)">finished</span>' : statusLineHTML(t)}</div>
+    </div>
+    <span class="shelf-caret">${icon('i-caret-hl',20)}</span>
+  </div>`;
+}
+// grid|rows density — a device-local preference (persists like theme), not synced.
+function teaDensity(){ try{ return localStorage.getItem('tealog_teaDensity')==='rows' ? 'rows' : 'grid'; }catch(e){ return 'grid'; } }
+function setTeaDensity(d){ try{ localStorage.setItem('tealog_teaDensity', d==='rows'?'rows':'grid'); }catch(e){} render(); }
 /* rebuy affordance memory — device-local (localStorage), one-time per tea. "Yes" also records
    would_rebuy (synced) and drops the tea on the shopping list; "No" just remembers we asked. */
 function rebuyAsked(id){ try{ return JSON.parse(localStorage.getItem('tealog_rebuyAsked')||'[]').includes(id); }catch(e){ return false; } }
@@ -95,48 +168,53 @@ function viewTeas(){
   if(seg==='vessels') return `${segControl}${viewVessels()}`;   // viewVessels lives in steep-sessions.js
   const F = state.teaFilter;
   const vendors = distinctVendors();
+  const density = teaDensity();
   const list = filteredSortedTeas();
-  const active = list.filter(t=>!isTeaFinished(t));
-  const finished = list.filter(t=>isTeaFinished(t));   // finished teas group at the bottom
+  const active = shelfSort(list.filter(t=>!isTeaFinished(t)));   // running-low sorts to the top (WS5)
+  const finished = list.filter(t=>isTeaFinished(t));            // finished teas group at the bottom
+  const renderShelf = (teas) => density==='rows'
+    ? `<div class="shelf-rows">${teas.map(shelfRowHTML).join('')}</div>`
+    : `<div class="tea-grid">${teas.map(teaCardHTML).join('')}</div>`;
   const finishedBlock = finished.length ? `
       <div class="section-title" style="margin-top:22px;opacity:.75;"><h2 style="font-family:var(--font-display);font-size:15px;color:var(--ink-soft);">Finished</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${finished.length}</span></div>
-      <div class="grid grid-3" style="opacity:.62;">${finished.map(teaCardHTML).join('')}</div>` : '';
+      <div style="opacity:.62;">${renderShelf(finished)}</div>` : '';
   const cards = list.length
-    ? `<div class="grid grid-3">${active.map(teaCardHTML).join('')}</div>${finishedBlock}`
+    ? `${renderShelf(active)}${finishedBlock}`
     : `<div class="card empty">${state.teas.length ? 'No teas match these filters.' : 'No teas yet — add your first one.'}</div>`;
-  const typeOpts = `<option value="">All types</option>` + TYPES.map(ty=>`<option value="${ty.k}" ${F.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
-  const vendorOpts = `<option value="">All vendors</option>` + vendors.map(v=>`<option value="${escapeHtml(v)}" ${F.vendor===v?'selected':''}>${escapeHtml(v)}</option>`).join('');
-  const controls = state.teas.length ? `
-    <div class="lib-controls">
-      <select class="lib-select" onchange="setTeaSort(this.value)" aria-label="Sort teas">
-        <option value="type" ${state.teaSort==='type'?'selected':''}>By type</option>
-        <option value="newest" ${state.teaSort==='newest'?'selected':''}>Newest</option>
-        <option value="oldest" ${state.teaSort==='oldest'?'selected':''}>Oldest</option>
-        <option value="name" ${state.teaSort==='name'?'selected':''}>Name A–Z</option>
-        <option value="stock-high" ${state.teaSort==='stock-high'?'selected':''}>Most stock</option>
-        <option value="stock-low" ${state.teaSort==='stock-low'?'selected':''}>Least stock</option>
-        <option value="rating" ${state.teaSort==='rating'?'selected':''}>Highest rated</option>
-      </select>
-      <select class="lib-select" onchange="setTeaFilter('type', this.value)" aria-label="Filter by type">${typeOpts}</select>
-      ${vendors.length ? `<select class="lib-select" onchange="setTeaFilter('vendor', this.value)" aria-label="Filter by vendor">${vendorOpts}</select>` : ''}
-      <button class="lib-chip ${F.lowStock?'active':''}" onclick="toggleLowStockFilter()">Low stock</button>
-      <button class="lib-chip ${F.favorite?'active':''}" onclick="toggleFavoriteFilter()">${favLeaf(13)} Favorites</button>
-      ${(F.type||F.vendor||F.lowStock||F.favorite) ? `<button class="lib-chip" onclick="clearTeaFilters()">✕ Clear</button>` : ''}
+  // running-low count for the header line (WS5): in stock but under the low-stock threshold.
+  const lowCount = state.teas.filter(t=>isRunningLow(t)).length;
+  // Filter chips: All · <types you own, in canonical order> · Low · Favs. Cleaner than the old
+  // sort/vendor dropdowns (those are dropped from the shelf; vendor rename stays under "Edit vendors").
+  const typesPresent = [...new Set(state.teas.map(t=>(t.type||'').toLowerCase()).filter(Boolean))].sort((a,b)=>typeRank(a)-typeRank(b));
+  const noFilter = !F.type && !F.lowStock && !F.favorite;
+  const chips = state.teas.length ? `
+    <div class="chip-row">
+      <button class="lib-chip ${noFilter?'active':''}" onclick="clearTeaFilters()">All</button>
+      ${typesPresent.map(ty=>`<button class="lib-chip ${F.type===ty?'active':''}" onclick="toggleTypeFilter('${ty}')">${escapeHtml(typeLabel(ty))}</button>`).join('')}
+      <button class="lib-chip ${F.lowStock?'active':''}" onclick="toggleLowStockFilter()">Low</button>
+      <button class="lib-chip ${F.favorite?'active':''}" onclick="toggleFavoriteFilter()">${favLeaf(13)} Favs</button>
+      ${vendors.length ? `<button class="lib-chip ${state.vendorsOpen?'active':''}" onclick="toggleVendors()">${state.vendorsOpen?'✕ Vendors':'Edit vendors'}</button>` : ''}
+    </div>` : '';
+  const densityToggle = state.teas.length ? `<div class="density-toggle" role="group" aria-label="Density">
+      <button class="density-seg ${density==='rows'?'active':''}" onclick="setTeaDensity('rows')" aria-label="List view">${icon('i-rows-hl',16)}</button>
+      <button class="density-seg ${density==='grid'?'active':''}" onclick="setTeaDensity('grid')" aria-label="Grid view">${icon('i-grid-hl',16)}</button>
     </div>` : '';
   return `
     ${segControl}
-    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">My teas</h2>
-      <div style="display:flex;gap:8px;align-items:center;">
-        ${vendors.length ? `<button class="lib-chip ${state.vendorsOpen?'active':''}" onclick="toggleVendors()">${state.vendorsOpen?'✕ Vendors':'Edit vendors'}</button>` : ''}
-        <button class="btn btn-primary" onclick="openTeaForm()">＋ Add tea</button>
+    <div class="lib-head">
+      <h2 style="font-family:var(--font-display);font-size:24px;margin:0;">My teas</h2>
+      <div class="lib-head-actions">${densityToggle}
+        <button class="btn-add" onclick="openTeaForm()">${icon('i-plus-hl',14)} Add</button>
       </div>
     </div>
+    <div class="mono lib-count">${state.teas.length} tea${state.teas.length===1?'':'s'}${lowCount?` · <span style="color:var(--clay);">${lowCount} running low</span>`:''}</div>
+    ${chips}
     ${state.vendorsOpen && vendors.length ? vendorManagerHTML() : ''}
-    <div class="mono" style="font-size:12px;color:var(--ink-soft);margin:-6px 0 12px;">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length?` · ${state.teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams)<lowStockG()).length} low`:''}</div>
-    ${controls}
     ${cards}
   `;
 }
+// Type chip toggles: pick a type, or clear it if it's already the active one (back to All).
+function toggleTypeFilter(type){ state.teaFilter.type = (state.teaFilter.type===type) ? '' : type; render(); }
 function setTeaSeg(seg){ state.teaSeg = (seg==='vessels') ? 'vessels' : 'teas'; state.view='teas'; render(); }
 function setTeaSort(v){ state.teaSort=v; render(); }
 function setTeaFilter(key, val){ state.teaFilter[key]=val; render(); }

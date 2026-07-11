@@ -129,6 +129,57 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
 .week-num{font-family:var(--font-display);font-weight:700;font-size:32px;line-height:1;color:var(--jade);}
 .week-cap{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);line-height:1.35;}
 
+/* WS5 Library — photo shelf + grid⇄rows density + one type-aware status line per tea */
+.lib-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px;}
+.lib-head-actions{display:flex;align-items:center;gap:10px;}
+.lib-count{font-size:12px;color:var(--ink-soft);margin:0 0 11px;}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px;}
+.density-toggle{display:flex;gap:3px;background:var(--porcelain-dim);border-radius:9px;padding:3px;}
+.density-seg{display:flex;align-items:center;justify-content:center;padding:5px 8px;border:none;background:none;border-radius:6px;color:var(--nav-inactive);}
+.density-seg.active{background:var(--white);color:var(--ink);}
+.btn-add{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:var(--porcelain);background:var(--jade);border:none;border-radius:999px;padding:6px 12px;}
+.btn-add:hover{background:var(--jade-deep);}
+/* type pill on the shelf — colour/bg come from the shared .t-* classes (fixed both themes) */
+.shelf-pill{display:inline-flex;align-items:center;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;line-height:1.4;border-radius:999px;padding:3px 9px;flex:0 0 auto;}
+.shelf-status{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11.5px;}
+.shelf-cbody .shelf-status{margin-top:8px;}
+.shelf-name{font-family:var(--font-display);font-weight:600;color:var(--ink);}
+/* photo / thumbnail fill: the user's image, a type-tinted stripe, or a kanji plate */
+.shelf-img{background-size:cover;background-position:center;}
+.shelf-ph{background:repeating-linear-gradient(135deg,var(--ph-a,#E7E0CE),var(--ph-a,#E7E0CE) 7px,var(--ph-b,#EFE9DA) 7px,var(--ph-b,#EFE9DA) 14px);}
+.shelf-ph.t-oolong{--ph-a:#EBE2D6;--ph-b:#F2EBDF;}
+.shelf-ph.t-black{--ph-a:#E6DCD0;--ph-b:#EFE7DB;}
+.shelf-ph.t-yellow{--ph-a:#EAE6CE;--ph-b:#F2EEDC;}
+html[data-theme="dark"] .shelf-ph{--ph-a:#242219;--ph-b:#2b2820;}
+html[data-theme="dark"] .shelf-ph.t-green{--ph-a:#20241d;--ph-b:#272b23;}
+html[data-theme="dark"] .shelf-ph.t-oolong{--ph-a:#25211a;--ph-b:#2c2820;}
+.shelf-kanji{display:flex;align-items:center;justify-content:center;font-family:var(--font-display);}
+.shelf-kanji.t-white{background:#ECEAE2;} .shelf-kanji.t-white span{color:#cfc9b8;}
+.shelf-kanji.t-puerh{background:#EAE0D3;} .shelf-kanji.t-puerh span{color:#cbbba3;}
+html[data-theme="dark"] .shelf-kanji.t-white{background:#26241d;} html[data-theme="dark"] .shelf-kanji.t-white span{color:#494434;}
+html[data-theme="dark"] .shelf-kanji.t-puerh{background:#2a241c;} html[data-theme="dark"] .shelf-kanji.t-puerh span{color:#544733;}
+/* grid density */
+.tea-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.shelf-card{background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;}
+.shelf-card:hover{border-color:var(--jade);}
+.shelf-photo-wrap{position:relative;}
+.shelf-photo{height:100px;}
+.shelf-photo-wrap .shelf-pill{position:absolute;top:8px;left:8px;}
+.shelf-photo-wrap .fav{position:absolute;top:8px;right:8px;display:flex;color:var(--jade);filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.45));}
+.shelf-cbody{padding:11px 12px 13px;}
+.shelf-cbody .shelf-name{font-size:15px;line-height:1.25;min-height:37px;}
+.shelf-kanji.shelf-photo span{font-size:32px;}
+.shelf-rebuy{margin-top:6px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft);}
+/* rows density */
+.shelf-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+.shelf-row:last-child{border-bottom:none;}
+.shelf-thumb{width:50px;height:50px;border-radius:11px;flex:0 0 auto;}
+.shelf-kanji.shelf-thumb span{font-size:22px;}
+.shelf-row-mid{flex:1;min-width:0;}
+.shelf-row .shelf-name{font-size:15.5px;line-height:1.2;}
+.shelf-row-meta{display:flex;align-items:center;gap:7px;margin-top:5px;}
+.shelf-caret{color:var(--ink-soft);display:flex;transform:rotate(-90deg);flex:0 0 auto;opacity:.55;}
+
 /* generic */
 .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;}
 .section{margin-top:22px;}

@@ -60,7 +60,7 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v84**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v85**. Keep CHANGELOG.md updated.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
@@ -72,16 +72,30 @@ global reconciliations apply (achievements stay gated · greeting is a reskin no
 built 3-way-ready for phase-2's `japanese` · ratings already on detail so WS5 is removal). WS4 is the only
 data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existing bilingual `KB_FLAVOR_CHIPS`
 20-term set) — two things to flag at its pause: tag namespacing + arrival-only vs end-of-session mood.
-**WS6 + WS2 shipped (v3.73/v3.74, below). NEXT: WS5 — Library ("My teas")** (photo shelf + grid⇄rows density
-toggle that persists; the core is `statusLine(tea)` → `{text,tone}` branching logic — build it with a
-`/vm-fixture` suite over the real 14 teas; ratings move OFF the card to detail — removal, not new work; kanji/
-striped photo fallbacks per the README). Paste the WS5 bundle to build it.
+**WS6 + WS2 + WS5 shipped (v3.73/v3.74/v3.75, below). NEXT: WS3 — Steeping** (the ritual hero: ensō ring becomes
+the timer — two SVG arcs, `stroke-dashoffset`=progress, CSS `sc-breathe`; steep schedule lives in the brew-guide
+PILLS, tap a pill → active steep, no separate dot row; sound OFF by default, opt-in single chime at 0:00; Focus
+mode = real full-screen breath-led state, replaces the 🧘 emoji flagged in DESIGN.md; nav recedes here — already
+wired via WS6's `navRecessed`). Paste the WS3 bundle to build it.
 
 **Parallel / Niklas's:** the **domain** (register slowcup.app); the **phase-2 gate** (~Jul 20) → phase-2
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.74 WS2 Home: greeting-led, glance-only** (cache **v84**, APP_VERSION v3.74): second of
+**NOW (just shipped) — v3.75 WS5 Library: photo shelf + one status line** (cache **v85**, APP_VERSION v3.75): third
+of the R2 design pass. The tea library is a **photo shelf** with **one type-aware status line per card** (same
+slot/weight; only words + tone change). Core logic `statusLine(tea)`→`{text,tone}` (steep-teas.js), tone ∈
+low(clay·sorts-top)/freshness(ink-soft)/plenty(jade)/ages(jade): low→"running low"; white/pu'er→"ages
+well/gracefully"; delicate green/yellow near harvest window→"best within N wks" else "fresh, plenty";
+oolong/black→"plenty". `freshnessWeeksLeft` reuses harvestYear/Season. **grid⇄rows density toggle**
+(persisted device-local `tealog_teaDensity`); CSS photo fallbacks (striped stripe / 白·餅 kanji). **Ratings left
+the card** (reconciliation #4 — still on detail); **chip filters** (All·types·Low·Favs) replaced the sort/vendor
+dropdowns. New committed **`fixtures/status-line-test.js`** (37, over the real teas). **Design-conflict call:**
+mock renders oolong "plenty" vs README prose "ages" → resolved to mock + existing freshnessClass (ages = white +
+pu'er only). Verified both themes × both densities (computed styles + DOM); console clean; `node --check` + all 5
+fixtures green. **NEXT: WS3 Steeping.**
+
+**Earlier — v3.74 WS2 Home: greeting-led, glance-only** (cache **v84**, APP_VERSION v3.74): second of
 the R2 design pass. Home is **glanceable ritual state, not a dashboard** — default cards reduced to **greeting ·
 running low · favourites · one number**. The greeting is a **reskin, not a rebuild** (reconciliation #2): the
 `greetingCardHTML` engine is untouched (buckets/ack/variety/rediscovery + all greeting-v4 coverage stay); only

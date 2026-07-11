@@ -148,9 +148,9 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   row gated on `ACHIEVEMENTS_ENABLED`. Supersedes the old top nav.
 - [x] **WS2 — Home** (v3.74) — greeting-led (reskin of the existing engine, fixtures intact); stat grid +
   clock + cost + recent relocated to Insights; new `week` number card.
-- [ ] **WS5 — Library** — photo shelf + grid⇄rows density toggle; `statusLine(tea)` (needs a vm-fixture);
-  ratings move off the card to detail (removal). **← NEXT**
-- [ ] **WS3 — Steeping** — ensō ring timer; steeps in the brew-guide pills; opt-in chime; Focus mode.
+- [x] **WS5 — Library** (v3.75) — photo shelf + grid⇄rows density; `statusLine(tea)` tone engine
+  (committed `status-line-test.js`, 37); ratings off the card; chip filters replace the dropdowns.
+- [ ] **WS3 — Steeping** — ensō ring timer; steeps in the brew-guide pills; opt-in chime; Focus mode. **← NEXT**
 - [ ] **WS1 — Forms** — core trio + one "more details" fold; method control built **3-way-ready** for
   phase-2's `japanese`.
 - [ ] **WS4 — Flavour** (LARGE, only data-model change, build LAST) — inline capture → session story →
@@ -158,7 +158,7 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   + arrival-only vs end mood.
 
 ## Suggested sequencing (parallel-friendly)
-Now: **R2 implementation deploys (Code, in flight — WS6 ✓, WS2 ✓, WS5 next)** ∥ register domain (Niklas) ∥
+Now: **R2 implementation deploys (Code, in flight — WS6 ✓, WS2 ✓, WS5 ✓, WS3 next)** ∥ register domain (Niklas) ∥
 phase-2 spec (~Jul 20).
 Then: phase-2 build (wants WS1 method control + WS4 tags in place).
 Then: Pillar C onboarding (with R2 language) → Pillar B migration + beta package → **v4.0**.
