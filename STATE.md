@@ -76,9 +76,11 @@ data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existi
 only data-model change (semantic, not schema — rides the existing `steeps.tags`/`sessions.tags` arrays, no SQL).
 Pause decisions were locked as: **bare + membership** namespace (vocab = membership in `KB_FLAVOR_CHIPS`, free
 words stored bare, never inflate the radar-unlock count), **arrival-only** mood ("Arrived steady."), and the
-session story **keeps the finish-screen inputs below it** (photo/rating/share not dropped). Next forward work is
-the parallel track below (domain · phase-2 gate ~Jul 20 — which wanted WS1's method + WS4's tags in place, now
-both landed) plus the beta inbox (issues #7–#12) and the R3 visual level-up (`design-r3/`).
+session story **keeps the finish-screen inputs below it** (photo/rating/share not dropped). Forward work is now
+the **post-R2 issue queue** (decided order): **v3.79 #13 timer time (SHIPPED, below) → v3.80 #19 + #20 (QoL pair)
+→ #18 tiering → #16 period toggle → phase-2 (#15 + #9)**; #14 parked → R3, #11 closed, and the held #15 vocab
+expansion stays out until phase-2. Plus the parallel track below (domain · phase-2 gate ~Jul 20 — which wanted
+WS1's method + WS4's tags in place, now both landed) and the R3 visual level-up (`design-r3/`).
 
 **Design Round 3 material stored:** `design-r3/` (gitignored) holds `DESIGN-R3-INSPIRATION.md` + a copy of
 `R2-STATUS.md` + `images/` (with a README — Niklas still needs to drop the 5 board PNGs there; Code can't write
@@ -89,7 +91,22 @@ saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.78 WS4 Flavour: capture · story · honesty ladder** (cache **v88**, APP_VERSION v3.78):
+**NOW (just shipped) — v3.79 #13: change the steep time with the new timer** (cache **v89**, APP_VERSION v3.79):
+first item off the post-R2 issue queue. **Bug:** with a brew guide active the countdown read "of 117s" with no
+way to edit it, while the "Steep time (seconds)" field held a different value (what actually logs) — two numbers
+visibly disagreeing; the only manual input rendered exclusively when `!d.schedule`, so it vanished the moment a
+guide was active. **Fix (steep-sessions.js): one value, one writer.** The countdown length (`timer.target`) and
+the logged time (`curTime`) are written **only** through `setSteepTime(secs)` — every prefill/edit path
+(`applyScheduleToCurrentSteep`, `d_setActiveSteep`, the steep-time field, the new inline editor) routes through it,
+so they can never drift. `focusProgress(tm)` still reads `tm.target`, so focus mode + the existing timer fixture
+(A–E) carry over unchanged. **Inline tap-to-edit (never a popup):** the "of Ns" sub-label is a dashed-underline tap
+target, editable only while stopped; a blank/zero commit is a **cancelled edit** → reverts to the prior target (no
+0-second countdown). **"Use time"** was a redundant bridge in countdown mode → removed there; kept **stopwatch-only**
+(elapsed is a real separate measurement). `fixtures/steeping-timer-test.js` extended with **section F** (12 checks,
+now 30 total; F3 is the no-drift bug as a contract, plus the pinned zero-edit revert). `node --check` + timer +
+brew-roundtrip green; verified in-browser at 390px both themes. **No SQL.** Next: **v3.80 = #19 + #20** (QoL pair).
+
+**Earlier — v3.78 WS4 Flavour: capture · story · honesty ladder** (cache **v88**, APP_VERSION v3.78):
 the LAST R2 workstream and the only new feature. Three connected moments over the existing tags arrays (no SQL).
 **Capture** (`flavorCaptureHTML`, steep-sessions.js): a reskin/upgrade of the per-steep tags field into inline
 flavour-family chips beneath the WS3 timer — the 20-term `KB_FLAVOR_CHIPS` vocab grouped into **4 families**

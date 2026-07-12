@@ -602,11 +602,13 @@ function saveTuningToGuide(teaId){
 // in-session carry (manual edits + last-pour nudges) so an adjustment sticks instead
 // of the schedule snapping back to its upward march each steep.
 function applyScheduleToCurrentSteep(d){
-  if(!d || !d.schedule) return;
+  if(!d) return;
+  // No guide (brewMode 'off'): still seed a sane countdown so target + logged time agree (#13).
+  if(!d.schedule){ if(d.timer.mode==='timer' && !(Number(d.curTime)>0)) setSteepTime(d.timer.target||15); return; }
   const i = d.steeps.length;
   d.activeSteep = i; // WS3: the pill for the steep you're about to brew is the active one
   const t = scheduleTimeForIndex(d.schedule, i);
-  if(t!=null){ const adj=Math.max(3, Math.round(t + (d.timeShift||0))); d.timer.mode='timer'; d.timer.target=adj; d.curTime=String(adj); }
+  if(t!=null){ d.timer.mode='timer'; setSteepTime(Math.max(3, Math.round(t + (d.timeShift||0)))); }
   if(d.schedule.tempC!=null){ const disp=cToDisplay(d.schedule.tempC); if(disp!=='') d.curTemp=String(disp); }
 }
 // WS3: tap a brew-guide pill → time that steep. Sets the ring's target + the "steep N" label; the
@@ -617,9 +619,9 @@ function d_setActiveSteep(i){
   const d = state.sessionDraft; if(!d || !d.schedule) return;
   const t = scheduleTimeForIndex(d.schedule, i); if(t==null) return;
   d.activeSteep = i;
-  const adj = Math.max(3, Math.round(t + (d.timeShift||0)));
   clearTimerInterval();
-  d.timer.mode = 'timer'; d.timer.target = adj; d.timer.elapsed = 0; d.timer.running = false;
+  d.timer.mode = 'timer'; d.timer.elapsed = 0; d.timer.running = false; d.timeEditing = false;
+  setSteepTime(Math.max(3, Math.round(t + (d.timeShift||0))));
   render();
 }
 // Nudge the *next* steep from how the last pour tasted (ephemeral to this session).
@@ -772,7 +774,12 @@ function sessionSteepingHTML(d){
 
   const displaySeconds = tm.mode==='timer' ? Math.max(0, tm.target - tm.elapsed) : tm.elapsed;
   const active = (d.activeSteep!=null ? d.activeSteep : d.steeps.length);
-  const subLabel = tm.mode==='timer' ? `of ${tm.target}s · steep ${active+1}` : `steep ${active+1}`;
+  // #13: the countdown length is tap-to-edit here (only while stopped) — it IS the logged steep time.
+  let subLabel;
+  if(tm.mode!=='timer'){ subLabel = `steep ${active+1}`; }
+  else if(d.timeEditing){ subLabel = `of <input type="number" id="timerTargetEdit" class="timer-target-inline" value="${tm.target||''}" oninput="setSteepTime(this.value)" onblur="d_endTimeEdit()" onkeydown="if(event.key==='Enter'){this.blur();}">s · steep ${active+1}`; }
+  else if(!tm.running){ subLabel = `of <button type="button" class="timer-target-tap" onclick="d_beginTimeEdit()"><span id="timerTargetLabel">${tm.target}</span>s</button> · steep ${active+1}`; }
+  else { subLabel = `of <span id="timerTargetLabel">${tm.target}</span>s · steep ${active+1}`; }
   const soundOn = !!state.settings.soundEnabled;
 
   return `
@@ -787,7 +794,6 @@ function sessionSteepingHTML(d){
 
     <div class="timer-box">
       ${modeBtns}
-      ${(tm.mode==='timer' && !d.schedule) ? `<div style="margin-bottom:10px;text-align:center;"><input type="number" value="${tm.target}" class="timer-target-input" oninput="setTimerTarget(this.value)"> <span style="opacity:.7;font-size:12px;">sec</span></div>` : ''}
       <div class="timer-ring">
         <div class="timer-enso-wrap">
           <svg class="timer-enso" viewBox="0 0 120 120" aria-hidden="true">
@@ -803,7 +809,7 @@ function sessionSteepingHTML(d){
       <div class="timer-ctrls">
         <button onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
         <button class="soft" onclick="timerReset()">Reset</button>
-        <button class="soft wide" onclick="useTimerValue()">Use time</button>
+        ${tm.mode==='stopwatch' ? `<button class="soft wide" onclick="useTimerValue()">Use time</button>` : ''}
       </div>
       <div class="timer-focus" onclick="toggleFocusMode()" role="button">${icon('i-focus-hl',18)}<span>Enter focus mode</span></div>
     </div>
@@ -814,7 +820,7 @@ function sessionSteepingHTML(d){
 
       <div class="form-grid" style="margin-top:14px;">
         <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
-        <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="d_setcur('curTime', this.value)"></div>
+        <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="setSteepTime(this.value)"></div>
         <div class="field span2"><label>Notes for this steep</label><textarea id="steepDesc" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
       </div>
 
@@ -876,10 +882,30 @@ function focusLogSteep(){
   d.timer = { mode:tm.mode, target:tm.target, elapsed:0, running:false, intervalId:null };
   render();
 }
-function setTimerMode(m){ state.sessionDraft.timer.mode=m; render(); }
-function setTimerTarget(v){
-  state.sessionDraft.timer.target=Number(v)||0;
+function setTimerMode(m){ state.sessionDraft.timer.mode=m; state.sessionDraft.timeEditing=false; render(); }
+// #13 — the countdown length (timer.target) and the logged "Steep time (seconds)" field
+// (curTime) are ONE value, written only here so they can never drift. No render(); callers
+// that need the field/sub-label redrawn call render() themselves.
+function setSteepTime(secs){
+  const d=state.sessionDraft; if(!d) return;
+  const n=Math.round(Number(secs));
+  const v=(isFinite(n)&&n>0)?n:0;
+  d.timer.target=v; d.curTime=v?String(v):'';
   updateTimerDisplayOnly();
+}
+// Inline tap-to-edit on the countdown's "of Ns" (never a popup; only while stopped).
+function d_beginTimeEdit(){
+  const d=state.sessionDraft; if(!d || d.timer.running) return;
+  d.timeEditPrev=d.timer.target; // for the cancelled-edit revert below
+  d.timeEditing=true; render();
+  setTimeout(()=>{ const el=document.getElementById('timerTargetEdit'); if(el){ el.focus(); el.select&&el.select(); } },0);
+}
+// Commit the edit; a blank/zero entry is a cancelled edit — revert to the prior target so
+// Start never faces a 0-second countdown (calmer than an instant complete + chime).
+function d_endTimeEdit(){
+  const d=state.sessionDraft; if(!d) return;
+  if(!(Number(d.curTime)>0)) setSteepTime(d.timeEditPrev||0);
+  d.timeEditing=false; render();
 }
 
 let _audioCtx = null;
@@ -910,6 +936,7 @@ function timerStartPause(){
     clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false;
   } else {
     if(!_audioCtx){ try{ _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+    state.sessionDraft.timeEditing=false; // starting closes any open target edit
     tm.running=true;
     tm.intervalId = setInterval(()=>{
       tm.elapsed += 1;
@@ -926,6 +953,8 @@ function updateTimerDisplayOnly(){
   const disp = document.querySelector('.timer-display');
   const tm = state.sessionDraft.timer;
   if(disp) disp.textContent = fmtSec(tm.mode==='timer'?Math.max(0,tm.target-tm.elapsed):tm.elapsed);
+  const tl = document.getElementById('timerTargetLabel'); // #13: keep "of Ns" synced with the steep-time field
+  if(tl && tm.mode==='timer') tl.textContent = tm.target;
   const arc = document.getElementById('ensoArc'); // WS3: fill the ensō ring as the steep runs
   if(arc) arc.setAttribute('stroke-dashoffset', (100*(1-focusProgress(tm))).toFixed(1));
   const btn = document.querySelector('.timer-ctrls button');
@@ -941,14 +970,16 @@ function updateTimerDisplayOnly(){
 function timerReset(){
   const tm = state.sessionDraft.timer;
   clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false; tm.elapsed=0;
+  state.sessionDraft.timeEditing=false;
   render();
 }
+// Stopwatch-only bridge (#13): capture the measured elapsed into the one steep-time value.
 function useTimerValue(){
   const tm = state.sessionDraft.timer;
   const val = tm.mode==='timer' ? tm.target : tm.elapsed;
-  state.sessionDraft.curTime = val; // persist to state so a re-render doesn't wipe it
+  setSteepTime(val); // one writer keeps target + curTime in lockstep
   const el = document.getElementById('steepTime');
-  if(el) el.value = val;
+  if(el) el.value = state.sessionDraft.curTime;
 }
 
 function renderTagSuggest(query, target){
@@ -1022,7 +1053,7 @@ function saveSteepAndContinue(){
     if(raw!=null) d.timeShift = Math.max(-45, Math.min(45, Number(time)-raw));
   }
   clearTimerInterval();
-  d.curSteepTags=[]; d.flavorMore=false; d.flavorFreeOpen=false; d.curSteepDesc=''; d.curTemp=''; d.curTime='';
+  d.curSteepTags=[]; d.flavorMore=false; d.flavorFreeOpen=false; d.curSteepDesc=''; d.curTemp=''; d.curTime=''; d.timeEditing=false;
   d.timer = {mode:d.timer.mode, target:d.timer.target, elapsed:0, running:false, intervalId:null};
   applyScheduleToCurrentSteep(d); // prefill the next steep's timer + temp from the guide
   render();

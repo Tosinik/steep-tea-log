@@ -384,6 +384,9 @@ html[data-theme="dark"] .steep-pill.active{color:#15140F;}
 .timer-center{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .timer-display{font-family:var(--font-mono);font-weight:500;font-size:46px;line-height:1;letter-spacing:.01em;color:var(--porcelain);}
 .timer-sub{font-family:var(--font-mono);font-size:11px;color:var(--timer-sub);margin-top:9px;letter-spacing:.09em;}
+/* #13: tap-to-edit the countdown length inline (only while stopped) — a quiet dashed hint, not a popup. */
+.timer-target-tap{background:none;border:none;color:var(--porcelain);font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;padding:2px 3px;border-bottom:1px dashed var(--timer-soft);opacity:.92;cursor:pointer;}
+.timer-target-inline{width:48px;text-align:center;border:none;border-radius:5px;padding:2px 3px;font-family:var(--font-mono);font-size:11px;background:var(--porcelain);color:var(--jade-deep);}
 .timer-ctrls{display:flex;gap:8px;margin-top:16px;}
 .timer-ctrls button{flex:1;background:var(--porcelain);color:var(--jade-deep);border:none;padding:12px 0;border-radius:11px;font-weight:600;font-size:14px;}
 .timer-ctrls button.soft{background:var(--timer-soft);color:var(--porcelain);}
