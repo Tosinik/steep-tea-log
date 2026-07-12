@@ -18,16 +18,32 @@ function sessionsByDay(){
   state.sessions.forEach(s=>{ const k=dayKey(s.date); (map[k]=map[k]||[]).push(s); });
   return map;
 }
+// WS5-style thumb placeholder (no emoji): the tea's photo, else a type-tinted stripe, else a
+// white(白)/pu'er(餅) kanji plate — mirrors shelfPhoto (steep-teas.js).
+function sessThumbHTML(tea){
+  if(tea && tea.image) return `<div class="sess-thumb" style="background-image:url(${escapeHtml(tea.image)})"></div>`;
+  const type = (tea && tea.type || '').toLowerCase();
+  const kanji = type==='white' ? '白' : (type==='puerh' ? '餅' : '');
+  if(kanji) return `<div class="sess-thumb shelf-kanji t-${escapeHtml(type)}"><span>${kanji}</span></div>`;
+  return `<div class="sess-thumb shelf-ph t-${escapeHtml(type||'unknown')}"></div>`;
+}
 function sessionRowHTML(s){
   const tea = teaById(s.teaId);
   const v = vesselById(s.vesselId);
-  const tags = (s.tags||[]).slice(0,4).map(t=>`<span class="tagchip">${escapeHtml(t)}</span>`).join(' ');
+  // History chips are the session's flavour notes (union of steep tags), plus any overall tags
+  // not already covered — nothing the user entered is dropped. Empty → the meta reads "· no notes".
+  const flav = sessionFlavorTags(s.steeps);
+  const extra = (s.tags||[]).filter(t=>!flav.some(f=>f.toLowerCase()===String(t).toLowerCase()));
+  const all = flav.concat(extra);
+  const shown = all.slice(0,3);
+  const overflow = all.length - shown.length;
+  const chips = shown.map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join('') + (overflow>0?`<span class="hist-chip more">+${overflow}</span>`:'');
   return `<div class="sess-row" onclick="openSessionEdit('${escapeJsArg(s.id)}')">
-    <div class="sess-thumb" style="${tea&&tea.image?`background-image:url(${escapeHtml(tea.image)})`:''}">${tea&&tea.image?'':'🍵'}</div>
+    ${sessThumbHTML(tea)}
     <div class="sess-main">
       <div class="sess-top"><strong>${tea?escapeHtml(tea.name):'Unknown tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
-      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}</div>
-      ${tags?`<div class="sess-tags">${tags}</div>`:''}
+      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}${all.length?'':' · no notes'}</div>
+      ${all.length?`<div class="sess-tags">${chips}</div>`:''}
     </div>
     <span class="sess-chev">›</span>
   </div>`;
@@ -83,7 +99,7 @@ function viewSessions(){
 function viewVessels(){
   const rows = state.vessels.length ? state.vessels.map(v=>`
     <div class="rank-row">
-      <span class="vessel-thumb" style="${v.image?`background-image:url(${escapeHtml(v.image)})`:''}">${v.image?'':'🫖'}</span>
+      <span class="vessel-thumb${v.image?'':' is-ph'}" style="${v.image?`background-image:url(${escapeHtml(v.image)})`:''}"></span>
       <span class="rname">${escapeHtml(v.name)} <span style="color:var(--ink-soft);font-weight:400;">— ${escapeHtml(v.type)}${v.material?', '+escapeHtml(v.material):''}</span></span>
       <span class="rval">${v.capacityMl?v.capacityMl+'ml':`<button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))" style="color:var(--ink-soft);font-size:11px;text-decoration:underline;padding:0;">· ml?</button>`}</span>
       <button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))">edit</button>
@@ -318,6 +334,8 @@ function startSessionFor(teaId){
     mood: null,                                          // v3.31 optional pre-brew energy/mood
     curTemp: '', curTime: '',
     curSteepTags: [],
+    flavorMore: false,      // WS4 capture: reveal the other two flavour families in place
+    flavorFreeOpen: false,  // WS4 capture: the "your own word" free-text door
     curSteepDesc: '',
     sessionTags: [],
     sessionRating: 0,
@@ -639,6 +657,7 @@ function beginSteeping(){
   else d.schedule = null;
   d.timeShift = 0;
   d.scheduleHidden = false;
+  d.flavorMore = false; d.flavorFreeOpen = false;
   d.stage='steeping';
   state.navRestored = false; // WS6: the bottom bar recedes for each fresh steep until swiped back up
   applyScheduleToCurrentSteep(d);
@@ -690,6 +709,49 @@ function scheduleStripHTML(d){
     <div class="steep-pills">${pills}</div>
   </div>`;
 }
+
+// WS4 capture — inline flavour chips beneath the timer, saved live to the active steep's
+// curSteepTags (committed into steeps[].tags on saveSteepAndContinue). Two families by default;
+// "more" reveals the other two in place; a quiet door opens a free-text input. Never a modal,
+// never required — skipping leaves no gap. Vocab is stored bare (bare + membership scheme).
+function flavorCaptureHTML(d){
+  const sel = d.curSteepTags || [];
+  const shown = d.flavorMore ? KB_FLAVOR_FAMILIES : KB_FLAVOR_FAMILIES.slice(0, FLAVOR_DEFAULT_FAMILIES);
+  const families = shown.map(f=>`
+    <div class="flav-fam">
+      <div class="flav-eyebrow">${escapeHtml(f.label)}</div>
+      <div class="flav-chips">${f.terms.map(t=>`<button type="button" class="flav-chip${sel.includes(t)?' on':''}" onclick="toggleFlavor('${escapeJsArg(t)}')">${escapeHtml(flavorLabel(t))}</button>`).join('')}</div>
+    </div>`).join('');
+  const hidden = KB_FLAVOR_FAMILIES.slice(FLAVOR_DEFAULT_FAMILIES);
+  const hiddenCount = hidden.reduce((n,f)=>n+f.terms.length,0);
+  const teaser = hidden.map(f=>f.terms[0]).join(', '); // "roast, spice"
+  const moreRow = d.flavorMore
+    ? `<button type="button" class="flav-more" onclick="d_flavorMore(false)">${icon('i-caret-up-hl',18)}<span>fewer flavours</span></button>`
+    : `<button type="button" class="flav-more" onclick="d_flavorMore(true)">${icon('i-caret-hl',18)}<span>${hiddenCount} more flavours · ${escapeHtml(teaser)}</span></button>`;
+  // Free-typed words already chosen (not vocabulary) stay visible + removable — nothing hidden.
+  const freeSel = sel.filter(t=>!isFlavorVocab(t));
+  const freeChips = freeSel.length ? `<div class="flav-freesel">${freeSel.map(t=>`<span class="flav-chip on">${escapeHtml(t)} <button onclick="removeCurTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : '';
+  const freeDoor = d.flavorFreeOpen
+    ? `<div class="tag-input-wrap"><input type="text" id="tagInputField" data-target="steep" placeholder="your own word, press Enter…"><div id="tagSuggestBox"></div></div>`
+    : `<button type="button" class="flav-door" onclick="d_flavorFreeOpen()">${icon('i-plus-hl',18)}<span>your own word</span></button>`;
+  return `
+    <div class="flav-capture">
+      <div class="flav-prompt"><span class="flav-q">What are you tasting?</span><span class="flav-opt mono">optional</span></div>
+      ${families}
+      ${moreRow}
+      <div class="flav-free">${freeDoor}${freeChips}</div>
+      <div class="flav-reassure mono">saved as you tap — nothing to submit</div>
+    </div>`;
+}
+function toggleFlavor(term){
+  const d = state.sessionDraft; if(!d) return;
+  term = String(term).toLowerCase();
+  const i = d.curSteepTags.indexOf(term);
+  if(i>=0) d.curSteepTags.splice(i,1); else d.curSteepTags.push(term);
+  render();
+}
+function d_flavorMore(v){ if(state.sessionDraft){ state.sessionDraft.flavorMore=!!v; render(); } }
+function d_flavorFreeOpen(){ if(state.sessionDraft){ state.sessionDraft.flavorFreeOpen=true; render(); setTimeout(()=>{ const el=document.getElementById('tagInputField'); if(el) el.focus(); },0); } }
 
 function sessionSteepingHTML(d){
   const tea = teaById(d.teaId);
@@ -746,21 +808,14 @@ function sessionSteepingHTML(d){
       <div class="timer-focus" onclick="toggleFocusMode()" role="button">${icon('i-focus-hl',18)}<span>Enter focus mode</span></div>
     </div>
 
+    ${flavorCaptureHTML(d)}
+
     ${d.steeps.length ? `<div style="margin-top:14px;">${steepsHTML}</div>` : ''}
 
       <div class="form-grid" style="margin-top:14px;">
         <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
         <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="d_setcur('curTime', this.value)"></div>
         <div class="field span2"><label>Notes for this steep</label><textarea id="steepDesc" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
-        <div class="field span2">
-          <label>Tasting tags</label>
-          <div id="curTagChips">${d.curSteepTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeCurTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
-          <div class="tag-input-wrap">
-            <input type="text" id="tagInputField" data-target="steep" placeholder="Type your own, press Enter...">
-            <div id="tagSuggestBox"></div>
-          </div>
-          ${tagLibraryChipsHTML('steep')}
-        </div>
       </div>
 
       <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
@@ -967,7 +1022,7 @@ function saveSteepAndContinue(){
     if(raw!=null) d.timeShift = Math.max(-45, Math.min(45, Number(time)-raw));
   }
   clearTimerInterval();
-  d.curSteepTags=[]; d.curSteepDesc=''; d.curTemp=''; d.curTime='';
+  d.curSteepTags=[]; d.flavorMore=false; d.flavorFreeOpen=false; d.curSteepDesc=''; d.curTemp=''; d.curTime='';
   d.timer = {mode:d.timer.mode, target:d.timer.target, elapsed:0, running:false, intervalId:null};
   applyScheduleToCurrentSteep(d); // prefill the next steep's timer + temp from the guide
   render();
@@ -979,17 +1034,55 @@ function finishSteeping(){
   if(timeVal && Number(timeVal)>0){ saveSteepAndContinue(); }
   if(state.sessionDraft.steeps.length===0){ showToast('Log at least one steep first.'); return; }
   clearTimerInterval();
+  state.sessionDraft.completedAt = new Date().toISOString(); // frozen "Session complete · HH:MM"
   state.sessionDraft.stage='finish';
   render();
 }
+// Union of a session's per-steep flavour tags, first-seen order (vocabulary + free words alike).
+function sessionFlavorTags(steeps){
+  const seen=[], out=[];
+  (steeps||[]).forEach(s=>(s.tags||[]).forEach(t=>{ const k=String(t).toLowerCase(); if(!seen.includes(k)){ seen.push(k); out.push(t); } }));
+  return out;
+}
+// The session read-back: which vocabulary note led early vs opened up in a later steep. An
+// observation of what happened across the steeps, never a verdict/score of the cup.
+function sessionFlavorStory(steeps){
+  const rows=(steeps||[]).map(s=>(s.tags||[]).filter(isFlavorVocab).map(t=>String(t).toLowerCase()));
+  const n=rows.length; if(n<2) return '';
+  const first=rows[0]||[];
+  const early=first[0];
+  let late=null, lateStep=null;
+  for(let i=1;i<n && !late;i++){ for(const t of rows[i]){ if(!first.includes(t)){ late=t; lateStep=i+1; break; } } }
+  const clauses=[];
+  if(early) clauses.push(`${capWord(flavorLabel(early))} led early`);
+  if(late)  clauses.push(`${flavorLabel(late)} opened up by steep ${lateStep}`);
+  return clauses.length ? clauses.join('; ')+'.' : '';
+}
+function hhmm(iso){ const d=iso?new Date(iso):new Date(); return d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}); }
 
 function sessionFinishHTML(d){
   const tea = teaById(d.teaId);
+  const ves = vesselById(d.vesselId);
+  const method = (!d.isColdBrew) ? brewMethodFor(d.brewStyle, ves&&ves.capacityMl) : null;
+  const temps = d.steeps.map(s=>s.tempC).filter(v=>v!=null && v!=='');
+  const metaBits = [`${d.steeps.length} steep${d.steeps.length===1?'':'s'}`];
+  if(temps.length) metaBits.push(cToDisplay(temps[0])+tempUnitLabel());
+  if(method) metaBits.push(method);
+  if(ves) metaBits.push(ves.name);
+  const tasted = sessionFlavorTags(d.steeps);
+  const story = sessionFlavorStory(d.steeps);
+  const breakdown = d.steeps.map((s,i)=>{ const st=(s.tags||[]); return st.length?`<div class="readback-step"><span class="rb-idx mono">steep ${i+1}</span><span class="rb-chips">${st.map(t=>`<span class="rb-chip">${escapeHtml(flavorLabel(t))}</span>`).join('')}</span></div>`:''; }).join('');
   return `
     <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
     <div class="card">
-      <h2 style="margin-top:0;">Wrap up: ${tea?escapeHtml(tea.name):''}</h2>
-      <div class="eyebrow">${d.steeps.length} steep${d.steeps.length===1?'':'s'} logged</div>
+      <div class="sess-story">
+        <div class="eyebrow">Session complete · ${escapeHtml(hhmm(d.completedAt))}</div>
+        <h2 class="story-name">${tea?escapeHtml(tea.name):''}</h2>
+        <div class="story-meta mono">${metaBits.map(escapeHtml).join(' · ')}</div>
+        ${tasted.length?`<div class="story-tasted"><div class="eyebrow">You tasted</div><div class="flav-chips">${tasted.map(t=>`<span class="flav-chip on static">${escapeHtml(flavorLabel(t))}</span>`).join('')}</div></div>`:''}
+        ${tasted.length?`<div class="readback-card">${story?`<div class="readback-obs">${escapeHtml(story)}</div>`:''}<div class="readback-steps">${breakdown}</div></div>`:''}
+        ${d.mood?`<div class="story-mood">Arrived <strong>${escapeHtml(String(d.mood).toLowerCase())}</strong>.</div>`:''}
+      </div>
       <div class="field span2" style="margin:14px 0;">
         <label>Photo (optional)</label>
         <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
@@ -1010,7 +1103,7 @@ function sessionFinishHTML(d){
         ${tagLibraryChipsHTML('session')}
       </div>
       <label class="checkrow" style="margin-top:16px;"><input type="checkbox" ${d.isShared?'checked':''} onchange="state.sessionDraft.isShared=this.checked"> Share this session with followers</label>
-      <button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save session</button>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save to journal</button>
     </div>
   `;
 }

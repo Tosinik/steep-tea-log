@@ -416,7 +416,7 @@ function deleteTea(id){
   render();
 }
 
-function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail';
+function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail'; state.flavorView='bars'; // WS4: bars is the default view on every visit — the toggle is deliberately NOT persisted (radar must never become sticky)
   try{ localStorage.setItem('tealog_view','tea-detail'); localStorage.setItem('tealog_activeTea', id); }catch(e){}
   render(); }
 
@@ -461,6 +461,102 @@ function freshnessCueHTML(tea){
 function sparklineHintHTML(tea){
   if(tea.purchaseDate || Number(tea.costOriginalGrams)<=0) return '';
   return `<div style="margin-top:8px;font-size:12px;color:var(--ink-soft);">Add a <span onclick="openTeaForm(teaById('${escapeJsArg(tea.id)}'))" style="color:var(--jade-deep);cursor:pointer;text-decoration:underline;">purchase date</span> to see the stock curve.</div>`;
+}
+
+/* ---------- WS4: "What you taste" — the honesty ladder ----------
+   Aggregates a tea's recent flavour captures and renders only the shape the data has earned:
+     sessionCount <= 2            → plain counted chips ("still early")
+     sessionCount >= 3            → ranked bars (the everyday default)
+     sessionCount >= 5 && >=4 terms → radar unlocks (bars stay default; radar/cloud are alt views)
+   Never render a higher rung than the data earns. Every generated line is an observation of what
+   happened across the steeps, never a verdict/score of the palate. Guarded by fixtures/flavor-ladder-test.js. */
+const FLAVOR_PROFILE_RECENT = 6;                    // "last 6" sessions carrying flavour data
+const FLAVOR_WARM = ['sweetness','honey','malty'];  // rendered amber on bars/radar (sweet/warm notes)
+
+function distinctVocab(session){ // distinct vocabulary terms in a session's steeps
+  const set=[];
+  (session.steeps||[]).forEach(st=>(st.tags||[]).forEach(t=>{ t=String(t).toLowerCase(); if(isFlavorVocab(t) && !set.includes(t)) set.push(t); }));
+  return set;
+}
+function teaFlavorProfile(teaId){
+  const sessions = state.sessions.filter(s=>s.teaId===teaId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const recent=[];
+  for(const s of sessions){ const vocab=distinctVocab(s); if(vocab.length){ recent.push({s,vocab}); if(recent.length>=FLAVOR_PROFILE_RECENT) break; } }
+  const tally={}, positions={}; // positions[term] = steep indices (0-based) it appeared at, across recent sessions
+  recent.forEach(({s,vocab})=>{
+    vocab.forEach(t=>{ tally[t]=(tally[t]||0)+1; });
+    (s.steeps||[]).forEach((st,i)=>(st.tags||[]).forEach(t=>{ t=String(t).toLowerCase(); if(isFlavorVocab(t)) (positions[t]=positions[t]||[]).push(i); }));
+  });
+  const terms = Object.keys(tally).sort((a,b)=> tally[b]-tally[a] || a.localeCompare(b));
+  const sessionCount = recent.length, distinctTermCount = terms.length;
+  const rung = (sessionCount>=5 && distinctTermCount>=4) ? 'radar' : (sessionCount>=3) ? 'bars' : (sessionCount>=1) ? 'chips' : 'none';
+  return { sessionCount, distinctTermCount, tally, terms, positions, rung };
+}
+// One observation about how a note moves across steeps. Observation, never a verdict/score.
+function flavorObservation(p){
+  if(!p || !p.terms || !p.terms.length) return '';
+  for(const t of p.terms){
+    const pos=p.positions[t]||[]; if(pos.length<2) continue;
+    const avg=pos.reduce((a,b)=>a+b,0)/pos.length;
+    if(avg>=1.2) return `${capWord(flavorLabel(t))} climbs in later steeps`;
+    if(pos.filter(i=>i===0).length>=Math.ceil(pos.length/2) && avg<0.6) return `${capWord(flavorLabel(t))} peaks at steep 1, softens after`;
+  }
+  const top=p.terms[0], pos=p.positions[top]||[];
+  return pos.length>=2 ? `${capWord(flavorLabel(top))} runs steady across the steeps` : '';
+}
+function setFlavorView(v){ state.flavorView=v; render(); } // not persisted — see openTeaDetail
+function flavpChipsHTML(p){
+  return `<div class="flavp-chips">${p.terms.map(t=>`<span class="flavp-chip">${escapeHtml(flavorLabel(t))} <span class="flavp-x mono">×${p.tally[t]}</span></span>`).join('')}</div>`;
+}
+function flavpBarsHTML(p){
+  const max=Math.max.apply(null, p.terms.map(t=>p.tally[t]).concat([1]));
+  return `<div class="flavp-bars">${p.terms.map(t=>{
+    const w=Math.round(100*p.tally[t]/max), warm=FLAVOR_WARM.includes(t);
+    return `<div class="flavp-bar"><div class="flavp-bar-top"><span>${escapeHtml(flavorLabel(t))}</span><span class="mono">${p.tally[t]}</span></div><div class="flavp-track"><div class="flavp-fill${warm?' warm':''}" style="width:${w}%"></div></div></div>`;
+  }).join('')}</div>`;
+}
+function flavpRadarHTML(p){
+  const terms=p.terms.slice(0,6), max=Math.max.apply(null, terms.map(t=>p.tally[t]).concat([1]));
+  const cx=100, cy=100, R=64, n=terms.length;
+  const pt=(i,rad)=>{ const a=-Math.PI/2 + i*2*Math.PI/n; return [cx+rad*Math.cos(a), cy+rad*Math.sin(a)]; };
+  const rings=[R/3,2*R/3,R].map(r=>`<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" class="flavp-radar-ring"/>`).join('');
+  const spokes=terms.map((t,i)=>{ const [x,y]=pt(i,R); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="flavp-radar-spoke"/>`; }).join('');
+  const poly=terms.map((t,i)=>pt(i,R*p.tally[t]/max)).map(([x,y])=>`${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const dots=terms.map((t,i)=>{ const [x,y]=pt(i,R*p.tally[t]/max); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" class="flavp-radar-dot"/>`; }).join('');
+  const labels=terms.map((t,i)=>{ const [x,y]=pt(i,R+15); return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" class="flavp-radar-label" text-anchor="middle" dominant-baseline="middle">${escapeHtml(flavorLabel(t))}</text>`; }).join('');
+  return `<div class="flavp-radar"><svg viewBox="0 0 200 200" role="img" aria-label="Flavour radar">${rings}${spokes}<polygon points="${poly}" class="flavp-radar-poly"/>${dots}${labels}</svg></div>`;
+}
+function flavpCloudHTML(p){
+  const max=Math.max.apply(null, p.terms.map(t=>p.tally[t]).concat([1]));
+  return `<div class="flavp-cloud">${p.terms.map(t=>`<span class="flavp-cloud-term" style="font-size:${(13+9*p.tally[t]/max).toFixed(1)}px">${escapeHtml(flavorLabel(t))}</span>`).join('')}</div>`;
+}
+function flavorProfileHTML(tea){
+  const p = teaFlavorProfile(tea.id);
+  if(p.rung==='none') return ''; // nothing captured — no empty state on the tea page
+  if(p.rung==='chips'){
+    return `<div class="flavp">
+      <div class="flavp-head"><span class="flavp-title">What you taste</span><span class="flavp-count mono">${p.sessionCount} session${p.sessionCount===1?'':'s'}</span></div>
+      ${flavpChipsHTML(p)}
+      <div class="flavp-foot">Still early — a couple of notes so far. The picture fills in as you brew.</div>
+    </div>`;
+  }
+  const radarUnlocked = p.rung==='radar';
+  let view = state.flavorView||'bars';
+  if(view==='radar' && !radarUnlocked) view='bars';
+  const badge = radarUnlocked ? `<span class="flavp-badge unlocked">${icon('i-lock-hl',13)} unlocked</span>` : `<span class="flavp-badge">the everyday form</span>`;
+  const toggle = `<div class="flavp-views">
+     <button type="button" class="${view==='bars'?'on':''}" onclick="setFlavorView('bars')">bars</button>
+     ${radarUnlocked?`<button type="button" class="${view==='radar'?'on':''}" onclick="setFlavorView('radar')">radar</button>`:''}
+     <button type="button" class="${view==='cloud'?'on':''}" onclick="setFlavorView('cloud')">cloud</button>
+   </div>`;
+  const body = view==='radar' ? flavpRadarHTML(p) : view==='cloud' ? flavpCloudHTML(p) : flavpBarsHTML(p);
+  const obs = flavorObservation(p);
+  return `<div class="flavp">
+    <div class="flavp-head"><span class="flavp-title">What you taste ${badge}</span><span class="flavp-count mono">last 6</span></div>
+    ${toggle}
+    ${body}
+    ${obs?`<div class="flavp-foot">${escapeHtml(obs)}</div>`:''}
+  </div>`;
 }
 
 function viewTeaDetail(){
@@ -508,6 +604,7 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
       </div>
       ${t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t)}
+      ${flavorProfileHTML(t)}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div></div>`:''}
 
       <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">

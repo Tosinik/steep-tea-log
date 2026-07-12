@@ -251,7 +251,7 @@ function syncAchievements(animate){
 }
 function celebrateAchievements(list){
   const names = list.map(a=>a.tierCount>1?`${a.title} (Lv ${a.level})`:a.title);
-  showToast('🎉 Unlocked: '+names.join(' · '));
+  showToast('Unlocked: '+names.join(' · '));
   confettiBurst();
 }
 function showToast(msg, ms){

@@ -26,6 +26,9 @@
   --wc-amber:#C17A3E; --wc-amber-fg:#2B1206; --wc-amber-soft:#5A3517;
   --wc-por:#F6F2E9; --wc-por-fg:#2B2320; --wc-por-soft:#5C5148; --wc-por-line:#E4DCC9;
   --wc-leaf:#3F5E42; --wc-leaf-lt:#8FBE83; --wc-enso:#E3A15C; --wc-bar:#3F5E42; --wc-frame:#CDC4AD;
+  /* WS4 Flavour */
+  --flav-onfg:#FFFEFB;               /* text on a selected (amber) flavour chip */
+  --flav-radar-fill:rgba(63,94,66,.18);
 }
 html[data-theme="dark"]{
   --porcelain:#15140F;
@@ -53,6 +56,9 @@ html[data-theme="dark"]{
   --wc-amber:#3A2415; --wc-amber-fg:#EAD0AE; --wc-amber-soft:#B98B5E;
   --wc-por:#1C1A14; --wc-por-fg:#EDE6D6; --wc-por-soft:#A79C87; --wc-por-line:#332F24;
   --wc-leaf:#8FBE83; --wc-leaf-lt:#8FBE83; --wc-enso:#E3A15C; --wc-bar:#8FBE83; --wc-frame:#2A261D;
+  /* WS4 Flavour (dark) */
+  --flav-onfg:#15140F;
+  --flav-radar-fill:rgba(111,154,102,.2);
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--porcelain);color:var(--ink);font-family:'Inter',sans-serif;transition:background .25s,color .25s;}
@@ -759,3 +765,76 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .social-notice-msg{flex:1;font-size:13px;line-height:1.5;color:var(--ink);}
 .social-notice-x{background:none;border:none;color:var(--ink-soft);font-size:18px;line-height:1;padding:0 4px;cursor:pointer;}
 .feed-more{text-align:center;margin:4px 0 12px;}
+
+/* ============ WS4 Flavour ============ */
+/* Capture — inline flavour chips beneath the steeping timer */
+.flav-capture{margin:16px 0 4px;}
+.flav-prompt{display:flex;align-items:baseline;gap:8px;margin-bottom:12px;}
+.flav-q{font-family:var(--font-display);font-weight:600;font-size:20px;color:var(--ink);}
+.flav-opt{font-size:11px;color:var(--ink-soft);}
+.flav-fam{margin-bottom:13px;}
+.flav-eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px;}
+.flav-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.flav-chip{font-size:13.5px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;line-height:1;}
+.flav-chip.on{background:var(--amber);border-color:var(--amber);color:var(--flav-onfg);font-weight:600;}
+.flav-chip.static{cursor:default;}
+.flav-chip button{background:none;border:none;color:inherit;font-size:12px;padding:0 0 0 5px;cursor:pointer;line-height:1;}
+.flav-more{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--jade);font-size:14px;padding:5px 0;cursor:pointer;}
+.flav-more svg,.flav-door svg{width:18px;height:18px;flex:0 0 auto;}
+.flav-free{border-top:1px solid var(--line);margin-top:10px;padding-top:12px;}
+.flav-door{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--ink-soft);font-size:14px;padding:2px 0;cursor:pointer;}
+.flav-freesel{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.flav-reassure{display:block;text-align:center;font-size:11px;color:var(--ink-soft);margin-top:16px;}
+
+/* Session story — the finish summary */
+.sess-story{margin-bottom:6px;}
+.story-name{font-family:var(--font-display);font-weight:700;font-size:24px;margin:6px 0 4px;color:var(--ink);}
+.story-meta{font-size:12px;color:var(--ink-soft);margin-bottom:14px;}
+.story-tasted{margin-bottom:14px;}
+.story-tasted .eyebrow{margin-bottom:8px;}
+.readback-card{border:1px solid var(--line);background:var(--white);border-radius:16px;padding:14px 16px;margin-bottom:14px;}
+.readback-obs{font-family:var(--font-display);font-size:16px;color:var(--ink);margin-bottom:12px;line-height:1.45;}
+.readback-steps{display:flex;flex-direction:column;gap:8px;}
+.readback-step{display:flex;gap:10px;align-items:baseline;}
+.rb-idx{font-size:10px;color:var(--ink-soft);flex:0 0 46px;text-transform:uppercase;letter-spacing:.06em;}
+.rb-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.rb-chip{font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--porcelain-dim);color:var(--ink);}
+.story-mood{background:var(--jade-pale);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--ink);}
+
+/* History cards — flavour chip row */
+.hist-chip{display:inline-flex;align-items:center;font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);margin:2px 5px 0 0;}
+.hist-chip.more{opacity:.7;}
+
+/* Tea-page profile — the honesty ladder */
+.flavp{margin-top:18px;border-top:1px solid var(--line);padding-top:16px;}
+.flavp-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px;}
+.flavp-title{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.flavp-count{font-family:var(--font-mono);font-size:11px;color:var(--amber);flex:0 0 auto;}
+.flavp-badge{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:2px 7px;display:inline-flex;align-items:center;gap:4px;font-weight:400;}
+.flavp-badge.unlocked{color:var(--amber);border-color:var(--amber);}
+.flavp-badge svg{width:12px;height:12px;}
+.flavp-views{display:inline-flex;gap:2px;background:var(--porcelain-dim);border-radius:8px;padding:3px;margin-bottom:14px;}
+.flavp-views button{background:none;border:none;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);padding:4px 12px;border-radius:6px;cursor:pointer;}
+.flavp-views button.on{background:var(--white);color:var(--ink);}
+.flavp-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.flavp-chip{font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink);}
+.flavp-x{color:var(--ink-soft);}
+.flavp-bars{display:flex;flex-direction:column;gap:11px;}
+.flavp-bar-top{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink);margin-bottom:5px;}
+.flavp-track{height:8px;background:var(--porcelain-dim);border-radius:4px;overflow:hidden;}
+.flavp-fill{height:100%;background:var(--jade);border-radius:4px;}
+.flavp-fill.warm{background:var(--amber);}
+.flavp-foot{font-family:var(--font-display);font-size:14.5px;color:var(--ink-soft);margin-top:14px;}
+.flavp-radar{display:flex;justify-content:center;padding:6px 0;}
+.flavp-radar svg{width:230px;max-width:100%;height:auto;}
+.flavp-radar-ring,.flavp-radar-spoke{fill:none;stroke:var(--line);stroke-width:1;}
+.flavp-radar-poly{fill:var(--flav-radar-fill);stroke:var(--jade);stroke-width:2;stroke-linejoin:round;}
+.flavp-radar-dot{fill:var(--jade);}
+.flavp-radar-label{font-family:var(--font-mono);font-size:9.5px;fill:var(--ink-soft);}
+.flavp-cloud{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:baseline;padding:4px 0;}
+.flavp-cloud-term{color:var(--ink);line-height:1.1;}
+
+/* WS4 thumb placeholders (no emoji) — .sess-thumb.shelf-ph needs (0,2,0) to beat .sess-thumb's bg */
+.sess-thumb.shelf-ph{background:repeating-linear-gradient(135deg,var(--ph-a,#E7E0CE),var(--ph-a,#E7E0CE) 7px,var(--ph-b,#EFE9DA) 7px,var(--ph-b,#EFE9DA) 14px);}
+.sess-thumb.shelf-kanji span{font-size:20px;}
+.vessel-thumb.is-ph{background:repeating-linear-gradient(135deg,var(--porcelain-dim),var(--porcelain-dim) 6px,var(--white) 6px,var(--white) 12px);}

@@ -223,7 +223,7 @@ function settingsModal(){
 
       ${sec('Appearance')}
       <div class="set-row">
-        <div><div class="set-label">Theme</div><div class="set-sub">Light or dark — also the ☀️/🌙 button in the header</div></div>
+        <div><div class="set-label">Theme</div><div class="set-sub">Light or dark — saved on this device</div></div>
         <div class="seg">
           <button class="${document.documentElement.getAttribute('data-theme')==='light'?'active':''}" onclick="setTheme('light')">Light</button>
           <button class="${document.documentElement.getAttribute('data-theme')==='dark'?'active':''}" onclick="setTheme('dark')">Dark</button>
@@ -237,7 +237,7 @@ function settingsModal(){
         ${toggle('quietMode')}
       </div>
       <div class="set-row">
-        <div><div class="set-label">Show achievements</div><div class="set-sub">Adds a 🏆 button in the header that opens your achievements page</div></div>
+        <div><div class="set-label">Show achievements</div><div class="set-sub">Opens your achievements page from the hub menu</div></div>
         ${toggle('showAchievements')}
       </div>` : ''}
 

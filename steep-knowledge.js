@@ -159,6 +159,30 @@ const KB_FLAVOR_CHIPS = { // quick-tap vocabulary, EN/DE
   fresh:'Frisch', crisp:'Spritzig', earthy:'Erdig', woody:'Holzig', stonefruit:'Steinobst'
 };
 
+// --- WS4 flavour capture: the 20 KB_FLAVOR_CHIPS keys grouped into four families. ---
+// Presentation only over the existing keys (KB_FLAVOR_CHIPS stays the source of truth for the
+// chip set; KB_FLAVOR_AXES is a separate analytic list, untouched). The first two families show
+// by default under the timer; "more" reveals the other two. umami + grassy are homed in
+// Vegetal & marine. Every key appears exactly once — the flavor-ladder fixture asserts this.
+const KB_FLAVOR_FAMILIES = [
+  { key:'vegetal', label:'Vegetal & marine',        terms:['umami','grassy','marine','vegetal','fresh','mineral'] },
+  { key:'sweet',   label:'Sweet & floral',          terms:['sweetness','honey','floral','fruity','stonefruit'] },
+  { key:'roast',   label:'Roast & nut',             terms:['roast','nutty','malty','woody','smoky'] },
+  { key:'spice',   label:'Spice, earth & texture',  terms:['spice','earthy','creamy','crisp'] }
+];
+const FLAVOR_DEFAULT_FAMILIES = 2; // families shown before "more"
+
+// A tag is flavour *vocabulary* iff it's a KB_FLAVOR_CHIPS key. Free-typed words are stored bare
+// in the same tags array but are not vocabulary — so they never inflate the radar-unlock count
+// (they still show in "You tasted" / on history cards). This is the "bare + membership" scheme.
+function isFlavorVocab(tag){ return Object.prototype.hasOwnProperty.call(KB_FLAVOR_CHIPS, String(tag||'').toLowerCase()); }
+function flavorFamilyOf(term){ term=String(term||'').toLowerCase(); return KB_FLAVOR_FAMILIES.find(f=>f.terms.includes(term))||null; }
+// Display label for a stored (English-key) flavour tag. Non-vocab free words render as typed.
+// KB_FLAVOR_CHIPS carries the German label for a future DE locale toggle; English key by default
+// (all five WS4 mocks show the English chips). The stored tag is always the English key.
+function flavorLabel(tag){ tag=String(tag||''); const k=tag.toLowerCase(); return isFlavorVocab(k) ? k : tag; }
+function capWord(s){ s=String(s||''); return s.charAt(0).toUpperCase()+s.slice(1); }
+
 // --- Resolver: text → best style match (longest alias wins), plus extras. ---
 function kbResolve(text){
   text = (text||'').toLowerCase();

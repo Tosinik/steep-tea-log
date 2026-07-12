@@ -60,7 +60,7 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v87**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v88**. Keep CHANGELOG.md updated.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
@@ -72,16 +72,13 @@ global reconciliations apply (achievements stay gated · greeting is a reskin no
 built 3-way-ready for phase-2's `japanese` · ratings already on detail so WS5 is removal). WS4 is the only
 data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existing bilingual `KB_FLAVOR_CHIPS`
 20-term set) — two things to flag at its pause: tag namespacing + arrival-only vs end-of-session mood.
-**WS6 + WS2 + WS5 + WS3 + WS1 shipped (v3.73–v3.77, below). NEXT — the LAST R2 workstream: WS4 — Flavour**
-(LARGE, the only data-model change; build on the settled surfaces). Uses the existing bilingual
-`KB_FLAVOR_CHIPS` (20 EN-key→DE-label terms) as the chip vocabulary — map into 4 families as presentation;
-writes to the existing `steeps.tags`/`sessions.tags` arrays (**no SQL**). Three moments: inline capture under
-the steeping timer (chips, saved live, no submit) → session story (summary + history cards) → tea-page profile
-on the **honesty ladder** (1–2 sessions → counted chips · 3+ → ranked bars [default] · 5+ & ≥4 distinct terms →
-radar unlock; never render a rung the data doesn't earn) — needs a `/vm-fixture`. **Two things to flag at the
-WS4 pause** (per `TASK-ws4-flavor.md`): (1) tag namespacing (bare key for vocab vs `free:` prefix), (2) the mood
-question — app captures arrival mood only, so ship arrival-only or propose an explicit end-of-session mood, don't
-invent a field. Bundle `design_handoff_ws4_flavor/` + `TASK-ws4-flavor.md` both already local.
+**WS6 + WS2 + WS5 + WS3 + WS1 + WS4 all shipped (v3.73–v3.78, below) — the R2 batch is COMPLETE.** WS4 was the
+only data-model change (semantic, not schema — rides the existing `steeps.tags`/`sessions.tags` arrays, no SQL).
+Pause decisions were locked as: **bare + membership** namespace (vocab = membership in `KB_FLAVOR_CHIPS`, free
+words stored bare, never inflate the radar-unlock count), **arrival-only** mood ("Arrived steady."), and the
+session story **keeps the finish-screen inputs below it** (photo/rating/share not dropped). Next forward work is
+the parallel track below (domain · phase-2 gate ~Jul 20 — which wanted WS1's method + WS4's tags in place, now
+both landed) plus the beta inbox (issues #7–#12) and the R3 visual level-up (`design-r3/`).
 
 **Design Round 3 material stored:** `design-r3/` (gitignored) holds `DESIGN-R3-INSPIRATION.md` + a copy of
 `R2-STATUS.md` + `images/` (with a README — Niklas still needs to drop the 5 board PNGs there; Code can't write
@@ -92,7 +89,26 @@ saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.77 WS1 Forms: core trio + one fold** (cache **v87**, APP_VERSION v3.77): fifth of the R2
+**NOW (just shipped) — v3.78 WS4 Flavour: capture · story · honesty ladder** (cache **v88**, APP_VERSION v3.78):
+the LAST R2 workstream and the only new feature. Three connected moments over the existing tags arrays (no SQL).
+**Capture** (`flavorCaptureHTML`, steep-sessions.js): a reskin/upgrade of the per-steep tags field into inline
+flavour-family chips beneath the WS3 timer — the 20-term `KB_FLAVOR_CHIPS` vocab grouped into **4 families**
+(`KB_FLAVOR_FAMILIES`, steep-knowledge.js; umami+grassy in Vegetal & marine), two shown by default + "more" + a
+free-text door; each tap toggles a tag on the active steep's `curSteepTags`, saved live. **Namespace = bare +
+membership** (`isFlavorVocab`): free words stored bare, shown in "You tasted"/history but never inflate the
+radar-unlock count or become a bar/axis; brew-advice matching untouched. **Story** (`sessionFinishHTML`): leads
+with "Session complete", tea name, "You tasted" chips, a read-back card (observation + per-steep breakdown), an
+**arrival-only** mood line; photo/rating/feedback/notes/share kept below; button → "Save to journal". History
+cards show flavour chips + "· no notes" when empty. **Honesty ladder** (`teaFlavorProfile`/`flavorProfileHTML`,
+steep-teas.js): the "What you taste" module over the **last 6 sessions with flavour data** — ≤2 → counted chips ·
+≥3 → ranked bars (jade, amber for warm notes) · ≥5 & ≥4 distinct terms → radar unlock (6-axis SVG; bars stay
+default via **non-persisted** `state.flavorView`). Every line an observation, never a %/score. **Rider:** 🍵/🫖
+emoji thumbs → WS5-style tinted/kanji placeholders (`sessThumbHTML`, `.vessel-thumb.is-ph`). New committed
+`fixtures/flavor-ladder-test.js` (66; family completeness + rung guard + free-word isolation + observation
+honesty guard + graceful real-data pass). `#i-lock-hl` added (caret/plus already existed). `node --check` +
+all committed fixtures green; xss-render bundle now includes steep-knowledge.js. **R2 batch complete.**
+
+**Earlier — v3.77 WS1 Forms: core trio + one fold** (cache **v87**, APP_VERSION v3.77): fifth of the R2
 design pass. Both first-run forms reshaped to **core essentials up front + one boolean fold**. Session setup: a
 core-trio card (Tea·Vessel styled selects · Method segment) + brew readout + **amber-pale "How are you arriving?"
 mood card** + "More details" fold (leaf/water/type/TDS/when/coldbrew, `d.showMoreDetails` render-on-state).

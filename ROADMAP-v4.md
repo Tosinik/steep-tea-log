@@ -155,12 +155,13 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   Committed `steeping-timer-test.js` (17).
 - [x] **WS1 — Forms** (v3.77) — core trio + one fold (session setup render-on-state; add-tea "specifics"
   a DOM toggle); method 3-way-ready via `SESSION_METHODS`; amber-pale mood moment.
-- [ ] **WS4 — Flavour** (LARGE, only data-model change, build LAST) **← NEXT (last)** — inline capture → session story →
-  tea-page honesty ladder. Rides existing tags arrays + `KB_FLAVOR_CHIPS`. Flag at pause: tag namespacing
-  + arrival-only vs end mood.
+- [x] **WS4 — Flavour** (v3.78) — inline capture → session story → tea-page honesty ladder
+  (`teaFlavorProfile`/`flavorProfileHTML`). Rides existing tags arrays + `KB_FLAVOR_CHIPS` grouped into 4
+  families (no SQL). Pause decisions: **bare + membership** namespace, **arrival-only** mood, story keeps the
+  finish inputs. Committed `flavor-ladder-test.js` (66). **R2 batch complete.**
 
 ## Suggested sequencing (parallel-friendly)
-Now: **R2 implementation deploys (Code, in flight — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 last)** ∥ register domain (Niklas) ∥
+Now: **R2 implementation deploys — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 ✓ (COMPLETE)** ∥ register domain (Niklas) ∥
 phase-2 spec (~Jul 20).
 Then: phase-2 build (wants WS1 method control + WS4 tags in place).
 Then: Pillar C onboarding (with R2 language) → Pillar B migration + beta package → **v4.0**.

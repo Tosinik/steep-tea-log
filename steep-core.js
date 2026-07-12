@@ -1,9 +1,9 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.77';
+const APP_VERSION = 'v3.78';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-const WHATS_NEW = 'Setup and add-tea are calmer — the essentials up top, everything else one tap away.';
+const WHATS_NEW = 'Note what you taste as you brew — it builds an honest flavour picture on each tea’s page.';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -16,14 +16,10 @@ function toggleTheme(){
   const next = cur==='dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('tealog_theme', next);
-  const btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.textContent = next==='dark' ? '☀️' : '🌙';
 }
 function setTheme(t){
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem('tealog_theme', t);
-  const btn = document.getElementById('themeToggleBtn');
-  if(btn) btn.textContent = t==='dark' ? '☀️' : '🌙';
   render();
 }
 
@@ -847,8 +843,6 @@ function render(){
     ${state.settingsOpen ? settingsModal() : ''}
   `;
   bindDynamic();
-  const themeBtn = document.getElementById('themeToggleBtn');
-  if(themeBtn) themeBtn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙';
 }
 
 // WS6 — the app shell. The bottom bar carries the five primary destinations (Log is the raised
