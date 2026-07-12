@@ -165,13 +165,16 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
 - [x] **#19 + #20 — QoL pair** (v3.80) — Library search (folded-umlaut predicate, focus-safe `#teaShelf` swap,
   transient per-tab; committed `tea-search-test.js`, 16) + session→tea path (row tap targets, back-to-sessions,
   modal "view tea →"; deleted-tea edge has no dead affordance).
-- [ ] **#18 — tiering** (NEXT — touches the WS5 `statusLine` engine; `status-line-test.js` is the contract).
-- [ ] **#16 — period toggle.**
+- [x] **#18 — tiering** (v3.81) — session-aware `stockTier` (cups = amount ÷ avg logged dose, 1 session anchors,
+  floor only without history; <2 low · 2–5 "a few cups left" ink-soft/no-sort · ≥5 plenty, 5.0=plenty). One
+  predicate family: Low chip, header count, cost card, detail red, shopping, Home card (tier ∈ {low,few} replaced
+  the 2×-floor band). `status-line-test.js` 39→56, purely additive.
+- [ ] **#16 — period toggle** (NEXT).
 - Then phase-2 (#15 + #9). #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.
 
 ## Suggested sequencing (parallel-friendly)
 Now: **R2 implementation deploys — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 ✓ (COMPLETE)** → the post-R2 issue
-queue above (#13 ✓, #19+#20 ✓, #18 next) ∥ register domain (Niklas) ∥ phase-2 spec (~Jul 20).
+queue above (#13 ✓, #19+#20 ✓, #18 ✓, #16 next) ∥ register domain (Niklas) ∥ phase-2 spec (~Jul 20).
 Then: phase-2 build (wants WS1 method control + WS4 tags in place).
 Then: Pillar C onboarding (with R2 language) → Pillar B migration + beta package → **v4.0**.
 Pillar E ships opportunistically behind its data gates, before or after v4.0.

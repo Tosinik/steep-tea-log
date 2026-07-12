@@ -77,8 +77,8 @@ only data-model change (semantic, not schema — rides the existing `steeps.tags
 Pause decisions were locked as: **bare + membership** namespace (vocab = membership in `KB_FLAVOR_CHIPS`, free
 words stored bare, never inflate the radar-unlock count), **arrival-only** mood ("Arrived steady."), and the
 session story **keeps the finish-screen inputs below it** (photo/rating/share not dropped). Forward work is now
-the **post-R2 issue queue** (decided order): **v3.79 #13 timer time + v3.80 #19 + #20 QoL pair (both SHIPPED, below)
-→ #18 tiering (NEXT) → #16 period toggle → phase-2 (#15 + #9)**; #14 parked → R3, #11 closed, and the held #15 vocab
+the **post-R2 issue queue** (decided order): **v3.79 #13 + v3.80 #19/#20 + v3.81 #18 tiering (all SHIPPED, below)
+→ #16 period toggle (NEXT) → phase-2 (#15 + #9)**; #14 parked → R3, #11 closed, and the held #15 vocab
 expansion stays out until phase-2. Plus the parallel track below (domain · phase-2 gate ~Jul 20 — which wanted
 WS1's method + WS4's tags in place, now both landed) and the R3 visual level-up (`design-r3/`).
 
@@ -91,7 +91,24 @@ saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.80 #19 + #20: find your way** (cache **v90**, APP_VERSION v3.80): the QoL pair off the
+**NOW (just shipped) — v3.81 #18: a few cups left** (cache **v91**, APP_VERSION v3.81): the shelf status line's
+quantity is now **session-aware** — cups left = on-hand ÷ the tea's average logged dose (`teaAvgDose`/`cupsLeft`/
+`stockTier`, top of steep-teas.js). **<2 cups → "running low"** (clay, sorts top, unchanged) · **2–5 → "a few cups
+left"** (NEW, ink-soft, deliberately **no sort effect**) · **≥5 → plenty** family, with **exactly 5.0 = plenty**
+(defuses the one-big-gongfu-session outlier). **One grams-logged session anchors the average** (`teaForecast`
+precedent; the dry-run showed only ONE real tea has ≥2 weighed sessions — a min-2 gate would have excluded the
+issue's own Sencha); **no history → the `lowStockG()` floor decides exactly as before**, which is why fixture
+sections A–E needed zero edits. Precedence **low → few → (ages | countdown | plenty)** — quantity wins while
+remarkable, never composed ("fresh · a few cups left" doesn't exist). **One predicate family** (the #13 guard):
+Low chip, header count, Cost-overview "Low stock" (its `goLowStock()` jump must agree with the chip it lands on),
+detail red, and shopping suggestions all derive from `isRunningLow` := `stockTier==='low'`; the Home "Running low"
+card swapped its 2×-floor band for tier ∈ {low, few} (fav/rebuy scope kept; few rows ink-soft; `teaForecast` ~days
+untouched — it answers *when*, tiers answer *how many*; its dose now calls `teaAvgDose` so one definition exists).
+`fixtures/status-line-test.js` **39 → 56 checks, purely additive** (F synthetic boundaries/precedence + G real-CSV
+pins incl. the issue's 12g Sencha → "a few cups left"; G skips with a reported count when CSVs absent). All 8
+committed suites green (greeting untouched). **No SQL.** Next: **#16 period toggle**.
+
+**Earlier — v3.80 #19 + #20: find your way** (cache **v90**, APP_VERSION v3.80): the QoL pair off the
 post-R2 issue queue. **#19 Library search** — a quiet hairline row **below** the WS5 chips, filtering on
 name · origin · cultivar · vendor(source) and composing with the chips as **AND** (one more clause in
 `filteredSortedTeas`). German is first-class via **light normalization** (`teaSearchNorm`: lowercase, ß→ss, fold

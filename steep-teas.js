@@ -1,8 +1,9 @@
 /* ============ WS5 shelf status line (the core rule) ============
    ONE status line, same slot + weight on every card — only the words + tone change, by type.
-   tone ∈ { low(clay·sorts top) · freshness(ink-soft) · plenty(jade) · ages(jade) }. Computed from
-   type + amount + a harvest-grounded freshness window (reuses lowStockG + freshnessYear/Season) —
-   never free text. Design note (2026-07-11): the mock renders oolong as "plenty", not "ages", so
+   tone ∈ { low(clay·sorts top) · few(ink-soft·no sort, #18) · freshness(ink-soft) · plenty(jade) ·
+   ages(jade) }. Computed from type + amount + a harvest-grounded freshness window (reuses lowStockG
+   + freshnessYear/Season) — never free text. #18 made quantity session-aware: cups left = on-hand ÷
+   this tea's average logged dose; the gram floor only decides when a tea has no brewing history. Design note (2026-07-11): the mock renders oolong as "plenty", not "ages", so
    the ages bucket is white + pu'er only here (the README prose grouped oolong in — resolved toward
    the mock + the app's existing freshnessClass, which never calls oolong 'ages'). Flagged at pause. */
 const FRESH_WINDOW_MONTHS = 12;   // a delicate green stays "best within" ~a year of harvest
@@ -23,10 +24,34 @@ function freshnessWeeksLeft(tea){
   bestBy.setMonth(bestBy.getMonth() + FRESH_WINDOW_MONTHS);
   return Math.round((bestBy - Date.now()) / (7*86400000));
 }
+// #18 session-aware tiers. One grams-logged session anchors the average (the teaForecast
+// precedent — a real shelf rarely has two); no history → the lowStockG() floor keeps the
+// old binary behavior. All styles count: cold brew and quick sessions consume leaf too.
+function teaAvgDose(tea){
+  const gs = (state.sessions||[]).filter(s=>s.teaId===tea.id && Number(s.gramsUsed)>0);
+  return gs.length ? gs.reduce((a,s)=>a+Number(s.gramsUsed),0)/gs.length : null;
+}
+function cupsLeft(tea){
+  const amt = Number(tea.amountGrams)||0, avg = teaAvgDose(tea);
+  return (amt>0 && avg) ? amt/avg : null;
+}
+// <2 cups → low · 2–5 → few · ≥5 → plenty (exactly 5.0 reads plenty — it defuses the
+// one-big-gongfu-session outlier, and five cups on the shelf IS plenty in a calm app).
+function stockTier(tea){
+  const amt = Number(tea.amountGrams)||0;
+  if(amt<=0) return 'out';
+  const cups = cupsLeft(tea);
+  if(cups!=null) return cups<2 ? 'low' : (cups<5 ? 'few' : 'plenty');
+  return amt<lowStockG() ? 'low' : 'plenty';
+}
 function statusLine(tea){
   const amt = Number(tea.amountGrams)||0;
   const g = fmtStockG(amt);
-  if(amt>0 && amt<lowStockG()) return { text:`${g} · running low`, tone:'low' };
+  const tier = stockTier(tea);
+  if(tier==='low') return { text:`${g} · running low`, tone:'low' };
+  // quantity wins while remarkable: 'few' outranks ages + the freshness countdown — an
+  // "ages well" or "best within N wks" on a nearly-empty tin hides the #18 lie.
+  if(tier==='few') return { text:`${g} · a few cups left`, tone:'few' };
   const cat = statusCategory(tea);
   if(cat==='ages'){
     const phrase = (tea.type||'').toLowerCase()==='puerh' ? 'ages gracefully' : 'ages well';
@@ -41,9 +66,11 @@ function statusLine(tea){
   }
   return { text:`${g} · plenty`, tone:'plenty' };
 }
-const STATUS_TONE_COLOR = { low:'var(--clay)', freshness:'var(--ink-soft)', plenty:'var(--jade)', ages:'var(--jade)' };
+const STATUS_TONE_COLOR = { low:'var(--clay)', few:'var(--ink-soft)', freshness:'var(--ink-soft)', plenty:'var(--jade)', ages:'var(--jade)' };
 // running-low teas sort to the top of the shelf, in any density/filter (WS5 rule).
-function isRunningLow(tea){ const a=Number(tea.amountGrams)||0; return a>0 && a<lowStockG(); }
+// THE low predicate — every surface ("Low" chip, header count, cost card, restock pulls)
+// derives from it so no two surfaces can disagree (#13 bug class). 'few' gets NO sort effect.
+function isRunningLow(tea){ return stockTier(tea)==='low'; }
 function shelfSort(list){ return [...list].sort((a,b)=> (isRunningLow(b)?1:0)-(isRunningLow(a)?1:0)); }
 
 // Photo area (grid ~100px / row 50px): the user's image, else a type-tinted stripe, else a kanji
@@ -153,7 +180,7 @@ function filteredSortedTeas(){
   const list = state.teas.filter(t=>{
     if(F.type && t.type!==F.type) return false;
     if(F.vendor && (t.source||'').trim()!==F.vendor) return false;
-    if(F.lowStock && !(Number(t.amountGrams)<lowStockG())) return false;
+    if(F.lowStock && !isRunningLow(t)) return false;   // #18: tier-aware; finished/untracked no longer match
     if(F.favorite && !t.isFavorite) return false;
     if(!teaMatchesSearch(t, state.teaSearch)) return false;   // #19: composes with chips as AND
     return true;
@@ -181,7 +208,7 @@ function viewTeas(){
   const F = state.teaFilter;
   const vendors = distinctVendors();
   const density = teaDensity();
-  // running-low count for the header line (WS5): in stock but under the low-stock threshold.
+  // running-low count for the header line (WS5; tier-aware since #18).
   const lowCount = state.teas.filter(t=>isRunningLow(t)).length;
   // Filter chips: All · <types you own, in canonical order> · Low · Favs. Cleaner than the old
   // sort/vendor dropdowns (those are dropped from the shelf; vendor rename stays under "Edit vendors").
@@ -625,7 +652,7 @@ function viewTeaDetail(){
           <h2 style="margin:8px 0 4px;">${escapeHtml(t.name)}</h2>
           ${renderStarsStatic(Number(t.rating)||0,true)}
           <div class="eyebrow" style="margin-top:8px;">On hand</div>
-          <div style="font-size:14px;${Number(t.amountGrams)<lowStockG()?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
+          <div style="font-size:14px;${isRunningLow(t)?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
           ${forecastLine(t)}
           ${inventorySparkline(t) || sparklineHintHTML(t)}
         </div>

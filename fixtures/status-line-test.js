@@ -4,6 +4,9 @@
  * and running-low teas sort to the top. This is the calm-first "one status line, same slot, only the
  * words change" rule (steep-teas.js). Grounded in Niklas's real teas_rows.csv; a couple of synthetic
  * greens exercise the harvest-window branch that real data (mostly harvest-less) never reaches.
+ * #18 (v3.81) added session-aware tiers — cups left = amount ÷ avg logged dose, gram floor only
+ * without history. Sections A–E run with state.sessions=[] (floor fallback → unchanged); F/G seed
+ * sessions explicitly and pin the tier boundaries, precedence, and the issue's own 12g case.
  *
  * Run: node fixtures/status-line-test.js   (exit non-zero on any failure)
  */
@@ -102,6 +105,61 @@ if(haveCSV){
   console.log('  E real data: '+(6 + teas.filter(t=>Number(t.amountGrams)>0 && !ctx.isRunningLow(t)).length + teas.filter(t=>t.type==='white'&&Number(t.amountGrams)>0).length)+' checks');
 } else {
   console.log('  E real data: SKIPPED (teas_rows.csv not present)');
+}
+
+// ---- 6. #18 session-aware tiers (synthetic controls; sessions injected explicitly) ----
+// state is a top-level `let` in the vm — reachable only by running a script in the context.
+const seed = arr => vm.runInContext('state.sessions='+JSON.stringify(arr)+';', ctx);
+const dose = (teaId,g) => ({teaId, gramsUsed:g});
+seed([dose('f-low',5), dose('f-two',5), dose('f-under5',5), dose('f-five',5), dose('f-issue',5),
+      dose('f-big',8), dose('f-white',10), dose('f-green',5), dose('f-heavy',15), dose('f-light',2)]);
+// boundary pins (one 5g session each — also pins that n=1 anchors the average):
+ok(S({id:'f-low',type:'oolong',amountGrams:9.95}).tone==='low', 'F1 1.99 cups → low');
+ok(S({id:'f-two',type:'oolong',amountGrams:10}).text==='10g · a few cups left' && S({id:'f-two',type:'oolong',amountGrams:10}).tone==='few', 'F2 2.0 cups → few, exact string');
+ok(S({id:'f-under5',type:'oolong',amountGrams:24.95}).tone==='few', 'F3 4.99 cups → few');
+ok(S({id:'f-five',type:'oolong',amountGrams:25}).tone==='plenty', 'F4 5.0 cups → plenty (exactly five reads plenty)');
+// the issue's shape: 12g at a 5g dose = 2.4 cups → the middle tier, not "plenty"
+ok(S({id:'f-issue',type:'oolong',amountGrams:12}).text==='12g · a few cups left', 'F5 12g @ 5g dose → "a few cups left"');
+ok(vm.runInContext('STATUS_TONE_COLOR.few',ctx)==='var(--ink-soft)', 'F6 few tone is ink-soft (information, not urgency)');
+// one big single session must NOT brand a full tin (56g @ 8g = 7 cups):
+ok(S({id:'f-big',type:'green',amountGrams:56}).tone==='plenty', 'F7 single 8g session on 56g → plenty');
+// cups govern when history exists — in BOTH directions across the gram floor (15):
+ok(S({id:'f-heavy',type:'oolong',amountGrams:20}).tone==='low', 'F8 20g @ 15g dose (1.3 cups) → low despite being over the floor');
+ok(S({id:'f-light',type:'oolong',amountGrams:10}).tone==='plenty', 'F9 10g @ 2g dose (5 cups) → plenty despite being under the floor');
+// precedence: quantity wins while remarkable — few outranks ages AND the freshness countdown:
+ok(S({id:'f-white',type:'white',amountGrams:30}).text==='30g · a few cups left', 'F10 white w/ 3 cups → few beats "ages well"');
+const fewGreen={id:'f-green',type:'green',amountGrams:15,harvestYear:String(now.getFullYear()-1),harvestSeason:'autumn'};
+ok(S(fewGreen).text==='15g · a few cups left', 'F11 near-window green w/ 3 cups → few beats the countdown');
+ok(!/fresh/.test(S(fewGreen).text), 'F12 no composition — never "fresh · a few cups left"');
+// few has NO sort effect (WS5: only low sorts to the top):
+ok(ctx.isRunningLow({id:'f-issue',type:'oolong',amountGrams:12})===false, 'F13 few tea is not isRunningLow');
+const fLow={id:'f-low',type:'oolong',amountGrams:9.95}, fFew={id:'f-issue',type:'oolong',amountGrams:12}, fPlenty={id:'f-five',type:'oolong',amountGrams:25};
+const fSorted=ctx.shelfSort([fPlenty,fFew,fLow]);
+ok(fSorted[0]===fLow && fSorted[1]===fPlenty && fSorted[2]===fFew, 'F14 shelfSort: low tops, few does NOT precede plenty');
+// no-history fallback: the floor (15) keeps deciding, exactly as before #18:
+seed([]);
+ok(S({id:'f-none',type:'oolong',amountGrams:12}).text==='12g · running low', 'F15 12g, no sessions → floor fallback "running low"');
+console.log('  F #18 tiers (synthetic): 15 checks');
+
+// ---- 7. #18 tiers on real data (needs BOTH teas + sessions CSVs; pins move on re-export) ----
+const sessCsvPath=path.join(__dirname,'sessions_rows.csv');
+if(haveCSV && fs.existsSync(sessCsvPath)){
+  const teas=parseCSV(fs.readFileSync(csvPath,'utf8')).map(teaFromRow).filter(t=>t.name && t.type);
+  seed(parseCSV(fs.readFileSync(sessCsvPath,'utf8')).map(r=>({teaId:r.tea_id, gramsUsed:Number(r.grams_used)||0})));
+  // cups math must not move the low set: still exactly Shincha + Honey Oolong
+  const lowT=teas.filter(t=>ctx.isRunningLow(t));
+  ok(lowT.length===2 && lowT.some(t=>/Shincha/i.test(t.name)) && lowT.some(t=>/Honey Oolong/i.test(t.name)),
+    'G1 real sessions seeded: low set still exactly Shincha + Honey Oolong (got '+lowT.map(t=>t.name).join(', ')+')');
+  const sencha=teas.find(t=>/Sencha Kagoshima Premium/i.test(t.name));
+  ok(sencha && ctx.stockTier(sencha)==='few', 'G2 Sencha Kagoshima Premium (16g @ ~5g dose) → few');
+  // THE issue pin: the same tea at the screenshot's 12g reads the middle tier, not "plenty"
+  ok(sencha && S(Object.assign({},sencha,{amountGrams:12})).text==='12g · a few cups left', 'G3 issue #18: 12g Sencha → "a few cups left"');
+  const megumi=teas.find(t=>/Megumi/i.test(t.name));
+  ok(megumi && ctx.stockTier(megumi)==='plenty', 'G4 Megumi 56g (one 8g session) → plenty');
+  seed([]);
+  console.log('  G #18 tiers (real data): 4 checks');
+} else {
+  console.log('  G #18 tiers (real data): SKIPPED, 4 checks not run (need teas_rows.csv + sessions_rows.csv)');
 }
 
 if(failures){ console.log('\n'+failures+' STATUS-LINE TEST(S) FAILED'); process.exit(1); }

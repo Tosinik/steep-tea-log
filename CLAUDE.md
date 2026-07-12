@@ -39,19 +39,18 @@ work queue alongside the ROADMAP** (the ROADMAP holds the planned sequence; issu
 incoming bugs/ideas/feedback). The repo is `Tosinik/steep-tea-log` and issues are public
 — one fetch, no auth needed:
 
-- With the `gh` CLI: `gh issue list --state open` (also `gh issue view <n>`).
-- If `gh` isn't installed (it currently isn't): the public REST API —
+- With the `gh` CLI — **installed and authenticated as `Tosinik`** (since v3.81):
+  `gh issue list --state open` (also `gh issue view <n>`), and writes
+  (create/label/close/comment) work directly.
+- Fallback if `gh` ever breaks: the public REST API —
   `curl -s "https://api.github.com/repos/Tosinik/steep-tea-log/issues?state=open"`
-  (returns PRs too; filter out entries that have a `pull_request` key).
+  (returns PRs too; filter out entries that have a `pull_request` key); reads are
+  unauthenticated, writes then need a token / the OS git credential.
 
 Issues are triaged with three labels: **`bug`** (something broken), **`idea`** (feature/
 enhancement), **`feedback`** (beta-tester notes). This queue replaces the old
 "beta-feedback bugs (batch)" lists that used to live in STATE.md — put new bugs/ideas
-in issues, not in the handoff docs. Writing to issues (create/label/close) needs auth,
-so `gh` or a token; unauthenticated is read-only. To make issue-writing reliably
-available, install the GitHub CLI once and authenticate: `winget install GitHub.cli`
-(Windows), then `gh auth login`. Until then, reads work unauthenticated and writes fall
-back to a token / the OS git credential.
+in issues, not in the handoff docs.
 
 ## Running & validating (no build, no test suite)
 

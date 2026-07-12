@@ -7,10 +7,10 @@
 function persistWish(w){ window.SteepDB.putWishItem(w).catch(saveErr); }
 
 function computeRestockSuggestions(){
-  const low = (typeof lowStockG==='function') ? lowStockG() : 5;
+  // #18: low is tier-aware (isRunningLow, steep-teas.js); out-of-stock stays in — this list is "low OR out".
   const onList = new Set((state.wishlist||[]).map(w=>(w.name||'').trim().toLowerCase()));
   return (state.teas||[])
-    .filter(t=>Number(t.amountGrams) < low && !onList.has((t.name||'').trim().toLowerCase()))
+    .filter(t=>(Number(t.amountGrams)<=0 || isRunningLow(t)) && !onList.has((t.name||'').trim().toLowerCase()))
     .sort((a,b)=>{
       const ao=Number(a.amountGrams)<=0?0:1, bo=Number(b.amountGrams)<=0?0:1;
       if(ao!==bo) return ao-bo;               // out of stock first

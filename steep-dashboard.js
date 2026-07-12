@@ -31,7 +31,7 @@ function computeStats(){
 
   const favorites = state.teas.filter(t=>t.isFavorite);
 
-  const lowStock = state.teas.filter(t=>Number(t.amountGrams)<lowStockG());
+  const lowStock = state.teas.filter(t=>isRunningLow(t));   // #18: shared predicate — goLowStock() lands on the Low chip, sets must agree
 
   const totalSpent = state.teas.reduce((a,t)=>a+(Number(t.costTotal)||0),0);
   const gramsBought = state.teas.reduce((a,t)=>a+(Number(t.costOriginalGrams)||0),0);
@@ -343,10 +343,9 @@ function teaForecast(tea){
   // grams-logged session is needed to anchor the dose — so any tea you've actually brewed
   // gets a prediction, not just teas with a purchase date or 2+ weighed sessions.
   const all = state.sessions.filter(s=>s.teaId===tea.id).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  const gs  = all.filter(s=>Number(s.gramsUsed)>0);
+  const gramsPer = teaAvgDose(tea);   // #18: the one dose definition (steep-teas.js) — same math as before
   let sessionRate = null; // g/day
-  if(gs.length>=1){
-    const gramsPer = gs.reduce((a,s)=>a+Number(s.gramsUsed),0)/gs.length;
+  if(gramsPer){
     const spanDays = Math.max(3, (Date.now()-new Date(all[0].date))/86400000);
     const perDay = (all.length/spanDays)*gramsPer;
     if(perDay>0) sessionRate = perDay;
@@ -909,9 +908,9 @@ function dashCardsHome(s){
       }).join('')}
     </div>` : '';
 
-  const nearLow = lowStockG()*2;
+  // #18: the old 2×-floor "near low" band was a proto-middle-tier — the real tiers replace it.
   const restock = state.teas
-    .filter(t=>(t.isFavorite||t.wouldRebuy) && Number(t.amountGrams)>0 && Number(t.amountGrams)<nearLow)
+    .filter(t=>{ const tier=(t.isFavorite||t.wouldRebuy) ? stockTier(t) : ''; return tier==='low'||tier==='few'; })
     .sort((a,b)=>Number(a.amountGrams)-Number(b.amountGrams));
   const restockHTML = restock.length ? `
     <div class="section card">
@@ -921,7 +920,7 @@ function dashCardsHome(s){
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
         return `<div class="rank-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="cursor:pointer;">
           <span class="rname" style="display:flex;align-items:center;gap:9px;">${favLeaf(15)}${escapeHtml(t.name)}</span>
-          <span class="rval mono" style="color:var(--clay);font-size:13px;">${g.toFixed(1)}g${est}</span>
+          <span class="rval mono" style="color:${isRunningLow(t)?'var(--clay)':'var(--ink-soft)'};font-size:13px;">${g.toFixed(1)}g${est}</span>
         </div>`;
       }).join('')}
     </div>` : '';
