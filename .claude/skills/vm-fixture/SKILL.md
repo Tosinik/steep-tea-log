@@ -1,6 +1,6 @@
 ---
 name: vm-fixture
-description: Build or extend a SlowCup Node vm sandbox test against the real CSV fixtures. Use whenever validating app logic (greeting, ratio, insights, forecasts, parsers) outside the browser.
+description: ALWAYS invoke before writing or extending ANY Node test of SlowCup app logic (greeting, ratio, statusLine, timer, insights, forecasts, parsers, WS4 ladder). Do not write ad-hoc node test scripts outside this skill's vm sandbox pattern.
 ---
 
 # /vm-fixture — the canonical sandbox harness
