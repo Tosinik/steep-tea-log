@@ -71,6 +71,10 @@ const STATUS_TONE_COLOR = { low:'var(--clay)', few:'var(--ink-soft)', freshness:
 // THE low predicate — every surface ("Low" chip, header count, cost card, restock pulls)
 // derives from it so no two surfaces can disagree (#13 bug class). 'few' gets NO sort effect.
 function isRunningLow(tea){ return stockTier(tea)==='low'; }
+// Home "Running low" card membership (v3.82, #18 correction): LOW only — a 'few' tea beside a
+// ~months forecast puts the cups clock and the days clock under one headline; few's home is the
+// shelf status line. Favourites & rebuys scope unchanged.
+function restockCandidate(tea){ return !!(tea.isFavorite||tea.wouldRebuy) && stockTier(tea)==='low'; }
 function shelfSort(list){ return [...list].sort((a,b)=> (isRunningLow(b)?1:0)-(isRunningLow(a)?1:0)); }
 
 // Photo area (grid ~100px / row 50px): the user's image, else a type-tinted stripe, else a kanji

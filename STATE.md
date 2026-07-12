@@ -60,27 +60,24 @@ v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date �
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v88**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v92**. Keep CHANGELOG.md updated.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**NOW IN FLIGHT — the Round-2 design pass** (`SlowCup R2 bundle handoff/` in the repo root; master plan +
-WS4 brief in `Downloads/files(4)/`). Six locked design workstreams shipping as versioned deploys, build order
-**WS6 → WS2 → WS5 → WS3 → WS1 → WS4**, **pause after each** for Niklas to verify against the remote. Four
-global reconciliations apply (achievements stay gated · greeting is a reskin not a rebuild · method control
-built 3-way-ready for phase-2's `japanese` · ratings already on detail so WS5 is removal). WS4 is the only
-data-model change (rides existing `steeps.tags`/`sessions.tags`; uses the existing bilingual `KB_FLAVOR_CHIPS`
-20-term set) — two things to flag at its pause: tag namespacing + arrival-only vs end-of-session mood.
-**WS6 + WS2 + WS5 + WS3 + WS1 + WS4 all shipped (v3.73–v3.78, below) — the R2 batch is COMPLETE.** WS4 was the
-only data-model change (semantic, not schema — rides the existing `steeps.tags`/`sessions.tags` arrays, no SQL).
-Pause decisions were locked as: **bare + membership** namespace (vocab = membership in `KB_FLAVOR_CHIPS`, free
-words stored bare, never inflate the radar-unlock count), **arrival-only** mood ("Arrived steady."), and the
-session story **keeps the finish-screen inputs below it** (photo/rating/share not dropped). Forward work is now
-the **post-R2 issue queue** (decided order): **v3.79 #13 + v3.80 #19/#20 + v3.81 #18 tiering (all SHIPPED, below)
-→ #16 period toggle (NEXT) → phase-2 (#15 + #9)**; #14 parked → R3, #11 closed, and the held #15 vocab
-expansion stays out until phase-2. Plus the parallel track below (domain · phase-2 gate ~Jul 20 — which wanted
-WS1's method + WS4's tags in place, now both landed) and the R3 visual level-up (`design-r3/`).
+**The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16
+(**all SHIPPED**, below) → **NEXT: phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20
+at current pace), so a natural pause may follow v3.82; that slot suits the **domain registration**
+(slowcup.app), the oldest open item on the board. #14 parked → R3; #11 closed; the held #15 vocab
+expansion stays out until phase-2. New bugs/ideas land as GitHub issues (the live inbox), not here.
+
+**Historical — the Round-2 design pass is COMPLETE** (WS6 → WS2 → WS5 → WS3 → WS1 → WS4, shipped v3.73–v3.78;
+bundle at `SlowCup R2 bundle handoff/` in the repo root). WS4 was the only data-model change (semantic, not
+schema — rides the existing `steeps.tags`/`sessions.tags` arrays, no SQL). Pause decisions were locked as:
+**bare + membership** namespace (vocab = membership in `KB_FLAVOR_CHIPS`, free words stored bare, never
+inflate the radar-unlock count), **arrival-only** mood ("Arrived steady."), and the session story **keeps
+the finish-screen inputs below it** (photo/rating/share not dropped). The R3 visual level-up (`design-r3/`)
+is the next design round, not yet scheduled.
 
 **Design Round 3 material stored:** `design-r3/` (gitignored) holds `DESIGN-R3-INSPIRATION.md` + a copy of
 `R2-STATUS.md` + `images/` (with a README — Niklas still needs to drop the 5 board PNGs there; Code can't write
@@ -91,7 +88,26 @@ saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.81 #18: a few cups left** (cache **v91**, APP_VERSION v3.81): the shelf status line's
+**NOW (just shipped) — v3.82 #16: a window on the numbers** (cache **v92**, APP_VERSION v3.82): the Insights
+stat grid gained a quiet **all-time · month · week** lens — a **scoped reinstatement** of what v3.65 retired,
+on the RAW grid only (every observation surface stays prose/all-time; `insights-room-test.js` byte-identical
+and green). **Calendar windows**: week = **Mon 00:00 local** (the Home week card's anchor — two surfaces can
+never disagree under the same word, pinned in the fixture), month = the 1st 00:00 local; boundary sessions are
+IN (`date >= start`). All six stats window honestly as pure session aggregates; `computeStats` now delegates
+its all-time six to the new **`gridStats(sessions)`** (single writer — grid and achievements can't drift).
+An always-present **eyebrow names the window** (screenshot honesty); empty windows render **quiet zeros**;
+persisted device-local as `tealog_statPeriod` (the `tealog_teaDensity` precedent, garbage → all-time).
+**Rider (#18 correction):** the Home "Running low" card is back to **LOW-only** membership via the named
+predicate **`restockCandidate`** (steep-teas.js, beside the tier family) — v3.81's {low, few} put a 4.6-cup
+"few" favourite (23g @ 5g dose) under the headline beside a ~6-month forecast; few's home stays the shelf
+status line (scope/copy/forecast untouched; noted on #18's closed thread). New committed
+`fixtures/stat-period-test.js` (67 checks: pinned calendar boundaries, per-stat windows through the production
+card, week-card agreement, gridStats≡computeStats, quiet zeros, persistence whitelist, real-CSV monotonicity
+with graceful skip); `status-line-test.js` 56 → 63 (additive H: restockCandidate low-only, the 23g case
+verbatim). All 9 committed suites green (greeting untouched). **No SQL.** Next: **phase-2 (#15 + #9)** after
+the ~Jul 20 gate.
+
+**Earlier — v3.81 #18: a few cups left** (cache **v91**, APP_VERSION v3.81): the shelf status line's
 quantity is now **session-aware** — cups left = on-hand ÷ the tea's average logged dose (`teaAvgDose`/`cupsLeft`/
 `stockTier`, top of steep-teas.js). **<2 cups → "running low"** (clay, sorts top, unchanged) · **2–5 → "a few cups
 left"** (NEW, ink-soft, deliberately **no sort effect**) · **≥5 → plenty** family, with **exactly 5.0 = plenty**
@@ -106,7 +122,7 @@ card swapped its 2×-floor band for tier ∈ {low, few} (fav/rebuy scope kept; f
 untouched — it answers *when*, tiers answer *how many*; its dose now calls `teaAvgDose` so one definition exists).
 `fixtures/status-line-test.js` **39 → 56 checks, purely additive** (F synthetic boundaries/precedence + G real-CSV
 pins incl. the issue's 12g Sencha → "a few cups left"; G skips with a reported count when CSVs absent). All 8
-committed suites green (greeting untouched). **No SQL.** Next: **#16 period toggle**.
+committed suites green (greeting untouched). **No SQL.**
 
 **Earlier — v3.80 #19 + #20: find your way** (cache **v90**, APP_VERSION v3.80): the QoL pair off the
 post-R2 issue queue. **#19 Library search** — a quiet hairline row **below** the WS5 chips, filtering on

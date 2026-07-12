@@ -169,12 +169,19 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   floor only without history; <2 low · 2–5 "a few cups left" ink-soft/no-sort · ≥5 plenty, 5.0=plenty). One
   predicate family: Low chip, header count, cost card, detail red, shopping, Home card (tier ∈ {low,few} replaced
   the 2×-floor band). `status-line-test.js` 39→56, purely additive.
-- [ ] **#16 — period toggle** (NEXT).
-- Then phase-2 (#15 + #9). #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.
+- [x] **#16 — period toggle** (v3.82) — all-time · month · week lens on the RAW stat grid only (scoped
+  reinstatement of the v3.65 retirement; observation surfaces untouched). Calendar windows (week = Mon 00:00,
+  the Home week-card anchor — the two agree by construction), always-present eyebrow, quiet-zero empty windows,
+  device-local `tealog_statPeriod`; `computeStats` delegates its six totals to `gridStats` (single writer).
+  Committed `stat-period-test.js`, 67. **Rider:** Home "Running low" card membership corrected back to
+  LOW-only via named `restockCandidate` (v3.81's tier ∈ {low,few} put a 4.6-cup 'few' under the headline
+  beside a ~6-month forecast); `status-line-test.js` 56→63.
+- **NEXT: phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20). #14 parked → R3;
+  #11 closed; #15 vocab expansion held until phase-2.
 
 ## Suggested sequencing (parallel-friendly)
 Now: **R2 implementation deploys — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 ✓ (COMPLETE)** → the post-R2 issue
-queue above (#13 ✓, #19+#20 ✓, #18 ✓, #16 next) ∥ register domain (Niklas) ∥ phase-2 spec (~Jul 20).
+queue above (#13 ✓, #19+#20 ✓, #18 ✓, #16 ✓ — COMPLETE) ∥ register domain (Niklas) ∥ phase-2 spec (~Jul 20).
 Then: phase-2 build (wants WS1 method control + WS4 tags in place).
 Then: Pillar C onboarding (with R2 language) → Pillar B migration + beta package → **v4.0**.
 Pillar E ships opportunistically behind its data gates, before or after v4.0.

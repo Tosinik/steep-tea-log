@@ -1,5 +1,6 @@
-function computeStats(){
-  const sessions = state.sessions;
+// #16 (v3.82): the six raw grid numbers over ANY sessions array — the totals card windows by
+// filtering first; computeStats delegates its all-time copies so one writer exists.
+function gridStats(sessions){
   const totalSessions = sessions.length;
   const totalSteeps = sessions.reduce((a,s)=>a+steepCountOf(s),0);
   const totalGrams = sessions.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0);
@@ -10,6 +11,24 @@ function computeStats(){
   },0);
   const days = new Set(sessions.map(s=>dayKey(s.date)));
   const uniqueTeas = new Set(sessions.map(s=>s.teaId)).size;
+  return {totalSessions, totalSteeps, totalGrams, totalLiters, days, uniqueTeas};
+}
+// #16 calendar windows: 'week' = Monday 00:00 local (same anchor as the Home week card, so both
+// say the same number under the same word), 'month' = the 1st 00:00 local, 'all' = null.
+// Boundary sessions are IN (date >= start). `now` is a parameter so fixtures can pin boundaries.
+function gridWindowStart(period, now){
+  const d = new Date(now||Date.now()); d.setHours(0,0,0,0);
+  if(period==='week'){ d.setDate(d.getDate()-((d.getDay()+6)%7)); return d; }
+  if(period==='month'){ d.setDate(1); return d; }
+  return null;
+}
+// Persisted device-local like tealog_teaDensity — a lens, not a setting worth syncing.
+function gridPeriod(){ try{ const v=localStorage.getItem('tealog_statPeriod'); return (v==='week'||v==='month') ? v : 'all'; }catch(e){ return 'all'; } }
+function setGridPeriod(p){ try{ localStorage.setItem('tealog_statPeriod', (p==='week'||p==='month')?p:'all'); }catch(e){} render(); }
+
+function computeStats(){
+  const sessions = state.sessions;
+  const {totalSessions, totalSteeps, totalGrams, totalLiters, days, uniqueTeas} = gridStats(sessions);
 
   // type breakdown by session count
   const typeCounts = {};
@@ -908,9 +927,9 @@ function dashCardsHome(s){
       }).join('')}
     </div>` : '';
 
-  // #18: the old 2×-floor "near low" band was a proto-middle-tier — the real tiers replace it.
-  const restock = state.teas
-    .filter(t=>{ const tier=(t.isFavorite||t.wouldRebuy) ? stockTier(t) : ''; return tier==='low'||tier==='few'; })
+  // v3.82: membership back to LOW-only (restockCandidate, steep-teas.js) — v3.81's {low,few}
+  // put "a few cups" rows under a "Running low" headline beside a ~months forecast.
+  const restock = state.teas.filter(restockCandidate)
     .sort((a,b)=>Number(a.amountGrams)-Number(b.amountGrams));
   const restockHTML = restock.length ? `
     <div class="section card">
@@ -920,7 +939,7 @@ function dashCardsHome(s){
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
         return `<div class="rank-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="cursor:pointer;">
           <span class="rname" style="display:flex;align-items:center;gap:9px;">${favLeaf(15)}${escapeHtml(t.name)}</span>
-          <span class="rval mono" style="color:${isRunningLow(t)?'var(--clay)':'var(--ink-soft)'};font-size:13px;">${g.toFixed(1)}g${est}</span>
+          <span class="rval mono" style="color:var(--clay);font-size:13px;">${g.toFixed(1)}g${est}</span>
         </div>`;
       }).join('')}
     </div>` : '';
@@ -929,14 +948,26 @@ function dashCardsHome(s){
     greeting: greetingCardHTML(),
     restock: restockHTML,
     recent: recentHTML,
-    totals: `<div class="section grid grid-3">
-      <div class="stat"><div class="num">${s.totalSessions}</div><div class="lbl">Sessions</div></div>
-      <div class="stat"><div class="num">${s.totalSteeps}</div><div class="lbl">Infusions</div></div>
-      <div class="stat"><div class="num">${s.days.size}</div><div class="lbl">Days logged</div></div>
-      <div class="stat"><div class="num">${s.totalGrams.toFixed(1)}</div><div class="lbl">Grams brewed</div></div>
-      <div class="stat"><div class="num">${s.totalLiters.toFixed(1)}</div><div class="lbl">Liters (est.)</div></div>
-      <div class="stat"><div class="num">${s.uniqueTeas}</div><div class="lbl">Teas brewed</div></div>
-    </div>`,
+    // #16 (v3.82): a period lens on the RAW numbers only — scoped reinstatement; v3.65's
+    // "observations, not KPIs" line stands everywhere else. The eyebrow names the window so a
+    // cropped screenshot can't pass a week off as all-time. Empty windows read as quiet zeros.
+    totals: (function(){
+      const p = gridPeriod(), start = gridWindowStart(p);
+      const g = start ? gridStats(state.sessions.filter(se=>new Date(se.date)>=start)) : s;
+      const eyebrow = p==='week' ? 'This week' : p==='month' ? 'This month' : 'All-time';
+      const seg = (k,lbl)=>`<button class="density-seg ${p===k?'active':''}" style="font-family:var(--font-mono);font-size:11px;" onclick="setGridPeriod('${k}')">${lbl}</button>`;
+      return `<div class="section">
+      <div class="section-title"><span class="eyebrow">${eyebrow}</span>
+        <div class="density-toggle" role="group" aria-label="Stats period">${seg('all','All-time')}${seg('month','Month')}${seg('week','Week')}</div></div>
+      <div class="grid grid-3">
+      <div class="stat"><div class="num">${g.totalSessions}</div><div class="lbl">Sessions</div></div>
+      <div class="stat"><div class="num">${g.totalSteeps}</div><div class="lbl">Infusions</div></div>
+      <div class="stat"><div class="num">${g.days.size}</div><div class="lbl">Days logged</div></div>
+      <div class="stat"><div class="num">${g.totalGrams.toFixed(1)}</div><div class="lbl">Grams brewed</div></div>
+      <div class="stat"><div class="num">${g.totalLiters.toFixed(1)}</div><div class="lbl">Liters (est.)</div></div>
+      <div class="stat"><div class="num">${g.uniqueTeas}</div><div class="lbl">Teas brewed</div></div>
+      </div></div>`;
+    })(),
     clock: brewingClockHTML(s),
     favorites: `<div class="section card">
       <div class="eyebrow" style="margin-bottom:12px;">Favourites</div>

@@ -7,6 +7,8 @@
  * #18 (v3.81) added session-aware tiers — cups left = amount ÷ avg logged dose, gram floor only
  * without history. Sections A–E run with state.sessions=[] (floor fallback → unchanged); F/G seed
  * sessions explicitly and pin the tier boundaries, precedence, and the issue's own 12g case.
+ * v3.82 adds H: the Home "Running low" card membership (restockCandidate) is pinned LOW-only —
+ * 'few' informs on the shelf but never earns the nudge card.
  *
  * Run: node fixtures/status-line-test.js   (exit non-zero on any failure)
  */
@@ -161,6 +163,21 @@ if(haveCSV && fs.existsSync(sessCsvPath)){
 } else {
   console.log('  G #18 tiers (real data): SKIPPED, 4 checks not run (need teas_rows.csv + sessions_rows.csv)');
 }
+
+// ---- 8. v3.82 Home "Running low" card membership — restockCandidate is LOW-only ----
+// The #18 correction: 23g at a 5g dose = 4.6 cups ('few') sat under the "Running low" headline
+// beside a ~6-month forecast — two clocks disagreeing under one title. Only 'low' earns the card.
+const RC=t=>ctx.restockCandidate(t);
+seed([dose('h-dawang',5), dose('h-low',5), dose('h-plain',5), dose('h-rebuy',5), dose('h-plenty',5)]);
+ok(RC({id:'h-low',type:'oolong',amountGrams:9,isFavorite:true})===true, 'H1 favourite at 1.8 cups (low) → on the card');
+ok(RC({id:'h-dawang',type:'oolong',amountGrams:23,isFavorite:true})===false, 'H2 the Dawang case: fav, 23g @ 5g dose = 4.6 cups (few) → NOT on the card');
+ok(ctx.stockTier({id:'h-dawang',amountGrams:23})==='few', 'H3 …while the shelf still says few for that same tea');
+ok(RC({id:'h-plain',type:'oolong',amountGrams:9})===false, 'H4 low but neither favourite nor rebuy → out of scope');
+ok(RC({id:'h-rebuy',type:'oolong',amountGrams:9,wouldRebuy:true})===true, 'H5 would-rebuy at low → on the card');
+ok(RC({id:'h-plenty',type:'oolong',amountGrams:40,isFavorite:true})===false, 'H6 favourite with plenty → no nudge');
+ok(RC({id:'h-out',type:'oolong',amountGrams:0,isFavorite:true})===false, 'H7 finished favourite (tier out) → no nudge');
+seed([]);
+console.log('  H v3.82 restock-card membership: 7 checks');
 
 if(failures){ console.log('\n'+failures+' STATUS-LINE TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL STATUS-LINE TESTS PASSED  ('+passed+' passed)');

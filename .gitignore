@@ -9,6 +9,7 @@ fixtures/*
 !fixtures/steeping-timer-test.js
 !fixtures/flavor-ladder-test.js
 !fixtures/tea-search-test.js
+!fixtures/stat-period-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ are tracked so they ship with the repo.
 .claude/*
