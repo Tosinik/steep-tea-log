@@ -20,12 +20,16 @@ function sessionsByDay(){
 }
 // WS5-style thumb placeholder (no emoji): the tea's photo, else a type-tinted stripe, else a
 // white(白)/pu'er(餅) kanji plate — mirrors shelfPhoto (steep-teas.js).
-function sessThumbHTML(tea){
-  if(tea && tea.image) return `<div class="sess-thumb" style="background-image:url(${escapeHtml(tea.image)})"></div>`;
+// #20: `tap` adds a stopPropagation onclick → tea detail. Passed only when the tea still exists
+// (a deleted tea's row shows the placeholder with no tap target — no dead link).
+function sessThumbHTML(tea, tap){
+  const attr = tap ? ` role="link" onclick="event.stopPropagation();openTeaDetail('${escapeJsArg(tea.id)}','sessions')"` : '';
+  const cur = tap ? 'cursor:pointer;' : '';
+  if(tea && tea.image) return `<div class="sess-thumb"${attr} style="background-image:url(${escapeHtml(tea.image)});${cur}"></div>`;
   const type = (tea && tea.type || '').toLowerCase();
   const kanji = type==='white' ? '白' : (type==='puerh' ? '餅' : '');
-  if(kanji) return `<div class="sess-thumb shelf-kanji t-${escapeHtml(type)}"><span>${kanji}</span></div>`;
-  return `<div class="sess-thumb shelf-ph t-${escapeHtml(type||'unknown')}"></div>`;
+  if(kanji) return `<div class="sess-thumb shelf-kanji t-${escapeHtml(type)}"${attr}${cur?` style="${cur}"`:''}><span>${kanji}</span></div>`;
+  return `<div class="sess-thumb shelf-ph t-${escapeHtml(type||'unknown')}"${attr}${cur?` style="${cur}"`:''}></div>`;
 }
 function sessionRowHTML(s){
   const tea = teaById(s.teaId);
@@ -38,10 +42,15 @@ function sessionRowHTML(s){
   const shown = all.slice(0,3);
   const overflow = all.length - shown.length;
   const chips = shown.map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join('') + (overflow>0?`<span class="hist-chip more">+${overflow}</span>`:'');
+  // #20: when the tea still exists, its thumb + name are their own tap targets → tea detail
+  // (stopPropagation keeps the rest of the row opening the session edit). Deleted tea → plain, no link.
+  const teaName = tea
+    ? `<strong class="sess-tealink" role="link" onclick="event.stopPropagation();openTeaDetail('${escapeJsArg(tea.id)}','sessions')">${escapeHtml(tea.name)}</strong>`
+    : `<strong>Unknown tea</strong>`;
   return `<div class="sess-row" onclick="openSessionEdit('${escapeJsArg(s.id)}')">
-    ${sessThumbHTML(tea)}
+    ${sessThumbHTML(tea, !!tea)}
     <div class="sess-main">
-      <div class="sess-top"><strong>${tea?escapeHtml(tea.name):'Unknown tea'}</strong>${s.rating?renderStarsStatic(s.rating,false):''}</div>
+      <div class="sess-top">${teaName}${s.rating?renderStarsStatic(s.rating,false):''}</div>
       <div class="sess-sub">${fmtDateTime(s.date)} · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}${all.length?'':' · no notes'}</div>
       ${all.length?`<div class="sess-tags">${chips}</div>`:''}
     </div>
@@ -183,6 +192,13 @@ function openSessionEdit(sessionId){
   render();
 }
 function closeSessionEdit(){ state.sessionEditOpen=false; state.editingSession=null; render(); }
+// #20: jump from the open session-edit modal to the tea's page. Closes the modal FIRST (it's appended
+// in render() regardless of view, so leaving it open would linger over tea-detail), then one render.
+function es_viewTea(){
+  const id = state.editingSession && state.editingSession.teaId;
+  state.sessionEditOpen=false; state.editingSession=null;
+  if(id) openTeaDetail(id,'sessions'); else render();
+}
 function es_set(key, val){ state.editingSession[key]=val; }
 function es_setSteep(i, key, val){
   if(key==='tempC'){ state.editingSession.steeps[i].tempC = displayToC(val); return; }
@@ -270,7 +286,11 @@ function sessionEditModal(){
   `).join('');
   return `<div class="overlay" onclick="if(event.target===this) closeSessionEdit()">
     <div class="modal">
-      <div class="modal-head"><h2>Edit session</h2><button class="close-x" onclick="closeSessionEdit()">✕</button></div>
+      <div class="modal-head"><h2>Edit session</h2>
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${teaById(e.teaId)?`<button class="btn-ghost sess-viewtea" onclick="es_viewTea()">view tea →</button>`:''}
+          <button class="close-x" onclick="closeSessionEdit()">✕</button>
+        </div></div>
       <div class="form-grid">
         <div class="field"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${e.gramsUsed??''}" oninput="es_set('gramsUsed', this.value)"></div>

@@ -77,8 +77,8 @@ only data-model change (semantic, not schema — rides the existing `steeps.tags
 Pause decisions were locked as: **bare + membership** namespace (vocab = membership in `KB_FLAVOR_CHIPS`, free
 words stored bare, never inflate the radar-unlock count), **arrival-only** mood ("Arrived steady."), and the
 session story **keeps the finish-screen inputs below it** (photo/rating/share not dropped). Forward work is now
-the **post-R2 issue queue** (decided order): **v3.79 #13 timer time (SHIPPED, below) → v3.80 #19 + #20 (QoL pair)
-→ #18 tiering → #16 period toggle → phase-2 (#15 + #9)**; #14 parked → R3, #11 closed, and the held #15 vocab
+the **post-R2 issue queue** (decided order): **v3.79 #13 timer time + v3.80 #19 + #20 QoL pair (both SHIPPED, below)
+→ #18 tiering (NEXT) → #16 period toggle → phase-2 (#15 + #9)**; #14 parked → R3, #11 closed, and the held #15 vocab
 expansion stays out until phase-2. Plus the parallel track below (domain · phase-2 gate ~Jul 20 — which wanted
 WS1's method + WS4's tags in place, now both landed) and the R3 visual level-up (`design-r3/`).
 
@@ -91,20 +91,23 @@ saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.79 #13: change the steep time with the new timer** (cache **v89**, APP_VERSION v3.79):
-first item off the post-R2 issue queue. **Bug:** with a brew guide active the countdown read "of 117s" with no
-way to edit it, while the "Steep time (seconds)" field held a different value (what actually logs) — two numbers
-visibly disagreeing; the only manual input rendered exclusively when `!d.schedule`, so it vanished the moment a
-guide was active. **Fix (steep-sessions.js): one value, one writer.** The countdown length (`timer.target`) and
-the logged time (`curTime`) are written **only** through `setSteepTime(secs)` — every prefill/edit path
-(`applyScheduleToCurrentSteep`, `d_setActiveSteep`, the steep-time field, the new inline editor) routes through it,
-so they can never drift. `focusProgress(tm)` still reads `tm.target`, so focus mode + the existing timer fixture
-(A–E) carry over unchanged. **Inline tap-to-edit (never a popup):** the "of Ns" sub-label is a dashed-underline tap
-target, editable only while stopped; a blank/zero commit is a **cancelled edit** → reverts to the prior target (no
-0-second countdown). **"Use time"** was a redundant bridge in countdown mode → removed there; kept **stopwatch-only**
-(elapsed is a real separate measurement). `fixtures/steeping-timer-test.js` extended with **section F** (12 checks,
-now 30 total; F3 is the no-drift bug as a contract, plus the pinned zero-edit revert). `node --check` + timer +
-brew-roundtrip green; verified in-browser at 390px both themes. **No SQL.** Next: **v3.80 = #19 + #20** (QoL pair).
+**NOW (just shipped) — v3.80 #19 + #20: find your way** (cache **v90**, APP_VERSION v3.80): the QoL pair off the
+post-R2 issue queue. **#19 Library search** — a quiet hairline row **below** the WS5 chips, filtering on
+name · origin · cultivar · vendor(source) and composing with the chips as **AND** (one more clause in
+`filteredSortedTeas`). German is first-class via **light normalization** (`teaSearchNorm`: lowercase, ß→ss, fold
+diacritics — `gruner`≡`Grüner`, `strasse`≡`Straße`; folding only broadens, never hides — the deliberate tradeoff
+over strict-umlaut); the query is folded **inside** `teaMatchesSearch` so the invariant is structural. **Focus-safe:**
+the shelf body is split into `teaShelfHTML()` and each keystroke swaps **only** `#teaShelf`'s innerHTML
+(`onTeaSearchInput`) — a naive `oninput→render()` would drop focus after one char (the standout catch). **Transient,
+not sticky:** `goView` clears `state.teaSearch` only when leaving the Teas tab (`v!=='teas'`), so a search → tap a
+tea → back round-trip keeps the term. Inline **✕** clears; empty state is a quiet "No teas match your search."
+**#20 session → tea** — in `sessionRowHTML` the tea name + thumb are their own tap targets → `openTeaDetail(id,'sessions')`
+(with `stopPropagation`, row still opens edit); tea-detail back button honours `'sessions'`; the session-edit modal
+gains a quiet **"view tea →"** link (`es_viewTea`, closes the modal **first** so no overlay lingers). **Deleted-tea
+edge:** "Unknown tea" gets no tap target and no modal link. New committed **`fixtures/tea-search-test.js`** (16 checks:
+case, umlaut/ß fold incl. raw-query-to-predicate, multi-field, negatives, chip+search AND; real-CSV pass skips with a
+reported count when the gitignored CSV is absent). `node --check` + all committed fixtures green; verified in-browser
+at 390px both themes (filtering, focus retention, session→tea nav, deleted-tea edge). **No SQL.** Next: **#18 tiering**.
 
 **Earlier — v3.78 WS4 Flavour: capture · story · honesty ladder** (cache **v88**, APP_VERSION v3.78):
 the LAST R2 workstream and the only new feature. Three connected moments over the existing tags arrays (no SQL).

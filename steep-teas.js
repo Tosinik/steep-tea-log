@@ -137,6 +137,17 @@ function renameVendor(oldName, newName){
   if(changed) showToast(`✓ "${oldName}" → "${newName}" (${changed} tea${changed===1?'':'s'})`);
   render();
 }
+/* #19 Library search — light normalization so German input is first-class: lowercase, ß→ss, and
+   fold combining diacritics (ü→u, ä→a, é→e…). Folding only ever *broadens* a match, so no tea can be
+   hidden by it — the asymmetric-risk argument. Applied to BOTH the query and every field. */
+function teaSearchNorm(s){ return String(s||'').toLowerCase()
+  .replace(/ß/g,'ss')
+  .normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .trim(); }
+// The query is folded INSIDE the predicate so the invariant is structural — callers pass raw text.
+// Matches across name / origin / cultivar / vendor(source). Empty query matches everything.
+function teaMatchesSearch(t,q){ q=teaSearchNorm(q); if(!q) return true;
+  return [t.name,t.origin,t.cultivar,t.source].some(f=>teaSearchNorm(f).includes(q)); }
 function filteredSortedTeas(){
   const F = state.teaFilter;
   const list = state.teas.filter(t=>{
@@ -144,6 +155,7 @@ function filteredSortedTeas(){
     if(F.vendor && (t.source||'').trim()!==F.vendor) return false;
     if(F.lowStock && !(Number(t.amountGrams)<lowStockG())) return false;
     if(F.favorite && !t.isFavorite) return false;
+    if(!teaMatchesSearch(t, state.teaSearch)) return false;   // #19: composes with chips as AND
     return true;
   });
   const time = t => new Date(t.dateAdded||0).getTime();
@@ -169,18 +181,6 @@ function viewTeas(){
   const F = state.teaFilter;
   const vendors = distinctVendors();
   const density = teaDensity();
-  const list = filteredSortedTeas();
-  const active = shelfSort(list.filter(t=>!isTeaFinished(t)));   // running-low sorts to the top (WS5)
-  const finished = list.filter(t=>isTeaFinished(t));            // finished teas group at the bottom
-  const renderShelf = (teas) => density==='rows'
-    ? `<div class="shelf-rows">${teas.map(shelfRowHTML).join('')}</div>`
-    : `<div class="tea-grid">${teas.map(teaCardHTML).join('')}</div>`;
-  const finishedBlock = finished.length ? `
-      <div class="section-title" style="margin-top:22px;opacity:.75;"><h2 style="font-family:var(--font-display);font-size:15px;color:var(--ink-soft);">Finished</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${finished.length}</span></div>
-      <div style="opacity:.62;">${renderShelf(finished)}</div>` : '';
-  const cards = list.length
-    ? `${renderShelf(active)}${finishedBlock}`
-    : `<div class="card empty">${state.teas.length ? 'No teas match these filters.' : 'No teas yet — add your first one.'}</div>`;
   // running-low count for the header line (WS5): in stock but under the low-stock threshold.
   const lowCount = state.teas.filter(t=>isRunningLow(t)).length;
   // Filter chips: All · <types you own, in canonical order> · Low · Favs. Cleaner than the old
@@ -199,6 +199,13 @@ function viewTeas(){
       <button class="density-seg ${density==='rows'?'active':''}" onclick="setTeaDensity('rows')" aria-label="List view">${icon('i-rows-hl',16)}</button>
       <button class="density-seg ${density==='grid'?'active':''}" onclick="setTeaDensity('grid')" aria-label="Grid view">${icon('i-grid-hl',16)}</button>
     </div>` : '';
+  // #19 quiet hairline search — sits below the chips (chips stay the primary WS5 control). The ✕ is
+  // always in the DOM, hidden when empty, so onTeaSearchInput can toggle it without a full re-render.
+  const searchRow = state.teas.length ? `
+    <div class="lib-search">
+      <input id="teaSearchInput" type="text" placeholder="Search teas…" value="${escapeHtml(state.teaSearch)}" oninput="onTeaSearchInput(this.value)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search teas">
+      <button id="teaSearchX" class="lib-search-x" onclick="clearTeaSearch()" aria-label="Clear search" style="${state.teaSearch?'':'display:none;'}">✕</button>
+    </div>` : '';
   return `
     ${segControl}
     <div class="lib-head">
@@ -209,10 +216,36 @@ function viewTeas(){
     </div>
     <div class="mono lib-count">${state.teas.length} tea${state.teas.length===1?'':'s'}${lowCount?` · <span style="color:var(--clay);">${lowCount} running low</span>`:''}</div>
     ${chips}
+    ${searchRow}
     ${state.vendorsOpen && vendors.length ? vendorManagerHTML() : ''}
-    ${cards}
+    <div id="teaShelf">${teaShelfHTML()}</div>
   `;
 }
+// #19: the shelf body (active + finished, or the empty line). Split out so onTeaSearchInput can swap
+// ONLY this node's innerHTML on each keystroke — a full render() would drop focus/caret from the input.
+function teaShelfHTML(){
+  const density = teaDensity();
+  const list = filteredSortedTeas();
+  const active = shelfSort(list.filter(t=>!isTeaFinished(t)));   // running-low sorts to the top (WS5)
+  const finished = list.filter(t=>isTeaFinished(t));            // finished teas group at the bottom
+  const renderShelf = (teas) => density==='rows'
+    ? `<div class="shelf-rows">${teas.map(shelfRowHTML).join('')}</div>`
+    : `<div class="tea-grid">${teas.map(teaCardHTML).join('')}</div>`;
+  const finishedBlock = finished.length ? `
+      <div class="section-title" style="margin-top:22px;opacity:.75;"><h2 style="font-family:var(--font-display);font-size:15px;color:var(--ink-soft);">Finished</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${finished.length}</span></div>
+      <div style="opacity:.62;">${renderShelf(finished)}</div>` : '';
+  if(list.length) return `${renderShelf(active)}${finishedBlock}`;
+  const empty = state.teas.length
+    ? (state.teaSearch.trim() ? 'No teas match your search.' : 'No teas match these filters.')
+    : 'No teas yet — add your first one.';
+  return `<div class="card empty">${empty}</div>`;
+}
+function onTeaSearchInput(val){
+  state.teaSearch = val;
+  const shelf = document.getElementById('teaShelf'); if(shelf) shelf.innerHTML = teaShelfHTML();
+  const x = document.getElementById('teaSearchX'); if(x) x.style.display = val ? '' : 'none';
+}
+function clearTeaSearch(){ state.teaSearch=''; render(); }
 // Type chip toggles: pick a type, or clear it if it's already the active one (back to All).
 function toggleTypeFilter(type){ state.teaFilter.type = (state.teaFilter.type===type) ? '' : type; render(); }
 function setTeaSeg(seg){ state.teaSeg = (seg==='vessels') ? 'vessels' : 'teas'; state.view='teas'; render(); }
@@ -574,8 +607,12 @@ function viewTeaDetail(){
     </div>`;
   }).join('') : '<div class="empty">No sessions logged for this tea yet.</div>';
 
+  // Back target honours where we came from — #20 adds 'sessions' (tapping a session's tea) alongside passport.
+  const back = state.teaDetailFrom==='passport' ? {v:'passport',l:'passport'}
+             : state.teaDetailFrom==='sessions' ? {v:'sessions',l:'sessions'}
+             : {v:'teas',l:'teas'};
   return `
-    <button class="detail-back" onclick="goView('${state.teaDetailFrom==='passport'?'passport':'teas'}')">← Back to ${state.teaDetailFrom==='passport'?'passport':'teas'}</button>
+    <button class="detail-back" onclick="goView('${back.v}')">← Back to ${back.l}</button>
     <div class="card">
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
         <div style="width:140px;height:140px;border-radius:12px;background:${t.image?`url(${escapeHtml(t.image)}) center/cover`:'var(--jade-pale)'};flex:0 0 auto;"></div>

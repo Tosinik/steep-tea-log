@@ -142,6 +142,14 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
 .lib-head-actions{display:flex;align-items:center;gap:10px;}
 .lib-count{font-size:12px;color:var(--ink-soft);margin:0 0 11px;}
 .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px;}
+/* #19 Library search — quiet hairline; plain + functional (R3 restyles the header later) */
+.lib-search{position:relative;margin:0 0 13px;}
+.lib-search input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--white);border-radius:10px;padding:9px 30px 9px 12px;font-size:14px;color:var(--ink);}
+.lib-search input::placeholder{color:var(--ink-soft);}
+.lib-search input:focus{outline:none;border-color:var(--jade);}
+.lib-search-x{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:var(--ink-soft);font-size:13px;padding:0;}
+.sess-tealink{cursor:pointer;}
+.sess-viewtea{font-size:12.5px;color:var(--ink-soft);padding:0;white-space:nowrap;}
 .density-toggle{display:flex;gap:3px;background:var(--porcelain-dim);border-radius:9px;padding:3px;}
 .density-seg{display:flex;align-items:center;justify-content:center;padding:5px 8px;border:none;background:none;border-radius:6px;color:var(--nav-inactive);}
 .density-seg.active{background:var(--white);color:var(--ink);}
