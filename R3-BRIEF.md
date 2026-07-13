@@ -42,6 +42,23 @@ captured seeds may be used, merged, or discarded: *warm atelier* vs *saturated
 botanical*, plus the reserved-colour idea. Design is explicitly invited to propose
 beyond all of these.
 
+**Ideas any direction may steal** (none required, none mutually exclusive — take one,
+several, or none): **poetic token naming** — `styles.css` tokens named "roasted bark" /
+"ivory steam" rather than functional (`--brown-700`); **stacked-syllable display type** —
+tea names broken into syllable stacks on detail pages / Wrapped cards, strong with
+Shippori Mincho at zero colour cost; and **objects as UI shapes** — quiet teaware
+silhouettes (scoop, gaiwan, cake) standing in for generic rounded cards. That last one
+is the concrete lever for **§2's thesis**: it breaks structural sameness at the container
+level, not the palette, and it reuses the **§5 teaware pipeline** (the same traced hairline
+line art, used as container shape rather than icon) — the two sections meet here.
+
+**The captured palettes, as text** (hex belongs in the file, not recovered by eyedropper):
+- *Warm atelier* — Ivory Steam `#E7DFD4` · Roasted Bark `#4B3621` · Golden Oolong `#C7A57C`.
+- *Saturated botanical* — Seashell `#F9F8ED` · Middle Green Yellow `#A6BD66` · Phthalo Green
+  `#21341F` · Xanthous `#E5AE2B` · Blood Red `#69160F`.
+- *Reserved colour* — St. Patrick's Blue `#2B2C7B` (board 4's "exclusive product colour":
+  one hue only ever worn by a single surface; scarcity as meaning, very calm-compatible).
+
 After Niklas picks a direction (hybrids allowed), R3 moves to per-workstream locked
 bundles, R2-style.
 
@@ -145,6 +162,10 @@ long — text blocks must survive it. English UI chrome, German content, mixed f
 8. Accessibility: contrast holds in both themes; decorative SVGs stay `aria-hidden`.
 9. Design must not compromise shipped engine behaviour or block known future work
    (phase-2 brew advice, timestamp-anchored timer, stock tiers incl. empty).
+10. Saturation is rationed, never the base. The *saturated botanical* palette (§3) is
+    viable only as sparse accents on an otherwise quiet ground; applied wholesale it
+    fights calm-first. This constrains how that direction may be *used* — it is not a bar
+    on proposing it.
 
 ## 9 · Out of scope
 
