@@ -11,7 +11,9 @@ v3.72 — the old Show-achievements/Quiet-Mode toggles are hidden while it's off
 calendar surface that stayed, the Sessions "Brewing days" heatmap, is deliberately neutral
 (streak framing removed v3.83) and deliberately ungated. Vanilla JS (no framework, no bundler, no
 `package.json`), backed by Supabase (Postgres + RLS + Auth + Storage), served as a
-static site on GitHub Pages: https://tosinik.github.io/steep-tea-log/
+static site on GitHub Pages at **https://slowcup.app** (custom domain since 2026-07-13;
+the old https://tosinik.github.io/steep-tea-log/ 301s there — setup facts in STATE.md
+"Domain & auth origins")
 
 Private + small beta.
 

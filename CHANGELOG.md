@@ -33,6 +33,22 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — slowcup.app is the canonical URL
+Deploy: `STATE.md`, `CLAUDE.md`, `ROADMAP-v4.md`, `CHANGELOG.md`. No app change, no SQL, no
+cache/APP_VERSION bump.
+- **Domain migration done 2026-07-13:** https://slowcup.app is canonical (GitHub Pages custom
+  domain; the old tosinik.github.io/steep-tea-log URL 301s there, so old links self-heal). **Zero
+  code changes were needed or made** — manifest scope/start_url are relative, the SW registers
+  relatively, auth redirects build from `location.origin` (verified pre-migration). PWA reinstalls
+  (new origin = new SW + storage) are user-side work, not repo work.
+- Setup facts recorded in STATE.md "Domain & auth origins": Porkbun DNS (4× A → Pages IPs, CNAME
+  www, the **must-stay** TXT verification record, auto-renew ON), Let's Encrypt via Pages +
+  Enforce HTTPS, `.app` HSTS-preload = no HTTP fallback (domain lapse = hard-dead app), Supabase
+  Site URL flipped + dual-origin redirect allowlist with the **Ruth-gated cleanup follow-up**.
+- **Out-of-band commit acknowledged:** `e744f7b` ("Create CNAME") was committed to main by GitHub
+  itself when the custom domain was set — expected, not a deploy. `CNAME` isn't referenced by the
+  SW or precache, so no cache bump; recorded here so the one-commit-per-deploy ledger stays honest.
+
 ## docs — post-R2 audit reconciliation
 Deploy: `CLAUDE.md`, `STATE.md`, `ROADMAP-v4.md`, `DESIGN.md`, `CHANGELOG.md` (this module map).
 No app change, no SQL, no cache/APP_VERSION bump. The doc-debt half of the 2026-07-13 audit (the code

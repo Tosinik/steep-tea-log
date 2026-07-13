@@ -33,9 +33,12 @@ surface.
   sessions), pooled per style/leaf-form sooner.
 
 ## Pillar B — launch infrastructure (checklist consolidated in ROADMAP-v3-next.md)
-Register slowcup.app (CRITICAL PATH, name is public) → root/`index.html` split → domain migration (repo
-URL, manifest, SW scope — the once-only move) → reshoot 3 landing screenshots → install guide (Android
-`beforeinstallprompt` + iOS manual) → beta package.
+~~Register slowcup.app~~ ✓ → ~~domain migration~~ ✓ (**both DONE 2026-07-13** — https://slowcup.app
+live, Enforce-HTTPS, zero code changes needed; setup facts + the Ruth-gated Supabase-allowlist
+cleanup in STATE.md "Domain & auth origins"; PWA reinstalls on the new origin are user-side) →
+root/`index.html` split decision for the landing page (still open — the app currently serves at the
+domain root) → reshoot 3 landing screenshots → install guide (Android `beforeinstallprompt` + iOS
+manual) → beta package.
 
 ## Pillar C — first-run experience [the one big NEW build]
 - Onboarding / feature-discovery pass: light guided intro; features surface on thresholds (already the

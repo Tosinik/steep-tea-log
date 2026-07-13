@@ -1,8 +1,9 @@
 # SlowCup — STATE (handoff)
 
 > **App renamed Steep → SlowCup (user-facing brand) in v3.59.** Internal names — `steep-*.js`
-> files, functions, `tealog_*` keys, the `steep-tea-log` repo/URL/cache prefix — keep the old name
-> (the repo/URL rename is deferred to the slowcup.app domain migration). "steep/steeps" tea
+> files, functions, `tealog_*` keys, the `steep-tea-log` repo name/cache prefix — keep the old name
+> (the **domain migration to slowcup.app is DONE, 2026-07-13** — see "Domain & auth origins" below;
+> the GitHub repo deliberately keeps its `steep-tea-log` name). "steep/steeps" tea
 > terminology stays. Below, "Steep" in historical notes = the old brand; don't rewrite them.
 
 
@@ -19,11 +20,29 @@ vessels — refresh them right before each phase-N spec, not continuously), **de
 Personal tea-logging PWA, **calm-first** (ritual over gamification; achievements/XP dormant
 app-wide via `ACHIEVEMENTS_ENABLED=false` since v3.72; the Sessions "Brewing days" heatmap is
 the one deliberately-kept calendar surface — neutral since v3.83, ungated on purpose).
-Private + small beta. Hosted on GitHub Pages: https://tosinik.github.io/steep-tea-log/
+Private + small beta. **Canonical URL: https://slowcup.app** (GitHub Pages custom domain since
+2026-07-13; the old https://tosinik.github.io/steep-tea-log/ 301s there, so old links self-heal).
 
 ## Stack
 Vanilla JS (no framework) · Supabase (Postgres + RLS + Auth + Storage) · service-worker PWA · GitHub Pages.
 Supabase project: https://duuosbgjozjjfyfusjzf.supabase.co (anon key in project knowledge).
+
+## Domain & auth origins (migrated 2026-07-13)
+- **https://slowcup.app is canonical.** GitHub committed the `CNAME` file to main itself when the
+  custom domain was set (`e744f7b` — expected out-of-band commit, not a deploy; CNAME isn't referenced
+  by the SW or precache, so no cache bump). **Zero app-code changes were needed**: manifest
+  scope/start_url are relative, the SW registers relatively, auth redirects build from
+  `location.origin` — verified pre-migration.
+- **DNS at Porkbun:** 4× A records → GitHub Pages IPs · CNAME `www` → `tosinik.github.io` ·
+  TXT `_github-pages-challenge-tosinik` (account-level domain verification — **must stay**).
+  Domain **auto-renew is ON** at Porkbun.
+- **HTTPS:** cert via GitHub Pages (Let's Encrypt, auto-renews); **Enforce HTTPS on**. `.app` is
+  **HSTS-preloaded — there is no HTTP fallback**, so a domain lapse = hard-dead app (hence the
+  auto-renew note above). Domain verified at the GitHub account level.
+- **Supabase:** Site URL flipped to `https://slowcup.app/`; the redirect **allowlist holds BOTH
+  origins during the transition**. **Follow-up task:** remove the `tosinik.github.io/steep-tea-log`
+  allowlist entry **once Ruth confirms her reinstall on the new origin** (PWA reinstalls are
+  user-side work — a new origin means a fresh SW + storage; the 301 heals plain links, not installs).
 
 ## Modules (index.html load order; boot last)
 steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard → steep-insights →
@@ -77,10 +96,12 @@ longer need a manual hard reload (dev still should, to verify). The SW waits for
 
 ## Continue here
 **The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16 →
-v3.83 audit riders (**all SHIPPED**, below). **Open lanes:** (1) the **interim Library sort** — ruled
-"ships now" at the 2026-07-13 review; its lane brief is still claude.ai-side and must be handed into the
-repo/Downloads before building; (2) **phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark
-(~Jul 20), the natural slot for the **domain registration** (slowcup.app), the oldest open item. **#23**
+v3.83 audit riders (**all SHIPPED**, below). **Open lanes:** (1) **v3.84 interim Library sort** — the
+brief is now in the repo root (**`TASK-23-interim-sort.md`**, decisions settled); **the plan-review
+pause before implementation is mandatory** (it touches shelf render + a behavior branch); (2)
+**phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20); (3) **Supabase allowlist
+cleanup** — drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins").
+The **domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
 ("R2 capability regressions" — planned as #21, renumbered by GitHub) holds the reinstate-vs-accept
 decisions (sorts full treatment, vendor filter, in-stock count, focus-mode log/reset, per-steep tag
 library); `setTeaSort`/`setTeaFilter`/`focusLogSteep` stay in the code as its reinstatement hooks. #14
@@ -101,9 +122,10 @@ repo `images/` folder** (corrected 2026-07-13 — the project re-clones the repo
 project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-up; two directions captured
 (warm atelier vs saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land.
 
-**Parallel / Niklas's:** the **domain** (register slowcup.app); the **phase-2 gate** (~Jul 20) → phase-2
-brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
-naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
+**Parallel / Niklas's:** ~~the domain~~ (**registered + migrated 2026-07-13** ✓); beta-tester
+**reinstalls on the new origin** (Ruth first — then the Supabase allowlist cleanup fires); the
+**phase-2 gate** (~Jul 20) → phase-2 brew-advice build (wants WS1's method control + WS4's tags in
+place first). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
 **NOW (just shipped) — v3.83 audit riders: never lose a session to the Log button** (cache **v93**,
 APP_VERSION v3.83): the four riders from the 2026-07-13 post-R2 audit (findings doc reviewed claude.ai-side;
