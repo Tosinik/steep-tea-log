@@ -327,12 +327,28 @@ function sessionEditModal(){
 }
 
 /* ================= SESSION LOGGING ================= */
-function quickLogSession(){
+// v3.83 (#23 audit F4): the WS6 bottom bar renders Log during the session flow, so a mis-tap used to
+// overwrite the draft silently (finish-screen rating/notes gone, mid-steep interval orphaned). Past
+// setup there is always something to lose; in setup only a form edited away from its fresh defaults is.
+function draftFingerprint(d){
+  return [d.teaId,d.vesselId,d.sessionDate,d.isColdBrew,d.waterType,d.waterTDS,d.gramsUsed,d.brewStyle,d.waterMl,d.mood].join('|');
+}
+function sessionDraftDirty(d){
+  if(!d) return false;
+  if(d.stage!=='setup') return true;                     // steeping/finish/quick carry logged work
+  return !!d._pristine && draftFingerprint(d)!==d._pristine;
+}
+function quickLogSession(btn){
   if(state.teas.length===0){ showToast('Add a tea first.'); state.view='teas'; render(); return; }
+  if(sessionDraftDirty(state.sessionDraft)){
+    if(btn){ armConfirm(btn, 'Discard the session in progress?', ()=>startSessionFor(null)); return; }
+    state.view='session'; render(); return;              // no button to arm → never silently discard; return to the draft
+  }
   startSessionFor(null);
 }
 function startSessionFor(teaId){
   if(state.vessels.length===0){ showToast('Add a vessel first — Teas → Vessels.'); goVessels(); return; }
+  clearTimerInterval();   // v3.83: never orphan a running tick when the draft is replaced
   state.sessionDraft = {
     teaId: teaId || (state.teas.find(t=>!isTeaFinished(t)) || state.teas[0]).id,  // default to an in-stock tea
     vesselId: state.vessels[0].id,
@@ -363,6 +379,7 @@ function startSessionFor(teaId){
     isShared: false,
     timer: {mode:'timer', target:15, elapsed:0, running:false, intervalId:null}
   };
+  state.sessionDraft._pristine = draftFingerprint(state.sessionDraft);  // dirty = any user edit vs this snapshot
   state._draftImage = null;
   state.view='session';
   render();

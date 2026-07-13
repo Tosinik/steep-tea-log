@@ -187,7 +187,7 @@ function settingsModal(){
         ${seg('tempUnit',[{v:'c',label:'°C'},{v:'f',label:'°F'}])}
       </div>
       <div class="set-row">
-        <div><div class="set-label">Timer sounds</div><div class="set-sub">Chime and vibration when a countdown finishes</div></div>
+        <div><div class="set-label">Timer sounds</div><div class="set-sub">Chime when a countdown finishes</div></div>
         ${toggle('soundEnabled')}
       </div>
 

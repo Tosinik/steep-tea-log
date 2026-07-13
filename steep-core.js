@@ -1,9 +1,9 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.82';
+const APP_VERSION = 'v3.83';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-const WHATS_NEW = 'The Insights number grid can now show just this week or this month — all-time stays the default.';
+const WHATS_NEW = 'The Log button now asks before discarding a session in progress.';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -855,7 +855,7 @@ function bottomNavHTML(){
   return `<nav class="bottomnav" aria-label="Primary"><div class="bottomnav-inner">
     ${item(v==='dashboard','i-home-hl','Home',"goView('dashboard')")}
     ${item(v==='teas'||v==='tea-detail','i-cup-hl','Teas',"goView('teas')")}
-    <button class="bn-log" onclick="quickLogSession()" aria-label="Log session" title="Log session"><span class="bn-log-circle">${icon('i-plus-hl',27)}</span><span class="bn-log-lbl">Log</span></button>
+    <button class="bn-log" onclick="quickLogSession(this)" aria-label="Log session" title="Log session"><span class="bn-log-circle">${icon('i-plus-hl',27)}</span><span class="bn-log-lbl">Log</span></button>
     ${item(v==='sessions','i-calendar-hl','Sessions',"goView('sessions')")}
     ${item(v==='insights'||v==='wrapped','i-chart-hl','Insights',"goView('insights')")}
   </div></nav>`;

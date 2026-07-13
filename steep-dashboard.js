@@ -142,7 +142,7 @@ function viewSpend(){
   const thisMonthName = new Date().toLocaleDateString(undefined,{month:'long',year:'numeric'});
 
   return `
-    <button class="detail-back" onclick="goView('dashboard')">← Back to dashboard</button>
+    <button class="detail-back" onclick="goView('insights')">← Back to Insights</button>
     <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Spending</h2></div>
     ${!hasAny ? `<div class="card empty">No priced purchases yet. Add a tea with a price and a purchase date and it'll show up here.</div>` : `
     <div class="card">
@@ -344,10 +344,12 @@ function heatmapHTML(days){
   </div>`;
 }
 
+// v3.83 (#23 audit F17): the streak framing goes — this was the last ungated streak surface after
+// v3.72 hid achievements. The calendar heatmap stays on Sessions (per Niklas, v3.44), now neutral.
 function streakCardHTML(){
   const s = computeStats();
   return `<div class="section card" style="margin-top:16px;">
-    <div class="section-title"><h2>Drinking streak</h2><span class="mono" style="font-size:13px;color:var(--amber);font-weight:600;">${s.streak} day${s.streak===1?'':'s'} current</span></div>
+    <div class="section-title"><h2>Brewing days</h2></div>
     ${heatmapHTML(s.days)}
   </div>`;
 }
@@ -485,12 +487,12 @@ function onboardingHTML(){
     <div class="ob-hero">
       <div style="display:flex;justify-content:center;margin-bottom:14px;">${steepLogoSVG(52)}</div>
       <h1>Welcome to SlowCup</h1>
-      <p class="ob-lede">A calm home for your tea. Log a few sessions and this space fills with your rhythms — what you brew, your streak, your favourites. No rush.</p>
+      <p class="ob-lede">A calm home for your tea. Log a few sessions and this space fills with your rhythms — what you brew, your brewing days, your favourites. No rush.</p>
     </div>
     <div class="card ob-steps">
       ${step(hasTea, 1, 'Add your first tea', 'Name and type are enough; add a photo and notes if you like.', `<button class="btn btn-primary ob-btn" onclick="goView('teas')">Add tea</button>`)}
       ${step(hasVessel, 2, 'Add a vessel', 'A gaiwan, teapot, or mug — whatever you brew in.', `<button class="btn btn-primary ob-btn" onclick="goView('vessels')">Add vessel</button>`)}
-      ${step(false, 3, 'Log your first session', ready?"Everything's ready — go brew something.":'Add a tea and a vessel first.', ready?`<button class="btn btn-primary ob-btn" onclick="quickLogSession()">Log session</button>`:'')}
+      ${step(false, 3, 'Log your first session', ready?"Everything's ready — go brew something.":'Add a tea and a vessel first.', ready?`<button class="btn btn-primary ob-btn" onclick="quickLogSession(this)">Log session</button>`:'')}
     </div>
   `;
 }
