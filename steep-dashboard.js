@@ -7,7 +7,10 @@ function gridStats(sessions){
   const totalLiters = sessions.reduce((a,s)=>{
     const v = vesselById(s.vesselId);
     const cap = v ? Number(v.capacityMl)||0 : 0;
-    return a + (cap*steepCountOf(s))/1000;
+    // #24 (v3.85): the per-session water override wins over vessel capacity. Number() because the
+    // edit modal leaves a string in state until the next load re-maps it.
+    const ml = Number(s.waterMl)>0 ? Number(s.waterMl) : cap;
+    return a + (ml*steepCountOf(s))/1000;
   },0);
   const days = new Set(sessions.map(s=>dayKey(s.date)));
   const uniqueTeas = new Set(sessions.map(s=>s.teaId)).size;

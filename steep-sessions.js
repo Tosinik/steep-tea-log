@@ -292,8 +292,9 @@ function sessionEditModal(){
           <button class="close-x" onclick="closeSessionEdit()">✕</button>
         </div></div>
       <div class="form-grid">
-        <div class="field"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
+        <div class="field span2"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${e.gramsUsed??''}" oninput="es_set('gramsUsed', this.value)"></div>
+        <div class="field"><label>Water (ml)</label><input type="number" value="${e.waterMl??''}" oninput="es_set('waterMl', this.value)" placeholder="${(vesselById(e.vesselId)||{}).capacityMl||'vessel capacity'}"></div>
         <div class="field span2"><label>Vessel</label><select onchange="es_set('vesselId', this.value)">${
           (state.vessels.some(v=>v.id===e.vesselId) ? '' : `<option value="${escapeHtml(e.vesselId||'')}" selected>${escapeHtml(e.vesselName||'(unknown vessel)')}</option>`)
           + state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${e.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}${v.capacityMl?` · ${v.capacityMl}ml`:''}</option>`).join('')
@@ -450,7 +451,7 @@ function sessionQuickHTML(d){
         <label>Overall tags</label>
         <div>${d.sessionTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeSessionTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
         <div class="tag-input-wrap">
-          <input type="text" id="tagInputField" data-target="session" placeholder="Type your own, press Enter...">
+          <input type="text" id="tagInputField" data-target="session" enterkeyhint="done" placeholder="Type your own, press Enter...">
           <div id="tagSuggestBox"></div>
         </div>
         ${tagLibraryChipsHTML('session')}
@@ -771,7 +772,7 @@ function flavorCaptureHTML(d){
   const freeSel = sel.filter(t=>!isFlavorVocab(t));
   const freeChips = freeSel.length ? `<div class="flav-freesel">${freeSel.map(t=>`<span class="flav-chip on">${escapeHtml(t)} <button onclick="removeCurTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : '';
   const freeDoor = d.flavorFreeOpen
-    ? `<div class="tag-input-wrap"><input type="text" id="tagInputField" data-target="steep" placeholder="your own word, press Enter…"><div id="tagSuggestBox"></div></div>`
+    ? `<div class="tag-input-wrap"><input type="text" id="tagInputField" data-target="steep" enterkeyhint="done" placeholder="your own word, press Enter…"><div id="tagSuggestBox"></div></div>`
     : `<button type="button" class="flav-door" onclick="d_flavorFreeOpen()">${icon('i-plus-hl',18)}<span>your own word</span></button>`;
   return `
     <div class="flav-capture">
@@ -1024,7 +1025,9 @@ function renderTagSuggest(query, target){
   if(!box) return;
   if(!query){ box.innerHTML=''; return; }
   const matches = state.tagLibrary.filter(t=>t.toLowerCase().includes(query.toLowerCase())).slice(0,6);
-  box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onclick="pickTagSuggest('${escapeJsArg(m)}','${target}')">${escapeHtml(m)}</div>`).join('')}</div>` : '';
+  // #29: mousedown+preventDefault — a suggestion tap must not blur-commit the half-typed word first
+  // (blur now commits, so onclick here would double-add "cara" AND "caramel").
+  box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onmousedown="event.preventDefault();pickTagSuggest('${escapeJsArg(m)}','${target}')">${escapeHtml(m)}</div>`).join('')}</div>` : '';
 }
 function pickTagSuggest(tag, target){
   addTag(tag, target);
@@ -1032,11 +1035,11 @@ function pickTagSuggest(tag, target){
   if(inp) inp.value='';
   document.getElementById('tagSuggestBox').innerHTML='';
 }
-function addTagFromInput(target){
+function addTagFromInput(target, refocus){
   const inp = document.getElementById('tagInputField');
   const val = inp.value.trim().toLowerCase();
   if(!val) return;
-  addTag(val, target);
+  addTag(val, target, refocus);
   inp.value='';
   document.getElementById('tagSuggestBox').innerHTML='';
 }
@@ -1052,12 +1055,14 @@ function tagLibraryChipsHTML(target){
   if(!available.length) return '';
   return `<div class="taglib">${available.map(t=>`<button type="button" class="taglib-chip" onclick="addTag('${escapeJsArg(t)}','${target}')">＋ ${escapeHtml(t)}</button>`).join('')}</div>`;
 }
-function addTag(tag, target){
+function addTag(tag, target, refocus){
   if(!state.tagLibrary.includes(tag)){ state.tagLibrary.push(tag); persistTag(tag); }
   const list = tagListFor(target);
   if(!list.includes(tag)) list.push(tag);
   render();
-  setTimeout(()=>{ const inp=document.getElementById('tagInputField'); if(inp) inp.focus(); },0);
+  // #29: the blur path passes refocus=false — the user is leaving the field; yanking focus back
+  // would reopen the keyboard they just dismissed. Every other path keeps the type-another flow.
+  if(refocus!==false) setTimeout(()=>{ const inp=document.getElementById('tagInputField'); if(inp) inp.focus(); },0);
 }
 function removeCurTag(tag){
   const d = state.sessionDraft;
@@ -1165,7 +1170,7 @@ function sessionFinishHTML(d){
         <label>Overall tags</label>
         <div>${d.sessionTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeSessionTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
         <div class="tag-input-wrap">
-          <input type="text" id="tagInputField" data-target="session" placeholder="Type your own, press Enter...">
+          <input type="text" id="tagInputField" data-target="session" enterkeyhint="done" placeholder="Type your own, press Enter...">
           <div id="tagSuggestBox"></div>
         </div>
         ${tagLibraryChipsHTML('session')}
@@ -1220,10 +1225,12 @@ async function commitSession(){
       infusionCount: d.steeps.length ? null : Math.max(1, Number(d.infusionCount)||1),
       feedback: d.feedback || null,
       mood: d.mood || null,
-      // v3.57: capture ratio inputs only when the feature is engaged (off touches nothing). brewStyle
-      // stores the method actually used (explicit pick or vessel inference) for phase-2 learned defaults.
-      waterMl: (state.settings.ratioAdjust===true && d.waterMl) ? Number(d.waterMl) : null,
-      brewStyle: (state.settings.ratioAdjust===true && !d.isColdBrew) ? brewMethodFor(d.brewStyle, ves&&ves.capacityMl) : null,
+      // v3.85 (#24): both un-gated from ratioAdjust. The water field is always visible since WS1, so
+      // the v3.57 gate silently discarded what the user typed; brewStyle snapshots the method actually
+      // used (explicit pick or vessel inference) for phase-2 learned defaults — its un-gate is its own
+      // 2026-07-13 ruling, not a drive-by. Cold brew keeps brewStyle null (no gongfu/western semantics).
+      waterMl: d.waterMl ? Number(d.waterMl) : null,
+      brewStyle: (!d.isColdBrew) ? brewMethodFor(d.brewStyle, ves&&ves.capacityMl) : null,
       teaName: tea?tea.name:'', teaType: tea?tea.type:'', vesselName: ves?ves.name:''
     };
     state.sessions.push(session);

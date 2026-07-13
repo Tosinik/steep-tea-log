@@ -167,5 +167,36 @@ if(need.every(f=>fs.existsSync(f))){
   console.log('  F real data: SKIPPED, 16 checks not run (need teas/sessions/vessels _rows.csv)');
 }
 
+// ---- G. #24 (v3.85) — liters respect the per-session water override (synthetic by necessity:
+// the real export predates the fix, so no row carries water_ml yet — flagged per convention) ----
+setState({ teas:[{id:'TA',name:'A',type:'green'}],
+  vessels:[{id:'v100',name:'Gaiwan',capacityMl:100},{id:'v200',name:'Kyusu',capacityMl:200}], sessions:[] });
+const litersOf=s=>vm.runInContext('gridStats(['+JSON.stringify(s)+']).totalLiters',ctx);
+const now=new Date().toISOString();
+ok(Math.abs(litersOf({id:'g1',teaId:'TA',vesselId:'v200',date:now,steeps:[{},{},{}],gramsUsed:5,waterMl:90})-0.27)<1e-9,
+  'G1 override wins: 90ml × 3 steeps = 0.27 L, not the 200ml vessel\'s 0.6 (the #24 shape)');
+ok(Math.abs(litersOf({id:'g2',teaId:'TA',vesselId:'v200',date:now,steeps:[{},{}],gramsUsed:4})-0.4)<1e-9,
+  'G2 no override → vessel capacity fallback (200ml × 2 = 0.4 L)');
+ok(Math.abs(litersOf({id:'g3',teaId:'TA',vesselId:'v200',date:now,steeps:[{},{}],gramsUsed:4,waterMl:'90'})-0.18)<1e-9,
+  'G3 string waterMl (edit-modal path pre-remap) coerces, not NaN');
+ok(Math.abs(litersOf({id:'g4',teaId:'TA',vesselId:'',date:now,infusionCount:1,gramsUsed:8,isColdBrew:true,waterMl:500})-0.5)<1e-9,
+  'G4 vessel-less session counts via its override (0 L before #24); cold brew participates unchanged');
+ok(Math.abs(litersOf({id:'g5',teaId:'TA',vesselId:'v100',date:now,steeps:[{}],gramsUsed:3,waterMl:0})-0.1)<1e-9,
+  'G5 non-positive override never zeroes the estimate — capacity fallback');
+setState({ teas:[{id:'TA',name:'A',type:'green'}],
+  vessels:[{id:'v100',name:'Gaiwan',capacityMl:100},{id:'v200',name:'Kyusu',capacityMl:200}],
+  sessions:[
+    {id:'g1',teaId:'TA',vesselId:'v200',date:now,steeps:[{},{},{}],gramsUsed:5,waterMl:90},
+    {id:'g2',teaId:'TA',vesselId:'v200',date:now,steeps:[{},{}],gramsUsed:4},
+    {id:'g4',teaId:'TA',vesselId:'',date:now,infusionCount:1,gramsUsed:8,isColdBrew:true,waterMl:500}
+  ]});
+ok(Math.abs(vm.runInContext('gridStats(state.sessions).totalLiters',ctx)-(0.27+0.4+0.5))<1e-9,
+  'G6 mixed shelf composes: 0.27 + 0.4 + 0.5 = 1.17 L');
+ok(vm.runInContext('gridStats(state.sessions).totalLiters===computeStats().totalLiters',ctx),
+  'G7 single writer holds with waterMl in play (computeStats still delegates exactly)');
+ok(Math.abs(litersOf({id:'g6',teaId:'TA',vesselId:'v200',date:now,infusionCount:1,gramsUsed:10,isColdBrew:true,waterMl:750})-0.75)<1e-9,
+  'G8 cold brew: liters counted from its waterMl (0.75 L), not the 200ml vessel — no cold-brew exclusion in gridStats');
+console.log('  G water override (#24): 8 checks');
+
 if(failures){ console.log('\n'+failures+' STAT-PERIOD TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL STAT-PERIOD TESTS PASSED  ('+passed+' passed)');

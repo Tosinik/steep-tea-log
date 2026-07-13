@@ -33,6 +33,36 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v3.85 — #24 + #29: the water counts, the word keeps
+Deploy: `steep-sessions.js` (commitSession un-gates + edit-modal Water(ml) + tag-commit path + `enterkeyhint`), `steep-dashboard.js` (`gridStats` liters), `steep-core.js` (bindDynamic onblur, APP_VERSION + WHATS_NEW), `service-worker.js` (**v95**), `fixtures/stat-period-test.js` (new G section), `fixtures/flavor-ladder-test.js` (new H section + steep-sessions.js joins its sandbox), `STATE.md`. **No SQL.**
+- **#24, two stacked bugs.** (a) The always-visible Water(ml) field (WS1 moved it out of the ratio-gated
+  `ratioSetupHTML` into the More-details fold) was still commit-gated on `ratioAdjust` — default OFF —
+  so the entered value was silently discarded (0 of 12 real sessions carried `water_ml`; a
+  "never strand user data" violation). `commitSession` now persists `waterMl` whenever entered.
+  (b) `gridStats` computed liters purely from vessel capacity; the per-session override now wins:
+  `(waterMl > 0 ? waterMl : capacity) × steeps`. The v3.82 single-writer delegation is untouched, so the
+  grid and achievements inputs still can't drift (pinned, G7).
+- **Ruled rider (its own decision, not a drive-by): `brewStyle` un-gated too.** With `ratioAdjust` off
+  it was null across the entire history, so phase-2's learned defaults (~Jul 20 gate) would have started
+  cold. It now snapshots the method actually used (explicit pick or vessel inference); **cold brew keeps
+  `brewStyle` null** — no gongfu/western semantics (branch verified unchanged in the live flow).
+- **Edit-modal rider:** the session editor gains a Water(ml) field (placeholder = vessel capacity), so a
+  past session's water is visible and backfillable — the reporter's "not visible in session data either."
+  Mappers have round-tripped `water_ml` since v3.57; no SQL.
+- **#29 — a typed flavour word is never lost.** On Android IMEs the keyboard's Enter arrives as a bare
+  "next" action the keydown handler never sees, and there was no blur commit at all. Now: tapping/focusing
+  away **commits** the word (no refocus on that path — the keyboard stays dismissed), `enterkeyhint="done"`
+  on all three tag inputs, and suggestion picks bind `mousedown`+preventDefault so a tap can't blur-commit
+  the half-typed prefix first (the "cara"+"caramel" double-add). Desktop Enter unchanged.
+- **Fixtures:** `stat-period-test.js` G (8 checks — override wins/fallback/string-coercion/vessel-less/
+  zero-override/composition/single-writer/**cold-brew row counted from its waterMl**; synthetic by
+  necessity — the real export predates the fix) and
+  `flavor-ladder-test.js` H (9 checks — routing, dedupe, trim+lowercase, clear, refocus discipline, the
+  mousedown markup pin). **All 11 committed suites green** (75 + 75). Browser-verified through the real
+  flow auth-lessly (seeded state): Enter and blur commits, empty-blur no-op, saved `waterMl`/`brewStyle`
+  with `ratioAdjust` off, cold-brew null, liters 0.09-not-0.21, edit round-trip, Insights tile. Real
+  Gboard key-event delivery can't be emulated in the pane — the blur path is the rescue either way.
+
 ## tooling — the audit and the inbox get names
 Deploy: `.gitignore`, `.claude/agents/verifier.md`, `.claude/agents/issue-triage.md`,
 `.claude/skills/five-lens-audit/SKILL.md`, `steep-core.js` (one comment reworded), `CHANGELOG.md`.

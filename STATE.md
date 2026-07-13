@@ -96,8 +96,15 @@ longer need a manual hard reload (dev still should, to verify). The SW waits for
 
 ## Continue here
 **The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16 →
-v3.83 audit riders → v3.84 interim sort (**all SHIPPED**, below). **Open lanes:** (1) **phase-2
-(#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20); (2) **Supabase allowlist cleanup**
+v3.83 audit riders → v3.84 interim sort → v3.85 #24+#29 water/word fixes (**all SHIPPED**, below).
+**Next up (ruled 2026-07-13): v3.86 stock-tier slice** — #26 options A+B+C (empty in the tallies ·
+`restockCandidate` includes finished favs/rebuys · statusLine "quantity not tracked" for active-0g) +
+#27 ruled D+F (accepted-nuances register entry + a tea-detail explanation line; shelf lines untouched)
+— **B is engine work: draft the plan and pause before implementing**; close #26/#27 with pointer comments
+when it ships. Queued after: a timestamp-anchored timer slice for #30 (pause-gated, touches #13 territory;
+notification/push is ruled OUT — answer it on the issue); the #25 greeting fix batches the #17 revisit
+when it gets a slice. **Open lanes:** (1) **phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark
+(~Jul 20), note v3.85's brewStyle un-gate now feeds it real method data; (2) **Supabase allowlist cleanup**
 — drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins"). The
 **domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
 ("R2 capability regressions" — planned as #21, renumbered by GitHub) holds the reinstate-vs-accept

@@ -20,7 +20,7 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const repo=path.resolve(__dirname,'..');
-const src=['steep-knowledge.js','steep-core.js','steep-teas.js'].map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
+const src=['steep-knowledge.js','steep-core.js','steep-teas.js','steep-sessions.js'].map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n'); // steep-sessions since v3.85: section H pins the #29 commit path
 const ctx={}; ctx.window=ctx; ctx.globalThis=ctx; ctx.console=console;
 ctx.document={documentElement:{setAttribute(){},getAttribute(){return 'light';}},getElementById(){return null;},querySelectorAll(){return[];},createElement(){return{style:{},setAttribute(){},appendChild(){},classList:{add(){}}};}};
 ctx.localStorage={getItem(){return null;},setItem(){},removeItem(){}}; ctx.matchMedia=()=>({matches:false}); ctx.navigator={onLine:true};
@@ -157,6 +157,38 @@ if(fs.existsSync(sPath) && fs.existsSync(stPath)){
 } else {
   console.log('  G real data: SKIPPED (sessions_rows.csv / steeps_rows.csv not present)');
 }
+
+// ---- 8. #29 (v3.85) — the free-word commit path the Enter/blur wiring calls ----
+// Pins the pure half of the fix: addTag routing/dedupe, addTagFromInput trim+lowercase+clear, the
+// refocus discipline (blur path must not steal focus back), and the suggest markup's mousedown
+// binding (a tap must not blur-commit the half-typed word first). The DOM focus/blur events
+// themselves are browser-verified at deploy time, not vm-verified — this harness has no real DOM.
+vm.runInContext('render=function(){}; persistTag=function(){}; state.sessionDraft={curSteepTags:[],sessionTags:[]}; state.tagLibrary=[];',ctx);
+const fakeInp={value:''}, fakeBox={innerHTML:''};
+ctx.document.getElementById=id=>id==='tagInputField'?fakeInp:(id==='tagSuggestBox'?fakeBox:null);
+let refocusTimers=0; ctx.setTimeout=()=>{refocusTimers++;};
+vm.runInContext('addTag("caramel","steep")',ctx);
+ok(vm.runInContext('state.sessionDraft.curSteepTags.join()',ctx)==='caramel', 'H1 addTag routes a steep word to curSteepTags');
+vm.runInContext('addTag("caramel","steep")',ctx);
+ok(vm.runInContext('state.sessionDraft.curSteepTags.length',ctx)===1, 'H2 duplicate add is a no-op');
+fakeInp.value='  ChocoLate '; fakeBox.innerHTML='stale';
+vm.runInContext('addTagFromInput("steep", false)',ctx);
+ok(vm.runInContext('state.sessionDraft.curSteepTags.includes("chocolate")',ctx)===true, 'H3 input commit trims + lowercases');
+ok(fakeInp.value==='' && fakeBox.innerHTML==='', 'H4 commit clears the field and the suggest box');
+const t0=refocusTimers; fakeInp.value='   ';
+vm.runInContext('addTagFromInput("steep", false)',ctx);
+ok(vm.runInContext('state.sessionDraft.curSteepTags.length',ctx)===2 && refocusTimers===t0, 'H5 whitespace-only input is a no-op');
+fakeInp.value='malty';
+vm.runInContext('addTagFromInput("steep", false)',ctx);
+ok(refocusTimers===t0, 'H6 blur path (refocus=false) never schedules a refocus');
+fakeInp.value='honeyed';
+vm.runInContext('addTagFromInput("steep")',ctx);
+ok(refocusTimers===t0+1, 'H7 Enter path keeps the type-another refocus');
+vm.runInContext('addTag("evening","session")',ctx);
+ok(vm.runInContext('state.sessionDraft.sessionTags.join()',ctx)==='evening' && vm.runInContext('state.sessionDraft.curSteepTags.includes("evening")',ctx)===false, 'H8 session target routes to sessionTags, not the steep list');
+vm.runInContext('state.tagLibrary=["caramel","malty","candied"]; renderTagSuggest("ca","steep");',ctx);
+ok(/onmousedown="event\.preventDefault\(\);pickTagSuggest\(/.test(fakeBox.innerHTML) && fakeBox.innerHTML.indexOf('onclick=')<0, 'H9 suggestion picks bind mousedown+preventDefault, never onclick');
+console.log('  H #29 commit path: 9 checks');
 
 if(failures){ console.log('\n'+failures+' FLAVOR-LADDER TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL FLAVOR-LADDER TESTS PASSED  ('+passed+' passed)');
