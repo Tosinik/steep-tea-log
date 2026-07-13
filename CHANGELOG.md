@@ -33,6 +33,25 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## tooling — the audit and the inbox get names
+Deploy: `.gitignore`, `.claude/agents/verifier.md`, `.claude/agents/issue-triage.md`,
+`.claude/skills/five-lens-audit/SKILL.md`, `steep-core.js` (one comment reworded), `CHANGELOG.md`.
+No behavior change, no SQL, no cache/APP_VERSION bump.
+- **`.claude/agents/` ships with the repo** (new `!.claude/agents/` gitignore exception) — the
+  `verifier` deploy-gate subagent existed only on this machine; sessions are disposable, knowledge
+  lives in files, same rule the skills already follow.
+- **New skill `/five-lens-audit`** — formalizes the 2026-07-13 pre-v3.83 audit (capability
+  regressions · stale copy · seam consistency · doc debt · known-nuance register). Human-invoked
+  (`disable-model-invocation: true`), read-only, findings report only — fixes always ship in their
+  own reviewed slice.
+- **New subagent `issue-triage`** (Sonnet, read-only) — pulls the open GitHub inbox incl. comments
+  and screenshot attachments, buckets each issue (engine-touching / copy-or-UI-only /
+  R3-design-gated / question-for-Niklas), and flags plan-review-pause + fixture implications.
+  Report only — labels, comments, and closes stay human.
+- **`steep-core.js` WS3 comment de-glyphed** — the favourite-mark comment (line 802) spelled the
+  literal heart/star glyphs it replaced; now says it in words, so the codepoint sweep stays strict
+  with no allowlist growth. Comment-only: behavior identical, cached copies stay valid.
+
 ## v3.84 — #23 F1: sort your shelf again
 Deploy: `steep-teas.js` (count row + `SORT_OPTS` select + the float branch in `teaShelfHTML` + reinstated `setTeaSort` caller), `styles.css` (`.lib-countrow`/`.lib-sort`/`.lib-sort-caret`), `steep-core.js` (APP_VERSION + WHATS_NEW), `service-worker.js` (**v94**), `.gitignore` (+`shelf-order-test.js`), `fixtures/shelf-order-test.js` (new committed guard), `STATE.md`. **No SQL.**
 The "ships now" slice of issue #23 (spec: `TASK-23-interim-sort.md`, repo root; plan-review pause held 2026-07-13). Interim = function now, R3 restyles.

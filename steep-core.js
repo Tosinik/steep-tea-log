@@ -799,7 +799,7 @@ function steepLogoSVG(px){
 // stroke-width via the .hl CSS rule (bumped on dark). Pass the full symbol id (e.g. 'i-settings-hl',
 // 'fav-leaf'); optional size (px) and extra class.
 function icon(id, px, cls){ const s = px||21; return `<svg class="hl${cls?' '+cls:''}" viewBox="0 0 24 24" width="${s}" height="${s}" aria-hidden="true"><use href="#${id}"/></svg>`; }
-// WS3: the tea-leaf favourite mark (jade), replacing ♥/★ everywhere favourites show.
+// WS3: the tea-leaf favourite mark (jade), replacing the heart/star glyphs everywhere favourites show.
 function favLeaf(px){ return icon('fav-leaf', px||16, 'i-fav'); }
 function render(){
   const app = document.getElementById('app');

@@ -13,9 +13,11 @@ fixtures/*
 !fixtures/log-guard-test.js
 !fixtures/shelf-order-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
-# committed project skills under .claude/skills/ are tracked so they ship with the repo.
+# committed project skills under .claude/skills/ and subagent definitions under
+# .claude/agents/ are tracked so they ship with the repo.
 .claude/*
 !.claude/skills/
+!.claude/agents/
 # Design-reference bundles (READMEs + .dc.html + PNGs) live local-only, never shipped.
 SlowCup R2 bundle handoff/
 design-r3/
