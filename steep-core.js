@@ -1,9 +1,9 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.85';
+const APP_VERSION = 'v3.86';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-const WHATS_NEW = 'The liters stat honours your session\'s water amount, and a typed flavour word is never lost.';
+const WHATS_NEW = 'An emptied tea now reads empty on your shelf, and an untracked one says so instead of pretending to be full.';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){

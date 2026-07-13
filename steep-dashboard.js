@@ -934,6 +934,8 @@ function dashCardsHome(s){
 
   // v3.82: membership back to LOW-only (restockCandidate, steep-teas.js) — v3.81's {low,few}
   // put "a few cups" rows under a "Running low" headline beside a ~months forecast.
+  // v3.86 (#26 B): empty favourites/rebuys join; their cell reads "empty" — a "0.0g" would claim
+  // a precision the drained tin doesn't need. The grams sort floats them to the top for free.
   const restock = state.teas.filter(restockCandidate)
     .sort((a,b)=>Number(a.amountGrams)-Number(b.amountGrams));
   const restockHTML = restock.length ? `
@@ -944,7 +946,7 @@ function dashCardsHome(s){
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
         return `<div class="rank-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="cursor:pointer;">
           <span class="rname" style="display:flex;align-items:center;gap:9px;">${favLeaf(15)}${escapeHtml(t.name)}</span>
-          <span class="rval mono" style="color:var(--clay);font-size:13px;">${g.toFixed(1)}g${est}</span>
+          <span class="rval mono" style="color:var(--clay);font-size:13px;">${isTeaFinished(t)?'empty':`${g.toFixed(1)}g${est}`}</span>
         </div>`;
       }).join('')}
     </div>` : '';

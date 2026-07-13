@@ -132,7 +132,26 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 **phase-2 gate** (~Jul 20) → phase-2 brew-advice build (wants WS1's method control + WS4's tags in
 place first). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.84 #23 F1: sort your shelf again** (cache **v94**, APP_VERSION v3.84): the
+**NOW (just shipped) — v3.86 #26 + #27: empty says so, unknown stays unknown** (cache **v96**,
+APP_VERSION v3.86): the stock-tier slice. `stockTier` splits 0g by evidence — **`empty`** (tracked +
+drained, `isTeaFinished`) vs **`untracked`** (bare 0g = unknown; v3.40 rule holds, unknown ≠ empty);
+`statusLine` is now total (`empty` / `quantity not tracked`, both ink-soft, **no gram prefix** — the old
+"0g · fresh, plenty" lie is dead). **#26 A:** count row gains a fourth "· E empty" segment (E>0 only;
+untracked counts in no stock segment, so segments don't sum to N — by design). **#26 B (engine):**
+`restockCandidate` widens to tier ∈ {low, empty} — `'few'` still excluded (v3.82 stands), `'untracked'`
+excluded by construction; the Home card cell reads "empty", grams-asc sort floats empties top. **Q1 ruled:**
+cards + rows render finished teas *through* `statusLine` (hardcoded "finished" spans gone) — one writer, one
+word; "Finished" section header stays as the grouping title. **Q2 ruled:** Home card keeps "Running low",
+judged on phone; pre-batched fallback = retitle "Worth restocking" **this same deploy** if it reads wrong
+above "empty" rows. **#27 D+F:** DESIGN.md accepted-nuance entry (tier is cups, not grams) + a tea-detail
+ledger line "≈ 4.6 cups at your usual 5g" (Q3 precise form; real dose history only; **shelf lines
+untouched**). New `status-line-test.js` section I (12; 75 total); all 11 committed suites green.
+Browser-verified at 390px both themes (seeded state, auth-less). **No SQL. Close #26/#27 with pointer
+comments.** **Deployed via `/slowcup-deploy` (first real run of the skill).** Next: phase-2 after the
+~Jul 20 gate; the Q2 title judgment + post-ship screenshots (unblock Design's R3 base) ride Niklas's
+phone check.
+
+**Earlier — v3.84 #23 F1: sort your shelf again** (cache **v94**, APP_VERSION v3.84): the
 "ships now" slice of #23 per `TASK-23-interim-sort.md` (repo root; plan-review pause held). **All seven
 sorts return** as a compact styled select on the count row — engine keys untouched, handler = the
 **reinstated `setTeaSort`** (held from the F11 cleanup as this exact hook), `selected` re-derived per

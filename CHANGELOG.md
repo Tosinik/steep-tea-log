@@ -33,6 +33,42 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v3.86 — #26 + #27: empty says so, unknown stays unknown
+Deploy: `steep-teas.js` (`stockTier` 0g split · `statusLine` empty/untracked branches · count-row empty segment · tea-detail cups line · cards/rows unify through statusLine), `steep-dashboard.js` (restock card renders `empty` cell), `steep-core.js` (APP_VERSION + WHATS_NEW), `service-worker.js` (**v96**), `DESIGN.md` (accepted-nuance entry), `fixtures/status-line-test.js` (section I + H relabel), `STATE.md`, `ROADMAP-v4.md`. **No SQL.**
+- **#26 — empty is now a first-class state.** `stockTier` split the old catch-all `'out'` (any ≤0g) into
+  **`'empty'`** (tracked and drained — `isTeaFinished`) vs **`'untracked'`** (bare 0g, the DB default, where
+  quantity was simply never entered). The v3.40 rule stands: unknown ≠ empty. Nothing else referenced `'out'`
+  (`isRunningLow`/`shelfSort`/Low chip/shopping untouched), so the split is contained.
+- **#26 C — `statusLine` stops lying.** It never handled ≤0g, so an active untracked tea fell through to
+  "0g · fresh, plenty". Two new branches, both **without a gram prefix** (a "0g ·" would restate the number
+  that's in doubt): `empty` → "empty", `untracked` → "quantity not tracked". Both ink-soft — information, not
+  urgency; clay stays low's alone. The function is now total.
+- **#26 A — empty joins the tally.** The Library count row gains a fourth segment
+  ("N teas · M in stock · K running low · E empty", rendered only when E>0). Untracked teas count in none of
+  the stock segments — so segments deliberately don't sum to N; unknown isn't tallied as anything.
+- **#26 B — restock card widens to low-or-empty.** `restockCandidate` = (favourite ‖ would-rebuy) ∧
+  (tier ∈ {low, empty}). A drained favourite is exactly what a restock surface is for. The v3.82 correction
+  **stands** — `'few'` still never earns the card — and `'untracked'` can never reach it by construction. On the
+  Home card an empty tea's cell reads "empty" (not "0.0g"); the existing grams-ascending sort floats empties top.
+  **Judgment call (Q1, ruled):** cards and rows now render finished teas *through* `statusLine` — the hardcoded
+  "finished" spans are gone. One writer, one word ("empty") across shelf, tally, and Home card; the "Finished"
+  section header stays as the grouping title (it names the section, not the stock state).
+  **Judgment call (Q2, ruled):** the Home card keeps its "Running low" title, judged on-device per the v3.81
+  precedent; if it reads wrong above rows that say "empty", the pre-batched fallback is to retitle
+  "Worth restocking" in this same deploy — no extra round-trip.
+- **#27 D + F — the cups-not-grams nuance, explained where curiosity goes.** The tier is session-aware
+  (cups = on-hand ÷ this tea's own average logged dose), so 19g at a ~3g dose honestly reads "plenty" (6.3 cups)
+  while 23g at a 5g dose reads "a few cups left" (4.6) — the reporter's exact pair. Recorded in DESIGN.md's
+  accepted-nuances register. A single quiet line now sits under tea-detail "On hand" — **"≈ 4.6 cups at your
+  usual 5g"** (precise, ledger register, Q3 ruling) — rendering only with real dose history. **No shelf change:
+  shelf lines stay dose-free.**
+- **Fixtures:** `status-line-test.js` section I (12 checks — the 0g split by evidence, exact strings with no
+  gram prefix, the "0g · fresh, plenty" bug pinned dead, card membership both directions, unknown-≠-empty by
+  construction, both new tones ink-soft). H relabelled: its bare-0g favourite (H7) was always *untracked*, so
+  the LOW-only pin survives B unchanged — the comment now says low-or-empty. 75 checks total; all 11 committed
+  suites green.
+
+---
 ## v3.85 — #24 + #29: the water counts, the word keeps
 Deploy: `steep-sessions.js` (commitSession un-gates + edit-modal Water(ml) + tag-commit path + `enterkeyhint`), `steep-dashboard.js` (`gridStats` liters), `steep-core.js` (bindDynamic onblur, APP_VERSION + WHATS_NEW), `service-worker.js` (**v95**), `fixtures/stat-period-test.js` (new G section), `fixtures/flavor-ladder-test.js` (new H section + steep-sessions.js joins its sandbox), `STATE.md`. **No SQL.**
 - **#24, two stacked bugs.** (a) The always-visible Water(ml) field (WS1 moved it out of the ratio-gated

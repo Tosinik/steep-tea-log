@@ -92,6 +92,10 @@ inline two-step confirm replacing all browser popups; sparklines/heatmap for tin
 - **Oolong roast level is untracked** — there is no roast field, so the shelf status line can't
   tell a heavy-roast oolong (which keeps like a white) from a jade one; both read "plenty"
   (the WS5 oolong-reads-"plenty" call). A roast field is a data-model decision, not a copy fix.
+- **Stock tier is cups, not grams** (#27, recorded v3.86) — cups left = on-hand ÷ this tea's own
+  average logged dose, so 19g at a ~3g dose honestly reads "plenty" (6.3 cups) while 23g at a 5g
+  dose reads "a few cups left" (4.6). Deliberate. The explaining line ("≈ 4.6 cups at your usual
+  5g") lives on tea detail — the ledger surface — never on the shelf.
 
 ## Layout & platform
 Mobile-first PWA (~380–430px is the real viewport; used one-handed with wet hands). Single

@@ -39,7 +39,9 @@ function cupsLeft(tea){
 // one-big-gongfu-session outlier, and five cups on the shelf IS plenty in a calm app).
 function stockTier(tea){
   const amt = Number(tea.amountGrams)||0;
-  if(amt<=0) return 'out';
+  // 0g splits by evidence (v3.86 #26): tracked-and-drained = 'empty', bare 0 = 'untracked' —
+  // the DB defaults amount_grams to 0, so 0 alone is ambiguous (v3.40 rule: unknown ≠ empty).
+  if(amt<=0) return isTeaFinished(tea) ? 'empty' : 'untracked';
   const cups = cupsLeft(tea);
   if(cups!=null) return cups<2 ? 'low' : (cups<5 ? 'few' : 'plenty');
   return amt<lowStockG() ? 'low' : 'plenty';
@@ -48,6 +50,9 @@ function statusLine(tea){
   const amt = Number(tea.amountGrams)||0;
   const g = fmtStockG(amt);
   const tier = stockTier(tea);
+  // neither 0g branch carries a gram prefix — "0g · …" would state as fact the number that's in doubt.
+  if(tier==='empty') return { text:'empty', tone:'empty' };
+  if(tier==='untracked') return { text:'quantity not tracked', tone:'untracked' };
   if(tier==='low') return { text:`${g} · running low`, tone:'low' };
   // quantity wins while remarkable: 'few' outranks ages + the freshness countdown — an
   // "ages well" or "best within N wks" on a nearly-empty tin hides the #18 lie.
@@ -66,16 +71,17 @@ function statusLine(tea){
   }
   return { text:`${g} · plenty`, tone:'plenty' };
 }
-const STATUS_TONE_COLOR = { low:'var(--clay)', few:'var(--ink-soft)', freshness:'var(--ink-soft)', plenty:'var(--jade)', ages:'var(--jade)' };
+const STATUS_TONE_COLOR = { low:'var(--clay)', few:'var(--ink-soft)', freshness:'var(--ink-soft)', plenty:'var(--jade)', ages:'var(--jade)', empty:'var(--ink-soft)', untracked:'var(--ink-soft)' };
 // running-low teas float to the top of the shelf in any density/filter (WS5 rule) — but only
 // under the DEFAULT 'type' sort since v3.84 (#23 F1): an explicit sort keeps the engine's order.
 // THE low predicate — every surface ("Low" chip, header count, cost card, restock pulls)
 // derives from it so no two surfaces can disagree (#13 bug class). 'few' gets NO sort effect.
 function isRunningLow(tea){ return stockTier(tea)==='low'; }
-// Home "Running low" card membership (v3.82, #18 correction): LOW only — a 'few' tea beside a
-// ~months forecast puts the cups clock and the days clock under one headline; few's home is the
-// shelf status line. Favourites & rebuys scope unchanged.
-function restockCandidate(tea){ return !!(tea.isFavorite||tea.wouldRebuy) && stockTier(tea)==='low'; }
+// Home "Running low" card membership (v3.82, #18 correction): 'few' never earns the card — a 'few'
+// tea beside a ~months forecast puts the cups clock and the days clock under one headline; few's
+// home is the shelf status line. v3.86 (#26 B): 'empty' joins 'low' — a drained favourite/rebuy is
+// what a restock surface is for; 'untracked' never qualifies (unknown ≠ empty, by construction).
+function restockCandidate(tea){ const tier=stockTier(tea); return !!(tea.isFavorite||tea.wouldRebuy) && (tier==='low'||tier==='empty'); }
 function shelfSort(list){ return [...list].sort((a,b)=> (isRunningLow(b)?1:0)-(isRunningLow(a)?1:0)); }
 
 // Photo area (grid ~100px / row 50px): the user's image, else a type-tinted stripe, else a kanji
@@ -109,7 +115,7 @@ function teaCardHTML(t){
     <div class="shelf-photo-wrap">${shelfPhoto(t,'photo')}${shelfPill(t)}${fav}</div>
     <div class="shelf-cbody">
       <div class="shelf-name">${escapeHtml(t.name)}</div>
-      ${fin ? '<span class="shelf-status" style="color:var(--ink-soft)">finished</span>' : statusLineHTML(t)}
+      ${statusLineHTML(t)}
       ${rebuy}
     </div>
   </div>`;
@@ -121,7 +127,7 @@ function shelfRowHTML(t){
     ${shelfPhoto(t,'thumb')}
     <div class="shelf-row-mid">
       <div class="shelf-name">${escapeHtml(t.name)}</div>
-      <div class="shelf-row-meta">${shelfPill(t)}${fin ? '<span class="shelf-status" style="color:var(--ink-soft)">finished</span>' : statusLineHTML(t)}</div>
+      <div class="shelf-row-meta">${shelfPill(t)}${statusLineHTML(t)}</div>
     </div>
     <span class="shelf-caret">${icon('i-caret-hl',20)}</span>
   </div>`;
@@ -215,6 +221,8 @@ function viewTeas(){
   const density = teaDensity();
   // running-low count for the header line (WS5; tier-aware since #18).
   const lowCount = state.teas.filter(t=>isRunningLow(t)).length;
+  // #26 A: empty joins the tallies — isTeaFinished, so untracked 0g never counts as empty.
+  const emptyCount = state.teas.filter(t=>isTeaFinished(t)).length;
   // Filter chips: All · <types you own, in canonical order> · Low · Favs. Cleaner than the old
   // sort/vendor dropdowns (those are dropped from the shelf; vendor rename stays under "Edit vendors").
   const typesPresent = [...new Set(state.teas.map(t=>(t.type||'').toLowerCase()).filter(Boolean))].sort((a,b)=>typeRank(a)-typeRank(b));
@@ -256,7 +264,7 @@ function viewTeas(){
       </div>
     </div>
     <div class="lib-countrow">
-      <div class="mono lib-count">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${lowCount?` · <span style="color:var(--clay);">${lowCount} running low</span>`:''}</div>
+      <div class="mono lib-count">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${lowCount?` · <span style="color:var(--clay);">${lowCount} running low</span>`:''}${emptyCount?` · ${emptyCount} empty`:''}</div>
       ${sortSelect}
     </div>
     ${chips}
@@ -647,6 +655,9 @@ function viewTeaDetail(){
   const _cpg = t.costOriginalGrams ? (t.costTotal/t.costOriginalGrams) : 0;
   const _avgG = mySessions.length ? mySessions.reduce((a,s)=>a+(Number(s.gramsUsed)||0),0)/mySessions.length : 0;
   const costPerSession = (_cpg>0 && _avgG>0) ? _cpg*_avgG : 0;
+  // #27 F: the tier is cups, not grams — the honest math lives here (ledger surface), never on the shelf.
+  const _cups = cupsLeft(t), _dose = teaAvgDose(t), _f1 = v => String(Math.round(v*10)/10);
+  const cupsLine = (_cups!=null && _dose) ? `<div class="mono" style="font-size:12px;color:var(--ink-soft);">≈ ${_f1(_cups)} cup${_f1(_cups)==='1'?'':'s'} at your usual ${_f1(_dose)}g</div>` : '';
   const histHTML = mySessions.length ? mySessions.map(s=>{
     const v = vesselById(s.vesselId);
     return `<div class="session-hist-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
@@ -674,6 +685,7 @@ function viewTeaDetail(){
           ${renderStarsStatic(Number(t.rating)||0,true)}
           <div class="eyebrow" style="margin-top:8px;">On hand</div>
           <div style="font-size:14px;${isRunningLow(t)?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
+          ${cupsLine}
           ${forecastLine(t)}
           ${inventorySparkline(t) || sparklineHintHTML(t)}
         </div>

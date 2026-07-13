@@ -7,8 +7,11 @@
  * #18 (v3.81) added session-aware tiers — cups left = amount ÷ avg logged dose, gram floor only
  * without history. Sections A–E run with state.sessions=[] (floor fallback → unchanged); F/G seed
  * sessions explicitly and pin the tier boundaries, precedence, and the issue's own 12g case.
- * v3.82 adds H: the Home "Running low" card membership (restockCandidate) is pinned LOW-only —
- * 'few' informs on the shelf but never earns the nudge card.
+ * v3.82 adds H: the Home "Running low" card membership (restockCandidate) — 'few' informs on
+ * the shelf but never earns the nudge card.
+ * v3.86 (#26/#27) splits the 0g tier by evidence — 'empty' (tracked, drained) vs 'untracked'
+ * (bare 0 = unknown, never plenty/empty) — and widens restockCandidate to low-or-empty
+ * ('few' still never qualifies). Section I pins the split; H relabelled accordingly.
  *
  * Run: node fixtures/status-line-test.js   (exit non-zero on any failure)
  */
@@ -164,9 +167,10 @@ if(haveCSV && fs.existsSync(sessCsvPath)){
   console.log('  G #18 tiers (real data): SKIPPED, 4 checks not run (need teas_rows.csv + sessions_rows.csv)');
 }
 
-// ---- 8. v3.82 Home "Running low" card membership — restockCandidate is LOW-only ----
+// ---- 8. v3.82 Home "Running low" card membership — 'few' never earns the card ----
 // The #18 correction: 23g at a 5g dose = 4.6 cups ('few') sat under the "Running low" headline
-// beside a ~6-month forecast — two clocks disagreeing under one title. Only 'low' earns the card.
+// beside a ~6-month forecast — two clocks disagreeing under one title. Only 'low' (and, since
+// v3.86 #26 B, 'empty') earns the card.
 const RC=t=>ctx.restockCandidate(t);
 seed([dose('h-dawang',5), dose('h-low',5), dose('h-plain',5), dose('h-rebuy',5), dose('h-plenty',5)]);
 ok(RC({id:'h-low',type:'oolong',amountGrams:9,isFavorite:true})===true, 'H1 favourite at 1.8 cups (low) → on the card');
@@ -175,9 +179,30 @@ ok(ctx.stockTier({id:'h-dawang',amountGrams:23})==='few', 'H3 …while the shelf
 ok(RC({id:'h-plain',type:'oolong',amountGrams:9})===false, 'H4 low but neither favourite nor rebuy → out of scope');
 ok(RC({id:'h-rebuy',type:'oolong',amountGrams:9,wouldRebuy:true})===true, 'H5 would-rebuy at low → on the card');
 ok(RC({id:'h-plenty',type:'oolong',amountGrams:40,isFavorite:true})===false, 'H6 favourite with plenty → no nudge');
-ok(RC({id:'h-out',type:'oolong',amountGrams:0,isFavorite:true})===false, 'H7 finished favourite (tier out) → no nudge');
+// h-out has no seeded session and no cost evidence — it is UNTRACKED, not finished (v3.40 rule),
+// so it stays off the card even after v3.86 widened membership to low-or-empty.
+ok(RC({id:'h-out',type:'oolong',amountGrams:0,isFavorite:true})===false, 'H7 bare-0g favourite is untracked (unknown ≠ empty) → no nudge');
 seed([]);
 console.log('  H v3.82 restock-card membership: 7 checks');
+
+// ---- 9. v3.86 (#26) the 0g split: empty vs untracked, and empty joins the card ----
+seed([dose('i-fin-s',5)]);
+const iUnk={id:'i-unk',type:'green',amountGrams:0};
+ok(ctx.stockTier(iUnk)==='untracked', 'I1 bare 0g, no evidence → tier untracked');
+ok(S(iUnk).text==='quantity not tracked' && S(iUnk).tone==='untracked', 'I2 untracked statusLine: exact string, no gram prefix');
+ok(!/plenty|fresh|empty|0g/.test(S(iUnk).text), 'I3 untracked never reads plenty/fresh/empty/0g (the "0g · fresh, plenty" bug)');
+const iCost={id:'i-cost',type:'oolong',amountGrams:0,costOriginalGrams:50};
+ok(ctx.stockTier(iCost)==='empty', 'I4 0g + purchase evidence → tier empty');
+ok(S(iCost).text==='empty' && S(iCost).tone==='empty', 'I5 empty statusLine: the one word, no gram prefix');
+ok(ctx.stockTier({id:'i-fin-s',type:'black',amountGrams:0})==='empty', 'I6 0g + a gramsUsed session → empty (usage is evidence too)');
+ok(RC(Object.assign({},iCost,{isFavorite:true}))===true, 'I7 empty favourite → on the card (#26 B)');
+ok(RC(Object.assign({},iCost,{wouldRebuy:true}))===true, 'I8 empty would-rebuy → on the card');
+ok(RC(iCost)===false, 'I9 empty but neither favourite nor rebuy → off (scope unchanged)');
+ok(RC(Object.assign({},iUnk,{isFavorite:true}))===false, 'I10 untracked favourite → off (unknown ≠ empty, by construction)');
+ok(ctx.isRunningLow(iCost)===false, 'I11 empty is not "running low" — Low chip/float stay tier-low only');
+ok(vm.runInContext('STATUS_TONE_COLOR.empty',ctx)==='var(--ink-soft)' && vm.runInContext('STATUS_TONE_COLOR.untracked',ctx)==='var(--ink-soft)', 'I12 both new tones are ink-soft (information, not urgency)');
+seed([]);
+console.log('  I v3.86 empty/untracked split: 12 checks');
 
 if(failures){ console.log('\n'+failures+' STATUS-LINE TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL STATUS-LINE TESTS PASSED  ('+passed+' passed)');
