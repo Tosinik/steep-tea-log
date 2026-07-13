@@ -33,6 +33,14 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v3.84 — #23 F1: sort your shelf again
+Deploy: `steep-teas.js` (count row + `SORT_OPTS` select + the float branch in `teaShelfHTML` + reinstated `setTeaSort` caller), `styles.css` (`.lib-countrow`/`.lib-sort`/`.lib-sort-caret`), `steep-core.js` (APP_VERSION + WHATS_NEW), `service-worker.js` (**v94**), `.gitignore` (+`shelf-order-test.js`), `fixtures/shelf-order-test.js` (new committed guard), `STATE.md`. **No SQL.**
+The "ships now" slice of issue #23 (spec: `TASK-23-interim-sort.md`, repo root; plan-review pause held 2026-07-13). Interim = function now, R3 restyles.
+- **All seven sorts return** — Type (default) · Recently added · Oldest first · Name A–Z · Most stock · Least stock · Highest rated — as one compact styled `appearance:none` select on the count row, mapping 1:1 onto the untouched engine keys in `filteredSortedTeas`. The handler is the **reinstated `setTeaSort`** (held from the F11 cleanup exactly for this); no parallel writer. `selected` re-derives from `state.teaSort` every render, so a mid-session `render()` can't snap the visible label back to "Type" while the order stays sorted. **Session-scoped** (resets on reload) — persistence is an R3 question.
+- **The float branch (the reviewed behavior change):** the WS5 running-low float now decorates **only the default Type sort** — under an explicit sort it would silently reorder the user's chosen order, so `teaShelfHTML` applies `shelfSort` only when `teaSort==='type'`. Finished teas group at the bottom under **all** sorts (the split is upstream of the branch). The select lives outside `#teaShelf`, so #19's keystroke-only search re-render never touches it.
+- **F3 rider (named, not drive-by):** the count line's **"M in stock" segment is restored** — "N teas · M in stock · K running low" — closing audit F3 alongside F1. The row is flex with `flex-wrap`: if 390px gets tight the select **wraps below the count text**; the count segments never truncate.
+- New committed **`fixtures/shelf-order-test.js`** (19 checks, 11th suite): the default-sort float + its stability over type-then-name, the no-float pin under every explicit key (incl. the low-3★-below-plenty-5★ case verbatim), finished-bottom under default AND explicit sorts, the v3.40 lifecycle pins stated definitionally (bare 0 g = unknown ≠ empty → active; purchase-evidence + 0 g → finished; untracked → 0 → stock-low head), grid≡rows order agreement, and a real-CSV section (every key over the real shelf, stock-sort monotonicity, low-set float) that skips with a reported count when the CSVs are absent. `node --check` clean; **all 11 committed suites green**.
+
 ## docs — slowcup.app is the canonical URL
 Deploy: `STATE.md`, `CLAUDE.md`, `ROADMAP-v4.md`, `CHANGELOG.md`. No app change, no SQL, no
 cache/APP_VERSION bump.

@@ -96,12 +96,10 @@ longer need a manual hard reload (dev still should, to verify). The SW waits for
 
 ## Continue here
 **The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16 →
-v3.83 audit riders (**all SHIPPED**, below). **Open lanes:** (1) **v3.84 interim Library sort** — the
-brief is now in the repo root (**`TASK-23-interim-sort.md`**, decisions settled); **the plan-review
-pause before implementation is mandatory** (it touches shelf render + a behavior branch); (2)
-**phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20); (3) **Supabase allowlist
-cleanup** — drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins").
-The **domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
+v3.83 audit riders → v3.84 interim sort (**all SHIPPED**, below). **Open lanes:** (1) **phase-2
+(#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20); (2) **Supabase allowlist cleanup**
+— drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins"). The
+**domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
 ("R2 capability regressions" — planned as #21, renumbered by GitHub) holds the reinstate-vs-accept
 decisions (sorts full treatment, vendor filter, in-stock count, focus-mode log/reset, per-steep tag
 library); `setTeaSort`/`setTeaFilter`/`focusLogSteep` stay in the code as its reinstatement hooks. #14
@@ -127,7 +125,23 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 **phase-2 gate** (~Jul 20) → phase-2 brew-advice build (wants WS1's method control + WS4's tags in
 place first). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.83 audit riders: never lose a session to the Log button** (cache **v93**,
+**NOW (just shipped) — v3.84 #23 F1: sort your shelf again** (cache **v94**, APP_VERSION v3.84): the
+"ships now" slice of #23 per `TASK-23-interim-sort.md` (repo root; plan-review pause held). **All seven
+sorts return** as a compact styled select on the count row — engine keys untouched, handler = the
+**reinstated `setTeaSort`** (held from the F11 cleanup as this exact hook), `selected` re-derived per
+render, **session-scoped** (persistence = R3). **The reviewed branch:** the WS5 running-low float now
+applies **only under the default Type sort** (`teaShelfHTML`: explicit sort ⇒ engine order untouched);
+finished teas stay bottom-grouped under all sorts (split is upstream). **F3 rider shipped too**: the
+count line reads "N teas · M in stock · K running low" again; the row is flex-wrap so a tight 390px
+wraps the select below the count — segments never truncate. Select sits outside `#teaShelf` (search
+keystrokes can't touch it). New committed **`fixtures/shelf-order-test.js`** (19 checks, 11th suite:
+float-default-only pins per key, finished-bottom, v3.40 lifecycle definitional pins, grid≡rows, real-CSV
+with graceful skip). All 11 suites green; browser-verified (sort orders both densities, 390px fit,
+selected carry, sort×search/chips compose, both themes). **F1 + F3 ticked on #23** — remaining there:
+F2 vendor filter · F7 focus-mode actions · F8 per-steep library chips (reinstate-vs-accept, R3-gated).
+**No SQL.** Next: phase-2 after the ~Jul 20 gate.
+
+**Earlier — v3.83 audit riders: never lose a session to the Log button** (cache **v93**,
 APP_VERSION v3.83): the four riders from the 2026-07-13 post-R2 audit (findings doc reviewed claude.ai-side;
 the capability-regression bundle is **issue #23**). **F4 — the guard:** WS6's raised Log rendered during the
 session flow and `quickLogSession` silently overwrote the draft (finish-screen mis-tap ate rating/notes;

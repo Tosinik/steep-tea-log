@@ -67,7 +67,8 @@ function statusLine(tea){
   return { text:`${g} · plenty`, tone:'plenty' };
 }
 const STATUS_TONE_COLOR = { low:'var(--clay)', few:'var(--ink-soft)', freshness:'var(--ink-soft)', plenty:'var(--jade)', ages:'var(--jade)' };
-// running-low teas sort to the top of the shelf, in any density/filter (WS5 rule).
+// running-low teas float to the top of the shelf in any density/filter (WS5 rule) — but only
+// under the DEFAULT 'type' sort since v3.84 (#23 F1): an explicit sort keeps the engine's order.
 // THE low predicate — every surface ("Low" chip, header count, cost card, restock pulls)
 // derives from it so no two surfaces can disagree (#13 bug class). 'few' gets NO sort effect.
 function isRunningLow(tea){ return stockTier(tea)==='low'; }
@@ -230,6 +231,15 @@ function viewTeas(){
       <button class="density-seg ${density==='rows'?'active':''}" onclick="setTeaDensity('rows')" aria-label="List view">${icon('i-rows-hl',16)}</button>
       <button class="density-seg ${density==='grid'?'active':''}" onclick="setTeaDensity('grid')" aria-label="Grid view">${icon('i-grid-hl',16)}</button>
     </div>` : '';
+  // v3.84 (#23 F1): the 7 engine sorts return as one compact styled select on the count row —
+  // outside #teaShelf, so search keystrokes never touch it; `selected` re-derives from state.teaSort
+  // on every render, so a mid-session render() can't snap the label back to Type while the order
+  // stays sorted. Session-scoped on purpose (resets on reload); persistence is an R3 question.
+  const SORT_OPTS = [['type','Type'],['newest','Recently added'],['oldest','Oldest first'],['name','Name A–Z'],['stock-high','Most stock'],['stock-low','Least stock'],['rating','Highest rated']];
+  const sortSelect = state.teas.length ? `<div class="lib-sort">
+      <select onchange="setTeaSort(this.value)" aria-label="Sort teas">${SORT_OPTS.map(([k,l])=>`<option value="${k}" ${state.teaSort===k?'selected':''}>${l}</option>`).join('')}</select>
+      <span class="lib-sort-caret">${icon('i-caret-hl',14)}</span>
+    </div>` : '';
   // #19 quiet hairline search — sits below the chips (chips stay the primary WS5 control). The ✕ is
   // always in the DOM, hidden when empty, so onTeaSearchInput can toggle it without a full re-render.
   const searchRow = state.teas.length ? `
@@ -245,7 +255,10 @@ function viewTeas(){
         <button class="btn-add" onclick="openTeaForm()">${icon('i-plus-hl',14)} Add</button>
       </div>
     </div>
-    <div class="mono lib-count">${state.teas.length} tea${state.teas.length===1?'':'s'}${lowCount?` · <span style="color:var(--clay);">${lowCount} running low</span>`:''}</div>
+    <div class="lib-countrow">
+      <div class="mono lib-count">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${lowCount?` · <span style="color:var(--clay);">${lowCount} running low</span>`:''}</div>
+      ${sortSelect}
+    </div>
     ${chips}
     ${searchRow}
     ${state.vendorsOpen && vendors.length ? vendorManagerHTML() : ''}
@@ -257,8 +270,12 @@ function viewTeas(){
 function teaShelfHTML(){
   const density = teaDensity();
   const list = filteredSortedTeas();
-  const active = shelfSort(list.filter(t=>!isTeaFinished(t)));   // running-low sorts to the top (WS5)
-  const finished = list.filter(t=>isTeaFinished(t));            // finished teas group at the bottom
+  // v3.84 (#23 F1): the WS5 running-low float decorates ONLY the default type sort — under an
+  // explicit sort it would silently reorder the user's chosen order. Finished split is upstream
+  // of the branch, so finished teas group at the bottom in ALL sorts.
+  const actives = list.filter(t=>!isTeaFinished(t));
+  const active = state.teaSort==='type' ? shelfSort(actives) : actives;
+  const finished = list.filter(t=>isTeaFinished(t));
   const renderShelf = (teas) => density==='rows'
     ? `<div class="shelf-rows">${teas.map(shelfRowHTML).join('')}</div>`
     : `<div class="tea-grid">${teas.map(teaCardHTML).join('')}</div>`;

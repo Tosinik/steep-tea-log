@@ -141,6 +141,14 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
 .lib-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px;}
 .lib-head-actions{display:flex;align-items:center;gap:10px;}
 .lib-count{font-size:12px;color:var(--ink-soft);margin:0 0 11px;}
+/* v3.84 (#23 F1) count row: count left, compact sort select right. flex-wrap is the 390px
+   degradation — the select wraps BELOW the count text; the count segments never truncate. */
+.lib-countrow{display:flex;align-items:baseline;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin:0 0 11px;}
+.lib-countrow .lib-count{margin:0;}
+.lib-sort{position:relative;display:flex;align-items:center;flex:none;margin-left:auto;}
+.lib-sort select{appearance:none;-webkit-appearance:none;border:none;background:transparent;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);padding:0 19px 0 0;cursor:pointer;}
+.lib-sort select:focus{outline:none;color:var(--ink);}
+.lib-sort-caret{position:absolute;right:0;display:flex;color:var(--ink-soft);pointer-events:none;}
 .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px;}
 /* #19 Library search — quiet hairline; plain + functional (R3 restyles the header later) */
 .lib-search{position:relative;margin:0 0 13px;}
