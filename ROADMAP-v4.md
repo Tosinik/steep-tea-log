@@ -49,12 +49,13 @@ URL, manifest, SW scope — the once-only move) → reshoot 3 landing screenshot
 ## Pillar D — design round 2 (brief: DESIGN-SESSION-2-BRIEF.md) + follow-on builds
 Forms (setup + add tea) · Home + greeting · steeping screen (hero) · flavor experience · tea library
 cards · menu decision boards. Each workstream returns as its own versioned deploy.
-- **Flavor experience (Niklas 2026-07-10):** the infrastructure exists and is unloved — `steeps.tags` +
-  `sessions.tags` arrays in the schema, `KB_FLAVOR_CHIPS` (20 EN/DE quick-tap terms) + `KB_FLAVOR_AXES` in
-  the KB. Build: a "what are you tasting?" quick-tap moment (per steep, optional, one thumb) → per-session
-  summary → **tea-page flavor profile aggregated from the user's own sessions** (honest counts, "your last
-  6 sessions" framing). Design R2 owns the experience; data conventions: chips write into the existing tags
-  arrays with a `flavor:` namespace so free tags stay untouched.
+- **Flavor experience (Niklas 2026-07-10) — ✅ SHIPPED v3.78 (WS4).** The quick-tap capture → session
+  story → tea-page honesty ladder all landed (see the R2 batch section below). **Data convention AS
+  SHIPPED: bare + membership** — vocabulary = membership in `KB_FLAVOR_CHIPS`, free words stored bare in
+  the same tags arrays. This spec's original `flavor:` namespace idea was **rejected at the v3.78 pause —
+  do not reintroduce it** (zero migration, and brew-advice tag matching stays untouched). Known scope
+  edge, deliberate: quick and cold-brew sessions carry no steeps, so they never feed the tea-page
+  profile (choke point: `distinctVocab()`, steep-teas.js — see STATE.md).
 
 ## Pillar E — the smarter-over-time backlog (Theme 2, ship as data matures)
 Each with its data prerequisite — the point is they get better every season:

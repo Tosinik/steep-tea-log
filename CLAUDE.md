@@ -4,9 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Steep** — a personal tea-collection and brewing-session logging PWA. **Calm-first**:
-ritual over gamification; all achievements/XP/streak surfaces are gated behind toggles
-(Show-achievements + Quiet Mode). Vanilla JS (no framework, no bundler, no
+**SlowCup** (user-facing brand since v3.59; repo, files, and internal names keep "Steep") —
+a personal tea-collection and brewing-session logging PWA. **Calm-first**: ritual over
+gamification. Achievements/XP are dormant app-wide (`ACHIEVEMENTS_ENABLED = false` since
+v3.72 — the old Show-achievements/Quiet-Mode toggles are hidden while it's off); the one
+calendar surface that stayed, the Sessions "Brewing days" heatmap, is deliberately neutral
+(streak framing removed v3.83) and deliberately ungated. Vanilla JS (no framework, no bundler, no
 `package.json`), backed by Supabase (Postgres + RLS + Auth + Storage), served as a
 static site on GitHub Pages: https://tosinik.github.io/steep-tea-log/
 
@@ -130,8 +133,10 @@ data + core first, boot last). The modules and what each owns:
 - Feature modules each own their view + logic (settings, dashboard, teas, shopping,
   passport, social, sessions).
 - **steep-dashboard** / **steep-insights** — the two dashboard surfaces (Home / Insights
-  tabs), split v3.44. Home owns persona/heatmap-adjacent/cost/running-low/clock/recent/
-  totals/favorites; Insights owns recap/Wrapped/insights-reading/type-breakdown/most-brewed.
+  tabs), split v3.44. Since WS2 (v3.74) Home owns greeting/running-low/favourites/the week
+  number; Insights owns the reflective room (hero/cadence/type mix/steep shape/notes/Wrapped)
+  plus the relocated recent/totals/clock/cost cards. (Persona was removed v3.52; the recap
+  grid retired v3.65 — the raw six-stat grid lives on Insights with the v3.82 period lens.)
   Both render through the **shared editable-card registry** in steep-dashboard: `DASH_SURFACE`
   assigns each card id a *default* surface ('home'|'insights'), and `renderDashboard(cards, surface)`
   filters by **effective** surface per tab (reorder/hide work per-tab). Since v3.47 edit mode can
@@ -213,9 +218,10 @@ only the rendering gets replaced. See ROADMAP/STATE.
 - **No browser `confirm()` / `prompt()` / `alert()`** — use inline UI. Destructive actions use
   the shared **`armConfirm(btn, message, onYes)`** (steep-core.js): a two-step "message · Yes / Cancel"
   swapped in place of the button via DOM (no re-render, so unsaved fields survive; any later render
-  clears it). Notices use **`showToast(msg)`**. (v3.50 swept steep-sessions/steep-teas clean; a few
-  `alert()`/`confirm()` remain only in steep-settings (bulk import / photo-migrate) and the
-  offline-sync error notice in steep-core — don't add new ones.)
+  clears it). Notices use **`showToast(msg)`**. (The sweep is COMPLETE — zero browser popups
+  remain anywhere: v3.50 swept sessions/teas, v3.58 moved the import replace-all onto an inline
+  confirm row and photo-migrate onto `armConfirm`, v3.66 folded the last `socialErr` alert into
+  an inline notice. Don't add new ones.)
 - **Never strand existing user data behind a settings toggle.** A switch that hides a
   feature must not hide or orphan data the user already entered — data stays readable/
   editable regardless of the toggle state.
@@ -258,8 +264,9 @@ Live issues (see STATE.md / ROADMAP for the full backlog):
   `saveSessionEdit`. Note the deeper smell remains: stock is an accumulated
   read-modify-write on `amountGrams` rather than derived (`purchased − Σ gramsUsed`) — a
   future data-model change would make it idempotent by construction (see ROADMAP).
-- **In-session "turn off" link gives weird feedback** — investigate `d_setBrewMode('off')`
-  mid-session.
+- ~~**In-session "turn off" link gives weird feedback.**~~ **Fixed v3.68** (issue #1) — the
+  in-session link is now a reversible **"hide"** (`d_hideStrip`/`d_showStrip`); the old
+  `d_setBrewMode('off')` reset `timeShift` and never cleared the card.
 - ~~**Legacy `alert()`s in sessions.**~~ **Swept v3.50** — steep-sessions/steep-teas now use
   `armConfirm` (inline two-step) + `showToast`. Remaining `alert()`/`confirm()` live only in
   steep-settings (bulk import/photo-migrate) and steep-core's offline-sync error.

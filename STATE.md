@@ -6,20 +6,28 @@
 > terminology stays. Below, "Steep" in historical notes = the old brand; don't rewrite them.
 
 
-Seed a fresh chat with: this file + ROADMAP-v3-next.md + CHANGELOG.md + the current
+Seed a fresh chat with: this file + ROADMAP-v4.md + CHANGELOG.md + the current
 source files. That keeps each session cheap (a long thread re-reads everything every turn).
 
+## Feeding claude.ai (the review/spec side)
+The claude.ai project **re-clones the repo live each turn — never mirror source files into
+the project base**. The project base holds only: the **4 CSV exports** (teas/sessions/steeps/
+vessels — refresh them right before each phase-N spec, not continuously), **design images**
+(mock boards, R3 PNGs), and **task/continuity docs**. Everything else it reads from the repo.
+
 ## What it is
-Personal tea-logging PWA, **calm-first** (ritual over gamification; achievements/XP gated behind
-toggles). Private + small beta. Hosted on GitHub Pages: https://tosinik.github.io/steep-tea-log/
+Personal tea-logging PWA, **calm-first** (ritual over gamification; achievements/XP dormant
+app-wide via `ACHIEVEMENTS_ENABLED=false` since v3.72; the Sessions "Brewing days" heatmap is
+the one deliberately-kept calendar surface — neutral since v3.83, ungated on purpose).
+Private + small beta. Hosted on GitHub Pages: https://tosinik.github.io/steep-tea-log/
 
 ## Stack
 Vanilla JS (no framework) · Supabase (Postgres + RLS + Auth + Storage) · service-worker PWA · GitHub Pages.
 Supabase project: https://duuosbgjozjjfyfusjzf.supabase.co (anon key in project knowledge).
 
 ## Modules (index.html load order; boot last)
-steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard → steep-teas →
-steep-shopping → steep-passport → steep-social → steep-sessions → steep-boot.
+steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard → steep-insights →
+steep-teas → steep-shopping → steep-passport → steep-social → steep-sessions → steep-boot.
 - **steep-data**: Supabase client, loadKey/saveKey, mappers, per-row CRUD, offline write queue.
 - **steep-knowledge**: curated tea KB; `kbResolve(text)` → {style,type,leafForm,tempC,ratio,first,
   country}. Feeds inferLeafForm + tea-form prefill. Loads before core (no deps of its own).
@@ -49,11 +57,14 @@ schema.sql · v2_1-migration · v2_2-photos-storage · v3_0-social · v3_1-quick
 v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date · v3_6-leaf-form · v3_7-mood.
 
 ## Conventions / principles
-- Calm-first; achievements/XP behind Show-achievements + Quiet Mode toggles.
+- Calm-first; achievements/XP dormant app-wide (`ACHIEVEMENTS_ENABLED=false`, v3.72 — the old
+  toggles are hidden while it's off). The Sessions heatmap stays as a neutral "Brewing days"
+  calendar (streak framing removed v3.83), deliberately ungated.
 - **Escape all user text in rendered HTML** (v3.36): use `escapeHtml` (data values, incl. attribute
   values) and `escapeJsArg` (inline `onclick` string args) from steep-core. Never interpolate raw
   tea/vessel/session/profile/tag text into an innerHTML template. Escape the data, never the markup.
-- No browser confirm()/prompt() — inline UI (a couple of legacy alert()s remain in sessions; backlog).
+- No browser confirm()/prompt()/alert() — inline UI only (`armConfirm` + `showToast`). The
+  popup sweep is COMPLETE (v3.50 sessions/teas · v3.58 settings · v3.66 socialErr); don't add new ones.
 - Generated art is placeholder; **human art for any public release**.
 - Settings are synced; **theme is device-local** (`tealog_theme` in localStorage, not synced).
 - Offline: read-only offline, queued writes. Photos on offline sessions are deferred (re-add online).
@@ -65,11 +76,16 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
-**The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16
-(**all SHIPPED**, below) → **NEXT: phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20
-at current pace), so a natural pause may follow v3.82; that slot suits the **domain registration**
-(slowcup.app), the oldest open item on the board. #14 parked → R3; #11 closed; the held #15 vocab
-expansion stays out until phase-2. New bugs/ideas land as GitHub issues (the live inbox), not here.
+**The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16 →
+v3.83 audit riders (**all SHIPPED**, below). **Open lanes:** (1) the **interim Library sort** — ruled
+"ships now" at the 2026-07-13 review; its lane brief is still claude.ai-side and must be handed into the
+repo/Downloads before building; (2) **phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark
+(~Jul 20), the natural slot for the **domain registration** (slowcup.app), the oldest open item. **#23**
+("R2 capability regressions" — planned as #21, renumbered by GitHub) holds the reinstate-vs-accept
+decisions (sorts full treatment, vendor filter, in-stock count, focus-mode log/reset, per-steep tag
+library); `setTeaSort`/`setTeaFilter`/`focusLogSteep` stay in the code as its reinstatement hooks. #14
+parked → R3; the held #15 vocab expansion stays out until phase-2. New bugs/ideas land as GitHub issues
+(the live inbox), not here.
 
 **Historical — the Round-2 design pass is COMPLETE** (WS6 → WS2 → WS5 → WS3 → WS1 → WS4, shipped v3.73–v3.78;
 bundle at `SlowCup R2 bundle handoff/` in the repo root). WS4 was the only data-model change (semantic, not
@@ -80,15 +96,34 @@ the finish-screen inputs below it** (photo/rating/share not dropped). The R3 vis
 is the next design round, not yet scheduled.
 
 **Design Round 3 material stored:** `design-r3/` (gitignored) holds `DESIGN-R3-INSPIRATION.md` + a copy of
-`R2-STATUS.md` + `images/` (with a README — Niklas still needs to drop the 5 board PNGs there; Code can't write
-pasted-in images to disk). R3 is the post-batch visual level-up; two directions captured (warm atelier vs
-saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land.
+`R2-STATUS.md` + `images/` (with a README). **The 5 R3 board PNGs go to the claude.ai project base, not the
+repo `images/` folder** (corrected 2026-07-13 — the project re-clones the repo live; images belong in the
+project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-up; two directions captured
+(warm atelier vs saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land.
 
 **Parallel / Niklas's:** the **domain** (register slowcup.app); the **phase-2 gate** (~Jul 20) → phase-2
 brew-advice build (wants WS1's method control + WS4's tags in place first, so this batch lands first
 naturally). Unsequenced beta inbox: issues **#7–#12** — triage into the R2 work or a fresh tail when ready.
 
-**NOW (just shipped) — v3.82 #16: a window on the numbers** (cache **v92**, APP_VERSION v3.82): the Insights
+**NOW (just shipped) — v3.83 audit riders: never lose a session to the Log button** (cache **v93**,
+APP_VERSION v3.83): the four riders from the 2026-07-13 post-R2 audit (findings doc reviewed claude.ai-side;
+the capability-regression bundle is **issue #23**). **F4 — the guard:** WS6's raised Log rendered during the
+session flow and `quickLogSession` silently overwrote the draft (finish-screen mis-tap ate rating/notes;
+mid-steep orphaned the interval). Now `quickLogSession(btn)` arms the inline `armConfirm` two-step
+("Discard the session in progress?") whenever the draft has something to lose — always past setup
+(steeping/finish/quick), in setup only when dirty vs the fresh-draft fingerprint (`_pristine`, stamped at
+creation; reverting an edit reads clean; UI-state toggles never count); a button-less call routes back to
+the session instead of discarding; `startSessionFor` clears the old interval unconditionally. **F6:**
+viewSpend back → "← Back to Insights" (its cost-card entry moved there in v3.74). **F9:** settings chime
+copy stops promising vibration (removed v3.77). **F17:** the Sessions streak card is now a neutral
+**"Brewing days"** heatmap — streak line gone, placement kept, deliberately ungated; onboarding's "your
+streak" promise re-worded to match. New committed **`fixtures/log-guard-test.js`** (24 checks, 10th suite;
+real-CSV section skips with a count when absent). All 10 suites green; verified live in the browser
+(guard arm/cancel/yes round-trip, back-route, copy, heatmap — console clean). **No SQL.** A separate
+docs-only commit (no cache bump) carried the audit's doc-debt fixes (CLAUDE/STATE/DESIGN/ROADMAP/module
+map) — details in the audit findings + CHANGELOG.
+
+**Earlier — v3.82 #16: a window on the numbers** (cache **v92**, APP_VERSION v3.82): the Insights
 stat grid gained a quiet **all-time · month · week** lens — a **scoped reinstatement** of what v3.65 retired,
 on the RAW grid only (every observation surface stays prose/all-time; `insights-room-test.js` byte-identical
 and green). **Calendar windows**: week = **Mon 00:00 local** (the Home week card's anchor — two surfaces can
@@ -160,6 +195,10 @@ emoji thumbs → WS5-style tinted/kanji placeholders (`sessThumbHTML`, `.vessel-
 `fixtures/flavor-ladder-test.js` (66; family completeness + rung guard + free-word isolation + observation
 honesty guard + graceful real-data pass). `#i-lock-hl` added (caret/plus already existed). `node --check` +
 all committed fixtures green; xss-render bundle now includes steep-knowledge.js. **R2 batch complete.**
+**Scope edge (deliberate; recorded at the 2026-07-13 audit): quick and cold-brew sessions can NEVER feed
+the tea-page flavour profile** — they carry no steeps, and session-level tags don't count either; the
+single choke point is `distinctVocab()` (steep-teas.js, reads only `steeps[].tags`). If that ever changes,
+change it there, knowingly.
 
 **Earlier — v3.77 WS1 Forms: core trio + one fold** (cache **v87**, APP_VERSION v3.77): fifth of the R2
 design pass. Both first-run forms reshaped to **core essentials up front + one boolean fold**. Session setup: a

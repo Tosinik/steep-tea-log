@@ -51,10 +51,10 @@ only glow is a faint amber one in dark mode).
 
 **Icons & accents (v3.63 WS3; placements extended by WS1/WS2/WS4):** header/action icons are a **hairline
 stroke set** (24×24, `fill:none; stroke:currentColor`, 1.7 light / 1.9 dark) from the `<svg><defs>` sprite
-in `index.html`, emitted via `icon(id,px,cls)` in steep-core. **Emoji are banned in UI** — WS3 replaced the
-header set. *Known leftover exception:* the 🧘 on the steeping screen's Focus-mode button
-(`steep-sessions.js`, `toggleFocusMode`) — slated for a hairline replacement, not yet swept; don't add new
-emoji anywhere. **Accent vocabulary — one home each, placement rules as shipped** (never button trim, card
+in `index.html`, emitted via `icon(id,px,cls)` in steep-core. **Emoji are banned in UI — and the sweep is
+COMPLETE**: WS3 replaced the header set, the v3.76 focus rebuild retired the last 🧘, and v3.78 cleared the
+remaining thumb/toast sites. `steep-*.js` is emoji-free (only the ✕ / ✓ / ★ / — glyph vocabulary remains);
+don't add new emoji anywhere. **Accent vocabulary — one home each, placement rules as shipped** (never button trim, card
 borders, spinners, or general decoration):
 - **tea leaf** (`fav-leaf`, jade) — the favourite mark (tea cards/rows, running-low, favourites filter,
   shopping) and the Insights "most reached-for" note.
@@ -72,15 +72,32 @@ clay `#8B5E4A|#C99872` · line `#D8CFB9|#332F24` · surface/white `#FFFEFB|#1C1A
 red (errors/destructive only) `#B5504A|#E08C82`. Both themes are first-class; every design
 must be checked in both.
 
+**Low-stock tone rule (recorded 2026-07-13):** one predicate (`stockTier`/`isRunningLow`),
+two deliberate tones — **clay on ritual surfaces** (shelf status line, Home "Running low"
+card) and **red on analytics/ledger surfaces** (Cost-overview rows, tea-detail "On hand").
+Not drift; keep new surfaces on the side they belong to.
+
 **Component vocabulary (reuse before inventing):** cards on porcelain; jade-pale "insight"
 cards (brew guide, suggested brew, greeting); segmented controls (`seg`) for small mode
 choices; ghost text-buttons for quiet affordances; pill chips (steep times, tags; amber =
 current); the eyebrow label pattern above every field; toasts bottom-anchored, non-blocking;
 inline two-step confirm replacing all browser popups; sparklines/heatmap for tiny data viz.
 
+**Accepted nuances (recorded at the 2026-07-13 audit — deliberate, don't "fix" without a decision):**
+- **Native select pickers** — the WS1 core-trio selects are styled (`appearance:none`, Shippori for
+  the tea) but open the OS-native picker sheet. Accepted tradeoff, not a gap.
+- **UI-chrome dates** — the greeting eyebrow's weekday is forced English (WS2: chrome never renders
+  a locale-mixed "Freitag evening"); the Spending view's month name stays device-locale
+  (`toLocaleDateString`, steep-dashboard.js). Both directions accepted as-is.
+- **Oolong roast level is untracked** — there is no roast field, so the shelf status line can't
+  tell a heavy-roast oolong (which keeps like a white) from a jade one; both read "plenty"
+  (the WS5 oolong-reads-"plenty" call). A roast field is a data-model decision, not a copy fix.
+
 ## Layout & platform
 Mobile-first PWA (~380–430px is the real viewport; used one-handed with wet hands). Single
-column, sticky header (logo + icon row + tab nav + one primary "Log session" CTA). Desktop
+column inside the WS6 shell (v3.73): a compact header (wordmark + avatar → hub sheet for
+friends/shopping/passport/settings) and a **bottom tab bar** (Home · Teas · [Log raised] ·
+Sessions · Insights) that recedes to a swipe-up handle while a steep runs. Desktop
 is the same column, centered, max-width — no multi-column layouts exist. Touch targets
 ≥40px. No horizontal scrolling ever.
 

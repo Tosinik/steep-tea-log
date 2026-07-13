@@ -5,27 +5,60 @@
 
 Newest first. "Deploy" = files to push to GitHub Pages. SQL = run once in the Supabase SQL editor.
 
-## Module map (after the v3 split)
-`app.js` was split into feature modules loaded in order by `index.html`. They share one
-global scope (plain scripts, not ES modules), so cross-file function calls just work.
-Concatenating them in this order reproduces the old `app.js` byte-for-byte.
+## Module map (current — refreshed at the v3.83 docs pass)
+Plain scripts sharing one global scope (not ES modules), loaded in this order by
+`index.html` (the `<script>` list there is authoritative). The v3 split was originally a
+mechanical cut of `app.js`; it has drifted far since — the old "concatenating reproduces
+`app.js` byte-for-byte" note is historical only.
 
-1. `steep-core.js` — constants, `state`, settings/persist helpers, small utils, stars,
-   image upload, the pixel logo, `render()`, header, `goView`, `bindDynamic`.
-2. `steep-settings.js` — backup/export/import, settings modal, `setSetting`.
-3. `steep-dashboard.js` — `computeStats`, persona, brewing clock, achievements
-   (compute/badge/sync/confetti), heatmap, streak card, recap, onboarding,
-   achievements page, `viewDashboard`.
-4. `steep-teas.js` — tea cards, vendor list, sort/filter/search, `viewTeas` (Teas|Vessels segments), tea form, tea detail.
-5. `steep-social.js` — friends/feed/profile/follow.
-6b. `steep-passport.js` — world dot-map, origin→country matching, tea click-through.
-6. `steep-sessions.js` — sessions calendar, vessels, session-edit modal, session flow
-   (setup/steeping/finish/quick), timer, tags, `commitSession`.
-7. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
-
-Data layer stays in `steep-data.js`; Supabase keys in `supabase-config.js`.
+1. `supabase-config.js` — Supabase keys.
+2. `steep-data.js` — Supabase client, `loadKey`/`saveKey`, mappers, per-row CRUD, offline
+   write queue (`window.SteepDB`).
+3. `steep-knowledge.js` — curated tea KB (`kbResolve`, `KB_STYLES`, flavour vocab/families).
+4. `steep-core.js` — constants, `state`, settings/persist helpers, small utils, image
+   upload, the pixel logo, `render()`, WS6 shell (bottom bar + avatar hub), `goView`,
+   `bindDynamic`, brew-guide parser + leaf-form logic, achievements engine (dormant).
+5. `steep-settings.js` — backup/export/import, settings modal, `setSetting`, diagnostics.
+6. `steep-dashboard.js` — `computeStats`/`gridStats`, greeting engine, Home cards +
+   shared editable-card registry (`DASH_*`), heatmap ("Brewing days" card), forecasts,
+   onboarding, spend view, `viewDashboard`.
+7. `steep-insights.js` — the Insights reflective room (hero/readings) + Wrapped.
+8. `steep-teas.js` — WS5 photo shelf (statusLine/stockTier engine, chips, search,
+   density), vendor manager, tea form, tea detail, WS4 honesty ladder.
+9. `steep-shopping.js` — shopping list + suggestions.
+10. `steep-passport.js` — origin→country matching + passport view (rendering PARKED).
+11. `steep-social.js` — friends/feed/profile/follow.
+12. `steep-sessions.js` — sessions calendar, vessels, session-edit modal, session flow
+    (setup/steeping/finish/quick), timer + WS4 capture, tags, `commitSession`.
+13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — post-R2 audit reconciliation
+Deploy: `CLAUDE.md`, `STATE.md`, `ROADMAP-v4.md`, `DESIGN.md`, `CHANGELOG.md` (this module map).
+No app change, no SQL, no cache/APP_VERSION bump. The doc-debt half of the 2026-07-13 audit (the code
+half shipped as v3.83; the capability-regression bundle is issue #23).
+- **ROADMAP-v4 Pillar D** (the live foot-gun, fixed first): the flavor-experience spec still prescribed a
+  `flavor:` tag namespace — corrected to the **shipped bare + membership** convention (v3.78 pause
+  decision) with an explicit do-not-reintroduce note, and marked SHIPPED.
+- **Module map above** rewritten to current reality (adds steep-data/knowledge/insights/shopping; the
+  "concatenates back to `app.js` byte-for-byte" claim retired as historical).
+- **CLAUDE.md:** intro now states the SlowCup brand + the real achievements posture (dormant app-wide
+  v3.72; the "Brewing days" heatmap deliberately neutral + ungated, v3.83); dashboard/insights card
+  ownership updated to post-WS2 reality; the popup-sweep note corrected (sweep COMPLETE — zero
+  `alert()`/`confirm()` remain); the fixed in-session "turn off" bug struck through (v3.68, issue #1).
+- **STATE.md:** seed line points at ROADMAP-v4; new **"Feeding claude.ai"** section (repo re-cloned live
+  each turn — never mirror source; project base = 4 CSVs refreshed before each phase-N spec + design
+  images + task/continuity docs); the 5 R3 board PNGs corrected to go to the claude.ai project base, not
+  repo `images/`; load order gains steep-insights; calm-first + popup claims aligned with CLAUDE.md; the
+  WS4 block records the **quick/cold-brew-never-feed-the-flavour-profile** scope edge with its single
+  choke point (`distinctVocab()`, steep-teas.js); Continue-here updated (v3.83 shipped · interim-sort
+  lane awaits its brief · #23 holds the reinstate-vs-accept decisions).
+- **DESIGN.md:** emoji-sweep note updated (complete — the 🧘 "known leftover" was retired v3.76); layout
+  paragraph now describes the WS6 shell (bottom bar + hub), not the old sticky header; new **low-stock
+  tone rule** (clay on ritual surfaces / red on analytics surfaces — deliberate); new **accepted
+  nuances** register (native select pickers · UI-chrome dates EN-greeting/locale-Spending · oolong roast
+  untracked).
+
 ## v3.83 — audit riders: never lose a session to the Log button
 Deploy: `steep-sessions.js` (`draftFingerprint`/`sessionDraftDirty` + guarded `quickLogSession(btn)` + `clearTimerInterval()` in `startSessionFor`), `steep-core.js` (bn-log passes `this`, APP_VERSION + WHATS_NEW), `steep-dashboard.js` (viewSpend back → Insights + neutral heatmap card + onboarding copy), `steep-settings.js` (chime copy), `service-worker.js` (**v93**), `.gitignore` (+`log-guard-test.js`), `fixtures/log-guard-test.js` (new committed guard). **No SQL.**
 The four riders from the 2026-07-13 post-R2 audit (the capability-regression bundle is issue #23 — planned as "#21" in the review, renumbered by GitHub).
