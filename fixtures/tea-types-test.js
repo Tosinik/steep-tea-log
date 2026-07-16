@@ -48,7 +48,10 @@ ok(data.filter(r=>r.parent&&!slugSet.has(r.parent)).length===0, 'A3 every member
 const cov={}; data.forEach(r=>(r.covers||[]).forEach(n=>(cov[n]=cov[n]||[]).push(r.slug)));
 ok(Object.values(cov).every(v=>v.length===1), 'A4 no covers collisions (each library tea covered by one type)');
 ok(data.filter(r=>!r.parent).length + data.filter(r=>r.parent).length === 55, 'A5 every row is a parent/standalone or a member');
-console.log('  A data integrity: 5 checks');
+// v3.88: confidence values must stay ASCII tokens — the hedge match keys on them, and the dead
+// non-ASCII '⚠︎ confirm' compare was removed. A future verify/confirm row must use an ASCII token.
+ok(data.every(r=>r.confidence===undefined || r.confidence==='canonical' || r.confidence==='contested'), 'A6 confidence values are the ASCII set {canonical,contested}');
+console.log('  A data integrity: 6 checks');
 
 // ---- B. inheritance (a member borrows the parent's processing facts) ----
 const dhp=resolve('dhp');

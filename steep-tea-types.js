@@ -124,6 +124,10 @@ function browseTeaTypes(){
 function typeConfidenceHedge(row){
   var c = (row && row.confidence) || 'canonical';
   if(c==='contested') return 'Sources genuinely disagree here — a starting point, not settled fact.';
-  if(c==='verify' || c==='⚠︎ confirm') return 'Not yet confirmed — worth checking before you rely on it.';
+  // NB (v3.88): the seed's confidence scheme also defines verify/confirm (⚠︎ in its prose), but NO
+  // committed row carries them — the old `c==='⚠︎ confirm'` branch was dead AND held the only
+  // non-ASCII compare key in shipped code (brittle to variation-selector/encoding drift). Removed.
+  // If a future seed row ever ships confidence 'verify'/'confirm', re-add an ASCII branch HERE
+  // (never the ⚠︎ glyph in a comparison — keep it to display copy) and pin it in the fixture.
   return '';
 }

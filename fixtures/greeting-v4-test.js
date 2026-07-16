@@ -258,4 +258,59 @@ const idsIn = html => (html.match(/openTeaDetail\('([^']+)'\)/g)||[]).map(m=>/\(
   console.log('  G redirect determinism: 4 checks');
 })();
 
+// ===== H. #25 recency window — soft penalty, PRIOR days only, habitual still surfaces =====
+(function(){
+  setNow(localMs(2026,7,15,8));   // morning
+  const TK='2026-07-15';
+  const pick=(target)=>call('(function(){var p=d_scorePick("'+target+'","'+TK+'",null,null);return p?{id:p.t.id,score:p.score,bucket:p.bucketCount}:null;})()');
+  // H1 — equal 1-session history, but b1 brewed YESTERDAY → the not-recent a1 wins.
+  const a1={id:'a1',name:'A',type:'green',amountGrams:40}, b1={id:'b1',name:'B',type:'oolong',amountGrams:40};
+  setState([a1,b1], [ sess('a1',2026,7,10,8), sess('b1',2026,7,14,8) ]);   // a1 5d ago, b1 yesterday
+  ok(pick('morning').id==='a1', 'H1 a tea brewed yesterday is demoted below an equal tea not recently brewed');
+  // H2 — a STRONGLY habitual tea brewed yesterday still surfaces over a low-history rival (soft, not exclude).
+  const hb={id:'hb',name:'Habit',type:'green',amountGrams:40}, rv={id:'rv',name:'Rival',type:'oolong',amountGrams:40};
+  const hs=[]; for(let d=1;d<=4;d++) hs.push(sess('hb',2026,7,d,8)); hs.push(sess('hb',2026,7,14,8)); // 4 far-past + yesterday
+  hs.push(sess('rv',2026,7,2,8));                                                                     // rival: 1 far-past
+  setState([hb,rv], hs);
+  ok(pick('morning').id==='hb', 'H2 a habitual tea still wins despite a brew yesterday (penalty is soft, not an exclude)');
+  // H3 — 3 days ago is OUTSIDE the 2-day window → no penalty (score == bucketCount).
+  setState([{id:'c3',name:'C',type:'green',amountGrams:40}], [ sess('c3',2026,7,12,8) ]);   // 3 days ago
+  const p3=pick('morning');
+  ok(p3.id==='c3' && Math.abs(p3.score-p3.bucket)<1e-9, 'H3 last brew 3 days ago carries no recency penalty');
+  // H4 — TODAY's brew is not penalised (keeps the predicted-vs-actual computation stable pre/post-log).
+  setState([{id:'td',name:'Today',type:'green',amountGrams:40}], [ sess('td',2026,7,15,7) ]);  // earlier today
+  const pt=pick('morning');
+  ok(Math.abs(pt.score-pt.bucket)<1e-9, 'H4 a tea brewed earlier TODAY carries no recency penalty (today excluded)');
+  // H5 — determinism.
+  setState([a1,b1], [ sess('a1',2026,7,10,8), sess('b1',2026,7,14,8) ]);
+  ok(JSON.stringify(pick('morning'))===JSON.stringify(pick('morning')), 'H5 same todayKey → same pick (deterministic)');
+  clearNow();
+  console.log('  H #25 recency window: 5 checks');
+})();
+
+// ===== I. #17 "unopened" copy gated on stock evidence =====
+(function(){
+  ok(call('isTeaUnopened({costOriginalGrams:50,amountGrams:18})')===false, 'I1 opened (18g of 50g bought) → not unopened');
+  ok(call('isTeaUnopened({costOriginalGrams:50,amountGrams:50})')===true,  'I2 full stock (50 of 50) → unopened');
+  ok(call('isTeaUnopened({costOriginalGrams:0,amountGrams:18})')===true,   'I3 no purchase data → treated as unopened');
+  // integration on a firing rediscovery day: opened-but-unsessioned → neglected register, never "unopened".
+  let firesKey=null;
+  for(let d=1; d<=31 && !firesKey; d++){ const k='2026-09-'+String(d).padStart(2,'0');
+    if(call('d_hash("'+k+'|shelf") % REDISCOVERY_ODDS')===0) firesKey={d}; }
+  ok(firesKey, 'I4 found a firing rediscovery day');
+  const drinker={id:'dr',name:'Habit',type:'green',amountGrams:40};
+  const dh=[]; for(let d=1;d<=6;d++) dh.push(sess('dr',2026,9,d,8));
+  setState([drinker,{id:'op',name:'Opened',type:'oolong',amountGrams:18,costOriginalGrams:50}], dh);  // opened, never sessioned
+  setNow(localMs(2026,9,firesKey.d,14));
+  let s=sub(greet());
+  ok(/waited|been open|return to/i.test(s) && !/unopened|never been steeped/i.test(s),
+     'I5 an opened-but-unsessioned tea gets the neglected register, never "unopened"');
+  setState([drinker,{id:'op',name:'Opened',type:'oolong',amountGrams:50,costOriginalGrams:50}], dh);  // same id, full stock
+  setNow(localMs(2026,9,firesKey.d,14));
+  s=sub(greet());
+  ok(/unopened|never been steeped|not brewed the/i.test(s), 'I6 a genuinely-untouched tea still reads "unopened"');
+  clearNow();
+  console.log('  I #17 unopened-copy gate: 6 checks');
+})();
+
 console.log('\nALL GREETING-V4 TESTS PASSED  ('+passed+' passed)');

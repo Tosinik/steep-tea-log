@@ -139,7 +139,21 @@ decisions in `PHASE2-PRESPEC-NOTES.md`; resolve feedback placement before fillin
 brew-advice build (wants WS1's method control + WS4's tags in place first). Unsequenced beta inbox: issues
 **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.87 tea reference layer: Phase A (data + read path)** (cache **v97**,
+**NOW (just shipped) — v3.88 greeting: no re-suggesting what you just had, honest "unopened"** (cache
+**v98**, APP_VERSION v3.88): a greeting-engine pass (#25 + #17 + ack) + one hygiene rider. **#25:**
+`d_scorePick` gains a proximity-scaled **soft recency penalty** (`RECENCY_DAYS`=2 / `RECENCY_PENALTY`=1.25,
+tunable) for teas brewed in the last 2 **prior** days — penalty not exclude (tiny shelf never starves;
+habitual tea still surfaces, pinned); **today excluded** to keep predicted-vs-actual stable; deterministic
+from `todayKey`. **#17:** new **`isTeaUnopened`** (steep-core, beside `isTeaFinished`, same v3.40 evidence
+axis) gates the rediscovery copy — opened-but-unbrewed teas get a neglected register, never "unopened".
+**Ack rider:** the didn't-take-predicted pool rewritten retrospective (past-tense, not a rec). **Hygiene
+rider (item 3):** dead `⚠︎ confirm` branch removed from `typeConfidenceHedge` (only non-ASCII compare key in
+shipped code; rides this cache bump). greeting-v4 47→58, tea-types 48→49; all 12 suites green; live-smoked
+(console clean). **This deploy carries a WHATS_NEW banner** (user-visible). **No SQL. 3rd real
+`/slowcup-deploy`.** **Sibling docs commit `89f035e`** (no version): ROADMAP v3.83/84/85 backfill + verifier
+codepoint policy + deleted 2 stale local suites. Next: phase-2 (gate ~3/15 + two pre-spec decisions) before Phase B.
+
+**Earlier — v3.87 tea reference layer: Phase A (data + read path)** (cache **v97**,
 APP_VERSION v3.87): the reference feature's **data + queryable read path, no UI yet** (Phase B = the
 browsable page, **held until phase-2**; Phase C = R3 styling + library link). New **`steep-tea-types.js`** —
 a script-global like `steep-knowledge.js` (`const TEA_TYPES`, 55 rows, precached, no fetch) + `resolveTeaType`

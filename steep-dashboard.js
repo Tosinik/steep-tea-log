@@ -652,15 +652,28 @@ const VARIETY_GUARD_SAME_DAY = true;
 // `excludeType` drops one leaf type (the variety guard). Same scoring as the greeting always used —
 // target-bucket history dominates, rating/favourite are small nudges, a date-seeded hash breaks ties.
 // Returns {t,bucketCount,score,tie} or null when nothing qualifies.
+// #25 (v3.88): a tea brewed within the last RECENCY_DAYS *prior* days is softly demoted so the
+// greeting doesn't re-suggest what was just had. SOFT (a score penalty, not an exclude) so a tiny
+// shelf never runs out of picks and a strongly-habitual tea can still surface. PRIOR days only —
+// today is excluded so logging a tea today can't retroactively change the day's predicted pick
+// (the predicted-vs-actual stability at the session-aware branch). Deterministic: the window is
+// measured from the passed-in todayKey ('YYYY-MM-DD'), never Date.now(). Both tunables.
+const RECENCY_DAYS = 2;
+const RECENCY_PENALTY = 1.25;   // proximity-scaled: 1 day ago = full, 2 days ago = half (with DAYS=2)
 function d_scorePick(target, todayKey, excludeIds, excludeType){
   const sessions = state.sessions || [];
   const candidates = (state.teas||[]).filter(t=> !isTeaFinished(t)
     && !(excludeIds && excludeIds.has(t.id))
     && !(excludeType && t.type===excludeType));
   if(!candidates.length) return null;
+  const todayMs = Date.parse(todayKey);   // calendar-day anchor; both sides parsed as UTC midnight → exact day diff
   const scored = candidates.map(t=>{
-    const bucketCount = sessions.filter(se=>se.teaId===t.id && d_hourBucket(new Date(se.date).getHours())===target).length;
-    const score = bucketCount + (Number(t.rating)||0)*0.05 + (t.isFavorite?0.15:0);
+    const mine = sessions.filter(se=>se.teaId===t.id);
+    const bucketCount = mine.filter(se=>d_hourBucket(new Date(se.date).getHours())===target).length;
+    let recency = 0;   // nearest prior-day brew within the window drives the penalty
+    mine.forEach(se=>{ const d=Math.round((todayMs-Date.parse(dayKey(se.date)))/86400000);
+      if(d>=1 && d<=RECENCY_DAYS){ const p=RECENCY_PENALTY*(RECENCY_DAYS-d+1)/RECENCY_DAYS; if(p>recency) recency=p; } });
+    const score = bucketCount + (Number(t.rating)||0)*0.05 + (t.isFavorite?0.15:0) - recency;
     return { t, bucketCount, score, tie:d_hash(todayKey+'|'+t.id) };
   }).sort((a,b)=> b.score-a.score || b.tie-a.tie);
   return scored[0];
@@ -773,11 +786,13 @@ function greetingCardHTML(){
                        `The ${teaLink(loggedTea)} in the pot already. Nice.`,
                        `The ${teaLink(loggedTea)}, just as the day called for.`,
                        `Right on cue — the ${teaLink(loggedTea)}.` ], todayKey, 'ack')
-        : d_copyPick([ `The ${teaLink(loggedTea)} instead — didn&rsquo;t see that coming.`,
-                       `The ${teaLink(loggedTea)} today — a nice surprise.`,
-                       `Ooh, the ${teaLink(loggedTea)} — not what I&rsquo;d have guessed.`,
-                       `The ${teaLink(loggedTea)} — a turn off the usual path.`,
-                       `The ${teaLink(loggedTea)}? Lovely, and unexpected.` ], todayKey, 'ack');
+        // ack rider (v3.88): a *retrospective* on the cup already brewed, never a suggestion —
+        // every line reads past-tense / in-the-pot so it can't be mistaken for "brew this next".
+        : d_copyPick([ `The ${teaLink(loggedTea)} today — a nice surprise in the pot.`,
+                       `The ${teaLink(loggedTea)} instead — a lovely, unexpected pour.`,
+                       `Ooh, the ${teaLink(loggedTea)} — not what I&rsquo;d have guessed you&rsquo;d reach for.`,
+                       `The ${teaLink(loggedTea)} — a turn off the usual, already steeped.`,
+                       `The ${teaLink(loggedTea)} in the pot — lovely, and unexpected.` ], todayKey, 'ack');
     } else {
       ack = d_copyPick([ `Nicely steeped already.`, `Well steeped this ${BUCKET_NOUN[bucket]}.`,
                          `A good pour already behind you.` ], todayKey, 'ack');
@@ -838,11 +853,20 @@ function greetingCardHTML(){
             `The ${rname}&rsquo;s been quiet on the shelf for ${redis.weeks} weeks. Today?`,
             `It&rsquo;s been ${redis.weeks} weeks since the ${rname} — maybe today.`,
           ], todayKey, 'shelf')
-        : d_copyPick([
-            `The ${rname} is still unopened — today could be the day.`,
-            `You&rsquo;ve not brewed the ${rname} yet; it&rsquo;s waited patiently.`,
-            `The ${rname}&rsquo;s never been steeped — shall we?`,
-          ], todayKey, 'shelf'));
+        : (isTeaUnopened(redis.t)
+            // #17 (v3.88): only claim "unopened" when the shelf agrees — no purchase data, or stock
+            // still at/above what was bought. A tea drawn down below its purchase amount HAS been
+            // opened (just not brewed in-app), so it gets the neglected-tea register, never "unopened".
+            ? d_copyPick([
+                `The ${rname} is still unopened — today could be the day.`,
+                `You&rsquo;ve not brewed the ${rname} yet; it&rsquo;s waited patiently.`,
+                `The ${rname}&rsquo;s never been steeped — shall we?`,
+              ], todayKey, 'shelf')
+            : d_copyPick([
+                `The ${rname} has waited patiently on the shelf — today?`,
+                `The ${rname}&rsquo;s been open a while without a steep; maybe today.`,
+                `Time to return to the ${rname}? It&rsquo;s been waiting.`,
+              ], todayKey, 'shelf')));
     }
   }
 

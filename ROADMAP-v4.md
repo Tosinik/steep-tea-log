@@ -198,6 +198,11 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   `typeConfidenceHedge`), reconciled from TEA-TYPES-SEED.md (see `TEA-REFERENCE-HANDOVER.md` §6). Confidence
   per-row (not inherited); covers member-only; committed `fixtures/tea-types-test.js` (48). **Phase B (the
   browsable page) is HELD until phase-2 ships; Phase C rides R3.**
+- [x] **greeting pass — #25 + #17 + ack** (v3.88) — `d_scorePick` soft recency penalty (2 prior days,
+  tunable; today excluded, deterministic) stops re-suggesting a just-had tea; new `isTeaUnopened` gates the
+  rediscovery copy so an opened tea is never called "unopened"; ack pool rewritten retrospective. Hygiene
+  rider: dead `⚠︎ confirm` branch removed from `typeConfidenceHedge`. greeting-v4 47→58, tea-types 48→49.
+  (Sibling docs commit `89f035e`: ROADMAP backfill above + verifier codepoint policy + stale-suite deletion.)
 - **NEXT: phase-2 (#15 + #9)** — gate re-measured **~3 of 15** ratio'd+feedback'd (2026-07-15; ~Jul 20 is
   stale, ~2–3 wks), and held behind two pre-spec decisions (`PHASE2-PRESPEC-NOTES.md`: one-tap signal source,
   per-steep strength placement). #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.

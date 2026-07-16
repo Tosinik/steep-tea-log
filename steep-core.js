@@ -1,12 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.87';
+const APP_VERSION = 'v3.88';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-// v3.87 ships a dormant, precached data module (tea reference Phase A) with no UI yet, so there is
-// nothing user-facing to announce — WHATS_NEW='' makes showUpdateBanner (steep-boot.js) omit the
-// second line entirely (WS4-landing precedent: don't promise a feature that isn't reachable).
-const WHATS_NEW = '';
+// (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
+// user-visible, so it carries a line again.)
+const WHATS_NEW = "Home won't suggest a tea you just had — and a tea you've opened is never called 'unopened.'";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -683,6 +682,13 @@ function isAmountTracked(tea){
   return (state.sessions||[]).some(s=>s.teaId===tea.id && Number(s.gramsUsed)>0);
 }
 function isTeaFinished(tea){ return isAmountTracked(tea) && Number(tea.amountGrams) <= 0; }
+// The UNOPENED predicate — the opposite end of the same v3.40 evidence axis as isTeaFinished
+// (fully consumed). Reads STOCK evidence: a tea is genuinely unopened only with no purchase
+// quantity on record, or current stock still at/above what was bought. One authoritative
+// definition (the #17 greeting copy-gate calls this, never a second inline copy that could
+// drift). It intentionally does NOT scan sessions — its caller (the rediscovery gate) only
+// reaches it for never-sessioned teas, so stock is the whole question there.
+function isTeaUnopened(tea){ const orig=Number(tea&&tea.costOriginalGrams)||0; return orig<=0 || (Number(tea.amountGrams)||0) >= orig; }
 function vesselById(id){ return state.vessels.find(v=>v.id===id); }
 function fmtSec(s){ s=Math.round(s); const m=Math.floor(s/60); const sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
 // A session's infusion count: real steeps if it has them, else the quick-log count.
