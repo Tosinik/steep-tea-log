@@ -26,31 +26,64 @@ axis; do **not** mine free-text steep/session notes for sentiment. Rationale: ca
 deterministic, no fuzzy NLP anywhere else in the app. *Decide explicitly so it's a
 choice, not a default — but the strong lean is: one-tap only, text stays out of scope.*
 
-**Decision 2 — placement & shape (the real problem).** The control renders **once, at
-session commit**, labelled *"How was this cup?" — Just right / A bit strong / A bit
-weak*. Two flaws surfaced from actual use:
+**Decision 2 — placement & shape. RULED (2026-07-15): the optional middle path.** The
+control today renders **once, at session commit** (*"How was this cup?" — Just right / A
+bit strong / A bit weak*). Two flaws surfaced from real use:
 
-1. **"This cup" is singular; the dominant method (gongfu) is multi-steep.** At the end
-   of a 5-steep session, "which cup?" has no clean answer — strength arcs across steeps
-   by design. The question mis-maps to what the user actually did.
-2. **A single end-of-session verdict is lossy** as engine input: the honest answer is
-   usually "early steeps strong, tail weak," which is ratio-and-timing information the
-   one tap flattens.
+1. **"This cup" is singular; the dominant method (gongfu) is multi-steep.** At the end of
+   a 5-steep session, "which cup?" has no clean answer — strength arcs across steeps by
+   design. But this is **not universal**: green/Japanese sessions and grandpa style
+   often leave only an *overall* impression, and forcing per-steep granularity there
+   would ask the user to invent detail they didn't experience.
+2. **A single end-of-session verdict is lossy** for multi-steep sessions; a forced
+   per-steep verdict is *fabricated* for single-impression sessions. Neither one shape
+   fits every method.
 
-**Observed effect:** the tap gets **skipped because it feels wrong to answer** — which is
-the actual reason the gate is under-filled, *not* under-logging. Notes are rich; the
-button just doesn't fit the flow.
+**Ruling — offer both, require neither:**
+- A **quiet, optional per-steep strength tap** (a touch strong / good / a touch weak),
+  offered as each infusion is logged, for sessions where the user *is* attending
+  per-steep (gongfu especially). Gives the engine a **strength curve**.
+- The **session-level tap stays** as the always-present fallback for overall-impression
+  sessions (green/Japanese/western/grandpa) and single-cup brews.
+- **Method drives the default affordance, never a requirement:** gongfu → per-steep
+  offered prominently; Japanese/western/grandpa → session-level default. The other
+  option is always reachable; neither is ever mandatory.
+- The engine **aggregates whatever exists**: a curve if per-steep was given, one verdict
+  if session-level, **nothing if nothing** — and "nothing" is a first-class, un-nagged
+  outcome (see Tea-First Principle below).
 
-**Decide:** move (or duplicate) the strength tap to **per-steep** — offered as each
-infusion is logged, where "this cup" is literally true and answerable — giving the engine
-a **strength curve** instead of one flattened verdict. Keep the session-level tap as the
-fallback for single-cup western brews.
+- **Data-model implication:** feedback can live on the **steep** row (per-steep) *and/or*
+  the **session** row (overall). Resolve the schema in the spec; fixture the aggregation
+  (steep curve → next-brew nudge; session verdict → same nudge; absence → no-op, never a
+  prompt).
+- **Sequencing implication:** fill the gate *under the new control*, not the old one —
+  so **build the optional per-steep affordance before pushing the logging that fills the
+  gate**.
 
-- **Data-model implication:** feedback on the **steep** row vs the **session** row (or
-  both). Resolve in the spec; fixture the aggregation (curve → next-brew nudge).
-- **Sequencing implication:** if per-steep is the answer, **decide it before pushing more
-  logging** — otherwise the gate gets filled under the worse control, with data that's
-  both harder to give and weaker to train on.
+### Tea-First Principle (NEW named constraint — load-bearing, do not optimise away)
+
+**SlowCup is for drinking tea, not for serving the app.** No feedback tap — per-steep or
+session — is ever required. A session logged with zero feedback is a **normal, complete,
+un-nagged outcome**, not a gap to prompt about. The engine learns only from what the user
+*chose* to give and never asks for more. Any capture UI that makes a session feel like it
+must be attended-to in-the-moment to "count" is off-brand, even if it would yield richer
+training data. This ranks **above** data completeness: a calmer session with less data
+beats a focused-on-the-phone session with more. Sits alongside calm-first and
+single-writer as a first-class principle; the phase-2 spec and its capture UI must be
+checked against it.
+
+### Method coverage (informs the affordance defaults)
+
+- **Japanese / senchadō** — already the planned phase-2 third method (`SESSION_METHODS`
+  is built to append `japanese`; currently `[gongfu, western]` at steep-sessions.js:539).
+  It is a *distinct* method, not gongfu-with-different-numbers, and its strength
+  perception is typically overall, not per-steep → session-level default affordance.
+- **Grandpa style** — future method, flagged now because it **stress-tests the model**:
+  leaves loose in the cup, continuous topping-up, **no discrete steeps at all**. There is
+  literally no per-steep structure to hang a tap on, so grandpa style is the clearest
+  proof the **session-level tap must always exist**. Design the schema so a
+  steepless/continuous session is representable (feedback on session only, steeps
+  optional/absent) rather than assuming every session decomposes into steeps.
 
 ## B. Gate reality — the ~Jul 20 estimate is stale
 
@@ -69,9 +102,11 @@ back-catalog mostly predates v3.85's water_ml/brewStyle capture, which is why th
 is low.
 
 **~Jul 20 is no longer real.** At a realistic pace it's ~2–3 weeks of consistent
-complete logging — *and only after Decision A2*, since fixing the control is what makes
-the completion rate climb. **Recommendation: don't grind the gate under the current
-control; resolve A2 first, then fill.**
+complete logging — *and only after the A2 control is built*, since fixing the control is
+what makes the completion rate climb. **A2 is now RULED (the optional middle path
+above), so the sequence is: build the optional per-steep + session affordance first,
+then fill the gate under it.** Do not grind the gate under the current end-of-session
+control.
 
 ## C. Related (not phase-2, but same engine neighbourhood) — greeting pass
 
