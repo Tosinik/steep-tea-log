@@ -1,4 +1,4 @@
-const CACHE_NAME = 'steep-tea-log-v96';
+const CACHE_NAME = 'steep-tea-log-v97';
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const FILES_TO_CACHE = [
   './supabase-config.js',
   './steep-data.js',
   './steep-knowledge.js',
+  './steep-tea-types.js',
   './steep-core.js',
   './steep-settings.js',
   './steep-dashboard.js',

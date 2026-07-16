@@ -184,8 +184,14 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   `empty`/`untracked` (unknown ≠ empty); `statusLine` total; count-row "· E empty"; `restockCandidate`
   low-or-empty ('few' still excluded); cards/rows unified through statusLine; tea-detail "≈ N cups at your
   usual Ng" (ledger surface). DESIGN.md nuance entry. `status-line-test.js` 63→75 (section I).
-- **NEXT: phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark (~Jul 20). #14 parked → R3;
-  #11 closed; #15 vocab expansion held until phase-2.
+- [x] **Tea reference layer — Phase A** (v3.87) — data + read path shipped **dormant** (no UI yet):
+  `steep-tea-types.js` (55-row `TEA_TYPES` script-global + `resolveTeaType`/`matchTeaType`/`browseTeaTypes`/
+  `typeConfidenceHedge`), reconciled from TEA-TYPES-SEED.md (see `TEA-REFERENCE-HANDOVER.md` §6). Confidence
+  per-row (not inherited); covers member-only; committed `fixtures/tea-types-test.js` (48). **Phase B (the
+  browsable page) is HELD until phase-2 ships; Phase C rides R3.**
+- **NEXT: phase-2 (#15 + #9)** — gate re-measured **~3 of 15** ratio'd+feedback'd (2026-07-15; ~Jul 20 is
+  stale, ~2–3 wks), and held behind two pre-spec decisions (`PHASE2-PRESPEC-NOTES.md`: one-tap signal source,
+  per-steep strength placement). #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.
 
 ## Suggested sequencing (parallel-friendly)
 Now: **R2 implementation deploys — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 ✓ (COMPLETE)** → the post-R2 issue

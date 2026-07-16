@@ -33,6 +33,15 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v3.87 — tea reference layer: Phase A (data + read path)
+Deploy: new `steep-tea-types.js` (55-row TEA_TYPES global + read path), new `fixtures/tea-types-test.js` (+ `.gitignore` exception), `index.html` (script tag), `service-worker.js` (**v97** + FILES_TO_CACHE), `steep-core.js` (APP_VERSION + WHATS_NEW suppressed), `CHANGELOG.md`, `STATE.md`, `ROADMAP-v4.md`. **No SQL.**
+- **Phase A of the tea reference layer** — the data + queryable read path, no UI yet (Phase B = the browsable page, held until phase-2; Phase C = R3 styling + the confirm-not-auto-write library link). `steep-tea-types.js` is a plain script-global like `steep-knowledge.js`: `const TEA_TYPES` inline (precached, no fetch) + `resolveTeaType` (read-time parent inheritance), `matchTeaType` (name→type by curated `covers`, never token inference), `browseTeaTypes`, `typeConfidenceHedge`.
+- **Two-level taxonomy + reconciliation rulings (2026-07-15).** 58 seed rows → 55 committed: gyokuro deduped (Batch-1 row, "(shaded green)" display; Batch-3 stub dropped); the flat `da-hong-pao-yancha` / `phoenix-dancong-yashixiang` rows superseded by two-level parents (`wuyi-yancha`+`dhp`, `phoenix-dancong`+`ya-shi-xiang`); `covers` moved member-only, so a library tea resolves to its most specific type while the parent stays browse-reachable.
+- **Confidence is per-row, never inherited (the load-bearing catch).** A member can be more contested than its parent: `dhp` carries `confidence:"contested"` under a `canonical` Wuyi Yancha, so the §3 hedge-visible contract fires on exactly the tea that shouldn't read as settled fact (commodity Da Hong Pao is usually a Shui Xian + Rou Gui blend, not mother-bush leaf). `resolveTeaType` forces each row's own confidence; `typeConfidenceHedge` renders it (copy is a Phase-B placeholder).
+- **No user-facing change → WHATS_NEW suppressed** (`''`): the module is real and precached but dormant, so the update banner (`showUpdateBanner`, steep-boot.js — its `&& WHATS_NEW` guard omits the second line when empty) announces no feature users can't reach. WS4-landing precedent; the CHANGELOG carries the full developer-facing truth.
+- **Fixtures:** new committed `fixtures/tea-types-test.js` (48 checks — data integrity, member inheritance, confidence-per-row, the DHP hedge end-to-end, covers resolution both ways [member is the matcher target, parent stays browse-reachable], disambiguation traps [bai≠white, EN black ≠ ZH hei cha, one name = two teas], and the real `teas_rows.csv` mapping all 13 library teas). All 12 committed suites green. The reconciliation generator stayed a local throwaway; the seed `.md` remains the human source.
+
+---
 ## docs — tea reference layer inputs + phase-2 pre-spec land in the repo
 Deploy: new `TEA-REFERENCE-HANDOVER.md`, `TEA-TYPES-SEED.md`, `TEA-HANDBOOK.md`,
 `TEA-REFERENCE-BRIEF.md`, `PHASE2-PRESPEC-NOTES.md`; updated `STATE.md`, `CHANGELOG.md`. No app

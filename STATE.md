@@ -139,7 +139,20 @@ decisions in `PHASE2-PRESPEC-NOTES.md`; resolve feedback placement before fillin
 brew-advice build (wants WS1's method control + WS4's tags in place first). Unsequenced beta inbox: issues
 **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.86 #26 + #27: empty says so, unknown stays unknown** (cache **v96**,
+**NOW (just shipped) — v3.87 tea reference layer: Phase A (data + read path)** (cache **v97**,
+APP_VERSION v3.87): the reference feature's **data + queryable read path, no UI yet** (Phase B = the
+browsable page, **held until phase-2**; Phase C = R3 styling + library link). New **`steep-tea-types.js`** —
+a script-global like `steep-knowledge.js` (`const TEA_TYPES`, 55 rows, precached, no fetch) + `resolveTeaType`
+(read-time parent inheritance), `matchTeaType` (name→type by curated `covers`, never token inference),
+`browseTeaTypes`, `typeConfidenceHedge`. Data reconciled from TEA-TYPES-SEED.md's 58 rows → 55 (gyokuro
+dedup · flat DHP/Dan Cong rows superseded by two-level parents · covers member-only). **Confidence is
+per-row, never inherited** — `dhp` is `contested` under a `canonical` Wuyi Yancha, so the §3 hedge fires on
+the tea that shouldn't read as settled fact. **WHATS_NEW suppressed (`''`)** — dormant module, nothing
+user-facing to announce (WS4 precedent; banner shows headline only). New committed
+`fixtures/tea-types-test.js` (48 checks; all 12 suites green). **No SQL. Deployed via `/slowcup-deploy`
+(2nd real run).** Next: phase-2 (gate ~3/15, and its two pre-spec decisions) before Phase B unlocks.
+
+**Earlier — v3.86 #26 + #27: empty says so, unknown stays unknown** (cache **v96**,
 APP_VERSION v3.86): the stock-tier slice. `stockTier` splits 0g by evidence — **`empty`** (tracked +
 drained, `isTeaFinished`) vs **`untracked`** (bare 0g = unknown; v3.40 rule holds, unknown ≠ empty);
 `statusLine` is now total (`empty` / `quantity not tracked`, both ink-soft, **no gram prefix** — the old

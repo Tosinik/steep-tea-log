@@ -1,9 +1,12 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.86';
+const APP_VERSION = 'v3.87';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-const WHATS_NEW = 'An emptied tea now reads empty on your shelf, and an untracked one says so instead of pretending to be full.';
+// v3.87 ships a dormant, precached data module (tea reference Phase A) with no UI yet, so there is
+// nothing user-facing to announce — WHATS_NEW='' makes showUpdateBanner (steep-boot.js) omit the
+// second line entirely (WS4-landing precedent: don't promise a feature that isn't reachable).
+const WHATS_NEW = '';
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
