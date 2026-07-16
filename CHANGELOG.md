@@ -33,6 +33,32 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — tea reference layer inputs + phase-2 pre-spec land in the repo
+Deploy: new `TEA-REFERENCE-HANDOVER.md`, `TEA-TYPES-SEED.md`, `TEA-HANDBOOK.md`,
+`TEA-REFERENCE-BRIEF.md`, `PHASE2-PRESPEC-NOTES.md`; updated `STATE.md`, `CHANGELOG.md`. No app
+change, no SQL, no cache/APP_VERSION bump.
+- **Tea reference layer — the finished, fact-checked inputs** for a future "tell me about this tea"
+  surface + browsable encyclopedia. `TEA-TYPES-SEED.md` is the source of truth for data shape: 58
+  rows, 7 authoring batches, all six families, a two-level parent→member taxonomy with
+  attributes-not-classes, a processing-term exclusivity audit + family scorecard.
+  `TEA-REFERENCE-HANDOVER.md` = the implementation plan (decisions ruled §6, R3 sequencing §4);
+  `TEA-REFERENCE-BRIEF.md` = design/UX intent (carries a reconciliation banner: seed wins on data,
+  brief wins on why/UX); `TEA-HANDBOOK.md` = the proofed prose that is the in-app copy source.
+  Committed so Code can open them; **implementation is Phase A/B, gated after phase-2** — nothing
+  built here.
+- **`PHASE2-PRESPEC-NOTES.md`** (planning-lane, nothing to build): two decisions that must land
+  before the phase-2 brew-advice spec — confirm the training signal stays the one-tap
+  good/strong/weak axis (not free-text notes), and whether the strength tap moves **per-steep**
+  (the end-of-session single tap mis-maps to multi-steep gongfu and is being skipped, the real
+  reason the gate is under-filled). Plus the diagnosed greeting-pass slice (#25 recency window +
+  #17 stock-evidence, batched).
+- **`STATE.md` refreshed:** the phase-2 gate lines now reflect reality — **~3 of 15** complete
+  (ratio'd + feedback'd) rows measured 2026-07-15, so the **~Jul 20 estimate is stale** (~2–3 weeks
+  out), and the gate is held behind the two pre-spec decisions above.
+- The `TEA-HANDOVER-PACKET.md` "start here" reader stays out of the repo (a paste-time index, not
+  something Code builds from).
+
+---
 ## v3.86 — #26 + #27: empty says so, unknown stays unknown
 Deploy: `steep-teas.js` (`stockTier` 0g split · `statusLine` empty/untracked branches · count-row empty segment · tea-detail cups line · cards/rows unify through statusLine), `steep-dashboard.js` (restock card renders `empty` cell), `steep-core.js` (APP_VERSION + WHATS_NEW), `service-worker.js` (**v96**), `DESIGN.md` (accepted-nuance entry), `fixtures/status-line-test.js` (section I + H relabel), `STATE.md`, `ROADMAP-v4.md`. **No SQL.**
 - **#26 — empty is now a first-class state.** `stockTier` split the old catch-all `'out'` (any ≤0g) into

@@ -103,8 +103,13 @@ v3.83 audit riders → v3.84 interim sort → v3.85 #24+#29 water/word fixes (**
 — **B is engine work: draft the plan and pause before implementing**; close #26/#27 with pointer comments
 when it ships. Queued after: a timestamp-anchored timer slice for #30 (pause-gated, touches #13 territory;
 notification/push is ruled OUT — answer it on the issue); the #25 greeting fix batches the #17 revisit
-when it gets a slice. **Open lanes:** (1) **phase-2 (#15 + #9)** — gated on the ~15 ratio'd-sessions mark
-(~Jul 20), note v3.85's brewStyle un-gate now feeds it real method data; (2) **Supabase allowlist cleanup**
+when it gets a slice. **Open lanes:** (1) **phase-2 (#15 + #9)** — gate is **~15 ratio'd+feedback'd sessions
+across both methods; measured 3/15 as of 2026-07-15 (~Jul 20 estimate is STALE)**. Two pre-spec decisions
+must land BEFORE the spec is drafted (see `PHASE2-PRESPEC-NOTES.md`): confirm the training signal is the
+one-tap good/strong/weak axis (not free-text notes), and decide whether the strength tap moves **per-steep**
+— the current end-of-session single tap mis-maps to multi-steep gongfu and is being skipped, which is the
+real reason the gate is under-filled (notes are rich, the button doesn't fit). Resolve placement BEFORE
+pushing more logging. v3.85's brewStyle un-gate now feeds real method data; (2) **Supabase allowlist cleanup**
 — drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins"). The
 **domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
 ("R2 capability regressions" — planned as #21, renumbered by GitHub) holds the reinstate-vs-accept
@@ -129,8 +134,10 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 
 **Parallel / Niklas's:** ~~the domain~~ (**registered + migrated 2026-07-13** ✓); beta-tester
 **reinstalls on the new origin** (Ruth first — then the Supabase allowlist cleanup fires); the
-**phase-2 gate** (~Jul 20) → phase-2 brew-advice build (wants WS1's method control + WS4's tags in
-place first). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
+**phase-2 gate** (3/15 measured, ~2–3 weeks out, NOT ~Jul 20 — and gated behind the two pre-spec
+decisions in `PHASE2-PRESPEC-NOTES.md`; resolve feedback placement before filling the gate) → phase-2
+brew-advice build (wants WS1's method control + WS4's tags in place first). Unsequenced beta inbox: issues
+**#7–#12** — triage into a fresh tail when ready.
 
 **NOW (just shipped) — v3.86 #26 + #27: empty says so, unknown stays unknown** (cache **v96**,
 APP_VERSION v3.86): the stock-tier slice. `stockTier` splits 0g by evidence — **`empty`** (tracked +
