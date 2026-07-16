@@ -180,6 +180,15 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   Committed `stat-period-test.js`, 67. **Rider:** Home "Running low" card membership corrected back to
   LOW-only via named `restockCandidate` (v3.81's tier ∈ {low,few} put a 4.6-cup 'few' under the headline
   beside a ~6-month forecast); `status-line-test.js` 56→63.
+- [x] **audit riders** (v3.83) — the 2026-07-13 post-R2 audit's four riders: `quickLogSession` guard
+  (`armConfirm` past setup, `_pristine` fingerprint), viewSpend→Insights back, chime copy, streak card →
+  neutral "Brewing days" heatmap. Committed `log-guard-test.js` (24). The audit's regression bundle = issue **#23**.
+- [x] **#23 F1 — interim Library sort** (v3.84) — the 7 engine sorts return as a styled select on the count
+  row (reinstated `setTeaSort`; session-scoped); low-float default-sort-only; "M in stock" segment restored (F3).
+  Committed `shelf-order-test.js` (19). #23 still holds F2/F7/F8 (reinstate-vs-accept, R3-gated).
+- [x] **#24 + #29 — water counts, word keeps** (v3.85) — `waterMl` un-gated in commitSession + `gridStats`
+  liters honour it + edit-modal Water(ml); **brewStyle un-gated** (feeds phase-2 method data; cold brew null);
+  #29 onblur tag-commit + `enterkeyhint` + mousedown suggest picks. `stat-period-test.js` G, `flavor-ladder-test.js` H.
 - [x] **#26 + #27 — stock tiers: empty & the cups nuance** (v3.86) — `stockTier` 0g split into
   `empty`/`untracked` (unknown ≠ empty); `statusLine` total; count-row "· E empty"; `restockCandidate`
   low-or-empty ('few' still excluded); cards/rows unified through statusLine; tea-detail "≈ N cups at your
