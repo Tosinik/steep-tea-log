@@ -118,6 +118,38 @@ function browseTeaTypes(){
   });
 }
 
+// Soft cultivar check (v3.90) — catch a Cultivar-field value that is really a tea NAME / STYLE / PLACE,
+// not a cultivar (the "Gui Fei" / "Da Hong Pao" confusion). HIGH-PRECISION, low-recall BY DESIGN: the
+// catalog is not an exhaustive cultivar list, so a hint that fired on a real-but-uncatalogued cultivar
+// would train the user to ignore it. It therefore hints ONLY when the folded value exactly matches a
+// name we can CONFIDENTLY call a non-cultivar — a top-level style/place/name row, MINUS an explicit
+// exceptions set of standalone rows that ARE a cultivar (Jin Xuan, Ruan Zhi) or double as one (Tie Guan
+// Yin) — PLUS the one member row that is a tea name (Da Hong Pao). Every cultivar member (Rou Gui, the
+// Dan Cong aromas, …) and anything unknown stay silent. SUGGEST-NEVER-BLOCK: read-only, returns the
+// matched display_name or null; the form saves the typed value unchanged regardless.
+const TT_CULTIVAR_EXCEPTIONS = ['jin-xuan-milky','ruan-zhi-oolong','anxi-tie-guan-yin']; // standalone rows that ARE / double as a cultivar
+function ttIsNonCultivar(row){
+  if(!row) return false;
+  if(row.slug==='dhp') return true;                              // the one member that is a tea name, not a cultivar
+  return row.parent==null && !!row.family && TT_CULTIVAR_EXCEPTIONS.indexOf(row.slug)<0;
+}
+// Folded name variants for a row: the display_name, its parenthetical-stripped form, each "/"-separated
+// half (so "Gui Fei / Concubine Oolong" yields "gui fei"), and every aka. Exact-fold match only.
+function ttNameVariants(row){
+  var out=[], dn=row.display_name||'';
+  var base=dn.replace(/\s*\([^)]*\)\s*/g,' ').trim();            // drop a trailing "(...)" qualifier
+  [dn].concat(base.split('/')).forEach(function(s){ if(s&&s.trim()) out.push(ttNormName(s)); });
+  (row.aka||[]).forEach(function(a){ out.push(ttNormName(a)); });
+  return out;
+}
+function cultivarNameHint(value){
+  var q=ttNormName(value); if(!q) return null;
+  for(var i=0;i<TEA_TYPES.length;i++){
+    if(ttIsNonCultivar(TEA_TYPES[i]) && ttNameVariants(TEA_TYPES[i]).indexOf(q)>=0) return TEA_TYPES[i].display_name;
+  }
+  return null;
+}
+
 // Content contract (§3): contested/unconfirmed rows must render WITH a hedge, never as flat
 // fact. The DECISION lives here (data layer); Phase B places the string visually. Copy is a
 // calm placeholder — final wording is Phase-B/Niklas's. Empty string = nothing to hedge.

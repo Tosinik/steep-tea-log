@@ -211,6 +211,14 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   (quiet-until-reached-for, observational, writes only `steep.feedback`). `computeBrewAdvice` unchanged. Also
   hidden when `brewAdvice` off. New committed `fixtures/brew-feedback-test.js` (54). Collapsed the planned
   inert-plumbing + UX commits into one.
+- [x] **recency tune (#25 follow-up) + soft cultivar check** (v3.90) — Part 1: `RECENCY_DAYS` 2→3 +
+  `RECENCY_PENALTY` 1.25→1.75 (`d_scorePick`) so a two-days-ago favourite is demoted (tuned against the fresh
+  export — only both dials together work; guardrail: strongly-habitual / no-recent teas still surface). Part 2:
+  `cultivarNameHint` (steep-tea-types.js) — a suggest-never-block heads-up when the Cultivar field holds a tea
+  name/style/place, riding the v3.87 catalog (high-precision/low-recall; top-level non-cultivar rows minus a
+  standalone-cultivar exceptions set plus `dhp`; value saved unchanged). First live use of the reference read
+  path (Phase B still held). PARKED: the ephemeral-nudge vs per-steep-feedback seam awaits the R3 Log/Focus
+  resolution. greeting-v4 H 5→8, tea-types H=11.
 - **NEXT: phase-2 gate-fill** — A2 shipped v3.89; the gate (~3/15, measured 2026-07-15) now fills UNDER the
   new per-steep control, ~2–3 wks of complete logging. Post-gate (separate specs): learned defaults ·
   `SESSION_METHODS` append `japanese`/senchadō. #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.

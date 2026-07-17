@@ -317,6 +317,7 @@ function openTeaForm(existing){
   state._draftImage = existing ? existing.image : null;
   state.teaFormOpen = true;
   _kbSuggestDismissed = false; _kbSuggest = null;
+  _cultivarHintDismissed = false; // v3.90: fresh cultivar hint per form open
   _teaFormTouched = false; // WS1: reset dirty-tracking so a fresh form closes freely
   render();
 }
@@ -336,6 +337,27 @@ function teaFormCloseGuard(btn){
    can accept or ignore — never auto-applied (calm-first). leafForm is left to
    inferLeafForm (which also consults the KB). Only offers fields that aren't already set. */
 let _kbSuggest = null, _kbSuggestDismissed = false;
+// Soft cultivar check (v3.90): on blur, if the typed cultivar is really a tea name/style/place per the
+// reference catalog, show a quiet, dismissable heads-up. NEVER blocks or rewrites — the value saves as
+// typed (submitTeaForm reads f.cultivar.value unchanged). Silent on real cultivars and unknowns.
+let _cultivarHintDismissed = false;
+function cultivarHintCheck(){
+  const box = document.getElementById('teaCultivarHint');
+  if(!box) return;
+  if(_cultivarHintDismissed || typeof cultivarNameHint!=='function'){ box.innerHTML=''; return; }
+  const form = document.getElementById('teaForm');
+  const val = form ? (form.elements['cultivar'].value||'').trim() : '';
+  const hit = val ? cultivarNameHint(val) : null;
+  if(!hit){ box.innerHTML=''; return; }
+  box.innerHTML = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--ink-soft);background:var(--jade-pale);border:1px solid var(--line);border-radius:8px;padding:7px 10px;">
+    <span>“${escapeHtml(val)}” looks like a tea name or style rather than a cultivar — kept as you typed it.</span>
+    <button type="button" class="btn-ghost" style="font-size:12px;padding:2px 4px;" onclick="dismissCultivarHint()">dismiss</button>
+  </div>`;
+}
+function dismissCultivarHint(){
+  _cultivarHintDismissed = true;
+  const box = document.getElementById('teaCultivarHint'); if(box) box.innerHTML='';
+}
 function teaFormNameSuggest(){
   const box = document.getElementById('teaKbSuggest');
   if(!box) return;
@@ -407,7 +429,7 @@ function teaFormModal(){
             <option ${t.harvestSeason==='Winter'?'selected':''}>Winter</option>
           </select></div>
           <div class="field"><label>Origin</label><input type="text" name="origin" value="${escapeHtml(t.origin||'')}" placeholder="Fujian, China"></div>
-          <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${escapeHtml(t.cultivar||'')}" placeholder="Qi Dan"></div>
+          <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${escapeHtml(t.cultivar||'')}" placeholder="Qi Dan" onblur="cultivarHintCheck()"><div id="teaCultivarHint"></div></div>
           <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${escapeHtml(t.source||'')}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}</datalist></div>
           <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
           <div class="field"><label>Grams bought (for that price)</label><input type="number" step="0.1" name="costOriginalGrams" value="${t.costOriginalGrams??''}" placeholder="50"></div>

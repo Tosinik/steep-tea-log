@@ -128,5 +128,23 @@ if(fs.existsSync(csvPath)){
   console.log('  G real CSV grounding: SKIPPED (teas_rows.csv not present)');
 }
 
+// ---- H. soft cultivar check (v3.90) — suggest-never-block; high-precision, low-recall ----
+const hint=v=>ctx.cultivarNameHint(v);
+// fires: a tea NAME / STYLE / PLACE typed where a cultivar belongs
+ok(typeof hint('Gui Fei')==='string', 'H1 "Gui Fei" → hint (a "/"-component of the display name is matched)');
+ok(typeof hint('Da Hong Pao')==='string', 'H2 "Da Hong Pao" → hint (the one member that is a tea name)');
+ok(typeof hint('大红袍')==='string', 'H3 "大红袍" (a DHP aka) → hint');
+ok(typeof hint('Wuyi Yancha')==='string', 'H4 "Wuyi Yancha" (a place, not a cultivar) → hint');
+// silent: real cultivars — the never-cry-wolf contract
+ok(hint('Rou Gui')===null, 'H5 "Rou Gui" (a cultivar member) → no hint');
+ok(hint('Jin Xuan')===null, 'H6 "Jin Xuan" → no hint (variant matches but the standalone-cultivar exception suppresses it)');
+ok(hint('Mi Lan Xiang')===null, 'H7 "Mi Lan Xiang" (a Dan Cong aroma member) → no hint');
+// silent: uncatalogued/unknown — better to miss than to nag
+ok(hint('Qing Xin')===null, 'H8 "Qing Xin" (a real cultivar not in the catalog) → no hint (silence, not a false positive)');
+ok(hint('Saemidori')===null && hint('zzznope')===null, 'H9 an unknown string → no hint');
+ok(hint('')===null && hint('   ')===null, 'H10 empty / whitespace → no hint');
+ok(hint('Gui Fei')===hint('Gui Fei'), 'H11 deterministic (same input → same result)');
+console.log('  H cultivar check: 11 checks');
+
 if(failures){ console.log('\n'+failures+' TEA-TYPES TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL TEA-TYPES TESTS PASSED  ('+passed+' passed)');

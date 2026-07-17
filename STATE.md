@@ -141,7 +141,26 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.89 per-steep strength feedback (gongfu)** (cache **v99**, APP_VERSION v3.89):
+**NOW (just shipped) — v3.90 greeting recency tune + soft cultivar check** (cache **v100**, APP_VERSION
+v3.90; one deploy / two commits / one banner): **Part 1 (#25 follow-up)** — DHP kept being re-suggested two
+days after a brew; verified a too-gentle dial, not a bug. `RECENCY_DAYS` 2→3 + `RECENCY_PENALTY` 1.25→1.75
+(`d_scorePick`). **Tuned against the fresh export, not a guess** — dry-run: widen-only (1.52) or strengthen-
+only (1.48) leave DHP winning vs Gui Fei 1.35; only both demote it (1.18). Guardrail intact (a 2-days-ago
+penalty overcomes only a bucket-lead of ~1 → strongly-habitual / no-recent teas still surface; morning stayed
+Shincha). greeting-v4 H 5→8. **Part 2** — `cultivarNameHint` (steep-tea-types.js): a quiet, dismissable,
+blur-triggered heads-up when the Cultivar field holds a tea name/style/place ("Gui Fei", "Da Hong Pao") not a
+cultivar. Rides the v3.87 catalog; **high-precision, low-recall** (hints only on a top-level style/place/name
+row minus a standalone-cultivar exceptions set {jin-xuan-milky, ruan-zhi-oolong, anxi-tie-guan-yin} plus the
+member `dhp`; variant-expands `/`-split+paren+aka since bare names aren't in `covers`). **Value saved
+unchanged** (suggest-never-block); mappers/write path untouched. tea-types H=11. First live use of the
+reference read path (Phase B still held). All 13 suites green; both live-verified (greeting dry-run + in-app
+cultivar hint, console clean). **5th real `/slowcup-deploy`.** **PARKED (diagnostic, for R3):** the ephemeral
+steeping nudge ("How was that pour? · Just right", `d_nudgeNextSteep`) writes only `timeShift` — "Just right"
+writes nothing — so a user can believe they logged taste while nothing reaches `steep.feedback`/the gate
+(silent gate-data loss). Confirmed, NOT fixed: the fix waits for the **R3 Log/Focus-screen resolution**, which
+must make "adjust the timer" and "log the taste" unconfusable, so both land consistently.
+
+**Earlier — v3.89 per-steep strength feedback (gongfu)** (cache **v99**, APP_VERSION v3.89):
 the **A2 capture control** (`SPEC-brew-advice-v3-feedback.md`, #15+#9) — the slice that fills the phase-2
 gate. Data: one nullable `steeps.feedback` (`sql/v3_9-steep-feedback.sql`, **already run 2026-07-17**; enum
 app-enforced, no DB CHECK); the `steepFromDb`/`steepToDb` pair carries it. Engine: `reduceSteepFeedback`
