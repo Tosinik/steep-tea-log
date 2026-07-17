@@ -658,8 +658,12 @@ const VARIETY_GUARD_SAME_DAY = true;
 // today is excluded so logging a tea today can't retroactively change the day's predicted pick
 // (the predicted-vs-actual stability at the session-aware branch). Deterministic: the window is
 // measured from the passed-in todayKey ('YYYY-MM-DD'), never Date.now(). Both tunables.
-const RECENCY_DAYS = 2;
-const RECENCY_PENALTY = 1.25;   // proximity-scaled: 1 day ago = full, 2 days ago = half (with DAYS=2)
+const RECENCY_DAYS = 3;         // v3.90 (#25 follow-up): 2 was too narrow — a two-days-ago brew sat at
+const RECENCY_PENALTY = 1.75;   // the window edge (half strength), so a habitual favourite still won.
+                                // proximity-scaled: nearest prior day = full penalty, tapering to 1/DAYS
+                                // at the window's far edge. Tuned against real data (a bucket-lead-of-1
+                                // favourite brewed 2 days ago is now demoted; a strongly-habitual tea, or
+                                // one with no recent brew, still surfaces). Both tunables; taste dial.
 function d_scorePick(target, todayKey, excludeIds, excludeType){
   const sessions = state.sessions || [];
   const candidates = (state.teas||[]).filter(t=> !isTeaFinished(t)

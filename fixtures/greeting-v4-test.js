@@ -273,10 +273,25 @@ const idsIn = html => (html.match(/openTeaDetail\('([^']+)'\)/g)||[]).map(m=>/\(
   hs.push(sess('rv',2026,7,2,8));                                                                     // rival: 1 far-past
   setState([hb,rv], hs);
   ok(pick('morning').id==='hb', 'H2 a habitual tea still wins despite a brew yesterday (penalty is soft, not an exclude)');
-  // H3 — 3 days ago is OUTSIDE the 2-day window → no penalty (score == bucketCount).
+  // H3 — v3.90 widened the window to 3 days: a brew 3 days ago now carries a (reduced) penalty.
   setState([{id:'c3',name:'C',type:'green',amountGrams:40}], [ sess('c3',2026,7,12,8) ]);   // 3 days ago
   const p3=pick('morning');
-  ok(p3.id==='c3' && Math.abs(p3.score-p3.bucket)<1e-9, 'H3 last brew 3 days ago carries no recency penalty');
+  ok(p3.id==='c3' && p3.score < p3.bucket, 'H3 a brew 3 days ago now carries a penalty (window widened to 3)');
+  // H3b — 4 days ago is OUTSIDE the widened window → no penalty (score == bucketCount).
+  setState([{id:'c4',name:'C4',type:'green',amountGrams:40}], [ sess('c4',2026,7,11,8) ]);  // 4 days ago
+  const p4=pick('morning');
+  ok(p4.id==='c4' && Math.abs(p4.score-p4.bucket)<1e-9, 'H3b a brew 4 days ago carries no recency penalty (outside the window)');
+  // H6 — v3.90 the DHP case: a bucket-2 favourite brewed 2 days ago is demoted below a fresh bucket-1
+  // favourite rival (rating+favourite cancel, so it turns on the bucket gap vs the two-days-ago penalty).
+  const dh={id:'dh',name:'DHPlike',type:'oolong',amountGrams:40,rating:4,isFavorite:true};
+  const gf={id:'gf',name:'GuiFeilike',type:'oolong',amountGrams:40,rating:4,isFavorite:true};
+  setState([dh,gf], [ sess('dh',2026,7,5,8), sess('dh',2026,7,13,8), sess('gf',2026,7,6,8) ]); // dh: far-past + 2d-ago; gf: 1 far-past
+  ok(pick('morning').id==='gf', 'H6 bucket-2 favourite brewed 2 days ago is demoted below a fresh bucket-1 favourite');
+  // H7 — guardrail: the SAME bucket-2 favourite with NO recent brew still surfaces over the bucket-1 rival.
+  const dg={id:'dg',name:'Habitual',type:'oolong',amountGrams:40,rating:4,isFavorite:true};
+  const gr={id:'gr',name:'Rival',type:'oolong',amountGrams:40,rating:4,isFavorite:true};
+  setState([dg,gr], [ sess('dg',2026,7,4,8), sess('dg',2026,7,5,8), sess('gr',2026,7,6,8) ]); // dg: 2 far-past, no recent
+  ok(pick('morning').id==='dg', 'H7 a habitual (bucket-2) tea with no recent brew still wins (soft, not a hard exclude)');
   // H4 — TODAY's brew is not penalised (keeps the predicted-vs-actual computation stable pre/post-log).
   setState([{id:'td',name:'Today',type:'green',amountGrams:40}], [ sess('td',2026,7,15,7) ]);  // earlier today
   const pt=pick('morning');
@@ -285,7 +300,7 @@ const idsIn = html => (html.match(/openTeaDetail\('([^']+)'\)/g)||[]).map(m=>/\(
   setState([a1,b1], [ sess('a1',2026,7,10,8), sess('b1',2026,7,14,8) ]);
   ok(JSON.stringify(pick('morning'))===JSON.stringify(pick('morning')), 'H5 same todayKey → same pick (deterministic)');
   clearNow();
-  console.log('  H #25 recency window: 5 checks');
+  console.log('  H #25 recency window: 8 checks');
 })();
 
 // ===== I. #17 "unopened" copy gated on stock evidence =====
