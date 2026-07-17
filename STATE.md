@@ -105,13 +105,13 @@ when it ships. Queued after: a timestamp-anchored timer slice for #30 (pause-gat
 notification/push is ruled OUT — answer it on the issue); the #25 greeting fix batches the #17 revisit
 when it gets a slice. **Open lanes:** (1) **phase-2 (#15 + #9)** — **feedback placement is RESOLVED.** The
 two pre-spec decisions are ruled (one-tap axis only; the optional-middle-path per-steep + session control)
-and the buildable spec is committed: **`SPEC-brew-advice-v3-feedback.md`**. **The A2 capture control is the
-next buildable slice — unblocked, opens on Niklas's go (do NOT start the build).** Approach: existing tokens
-+ phone-check (glyph/colour = Design's lane; save→reload is the mapper check). It adds `steeps.feedback`
-(`sql/v3_9-steep-feedback.sql`), a per-steep tap gated to gongfu, `reduceSteepFeedback` + one branch in
-`feedbackSignalOf`, `sessionHasFeedback`, `fixtures/brew-feedback-test.js`. **Gate ~3/15** (measured
-2026-07-15; ~Jul 20 is STALE) — it **fills UNDER A2 once shipped** (the old end-of-session control is why the
-rate was low), ~2–3 wks of complete logging after. v3.85's brewStyle un-gate feeds real method data. Post-gate
+and the buildable spec is committed: **`SPEC-brew-advice-v3-feedback.md`**. **The A2 capture control SHIPPED
+v3.89** (cache v99): `steeps.feedback` live (`sql/v3_9-steep-feedback.sql`, run 2026-07-17), a per-steep tap
+gated to gongfu, `reduceSteepFeedback` + one branch in `feedbackSignalOf`, `sessionHasFeedback`, committed
+`fixtures/brew-feedback-test.js`. Niklas's remaining device checks: save→reload mapper round-trip + on-device
+quiet-until-reached-for (glyph/colour = Design's lane if it reads too loud). **Gate ~3/15** (measured
+2026-07-15) — it now **fills UNDER the shipped control** (the old end-of-session control is why the rate was
+low), ~2–3 wks of complete logging after. v3.85's brewStyle un-gate feeds real method data. Post-gate
 (separate specs): learned defaults · `SESSION_METHODS` append `japanese`/senchadō. (2) **Supabase allowlist cleanup**
 — drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins"). The
 **domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
@@ -137,12 +137,28 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 
 **Parallel / Niklas's:** ~~the domain~~ (**registered + migrated 2026-07-13** ✓); beta-tester
 **reinstalls on the new origin** (Ruth first — then the Supabase allowlist cleanup fires); the
-**phase-2 gate** (3/15 measured, ~2–3 weeks out, NOT ~Jul 20) — feedback placement now **RESOLVED**, spec
-committed (`SPEC-brew-advice-v3-feedback.md`); **the A2 capture control is the unblocked next slice (opens on
-Niklas's go), and the gate fills UNDER A2 once it ships** → then the phase-2 brew-advice build (learned
-defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
+**phase-2 gate** (3/15 measured 2026-07-15, ~2–3 weeks out) — **the A2 capture control SHIPPED v3.89**; the
+gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
+low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.88 greeting: no re-suggesting what you just had, honest "unopened"** (cache
+**NOW (just shipped) — v3.89 per-steep strength feedback (gongfu)** (cache **v99**, APP_VERSION v3.89):
+the **A2 capture control** (`SPEC-brew-advice-v3-feedback.md`, #15+#9) — the slice that fills the phase-2
+gate. Data: one nullable `steeps.feedback` (`sql/v3_9-steep-feedback.sql`, **already run 2026-07-17**; enum
+app-enforced, no DB CHECK); the `steepFromDb`/`steepToDb` pair carries it. Engine: `reduceSteepFeedback`
+(net-sign, tie→`good`) + one branch atop `feedbackSignalOf` (curve→verdict→tags→null, **per-steep wins,
+never merged**); `computeBrewAdvice` **UNCHANGED**; `sessionHasFeedback` a **real function** (steep-only→true
+linchpin). UX (steep-sessions): gongfu-gated per-steep tap on completed steep cards
+(`steepFeedbackHTML`/`d_toggleSteepFb`/`setSteepFeedback`) — quiet-until-reached-for (faint `strength?` →
+chips on tap → faint marker), **observational** copy, writes only `steep.feedback` (the ephemeral nudge /
+`timeShift` untouched — strict non-interaction). Also hidden when `brewAdvice` off (approved — one switch
+governs the loop). **Collapsed the planned 2 commits into 1** (one banner). Fixtures: new committed
+`brew-feedback-test.js` (54, incl. **12/12 no-op regression**); all 13 green; live-smoked (real onclick
+paths; western hides the affordance). **SQL already run. 4th real `/slowcup-deploy`.** **Niklas's device
+checks:** save→reload mapper round-trip + on-device quiet-until-reached-for. The gate now **fills UNDER this
+control** (~3/15 measured 2026-07-15, ~2–3 wks of complete logging). Post-gate (separate specs): learned
+defaults · `SESSION_METHODS` append `japanese`/senchadō.
+
+**Earlier — v3.88 greeting: no re-suggesting what you just had, honest "unopened"** (cache
 **v98**, APP_VERSION v3.88): a greeting-engine pass (#25 + #17 + ack) + one hygiene rider. **#25:**
 `d_scorePick` gains a proximity-scaled **soft recency penalty** (`RECENCY_DAYS`=2 / `RECENCY_PENALTY`=1.25,
 tunable) for teas brewed in the last 2 **prior** days — penalty not exclude (tiny shelf never starves;

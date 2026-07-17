@@ -16,7 +16,8 @@ forms) · brew advice learns from the user's own sessions (phase 2) · design la
 surface.
 
 ## Pillar A — brew advice phase 2: learned defaults
-- Gate: ≥15 ratio'd sessions with feedback, both methods — lands ~2026-07-20/24. Fresh CSV exports →
+- Gate: ≥15 ratio'd sessions with feedback, both methods — **~3/15 as of 2026-07-15; fills UNDER the A2
+  per-steep control (shipped v3.89, 2026-07-17), ~2–3 wks of complete logging → early Aug.** Fresh CSV exports →
   spec drafted claude.ai-side, dry-run on real data, decisions batched. (`ratioAdjust` must be ON for the
   window to count.)
 - **NEW (Niklas 2026-07-10): third brewing method `japanese` (senchadō).** Green tea in a kyusu is
@@ -203,9 +204,16 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   rediscovery copy so an opened tea is never called "unopened"; ack pool rewritten retrospective. Hygiene
   rider: dead `⚠︎ confirm` branch removed from `typeConfidenceHedge`. greeting-v4 47→58, tea-types 48→49.
   (Sibling docs commit `89f035e`: ROADMAP backfill above + verifier codepoint policy + stale-suite deletion.)
-- **NEXT: phase-2 (#15 + #9)** — gate re-measured **~3 of 15** ratio'd+feedback'd (2026-07-15; ~Jul 20 is
-  stale, ~2–3 wks), and held behind two pre-spec decisions (`PHASE2-PRESPEC-NOTES.md`: one-tap signal source,
-  per-steep strength placement). #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.
+- [x] **A2 per-steep strength feedback — #15 + #9** (v3.89) — the capture control that fills the phase-2
+  gate. One nullable `steeps.feedback` (`sql/v3_9-steep-feedback.sql`); `reduceSteepFeedback` (net-sign,
+  tie→`good`) + `feedbackSignalOf` per-steep branch (curve→verdict→tags→null, per-steep wins) +
+  `sessionHasFeedback` (steep-only→true); gongfu-gated per-steep tap on completed steep cards
+  (quiet-until-reached-for, observational, writes only `steep.feedback`). `computeBrewAdvice` unchanged. Also
+  hidden when `brewAdvice` off. New committed `fixtures/brew-feedback-test.js` (54). Collapsed the planned
+  inert-plumbing + UX commits into one.
+- **NEXT: phase-2 gate-fill** — A2 shipped v3.89; the gate (~3/15, measured 2026-07-15) now fills UNDER the
+  new per-steep control, ~2–3 wks of complete logging. Post-gate (separate specs): learned defaults ·
+  `SESSION_METHODS` append `japanese`/senchadō. #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.
 
 ## Suggested sequencing (parallel-friendly)
 Now: **R2 implementation deploys — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 ✓ (COMPLETE)** → the post-R2 issue

@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.88';
+const APP_VERSION = 'v3.89';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Home won't suggest a tea you just had — and a tea you've opened is never called 'unopened.'";
+const WHATS_NEW = "Gongfu sessions can now note each steep's strength — it quietly tunes future brews.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -553,14 +553,34 @@ function fmtSecShort(s){ s=Math.round(s); if(s<60) return s+'s'; const m=Math.fl
    the parsed guide baseline. Sessions stay loose — this only surfaces when asked. */
 const BREW_STRONG_TAGS = ['bitter','astringent','harsh','over-steeped','oversteeped','overbrewed','too strong','stewed'];
 const BREW_WEAK_TAGS   = ['weak','watery','thin','flat','under-steeped','understeeped','bland','too light'];
+// A session's per-steep taps → one verdict. Net sign only (shape deliberately ignored
+// until the shape-aware upgrade earns its data). Untapped steeps contribute nothing.
+function reduceSteepFeedback(steeps){
+  let strong=0, weak=0, any=false;
+  (steeps||[]).forEach(st=>{
+    if(st.feedback==='strong'){ strong++; any=true; }
+    else if(st.feedback==='weak'){ weak++; any=true; }
+    else if(st.feedback==='good'){ any=true; }
+  });
+  if(!any) return null;                       // no per-steep tap → fall through to session/tags
+  const net = weak - strong;
+  return net>0 ? 'weak' : (net<0 ? 'strong' : 'good');   // tie → 'good' (counted, net-neutral)
+}
 function feedbackSignalOf(session){
   if(!session) return null;
-  if(session.feedback==='strong'||session.feedback==='weak'||session.feedback==='good') return session.feedback;
+  const curve = reduceSteepFeedback(session.steeps);   // 1 · per-steep wins
+  if(curve) return curve;
+  if(session.feedback==='strong'||session.feedback==='weak'||session.feedback==='good') return session.feedback; // 2 · session verdict (fallback)
   const tags = [].concat(session.tags||[], ...((session.steeps||[]).map(st=>st.tags||[])))
-    .map(t=>String(t).toLowerCase().trim());
+    .map(t=>String(t).toLowerCase().trim());       // 3 · tag inference (weakest)
   if(tags.some(t=>BREW_STRONG_TAGS.includes(t))) return 'strong';
   if(tags.some(t=>BREW_WEAK_TAGS.includes(t))) return 'weak';
   return null;
+}
+// Gate predicate: does this session carry ANY feedback (per-steep or session-level)? The
+// linchpin is steep-only → true — else A2's own data would be invisible to its gate.
+function sessionHasFeedback(session){
+  return !!session.feedback || (session.steeps||[]).some(st => !!st.feedback);
 }
 // Sessions counted for advice: this tea, not cold brew, and (if a tuned baseline
 // was saved into the guide) only those logged since — so saved tunings don't

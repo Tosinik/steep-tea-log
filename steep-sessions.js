@@ -684,6 +684,33 @@ function brewNudgeRowHTML(d){
   </div>`;
 }
 
+// Per-steep strength tap (v3.89, gongfu only) — recorded ON the completed steep card, a separate
+// axis from the ephemeral nudge above. Observational copy ("a touch weak"), never imperative.
+// quiet-until-reached-for: faint when unrated, a faint marker once set, chips only while expanded
+// (one steep open at a time — a fully-tapped session reads as faint markers, never open chip-rows).
+// Writes ONLY steep.feedback (never timeShift — strict non-interaction); persists in-draft via
+// d.steeps → steepToDb at commit. Tea-First: never required, finish never flags an un-rated steep.
+const STEEP_FB_LABELS = { weak:'a touch weak', good:'good', strong:'a touch strong' };
+function steepFeedbackHTML(d, i){
+  const fb = (d.steeps[i]||{}).feedback || null;
+  if(d.steepFbOpen===i){
+    const chip=v=>`<button type="button" class="lib-chip ${fb===v?'active':''}" onclick="setSteepFeedback(${i},'${v}')">${STEEP_FB_LABELS[v]}</button>`;
+    return `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${chip('weak')}${chip('good')}${chip('strong')}</div>`;
+  }
+  return `<button type="button" onclick="d_toggleSteepFb(${i})" style="margin-top:6px;background:none;border:none;padding:0;font-size:11px;color:var(--ink-soft);${fb?'':'opacity:.6;'}cursor:pointer;">${fb?'· '+STEEP_FB_LABELS[fb]:'strength?'}</button>`;
+}
+function d_toggleSteepFb(i){
+  const d = state.sessionDraft; if(!d) return;
+  d.steepFbOpen = (d.steepFbOpen===i) ? null : i; // one open at a time; re-tap the marker to change/clear
+  render();
+}
+function setSteepFeedback(i, v){
+  const d = state.sessionDraft; if(!d || !d.steeps[i]) return;
+  d.steeps[i].feedback = (d.steeps[i].feedback===v) ? null : v; // toggle off on second tap → clear (mirrors setSessionFeedback)
+  d.steepFbOpen = null; // collapse to the quiet marker after a pick
+  render();
+}
+
 function beginSteeping(){
   const d = state.sessionDraft;
   const tea = teaById(d.teaId);
@@ -796,11 +823,17 @@ function d_flavorFreeOpen(){ if(state.sessionDraft){ state.sessionDraft.flavorFr
 function sessionSteepingHTML(d){
   const tea = teaById(d.teaId);
   const tm = d.timer;
+  // Per-steep feedback rides the same opt-in switch as the session verdict (feedbackRowHTML) and is
+  // gongfu-only — the method gate is the main quietness mechanism (spec §3). Same method resolution
+  // commitSession snapshots into brewStyle. Cold brew carries no timed steeps, so no cards anyway.
+  const ves = vesselById(d.vesselId);
+  const showSteepFb = state.settings.brewAdvice!==false && !d.isColdBrew && brewMethodFor(d.brewStyle, ves&&ves.capacityMl)==='gongfu';
   const steepsHTML = d.steeps.map((s,i)=>`
     <div class="steep-item">
       <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC)+tempUnitLabel()+' · ':''}${fmtSec(s.timeSeconds)}</span></div>
       ${s.description?`<div style="margin-top:3px;color:var(--ink-soft);">${escapeHtml(s.description)}</div>`:''}
       ${s.tags.length?`<div class="steep-tags">${s.tags.map(t=>`<span class="tagchip">${escapeHtml(t)}</span>`).join(' ')}</div>`:''}
+      ${showSteepFb?steepFeedbackHTML(d,i):''}
     </div>
   `).join('');
 
