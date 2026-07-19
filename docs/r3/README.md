@@ -14,6 +14,9 @@ direction lock, then per-bundle and per-screen reviews. Read these for *why* a s
 the way it does; each records what was caught, what was ruled, and what was flagged as new
 capability.
 
+- `R3-RULINGS-LEDGER.md` — **the binding reference for the #09b sweep + hand-off**: 27 numbered
+  rulings, corrections-owed per board, shipped-truth. Boards verify against this + the code, never
+  against completion summaries.
 - `R3-DIRECTION-LOCK.md` — why D won over A/B/C; the five rationing contracts; the liquor
   swatch mini-spec
 - `R3-BUNDLE1-RECONCILIATION.md` → `R3-BUNDLE1-REV4.md` — the four canonical screens

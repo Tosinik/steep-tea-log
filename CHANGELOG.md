@@ -33,6 +33,11 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — R3 rulings ledger lands in the repo
+
+`docs/r3/planning/R3-RULINGS-LEDGER.md` — the planning lane's **binding reference** for the #09b conformance sweep and the Code hand-off: 27 numbered rulings, corrections-owed per board, and a shipped-truth section, verified against the repo at `77cf800` and the 2026-07-19 exports. Boards get verified against this ledger and the code, never against completion summaries. (README `planning/` index updated to point at it.) No app change.
+
+---
 ## v3.91 — senchadō capture + fixture repair
 Deploy: `steep-core.js` (VESSEL_TYPES + brewMethodFor + LEAF_RATIO_DEFAULT + baselineRatioFor + APP_VERSION + WHATS_NEW), `steep-sessions.js` (SESSION_METHODS + per-steep gate + vessel-type prefill + edit-modal method control), `fixtures/brew-feedback-test.js` (R section), new `docs/tasks/TASK-senchado-capture.md`, `.claude/skills/slowcup-deploy/SKILL.md` (step-6 line), `service-worker.js` (**v101**), `CHANGELOG.md`, `STATE.md`, `ROADMAP-v4.md`. **No SQL.**
 - **Part A — the brew-feedback R section was stale-red and would have failed the deploy's own fixture gate.** Four real sessions now carry per-steep taps (two with no session-level feedback), expiring the old "every real session → reduce null" + `has===!!feedback` identity. Rewritten to three LIVE guards: the reducer in both directions (null untapped / non-null tapped), the steep-only linchpin on real data, and the gate count REPORTED not pinned with a method split on stored `brew_style`. Engine (`reduceSteepFeedback`/`sessionHasFeedback`/`computeBrewAdvice`) untouched. brew-feedback 54→59.
