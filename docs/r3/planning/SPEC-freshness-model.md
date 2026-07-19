@@ -210,7 +210,7 @@ Recorded so they aren't re-introduced. All three were verified against `9ce9492`
 |---|---|
 | "the live engine knows only `freshnessClass` (delicate vs neutral)" | `freshnessClass` returns `young`/`ages`/`null` and is the v3.62 **detail cue only**. Delicate-vs-neutral is `statusCategory`, a *different* function driving the **shelf** — the load-bearing one, which rev 1 never mentions. |
 | "no concept of oolong *ageing*" (flagged as new capability) | Ageing ships for white + pu-erh on both surfaces. Only **oolong** ageing is new. |
-| "no concept of *opened*" | `isTeaUnopened` (v3.90) exists — inferred from stock, not measured. See §7.1. |
+| "no concept of *opened*" | `isTeaUnopened` (v3.88) exists — inferred from stock, not measured. See §7.1. |
 
 Rev 1 also left the slice scoped as a detail-page block when single-writer discipline requires it
 to own the shelf (§0), and conflated clock-grounding with window-grounding (§2).
