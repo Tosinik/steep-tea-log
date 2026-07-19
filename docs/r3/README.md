@@ -20,15 +20,21 @@ capability.
 - `R3-BUNDLE2-RECONCILIATION.md` — Insights · Origins · Settings · Shopping · Social
 - `R3-INVENTORY-RATIFICATION.md` — surface completeness + edit-layout
 - `R3-SESSIONS-RECONCILIATION.md` — Sessions, and the connection-map ask
-- `SPEC-freshness-model.md` — **a Code hand-off pin**
+- `SPEC-freshness-model.md` — **a Code hand-off pin** (rev 2 — scope now covers the shelf
+  status line, not only Tea detail)
 - `TASK-delete-everything.md` — decided, not yet built
 
 **`design/`** — Design's own structural documents.
 
 - `R3-SURFACE-INVENTORY.md` — every surface, marked designed / undesigned / deferred
 - `R3-CONNECTION-MAP.md` — the edges: what links to what (the companion to the inventory)
-- `SPEC-freshness-model-DESIGN.md` — Design's version of the freshness spec. Kept alongside
-  the planning lane's; they differ in framing and both are useful.
+- `SPEC-freshness-model-DESIGN.md` — Design's version of the freshness spec, kept for the
+  record. It differs from the planning lane's copy in **substance**, not framing: it splits
+  oolong into two rows (light vs roasted), where the planning copy collapses them into one
+  type plus a per-tea `ageing` flag. The planning copy is the authoritative pin.
+  Note both files open with the same `Design → Code hand-off` line — that describes the
+  document's *purpose*, not its authorship. This one is Design's; `planning/` is the
+  planning lane's.
 
 **`boards/`** — the visual record, latest locked revision only. Preview PNGs; the `.dc.html`
 standalone exports are deliberately *not* committed (~10 MB each of inlined runtime, no extra

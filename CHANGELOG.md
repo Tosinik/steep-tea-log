@@ -33,6 +33,29 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — freshness spec rev 2
+
+Reviewed the freshness hand-off pin (`docs/r3/planning/SPEC-freshness-model.md`) against the live
+build. Rev 1 mis-stated what ships today in three places: `freshnessClass` is the v3.62 detail cue,
+not the engine (that's `statusCategory` + `freshnessWeeksLeft`, driving the shelf); ageing already
+ships for white and pu-erh, so only oolong ageing is new; and `isTeaUnopened` (v3.88) already infers
+openedness from stock.
+
+Rulings folded in: the new model is single writer across shelf and detail, so `statusCategory` and
+the global `FRESH_WINDOW_MONTHS`/`FRESH_NEAR_WEEKS` retire and status-line-test section D is
+rewritten, while `statusLine`'s quantity-first precedence stays; clock-grounding and
+window-grounding are separated, adding an elapsed-only rung so a tea with `opened_date` but no
+catalog match still reads; windows key on catalog slug with family fallback, and the Herbal row is
+dropped; ungrounded on the shelf falls through to the quantity tone, never an empty slot.
+
+Three collisions flagged as hand-off items rather than assumed: `isTeaUnopened` vs `opened_date`,
+`teas.type = puerh` vs `TEA_TYPES.family = dark`, and the catalog's exact-name hand-curated join.
+README corrected: the two spec copies differ in substance, not framing, and the shared
+`Design → Code hand-off` header describes purpose, not authorship.
+
+Docs only — no app change.
+
+---
 ## docs — the R3 design record lands in the repo
 
 `docs/r3/` — the design round's durable record: the planning lane's reconciliation notes and
