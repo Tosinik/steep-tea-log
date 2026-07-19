@@ -20,6 +20,9 @@ fixtures/*
 .claude/*
 !.claude/skills/
 !.claude/agents/
-# Design-reference bundles (READMEs + .dc.html + PNGs) live local-only, never shipped.
+# Design WORKING files stay local: raw inspiration, teaware source shots, and the
+# .dc.html standalone exports (~10MB each of inlined runtime). The LOCKED R3 record
+# lives in docs/r3/ and IS committed — it's the spec Code builds from, not reference.
 SlowCup R2 bundle handoff/
 design-r3/
+*.dc.html

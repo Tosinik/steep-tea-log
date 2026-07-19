@@ -33,6 +33,32 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — the R3 design record lands in the repo
+
+`docs/r3/` — the design round's durable record: the planning lane's reconciliation notes and
+specs, Design's surface inventory + connection map, and the locked board PNGs. Previously
+this existed only in chat transcripts and Design's workspace; `R3-BRIEF.md` was the sole
+committed artifact.
+
+- **`.gitignore` corrected.** The "design bundles are local-only, never shipped" rule dated
+  from R2, when bundles were inspiration reference. R3's boards are the spec Code builds
+  from, so the locked record is now tracked; only working files and the ~10MB `.dc.html`
+  standalone exports stay ignored.
+- **Includes a hand-off pin** — `SPEC-freshness-model.md` (opened-date clock, per-type
+  catalog windows, ageing-as-history) had no home in the repo and joins the swatch and
+  per-origin script models at the joint Code hand-off.
+- **Boards: latest locked revision only.** The reconciliation notes carry the reasoning for
+  each change, so revision history isn't duplicated as pixels. `.dc.html` standalone exports
+  excluded — no extra reviewable content over the PNGs. (Two boards renamed to kebab-case —
+  `03-tea-detail.png`, `06-add-edit-tea.png` — to match the README and the other eleven.)
+- **Planning-lane handover kept as a dated snapshot** — `docs/r3/HANDOVER-planning-lane.md`,
+  banner-marked 2026-07-19 / not-current (its status sections go stale by design; current state
+  is `STATE.md`/`CHANGELOG.md`). **Known follow-up:** its §6 (review method) + §7 (recurring
+  failure modes) are durable discipline recorded nowhere else and should be promoted into
+  `CLAUDE.md` as standing review discipline.
+- No app change. Docs-only.
+
+---
 ## v3.90 — greeting recency tune + soft cultivar check
 Deploy: `steep-dashboard.js` (RECENCY_DAYS/RECENCY_PENALTY), `fixtures/greeting-v4-test.js` (H section), `steep-tea-types.js` (cultivarNameHint), `steep-teas.js` (cultivar-field hint), `fixtures/tea-types-test.js` (H section), `steep-core.js` (APP_VERSION + WHATS_NEW), `service-worker.js` (**v100**), `CHANGELOG.md`, `STATE.md`, `ROADMAP-v4.md`. **No SQL.**
 - **Part 1 — recency tune (#25 follow-up).** DHP kept being re-suggested two days after a brew: verified not a bug but too-gentle dials — a two-days-ago brew sat at the old 2-day window's edge (half penalty), which a habitual favourite's bucket lead swamped. **`RECENCY_DAYS` 2→3, `RECENCY_PENALTY` 1.25→1.75** (`d_scorePick`, steep-dashboard.js). Tuned against the *current* export, not a guess: the dry-run showed widening OR strengthening **alone** left DHP winning (1.52 / 1.48 vs Gui Fei 1.35); only both together demote it (1.18). Guardrail intact — a two-days-ago penalty only overcomes a bucket lead of ~1, so a strongly-habitual tea (bigger lead) or one with no recent brew still surfaces (the morning pick stayed the habitual Shincha in the dry-run). No scoring-structure change; both consts stay tunable (taste dial). greeting-v4 H 5→8 (the DHP-mirror demote + its guardrail; the widened-window boundary).
