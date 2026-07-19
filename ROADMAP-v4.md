@@ -219,9 +219,19 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   standalone-cultivar exceptions set plus `dhp`; value saved unchanged). First live use of the reference read
   path (Phase B still held). PARKED: the ephemeral-nudge vs per-steep-feedback seam awaits the R3 Log/Focus
   resolution. greeting-v4 H 5→8, tea-types H=11.
+- [x] **senchadō — third brewing method + fixture repair** (v3.91) — the app knew only gongfu|western;
+  senchadō is now a real method (`SESSION_METHODS`, `VESSEL_TYPES`+Shiboridashi, `brewMethodFor` three-valued,
+  vessel-type prefill on new setups + an explicit method control on the edit modal, per-steep gate for gongfu
+  OR senchadō). Ratio-aware (the B5 reversal): senchadō rides the gongfu side in `baselineRatioFor`; the 2.8
+  green_jp leaf-seed is currently KB-shadowed (every library Japanese green resolves to 3.0) → the gyokuro
+  revisit needs senchadō ratios IN THE KB. Regression: 0 verdicts changed across 28 sessions. Part A repaired
+  the brew-feedback R section against fresh exports (54→59). Known downstream: R3 board #04 needs a 3-button
+  method segment (Design's, routed separately).
 - **NEXT: phase-2 gate-fill** — A2 shipped v3.89; the gate (~3/15, measured 2026-07-15) now fills UNDER the
-  new per-steep control, ~2–3 wks of complete logging. Post-gate (separate specs): learned defaults ·
-  `SESSION_METHODS` append `japanese`/senchadō. #14 parked → R3; #11 closed; #15 vocab expansion held until phase-2.
+  new per-steep control, ~2–3 wks of complete logging. **The gate metric should move to stored `brew_style`,
+  not `brewMethodFor`** (a phase-2 spec change — now that senchadō/western are real, the metric should count
+  what was brewed, not the capacity heuristic). Post-gate (separate specs): learned defaults; senchadō method
+  **shipped v3.91** (was listed here as a post-gate append). #14 parked → R3; #11 closed; #15 held until phase-2.
 
 ## Suggested sequencing (parallel-friendly)
 Now: **R2 implementation deploys — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 ✓ (COMPLETE)** → the post-R2 issue

@@ -30,7 +30,9 @@ The ritual, in order. Do not skip, reorder, or batch steps silently:
 6. **Fixtures** — run ALL committed suites (`fixtures/brew-roundtrip-test.js` at minimum,
    plus insights-room / wrapped-cards and any suite covering touched modules). Local
    gitignored suites for the changed feature run too. ANY red = stop, fix, rerun; never
-   ship red.
+   ship red. The gitignored `fixtures/*.csv` exports must be **current** before this step
+   counts — a fresh clone has none, so real-data sections (e.g. brew-feedback's R) graceful-
+   skip and their guards never fire; drop the latest Supabase exports in first.
 7. **Commit & push** — message `vX.YY — <title>` (matches the changelog heading). Docs-only
    changes use a `docs:` prefix and SKIP steps 1 and 6 (no bumps for non-app artifacts —
    the landing-page precedent).

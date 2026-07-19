@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.90';
+const APP_VERSION = 'v3.91';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "A gentle heads-up when a cultivar looks like a tea name — plus sharper 'what to brew' suggestions.";
+const WHATS_NEW = "Japanese brewing gets its own method — senchadō, with a proper leaf-to-water baseline and per-steep notes.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -106,7 +106,7 @@ function groupTeasByType(teas){
 }
 // Flat version of the same ordering — the Teas-tab default sort.
 function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g.teas); }
-const VESSEL_TYPES = ['Gaiwan','Kyusu','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
+const VESSEL_TYPES = ['Gaiwan','Kyusu','Shiboridashi','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
 const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
 // v3.72 (issue #6) — achievements/confetti are dormant app-wide: the 8-bit system was scrapped and a
@@ -353,17 +353,25 @@ const METHOD_MISMATCH_MAX = 2.5;    // if the factor still exceeds this after me
                                     // don't scale (a visibly-skipped adjustment beats a wrong one)
 // Last-resort per-LEAF_PROFILES-family baseline ratios, method-split (g/100ml). Only used when
 // neither the guide nor the KB resolves a baseline. Deliberately coarse — the KB is the real source.
+// senchadō (v3.91) is seeded ONLY for green_jp. NOTE it is currently UNREACHABLE: the KB tier in
+// baselineRatioFor sits ABOVE this table and resolves every library green_jp to kb.ratioGongfu (3.0),
+// so senchadō == gongfu baseline for today's teas and this 2.8 fires only if the KB ever misses. 2.8 is
+// a SEED (kyusu sencha ~5g/180ml), not settled fact; gyokuro/dense shiboridashi run far higher — the
+// gyokuro revisit needs senchadō ratios IN THE KB, not here, or the seed stays decorative. Other forms
+// omit senchadō and fall through to their gongfu value (the nearer neighbour), never western.
 const LEAF_RATIO_DEFAULT = {
-  green_jp:   { western:1.8, gongfu:3.0 },
+  green_jp:   { western:1.8, gongfu:3.0, senchado:2.8 },
   green_cn:   { western:1.4, gongfu:3.0 },
   rolled:     { western:0.8, gongfu:3.5 },
   open:       { western:1.3, gongfu:4.0 },
   bud:        { western:1.5, gongfu:4.5 },
   compressed: { western:1.6, gongfu:5.0 }
 };
-// Method for a session: explicit brewStyle wins; else infer from the vessel's capacity.
+// Method for a session: explicit brewStyle wins; else infer from the vessel's capacity. senchadō
+// (v3.91) is EXPLICIT-only — the capacity heuristic never infers it (a kyusu at 210ml would read
+// western, a shiboridashi at 73ml gongfu; both wrong), so it's set by the vessel-type prefill/tap.
 function brewMethodFor(brewStyle, capacityMl){
-  if(brewStyle==='gongfu'||brewStyle==='western') return brewStyle;
+  if(brewStyle==='gongfu'||brewStyle==='western'||brewStyle==='senchado') return brewStyle;
   const cap = Number(capacityMl);
   return (cap>0 && cap<=GONGFU_VESSEL_MAX_ML) ? 'gongfu' : 'western';
 }
@@ -388,12 +396,13 @@ function baselineRatioFor(tea, method){
   if(typeof kbResolve==='function'){
     const kb = kbResolve([tea&&tea.name, tea&&tea.cultivar, tea&&tea.origin].filter(Boolean).join(' '));
     if(kb){
-      const r = method==='gongfu' ? (Number(kb.ratioGongfu)||Number(kb.ratio)) : (Number(kb.ratioWestern)||Number(kb.ratio));
+      // senchadō rides the gongfu side (no kb.ratioSenchado; kb.ratio the final fallback) — nearer neighbour.
+      const r = (method==='gongfu'||method==='senchado') ? (Number(kb.ratioGongfu)||Number(kb.ratio)) : (Number(kb.ratioWestern)||Number(kb.ratio));
       if(r>0) return { ratio:r, source:'kb' };
     }
   }
   const d = LEAF_RATIO_DEFAULT[effectiveLeafForm(tea)];
-  if(d) return { ratio: method==='gongfu'?d.gongfu:d.western, source:'leaf' };
+  if(d) return { ratio: method==='senchado' ? (d.senchado||d.gongfu) : (method==='gongfu'?d.gongfu:d.western), source:'leaf' };
   return null;
 }
 // The per-session ratio verdict. ctx = {gramsUsed, waterMl, brewStyle, capacityMl}. Returns null when

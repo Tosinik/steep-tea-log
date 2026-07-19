@@ -141,7 +141,31 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.90 greeting recency tune + soft cultivar check** (cache **v100**, APP_VERSION
+**NOW (just shipped) — v3.91 senchadō capture + fixture repair** (cache **v101**, APP_VERSION v3.91):
+**Part A** — the brew-feedback fixture's R section had gone stale-red against the fresh exports (4 real
+sessions now carry per-steep taps, 2 with no session-level feedback) and would have failed the deploy's own
+fixture gate; rewritten to three LIVE guards (reducer both directions · steep-only linchpin on real data ·
+gate count reported-not-pinned with a stored-`brew_style` method split). Engine untouched; 54→59.
+**Part B** — **senchadō is a real third method** (Niklas brews gongfu + Japanese, never western; his
+kyusu/shiboridashi sessions were split by capacity). `SESSION_METHODS`+`senchado`, `VESSEL_TYPES`+`Shiboridashi`,
+`brewMethodFor` three-valued (senchadō explicit-only), the per-steep gate fires for gongfu OR senchadō, a
+vessel-type prefill sets `brewStyle` on new setups (Gaiwan→gongfu, Kyusu/Shiboridashi→senchado; default not
+lock), and **(B7) an explicit method control on the edit modal** so old sessions are retaggable in-app.
+**Ratio (B5 reversal):** senchadō rides the gongfu side (`kb.ratioGongfu`). **The 2.8 leaf-seed is currently
+UNREACHABLE** — all five library Japanese greens resolve in the KB to 3.0, above the leaf table, so senchadō ==
+gongfu baseline today; **the gyokuro revisit needs senchadō ratios IN THE KB, not the leaf table.** Regression:
+OLD `892cb0b` vs NEW `computeSessionRatio` over all 28 sessions → **0 verdicts changed** (nothing tagged
+senchadō yet). All 13 suites green; browser-verified (3-method setup + prefill, senchadō per-steep cards,
+edit-modal control). Gate stays on `brewMethodFor` (the Travel cuppa is the one vessel it matters for —
+routing keeps its cards; strict-explicit would remove them, failure-mode #4). **6th real `/slowcup-deploy`.**
+**After-ship (Niklas):** re-type Mogake Shiboridashi `Other→Shiboridashi`; **retag to Senchadō the 5 method-
+less feedback sessions + the kyusu/shiboridashi ones** (gate split `{gongfu:6, western:1, (none):5}` — five
+carry no stored method, now fixable in-app via B7); fill `leaf_form` on Sencha Kagoshima Premium for data
+completeness + freshness display (NOT for a ratio — it resolves via KB to 3.0 regardless). **Known downstream:**
+R3 board #04's 2-button method segment needs a 3-button revision (Design's, routed separately). **Ritual:**
+`slowcup-deploy` step 6 now requires current `fixtures/*.csv` exports before the fixture run counts.
+
+**Earlier — v3.90 greeting recency tune + soft cultivar check** (cache **v100**, APP_VERSION
 v3.90; one deploy / two commits / one banner): **Part 1 (#25 follow-up)** — DHP kept being re-suggested two
 days after a brew; verified a too-gentle dial, not a bug. `RECENCY_DAYS` 2→3 + `RECENCY_PENALTY` 1.25→1.75
 (`d_scorePick`). **Tuned against the fresh export, not a guess** — dry-run: widen-only (1.52) or strengthen-

@@ -112,10 +112,13 @@ ok(eq(ctx.computeBrewAdvice({id:'T'},base).tuned, ctx.computeBrewAdvice({id:'T'}
 console.log('  I determinism: 2 checks');
 
 // ---- Real data (sessions_rows.csv + steeps_rows.csv), graceful when absent ----
-// Forward no-op regression: every existing session predates the steeps.feedback column, so
-// reduceSteepFeedback(session.steeps) MUST be null for all of them — which is exactly why
-// computeBrewAdvice stays byte-identical for every existing tea. Guards against a future
-// change letting the per-steep path fire on legacy (untapped) rows.
+// A LIVE guard now that real sessions carry per-steep feedback (v3.89 shipped, taps exist):
+//  1. the reducer's TWO directions on real rows — null when no steep is tapped, non-null when one is
+//     (the old "every real session → null" assumption expired the moment four sessions gained taps);
+//  2. the v3.89 path is live end to end — at least one real session qualifies via steep feedback ALONE
+//     (sessionHasFeedback true while session-level feedback is absent): the steep-only linchpin, on real data;
+//  3. gate count REPORTED, never pinned (re-editing a hard number every export is the trap), with the
+//     method split on STORED brew_style — what was actually brewed, not the capacity heuristic's inference.
 function parseCSV(t){const R=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];
  if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++;}else q=false;}else c+=ch;}
  else if(ch==='"')q=true;else if(ch===','){r.push(c);c='';}
@@ -125,18 +128,25 @@ function parseCSV(t){const R=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++
 const sPath=path.join(__dirname,'sessions_rows.csv'), stPath=path.join(__dirname,'steeps_rows.csv');
 if(fs.existsSync(sPath) && fs.existsSync(stPath)){
   const byId={};
-  // Mirror steep-data.js mappers: feedback = r.feedback || null (steeps CSV has no such column
-  // pre-v3_9, so every real steep resolves to null).
-  const sessions=parseCSV(fs.readFileSync(sPath,'utf8')).map(r=>{ const s={ id:r.id, teaId:r.tea_id, date:r.session_date, isColdBrew:r.is_cold_brew==='true'||r.is_cold_brew==='t', feedback:r.feedback||null, tags:[], steeps:[] }; byId[r.id]=s; return s; });
+  // Mirror steep-data.js mappers: feedback = r.feedback || null; brewStyle from the stored column.
+  parseCSV(fs.readFileSync(sPath,'utf8')).forEach(r=>{ byId[r.id]={ id:r.id, brewStyle:r.brew_style||'', feedback:r.feedback||null, steeps:[] }; });
   parseCSV(fs.readFileSync(stPath,'utf8')).forEach(r=>{ const s=byId[r.session_id]; if(s) s.steeps.push({order:Number(r.steep_order)||0, feedback:r.feedback||null}); });
-  let noop=0;
-  sessions.forEach(s=>{ ok(reduce(s.steeps)===null, 'R no-op: session '+s.id+' has no per-steep feedback → reduce null'); if(reduce(s.steeps)===null) noop++; });
-  // Gate-count reproduction is informational until a FRESH export (with taps) is dropped in;
-  // on this legacy export sessionHasFeedback reduces to session-level feedback only. Assert that
-  // identity holds (no steep feedback anywhere) and report the count rather than pinning a number.
-  sessions.forEach(s=>ok(has(s)===!!s.feedback, 'R gate: session '+s.id+' — sessionHasFeedback === session-level feedback (no steep taps yet)'));
-  const gate=sessions.filter(has).length;
-  console.log('  R real data: '+sessions.length+' sessions, '+noop+' no-op-clean, '+gate+' carry session-level feedback (gate-count anchor reproduces on a fresh export)');
+  const sess=Object.values(byId);
+  // 1 · reducer fires in BOTH directions on real rows (was the stale one-directional no-op check).
+  sess.forEach(s=>{
+    const tapped=s.steeps.some(st=>!!st.feedback);
+    if(tapped) ok(reduce(s.steeps)!==null, 'R reducer non-null on a real steep-tapped session '+s.id);
+    else       ok(reduce(s.steeps)===null, 'R reducer null on a real untapped session '+s.id);
+  });
+  // 2 · the steep-only linchpin, live on real data (replaces the has===!!feedback identity, only ever
+  //     true when no steep feedback existed): at least one session qualifies via steep feedback ALONE.
+  const steepOnly=sess.filter(s=>has(s) && !s.feedback);
+  ok(steepOnly.length>=1, 'R at least one real session qualifies via steep feedback ALONE (steep-only='+steepOnly.length+')');
+  // 3 · gate count + method split REPORTED, not pinned (survives any export); split on stored brew_style.
+  const gate=sess.filter(has);
+  const split={}; gate.forEach(s=>{ const k=s.brewStyle||'(none)'; split[k]=(split[k]||0)+1; });
+  const tapped=sess.filter(s=>s.steeps.some(st=>!!st.feedback)).length;
+  console.log('  R real data: '+sess.length+' sessions · '+tapped+' steep-tapped · '+gate.length+' with feedback (by brew_style: '+JSON.stringify(split)+')');
 } else {
   console.log('  R real data: SKIPPED (sessions_rows.csv / steeps_rows.csv not present)');
 }

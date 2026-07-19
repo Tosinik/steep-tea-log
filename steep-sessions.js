@@ -200,6 +200,11 @@ function es_viewTea(){
   if(id) openTeaDetail(id,'sessions'); else render();
 }
 function es_set(key, val){ state.editingSession[key]=val; }
+// B7 (v3.91): explicit method correction on the edit modal — the ONLY way brewStyle changes here
+// (saveSessionEdit passes the field through untouched; JC1's no-prefill-on-edit rule stays intact).
+function es_setBrewStyle(m){ es_set('brewStyle', m); render(); }
+// What a method-less session is currently READ as (capacity inference), for the observational hint.
+function esMethodReadLabel(e){ const rd=brewMethodFor(e.brewStyle,(vesselById(e.vesselId)||{}).capacityMl); return (SESSION_METHODS.find(m=>m.k===rd)||{}).label||rd; }
 function es_setSteep(i, key, val){
   if(key==='tempC'){ state.editingSession.steeps[i].tempC = displayToC(val); return; }
   state.editingSession.steeps[i][key] = (key==='timeSeconds') ? (val===''?null:Number(val)) : val;
@@ -299,6 +304,10 @@ function sessionEditModal(){
           (state.vessels.some(v=>v.id===e.vesselId) ? '' : `<option value="${escapeHtml(e.vesselId||'')}" selected>${escapeHtml(e.vesselName||'(unknown vessel)')}</option>`)
           + state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${e.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}${v.capacityMl?` · ${v.capacityMl}ml`:''}</option>`).join('')
         }</select></div>
+        ${!e.isColdBrew ? `<div class="field span2"><label>Method</label>
+          <div class="seg seg-sm">${SESSION_METHODS.map(m=>`<button type="button" class="${e.brewStyle===m.k?'active':''}" onclick="es_setBrewStyle('${m.k}')">${escapeHtml(m.label)}</button>`).join('')}</div>
+          ${!e.brewStyle ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:5px;">no method recorded — currently read as ${escapeHtml(esMethodReadLabel(e))} from the vessel</div>` : ''}
+        </div>` : ''}
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isColdBrew?'checked':''} onchange="es_set('isColdBrew', this.checked)"> Cold brew</label></div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isShared?'checked':''} onchange="es_set('isShared', this.checked)"> Shared with followers</label></div>
         <div class="field span2"><label>Overall rating</label><div id="editRatingWrap">${renderStarsInteractive(Number(e.rating)||0,true,'setEditSessionRating')}</div></div>
@@ -358,7 +367,7 @@ function startSessionFor(teaId){
     waterType: '',
     waterTDS: '',
     gramsUsed: '',
-    brewStyle: null,                                    // v3.57 'gongfu'|'western'; null = infer from vessel capacity
+    brewStyle: methodPrefillFor(state.vessels[0].id),   // v3.91: vessel-type default (B4); null → capacity infer
     waterMl: '',                                        // v3.57 optional per-session override; blank = vessel capacity
     steeps: [],
     infusionCount: 1,
@@ -483,8 +492,8 @@ function sessionSetupHTML(d){
   const capLink = (selVes && !selVes.capacityMl)
     ? `<button type="button" onclick="openVesselForm(vesselById('${escapeJsArg(selVes.id)}'))" style="margin-top:5px;background:none;border:0;padding:0;color:var(--ink-soft);font-size:11px;text-decoration:underline;cursor:pointer;">set capacity — sharpens brew advice</button>`
     : '';
-  // WS1: method is 3-way-ready — phase-2 adds {k:'japanese',label:'Japanese'} here and teaches
-  // brewMethodFor to return it; the segment and storage need no layout change.
+  // WS1: the segment renders the resolved method; senchadō added v3.91 — brewMethodFor returns it for an
+  // explicit brewStyle, which the vessel-type prefill (d_setVessel) sets. No layout change.
   const cap = (selVes||{}).capacityMl || null;
   const curMethod = brewMethodFor(d.brewStyle, cap);
   const methodBtns = SESSION_METHODS.map(m=>`<button type="button" class="${curMethod===m.k?'active':''}" onclick="d_setBrewStyle('${m.k}')">${escapeHtml(m.label)}</button>`).join('');
@@ -500,7 +509,7 @@ function sessionSetupHTML(d){
       </div>
       <div class="trio-row">
         <div class="trio-eyebrow">Vessel</div>
-        <div class="trio-line"><select class="trio-select" onchange="d_set('vesselId', this.value)" aria-label="Vessel">${vesselOpts}</select>${caret}</div>
+        <div class="trio-line"><select class="trio-select" onchange="d_setVessel(this.value)" aria-label="Vessel">${vesselOpts}</select>${caret}</div>
         ${capLink}
       </div>
       ${!d.isColdBrew ? `<div class="trio-row trio-method-row">
@@ -535,8 +544,9 @@ function sessionSetupHTML(d){
     `}
   `;
 }
-// WS1: the session method segment — 3-way-ready (phase-2 appends japanese; a data change, no rebuild).
-const SESSION_METHODS = [{k:'gongfu',label:'Gongfu'},{k:'western',label:'Western'}];
+// WS1: the session method segment — senchadō added v3.91 (a data change, no layout rebuild). Gongfu
+// beside it (both East-Asian multi-infusion), western last.
+const SESSION_METHODS = [{k:'gongfu',label:'Gongfu'},{k:'senchado',label:'Senchadō'},{k:'western',label:'Western'}];
 function d_toggleMoreDetails(){ const d=state.sessionDraft; if(d){ d.showMoreDetails=!d.showMoreDetails; render(); } }
 function d_set(key, val){
   state.sessionDraft[key] = val;
@@ -558,7 +568,14 @@ function ratioSetupHTML(d){
       <div class="seg">${mBtn('gongfu','Gongfu')}${mBtn('western','Western')}</div></div>
     <div class="field"><label>Water (ml, optional)</label><input type="number" value="${d.waterMl}" oninput="d_set('waterMl', this.value)" placeholder="${cap?cap:'vessel capacity'}"></div>`;
 }
-function d_setBrewStyle(m){ state.sessionDraft.brewStyle = m; render(); }
+function d_setBrewStyle(m){ const d=state.sessionDraft; d.brewStyle = m; d.brewStyleLocked = true; render(); } // explicit tap wins over the vessel-type prefill
+// Vessel-type → method default (B4, v3.91): the capacity heuristic misclassifies both Japanese vessels
+// (a 210ml kyusu reads western, a 73ml shiboridashi gongfu), so selecting a vessel sets brewStyle
+// EXPLICITLY from its type. A default, not a lock — an explicit method tap (brewStyleLocked) always
+// wins; unmapped types leave it null and fall through to the capacity heuristic as before.
+const VESSEL_METHOD_PREFILL = { 'Gaiwan':'gongfu', 'Kyusu':'senchado', 'Shiboridashi':'senchado' };
+function methodPrefillFor(vesselId){ const v=vesselById(vesselId); return (v && VESSEL_METHOD_PREFILL[v.type]) || null; }
+function d_setVessel(val){ const d=state.sessionDraft; if(!d) return; d.vesselId = val; if(!d.brewStyleLocked) d.brewStyle = methodPrefillFor(val); render(); }
 
 // v3.31 optional pre-brew mood/energy — captured at setup so it's tied to the session
 // (and the time of day), the reading the future sleep/caffeine correlation will lean on.
@@ -823,11 +840,12 @@ function d_flavorFreeOpen(){ if(state.sessionDraft){ state.sessionDraft.flavorFr
 function sessionSteepingHTML(d){
   const tea = teaById(d.teaId);
   const tm = d.timer;
-  // Per-steep feedback rides the same opt-in switch as the session verdict (feedbackRowHTML) and is
-  // gongfu-only — the method gate is the main quietness mechanism (spec §3). Same method resolution
-  // commitSession snapshots into brewStyle. Cold brew carries no timed steeps, so no cards anyway.
+  // Per-steep feedback rides the same opt-in switch as the session verdict (feedbackRowHTML) and shows
+  // for gongfu OR senchadō (v3.91) — both multi-infusion; the method gate is the main quietness
+  // mechanism (spec §3). Resolved through brewMethodFor (same as the setup segment and what commitSession
+  // snapshots), so the segment and the cards always agree. Cold brew carries no timed steeps → no cards.
   const ves = vesselById(d.vesselId);
-  const showSteepFb = state.settings.brewAdvice!==false && !d.isColdBrew && brewMethodFor(d.brewStyle, ves&&ves.capacityMl)==='gongfu';
+  const showSteepFb = state.settings.brewAdvice!==false && !d.isColdBrew && ['gongfu','senchado'].includes(brewMethodFor(d.brewStyle, ves&&ves.capacityMl));
   const steepsHTML = d.steeps.map((s,i)=>`
     <div class="steep-item">
       <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC)+tempUnitLabel()+' · ':''}${fmtSec(s.timeSeconds)}</span></div>
