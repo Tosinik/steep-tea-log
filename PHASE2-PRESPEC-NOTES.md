@@ -85,28 +85,26 @@ checked against it.
   steepless/continuous session is representable (feedback on session only, steeps
   optional/absent) rather than assuming every session decomposes into steeps.
 
-## B. Gate reality — the ~Jul 20 estimate is stale
+## B. Gate reality — MET, and the metric needs redefining
 
-Measured against the real export (`sessions_rows.csv`, 2026-07-15):
+Measured against the real export (2026-07-19): **31 sessions, 15 with both a computable
+ratio and feedback.** The gate target was ~15. It is met.
 
-- 24 sessions total.
-- **10** have `water_ml` + `grams_used` (ratio-able).
-- **8** have any `feedback` tap.
-- **3** have **both** — and that (ratio'd + feedback'd, across both methods) is the gate
-  metric, target **~15**.
-- Method split within the 3: 2 gongfu / 1 western.
+Split by stored `brew_style`: **6 senchadō · 6 gongfu · 3 untagged.** Resolved through
+`brewMethodFor`: **9 gongfu · 6 senchadō · 0 western.**
 
-So the true position is **~3 of 15**, needing **~12 more *complete* rows** (water_ml +
-strength tap, spread across gongfu and western) — not 12 more sessions of any kind. The
-back-catalog mostly predates v3.85's water_ml/brewStyle capture, which is why the count
-is low.
+The A2 ruling worked exactly as predicted — v3.89's per-steep control is what made the
+completion rate climb, and v3.91's senchadō capture is what made the split honest. The
+back-catalog problem resolved itself once capture was fixed.
 
-**~Jul 20 is no longer real.** At a realistic pace it's ~2–3 weeks of consistent
-complete logging — *and only after the A2 control is built*, since fixing the control is
-what makes the completion rate climb. **A2 is now RULED (the optional middle path
-above), so the sequence is: build the optional per-steep + session affordance first,
-then fill the gate under it.** Do not grind the gate under the current end-of-session
-control.
+**But "both methods" as written (gongfu + western) can no longer be satisfied.** Niklas
+does not brew western; every session previously counted as western was a Kagoshima green
+in the kyusu, and all of those are now correctly tagged senchadō. Western is zero and
+will stay zero until he buys a big pot.
+
+**Decision needed before the spec is drafted:** the gate condition means *two methods the
+user actually brews*, not gongfu-and-western specifically. Rewrite it that way in
+ROADMAP-v4 Pillar A. As it stands the gate is met at 9 gongfu / 6 senchadō.
 
 ## C. Related (not phase-2, but same engine neighbourhood) — greeting pass
 
@@ -128,3 +126,57 @@ ahead of it).
 **Ruling (standing):** batch #25 + #17 + the ack rider into **one plan-review pass** over
 the greeting engine — different functions, but one cheap moment to touch the engine.
 Slots after phase-2, in the same pre-R3 quiet-engine window.
+
+## D. Senchadō baselines — v3.91 contradicts Pillar A, and Pillar A is probably right
+
+**This is the first decision of the brewing session.** Two committed documents disagree
+about the same number, which is exactly the two-sources-that-can-disagree pattern.
+
+**ROADMAP-v4 Pillar A (Niklas, 2026-07-10)** says: the KB's "raised JP-green westerns"
+(sencha 1.8 / kabusecha 2.0) are *senchadō values wearing the wrong name*. So `ratioJapanese`
+should take those values, and `ratioWestern` should re-lower to true big-pot numbers
+(~0.6–0.8 g/100ml — cf. the MainTee label's 3–4 tsp/litre).
+
+**v3.91 as shipped** routes senchadō to `kb.ratioGongfu` (3.0) and leaves `ratioWestern`
+at 1.8/2.0. The planning lane specced this without reading the Pillar A entry; Code
+implemented it faithfully. Neither checked.
+
+Both numbers are defensible in isolation — published sencha guidance spans roughly
+1.8–3.3 g/100 ml, and the v3.91 change was still a large improvement over scoring a kyusu
+sencha against western 1.8. **But Pillar A is better reasoned, because it fixes the other
+half:** `ratioWestern` currently carries Japanese-green values, so anyone brewing an
+actual big pot gets a baseline roughly 2–3× too high. v3.91 left that untouched.
+
+Resolve by ruling on both numbers together:
+- what `ratioJapanese` / senchadō should be (1.8–2.0 per Pillar A, ~2.8 per the leaf seed,
+  or 3.0 as shipped);
+- what `ratioWestern` re-lowers to;
+- whether the `LEAF_RATIO_DEFAULT.green_jp.senchado` seed survives at all.
+
+Related and already recorded: that seed (2.8) is **currently unreachable** — all of the
+library's Japanese greens resolve in the KB, which sits above the leaf table, so senchadō
+and gongfu produce an identical baseline for every current tea. See
+`docs/tasks/TASK-senchado-capture.md`.
+
+## E. The retagged sessions carry feedback recorded under a superseded baseline
+
+Six sessions are now tagged `senchado` that were previously read as western. Their
+baseline moved from 1.8 to 3.0, which flips a ~2.8 g/100 ml pour from "heavier than
+baseline, shorten the times" to "about right".
+
+This matters because feedback is **not** an absolute verdict. `steep-core.js:606`: the
+feedback nudge "tunes ON TOP of the ratio correction" (ordering: base → ratio → feedback →
+timeShift). So a "good" or "strong" recorded against the old scaling refers to a
+suggestion that no longer exists.
+
+`ratioAdjust` has been **ON** throughout (confirmed in `user_settings`, 2026-07-16), so
+this is real rather than theoretical — the ratio layer was live for every one of those
+sessions.
+
+Retagging was still correct: the record has to be true, and the alternative was a gate
+built entirely on mislabelled rows. But the spec must decide how learned defaults treat
+these six — excluded, marked lower-confidence, or accepted with the caveat recorded. They
+are 6 of the 15 gate rows, so this is not a rounding question.
+
+**Also decide the general rule**, since this will recur: when a baseline changes, what
+happens to feedback recorded against the old one?

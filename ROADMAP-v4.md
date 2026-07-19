@@ -16,10 +16,11 @@ forms) · brew advice learns from the user's own sessions (phase 2) · design la
 surface.
 
 ## Pillar A — brew advice phase 2: learned defaults
-- Gate: ≥15 ratio'd sessions with feedback, both methods — **~3/15 as of 2026-07-15; fills UNDER the A2
-  per-steep control (shipped v3.89, 2026-07-17), ~2–3 wks of complete logging → early Aug.** Fresh CSV exports →
-  spec drafted claude.ai-side, dry-run on real data, decisions batched. (`ratioAdjust` must be ON for the
-  window to count.)
+- Gate: **MET — 15/15 on 2026-07-19 (9 gongfu / 6 senchadō / 0 western resolved through `brewMethodFor`).**
+  The "both methods" condition (written gongfu + western) can no longer be satisfied — Niklas doesn't brew
+  western, so it means **two methods the user actually brews** and should be reworded that way. Fresh CSV
+  exports → spec drafted claude.ai-side, dry-run on real data, decisions batched. (`ratioAdjust` must be ON
+  for the window to count.) See `PHASE2-PRESPEC-NOTES.md` §B.
 - **NEW (Niklas 2026-07-10): third brewing method `japanese` (senchadō).** Green tea in a kyusu is
   neither gongfu nor western — multiple short infusions at moderate ratio. Today it's mislabeled
   "western", and the "raised JP-green westerns" (sencha 1.8 / kabusecha 2.0) are really senchadō values
@@ -29,6 +30,10 @@ surface.
   (Japanese-green style + mid-size vessel/kyusu → japanese), the session switch becomes 3-way for those
   teas, stored `brew_style` stays free text so no migration. Existing kyusu sessions relabel cleanly since
   inference is deterministic from vessel + style.
+  **NOTE (2026-07-19): v3.91 shipped a senchadō baseline that DISAGREES with this entry** — it routes
+  senchadō to `kb.ratioGongfu` (3.0) and left `ratioWestern` at the raised JP-green values, not the plan
+  above. Unresolved, left visible deliberately (not reconciled in favour of whichever doc is read first);
+  see `PHASE2-PRESPEC-NOTES.md` §D, which argues this 2026-07-10 entry is the better-reasoned of the two.
 - Learned defaults proper: good sessions (rating/feedback) contribute ratio-normalised, method-normalised
   evidence; KB/LEAF_PROFILES = prior, user data = posterior; confidence-gated per tea (~4–6 rated
   sessions), pooled per style/leaf-form sooner.

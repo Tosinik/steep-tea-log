@@ -81,6 +81,26 @@ existing data model instead of bolting a second one alongside.
 - **Interaction with per-steep capture** — step 9 overlaps the existing per-steep taste/tap.
 - **Where is it entered from?** Session setup? Tea detail ("taste this properly")?
 
+## The sample flag (Niklas, 2026-07-19)
+
+Add an option when adding a tea: mark it a **sample** — bought or gifted. Samples are
+usually 5–10 g, which is two or three sessions, so the question they pose isn't "how much
+is left" but **"do I want to buy this properly?"**
+
+That makes samples the natural home for tasting mode: a tea you'll drink two or three times
+and then decide on is exactly the tea worth attending to closely. Sample + tasting mode +
+the wishlist rebuy path is one loop — taste deliberately, decide, add to the list.
+
+**Known interaction, not a detail:** `lowStockThreshold` is user-set (currently 11 g). A
+10 g sample reads **low** the moment it's added, and becomes a `restockCandidate`
+immediately. So the flag can't be only a label — it has to reach `stockTier`, which is one
+of the engine's single-writer predicates. Options: samples exempt from the low tier,
+samples get a proportional threshold, or samples carry their own tier language ("a sample —
+two or three sittings"). The third is most in register and least invasive.
+
+Not scoped. Recorded so the stock-tier interaction is known before anyone treats it as a
+one-line checkbox.
+
 ## Related
 
 - Tea-First Principle — `PHASE2-PRESPEC-NOTES.md`
