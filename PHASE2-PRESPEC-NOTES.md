@@ -180,3 +180,34 @@ are 6 of the 15 gate rows, so this is not a rounding question.
 
 **Also decide the general rule**, since this will recur: when a baseline changes, what
 happens to feedback recorded against the old one?
+
+## F. Bitter vs strong — one axis, two sensations (open question, not a defect)
+
+Raised by Niklas 2026-07-19. An earlier draft of this section claimed the "strong"
+correction reduces leaf. **That was wrong** — `computeBrewAdvice` (`steep-core.js:614`)
+produces only `tempAdjC` (cooler) and `timeAdjPct` (shorter); the feedback axis never
+touches grams. Cooler-and-shorter is the correct response to bitterness, so no
+miscorrection occurs today. Recorded so the error isn't reintroduced.
+
+The division of labour is in fact clean: the **ratio layer** handles leaf-to-water, the
+**feedback layer** handles extraction via temperature and time.
+
+What remains open is whether one axis is enough. "Too strong" (concentrated) and
+"bitter" (harsh) are different sensations that currently produce an identical correction
+in fixed proportion — `net*2°C` and `net*8%` together. Bitterness is more
+temperature-driven; concentration more leaf- and time-driven. Whether splitting them
+earns its complexity is a real question, and it is Niklas's observation to rule on.
+
+Also open: **nothing in the model ever suggests changing leaf quantity.** The ratio layer
+scales times *to* the leaf used; it never says "try 4 g instead of 5". Whether that is a
+gap or correct restraint belongs to the same conversation.
+
+Capture state, so nothing is lost while this is undecided:
+- **Session tags keep the raw word.** "bitter" is stored verbatim in `session.tags`; the
+  strong/weak mapping is derived at read time, so history can be re-derived under any
+  future model.
+- **Per-steep taps do not.** They store strength only, with no cause — so a cause axis
+  there would start collecting from zero.
+
+Design constraint if it ever ships: a second axis must not become a second required tap.
+A zero-feedback session stays a complete outcome (Tea-First Principle).

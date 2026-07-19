@@ -255,11 +255,22 @@ only the rendering gets replaced. See ROADMAP/STATE.
   session-setup core-trio card (`SESSION_METHODS` + `brewMethodFor`) and the optional water(ml) field
   into the "More details" fold, so nothing calls `ratioSetupHTML` any more. Left in place to keep the
   WS1 diff focused; delete it next time steep-sessions.js setup code is edited.
+  Now also stale in a second way: as of v3.91 `brewMethodFor` is three-valued
+  (`gongfu | senchado | western`), while `ratioSetupHTML`'s hard-coded two-button segment is fed by
+  neither `SESSION_METHODS` nor the new value — so if revived, its `method===m` check would light
+  **neither** button for a senchadō session. Delete rather than patch.
 
 ## Known open bugs
 
 Live issues (see STATE.md / ROADMAP for the full backlog):
 
+- **Currency is hard-coded to `$`.** `steep-teas.js:722–723` print `'$'` for Cost/gram and
+  Cost/session. `cost_total` stores a bare number and there is no currency field anywhere in the
+  app. Every vendor in the library is German (MainTee Würzburg ×5, Tee Kontor Kiel ×3, Si Fang Guan
+  ×3, Bohea Berlin ×2, Diez, Teerausch…), so the figure shown is wrong for every tea. Not urgent, but
+  it is a *wrong number shown to the user*, not a missing feature. The intended home for the fix is a
+  currency preference in **R3 #07 Settings**, which is unbuilt — flagged to Design as an input rather
+  than patched separately.
 - ~~**Double stock decrement.**~~ **Fixed v3.35.** Cause was a re-entrant double-fire of
   `commitSession` (not the offline queue, which replays idempotent absolute-value
   upserts). Fixed with a shared `_sessionSaving` guard on `commitSession` +
