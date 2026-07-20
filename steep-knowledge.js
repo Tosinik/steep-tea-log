@@ -149,21 +149,32 @@ const KB_REGIONS = {
   'ha giang':'Vietnam','moc chau':'Vietnam','java':'Indonesia','sumatra':'Indonesia'
 };
 
-// --- Flavor axes (0-5) for the future tasting-chips feature. ---
-// Modeled on the axis system German specialist retailers use to grade teas.
+// --- Flavor axes (0-5), once intended for a tasting-chips feature. ---
+// DEAD as of R30 — declared "a separate analytic list" and referenced by nothing (see CLAUDE.md
+// cleanup backlog). Kept, not deleted: the planning lane may promote its last four (tannin ·
+// bitterness · oxidation · complexity are structural dimensions, not taste notes — the two-layer
+// question, ledger §4). Do not wire it in as a fourth vocabulary without that decision.
 const KB_FLAVOR_AXES = ['umami','sweetness','floral','fruity','nutty','roast','spice','tannin','bitterness','oxidation','complexity'];
-const KB_FLAVOR_CHIPS = { // quick-tap vocabulary, EN/DE
+const KB_FLAVOR_CHIPS = { // flavour vocabulary (isFlavorVocab membership), EN/DE
   umami:'Umami', sweetness:'Süße', floral:'Blumig', fruity:'Fruchtig', nutty:'Nussig',
   roast:'Röstig', spice:'Würzig', grassy:'Grasig', vegetal:'Vegetabil', marine:'Marin',
   creamy:'Cremig', honey:'Honig', malty:'Malzig', smoky:'Rauchig', mineral:'Mineralisch',
-  fresh:'Frisch', crisp:'Spritzig', earthy:'Erdig', woody:'Holzig', stonefruit:'Steinobst'
+  fresh:'Frisch', crisp:'Spritzig', earthy:'Erdig', woody:'Holzig', stonefruit:'Steinobst',
+  // R30: five words seeded to every tag_library (DEFAULT_TAGS) that failed isFlavorVocab — the app
+  // suggested them, then silently dropped them from "What you taste". Now vocabulary so past + future
+  // entries count. Seed-only: intentionally NOT added to a capture family — roasted/sweet/buttery/citrus
+  // would sit next to roast/sweetness/creamy/fruity as confusing near-dupes (astringent is novel).
+  // The nested/alias vocabulary that folds the dupes is R31 (deferred to the planning lane).
+  roasted:'Geröstet', sweet:'Süß', astringent:'Adstringierend', buttery:'Butterig', citrus:'Zitrus'
 };
 
-// --- WS4 flavour capture: the 20 KB_FLAVOR_CHIPS keys grouped into four families. ---
-// Presentation only over the existing keys (KB_FLAVOR_CHIPS stays the source of truth for the
-// chip set; KB_FLAVOR_AXES is a separate analytic list, untouched). The first two families show
-// by default under the timer; "more" reveals the other two. umami + grassy are homed in
-// Vegetal & marine. Every key appears exactly once — the flavor-ladder fixture asserts this.
+// --- WS4 flavour capture: 20 curated vocabulary keys grouped into four families. ---
+// Presentation only over KB_FLAVOR_CHIPS keys (that object stays the source of truth for the
+// vocabulary; KB_FLAVOR_AXES is a separate dead list, R30). The first two families show by default
+// under the timer; "more" reveals the other two. umami + grassy are homed in Vegetal & marine.
+// Every family term is a chip key, no term twice; since R30 the families are a curated SUBSET of the
+// vocabulary (the 5 seed-only orphans are chips but not capture families) — the flavor-ladder fixture
+// asserts exactly that.
 const KB_FLAVOR_FAMILIES = [
   { key:'vegetal', label:'Vegetal & marine',        terms:['umami','grassy','marine','vegetal','fresh','mineral'] },
   { key:'sweet',   label:'Sweet & floral',          terms:['sweetness','honey','floral','fruity','stonefruit'] },

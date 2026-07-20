@@ -36,19 +36,23 @@ const setSessions = arr => vm.runInContext('state.sessions='+JSON.stringify(arr)
 const mk = (dayOffset, steeps, teaId='T') => ({ teaId, date:new Date(2026,0,1+dayOffset).toISOString(), steeps:steeps.map((tags,i)=>({order:i+1, tags})) });
 const profile = (teaId='T') => ctx.teaFlavorProfile(teaId);
 
-// ---- 1. Family completeness: all 20 KB_FLAVOR_CHIPS keys mapped exactly once across 4 families ----
+// ---- 1. Family completeness: the 4 capture families are a curated subset of the vocabulary ----
+// R30: KB_FLAVOR_CHIPS is the flavour VOCABULARY (isFlavorVocab membership + tag_library seed); the
+// families are the WS4 quick-tap CAPTURE grid, a curated 20-of-25. The five seed-only orphans
+// (roasted/sweet/astringent/buttery/citrus) are vocabulary but intentionally not capture chips.
 const fam = JSON.parse(vm.runInContext(`JSON.stringify({
   n:KB_FLAVOR_FAMILIES.length,
   keys:Object.keys(KB_FLAVOR_CHIPS),
   flat:[].concat.apply([],KB_FLAVOR_FAMILIES.map(f=>f.terms)),
   labels:KB_FLAVOR_FAMILIES.map(f=>f.label)
 })`, ctx));
+const R30_ORPHANS=['roasted','sweet','astringent','buttery','citrus'];
 ok(fam.n===4, 'A1 exactly four families (got '+fam.n+')');
-ok(fam.keys.length===20, 'A2 KB_FLAVOR_CHIPS has 20 keys (got '+fam.keys.length+')');
-ok(fam.flat.length===20, 'A3 families list 20 terms total (got '+fam.flat.length+')');
+ok(fam.keys.length===25, 'A2 KB_FLAVOR_CHIPS has 25 vocabulary keys (got '+fam.keys.length+')');
+ok(fam.flat.length===20, 'A3 families list 20 capture terms total (got '+fam.flat.length+')');
 ok(new Set(fam.flat).size===20, 'A4 no term appears in two families');
-ok(fam.keys.every(k=>fam.flat.includes(k)), 'A5 every KB_FLAVOR_CHIPS key has a family');
-ok(fam.flat.every(t=>fam.keys.includes(t)), 'A6 no family term is outside KB_FLAVOR_CHIPS');
+ok(fam.flat.every(t=>fam.keys.includes(t)), 'A5 every family term is valid vocabulary (subset of chip keys)');
+ok(R30_ORPHANS.every(k=>fam.keys.includes(k) && !fam.flat.includes(k)), 'A6 R30 orphans are vocabulary but not capture chips');
 ok(fam.labels[0]==='Vegetal & marine' && fam.flat.slice(0,6).includes('umami') && fam.flat.slice(0,6).includes('grassy'), 'A7 umami + grassy homed in Vegetal & marine');
 console.log('  A family completeness: 7 checks');
 

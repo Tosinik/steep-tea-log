@@ -142,6 +142,30 @@ decision; the pillar reduces to the install guide (drafting after R3 screenshots
 the beta-package checklist (§4 gains: "beta welcome note must not promise deletion while
 delete-everything is unbuilt").
 
+**R30 — One flavour vocabulary, one writer. SHIPPED v3.93.** `DEFAULT_TAGS` (the `tag_library` seed,
+steep-core.js) and `KB_FLAVOR_CHIPS` (the `isFlavorVocab` membership set, steep-knowledge.js) were two
+vocabularies for one concept, disagreeing on five words: `roasted · sweet · astringent · buttery ·
+citrus` were seeded to every user but failed the membership test, so the app *suggested words it silently
+dropped* from "What you taste" (10 of Niklas's 15 real tags invisible). Fix: the five join
+`KB_FLAVOR_CHIPS` (German labels `Geröstet · Süß · Adstringierend · Butterig · Zitrus`); `DEFAULT_TAGS`
+is now **derived** from its keys, never a second array. Two sub-decisions, recorded: **(a)**
+`roasted`/`sweet` coexist with `roast`/`sweetness` in the vocabulary (a tea tasted both ways draws two
+bars until R31's aliases fold them) — accepted pending the nested vocabulary; **(b)** the WS4 capture
+families stay a curated **20-of-25** — the orphans are **seed-only, not capture chips**, because
+`roast`+`roasted` adjacent in the grid reads as a confusing dupe (worse than the vocabulary
+coexistence). The flavor-ladder fixture's family block now asserts the curated-subset invariant (families
+⊂ vocabulary; the 5 orphans are vocabulary but not family terms), replacing the old "every chip key has a
+family". Nothing stored changes — the profile aggregates at read time, so past entries are fixed too.
+
+**R31 — Normalise before the membership test. DEFERRED (Code; needs the alias map from this lane first).**
+Add an alias layer so word *form* stops deciding whether a note counts — the three-tier shape used
+everywhere else: **exact key → alias → bare word**. Seed from the near-miss table (`spices→spice ·
+roasted→roast · sweet→sweetness · toasty→roast · apricot→stonefruit · dried fruit→fruity`) plus obvious
+plurals/participles. Recovers most free-typed notes without opening the radar to arbitrary strings, and
+keeps the honest floor (a genuinely novel word stays bare). Draft it against the real `tag_library`
+values, not invented aliases. This is what collapses R30's accepted coexistence (`roast`/`roasted`,
+`sweet`/`sweetness`) back to one bar.
+
 ---
 
 ## 2 · Corrections owed, per board
@@ -246,6 +270,23 @@ stale. This section is the packet.
 - **Pillar B (launch)** — decision closed by R29; install guide + beta package gated on R3 implementation, owners assigned.
 - **Tea atlas Phase B** — after phase-2, per plan.
 - **monoFont** — expose or kill (see Settings).
+- **Flavour vocabulary — the two-layer question (R30/R31 fallout).** There is no flavour-based
+  *recommender* to rethink — the only `suggest*` paths (`teaFormNameSuggest`, `suggestedBrewHTML`) are
+  brewing suggestions; nothing profiles a palate. The open question is whether to *build* one, and it must
+  wait until R30/R31 land (a recommender trained on today's vocabulary reasons from a third of the data).
+  The interesting salvage is `KB_FLAVOR_AXES` (dead, kept — CLAUDE.md backlog): its last four items
+  (`tannin · bitterness · oxidation · complexity`) are **structural dimensions**, not taste notes —
+  someone once intended two layers, *what a tea tastes of* vs *how it's built*. That ties directly to
+  `PHASE2-PRESPEC-NOTES.md` §F: `bitterness` is a dead axis, while `bitter` lives in `BREW_STRONG_TAGS`
+  (→ "strong" → cooler + shorter). **Same problem from two sides** — bitterness is a brewing signal with
+  no flavour representation; the flavour system has no notion of intensity/structure. A structural layer
+  (astringency / body / bitterness captured *as sensation*) feeds §F's cause-aware correction directly:
+  bitter-without-strength → temperature, strong-without-bitterness → ratio. So the flavour rethink belongs
+  **on the brewing-session agenda, alongside §F**, not as separate work — both need the same decision:
+  does the model get a second dimension, and is it *cause* (§F) or *structure* (axes), likely the same
+  axis viewed from either end. Also Code-adjacent but not this ship: **Design #03** — bare
+  (non-vocabulary) free words must surface on **Tea detail** as a quiet "also noted: fig, cocoa, date"
+  line; they vanish there today though the code comment claims they "still show".
 
 ## 5 · Data appendix — rows, not counts
 

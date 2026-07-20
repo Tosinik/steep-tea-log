@@ -124,8 +124,9 @@ parked → R3; the held #15 vocab expansion stays out until phase-2. New bugs/id
 (the live inbox), not here.
 
 **R3 status (2026-07-19):** the design record lives in `docs/r3/`; the **binding reference** for the #09b
-conformance sweep + Code hand-off is **`docs/r3/planning/R3-RULINGS-LEDGER.md`** (29 rulings — boards verify
-against it + the code, never completion summaries), with `DATA-region-coordinates.md` the Origins coordinate
+conformance sweep + Code hand-off is **`docs/r3/planning/R3-RULINGS-LEDGER.md`** (31 rulings — R30 shipped
+v3.93, R31 deferred — boards verify against it + the code, never completion summaries), with
+`DATA-region-coordinates.md` the Origins coordinate
 source. R29 closed Pillar B (no root split — app stays at `slowcup.app/`, landing = #09's logged-out screen).
 Shipped-but-unboarded: **Focus/steeping** + **Wrapped** (need board numbers before hand-off).
 
@@ -155,7 +156,23 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.92 Focus feedback write** (cache **v102**, APP_VERSION v3.92): the steeping
+**NOW (just shipped) — v3.93 R30 flavour vocabulary** (cache **v103**, APP_VERSION v3.93): `DEFAULT_TAGS`
+(the `tag_library` seed) and `KB_FLAVOR_CHIPS` (the `isFlavorVocab` membership set) were two vocabularies
+for one concept — five words (`roasted · sweet · astringent · buttery · citrus`) were seeded to every user
+but failed the membership test, so the app **suggested words it silently dropped** from "What you taste"
+(10 of Niklas's 15 real tags invisible). Fix: the five join `KB_FLAVOR_CHIPS` (German labels); `DEFAULT_TAGS`
+is now **derived** from its keys, not a hand-kept array — the seed can never again suggest a non-vocabulary
+word. **Decisions recorded (R30):** (a) `roasted`/`sweet` coexist with `roast`/`sweetness` in the vocab
+(two bars until R31's aliases fold them — accepted pending the nested vocabulary); (b) the WS4 capture
+families stay a curated **20-of-25** — the orphans are **seed-only, not capture chips** (a `roast`+`roasted`
+grid dupe would be worse), and the flavor-ladder fixture now asserts the curated-subset invariant.
+`KB_FLAVOR_AXES` flagged **dead** (CLAUDE.md backlog; may be promoted — the two-layer/§F question, ledger
+§4). **Deferred:** R31 alias layer, Design #03 (bare words on Tea detail). **No SQL** — nothing stored
+changes; the profile aggregates at read time, so past entries are fixed too. Validated: `node --check` ×2,
+all 13 committed suites green (flavor-ladder 96 with the rewritten A-block; `DEFAULT_TAGS`→25, no dupes,
+all 5 orphans now `isFlavorVocab`). One real tea moved `none→chips` (a dropped word now counts).
+
+**Also this session — v3.92 Focus feedback write** (cache **v102**, APP_VERSION v3.92): the steeping
 nudge's "How was that pour?" tap now **persists** as well as nudging the timer. `d_nudgeNextSteep` writes
 `steep.feedback` on the pour just finished (weak→`weak` · ok→`good` · strong→`strong`) with a **visible
 saved state** (active chip + a quiet "saved"); the ephemeral `timeShift` is byte-identical (this adds

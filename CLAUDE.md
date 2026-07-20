@@ -260,6 +260,14 @@ only the rendering gets replaced. See ROADMAP/STATE.
   neither `SESSION_METHODS` nor the new value — so if revived, its `method===m` check would light
   **neither** button for a senchadō session. Delete rather than patch.
 
+- **`KB_FLAVOR_AXES` (steep-knowledge.js) is dead as of R30/v3.93** — an 11-item list declared "a
+  separate analytic list" and referenced by nothing (the vocabulary is `KB_FLAVOR_CHIPS`, the capture
+  grouping is `KB_FLAVOR_FAMILIES`). **Do not delete yet** — the planning lane may promote its last four
+  (`tannin · bitterness · oxidation · complexity` are structural dimensions, not taste notes; the
+  two-layer question sits on the brewing-session agenda, ledger §4). Flagged here so it can't quietly
+  become a *fourth* vocabulary: don't wire it into `isFlavorVocab`/capture/seeds without that decision.
+  If the two-layer question is settled as "no", delete it.
+
 ## Known open bugs
 
 Live issues (see STATE.md / ROADMAP for the full backlog):

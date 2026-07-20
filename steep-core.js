@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.92';
+const APP_VERSION = 'v3.93';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "The “How was that pour?” tap now saves how each steep tasted, not just the timer nudge.";
+const WHATS_NEW = "Tasting words like roasted, sweet and citrus now count in your flavour profile instead of being dropped.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -86,7 +86,11 @@ function socialErr(e, action){
 }
 
 /* ---------- state ---------- */
-const DEFAULT_TAGS = ["floral","fruity","roasted","vegetal","umami","sweet","astringent","woody","honey","mineral","creamy","smoky","malty","buttery","grassy","stonefruit","citrus"];
+// Seeds every user's tag_library. R30: derived from KB_FLAVOR_CHIPS keys (steep-knowledge.js, loads
+// first) rather than a second hand-kept array — so the seed can never again suggest a word isFlavorVocab
+// drops (the old list seeded roasted/sweet/astringent/buttery/citrus, none of them chip keys → 10 of
+// Niklas's 15 tags were invisible to the flavour profile). One vocabulary, one writer.
+const DEFAULT_TAGS = Object.keys(KB_FLAVOR_CHIPS);
 const TYPES = [
   {k:'green',label:'Green'},{k:'black',label:'Black'},{k:'oolong',label:'Oolong'},
   {k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}
