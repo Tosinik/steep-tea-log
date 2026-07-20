@@ -105,14 +105,16 @@ when it ships. Queued after: a timestamp-anchored timer slice for #30 (pause-gat
 notification/push is ruled OUT — answer it on the issue); the #25 greeting fix batches the #17 revisit
 when it gets a slice. **Open lanes:** (1) **phase-2 (#15 + #9)** — **feedback placement is RESOLVED.** The
 two pre-spec decisions are ruled (one-tap axis only; the optional-middle-path per-steep + session control)
-and the buildable spec is committed: **`SPEC-brew-advice-v3-feedback.md`**. **The A2 capture control SHIPPED
-v3.89** (cache v99): `steeps.feedback` live (`sql/v3_9-steep-feedback.sql`, run 2026-07-17), a per-steep tap
-gated to gongfu, `reduceSteepFeedback` + one branch in `feedbackSignalOf`, `sessionHasFeedback`, committed
-`fixtures/brew-feedback-test.js`. Niklas's remaining device checks: save→reload mapper round-trip + on-device
-quiet-until-reached-for (glyph/colour = Design's lane if it reads too loud). **Gate ~3/15** (measured
-2026-07-15) — it now **fills UNDER the shipped control** (the old end-of-session control is why the rate was
-low), ~2–3 wks of complete logging after. v3.85's brewStyle un-gate feeds real method data. Post-gate
-(separate specs): learned defaults · `SESSION_METHODS` append `japanese`/senchadō. (2) **Supabase allowlist cleanup**
+and the buildable spec is committed: **`SPEC-brew-advice-v3-feedback.md`**. **A2 capture SHIPPED v3.89**
+(per-steep tap); **senchadō as a real 3rd method SHIPPED v3.91** — the `SESSION_METHODS` append that was a
+post-gate item is DONE. **GATE NOW MET — 15/15 (2026-07-19): 9 gongfu / 6 senchadō / 0 western** (Niklas
+retagged; western is empty and stays empty since he doesn't brew it, so "both methods" must be reworded to
+*two methods actually brewed* — ROADMAP Pillar A + `PHASE2-PRESPEC-NOTES.md` §B). **The phase-2 brew-advice
+spec can now be drafted**; decisions-to-resolve-first are the agenda in `PHASE2-PRESPEC-NOTES.md` §D (senchadō
+baseline conflicts with Pillar A — v3.91 ships `kb.ratioGongfu` 3.0; the 2.8 leaf-seed is currently
+unreachable, so the gyokuro revisit needs senchadō ratios IN THE KB), §E (6 retagged sessions carry feedback
+recorded under a superseded baseline), §F (bitter/strong = one axis, open question), + move the gate metric to
+stored `brew_style`. v3.85's brewStyle un-gate feeds real method data. (2) **Supabase allowlist cleanup**
 — drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins"). The
 **domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
 ("R2 capability regressions" — planned as #21, renumbered by GitHub) holds the reinstate-vs-accept
@@ -120,6 +122,18 @@ decisions (sorts full treatment, vendor filter, in-stock count, focus-mode log/r
 library); `setTeaSort`/`setTeaFilter`/`focusLogSteep` stay in the code as its reinstatement hooks. #14
 parked → R3; the held #15 vocab expansion stays out until phase-2. New bugs/ideas land as GitHub issues
 (the live inbox), not here.
+
+**R3 status (2026-07-19):** the design record lives in `docs/r3/`; the **binding reference** for the #09b
+conformance sweep + Code hand-off is **`docs/r3/planning/R3-RULINGS-LEDGER.md`** (29 rulings — boards verify
+against it + the code, never completion summaries), with `DATA-region-coordinates.md` the Origins coordinate
+source. R29 closed Pillar B (no root split — app stays at `slowcup.app/`, landing = #09's logged-out screen).
+Shipped-but-unboarded: **Focus/steeping** + **Wrapped** (need board numbers before hand-off).
+
+**Pending Code cleanups (were ephemeral task-chips — recorded here so a session-clear doesn't lose them):**
+(a) delete dead `ratioSetupHTML` (`steep-sessions.js:562`, never called; also in CLAUDE.md cleanup backlog —
+its "remove when touching setup code" trigger has fired-and-missed twice, v3.85 + v3.91; a real deploy, not
+docs); (b) promote the R3 handover's §6 (review method) + §7 (recurring failure modes) into CLAUDE.md as
+standing discipline — see the banner in `docs/r3/HANDOVER-planning-lane.md`.
 
 **Historical — the Round-2 design pass is COMPLETE** (WS6 → WS2 → WS5 → WS3 → WS1 → WS4, shipped v3.73–v3.78;
 bundle at `SlowCup R2 bundle handoff/` in the repo root). WS4 was the only data-model change (semantic, not
