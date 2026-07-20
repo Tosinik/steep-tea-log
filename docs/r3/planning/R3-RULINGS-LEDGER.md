@@ -125,6 +125,23 @@ R3. Planning-lane ruling, standing unless Niklas objects.
 and the specs are normative; **claims, counts and affordances derived from example data must be
 real** (the "6 SITTINGS · See all" lesson; the "SHARED to Ruth" schema lesson).
 
+**R28 — Country-tier pins carry no coordinates.** The `? N` pins are polygon labels, not
+point data: they claim "this country," and the Natural Earth country shape is that datum —
+the renderer places the label inside the polygon (pole-of-inaccessibility / polylabel), as
+cartographers place country names. No invented coordinate, no capital-vs-centroid dilemma (a
+China pin at Beijing would be verifiable but absurd on a tea atlas). Two tiers, two data
+kinds: region = verified point (`DATA-region-coordinates.md`) · country = labelled polygon.
+
+**R29 — No root split. The app stays at `slowcup.app/`; the landing page is #09's
+logged-out screen.** Moving the app off root breaks every installed PWA (service-worker
+scope, manifest `start_url` — Niklas's and Ruth's home-screen installs). For an
+invitation-only beta, the login/first-run screen is the landing and is already scheduled
+work. A standalone marketing page is deferred until there's a public audience, and would
+live at a path or subdomain, never displacing the app. This closes Pillar B's open
+decision; the pillar reduces to the install guide (drafting after R3 screenshots exist) and
+the beta-package checklist (§4 gains: "beta welcome note must not promise deletion while
+delete-everything is unbuilt").
+
 ---
 
 ## 2 · Corrections owed, per board
@@ -225,7 +242,7 @@ stale. This section is the packet.
 - **Rinse research** — two constraints pre-fixed (structured supersedes prose; own contested
   field, not `confidence`).
 - **Coordinates pass 3** — Kagoshima City, Sri Lanka, Hoshino (gazetteer), Kunming centre.
-- **Pillar B (launch)** — landing split, screenshots, install guide, beta package. **Unowned.**
+- **Pillar B (launch)** — decision closed by R29; install guide + beta package gated on R3 implementation, owners assigned.
 - **Tea atlas Phase B** — after phase-2, per plan.
 - **monoFont** — expose or kill (see Settings).
 

@@ -33,6 +33,11 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — Origins coordinate table + ledger R28/R29
+
+`docs/r3/planning/DATA-region-coordinates.md` — the Origins map's coordinate source (8 region rows, city/province-capital level, verified against independent sources; keyed on normalized `teas.origin`, never the catalog). Two rulings appended to `R3-RULINGS-LEDGER.md` §1: **R28** (country-tier `?N` pins are polygon labels, not point coordinates) and **R29** (no root split — the app stays at `slowcup.app/`, the landing is #09's logged-out screen; closes Pillar B's open decision, whose §4 note is updated accordingly). No app change.
+
+---
 ## docs — R3 rulings ledger lands in the repo
 
 `docs/r3/planning/R3-RULINGS-LEDGER.md` — the planning lane's **binding reference** for the #09b conformance sweep and the Code hand-off: 27 numbered rulings, corrections-owed per board, and a shipped-truth section, verified against the repo at `77cf800` and the 2026-07-19 exports. Boards get verified against this ledger and the code, never against completion summaries. (README `planning/` index updated to point at it.) No app change.
