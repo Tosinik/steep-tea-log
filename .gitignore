@@ -26,3 +26,7 @@ fixtures/*
 SlowCup R2 bundle handoff/
 design-r3/
 *.dc.html
+# Photographs of copyrighted tea-book pages, kept for transcription only. The repo is
+# PUBLIC — the images must never be committed. The factual data transcribed from them
+# (aroma taxonomy, tasting lexicon) lives in docs/r3/planning/DATA-*.md and IS committed.
+book_reference_material/
