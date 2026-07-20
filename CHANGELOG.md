@@ -33,6 +33,11 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## docs — R3 index widened + delete-everything beta-note caveat
+
+Follow-ups to the Origins batch: the ledger's §4 Delete-everything bullet gains R29's caveat (the beta welcome note must not promise deletion until delete-everything ships); and `docs/r3/README.md` now indexes `DATA-region-coordinates.md` as a verified dataset — its `planning/` framing widened to "decisions, reconciliation notes, and verified datasets", and the ledger's rulings count corrected 27→29. No app change.
+
+---
 ## docs — Origins coordinate table + ledger R28/R29
 
 `docs/r3/planning/DATA-region-coordinates.md` — the Origins map's coordinate source (8 region rows, city/province-capital level, verified against independent sources; keyed on normalized `teas.origin`, never the catalog). Two rulings appended to `R3-RULINGS-LEDGER.md` §1: **R28** (country-tier `?N` pins are polygon labels, not point coordinates) and **R29** (no root split — the app stays at `slowcup.app/`, the landing is #09's logged-out screen; closes Pillar B's open decision, whose §4 note is updated accordingly). No app change.

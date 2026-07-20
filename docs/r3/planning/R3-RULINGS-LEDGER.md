@@ -235,7 +235,8 @@ stale. This section is the packet.
 - **Sample flag** — committed in `IDEA-tasting-mode.md`; touches `stockTier` (single-writer),
   not a checkbox.
 - **Delete-everything** — `TASK-delete-everything.md`, unbuilt; Settings privacy copy is untrue
-  until it ships; board correctly draws it disabled.
+  until it ships; board correctly draws it disabled, and the beta welcome note must not promise
+  deletion until it does.
 - **Brewing session** — agenda ready: `PHASE2-PRESPEC-NOTES.md` §D (baseline conflict with
   Pillar A), §E (retagged feedback under superseded baseline), §F (bitter/strong axis), plus
   gate-metric move to stored `brew_style` and senchadō KB ratios (gyokuro).

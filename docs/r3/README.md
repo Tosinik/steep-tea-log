@@ -9,12 +9,12 @@ boards) and wrong here.
 
 ## What's here
 
-**`planning/`** — the planning lane's decisions. Reconciliation notes, in order: the
-direction lock, then per-bundle and per-screen reviews. Read these for *why* a screen looks
-the way it does; each records what was caught, what was ruled, and what was flagged as new
-capability.
+**`planning/`** — the planning lane's decisions, reconciliation notes, and verified datasets.
+The reconciliation notes, in order: the direction lock, then per-bundle and per-screen reviews —
+read these for *why* a screen looks the way it does; each records what was caught, what was
+ruled, and what was flagged as new capability.
 
-- `R3-RULINGS-LEDGER.md` — **the binding reference for the #09b sweep + hand-off**: 27 numbered
+- `R3-RULINGS-LEDGER.md` — **the binding reference for the #09b sweep + hand-off**: 29 numbered
   rulings, corrections-owed per board, shipped-truth. Boards verify against this + the code, never
   against completion summaries.
 - `R3-DIRECTION-LOCK.md` — why D won over A/B/C; the five rationing contracts; the liquor
@@ -25,6 +25,8 @@ capability.
 - `R3-SESSIONS-RECONCILIATION.md` — Sessions, and the connection-map ask
 - `SPEC-freshness-model.md` — **a Code hand-off pin** (rev 2 — scope now covers the shelf
   status line, not only Tea detail)
+- `DATA-region-coordinates.md` — **verified data table, the authoritative coordinate source** for
+  the Origins map (cited by R15/R28; keyed on normalized `teas.origin`, never the catalog)
 - `TASK-delete-everything.md` — decided, not yet built
 
 **`design/`** — Design's own structural documents.
