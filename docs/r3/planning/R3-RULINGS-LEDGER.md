@@ -270,6 +270,14 @@ stale. This section is the packet.
 - **Pillar B (launch)** — decision closed by R29; install guide + beta package gated on R3 implementation, owners assigned.
 - **Tea atlas Phase B** — after phase-2, per plan.
 - **monoFont** — expose or kill (see Settings).
+- **R30 fixed 2 of Niklas's 10 invisible tags, not the issue.** v3.93 recovered `roasted` and `sweet`
+  (they became vocabulary). The other **eight** — `toasty · date · apricot · pear · cocoa · spices ·
+  dried fruit · fig` — are near-misses or nesting cases that still need R31's alias layer / the nested
+  tree; do **not** read R30 as closing the flavour-vocabulary issue. The nested tree's source now exists,
+  transcribed: `DATA-flavour-wheel.md` (twelve-family aroma taxonomy) + `DATA-tasting-lexicon.md` (the
+  separate structure/texture layer). All eight map into the wheel (cocoa → Confectionery; apricot/pear →
+  Fruity·Fresh fruits; date/dried fruit/fig → Fruity·Dried and candied; toasty → Empyreumatic;
+  spices → Spiced), which is what makes R31 draftable.
 - **Flavour vocabulary — the two-layer question (R30/R31 fallout).** There is no flavour-based
   *recommender* to rethink — the only `suggest*` paths (`teaFormNameSuggest`, `suggestedBrewHTML`) are
   brewing suggestions; nothing profiles a palate. The open question is whether to *build* one, and it must
