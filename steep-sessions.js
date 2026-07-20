@@ -679,53 +679,57 @@ function d_setActiveSteep(i){
   setSteepTime(Math.max(3, Math.round(t + (d.timeShift||0))));
   render();
 }
-// Nudge the *next* steep from how the last pour tasted (ephemeral to this session).
+// Per-steep taste is captured (and echoed) only for the multi-infusion methods — the §3 quietness
+// gate — resolved through brewMethodFor so it agrees with the setup segment. Also off when brewAdvice is
+// (one switch governs the whole loop). Single source for both the nudge's write and the card's echo.
+function steepFbActive(d){
+  if(!d || d.isColdBrew || state.settings.brewAdvice===false) return false;
+  const ves = vesselById(d.vesselId);
+  return ['gongfu','senchado'].includes(brewMethodFor(d.brewStyle, ves&&ves.capacityMl));
+}
+// Nudge the *next* steep from how the last pour tasted, AND record that taste on the pour itself.
+// timeShift is the ephemeral in-session carry (unchanged, every method). v3.92: the same tap now also
+// writes the persistent steep.feedback (weak→weak · ok→good · strong→strong) so "Just right" stops
+// silently dropping the signal the phase-2 gate reads — this is now the *only* writer of that field
+// (the per-steep card is a read-only echo). Feedback write is §3-gated (steepFbActive); western still
+// only nudges the timer. Last-write-wins, not toggle-clear — timeShift accumulates, so a re-tap can't
+// mean "clear" here without the two axes disagreeing.
 function d_nudgeNextSteep(kind){
   const d = state.sessionDraft; if(!d || !d.schedule) return;
   const STEP=5, clamp=x=>Math.max(-45, Math.min(45, x));
   if(kind==='weak') d.timeShift = clamp((d.timeShift||0)+STEP);        // under-extracted → longer
   else if(kind==='strong') d.timeShift = clamp((d.timeShift||0)-STEP); // over-extracted → shorter
-  // 'ok' leaves the current carry as-is
+  // 'ok' leaves the current carry as-is (timeShift behaviour unchanged; the write below is the new part)
+  const last = d.steeps.length ? d.steeps[d.steeps.length-1] : null;   // the pour "that" refers to
+  if(last && steepFbActive(d)) last.feedback = (kind==='weak') ? 'weak' : (kind==='strong') ? 'strong' : 'good';
   applyScheduleToCurrentSteep(d);
   render();
 }
 function brewNudgeRowHTML(d){
   if(!d.schedule || !d.steeps.length || d.scheduleHidden) return '';
   const shift = d.timeShift||0;
-  const chip=(k,l)=>`<button type="button" class="lib-chip" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;
+  const rec = steepFbActive(d) ? (d.steeps[d.steeps.length-1].feedback||null) : null; // recorded verdict for this pour
+  const on = { weak:'weak', ok:'good', strong:'strong' };
+  const chip=(k,l)=>`<button type="button" class="lib-chip ${rec===on[k]?'active':''}" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;
+  const saved = rec ? `<span style="font-size:11px;color:var(--jade-deep);">saved</span>` : ''; // visible saved state, not a toast
   const note = shift ? `<span style="font-size:11px;color:var(--ink-soft);">next steep ${shift>0?'+':''}${shift}s vs guide</span>` : '';
   return `<div style="margin:-4px 0 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
     <span style="font-size:11.5px;color:var(--ink-soft);">How was that pour?</span>
     ${chip('weak','Weak → longer')}${chip('ok','Just right')}${chip('strong','Strong → shorter')}
-    ${note}
+    ${saved}${note}
   </div>`;
 }
 
-// Per-steep strength tap (v3.89, gongfu only) — recorded ON the completed steep card, a separate
-// axis from the ephemeral nudge above. Observational copy ("a touch weak"), never imperative.
-// quiet-until-reached-for: faint when unrated, a faint marker once set, chips only while expanded
-// (one steep open at a time — a fully-tapped session reads as faint markers, never open chip-rows).
-// Writes ONLY steep.feedback (never timeShift — strict non-interaction); persists in-draft via
-// d.steeps → steepToDb at commit. Tea-First: never required, finish never flags an un-rated steep.
+// Per-steep verdict has a single writer now — the nudge (d_nudgeNextSteep) records it on the pour you
+// just finished (v3.92). This is the quiet READ-ONLY echo on each completed steep card: it was v3.89's
+// tappable "strength?" marker, whose write duplicated the nudge's field (the "two controls, one field"
+// duplication). Observational copy; renders only once a verdict exists; §3-gated by steepFbActive at the
+// call site. Persists in-draft via d.steeps → steepToDb at commit, unchanged.
 const STEEP_FB_LABELS = { weak:'a touch weak', good:'good', strong:'a touch strong' };
 function steepFeedbackHTML(d, i){
   const fb = (d.steeps[i]||{}).feedback || null;
-  if(d.steepFbOpen===i){
-    const chip=v=>`<button type="button" class="lib-chip ${fb===v?'active':''}" onclick="setSteepFeedback(${i},'${v}')">${STEEP_FB_LABELS[v]}</button>`;
-    return `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${chip('weak')}${chip('good')}${chip('strong')}</div>`;
-  }
-  return `<button type="button" onclick="d_toggleSteepFb(${i})" style="margin-top:6px;background:none;border:none;padding:0;font-size:11px;color:var(--ink-soft);${fb?'':'opacity:.6;'}cursor:pointer;">${fb?'· '+STEEP_FB_LABELS[fb]:'strength?'}</button>`;
-}
-function d_toggleSteepFb(i){
-  const d = state.sessionDraft; if(!d) return;
-  d.steepFbOpen = (d.steepFbOpen===i) ? null : i; // one open at a time; re-tap the marker to change/clear
-  render();
-}
-function setSteepFeedback(i, v){
-  const d = state.sessionDraft; if(!d || !d.steeps[i]) return;
-  d.steeps[i].feedback = (d.steeps[i].feedback===v) ? null : v; // toggle off on second tap → clear (mirrors setSessionFeedback)
-  d.steepFbOpen = null; // collapse to the quiet marker after a pick
-  render();
+  if(!fb) return '';
+  return `<div style="margin-top:6px;font-size:11px;color:var(--ink-soft);">· ${STEEP_FB_LABELS[fb]}</div>`;
 }
 
 function beginSteeping(){
@@ -840,12 +844,9 @@ function d_flavorFreeOpen(){ if(state.sessionDraft){ state.sessionDraft.flavorFr
 function sessionSteepingHTML(d){
   const tea = teaById(d.teaId);
   const tm = d.timer;
-  // Per-steep feedback rides the same opt-in switch as the session verdict (feedbackRowHTML) and shows
-  // for gongfu OR senchadō (v3.91) — both multi-infusion; the method gate is the main quietness
-  // mechanism (spec §3). Resolved through brewMethodFor (same as the setup segment and what commitSession
-  // snapshots), so the segment and the cards always agree. Cold brew carries no timed steeps → no cards.
-  const ves = vesselById(d.vesselId);
-  const showSteepFb = state.settings.brewAdvice!==false && !d.isColdBrew && ['gongfu','senchado'].includes(brewMethodFor(d.brewStyle, ves&&ves.capacityMl));
+  // Per-steep verdict echo rides the same §3 gate as the nudge's write (steepFbActive: brewAdvice on,
+  // not cold brew, gongfu/senchadō) so the cards and the writer always agree. Cold brew → no cards.
+  const showSteepFb = steepFbActive(d);
   const steepsHTML = d.steeps.map((s,i)=>`
     <div class="steep-item">
       <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC)+tempUnitLabel()+' · ':''}${fmtSec(s.timeSeconds)}</span></div>

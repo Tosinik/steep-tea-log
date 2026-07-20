@@ -155,7 +155,24 @@ project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.91 senchadō capture + fixture repair** (cache **v101**, APP_VERSION v3.91):
+**NOW (just shipped) — v3.92 Focus feedback write** (cache **v102**, APP_VERSION v3.92): the steeping
+nudge's "How was that pour?" tap now **persists** as well as nudging the timer. `d_nudgeNextSteep` writes
+`steep.feedback` on the pour just finished (weak→`weak` · ok→`good` · strong→`strong`) with a **visible
+saved state** (active chip + a quiet "saved"); the ephemeral `timeShift` is byte-identical (this adds
+persistence, it doesn't change the nudge). **Merge decision:** the nudge is now the **sole writer** of
+`steep.feedback`; v3.89's per-steep card marker (`steepFeedbackHTML`) is demoted to a **read-only echo** and
+its writers (`d_toggleSteepFb`/`setSteepFeedback`) removed — resolving the "two controls, one field"
+duplication. Both the write and the echo are §3-gated through the new shared `steepFbActive(d)` (brewAdvice
+on · not cold brew · gongfu/senchadō), so western still only nudges the timer and the cards/writer never
+disagree. **Gate-metric shift (intended, not a regression):** `sessionHasFeedback` counts session-OR-any-
+steep, so nudge-only "Just right" sessions flip **uncounted→counted** going forward (stored data + the
+2026-07-19 export's 12 feedback-bearing / `{gongfu:6, western:1, (none):5}` unchanged; `reduceSteepFeedback`/
+`feedbackSignalOf`/`computeBrewAdvice` untouched). Validated: `node --check` ×3, all committed suites green
+(brew-feedback 59 · flavor-ladder 96 · brew-roundtrip 82), a throwaway vm harness (17 checks: write ·
+western/off gates · saved state · read-only echo · gate flip). **No SQL** (`steeps.feedback` since v3.89).
+**Niklas's device check:** saved pill + read-only echo in a live steeping session (per v3.89's precedent).
+
+**Earlier — v3.91 senchadō capture + fixture repair** (cache **v101**, APP_VERSION v3.91):
 **Part A** — the brew-feedback fixture's R section had gone stale-red against the fresh exports (4 real
 sessions now carry per-steep taps, 2 with no session-level feedback) and would have failed the deploy's own
 fixture gate; rewritten to three LIVE guards (reducer both directions · steep-only linchpin on real data ·
@@ -192,11 +209,13 @@ row minus a standalone-cultivar exceptions set {jin-xuan-milky, ruan-zhi-oolong,
 member `dhp`; variant-expands `/`-split+paren+aka since bare names aren't in `covers`). **Value saved
 unchanged** (suggest-never-block); mappers/write path untouched. tea-types H=11. First live use of the
 reference read path (Phase B still held). All 13 suites green; both live-verified (greeting dry-run + in-app
-cultivar hint, console clean). **5th real `/slowcup-deploy`.** **PARKED (diagnostic, for R3):** the ephemeral
-steeping nudge ("How was that pour? · Just right", `d_nudgeNextSteep`) writes only `timeShift` — "Just right"
-writes nothing — so a user can believe they logged taste while nothing reaches `steep.feedback`/the gate
-(silent gate-data loss). Confirmed, NOT fixed: the fix waits for the **R3 Log/Focus-screen resolution**, which
-must make "adjust the timer" and "log the taste" unconfusable, so both land consistently.
+cultivar hint, console clean). **5th real `/slowcup-deploy`.** **FIXED v3.92 (above):** the ephemeral
+steeping nudge ("How was that pour? · Just right", `d_nudgeNextSteep`) used to write only `timeShift` — "Just
+right" wrote nothing — so a user could believe they logged taste while nothing reached `steep.feedback`/the
+gate (silent gate-data loss). v3.92 makes the same tap write `steep.feedback` (weak/good/strong) with a visible
+saved state, and makes the nudge the sole writer (v3.89 card → read-only echo). The R3 Log/Focus restyle still
+owns making "adjust the timer" vs "log the taste" visually unconfusable; the **persistence no longer waits on
+it** (Design #10: committed three-way write + visible saved state unblocked the logic ahead of the restyle).
 
 **Earlier — v3.89 per-steep strength feedback (gongfu)** (cache **v99**, APP_VERSION v3.89):
 the **A2 capture control** (`SPEC-brew-advice-v3-feedback.md`, #15+#9) — the slice that fills the phase-2
