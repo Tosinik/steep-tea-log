@@ -155,7 +155,23 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.93 R30 flavour vocabulary** (cache **v103**, APP_VERSION v3.93): `DEFAULT_TAGS`
+**NOW (just shipped) — v3.94 R31 recognition layer** (cache **v104**, APP_VERSION v3.94): the nested
+flavour tree from `docs/r3/planning/DATA-flavour-tree.md` (Gascoyne wheel, 12 families, 111 recognition
+nodes) lands as **recognition + roll-up DATA and a resolver** in steep-knowledge.js. `isFlavorVocab` now
+resolves **exact → alias (EN word-forms + DE) → bare**; `flavorResolve` returns the `{term, subFamily,
+family}` roll-up; `flavorNorm` is diacritic-tolerant (ä≡ae/ö≡oe/ü≡ue/ß≡ss + NFD strip). The **stored word
+is never rewritten** (German "Aprikose" counts to Fruity/Fresh fruits, displays as written; `flavorLabel`
+unchanged). **Visible win:** all 15 of Niklas's tag_library words count — the 8 R30 left invisible come
+back (toasty/apricot/pear/date/dried fruit/fig/cocoa/spices); on the real steep export **0 of 23 tag words
+stay bare**, one tea climbs none→chips. **Scope fence held:** recognition + roll-up data only — no
+capture-family change, no bar/radar render change, no taste-panel. **Judgment calls (flagged, see
+CHANGELOG):** (1) roast/roasted "one bar" needs a render change (out of fence) — they resolve to one node
+but still draw as two bars; (2) **"milky" (live tag) seeded** as a Milky family-level node (DE `milchig`) —
+folded in before push, reconciling the dataset's §1-family-listed vs §2-adjective-omitted inconsistency
+(F4 asserts it resolves); (3) "rauchig" homed on smoky only (index collision-free). **No SQL.** Fixtures: new `flavor-tree-test.js` (27),
+`flavor-ladder` A8 (tree ⊂ vocabulary); all 14 committed suites green.
+
+**Earlier — v3.93 R30 flavour vocabulary** (cache **v103**, APP_VERSION v3.93): `DEFAULT_TAGS`
 (the `tag_library` seed) and `KB_FLAVOR_CHIPS` (the `isFlavorVocab` membership set) were two vocabularies
 for one concept — five words (`roasted · sweet · astringent · buttery · citrus`) were seeded to every user
 but failed the membership test, so the app **suggested words it silently dropped** from "What you taste"

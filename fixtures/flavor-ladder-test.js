@@ -54,7 +54,12 @@ ok(new Set(fam.flat).size===20, 'A4 no term appears in two families');
 ok(fam.flat.every(t=>fam.keys.includes(t)), 'A5 every family term is valid vocabulary (subset of chip keys)');
 ok(R30_ORPHANS.every(k=>fam.keys.includes(k) && !fam.flat.includes(k)), 'A6 R30 orphans are vocabulary but not capture chips');
 ok(fam.labels[0]==='Vegetal & marine' && fam.flat.slice(0,6).includes('umami') && fam.flat.slice(0,6).includes('grassy'), 'A7 umami + grassy homed in Vegetal & marine');
-console.log('  A family completeness: 7 checks');
+// R31: the families-⊂-vocabulary invariant extends to the nested tree — every tree node term (and every
+// capture-family term) must be flavour vocabulary. The resolver's own integrity lives in flavor-tree-test.js.
+const treeOK = vm.runInContext('FLAVOR_TREE.every(n=>isFlavorVocab(n.t)) && '+
+  JSON.stringify(fam.flat)+'.every(t=>isFlavorVocab(t))', ctx);
+ok(treeOK===true, 'A8 every flavour-tree node term + every capture term is vocabulary (tree ⊂ vocabulary)');
+console.log('  A family completeness: 8 checks');
 
 // ---- 2. Rung guard: never draw a higher rung than the data earns ----
 setSessions([ mk(0,[['umami']]), mk(1,[['grassy']]) ]);

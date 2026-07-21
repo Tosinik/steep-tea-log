@@ -183,10 +183,177 @@ const KB_FLAVOR_FAMILIES = [
 ];
 const FLAVOR_DEFAULT_FAMILIES = 2; // families shown before "more"
 
-// A tag is flavour *vocabulary* iff it's a KB_FLAVOR_CHIPS key. Free-typed words are stored bare
-// in the same tags array but are not vocabulary — so they never inflate the radar-unlock count
-// (they still show in "You tasted" / on history cards). This is the "bare + membership" scheme.
-function isFlavorVocab(tag){ return Object.prototype.hasOwnProperty.call(KB_FLAVOR_CHIPS, String(tag||'').toLowerCase()); }
+// ===== R31 (v3.94): nested flavour tree — recognition + roll-up DATA and resolver ONLY. =====
+// Source: docs/r3/planning/DATA-flavour-tree.md (Gascoyne wheel, 12 families, curated ~80 terms).
+// SCOPE FENCE: adds recognition (membership via EN-variant/DE alias) + roll-up data (term→sub-family→
+// family). Does NOT touch the WS4 capture families (KB_FLAVOR_FAMILIES) or any bar/radar rendering.
+// The "collapse roast/roasted to one bar" the dataset anticipates is a *render* change (group-by-node),
+// so it is OUT of scope here — the roll-up data is provided; today each stored word is still its own bar.
+const FLAVOR_FAMILY_DE = { Vegetal:'Vegetabil', Marine:'Marin', Floral:'Blumig', Fruity:'Fruchtig',
+  Woody:'Holzig', Earthy:'Erdig', Empyreumatic:'Röstaromen', Animal:'Animalisch', Mineral:'Mineralisch',
+  Confectionery:'Süßwaren', Spiced:'Würzig', Milky:'Milchig' };
+const FLAVOR_SUBFAMILY_DE = { 'Dry herbs':'Trockene Kräuter', 'Fresh herbs':'Frische Kräuter',
+  'Aromatic herbs':'Aromatische Kräuter', 'Vegetables':'Gemüse', 'Fresh flowers':'Frische Blüten',
+  'Opulent flowers':'Opulente Blüten', 'Fresh fruits':'Frische Früchte', 'Berries':'Beeren',
+  'Citrus':'Zitrus', 'Dried & candied':'Trocken- & kandierte Früchte', 'Exotic':'Exotische Früchte',
+  'Woodlands':'Waldig', 'Undergrowth':'Unterholz' };
+// Nodes: t=canonical term (a recognition key) · f=family · s=sub-family (null = family-level) ·
+// a=aliases (EN word-form variants + DE input words). All keys resolve case-insensitively and
+// diacritic-tolerantly (ä≡ae, ö≡oe, ü≡ue, ß≡ss) via flavorNorm. Provenance lives in the dataset.
+const FLAVOR_TREE = [
+  // Vegetal
+  {t:'hay',f:'Vegetal',s:'Dry herbs',a:['heu']},
+  {t:'straw',f:'Vegetal',s:'Dry herbs',a:['stroh']},
+  {t:'cut grass',f:'Vegetal',s:'Fresh herbs',a:['frisch geschnittenes gras','gras']},
+  {t:'grassy',f:'Vegetal',s:'Fresh herbs',a:['grasig']},
+  {t:'green wood',f:'Vegetal',s:'Fresh herbs',a:['grünes holz']},
+  {t:'mint',f:'Vegetal',s:'Aromatic herbs',a:['minze']},
+  {t:'basil',f:'Vegetal',s:'Aromatic herbs',a:['basilikum']},
+  {t:'thyme',f:'Vegetal',s:'Aromatic herbs',a:['thymian']},
+  {t:'spinach',f:'Vegetal',s:'Vegetables',a:['spinat']},
+  {t:'green beans',f:'Vegetal',s:'Vegetables',a:['grüne bohnen']},
+  {t:'artichoke',f:'Vegetal',s:'Vegetables',a:['artischocke']},
+  {t:'cooked vegetables',f:'Vegetal',s:'Vegetables',a:['gekochtes gemüse']},
+  {t:'vegetal',f:'Vegetal',s:'Vegetables',a:['vegetabil','gemüsig']},
+  {t:'fresh',f:'Vegetal',s:'Fresh herbs',a:['frisch']}, // [ours] low-conf: no "fresh" aroma on the wheel
+  // Marine
+  {t:'algae',f:'Marine',s:null,a:['algen']},
+  {t:'kelp',f:'Marine',s:null,a:['seetang']},
+  {t:'iodine',f:'Marine',s:null,a:['jod']},
+  {t:'marine',f:'Marine',s:null,a:['marin','meerig']},
+  // Floral
+  {t:'jasmine',f:'Floral',s:'Fresh flowers',a:['jasmin']},
+  {t:'osmanthus',f:'Floral',s:'Fresh flowers',a:[]},
+  {t:'honeysuckle',f:'Floral',s:'Fresh flowers',a:['geißblatt']},
+  {t:'orange blossom',f:'Floral',s:'Fresh flowers',a:['orangenblüte']},
+  {t:'rose',f:'Floral',s:'Opulent flowers',a:[]},
+  {t:'orchid',f:'Floral',s:'Opulent flowers',a:['orchidee']},
+  {t:'magnolia',f:'Floral',s:'Opulent flowers',a:['magnolie']},
+  {t:'floral',f:'Floral',s:null,a:['blumig']},
+  // Fruity
+  {t:'apricot',f:'Fruity',s:'Fresh fruits',a:['aprikose']},
+  {t:'peach',f:'Fruity',s:'Fresh fruits',a:['pfirsich']},
+  {t:'pear',f:'Fruity',s:'Fresh fruits',a:['birne']},
+  {t:'plum',f:'Fruity',s:'Fresh fruits',a:['pflaume']},
+  {t:'apple',f:'Fruity',s:'Fresh fruits',a:['apfel']},
+  {t:'grape',f:'Fruity',s:'Fresh fruits',a:['traube']},
+  {t:'muscatel',f:'Fruity',s:'Fresh fruits',a:['muskateller']},
+  {t:'cherry',f:'Fruity',s:'Fresh fruits',a:['kirsche']},
+  {t:'stonefruit',f:'Fruity',s:'Fresh fruits',a:['steinobst']},
+  {t:'red berries',f:'Fruity',s:'Berries',a:['rote beeren']},
+  {t:'blackcurrant',f:'Fruity',s:'Berries',a:['schwarze johannisbeere']},
+  {t:'bergamot',f:'Fruity',s:'Citrus',a:['bergamotte']},
+  {t:'lemon',f:'Fruity',s:'Citrus',a:['zitrone']},
+  {t:'orange',f:'Fruity',s:'Citrus',a:[]},
+  {t:'zest',f:'Fruity',s:'Citrus',a:['zeste','schale']},
+  {t:'citrus',f:'Fruity',s:'Citrus',a:['zitrus']},
+  {t:'raisin',f:'Fruity',s:'Dried & candied',a:['rosine']},
+  {t:'dried fig',f:'Fruity',s:'Dried & candied',a:['fig','feige','getrocknete feige']},
+  {t:'date',f:'Fruity',s:'Dried & candied',a:['dattel']},
+  {t:'dried fruit',f:'Fruity',s:'Dried & candied',a:['trockenfrüchte','trockenobst']},
+  {t:'chestnut',f:'Fruity',s:'Dried & candied',a:['kastanie']},
+  {t:'walnut',f:'Fruity',s:'Dried & candied',a:['walnuss']},
+  {t:'hazelnut',f:'Fruity',s:'Dried & candied',a:['haselnuss']},
+  {t:'almond',f:'Fruity',s:'Dried & candied',a:['mandel']},
+  {t:'nutty',f:'Fruity',s:'Dried & candied',a:['nussig']}, // [ours]: wheel homes nuts here
+  {t:'lychee',f:'Fruity',s:'Exotic',a:['litschi']},
+  {t:'coconut',f:'Fruity',s:'Exotic',a:['kokos']},
+  {t:'mango',f:'Fruity',s:'Exotic',a:[]},
+  {t:'pineapple',f:'Fruity',s:'Exotic',a:['ananas']},
+  {t:'fruity',f:'Fruity',s:null,a:['fruchtig']},
+  // Woody
+  {t:'oak',f:'Woody',s:'Woodlands',a:['eiche']},
+  {t:'pine',f:'Woody',s:'Woodlands',a:['kiefer']},
+  {t:'camphor',f:'Woody',s:'Woodlands',a:['kampfer']},
+  {t:'bark',f:'Woody',s:'Woodlands',a:['rinde']},
+  {t:'dry wood',f:'Woody',s:'Woodlands',a:['trockenes holz']},
+  {t:'woody',f:'Woody',s:'Woodlands',a:['holzig']},
+  {t:'moss',f:'Woody',s:'Undergrowth',a:['moos']},
+  {t:'wet leaves',f:'Woody',s:'Undergrowth',a:['nasses laub']},
+  {t:'mushrooms',f:'Woody',s:'Undergrowth',a:['pilze']},
+  {t:'humus',f:'Woody',s:'Undergrowth',a:[]},
+  // Earthy
+  {t:'earth',f:'Earthy',s:null,a:['erde']},
+  {t:'peat',f:'Earthy',s:null,a:['torf']},
+  {t:'wet rock',f:'Earthy',s:null,a:['nasser stein']},
+  {t:'cellar',f:'Earthy',s:null,a:['keller']},
+  {t:'earthy',f:'Earthy',s:null,a:['erdig']},
+  // Empyreumatic  (rauchig homed on smoky only, to keep the index collision-free)
+  {t:'smoked',f:'Empyreumatic',s:null,a:['geräuchert']},
+  {t:'smoky',f:'Empyreumatic',s:null,a:['rauchig']},
+  {t:'toasted',f:'Empyreumatic',s:null,a:['getoastet']},
+  {t:'toasty',f:'Empyreumatic',s:null,a:[]}, // near-miss recovered → family
+  {t:'toast',f:'Empyreumatic',s:null,a:[]},
+  {t:'roast',f:'Empyreumatic',s:null,a:['roasting','roasted','röstung','röstig','geröstet']}, // 3 word-forms, 1 node
+  {t:'tobacco',f:'Empyreumatic',s:null,a:['tabak']},
+  {t:'burnt',f:'Empyreumatic',s:null,a:['verbrannt']},
+  {t:'ash',f:'Empyreumatic',s:null,a:['asche']},
+  {t:'malty',f:'Empyreumatic',s:null,a:['malzig']}, // [ours] low-conf: not on the wheel, flag for review
+  // Animal
+  {t:'leather',f:'Animal',s:null,a:['leder']},
+  {t:'musk',f:'Animal',s:null,a:['moschus']},
+  // Mineral
+  {t:'flint',f:'Mineral',s:null,a:['feuerstein']},
+  {t:'stone',f:'Mineral',s:null,a:['stein']},
+  {t:'chalk',f:'Mineral',s:null,a:['kreide']},
+  {t:'metal',f:'Mineral',s:null,a:['metall']},
+  {t:'mineral',f:'Mineral',s:null,a:['mineralisch']},
+  // Confectionery
+  {t:'cocoa',f:'Confectionery',s:null,a:['kakao']},
+  {t:'chocolate',f:'Confectionery',s:null,a:['schokolade']},
+  {t:'honey',f:'Confectionery',s:null,a:['honig']},
+  {t:'vanilla',f:'Confectionery',s:null,a:['vanille']},
+  {t:'caramelized sugar',f:'Confectionery',s:null,a:['karamell','karamellisiert']},
+  {t:'marzipan',f:'Confectionery',s:null,a:[]},
+  {t:'brioche',f:'Confectionery',s:null,a:[]},
+  {t:'sweet bread',f:'Confectionery',s:null,a:['süßes gebäck']},
+  // Spiced
+  {t:'cinnamon',f:'Spiced',s:null,a:['zimt']},
+  {t:'cardamom',f:'Spiced',s:null,a:['kardamom']},
+  {t:'ginger',f:'Spiced',s:null,a:['ingwer']},
+  {t:'clove',f:'Spiced',s:null,a:['nelke']},
+  {t:'anise',f:'Spiced',s:null,a:['anis']},
+  {t:'nutmeg',f:'Spiced',s:null,a:['muskat']},
+  {t:'licorice',f:'Spiced',s:null,a:['lakritz']},
+  {t:'spice',f:'Spiced',s:null,a:['spices','gewürze','würzig']}, // 2 word-forms, 1 family node
+  // Milky
+  {t:'fresh butter',f:'Milky',s:null,a:['frische butter']},
+  {t:'melted butter',f:'Milky',s:null,a:['zerlassene butter']},
+  {t:'cream',f:'Milky',s:null,a:['sahne']},
+  {t:'milk',f:'Milky',s:null,a:['milch']},
+  {t:'milky',f:'Milky',s:null,a:['milchig']}, // family-level term: dataset §1 lists the Milky family, §2 omitted the adjective (floral/fruity/marine got one) — reconciled
+  {t:'creamy',f:'Milky',s:null,a:['cremig']},
+  {t:'buttery',f:'Milky',s:null,a:['butterig']}
+];
+// Normalize for matching: lowercase · fold German umlauts (ä→ae ö→oe ü→ue ß→ss) · strip other
+// diacritics · collapse whitespace. Storage is NEVER normalized — only the match key is (so an
+// umlaut round-trips in the stored/displayed word untouched; see flavorLabel).
+function flavorNorm(s){
+  s = String(s||'').toLowerCase().normalize('NFC').trim();
+  s = s.replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+  s = s.normalize('NFD').replace(/[̀-ͯ]/g,'');
+  return s.replace(/\s+/g,' ');
+}
+const _FLAVOR_INDEX = (function(){
+  const m = Object.create(null);
+  FLAVOR_TREE.forEach(n=>{ [n.t].concat(n.a||[]).forEach(k=>{ const nk = flavorNorm(k); if(nk && !(nk in m)) m[nk] = n; }); });
+  return m; // authored collision-free; the flavor-tree fixture guards it
+})();
+// Resolve a stored/typed word to its tree node via exact term / EN-variant / DE-alias (all normalized).
+// Returns the roll-up {term, subFamily, family} or null (bare — the honest floor). Roll-up is DATA:
+// nothing here renders it; the render layer still tallies by the raw stored word (scope fence).
+function flavorResolve(word){
+  const n = _FLAVOR_INDEX[flavorNorm(word)];
+  return n ? { term:n.t, subFamily:n.s||null, family:n.f } : null;
+}
+
+// A tag is flavour *vocabulary* iff it's a KB_FLAVOR_CHIPS key OR it resolves in the flavour tree
+// (R31). Free-typed words that resolve to neither stay bare — the honest floor — so they never inflate
+// the radar-unlock count (they still show in "You tasted" / on history cards). "bare + membership".
+function isFlavorVocab(tag){
+  const w = String(tag||'').toLowerCase();
+  return Object.prototype.hasOwnProperty.call(KB_FLAVOR_CHIPS, w) || flavorResolve(w) != null;
+}
 function flavorFamilyOf(term){ term=String(term||'').toLowerCase(); return KB_FLAVOR_FAMILIES.find(f=>f.terms.includes(term))||null; }
 // Display label for a stored (English-key) flavour tag. Non-vocab free words render as typed.
 // KB_FLAVOR_CHIPS carries the German label for a future DE locale toggle; English key by default
