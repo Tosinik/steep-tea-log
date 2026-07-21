@@ -279,6 +279,13 @@ Live issues (see STATE.md / ROADMAP for the full backlog):
   it is a *wrong number shown to the user*, not a missing feature. The intended home for the fix is a
   currency preference in **R3 #07 Settings**, which is unbuilt — flagged to Design as an input rather
   than patched separately.
+- **Session-edit modal's "TAGS" is session-level only.** The edit modal (`sessionEditModal`) surfaces
+  the session's overall `tags`; **per-steep taste words (`steeps[].tags`) and the per-steep `feedback`
+  are not shown/editable there.** Verified **non-destructive at HEAD**: the modal deep-copies the session
+  in (`state.editingSession = JSON.parse(JSON.stringify(s))`, steep-sessions.js:189) and `saveSessionEdit`
+  writes the whole object back (`state.sessions[idx] = e`, :262), so the un-surfaced per-steep fields are
+  carried through untouched — editing session tags never drops per-steep taste/feedback. The real fix
+  (surfacing per-steep taste in the edit UI) rides the **#02b** rebuild; **no interim change requested**.
 - ~~**Double stock decrement.**~~ **Fixed v3.35.** Cause was a re-entrant double-fire of
   `commitSession` (not the offline queue, which replays idempotent absolute-value
   upserts). Fixed with a shared `_sessionSaving` guard on `commitSession` +

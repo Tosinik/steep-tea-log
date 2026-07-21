@@ -39,10 +39,9 @@ Supabase project: https://duuosbgjozjjfyfusjzf.supabase.co (anon key in project 
 - **HTTPS:** cert via GitHub Pages (Let's Encrypt, auto-renews); **Enforce HTTPS on**. `.app` is
   **HSTS-preloaded — there is no HTTP fallback**, so a domain lapse = hard-dead app (hence the
   auto-renew note above). Domain verified at the GitHub account level.
-- **Supabase:** Site URL flipped to `https://slowcup.app/`; the redirect **allowlist holds BOTH
-  origins during the transition**. **Follow-up task:** remove the `tosinik.github.io/steep-tea-log`
-  allowlist entry **once Ruth confirms her reinstall on the new origin** (PWA reinstalls are
-  user-side work — a new origin means a fresh SW + storage; the 301 heals plain links, not installs).
+- **Supabase:** Site URL is `https://slowcup.app/`. The redirect allowlist **cleanup is DONE** —
+  Niklas removed the `tosinik.github.io/steep-tea-log` entry **2026-07-20** (Ruth reinstalled on the new
+  origin), so the allowlist now holds only slowcup.app. The 301 still heals plain links.
 
 ## Modules (index.html load order; boot last)
 steep-data → steep-knowledge → steep-core → steep-settings → steep-dashboard → steep-insights →
@@ -114,8 +113,8 @@ spec can now be drafted**; decisions-to-resolve-first are the agenda in `PHASE2-
 baseline conflicts with Pillar A — v3.91 ships `kb.ratioGongfu` 3.0; the 2.8 leaf-seed is currently
 unreachable, so the gyokuro revisit needs senchadō ratios IN THE KB), §E (6 retagged sessions carry feedback
 recorded under a superseded baseline), §F (bitter/strong = one axis, open question), + move the gate metric to
-stored `brew_style`. v3.85's brewStyle un-gate feeds real method data. (2) **Supabase allowlist cleanup**
-— drop the github.io origin once Ruth confirms her reinstall (see "Domain & auth origins"). The
+stored `brew_style`. v3.85's brewStyle un-gate feeds real method data. (2) ~~**Supabase allowlist cleanup**~~
+**DONE 2026-07-20** — github.io origin removed after Ruth's reinstall (see "Domain & auth origins"). The
 **domain is DONE** (registered + migrated 2026-07-13 — https://slowcup.app). **#23**
 ("R2 capability regressions" — planned as #21, renumbered by GitHub) holds the reinstate-vs-accept
 decisions (sorts full treatment, vendor filter, in-stock count, focus-mode log/reset, per-steep tag
@@ -150,8 +149,8 @@ repo `images/` folder** (corrected 2026-07-13 — the project re-clones the repo
 project base, see "Feeding claude.ai" above). R3 is the post-batch visual level-up; two directions captured
 (warm atelier vs saturated botanical) + the reserved-colour idea. Not in scope until WS1+WS4 land.
 
-**Parallel / Niklas's:** ~~the domain~~ (**registered + migrated 2026-07-13** ✓); beta-tester
-**reinstalls on the new origin** (Ruth first — then the Supabase allowlist cleanup fires); the
+**Parallel / Niklas's:** ~~the domain~~ (**registered + migrated 2026-07-13** ✓); ~~beta-tester
+reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup DONE 2026-07-20** ✓); the
 **phase-2 gate** (3/15 measured 2026-07-15, ~2–3 weeks out) — **the A2 capture control SHIPPED v3.89**; the
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.

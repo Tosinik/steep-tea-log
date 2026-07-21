@@ -166,6 +166,36 @@ keeps the honest floor (a genuinely novel word stays bare). Draft it against the
 values, not invented aliases. This is what collapses R30's accepted coexistence (`roast`/`roasted`,
 `sweet`/`sweetness`) back to one bar.
 
+**R32 — Landing copy is all-new, canonical as drawn.** The "shipped about line" provenance claim was
+false — there is no prior about-line to inherit; #09's logged-out landing copy stands as authored. Keep
+minimal.
+
+**R33 — Ensō: door + timer, never the icon.** Amends the app-icon note (§4): the logged-out door may
+carry the ensō alongside the timer; the app icon still may not.
+
+**R34 — No invite-code redemption.** The invite-code line is cut — no redemption mechanism exists or
+will; a passive "invitation-only" line is permitted (states the fact, collects nothing).
+
+**R35 — Presence parked post-beta, not rejected.** Online/presence indicators wait until after beta;
+not a no.
+
+**R36 — Passed-tea destination is three-tier.** Catalog "Go deeper" when the tea is covered; otherwise a
+minimal preview card with Add-to-shelf.
+
+**R37 — Wrapped Share-card / Save-image accepted, pull-only.** Never auto-posted, never names people;
+Code owns the card sizes; Save-image may slip a build.
+
+**R38 — Wrapped's period is monthly, explicitly.** A yearly sibling comes later; v3.64's seasonal scope
+changes at the #11 build.
+
+**R39 — Picker swatch long-press colour correction ratified.**
+
+**R40 — #02b out-links accepted.** Brew-this-again (carries vessel + method), Copy-to-a-new-entry, and
+Pass-this-tea (rides R25).
+
+**R41 — Teaware line-art pipeline retired (retroactive record of an earlier chat decision).** Real
+photos are vessel identity; type-kanji is the fallback.
+
 ---
 
 ## 2 · Corrections owed, per board
