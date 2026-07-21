@@ -4,13 +4,11 @@ Transcribed 2026-07-20 for the planning lane's nested flavour vocabulary (R30/R3
 This is the **aroma** layer: what a tea smells/tastes *of*. The structure/texture layer is a separate
 file — `DATA-tasting-lexicon.md`.
 
-**Source.** *Tea — History, Terroirs, Varieties*, Kevin Gascoyne et al. (Camellia Sinensis) — confirmed
-by Niklas 2026-07-20. Photographed pages: p.221 ("Families of aromas", titled **"Flavor wheel"**) and
-p.223 ("A Brief Lexicon of Tasting"). *(The earlier Palais des Thés / Delmas attribution was wrong and
-is struck.)* The book has four authors; only the lead (Kevin Gascoyne) is named here — the other three
-were **not** expanded, because the cover was not among the photographed pages and names of this kind
-should not be written from memory. Confirm the four spellings against the physical cover to expand
-"et al." to the full author list.
+**Source.** *Tea: History, Terroirs, Varieties* (Third Edition), Kevin Gascoyne, François Marchand,
+Jasmin Desharnais & Hugo Américi (Camellia Sinensis). Author names and edition confirmed by Niklas from
+the physical cover, 2026-07-21. Photographed pages: p.221 ("Families of aromas", titled **"Flavor
+wheel"**) and p.223 ("A Brief Lexicon of Tasting") — the page refs are **edition-specific** (Third
+Edition). *(The earlier Palais des Thés / Delmas attribution was wrong and is struck.)*
 
 **Local-only images.** The source photographs live in `book_reference_material/`, which is **gitignored**
 — the repo is public and the pages are copyrighted. Only this factual term taxonomy (structure preserved,

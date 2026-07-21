@@ -1,11 +1,11 @@
 # DATA — Nested flavour tree
 
-2026-07-20 · Planning lane. **Ratified by Niklas 2026-07-20.** Source: *Tea — History, Terroirs,
-Varieties*, Kevin Gascoyne et al. (Camellia Sinensis). Four authors; only the lead is named here — the
-other three spellings are pending a physical-cover check, so **"et al." stands** (the cover was not among
-the photographed pages; such names should not be written from memory). This is the committed dataset
-behind **R31**; it replaces the `[unclear]` citation headers here and in both transcription files (the
-earlier Palais des Thés / Delmas lead was wrong — struck). Drafted against `DATA-flavour-wheel.md` (source
+2026-07-20 · Planning lane. **Ratified by Niklas 2026-07-20.** Source: *Tea: History, Terroirs,
+Varieties* (Third Edition), Kevin Gascoyne, François Marchand, Jasmin Desharnais & Hugo Américi (Camellia
+Sinensis) — authors + edition confirmed by Niklas from the physical cover 2026-07-21 (the p.221/223 page
+refs are edition-specific). This is the committed dataset behind **R31**; it replaces the `[unclear]`
+citation headers here and in both transcription files (the earlier Palais des Thés / Delmas lead was
+wrong — struck). Drafted against `DATA-flavour-wheel.md` (source
 structure, terms verbatim), the real `tag_library` (15 tags, 2026-07-19 export), and shipped
 `KB_FLAVOR_CHIPS` (25 keys). Anchor ruling (Niklas, 2026-07-20): **the tree is wheel-native — twelve
 families**; the 25 chips are terms *within* it, not the axes. Seed depth: **curated ~80**, not full
@@ -136,6 +136,7 @@ case-insensitive and diacritic-tolerant (ä/ae etc.); umlauts must round-trip in
    Design-gated (provisional taste panel). This file changes *recognition and roll-up* only.
 4. The three [ours] mappings — fresh · malty · nutty — **ratified by Niklas 2026-07-20**; provenance
    tags stay as the honest record of what isn't the source's.
-5. Citation header: *Tea — History, Terroirs, Varieties*, Kevin Gascoyne et al. — the four author
-   spellings still need a physical-cover check to expand "et al."; applied as-is to both transcription
-   files, and their Palais des Thés / Delmas lead struck (it was wrong).
+5. Citation header — **DONE.** *Tea: History, Terroirs, Varieties* (Third Edition), Kevin Gascoyne,
+   François Marchand, Jasmin Desharnais & Hugo Américi (Camellia Sinensis); confirmed from the physical
+   cover 2026-07-21 and applied to all three files (p.221/223 refs are edition-specific). Palais des
+   Thés / Delmas lead struck (it was wrong).
