@@ -6,9 +6,10 @@ from the aroma wheel (`DATA-flavour-wheel.md`): it is *structure, body, and text
 "two-layer question" the ledger §4 entry raises (structure vs aroma; ties to `PHASE2-PRESPEC-NOTES.md`
 §F on bitter/strong). Kept separate on purpose so the two layers don't get merged into one vocabulary.
 
-**Source.** Photographed page 223, **"A Brief Lexicon of Tasting"**, of the same English-language
-tea-tasting reference as the flavour wheel (see `DATA-flavour-wheel.md` for the source note; the exact
-citation is **[unclear — title page not photographed; confirm from the physical book]**).
+**Source.** Photographed page 223, **"A Brief Lexicon of Tasting"**, of *Tea — History, Terroirs,
+Varieties*, Kevin Gascoyne et al. (Camellia Sinensis) — the same book as the flavour wheel, confirmed by
+Niklas 2026-07-20 (see `DATA-flavour-wheel.md` for the full source note; the earlier Palais des Thés /
+Delmas lead was wrong and is struck; "et al." pending the four author spellings from the cover).
 
 **Local-only images.** The source photograph lives in `book_reference_material/` (gitignored, public
 repo, copyrighted pages). Only this **word list** is committed. The author's definitions are deliberately
