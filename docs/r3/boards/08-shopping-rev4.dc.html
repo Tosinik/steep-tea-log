@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><path d="M34 40 h52 l-6 44 h-40 z" fill="none" stroke="#2B2320" stroke-width="5" stroke-linejoin="round"></path><path d="M46 40 v-8 a14 14 0 0 1 28 0 v8" fill="none" stroke="#2B2320" stroke-width="5"></path><rect x="40" y="52" width="16" height="20" rx="4" fill="#843A1E"></rect><rect x="64" y="52" width="16" height="20" rx="4" fill="#9C5B33"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #08</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">SHOPPING · rev 4</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Shopping</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1000px; margin:0; line-height:1.65;">Two sources: <strong>running low</strong> derives from your shelf (<code>stockTier</code>), <strong>wishlist</strong> is a separate table. The export has exactly <strong>one wishlist row</strong> — and it names a tea <em>already on the shelf</em>, so the two lists aren't disjoint. That real overlap becomes the board's spine: the wishlist row reads as a <strong>rebuy</strong>, not a duplicate want. Rev 4 lands the real running-low pair, adds <strong>restock → repeat purchase</strong> (R11) and a <strong>vendor web-search</strong> (R12); overlap, <code>done</code> and no-price all stand.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:26px 24px 26px; display:flex; flex-direction:column;">
+
+          <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:23px; color:{{ t.ink }};">Shopping</span>
+            <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+          </div>
+          <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:{{ t.muted }}; margin-top:12px;">What to restock, what to seek.</span>
+
+          <!-- RUNNING LOW -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:20px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">RUNNING LOW · FROM YOUR SHELF</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.jade }};">stockTier ✓ · export</span>
+          </div>
+          <sc-for list="{{ t.lowR }}" as="x" hint-placeholder-count="2">
+            <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+              <div style="width:24px; height:31px; flex:none; background:{{ x.sw }}; border:1px solid rgba(0,0,0,0.06); border-radius:8px 4px 7px 4px;"></div>
+              <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">{{ x.n }}</span><span style="font-family:'Noto Serif SC',serif; font-size:11.5px; color:{{ t.muted }};">{{ x.script }}</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.lowFg }};">{{ x.stock }}</span>
+              </div>
+              <span style="font-size:12px; font-weight:500; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">restock</span>
+            </div>
+          </sc-for>
+
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:10px;">restock prefills Add tea with <span style="color:{{ t.ink }};">purchase_type=repeat</span> (R11) — the one honest place “repeat” is set, giving cost first-vs-repeat variance. <span style="color:{{ t.link }};">find at vendor ↗</span> runs a web search (R12), no schema.</span>
+
+          <!-- WISHLIST -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:22px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">WISHLIST · TEAS TO SEEK</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.jade }};">1 row ✓</span>
+          </div>
+
+          <!-- the real overlap row — verified: names a tea already on the shelf, at 0 g -->
+          <div style="margin-top:12px; border:1px solid {{ t.hair }}; border-radius:13px; background:{{ t.factBg }}; padding:14px; display:flex; flex-direction:column; gap:11px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:26px; height:26px; flex:none; border:1.5px solid {{ t.hair }}; border-radius:7px;"></div>
+              <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">Shincha Saemidori Kagoshima</span><span style="font-family:'Noto Serif SC',serif; font-size:11.5px; color:{{ t.muted }};">新茶</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.muted }};">Bamboo Tea Room · green</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:9px; background:{{ t.selBg }};">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.08em; color:{{ t.clayInk }}; background:{{ t.clay }}; padding:3px 6px; border-radius:3px;">REBUY</span>
+              <span style="font-size:11px; color:{{ t.ink }}; flex:1; line-height:1.4;">On your shelf at <strong>0 g</strong> — a restock, not a new find.</span>
+              <span style="font-size:12px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">open ›</span>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:11px;">tick the box to mark it acquired — the existing <span style="color:{{ t.ink }};">done</span> flag, so “clear acquired” is schema-ready, not new. wishlist stores name · vendor · type · note · done — no price field, so none is shown.</span>
+
+          <!-- add -->
+          <div style="display:flex; align-items:center; gap:8px; margin-top:20px;">
+            <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">＋ Add to wishlist</span>
+          </div>
+
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 4</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Two sources, one real overlap</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Overlap is the real state (checked):</strong> the one wishlist row — <em>Shincha Saemidori Kagoshima · Bamboo Tea Room · green · done=false</em> — names a tea already on the shelf, and that tea is at <strong>0 g</strong>, so the want and the restock are the same errand. The lists aren't disjoint, and the rebuy affordance links the row to the owned tea rather than showing a duplicate want. <strong style="color:#E5AE2B;">Correction note:</strong> a rev-3 pass redrew this as an empty wishlist on a report that the table had no rows; that report wasn't verified. Rev 4 restores the verified state — the row is real and load-bearing.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">done ships (checked):</strong> <code style="color:#C9BFAC;">done</code> is the existing clear-acquired boolean — “mark acquired” is schema-ready, not new capability. <strong style="color:#E5AE2B;">No price (checked):</strong> the wishlist schema is name · vendor · tea_type · note · done — no cost field, so no price is drawn. If cost ever appears, it inherits the Settings currency pref (€ for Niklas), same as the rest.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Running low is real (checked):</strong> Honey Oolong Gui Fei (7 g) · Sencha Kagoshima Premium (8 g) from <code style="color:#C9BFAC;">stockTier</code> against the low-stock threshold — no Tie Guan Yin exists. <strong style="color:#E5AE2B;">Restock (R11):</strong> prefills Add tea with <code style="color:#C9BFAC;">purchase_type='repeat'</code> (+ name, vendor, type) — the truthful home for “repeat” (100% “first” today), unlocking cost first-vs-repeat variance. <strong style="color:#E5AE2B;">Vendor search (R12):</strong> a web-search action on wishlist/restock rows — user-initiated pull, no schema; a <code style="color:#C9BFAC;">url</code> column and vendor entity are deferred.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    // CHECKED — real running-low pair from stockTier (ledger §2). No Tie Guan Yin exists.
+    const low = [
+      { sw: "#CBA347", n: "Honey Oolong Gui Fei", script: "貴妃", stock: "running low · 7 g" },
+      { sw: "#8FA83E", n: "Sencha Kagoshima Premium", script: "煎茶", stock: "running low · 8 g" }
+    ];
+
+    const resolve = (t) => ({ ...t,
+      cap: t.capText,
+      lowR: low.map(x => ({ n: x.n, script: x.script, sw: x.sw, stock: x.stock }))
+    });
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const ES = { tag: "ESTIMATED", tagBg: "rgba(105,22,15,0.14)", tagFg: "#8A2B1C" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...CK, k: "SH1", t: "The overlap is the design", d: "The single wishlist row names a tea already on the shelf — and that tea sits at 0 g, so the want and the restock are one errand. Rather than two disjoint lists, the row reads as a rebuy and links to the owned tea. The sparse single-row state carries the whole idea (TD9: sparse adapts, doesn't vanish)." },
+      { ...CK, k: "SH2", t: "Two sources, one screen", d: "Running low is derived from teas via stockTier; wishlist is its own table (name · vendor · tea_type · note · done). They share a screen but not a source — the headers say which is which." },
+      { ...CK, k: "SH3", t: "done = clear acquired", d: "The tick reuses the existing done boolean, so marking a want acquired is schema-ready, not new capability. Unchecked here (done=false), matching the export." },
+      { ...CK, k: "SH4", t: "No price, by schema", d: "The wishlist stores no cost, so the board shows none — inventing a price would be exactly the failure mode the round keeps catching. Any future cost inherits the Settings currency pref." },
+      { ...CK, k: "SH5", t: "Running low is the real pair", d: "Honey Oolong Gui Fei (7 g) and Sencha Kagoshima Premium (8 g), from stockTier against the low-stock threshold. No Tie Guan Yin exists — the earlier rows were invented. Teas and grams are from the export now." },
+      { ...FL, k: "SH6", t: "Wishlist→library join", d: "Detecting the overlap needs a join. Name-match is simplest; the matchTeaType slug join Origins raised is the alternative. One ruling covers both surfaces — flagged, not chosen here." },
+      { ...FL, k: "SH7", t: "Restock prefills a repeat (R11)", d: "The restock action opens Add tea prefilled with name, vendor, type and purchase_type='repeat' — the one place 'repeat' is set truthfully, inside an explicit action. Revives a field 100% 'first' today and unlocks cost first-vs-repeat variance." },
+      { ...FL, k: "SH8", t: "Vendor search, no schema (R12)", d: "A web-search action (vendor + tea name) rides wishlist and restock rows — user-initiated, a pull, no url column or vendor entity yet (deferred). The lightest way to close the loop from 'running low' to 'buying'." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "Running low sits first — restocking is the more frequent errand — then the wishlist, anchored by the real rebuy. The overlap callout uses the amber Focus tint sparingly, to mark the one row that needs a second look.", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", lowFg: "#B07C3E", factBg: "#EDE6D4", selBg: "rgba(229,174,43,0.14)" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "The same two sources at night. The rebuy callout still reads as the one thing to notice; everything else stays quiet paper-on-dark.", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", lowFg: "#D79A5A", factBg: "#262017", selBg: "rgba(229,174,43,0.12)" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

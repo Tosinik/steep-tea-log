@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><path d="M20 74 C40 66 52 82 70 72 C84 64 96 74 104 70" fill="none" stroke="#9C5B33" stroke-width="4" stroke-linecap="round"></path><circle cx="60" cy="46" r="19" fill="none" stroke="#2A1F14" stroke-width="4"></circle><rect x="54" y="40" width="12" height="14" rx="3" fill="#8FA83E"></rect><text x="60" y="108" font-family="serif" font-size="14" fill="#2A1F14" text-anchor="middle">摺物 2</text></svg></template>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="b2-chev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="b2-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="b2-leaf" viewBox="0 0 24 24"><path d="M6 18C6 10 11 5 19 5c0 8-5 13-13 13Z" fill="currentColor"></path></symbol>
+<symbol id="b2-hanko" viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="19" height="19" rx="4.5" fill="#B5504A"></rect><path d="M8.4 16.2c2.3-1.5 3.5-3.8 3.5-6.7M12.5 8c1.2 3.1.3 6.4-1.9 8.6" fill="none" stroke="#F6F2E9" stroke-width="1.7" stroke-linecap="round"></path></symbol>
+<symbol id="b2-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M3.5 12h17M12 3.5c2.4 2.3 3.8 5.4 3.8 8.5S14.4 18.2 12 20.5c-2.4-2.3-3.8-5.4-3.8-8.5S9.6 5.8 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.4"></path></symbol>
+<symbol id="b2-bell" viewBox="0 0 24 24"><path d="M6 17c1.2-1 1.7-2.5 1.7-4.6 0-3.6 1.4-5.6 4.3-5.6s4.3 2 4.3 5.6c0 2.1.5 3.6 1.7 4.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path><path d="M10.5 20a1.7 1.7 0 0 0 3 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></symbol>
+<symbol id="b2-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.6"></path></symbol>
+<symbol id="b2-dl" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="b2-send" viewBox="0 0 24 24"><path d="M4 12l16-7-7 16-2.5-6.5L4 12Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></symbol>
+</defs></svg>
+<section style="padding:48px; display:flex; flex-direction:column; gap:30px;">
+
+  <div style="max-width:1280px; display:flex; flex-direction:column; gap:14px;">
+    <div style="display:flex; align-items:baseline; gap:16px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUNDLE 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 9px; border-radius:4px;">REFLECTIVE + UTILITY</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">SNAPSHOT · locked 2026-07-18 · example data illustrative</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:30px; color:#2B2320; margin:0;">Insights · Origins · Settings · Shopping · Social</h1>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; background:#F3E4C8; border:1px solid #D8B778; border-radius:10px; padding:10px 16px; width:fit-content;">
+      <svg viewBox="0 0 24 24" style="width:18px; height:18px; flex:none;"><use href="#b2-hanko"></use></svg>
+      <span style="font-size:12.5px; color:#5A4A2E; line-height:1.5;"><strong>Handback, not handoff.</strong> Inherits Bundle 1's locked system whole. Four surfaces are <em>restyle / new-build</em>; <strong>Social is a concept to react to — not finished screens</strong>, per your ask. Shown in light; dark inherits the locked tokens.</span>
+    </div>
+    <p style="font-size:14.5px; color:#4A4038; max-width:860px; margin:2px 0 0; line-height:1.65;">Insights is the reflective room and nests <strong>Origins</strong> — the one genuinely new surface, given its own design pass. Settings and Shopping are honest restyles of what ships today, behind the profile avatar. Social gets a rethink, not a reskin.</p>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:1280px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#5C5148;">INHERITED FROM BUNDLE 1 · unchanged</span>
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+      <sc-for list="{{ inherits }}" as="c" hint-placeholder-count="3">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#2B2320;">{{ c.k }}</span>
+          <span style="font-size:12px; color:#5C5148; line-height:1.5;">{{ c.v }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <div style="width:390px; height:812px; border-radius:30px; border:1px solid rgba(42,31,20,0.30); background:#F5F0E3; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box;">
+        <div style="padding:28px 28px 0; display:flex; flex-direction:column; flex:1;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid #2A1F14; padding-bottom:8px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:26px; color:#2A1F14;">The month, so far</span>
+            <span style="width:28px; height:28px; border-radius:50%; background:#E8DEC5; border:1px solid rgba(42,31,20,0.3); display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-size:13px; color:#2A1F14;">N</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#8C7F6C; margin-top:10px;">JULY · SIXTEEN DAYS IN</span>
+          <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:16px; color:#2A1F14; margin-top:14px; line-height:1.6;">Thirty-one cups across twelve teas — nine sessions, and four quiet days.</span>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:24px; border-bottom:1px solid rgba(42,31,20,0.3); padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.18em; color:#8C7F6C;">MOST POURED</span>
+          </div>
+          <sc-for list="{{ topPoured }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex; gap:11px; align-items:center; padding:11px 0; border-bottom:1px solid rgba(42,31,20,0.14);">
+              <div style="width:20px; height:26px; flex:none; background:{{ r.sw }}; border-radius:7px 4px 6px 4px; border:1px solid rgba(0,0,0,0.06);"></div>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:#2A1F14;">{{ r.n }}</span>
+              <span style="font-family:'Noto Serif SC',serif; font-size:11.5px; color:#8C7F6C;">{{ r.script }}</span>
+              <span style="flex:1; border-bottom:1px dotted rgba(42,31,20,0.3); transform:translateY(-3px);"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#8C7F6C; flex:none;">{{ r.c }}</span>
+            </div>
+          </sc-for>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:22px; border-bottom:1px solid rgba(42,31,20,0.3); padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.18em; color:#8C7F6C;">HOW YOU BREWED</span>
+          </div>
+          <div style="display:flex; gap:15px; flex-wrap:wrap; padding:13px 0 4px;">
+            <sc-for list="{{ methods }}" as="me" hint-placeholder-count="4">
+              <span style="font-family:'Shippori Mincho',serif; font-size:15.5px; font-weight:{{ me.w }}; color:{{ me.fg }}; box-shadow:{{ me.mark }}; padding:0 2px;">{{ me.l }}</span>
+            </sc-for>
+          </div>
+          <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:#8C7F6C; margin-top:8px;">Hottest pour 99°, gentlest 60°, most patient steep 7:00.</span>
+          <div style="flex:1; min-height:12px;"></div>
+          <div style="display:flex; align-items:center; gap:14px; background:#EDE4CE; border:1px solid #D8CDB2; border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+            <div style="width:66px; height:66px; border-radius:11px; overflow:hidden; flex:none; border:1px solid rgba(42,31,20,0.18);"><img src="assets/origins-map.png" alt="Origins map preview" style="width:100%; height:auto; margin-top:-31px;"></div>
+            <div style="display:flex; flex-direction:column; gap:3px; flex:1;">
+              <div style="display:flex; align-items:center; gap:7px;"><svg viewBox="0 0 24 24" style="width:15px; height:15px; color:#3F5E42;"><use href="#b2-globe"></use></svg><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2A1F14;">Origins</span></div>
+              <span style="font-size:11.5px; color:#6E6152; line-height:1.4;">Eight regions · five countries — where your tea grows</span>
+            </div>
+            <svg viewBox="0 0 24 24" style="width:16px; height:16px; color:#8C7F6C; transform:rotate(180deg);"><use href="#b2-chev"></use></svg>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-end; justify-content:space-around; border-top:1px solid rgba(42,31,20,0.3); padding:14px 0 22px; position:relative;">
+          <span style="font-size:11.5px; color:#8C7F6C;">Home</span>
+          <span style="font-size:11.5px; color:#8C7F6C;">Library</span>
+          <div style="width:46px; height:46px; border-radius:50%; background:#3F5E42; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-size:26px; line-height:1; margin-top:-28px; box-shadow:0 6px 16px rgba(0,0,0,0.28);">＋</div>
+          <span style="font-size:11.5px; color:#8C7F6C;">Sessions</span>
+          <span style="font-size:11.5px; font-weight:600; color:#2A1F14; box-shadow:inset 0 -6px 0 #E5AE2B;">Insights</span>
+        </div>
+      </div>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">INSIGHTS · WS-REFLECT</span>
+      <span style="font-size:11px; color:#75695C; line-height:1.5;">The reflective room. Prose + dotted leaders, one xanthous marker — the honesty ladder from the B-insights study, now with liquor swatches. No deckle band (WASHI is Home-only). The Origins card is the nested entry.</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <div style="width:390px; height:812px; border-radius:30px; border:2px solid #E5AE2B; background:#F5F0E3; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box; position:relative; box-shadow:0 0 0 4px rgba(229,174,43,0.14);">
+        <img src="assets/origins-map.png" alt="Origins — provenance map" style="width:390px; height:auto; display:block;">
+      </div>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#B98A16;">◆ ORIGINS · NEW · the centerpiece</span>
+      <span style="font-size:11px; color:#75695C; line-height:1.5;">Real geography (d3-geo, Natural Earth) — not a drawn map. Live &amp; interactive as its own file: <a href="SlowCup R3 - Origins Map.html">SlowCup R3 - Origins Map.html</a>. Design notes below.</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <div style="width:390px; height:812px; border-radius:30px; border:1px solid rgba(42,31,20,0.30); background:#F5F0E3; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box;">
+        <div style="padding:28px 28px 24px; display:flex; flex-direction:column; flex:1; overflow:hidden;">
+          <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #2A1F14; padding-bottom:8px;">
+            <svg viewBox="0 0 24 24" style="width:20px; height:20px; color:#2A1F14;"><use href="#b2-chev"></use></svg>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Settings</span>
+          </div>
+          <sc-for list="{{ settings }}" as="grp" hint-placeholder-count="4">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:#8C7F6C; margin-top:{{ grp.gap }};">{{ grp.k }}</span>
+            <sc-for list="{{ grp.rows }}" as="row" hint-placeholder-count="2">
+              <div style="display:flex; align-items:center; gap:11px; padding:12px 0; border-bottom:1px solid rgba(42,31,20,0.12);">
+                <svg viewBox="0 0 24 24" style="width:17px; height:17px; color:#6E6152; flex:none;"><use href="{{ row.icon }}"></use></svg>
+                <span style="font-size:13.5px; color:#2A1F14;">{{ row.l }}</span>
+                <span style="flex:1;"></span>
+                <sc-if value="{{ row.isToggle }}" hint-placeholder-val="{{ false }}">
+                  <div style="width:38px; height:22px; border-radius:11px; background:{{ row.track }}; position:relative; flex:none;"><div style="position:absolute; top:2px; {{ row.knobSide }}:2px; width:18px; height:18px; border-radius:50%; background:#F6F2E9; box-shadow:0 1px 2px rgba(0,0,0,0.3);"></div></div>
+                </sc-if>
+                <sc-if value="{{ row.isSeg }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; gap:3px; background:#EDE4CE; border-radius:8px; padding:3px;">
+                    <sc-for list="{{ row.seg }}" as="s" hint-placeholder-count="2">
+                      <span style="font-size:11.5px; font-weight:{{ s.w }}; padding:4px 9px; border-radius:6px; color:{{ s.fg }}; background:{{ s.bg }};">{{ s.l }}</span>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ row.isValue }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:12.5px; color:#8C7F6C;">{{ row.val }}</span>
+                  <svg viewBox="0 0 24 24" style="width:14px; height:14px; color:#8C7F6C; transform:rotate(180deg);"><use href="#b2-chev"></use></svg>
+                </sc-if>
+              </div>
+            </sc-for>
+          </sc-for>
+          <div style="margin-top:18px; background:#EDE4CE; border:1px solid #D8CDB2; border-radius:12px; padding:14px 16px;">
+            <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:#2A1F14; line-height:1.55;">No accounts, no tracking, no cookies. Your diary lives on your device.</span>
+          </div>
+          <div style="flex:1;"></div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#8C7F6C; text-align:center;">SLOWCUP 3.87 · MADE QUIETLY</span>
+        </div>
+      </div>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SETTINGS · #8 · behind avatar ⊙</span>
+      <span style="font-size:11px; color:#75695C; line-height:1.5;">Restyle of today's settings. Auto-saves — no clay (nothing to commit). Toggles/segments carry the xanthous state marker; privacy stated proudly (from the marketing voice).</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <div style="width:390px; height:812px; border-radius:30px; border:1px solid rgba(42,31,20,0.30); background:#F5F0E3; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box;">
+        <div style="padding:28px 28px 24px; display:flex; flex-direction:column; flex:1;">
+          <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #2A1F14; padding-bottom:8px;">
+            <svg viewBox="0 0 24 24" style="width:20px; height:20px; color:#2A1F14;"><use href="#b2-chev"></use></svg>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Shopping list</span>
+          </div>
+          <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:#8C7F6C; margin-top:10px;">What's low, and what you're curious about.</span>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:18px; border-bottom:1px solid rgba(42,31,20,0.3); padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.18em; color:#8C7F6C;">RUNNING LOW</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">FROM YOUR SHELF</span>
+          </div>
+          <sc-for list="{{ shoppingLow }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex; gap:11px; align-items:center; padding:11px 0; border-bottom:1px solid rgba(42,31,20,0.12);">
+              <div style="width:20px; height:19px; flex:none; border-radius:5px; border:1.6px solid {{ s.boxBd }}; background:{{ s.boxBg }}; display:flex; align-items:center; justify-content:center; color:#F6F2E9;"><sc-if value="{{ s.checked }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:13px; height:13px;"><use href="#b2-check"></use></svg></sc-if></div>
+              <div style="width:18px; height:24px; flex:none; background:{{ s.sw }}; border-radius:6px 3px 5px 3px; border:1px solid rgba(0,0,0,0.06);"></div>
+              <div style="display:flex; flex-direction:column; gap:1px;">
+                <div style="display:flex; align-items:baseline; gap:6px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:15px; color:#2A1F14; text-decoration:{{ s.strike }};">{{ s.n }}</span><span style="font-family:'Noto Serif SC',serif; font-size:10.5px; color:#8C7F6C;">{{ s.script }}</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ s.subFg }};">{{ s.sub }}</span>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:22px; border-bottom:1px solid rgba(42,31,20,0.3); padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.18em; color:#8C7F6C;">WISHLIST</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">FROM “GO DEEPER”</span>
+          </div>
+          <sc-for list="{{ shoppingWish }}" as="w" hint-placeholder-count="2">
+            <div style="display:flex; gap:11px; align-items:center; padding:11px 0; border-bottom:1px solid rgba(42,31,20,0.12);">
+              <div style="width:20px; height:19px; flex:none; border-radius:5px; border:1.6px solid rgba(42,31,20,0.3);"></div>
+              <div style="width:18px; height:24px; flex:none; background:transparent; border:1.5px dashed rgba(42,31,20,0.3); border-radius:6px 3px 5px 3px;"></div>
+              <div style="display:flex; flex-direction:column; gap:1px;">
+                <div style="display:flex; align-items:baseline; gap:6px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:15px; color:#2A1F14;">{{ w.n }}</span><span style="font-family:'Noto Serif SC',serif; font-size:10.5px; color:#8C7F6C;">{{ w.script }}</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">{{ w.sub }}</span>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:flex; align-items:center; gap:8px; padding:14px 0 0;">
+            <span style="font-size:18px; color:#3F5E42; line-height:1;">＋</span>
+            <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#21341F; border-bottom:1px solid rgba(42,31,20,0.3);">add a tea</span>
+          </div>
+          <div style="flex:1;"></div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#8C7F6C; text-align:center;">TICK WHEN IT ARRIVES → MOVES TO YOUR LIBRARY</span>
+        </div>
+      </div>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SHOPPING · behind avatar ⊙</span>
+      <span style="font-size:11px; color:#75695C; line-height:1.5;">Restyle. “Running low” auto-fills from stock (owned swatches); wishlist teas use the faint catalog swatch (Tier-2 suggestion). Ticking is quiet state, not a clay commit — it's a running list.</span>
+    </div>
+
+  </div>
+
+  <div style="height:1px; background:#B8AC92; max-width:1280px; margin-top:6px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:18px; max-width:1280px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">◆ ORIGINS</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2B2320; margin:0;">The provenance map — design notes</h2>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C5148;">the one surface given a real design pass, not just the system applied</span>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:860px; margin:0; line-height:1.65;">Origins answers a question the diary already implies: <em>where does all this come from?</em> It's a quiet atlas of the growing regions your collection spans — built to pair with the per-origin script and the catalog's origin data.</p>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;">
+      <sc-for list="{{ originsNotes }}" as="o" hint-placeholder-count="4">
+        <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:9px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; color:{{ o.fg }};">{{ o.k }}</span>
+          <span style="font-size:13px; font-weight:600; color:#2B2320; line-height:1.4;">{{ o.t }}</span>
+          <span style="font-size:12px; color:#5C5148; line-height:1.6;">{{ o.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex; align-items:flex-start; gap:12px; background:#EEF3E6; border:1px solid #B9CBA0; border-radius:12px; padding:14px 18px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#3F5E42; flex:none; margin-top:2px;">DATA · FOR CODE</span>
+      <span style="font-size:12.5px; color:#41503A; line-height:1.6;">The map reads the same three-tier model as the script: a tea plots only when the catalog carries a <span style="font-family:'IBM Plex Mono',monospace; font-size:11px;">region</span> with coordinates (Tier 1). No verified region → it simply doesn't plot (Tier 3), never a guessed pin — the “Origins” count stays honest. Blends with no single origin (Earl Grey) are named in a quiet “not from one place” footnote, not forced onto the map. Geometry is Natural Earth via d3-geo; region pins are catalog lon/lat.</span>
+    </div>
+  </div>
+
+  <div style="height:3px; background:#2B2320; max-width:1280px; margin-top:10px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:20px; max-width:1280px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#B5504A; color:#F6F2E9; padding:4px 10px; border-radius:4px;">SOCIAL</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2B2320; margin:0;">A concept to react to — not finished screens</h2>
+    </div>
+    <p style="font-size:14.5px; color:#4A4038; max-width:900px; margin:0; line-height:1.65;">You asked for the idea first, and you're right that today's social doesn't fit a calm diary. So this is a <strong>rethink of what social is for</strong>, with small fragments to make it concrete — not a screen set. React to the shape; the screens come after.</p>
+
+    <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:stretch;">
+      <div style="flex:1.3; min-width:400px; background:#2B2320; border-radius:16px; padding:24px; display:flex; flex-direction:column; gap:14px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#E5AE2B;">THE PRINCIPLE</span>
+        <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:26px; color:#F6F2E9; line-height:1.3;">Correspondence, not broadcast.</span>
+        <span style="font-size:13.5px; color:#C9BFAC; line-height:1.7;">Social in SlowCup is small, deliberate, and <em>pull, not push</em>. It's about the <strong style="color:#E7DFCE;">tea</strong> moving between people who trust each other's palate — like passing a friend a page of your diary, or lending a good book — never a performance of your activity. Nothing pings you; you visit when you want to.</span>
+        <div style="display:flex; flex-direction:column; gap:9px; margin-top:4px;">
+          <sc-for list="{{ socialFor }}" as="f" hint-placeholder-count="3">
+            <div style="display:flex; gap:10px; align-items:baseline;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#E5AE2B; flex:none;">{{ f.no }}</span>
+              <span style="font-size:13px; color:#E7DFCE; line-height:1.55;">{{ f.t }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:1; min-width:320px; background:#FBEEE9; border:1px solid #D9A79B; border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:12px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#8A2B1C;">WHAT IT DELIBERATELY IS NOT</span>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <sc-for list="{{ socialRejects }}" as="r" hint-placeholder-count="5">
+            <div style="display:flex; gap:10px; align-items:baseline;">
+              <span style="color:#8A2B1C; font-size:14px; flex:none; line-height:1.4;">✕</span>
+              <div style="display:flex; flex-direction:column; gap:1px;">
+                <span style="font-size:13px; font-weight:600; color:#6E3226;">{{ r.t }}</span>
+                <span style="font-size:11.5px; color:#8A5A50; line-height:1.5;">{{ r.d }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148; margin-top:4px;">TWO MECHANISMS · illustrative fragments, not final screens</span>
+    <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start;">
+
+      <div style="flex:1; min-width:320px; display:flex; flex-direction:column; gap:10px;">
+        <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#2B2320;">1 · Passed cups</span>
+        <span style="font-size:12.5px; color:#5C5148; line-height:1.6;">You hand a specific tea to a specific person, with a note. It lands on their quiet “Passed to you” shelf — one-to-one, no broadcast, no feed.</span>
+        <div style="background:#F5F0E3; border:1px solid #D8CFB9; border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 8px 22px rgba(0,0,0,0.08);">
+          <div style="display:flex; align-items:center; gap:9px;">
+            <span style="width:26px; height:26px; border-radius:50%; background:#B5504A; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-size:12px;">M</span>
+            <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:#5C5148;">Mira passed you a cup</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; border-top:1px solid rgba(42,31,20,0.12); border-bottom:1px solid rgba(42,31,20,0.12); padding:12px 0;">
+            <div style="width:30px; height:38px; flex:none; background:#843A1E; border-radius:9px 4px 8px 5px; border:1px solid rgba(0,0,0,0.06);"></div>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; align-items:baseline; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:17px; color:#2A1F14;">Da Hong Pao</span><span style="font-family:'Noto Serif SC',serif; font-size:12px; color:#8C7F6C;">大紅袍</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">Wuyi oolong · from her shelf</span>
+            </div>
+          </div>
+          <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:#2A1F14; line-height:1.55;">“The mineral one I kept going on about. Give it a quick rinse first.”</span>
+          <div style="display:flex; align-items:center; gap:14px; margin-top:2px;">
+            <div style="background:#9C5B33; color:#F6EFE2; font-weight:600; font-size:13px; padding:10px 18px; border-radius:13px 5px 11px 6px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">Add to Library</div>
+            <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#21341F; border-bottom:1px solid rgba(42,31,20,0.3);">Thank Mira</span>
+          </div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C; line-height:1.5;">One clay commit (Add to Library). No like button — “Thank” is a private reply, not a public count.</span>
+      </div>
+
+      <div style="flex:1; min-width:320px; display:flex; flex-direction:column; gap:10px;">
+        <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#2B2320;">2 · Kindred notes</span>
+        <span style="font-size:12.5px; color:#5C5148; line-height:1.6;">Social dissolves into the tea itself: when someone in your circle keeps a tea you're looking at, their note appears quietly on it. Trusted palates, in context — never a separate feed.</span>
+        <div style="background:#F5F0E3; border:1px solid #D8CFB9; border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 8px 22px rgba(0,0,0,0.08);">
+          <div style="display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(42,31,20,0.12); padding-bottom:12px;">
+            <div style="width:30px; height:38px; flex:none; background:#C9CF86; border-radius:9px 4px 8px 5px; border:1px solid rgba(0,0,0,0.06);"></div>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; align-items:baseline; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:17px; color:#2A1F14;">Gyokuro Okabe</span><span style="font-family:'Noto Serif SC',serif; font-size:12px; color:#8C7F6C;">玉露</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">Library · Go Deeper</span>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#8C7F6C;">IN YOUR CIRCLE</span>
+            <sc-for list="{{ kindred }}" as="k" hint-placeholder-count="2">
+              <div style="display:flex; gap:10px; align-items:flex-start;">
+                <span style="width:22px; height:22px; border-radius:50%; background:{{ k.bg }}; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-size:11px; flex:none;">{{ k.i }}</span>
+                <span style="font-size:13px; color:#2A1F14; line-height:1.5;"><strong style="font-weight:600;">{{ k.n }}</strong> <span style="color:#6E6152;">keeps this too — </span><span style="font-family:'Shippori Mincho',serif; font-style:italic;">“{{ k.note }}”</span></span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C; border-top:1px solid rgba(42,31,20,0.12); padding-top:10px; line-height:1.5;">Only people you've added. No stars, no counts — just what a trusted palate noticed.</span>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C; line-height:1.5;">This is where most of social's value lives, with none of a feed's noise.</span>
+      </div>
+
+      <div style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:10px;">
+        <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#2B2320;">The circle</span>
+        <span style="font-size:12.5px; color:#5C5148; line-height:1.6;">A handful of people, added on purpose — not followers to accumulate. Lives behind the profile avatar with Settings + Shopping, not on the tab bar.</span>
+        <div style="background:#F5F0E3; border:1px solid #D8CFB9; border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:4px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid #2A1F14; padding-bottom:8px; margin-bottom:6px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2A1F14;">Your circle</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">4 · not a follower count</span>
+          </div>
+          <sc-for list="{{ circle }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(42,31,20,0.1);">
+              <span style="width:28px; height:28px; border-radius:50%; background:{{ p.bg }}; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-size:12px; flex:none;">{{ p.i }}</span>
+              <span style="font-family:'Shippori Mincho',serif; font-size:15px; color:#2A1F14;">{{ p.n }}</span>
+              <span style="flex:1;"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">{{ p.tag }}</span>
+            </div>
+          </sc-for>
+          <div style="display:flex; align-items:center; gap:8px; padding:12px 0 2px;">
+            <svg viewBox="0 0 24 24" style="width:15px; height:15px; color:#3F5E42;"><use href="#b2-send"></use></svg>
+            <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#21341F; border-bottom:1px solid rgba(42,31,20,0.3);">invite by a private link</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#F0EAD6; border:1px solid #C9BC9E; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:12px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#5C5148;">ALTERNATIVES I CONSIDERED — and why they're weaker</span>
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:14px;">
+        <sc-for list="{{ altsConsidered }}" as="a" hint-placeholder-count="2">
+          <div style="display:flex; flex-direction:column; gap:5px; padding:12px 14px; background:#F6F2E9; border:1px solid #D8CFB9; border-radius:10px;">
+            <span style="font-size:13px; font-weight:600; color:#2B2320;">{{ a.t }}</span>
+            <span style="font-size:12px; color:#5C5148; line-height:1.6;">{{ a.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-size:12px; color:#6E6152; line-height:1.6; font-style:italic; font-family:'Shippori Mincho',serif;">My read: “Passed cups” + “Kindred notes” give social real warmth and usefulness while staying calm. If any single piece is the risk, it's whether a circle stays small — so the model has no follower mechanics to tempt growth. React to the shape and I'll build the screens.</span>
+    </div>
+  </div>
+
+  <div style="height:3px; background:#2B2320; max-width:1280px; margin-top:10px;"></div>
+
+  <div style="background:#2B2320; border-radius:12px; padding:20px 22px; display:flex; flex-direction:column; gap:14px; max-width:1280px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">BUNDLE 2 · STATUS + WHAT I NEED BACK</span>
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+      <sc-for list="{{ status }}" as="s" hint-placeholder-count="3">
+        <div style="border:1px solid #4A4234; border-radius:9px; padding:12px 14px; display:flex; flex-direction:column; gap:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:{{ s.fg }};">{{ s.k }}</span>
+          <span style="font-size:11.5px; color:#C9BFAC; line-height:1.55;">{{ s.v }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <span style="font-size:11.5px; color:#9E9078; line-height:1.6;">Same rhythm: this comes back to your planning lane for reconciliation vs the live repo. Bundle 1 + Bundle 2 hand to Code together, after phase-2 ships — the pins carry across (swatch model · per-origin script model · Origins region data · five contracts · per-steep temp · ensō animation).</span>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const ink = "#2A1F14", muted = "#8C7F6C", hi = "#E5AE2B", jade = "#3F5E42";
+    const meth = [{ l: "gongfu", on: true }, { l: "western" }, { l: "senchadō" }, { l: "cold brew" }];
+    return {
+      inherits: [
+        { k: "FIVE CONTRACTS", v: "liquor swatch · clay (one commit) · xanthous (state) · Kachi-iro blue (Focus ring only) · washi (Home masthead only)" },
+        { k: "TYPE + SCRIPT", v: "Shippori Mincho display, IBM Plex Mono labels, Inter body; per-origin CJK script (Noto Serif SC), catalog-sourced" },
+        { k: "QUIET AFFORDANCES", v: "dropdowns, icons, folds — never chip rows; the two-arc ensō + heritage untouched" }
+      ],
+      topPoured: [
+        { n: "Sencha Fukamushi", script: "煎茶", c: "9 cups", sw: "#AEBB57" },
+        { n: "Gyokuro Okabe", script: "玉露", c: "6 cups", sw: "#C9CF86" },
+        { n: "Genmaicha", script: "玄米茶", c: "5 cups", sw: "#B07C3E" },
+        { n: "Da Hong Pao", script: "大紅袍", c: "4 cups", sw: "#843A1E" }
+      ],
+      methods: meth.map(m => ({ l: m.l, fg: m.on ? ink : muted, w: m.on ? 700 : 500, mark: m.on ? "inset 0 -8px 0 " + hi : "none" })),
+      settings: [
+        { k: "ACCOUNT", gap: "18px", rows: [
+          { l: "Niklas — niklas@…", icon: "#b2-leaf", isValue: true, val: "edit" }
+        ]},
+        { k: "BREWING", gap: "20px", rows: [
+          { l: "Default method", icon: "#b2-hanko", isValue: true, val: "gongfu" },
+          { l: "Temperature", icon: "#b2-bell", isSeg: true, seg: [{ l: "°C", on: true }, { l: "°F" }] },
+          { l: "Steep reminders", icon: "#b2-bell", isToggle: true, on: false }
+        ]},
+        { k: "APPEARANCE", gap: "20px", rows: [
+          { l: "Theme", icon: "#b2-globe", isSeg: true, seg: [{ l: "Light", on: true }, { l: "Dark" }, { l: "Auto" }] }
+        ]},
+        { k: "PRIVACY & DATA", gap: "20px", rows: [
+          { l: "Export your diary", icon: "#b2-dl", isValue: true, val: "" },
+          { l: "What we store", icon: "#b2-lock", isValue: true, val: "" }
+        ]}
+      ].map(g => ({ ...g, rows: g.rows.map(r => ({
+        ...r,
+        isToggle: !!r.isToggle, isSeg: !!r.isSeg, isValue: !!r.isValue,
+        track: r.on ? hi : "rgba(42,31,20,0.22)",
+        knobSide: r.on ? "right" : "left",
+        seg: (r.seg || []).map(s => ({ l: s.l, w: s.on ? 600 : 500, fg: s.on ? ink : muted, bg: s.on ? "rgba(229,174,43,0.28)" : "transparent" }))
+      })) })),
+      shoppingLow: [
+        { n: "Tie Guan Yin", script: "鐵觀音", sw: "#CBA347", sub: "low · Yunomi", subFg: "#B07C3E", checked: true, boxBg: jade, boxBd: jade, strike: "line-through" },
+        { n: "Matcha Kiri", script: "抹茶", sw: "#8FA83E", sub: "low · Ippodo", subFg: "#B07C3E", checked: false, boxBg: "transparent", boxBd: "rgba(42,31,20,0.3)", strike: "none" },
+        { n: "Hōjicha Kyō", script: "ほうじ茶", sw: "#8A5A2E", sub: "empty · Local", subFg: "#69160F", checked: false, boxBg: "transparent", boxBd: "rgba(42,31,20,0.3)", strike: "none" },
+        { n: "Kukicha", script: "茎茶", sw: "#A8B36A", sub: "empty · Yunomi", subFg: "#69160F", checked: false, boxBg: "transparent", boxBd: "rgba(42,31,20,0.3)", strike: "none" }
+      ],
+      shoppingWish: [
+        { n: "Phoenix Dan Cong", script: "鳳凰單欉", sub: "catalog · Guangdong oolong" },
+        { n: "Oriental Beauty", script: "東方美人", sub: "catalog · Taiwan" }
+      ],
+      originsNotes: [
+        { k: "WHY AN ATLAS", fg: "#8A6A2E", t: "Provenance, not place-of-use", d: "You drink at home — the interesting geography is where the leaves are grown. An atlas of your shelf's regions, quiet enough to sit inside Insights." },
+        { k: "THE BLUE PROBLEM", fg: "#233A63", t: "Sea is aged paper, not blue", d: "Kachi-iro is rationed to the Focus ring. So the sea reads as old parchment and land as warm neutral — which lands more on-brand than a blue map anyway. Zero contract spend." },
+        { k: "IDENTITY", fg: "#3F5E42", t: "Regions marked by liquor swatch", d: "Each pin is the tea's brewed colour, with its origin script (武夷, 宇治). The map ties straight back to the swatch + script contracts — one visual language." },
+        { k: "REAL GEOMETRY", fg: "#69160F", t: "Data, never a drawn shape", d: "Coastlines are Natural Earth via d3-geo — the “dots → drawn outlines” the R3 scope always called for. Hand-drawn geography reads wrong; this doesn't." }
+      ],
+      socialFor: [
+        { no: "01", t: "Share a discovery with someone whose taste you trust — a recommendation, not a post." },
+        { no: "02", t: "Let a tea travel between people: the object of attention is the leaf, not the person." },
+        { no: "03", t: "Enrich the tea you're already looking at with a trusted note — value without a feed." }
+      ],
+      socialRejects: [
+        { t: "An activity feed", d: "“Niklas brewed a gyokuro 2h ago” is performance; it turns a ritual into content." },
+        { t: "Likes & hearts", d: "A reaction count makes tea a thing to score. No hearts anywhere." },
+        { t: "Follower / following counts", d: "Numbers to grow invite performance. A circle has no size to chase." },
+        { t: "Streaks vs. friends", d: "Competition is the opposite of slow. Never leaderboards." },
+        { t: "Push notifications", d: "Presence is pull, not push — you come to it; it never interrupts." }
+      ],
+      kindred: [
+        { i: "M", bg: "#B5504A", n: "Mira", note: "stone fruit on the third steep." },
+        { i: "K", bg: "#3F5E42", n: "Kenji", note: "60° or it turns grassy." }
+      ],
+      circle: [
+        { i: "M", bg: "#B5504A", n: "Mira", tag: "passed you 3" },
+        { i: "K", bg: "#3F5E42", n: "Kenji", tag: "6 shared teas" },
+        { i: "R", bg: "#8A5A2E", n: "Aunt Rui", tag: "gifts the pu’er" },
+        { i: "T", bg: "#233A63", n: "Tomas", tag: "new" }
+      ],
+      altsConsidered: [
+        { t: "“Tea together” — ambient presence", d: "A quiet signal that someone in your circle is also having tea now. Lovely in theory, but it's either a notification (breaks calm) or too faint to matter. Could return later as a tiny opt-in ambient mark — not core." },
+        { t: "Public / crowd reviews", d: "Anonymous ratings on every tea. Rejected: crowd noise fights the trusted-palate intimacy. Kindred notes give the useful part — a few voices you chose — without the feed." }
+      ],
+      status: [
+        { k: "READY TO BUILD", fg: "#A6BD66", v: "Insights, Origins (map done + live), Settings, Shopping — restyled/built on the locked system." },
+        { k: "NEEDS YOUR REACTION", fg: "#E3A15C", v: "Social concept: is “correspondence, not broadcast” the right shape? Screens follow your yes." },
+        { k: "OPEN QUESTIONS", fg: "#E5AE2B", v: "Dark theme for these four — want it this pass or at reconciliation? And: keep Origins inside Insights, or also reachable from a tea's Go Deeper?" }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

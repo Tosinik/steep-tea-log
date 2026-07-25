@@ -21,12 +21,16 @@ fixtures/*
 .claude/*
 !.claude/skills/
 !.claude/agents/
-# Design WORKING files stay local: raw inspiration, teaware source shots, and the
-# .dc.html standalone exports (~10MB each of inlined runtime). The LOCKED R3 record
-# lives in docs/r3/ and IS committed — it's the spec Code builds from, not reference.
+# Design WORKING files stay local: raw inspiration, teaware source shots, and loose
+# .dc.html exports. The LOCKED R3 record lives in docs/r3/boards/ and IS committed —
+# it's the spec Code builds from, not reference. The old "~10MB each of inlined runtime"
+# premise died with the final export: it factors the runtime into one shared support.js
+# (68 KB), so all 21 boards together are ~660 KB. Scoped to that folder — a stray
+# .dc.html anywhere else is still a working file and stays ignored.
 SlowCup R2 bundle handoff/
 design-r3/
 *.dc.html
+!docs/r3/boards/*.dc.html
 # Photographs of copyrighted tea-book pages, kept for transcription only. The repo is
 # PUBLIC — the images must never be committed. The factual data transcribed from them
 # (aroma taxonomy, tasting lexicon) lives in docs/r3/planning/DATA-*.md and IS committed.

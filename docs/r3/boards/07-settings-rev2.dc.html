@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><circle cx="60" cy="44" r="15" fill="none" stroke="#2B2320" stroke-width="6"></circle><path d="M60 12 v10 M60 66 v10 M28 44 h10 M82 44 h10 M37 21 l7 7 M83 61 l-7-7 M37 67 l7-7 M83 27 l-7 7" stroke="#2B2320" stroke-width="5" stroke-linecap="round"></path><rect x="28" y="92" width="64" height="9" rx="4" fill="#9C5B33"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #07</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">SETTINGS · rev 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Settings</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1010px; margin:0; line-height:1.65;">Rev 2 works from the rulings ledger. It <strong>restores four shipped sections</strong> the first pass dropped — Brew guidance (with <strong>Ratio adjustment</strong>, the master switch for the whole ratio layer), Session check-in, Inventory, and Import/data-health/diagnostics — corrects a <strong>false “stays on this device”</strong> line (the app is Supabase-backed), fixes the °C/°F mistag (the unit toggle <em>ships</em>; dropping °F is a recorded decision), and takes in the <strong>completeness panel from Insights</strong> (R22). Currency stays the one genuinely new capability.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:26px 24px 26px; display:flex; flex-direction:column;">
+
+          <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:23px; color:{{ t.ink }};">Settings</span>
+            <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+          </div>
+
+          <!-- ACCOUNT -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }}; margin-top:18px;">ACCOUNT</span>
+          <div style="display:flex; align-items:center; gap:13px; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="width:40px; height:40px; flex:none; border-radius:50%; background:{{ t.clay }}; color:{{ t.clayInk }}; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px;">N</div>
+            <div style="display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; align-items:baseline; gap:8px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">Niklas</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">tosinik</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.link }};">1 following → Friends</span>
+            </div>
+            <span style="font-size:15px; color:{{ t.muted }};">›</span>
+          </div>
+
+          <!-- APPEARANCE -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }}; margin-top:18px;">APPEARANCE</span>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <span style="font-size:14.5px; color:{{ t.ink }};">Theme</span>
+            <div style="display:flex; border:1px solid {{ t.hair }}; border-radius:9px; overflow:hidden;">
+              <sc-for list="{{ t.themeSegR }}" as="s" hint-placeholder-count="3"><span style="padding:6px 12px; font-family:'Shippori Mincho',serif; font-size:13px; background:{{ s.bg }}; color:{{ s.fg }}; font-weight:{{ s.w }}; border-left:{{ s.divider }};">{{ s.l }}</span></sc-for>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; flex-direction:column;"><span style="font-size:14.5px; color:{{ t.ink }};">Accent</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">Kachi-iro · reserved for Focus</span></div>
+            <div style="display:flex; align-items:center; gap:8px;"><span style="width:15px; height:15px; border-radius:4px; background:#26343F; border:1px solid rgba(0,0,0,0.15);"></span><span style="width:15px; height:15px; border-radius:4px; background:{{ t.hi }};"></span></div>
+          </div>
+
+
+          <!-- PREFERENCES -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }}; margin-top:18px;">PREFERENCES</span>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; flex-direction:column;"><div style="display:flex; align-items:center; gap:7px;"><span style="font-size:14.5px; color:{{ t.ink }};">Currency</span><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:0.08em; color:{{ t.clayInk }}; background:{{ t.red }}; padding:2px 4px; border-radius:3px;">NEW</span></div><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.red }};">app hardcodes $ today — the one real gap</span></div>
+            <div style="display:flex; border:1px solid {{ t.hair }}; border-radius:9px; overflow:hidden;">
+              <sc-for list="{{ t.currR }}" as="c" hint-placeholder-count="4"><span style="padding:6px 11px; font-family:'IBM Plex Mono',monospace; font-size:13px; background:{{ c.bg }}; color:{{ c.fg }}; font-weight:{{ c.w }}; border-left:{{ c.divider }};">{{ c.l }}</span></sc-for>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; flex-direction:column;"><span style="font-size:14.5px; color:{{ t.ink }};">Temperature</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">ships · dropping °F is a decision, not an absence</span></div>
+            <div style="display:flex; border:1px solid {{ t.hair }}; border-radius:9px; overflow:hidden;">
+              <sc-for list="{{ t.tempR }}" as="c" hint-placeholder-count="2"><span style="padding:6px 13px; font-family:'IBM Plex Mono',monospace; font-size:13px; background:{{ c.bg }}; color:{{ c.fg }}; font-weight:{{ c.w }}; border-left:{{ c.divider }};">{{ c.l }}</span></sc-for>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <span style="font-size:14.5px; color:{{ t.ink }};">Units</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }};">grams · ml</span>
+          </div>
+
+          <!-- BREW GUIDANCE -->
+          <div style="display:flex; align-items:baseline; gap:8px; margin-top:18px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">BREW GUIDANCE</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.jade }};">shipped ✓</span></div>
+          <sc-for list="{{ t.brewR }}" as="tog" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+              <div style="display:flex; flex-direction:column; flex:1; padding-right:12px;"><span style="font-size:14.5px; color:{{ t.ink }}; font-weight:{{ tog.lw }};">{{ tog.l }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ tog.subFg }};">{{ tog.sub }}</span></div>
+              <div style="width:42px; height:24px; flex:none; border-radius:12px; background:{{ tog.trackBg }}; display:flex; align-items:center; padding:2px; box-sizing:border-box; justify-content:{{ tog.knobPos }};"><div style="width:20px; height:20px; border-radius:50%; background:#F6F2E9; box-shadow:0 1px 2px rgba(0,0,0,0.35);"></div></div>
+            </div>
+          </sc-for>
+
+          <!-- SESSION CHECK-IN -->
+          <div style="display:flex; align-items:baseline; gap:8px; margin-top:18px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">SESSION CHECK-IN</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.jade }};">shipped ✓</span></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; flex-direction:column; flex:1; padding-right:12px;"><span style="font-size:14.5px; color:{{ t.ink }};">Mood check-in</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">“How are you arriving?” · filled 48% (15/31), fully optional</span></div>
+            <div style="width:42px; height:24px; flex:none; border-radius:12px; background:{{ t.jade }}; display:flex; align-items:center; padding:2px; box-sizing:border-box; justify-content:flex-end;"><div style="width:20px; height:20px; border-radius:50%; background:#F6F2E9; box-shadow:0 1px 2px rgba(0,0,0,0.35);"></div></div>
+          </div>
+
+          <!-- INVENTORY -->
+          <div style="display:flex; align-items:baseline; gap:8px; margin-top:18px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">INVENTORY</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.jade }};">shipped ✓</span></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; flex-direction:column;"><span style="font-size:14.5px; color:{{ t.ink }};">Low-stock threshold</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">what tips a tea into “running low”</span></div>
+            <div style="display:flex; align-items:center; gap:9px; border:1px solid {{ t.hair }}; border-radius:8px; padding:5px 8px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }};">–</span><span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ t.ink }};">11 g</span><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }};">+</span></div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; flex-direction:column;"><span style="font-size:14.5px; color:{{ t.ink }};">Packaging tare</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">subtract the tin so stock reads leaf-only</span></div>
+            <span style="font-size:13px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">set per tea ›</span>
+          </div>
+
+          <!-- DATA & PRIVACY -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }}; margin-top:18px;">DATA &amp; PRIVACY</span>
+          <sc-for list="{{ t.dataR }}" as="d" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+              <div style="display:flex; flex-direction:column;"><span style="font-size:14.5px; color:{{ t.ink }};">{{ d.l }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.jade }};">{{ d.sub }}</span></div>
+              <span style="font-size:15px; color:{{ t.muted }};">›</span>
+            </div>
+          </sc-for>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; flex-direction:column; flex:1; padding-right:12px;"><div style="display:flex; align-items:center; gap:7px;"><span style="font-size:14.5px; color:{{ t.muted }};">Delete everything</span><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:0.06em; color:{{ t.muted }}; border:1px solid {{ t.hair }}; padding:2px 4px; border-radius:3px;">NOT BUILT</span></div><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.red }};">TASK-delete-everything pending — drawn, disabled</span></div>
+            <span style="font-size:15px; color:{{ t.hairSoft }};">›</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; padding-top:9px;">Your tea syncs to your private account and is yours to export or import anytime. <span style="color:{{ t.hiInk }};">Stored on SlowCup's servers (encrypted, private to you)</span> — not only on this device.</span>
+
+          <!-- DATA HEALTH (relocated from Insights, R22) -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:18px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">DATA HEALTH · WHAT YOU'VE CAPTURED</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.hiInk }};">moved from Insights · R22</span></div>
+          <sc-for list="{{ t.capR }}" as="f" hint-placeholder-count="5">
+            <div style="display:flex; align-items:center; gap:11px; padding:7px 0;"><span style="font-size:12.5px; color:{{ t.ink }}; width:104px; flex:none;">{{ f.l }}</span><div style="flex:1; height:8px; border-radius:4px; background:{{ t.hairSoft }}; overflow:hidden;"><div style="height:100%; width:{{ f.pct }}; background:{{ f.barBg }}; border-radius:4px;"></div></div><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }}; width:44px; flex:none; text-align:right;">{{ f.f }}</span></div>
+          </sc-for>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.red }}; line-height:1.5; margin-top:5px;">fractions are the 2026-07-18 export (28 sessions) — refresh to 07-19 (31) at build. it's data hygiene, not a brewing insight, so it lives here.</span>
+
+          <!-- ABOUT -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }}; margin-top:18px;">ABOUT</span>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 0 2px;">
+            <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:{{ t.muted }};">SlowCup — a slower cup, better kept.</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">build 9f695e2</span>
+          </div>
+
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 2</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Corrected against the ledger</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Ratio adjustment is the master switch</strong> for the entire ratio layer — <code style="color:#C9BFAC;">ratioAdjust</code>, <strong>ON</strong> for Niklas. Don't trust the first <code style="color:#C9BFAC;">user_settings</code> row: there are seven, server-side. <strong style="color:#E5AE2B;">Storage:</strong> Supabase (Postgres · Auth · RLS), so the old “stays on this device” was the worst place for an untrue line — corrected. Delete-everything is still unbuilt (<code style="color:#C9BFAC;">TASK-delete-everything</code>), so its row stays disabled; <strong>Import backup</strong> ships (confirm-replace — Ruth's migration depends on it).</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Temperature toggle ships</strong> (<code style="color:#C9BFAC;">tempUnit</code>, °C/°F — live screenshot). The earlier “no unit field” was wrong; dropping °F is Niklas's decision to <em>remove a shipped control</em>, recorded as such. <strong style="color:#E5AE2B;">monoFont</strong> ships (one user set “pixel”) and needs an expose-or-kill call. <strong style="color:#E5AE2B;">Build stamp</strong> reads from the build (<code style="color:#C9BFAC;">9f695e2</code>), never typed by hand. Theme gains <strong>System</strong>; “1 following” deep-links to the Friends view (R8).</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Completeness moved here (R22):</strong> honest fractions, but data hygiene — it sits beside the shipped data-health checks, not in Insights. Fractions shown are the 07-18 export (28 sessions); refresh to the 07-19 export (31) at build.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const seg = (items, selIdx, t) => items.map((it, i) => ({ l: it,
+      bg: i === selIdx ? t.selBg : "transparent",
+      fg: i === selIdx ? t.ink : t.muted,
+      w: i === selIdx ? 700 : 500,
+      divider: i > 0 ? ("1px solid " + t.hair) : "none" }));
+
+    const brew = [
+      { l: "Autofill brew guide", sub: "prefill the recipe from the catalog", on: true },
+      { l: "Brew advice", sub: "gentle nudges as a session runs", on: true },
+      { l: "Ratio adjustment", sub: "master switch for the entire ratio layer", on: true, master: true },
+      { l: "Keep screen awake while steeping", sub: "only while a steep timer runs (R7)", on: true }
+    ];
+    const cap = [
+      { l: "Rating", f: "28/28", pct: "100%", full: true },
+      { l: "Water logged", f: "14/28", pct: "50%" },
+      { l: "Mood", f: "12/28", pct: "43%" },
+      { l: "Feedback", f: "12/28", pct: "43%" },
+      { l: "Photo", f: "9/28", pct: "32%" }
+    ];
+    const data = [
+      { l: "Export my data", sub: "ships ✓ · JSON" },
+      { l: "Import backup", sub: "ships ✓ · confirm-replace" },
+      { l: "Data-health checks", sub: "ships ✓" },
+      { l: "Diagnostics log", sub: "ships ✓" }
+    ];
+
+    const resolve = (t) => {
+      const isLight = t.key === "light";
+      return { ...t, isLight, cap: t.capText,
+        themeSegR: seg(["Light", "Dark", "System"], isLight ? 0 : 1, t),
+        currR: seg(["$", "€", "¥", "£"], 1, t),
+        tempR: seg(["°C", "°F"], 0, t),
+        brewR: brew.map(b => ({ l: b.l, sub: b.sub, lw: b.master ? 700 : 400,
+          subFg: b.master ? t.hiInk : t.muted,
+          trackBg: b.on ? t.jade : t.hair, knobPos: b.on ? "flex-end" : "flex-start" })),
+        dataR: data.map(d => ({ l: d.l, sub: d.sub })),
+        capR: cap.map(f => ({ l: f.l, f: f.f, pct: f.pct, barBg: f.full ? t.jade : t.clay }))
+      };
+    };
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const FX = { tag: "FIXED", tagBg: "rgba(105,22,15,0.14)", tagFg: "#8A2B1C" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...FX, k: "SET1", t: "Four shipped sections restored", d: "The first pass dropped Brew guidance, Session check-in, Inventory, and Import/health/diagnostics — all shipped. Brew guidance carries Ratio adjustment, the master switch for the whole ratio layer (ON for Niklas). Dropping the dormant Calm & achievements (v3.72) was right." },
+      { ...FX, k: "SET2", t: "“On this device” was false", d: "The app is Supabase-backed — Postgres, Auth, RLS, seven user_settings rows server-side. The privacy line now says the truth: synced to a private account, yours to export or import. Delete-everything stays disabled until TASK-delete-everything ships." },
+      { ...FX, k: "SET3", t: "Temperature toggle ships", d: "Earlier tagged “no unit field” — wrong. tempUnit ships (°C/°F, screenshot evidence). Dropping °F is Niklas's decision to remove a shipped control, recorded as such — not an absent one. Metric grams · ml stays." },
+      { ...CK, k: "SET4", t: "Import backup is real", d: "Export shipped already; Import backup ships too (confirm-replace) — Ruth's migration depends on it. Both sit above the disabled delete row, so the section reads truthfully: two things it does, one it doesn't yet." },
+      { ...FX, k: "SET5", t: "monoFont killed (R48)", d: "The shipped mono-typeface preference is removed — the row comes off the board and Code removes the control. Theme gains System. Build stamp now reads from the build (9f695e2), never hand-typed. Accent stays display-only (contracts 3/4)." },
+      { ...FX, k: "SET6", t: "Completeness moved here (R22)", d: "The Insights completeness panel was honest but the wrong surface — it's data hygiene. It now sits beside the data-health checks. Fractions are the 07-18 export; refresh to 07-19 (31 sessions) at build." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "Nine grouped sections, the four restored ones among them. Ratio adjustment is weighted heavier than its neighbours because it governs the layer below it. The relocated completeness panel closes the screen as data health, not insight.", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", hiInk: "#7A5A10", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", factBg: "#EDE6D4", selBg: "rgba(229,174,43,0.14)" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "The same nine sections at night, Dark selected in the segment. System sits third, unselected in both cards — it resolves to one theme, it isn't a third look. Kachi-iro stays the reserved accent.", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", hiInk: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", factBg: "#262017", selBg: "rgba(229,174,43,0.12)" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

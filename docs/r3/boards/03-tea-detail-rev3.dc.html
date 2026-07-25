@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="22" y="24" width="20" height="26" rx="5" fill="#843A1E"></rect><rect x="50" y="28" width="46" height="6" rx="3" fill="#2A1F14"></rect><rect x="50" y="40" width="30" height="4" rx="2" fill="#8C7F6C"></rect><rect x="22" y="64" width="74" height="4" rx="2" fill="#8C7F6C"></rect><g fill="#2A1F14"><rect x="22" y="76" width="8" height="10" rx="1"></rect><rect x="33" y="76" width="8" height="10" rx="1"></rect><rect x="44" y="76" width="8" height="10" rx="1"></rect></g><rect x="22" y="98" width="52" height="10" rx="3" fill="#9C5B33"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1280px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #03</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">茶 TEA DETAIL · rev 3</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Tea detail — the busiest hub</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:960px; margin:0; line-height:1.65;">Rev 2 corrects the photo: it's a <strong>label</strong> (packaging), so it's <em>provenance evidence</em>, not identity — a hero image would demote the liquor swatch, which the contract forbids. Identity stays the swatch everywhere. The label joins a “where this came from” cluster with vendor · cost · purchase. Fill-rate shape corrected: cost / would-rebuy / purchase-type are 100% and prominent; leaf-form &amp; purchase-date show when present. The brew-guide schedule is illustrative — the stored <code>brew_guide</code> is free text (often reading 100 °C); the structured per-step shape is the AT8 schema flag, not shipped storage. Both themes.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; position:relative;">
+            <div style="padding:26px 24px 24px; display:flex; flex-direction:column;">
+
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <svg viewBox="0 0 24 24" style="width:20px; height:20px; color:{{ t.ink }};"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <div style="display:flex; align-items:center; gap:16px; color:{{ t.ink }};">
+                  <svg viewBox="0 0 24 24" style="width:17px; height:17px;"><path d="M14.5 4.5l5 5M4 20l1.2-4.6L16 4.6l3.9 3.9L9.1 19.3 4 20Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path></svg>
+                  <svg viewBox="0 0 24 24" style="width:17px; height:17px; fill:currentColor;"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>
+                </div>
+              </div>
+
+              <!-- IDENTITY = SWATCH (always) -->
+              <div style="display:flex; align-items:flex-start; gap:14px; margin-top:16px; padding-bottom:16px; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="width:46px; height:60px; flex:none; position:relative;">
+                  <div style="width:46px; height:60px; background:#843A1E; border-radius:12px 5px 10px 6px; border:1px solid rgba(0,0,0,0.08);"></div>
+                  <div style="position:absolute; right:-6px; bottom:-6px; width:20px; height:20px; border-radius:50%; background:{{ t.bg }}; border:1px solid {{ t.hair }}; display:flex; align-items:center; justify-content:center; color:{{ t.ink }};"><svg viewBox="0 0 24 24" style="width:11px; height:11px;"><path d="M14.5 4.5l5 5M4 20l1.2-4.6L16 4.6l3.9 3.9L9.1 19.3 4 20Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
+                  <div style="display:flex; align-items:center; gap:9px;">
+                    <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:23px; color:{{ t.ink }};">Da Hong Pao</span>
+                    <span style="font-family:'Noto Serif SC',serif; font-size:15px; color:{{ t.muted }};">大紅袍</span>
+                    <svg viewBox="0 0 24 24" style="width:13px; height:13px; color:{{ t.jade }};"><path d="M6 18C6 10 11 5 19 5c0 8-5 13-13 13Z" fill="currentColor"></path></svg>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:5px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">Wuyi oolong · open leaf ·</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Wuyi Shan, Fujian ›</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">Qi Dan cultivar</span>
+                    <span style="width:13px; height:13px; border-radius:50%; border:1px solid {{ t.hair }}; color:{{ t.muted }}; font-size:8px; display:inline-flex; align-items:center; justify-content:center;">i</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:14px; display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">YOUR RATING</span>
+                <span style="font-size:14px; letter-spacing:0.06em; color:{{ t.ink }};">★★★★<span style="opacity:0.24;">★</span></span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">the tea itself (teas.rating) — not a session average</span>
+              </div>
+
+              <!-- STOCK + CUPS (v3.86) -->
+              <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">STOCK</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.jadeText }};">plenty</span>
+                </div>
+                <div style="display:flex; align-items:baseline; gap:8px;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:{{ t.ink }};">20 g</span>
+                  <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:{{ t.muted }};">left · ≈ 4 cups at your usual 5 g</span>
+                </div>
+                <svg viewBox="0 0 260 56" style="width:100%; height:50px; overflow:visible; margin-top:2px;">
+                  <line x1="8" y1="48" x2="252" y2="48" stroke="{{ t.hairSoft }}" stroke-width="1"></line>
+                  <line x1="150" y1="6" x2="150" y2="48" stroke="{{ t.hair }}" stroke-width="1" stroke-dasharray="2 3"></line>
+                  <polyline points="8,10 150,31" fill="none" stroke="{{ t.jade }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                  <polyline points="150,31 250,47" fill="none" stroke="{{ t.muted }}" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="round"></polyline>
+                  <circle cx="150" cy="31" r="3" fill="{{ t.jade }}"></circle>
+                </svg>
+                <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">
+                  <span>bought · 30 g · May ’26</span>
+                  <span style="color:{{ t.jadeText }};">now · 20 g</span>
+                  <span>≈ empty · projected</span>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">The stock curve (inventorySparkline · v3.28, dropped in R3): bought → on-hand → dashed projection to run-out at your ledger rate. Show-when-present — needs purchase_date + grams bought; else falls back to the plain level bar. Untracked teas show status, never a false cup count.</span>
+              </div>
+
+              <!-- FRESHNESS (show-when opened_date OR harvest present · NEW model) -->
+              <div style="margin-top:14px; display:flex; flex-direction:column; gap:7px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="display:flex; align-items:center; gap:6px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">FRESHNESS</span><span style="font-family:'IBM Plex Mono',monospace; font-size:7px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 4px; border-radius:3px;">NEW MODEL</span></span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.jadeText }};">within its opened window</span>
+                </div>
+                <div style="display:flex; align-items:baseline; gap:8px;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:{{ t.ink }};">2 wks open</span>
+                  <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:{{ t.muted }};">Bought 15 May 2026; opened ~2 weeks ago — opened_date shown is a representative value (the field is new, no fills yet). Freshness counts from opening.</span>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">Confidence ladder — opened_date (measured) → harvest (estimated, assumes sealed) → no reading. Purchase isn't a freshness anchor (it'd read a 2023 harvest bought in 2026 as fresh) — it keeps its stock-curve / ledger / cost jobs. Window seeds key on catalog slug (family fallback), not teas.type — opened vs sealed 5–10×, editable. Countdown-vs-history is a per-tea ageing flag — this Da Hong Pao is flagged drink-fresh. → SPEC-freshness-model.md</span>
+              </div>
+
+              <!-- BREW GUIDE -->
+              <div style="margin-top:18px; padding-top:14px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:9px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">BREW GUIDE · 95°C · RINSE + 5 · GONGFU · ILLUSTRATIVE</span>
+                <div style="display:flex; gap:6px;">
+                  <sc-for list="{{ t.guideR }}" as="g" hint-placeholder-count="6">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 8px; border-radius:8px; background:{{ t.factBg }}; border:{{ g.bd }};">
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.ink }};">{{ g.n }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">{{ g.t }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">Rinse (the dashed leading step) is catalog-informed — a slug-keyed default (family fallback) with its own contested-rinse flag — separate from taxonomy confidence — your edit overrides, nothing when ungrounded (same three-tier as the swatch). Roasted &amp; compressed teas usually take a rinse; delicate greens usually don't. <span style="color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Why → Go Deeper</span></span>
+              </div>
+
+              <!-- THIS TEA'S SITTINGS -->
+              <div style="margin-top:18px; padding-top:14px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:9px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">THIS TEA · 2 SITTINGS</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">both shown</span>
+                </div>
+                <sc-for list="{{ t.teaSessionsR }}" as="ts" hint-placeholder-count="3">
+                  <div style="display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid {{ t.hairSoft }};">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.ink }}; width:44px; flex:none;">{{ ts.date }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }}; flex:1;">{{ ts.meta }}</span>
+                    <span style="font-size:10.5px; letter-spacing:0.04em; color:{{ t.ink }};">{{ ts.rFull }}<span style="opacity:0.24;">{{ ts.rEmpty }}</span></span>
+                    <svg viewBox="0 0 24 24" style="width:15px; height:15px; color:{{ t.muted }}; flex:none;"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- PROVENANCE (label photo lives here, as evidence) -->
+              <div style="margin-top:18px; padding-top:14px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:10px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">WHERE THIS CAME FROM</span>
+                <div style="display:flex; gap:13px; align-items:flex-start;">
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:3px; flex:none;">
+                    <div style="width:42px; height:54px; border-radius:6px; background:{{ t.photoBg }}; border:1px solid {{ t.hairSoft }}; display:flex; align-items:center; justify-content:center; color:{{ t.muted }};">
+                      <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M4 8h3l1.6-2h6.8L23 8" fill="none" stroke="currentColor" stroke-width="1.4"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.4"></path><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.4"></circle></svg>
+                    </div>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:{{ t.link }};">label ›</span>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                      <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">Si Fang Guan</span>
+                      <span style="display:flex; align-items:center; gap:4px; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.jadeText }};"><svg viewBox="0 0 24 24" style="width:12px; height:12px;"><path d="M5 12.5l4.5 4.5L19 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>would buy again</span>
+                    </div>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">€15 · 30 g · bought 15 May 2026</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">≈ €2.50 a sitting</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">Freiburg</span>
+                  </div>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">the photo is the label — evidence for provenance, never identity. optional, never nudged: the swatch carries identity, so a photo-less tea is whole.</span>
+              </div>
+
+              <!-- COMMIT + secondary -->
+              <div style="margin-top:20px; background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; text-align:center; padding:13px 0; border-radius:15px 6px 13px 7px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">Start a session</div>
+              <div style="display:flex; justify-content:center; gap:20px; margin-top:12px;">
+                <span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Add to shopping</span>
+                <span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Go Deeper ›</span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; text-align:center; margin-top:9px;">already listed → reads “On your list ✓”, never a duplicate add</span>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">TEA DETAIL · #03 · rev 3</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capDetail }}</span>
+          <sc-if value="{{ t.isLight }}" hint-placeholder-val="{{ true }}">
+            <div style="width:390px; box-sizing:border-box; margin-top:2px; border:1px dashed #B8AC92; border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:8px; background:#F1EBDA;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#8A7A5E;">SWATCH PICKER — the ✎ badge on the swatch opens it</span>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:26px; height:34px; background:#843A1E; border-radius:8px 4px 7px 4px; border:2px solid #2B2320;"></div>
+                <span style="font-size:11px; color:#5C5148; line-height:1.45;">most teas arrive with a <strong>catalog default</strong> — the real gesture is <em>correcting</em> it toward what you actually brew, right where you notice it's off.</span>
+              </div>
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#E6D89B;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#C9CF86;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#AEBB57;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#8FA83E;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#CBA347;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#B07C3E;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#9C5B33;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#843A1E; outline:2px solid #2B2320; outline-offset:1px;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#5A2A16;"></span>
+                <span style="width:22px; height:22px; border-radius:6px 3px 5px 3px; background:#2A1A12;"></span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#8A7A5E;">Bundle 1's 14-swatch palette · outlined = current · “Set this colour” commits. Also reachable from add / edit tea (#06), but this is the primary path.</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ t.isLight }}" hint-placeholder-val="{{ true }}">
+            <div style="width:390px; box-sizing:border-box; margin-top:2px; border:1px dashed #B8AC92; border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; background:#F1EBDA;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#8A7A5E;">⋯ MENU · ENUMERATED — the header ⋯, not shown open on-screen</span>
+              <span style="font-size:12px; color:#2B2320;">Pass this tea to the circle <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 5px; border-radius:3px;">NEW</span></span>
+              <span style="font-size:12px; color:#2B2320;">Add to shopping list</span>
+              <span style="font-size:12px; color:#2B2320;">Go Deeper — reference entry</span>
+              <span style="font-size:12px; color:#8A2B1C;">Delete this tea</span>
+            </div>
+          </sc-if>
+        </div>
+
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="display:flex; flex-direction:column; gap:14px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">SPARSE / EMPTY STATES</span>
+      <span style="font-size:11.5px; color:#75695C;">not-yet-brewed, no brew guide (10%), no origin (5%), no opened_date/harvest → no freshness reading, opened_date but no catalog window → elapsed-only (“opened 6 weeks ago”, no countdown), no purchase_date+grams → no stock curve (falls back to the level bar) — the block adapts, it never just vanishes.</span>
+    </div>
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+      <div style="width:336px; box-sizing:border-box; background:#F5F0E3; border:1px solid rgba(42,31,20,0.30); border-radius:16px; padding:18px 18px; display:flex; flex-direction:column; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#8C7F6C;">THIS TEA · NOT BREWED YET</span>
+        <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:#5C5148; line-height:1.5;">The diary for this tea starts with your first cup.</span>
+        <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#21341F; border-bottom:1px solid rgba(42,31,20,0.30); width:fit-content;">Start the first ›</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5;">no sittings count, no rows, no average — the count &amp; stars appear only once there's history.</span>
+      </div>
+      <div style="width:336px; box-sizing:border-box; background:#F5F0E3; border:1px solid rgba(42,31,20,0.30); border-radius:16px; padding:18px 18px; display:flex; flex-direction:column; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#8C7F6C;">BREW GUIDE</span>
+        <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:#5C5148; line-height:1.5;">None saved yet.</span>
+        <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;"><span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#21341F; border-bottom:1px solid rgba(42,31,20,0.30);">Add a guide ›</span><span style="display:flex; align-items:center; gap:6px;"><span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#21341F; border-bottom:1px solid rgba(42,31,20,0.30);">Borrow from Go Deeper</span><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 5px; border-radius:3px;">NEW</span></span></div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5;">10% (2 teas) has no guide. “Borrow” is new capability — a user-initiated pull of a catalog typical_brew; the reference layer suggests, never auto-writes. → Code slice.</span>
+      </div>
+      <div style="width:336px; box-sizing:border-box; background:#F5F0E3; border:1px solid rgba(42,31,20,0.30); border-radius:16px; padding:18px 18px; display:flex; flex-direction:column; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#8C7F6C;">NO ORIGIN (5%)</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:26px; height:34px; background:#B5732E; border-radius:8px 4px 7px 4px; border:1px solid rgba(0,0,0,0.06);"></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2A1F14;">Earl Grey</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">flavoured black · whole leaf</span></div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5;">origin unknown → the “Wuyi Shan ›” link is simply absent, no “where it grows”. Nothing reads as broken.</span>
+      </div>
+      <div style="width:336px; box-sizing:border-box; background:#F5F0E3; border:1px solid rgba(42,31,20,0.30); border-radius:16px; padding:18px 18px; display:flex; flex-direction:column; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#8C7F6C;">FRESHNESS · ELAPSED-ONLY</span>
+        <div style="display:flex; align-items:baseline; gap:8px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:20px; color:#2A1F14;">opened 6 wks ago</span></div>
+        <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:#5C5148; line-height:1.5;">Clock is measured; no catalog window matched — so no countdown, no window claim.</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5;">clock &amp; window ground independently. covers is hand-curated + Phase C confirm-not-auto-write, so every newly-added tea starts here — the common state, not an edge case.</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:2px; background:#B8AC92; max-width:1280px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1280px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 3</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Identity, provenance, and the real shape</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#3F5E42;">{{ n.k }}</span>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:7px; max-width:1000px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">CONTRACT KEPT · LINKS DRAWN</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;">The swatch stays identity — the label photo never leads, so “liquor = identity only” holds. Every out-link is here: <strong style="color:#A6BD66;">edit · ⋯ · Start a session · its sittings › · origin → Origins · Add to shopping · Go Deeper · Pass to a friend</strong>. <strong style="color:#E5AE2B;">New</strong>: pass-to-circle. <strong style="color:#E5AE2B;">Delete</strong> (not archive) matches the code.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const cap = {
+      capDetail: "Identity is the swatch (the contract). The label photo sits in provenance — evidence beside vendor · cost · purchase · would-rebuy, a quiet thumbnail you tap for full. Honest stock + the v3.86 cups line, brew guide, this tea's sittings (→ detail), one clay commit (Start a session). Origin → Origins (O2); cultivar carries the v3.90 hint."
+    };
+    const guideData = [ { n: "rinse", t: "10s" }, { n: "1", t: "20s" }, { n: "2", t: "25s" }, { n: "3", t: "35s" }, { n: "4", t: "45s" }, { n: "5", t: "60s" } ];
+    const teaSessionsData = [
+      { date: "15 Jul", meta: "Mogake Shiboridashi · 4 steeps", rating: 4 },
+      { date: "6 Jul", meta: "Dragon Gaiwan · 6 steeps", rating: 4.5 }
+    ];
+    const resolve = (t) => ({ ...t, ...cap, isLight: t.key === "light",
+      jadeText: t.key === "dark" ? "#8FBE83" : "#3F5E42",
+      guideR: guideData.map(g => ({ ...g, bd: g.n === "rinse" ? "1px dashed " + (t.key === "dark" ? "#8FBE83" : "#3F5E42") : "1px solid transparent" })),
+      teaSessionsR: teaSessionsData.map(s => { const full = Math.floor(s.rating); const half = (s.rating - full) >= 0.5; return { date: s.date, meta: s.meta, rFull: "★".repeat(full) + (half ? "½" : ""), rEmpty: "★".repeat(5 - full - (half ? 1 : 0)) }; })
+    });
+    const notes = [
+      { k: "TD1", t: "Identity is always the swatch", d: "A hero photo would compete with the liquor swatch for the exact job it exists to do — so the photo never leads. Swatch in Library, lists, and here. The contract holds." },
+      { k: "TD2", t: "The label photo = provenance evidence", d: "Niklas photographs packaging, not tea. So it documents where a tea came from: a quiet thumbnail beside vendor / cost / purchase, tap for full. Optional, never nudged." },
+      { k: "TD3", t: "Kanji plate = the swatch's Tier-3", d: "Not redundant. When there's no user-brewed colour and no catalog default, the swatch shape renders the per-origin script instead of a colour. It's the swatch system's last tier — never a photo fallback." },
+      { k: "TD4", t: "Fill-rate shape, corrected", d: "cost · would-rebuy · purchase-type are 100% → prominent in provenance. leaf-form (55%), purchase-date (40%), harvest season (30%) + year (20%) show when present — season now outfills year, an inversion of the old picture; 3 teas carry a season with no year, so they read like a freshness anchor but can't be one (the ladder anchors on year); 1 more carries a year with no season — the sets don't nest. description (0%) stays absent — fill rates checked vs the 20-tea export (2026-07-18)." },
+      { k: "TD7", t: "Two ratings, named", d: "The header stars are teas.rating — your standing rating of the tea (100% filled), labelled “YOUR RATING”. Per-sitting ratings live in the sittings rows; no redundant average is invented." },
+      { k: "TD5", t: "would-rebuy feeds restock", d: "The ✓ is half the restockCandidate predicate (with low stock) — surfaced as honest history, not a vanity mark." },
+      { k: "TD6", t: "Delete, not archive", d: "The ⋯ uses “Delete this tea” — the capability that exists in code. Archive was invented and dropped; no unflagged feature." },
+      { k: "TD8", t: "The swatch has a visible entry", d: "A ✎ badge on the swatch opens the picker in place. Because most teas arrive with a catalog default, the real job is correcting a slightly-wrong colour where you notice it — so the direct tap is primary; the add/edit-tea path (#06) stays as the secondary route." },
+      { k: "TD9", t: "Sparse states adapt, never vanish", d: "Not-brewed → an invitation (no count/average/rows); no brew guide (10%) → an add / borrow prompt; no origin (5%) → the link simply absent. A thin tea still looks whole — and the sittings header adapts to the real count (this tea has 2: “2 SITTINGS · both shown”, no false “See all” over padded rows)." },
+      { k: "TD10", t: "Add-to-shopping is conditional", d: "Reads “Add to shopping” only when the tea isn't already listed; once added it becomes “On your list ✓” — never a duplicate add." },
+      { k: "TD11", t: "Freshness, re-anchored (NEW model)", d: "The earlier draft read freshness off sincePurchaseDays — wrong: that figure drives the consumption forecast, not freshness. Re-anchored per SPEC-freshness-model.md as a confidence ladder — opened_date (measured) → harvest (estimated, assumes sealed) → no reading. Purchase is deliberately NOT a freshness anchor: it'd read a 2023 harvest bought in 2026 as fresh, and the app never guesses — it keeps its stock-curve / ledger / cost jobs. Windows key on catalog slug (matched row's family as fallback), not teas.type — its six values (green/black/oolong/puerh/yellow/white) can't express the Matcha / JP-green / CN-green rows where seeds differ ~2×; matchTeaType resolves by slug. Opened vs sealed differ 5–10× (sources vary ~2×), so matcha ≠ sencha and oolong gets a real window instead of nothing. Countdown-vs-history is a per-tea `ageing` flag, not a family split (roast level is a tea property) — white/puer default on, oolong off-but-flippable. Mostly a COPY REPLACEMENT, not net-new: white + pu-erh ageing already ships on both surfaces (statusLine “ages well” / “ages gracefully” on the shelf, freshnessCueHTML “this style deepens with age.” on detail) — only oolong ageing is new; the rest rewords shipped, fixture-tested strings. The shelf’s delicate-vs-neutral split (statusCategory) and its global 12-month window retire, since single-writer discipline makes this the one freshness writer across shelf + detail. (freshnessClass — young/ages/null, the quiet v3.62 detail cue — is a different function.)" },
+      { k: "TD12", t: "Stock curve restored", d: "R3 had dropped inventorySparkline (v3.28) to a flat progress bar. Restored: the SVG reconstructs stock from the purchase anchor → today's on-hand → a dashed projection to run-out at the ledger rate. Show-when-present (needs purchase_date + grams bought); level bar otherwise. This is why purchase_date earns its promotion — it anchors this curve and the ≥10-day ledger forecast, not freshness." },
+      { k: "TD13", t: "Rinse is catalog-informed (three-tier)", d: "The brew guide's leading rinse step follows the same three-tier pattern as the swatch and the freshness windows — a catalog default keyed on slug (matched row's family as fallback), the same key as the windows, carrying its OWN rinse-confidence, not the taxonomy confidence field (that one means what the tea IS — the Ruan Zhi / Da Hong Pao / Jin Xuan disputes, forced per-row by resolveTeaType so it can't leak; rinse contestedness takes its own field, settled at §10.2 of the committed spec). Your override wins, nothing when ungrounded. Roasted & compressed teas usually rinse; delicate greens usually don't (a rinse there throws away the best infusion), which is why it's catalog-seeded not assumed. A natural Go Deeper surface: the reference entry is where WHY a tea is rinsed lives. Storage/serialisation of the now-editable guide is flagged on Add/Edit (AT8)." },
+      { k: "TD14", t: "Shelf ownership + the elapsed-only state", d: "Single-writer discipline makes the new model the one freshness writer across shelf and detail, so Library-card status copy is in this slice too. The shelf is two-key — a freshness tone only when clock AND window are both grounded, else it falls through to the plain quantity tone (20 g · plenty), never an empty slot (WS5: one status line, same slot, every card). Detail is graded, so it can show elapsed-only: opened_date set but no catalog window → “opened 6 weeks ago”, no countdown, no window claim — only the window would be invented, and that's withheld. Because covers is hand-curated and Phase C is confirm-not-auto-write, elapsed-only is the common state for any newly-added tea, not an edge case." },
+      { k: "TD15", t: "Currency is new capability (flag)", d: "The € on cost / provenance isn't real yet — the app hardcodes $ (steep-teas.js:722–723) and cost_total is a bare number with no currency field. Every vendor in the library is German, so € is right for Niklas but unbuilt. Treat like opened_date: new capability, home is a currency preference in Settings (#07); cost_total stays a bare number, the symbol comes from the pref." }
+    ];
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", lowFg: "#B07C3E", factBg: "#EDE6D4", photoBg: "#E7DFCC" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", lowFg: "#D79A5A", factBg: "#262017", photoBg: "#241E16" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

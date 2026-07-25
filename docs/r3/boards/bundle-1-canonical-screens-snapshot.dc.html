@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><path d="M60 30 a26 26 0 1 0 19 8" fill="none" stroke="#2A1F14" stroke-width="5" stroke-linecap="round"></path><rect x="52" y="70" width="16" height="20" rx="4" fill="#9C5B33"></rect><text x="60" y="112" font-family="serif" font-size="15" fill="#2A1F14" text-anchor="middle">摺物 D</text></svg></template>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="enso" viewBox="0 0 120 120"><path d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"></path></symbol>
+<symbol id="enso-brush" viewBox="0 0 120 120"><path d="M52 16 C34 19 18 37 16 58 C14 80 32 105 58 105 C82 105 104 86 104 64 C104 50 98 38 88 30 L83 39 C90 46 94 53 94 64 C94 82 78 92 58 92 C36 92 26 78 27 60 C28 42 40 27 58 25 Z" fill="currentColor"></path></symbol>
+<symbol id="hanko" viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="19" height="19" rx="4.5" fill="#B5504A"></rect><path d="M8.4 16.2c2.3-1.5 3.5-3.8 3.5-6.7M12.5 8c1.2 3.1.3 6.4-1.9 8.6" fill="none" stroke="#F6F2E9" stroke-width="1.7" stroke-linecap="round"></path></symbol>
+<symbol id="deckle" viewBox="0 0 390 12" preserveAspectRatio="none"><path d="M0 6 C 18 2, 36 10, 58 5 S 102 9, 132 4 S 172 10, 202 6 S 242 2, 272 7 S 322 10, 352 4 S 382 8, 390 5 L390 12 L0 12 Z" fill="currentColor"></path></symbol>
+<symbol id="fav-leaf" viewBox="0 0 24 24"><path d="M6 18C6 10 11 5 19 5c0 8-5 13-13 13Z" fill="currentColor"></path></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.8 15.8l4.4 4.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></symbol>
+<linearGradient id="glazeBlueD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5658C9"></stop><stop offset="0.5" stop-color="#2B2C7B"></stop><stop offset="1" stop-color="#3E40A8"></stop></linearGradient>
+<linearGradient id="glazeKachi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2C477A"></stop><stop offset="0.5" stop-color="#233A63"></stop><stop offset="1" stop-color="#182643"></stop></linearGradient>
+</defs></svg>
+<section style="padding:48px; display:flex; flex-direction:column; gap:30px;">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:14px;">
+    <div style="display:flex; align-items:baseline; gap:16px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUNDLE 1</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 9px; border-radius:4px;">REV 4 · A·B·C·D</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">SNAPSHOT · locked 2026-07-18 · example data illustrative</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:30px; color:#2B2320; margin:0;">Canonical screens · Direction D 摺物</h1>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; background:#F3E4C8; border:1px solid #D8B778; border-radius:10px; padding:10px 16px; width:fit-content;">
+      <svg viewBox="0 0 24 24" style="width:18px; height:18px; flex:none;"><use href="#hanko"></use></svg>
+      <span style="font-size:12.5px; color:#5A4A2E; line-height:1.5;"><strong>Rev 4 · handback.</strong> Rev 3's six stay closed. This pass resolves the new findings (A regressions · B metaphor · C mismatches · D the missing in-session screen) + adds the standard steeping screen. Back to the planning lane for the final pass before Code.</span>
+    </div>
+    <p style="font-size:14.5px; color:#4A4038; max-width:840px; margin:2px 0 0; line-height:1.65;">Five screens now: Home · Library · <strong>In-session steeping</strong> (new — the daily-logging surface) · Focus · Log. The journal is pulled back from <em>newspaper</em> to <em>diary</em> (B1); flavour leaves setup for the steep (B3); each tea shows its <strong>own origin's script</strong> (B4). Both themes; states split across them where a screen has two.</p>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:12px; max-width:1240px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#5C5148;">PINNED CONTRACTS</span>
+      <span style="font-size:11.5px; color:#75695C;">unchanged from Rev 3 — the fence the planning lane pins as invariants</span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px;">
+      <sc-for list="{{ contracts }}" as="c" hint-placeholder-count="5">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:7px;">
+            <span style="width:9px; height:9px; border-radius:2px; background:{{ c.dot }}; flex:none;"></span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#2B2320;">{{ c.k }}</span>
+          </div>
+          <span style="font-size:12px; color:#5C5148; line-height:1.5;">{{ c.v }}</span>
+          <span style="font-size:10.5px; color:{{ c.tagFg }}; font-family:'IBM Plex Mono',monospace;">{{ c.tag }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box;">
+            <div style="padding:28px 28px 0;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.22em; color:{{ t.ink }};">SLOWCUP</span>
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.muted }};">a tea diary</span><span style="width:24px; height:24px; border-radius:50%; background:{{ t.band }}; border:1px solid {{ t.hair }}; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-size:11px; color:{{ t.ink }};">N</span></div>
+              </div>
+              <span style="display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:{{ t.muted }}; margin-top:10px;">TUESDAY 14 JULY · MORNING</span>
+              <span style="display:block; font-family:'Shippori Mincho',serif; font-weight:700; font-size:38px; line-height:1.22; color:{{ t.ink }}; margin-top:14px;">Good<br>morning,<br>Niklas.</span>
+              <span style="display:block; font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:{{ t.muted }}; margin-top:10px;">Your 214th cup.</span>
+            </div>
+            <svg viewBox="0 0 390 12" preserveAspectRatio="none" style="display:block; width:100%; height:12px; color:{{ t.band }}; margin-top:18px;"><use href="#deckle"></use></svg>
+            <div style="background:{{ t.band }}; background-image:{{ t.grain }}; background-size:5px 5px; padding:14px 28px 22px;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.18em; color:{{ t.muted }};">THIS WEEK</span>
+                <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:{{ t.muted }};">Nine cups — four teas, two sessions.</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; margin-top:14px;">
+                <div style="background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; padding:13px 24px; border-radius:14px 5px 12px 6px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -2px 0 rgba(0,0,0,0.18);">Start steeping</div>
+                <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }}; border-bottom:1px solid {{ t.hair }};">Log a cup&nbsp;→</span>
+              </div>
+            </div>
+            <svg viewBox="0 0 390 12" preserveAspectRatio="none" style="display:block; width:100%; height:12px; background:{{ t.band }}; color:{{ t.bg }}; transform:scaleY(-1);"><use href="#deckle"></use></svg>
+            <div style="padding:16px 28px 0; display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid {{ t.hair }}; padding-bottom:6px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.18em; color:{{ t.muted }};">EARLIER TODAY</span>
+              </div>
+              <sc-for list="{{ t.recentsR }}" as="r" hint-placeholder-count="2">
+                <div style="display:flex; gap:13px; padding:13px 0; border-bottom:1px solid {{ t.hairSoft }}; align-items:center;">
+                  <div style="width:24px; height:32px; flex:none; background:{{ r.sw }}; border-radius:9px 4px 8px 5px; border:1px solid rgba(0,0,0,0.06);"></div>
+                  <div style="display:flex; flex-direction:column; gap:3px; flex:1;">
+                    <div style="display:flex; align-items:center; gap:7px;">
+                      <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16.5px; color:{{ t.ink }};">{{ r.n }}</span>
+                      <span style="font-family:'Noto Serif SC',serif; font-size:13px; color:{{ t.muted }};">{{ r.script }}</span>
+                      <sc-if value="{{ r.fav }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:12px; height:12px; color:{{ t.jade }};"><use href="#fav-leaf"></use></svg></sc-if>
+                    </div>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.muted }};">{{ r.m }}</span>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="flex:1;"></div>
+              <div style="display:flex; align-items:flex-end; justify-content:space-around; border-top:1px solid {{ t.hair }}; padding:14px 0 22px; margin:0 -28px; position:relative;">
+                <span style="font-size:11.5px; font-weight:600; color:{{ t.ink }}; box-shadow:inset 0 -6px 0 {{ t.hi }};">Home</span>
+                <span style="font-size:11.5px; color:{{ t.muted }};">Library</span>
+                <div style="width:46px; height:46px; border-radius:50%; background:{{ t.jade }}; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-size:26px; line-height:1; margin-top:-28px; box-shadow:0 6px 16px rgba(0,0,0,0.28);">＋</div>
+                <span style="font-size:11.5px; color:{{ t.muted }};">Sessions</span>
+                <span style="font-size:11.5px; color:{{ t.muted }};">Insights</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">HOME · WS2</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5;">{{ t.capHome }}</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box;">
+            <div style="padding:28px 28px 0; display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:26px; color:{{ t.ink }};">Library</span>
+                <div style="display:flex; align-items:center; gap:14px;">
+                  <svg viewBox="0 0 24 24" style="width:18px; height:18px; color:{{ t.ink }};"><use href="#i-search"></use></svg>
+                  <span style="font-size:12.5px; font-weight:500; color:{{ t.ink }};">Filter ▾</span>
+                  <span style="font-size:12.5px; font-weight:500; color:{{ t.muted }};">Recent ▾</span>
+                </div>
+              </div>
+              <div style="position:relative; display:flex; justify-content:space-between; align-items:baseline; margin-top:12px; border-bottom:1px solid {{ t.hair }}; padding-bottom:12px;">
+                <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:{{ t.muted }};">Twenty-three teas, three empty.</span>
+                <sc-if value="{{ t.filterOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; right:0; top:28px; background:{{ t.bg }}; border:1px solid {{ t.hair }}; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px; min-width:200px; box-shadow:0 12px 30px rgba(0,0,0,0.28); z-index:5;">
+                    <sc-for list="{{ t.filterGroups }}" as="fg" hint-placeholder-count="3">
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">{{ fg.k }}</span>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                          <sc-for list="{{ fg.opts }}" as="op" hint-placeholder-count="3">
+                            <span style="font-size:11px; padding:4px 9px; border-radius:999px; border:1px solid {{ op.bd }}; color:{{ op.fg }}; background:{{ op.bg }};">{{ op.l }}</span>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.06em; color:{{ t.muted }}; border-top:1px solid {{ t.hairSoft }}; padding-top:8px;">ONE QUIET CONTROL · VENDOR + TYPE + STOCK</span>
+                  </div>
+                </sc-if>
+              </div>
+              <sc-for list="{{ t.teasR }}" as="tea" hint-placeholder-count="8">
+                <div style="display:flex; gap:11px; align-items:center; padding:9px 0; border-bottom:1px solid {{ t.hairSoft }};">
+                  <div style="width:22px; height:28px; flex:none; background:{{ tea.swBg }}; border:{{ tea.swBd }}; border-radius:8px 4px 7px 4px; box-sizing:border-box;"></div>
+                  <div style="display:flex; flex-direction:column; gap:1px; flex:none;">
+                    <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:15.5px; color:{{ t.ink }}; opacity:{{ tea.op }};">{{ tea.n }}</span>
+                    <span style="font-family:'Noto Serif SC',serif; font-size:11px; color:{{ tea.scriptFg }};">{{ tea.script }}</span>
+                  </div>
+                  <sc-if value="{{ tea.fav }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:13px; height:13px; color:{{ t.jade }}; flex:none;"><use href="#fav-leaf"></use></svg></sc-if>
+                  <span style="flex:1; border-bottom:1px dotted {{ t.hair }}; transform:translateY(-3px);"></span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ tea.valFg }}; flex:none;">{{ tea.val }}</span>
+                </div>
+              </sc-for>
+              <div style="flex:1;"></div>
+              <div style="display:flex; align-items:flex-end; justify-content:space-around; border-top:1px solid {{ t.hair }}; padding:14px 0 22px; margin:0 -28px; position:relative;">
+                <span style="font-size:11.5px; color:{{ t.muted }};">Home</span>
+                <span style="font-size:11.5px; font-weight:600; color:{{ t.ink }}; box-shadow:inset 0 -6px 0 {{ t.hi }};">Library</span>
+                <div style="width:46px; height:46px; border-radius:50%; background:{{ t.jade }}; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-size:26px; line-height:1; margin-top:-28px; box-shadow:0 6px 16px rgba(0,0,0,0.28);">＋</div>
+                <span style="font-size:11.5px; color:{{ t.muted }};">Sessions</span>
+                <span style="font-size:11.5px; color:{{ t.muted }};">Insights</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">LIBRARY · WS5</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5;">{{ t.capLib }}</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box; position:relative;">
+            <span style="position:absolute; left:22px; top:70px; writing-mode:vertical-rl; font-family:'Noto Serif SC',serif; font-weight:700; font-size:46px; color:{{ t.ink }}; opacity:0.9; letter-spacing:0.1em;">大紅袍</span>
+            <div style="padding:26px 26px 26px; display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:{{ t.muted }};">TUE 14 JUL · {{ t.sIState }}</span>
+                <span style="font-size:15px; color:{{ t.ink }};">✕</span>
+              </div>
+              <div style="margin-left:52px; margin-top:8px; display:flex; align-items:center; gap:10px;">
+                <div style="width:22px; height:28px; flex:none; background:#843A1E; border-radius:8px 4px 7px 4px; border:1px solid rgba(0,0,0,0.06);"></div>
+                <div style="display:flex; flex-direction:column;">
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:{{ t.ink }};">Da Hong Pao</span><svg viewBox="0 0 24 24" style="width:13px; height:13px; color:{{ t.jade }};"><use href="#fav-leaf"></use></svg></div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">Wuyi oolong · gongfu</span>
+                </div>
+              </div>
+              <div style="margin-left:52px; margin-top:18px; display:flex; flex-direction:column; gap:7px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">BREW GUIDE · 95°C · RINSE + 5</span>
+                <div style="display:flex; gap:5px;">
+                  <sc-for list="{{ t.guideR }}" as="g" hint-placeholder-count="6">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:5px 7px; border-radius:7px; background:{{ g.bg }}; box-shadow:{{ g.mark }};">
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ g.fg }};">{{ g.n }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">{{ g.t }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="margin-left:52px; margin-top:20px; display:flex; align-items:baseline; gap:10px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:44px; color:{{ t.ink }};">{{ t.tNow }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.muted }};">{{ t.tOf }}</span>
+              </div>
+              <div style="margin-left:52px; margin-top:10px; height:3px; border-radius:2px; background:{{ t.hairSoft }}; position:relative;"><div style="position:absolute; left:0; top:0; height:3px; border-radius:2px; width:{{ t.barPct }}; background:{{ t.ink }};"></div></div>
+              <div style="margin-left:52px; margin-top:10px; display:flex; align-items:center; gap:18px;">
+                <span style="font-size:12.5px; color:{{ t.ink }};">{{ t.tCtrl }}</span>
+                <span style="font-size:12.5px; color:{{ t.muted }};">reset</span>
+                <span style="flex:1;"></span>
+                <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.link }};">Focus ↗</span>
+              </div>
+              <div style="margin-top:18px; padding-top:14px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">THIS INFUSION · WATER</span>
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:{{ t.ink }};">95°C</span>
+                </div>
+                <div style="height:1.5px; background:{{ t.hairSoft }}; position:relative;"><div style="position:absolute; left:0; top:0; height:1.5px; width:82%; background:{{ t.ink }};"></div><div style="position:absolute; left:82%; top:-5px; width:12px; height:12px; border-radius:50%; background:{{ t.ink }}; border:2px solid {{ t.bg }};"></div></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">ink thumb — not clay (C4). per-steep, prospective.</span>
+              </div>
+              <div style="margin-top:14px; padding-top:12px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.calibFg }};">CALIBRATE · TUNES THE NEXT POUR</span>
+                <sc-if value="{{ t.calibActive }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; gap:9px;">
+                    <sc-for list="{{ t.calibR }}" as="cb" hint-placeholder-count="3">
+                      <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ cb.fg }}; box-shadow:{{ cb.mark }}; padding:0 3px;">{{ cb.l }}</span>
+                    </sc-for>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">saved · nudges steep 3 → ~40s. writes, never silent.</span>
+                </sc-if>
+                <sc-if value="{{ t.calibIdle }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.muted }};">appears when the pour finishes.</span>
+                </sc-if>
+              </div>
+              <div style="margin-top:14px; padding-top:12px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:9px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">TASTE · THE RECORD (retrospective)</span>
+                <sc-if value="{{ t.notesOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; gap:9px; flex-wrap:wrap;">
+                    <sc-for list="{{ t.chipsR }}" as="ch" hint-placeholder-count="5">
+                      <span style="font-family:'Shippori Mincho',serif; font-size:14px; font-style:{{ ch.fs }}; color:{{ ch.fg }}; box-shadow:{{ ch.mark }}; padding:0 3px;">{{ ch.l }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; margin-top:2px;">
+                    <span style="font-size:16px; letter-spacing:0.08em; color:{{ t.ink }};">★★★★<span style="opacity:0.25;">★</span></span>
+                    <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.muted }};">a note…</span>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">chips are this tea's own vocabulary (C2) · roasted oolong, never “marine”.</span>
+                </sc-if>
+                <sc-if value="{{ t.notesClosed }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }}; width:fit-content;">＋ Note the taste</span>
+                </sc-if>
+              </div>
+              <div style="flex:1;"></div>
+              <div style="background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; text-align:center; padding:13px 0; border-radius:15px 6px 13px 7px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">{{ t.commit }}</div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">IN-SESSION STEEPING · WS3 · NEW</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5;">{{ t.capSteep }}</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box; position:relative;">
+            <span style="position:absolute; left:24px; top:76px; writing-mode:vertical-rl; font-family:'Noto Serif SC',serif; font-weight:700; font-size:54px; color:{{ t.ink }}; letter-spacing:0.12em;">玉露</span>
+            <div style="padding:28px 28px 34px; display:flex; flex-direction:column; align-items:center; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.18em; color:{{ t.muted }};">FOCUS · SECOND OF FIVE</span>
+                <span style="font-size:16px; color:{{ t.ink }};">✕</span>
+              </div>
+              <div style="position:relative; width:240px; height:240px; margin-top:74px; margin-left:44px;">
+                <svg viewBox="0 0 120 120" style="width:252px; height:252px; color:{{ t.ink }}; opacity:0.14; position:absolute; inset:-6px;"><use href="#enso-brush"></use></svg>
+                <svg viewBox="0 0 240 240" style="width:240px; height:240px; position:absolute; inset:0;"><circle cx="120" cy="120" r="90" fill="none" stroke="url(#glazeKachi)" stroke-width="12" stroke-linecap="round" stroke-dasharray="328 238" transform="rotate(-90 120 120)"></circle></svg>
+                <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:56px; color:{{ t.ink }};">1:24</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.muted }};">of 2:00</span>
+                </div>
+              </div>
+              <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:16px; color:{{ t.muted }}; margin-top:30px; margin-left:44px;">Gyokuro Okabe — houhin.</span>
+              <div style="flex:1;"></div>
+              <div style="width:264px; margin-left:44px; display:flex; flex-direction:column; gap:9px; margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">THIS INFUSION · WATER</span>
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:20px; color:{{ t.ink }};">60°C</span>
+                </div>
+                <div style="height:1.5px; background:{{ t.hairSoft }}; position:relative;"><div style="position:absolute; left:0; top:0; height:1.5px; width:30%; background:{{ t.ink }};"></div><div style="position:absolute; left:30%; top:-5px; width:12px; height:12px; border-radius:50%; background:{{ t.ink }}; border:2px solid {{ t.bg }};"></div></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.06em; color:{{ t.muted }};">ink thumb (C4) · each steep keeps its own</span>
+              </div>
+              <div style="background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; padding:13px 28px; border-radius:15px 6px 13px 7px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">Log this infusion</div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.muted }}; margin-top:14px;">tap anywhere to pause</span>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">STEEPING · FOCUS · WS3</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5;">{{ t.capFocus }}</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box;">
+            <div style="padding:28px 28px 26px; display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:{{ t.ink }};">Log a cup</span>
+                <span style="font-size:16px; color:{{ t.muted }};">✕</span>
+              </div>
+              <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:{{ t.muted }}; margin-top:12px;">A cup you've had — recorded after the fact.</span>
+              <div style="display:flex; gap:12px; align-items:baseline; margin-top:18px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.red }};">01</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">WHICH TEA</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:11px; padding:6px 0 14px 30px; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="width:22px; height:28px; flex:none; background:{{ t.swSencha }}; border-radius:8px 4px 7px 4px; border:1px solid rgba(0,0,0,0.06);"></div>
+                <div style="display:flex; flex-direction:column;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:18px; color:{{ t.ink }};">Sencha Fukamushi</span>
+                  <span style="font-family:'Noto Serif SC',serif; font-size:12px; color:{{ t.muted }};">煎茶</span>
+                </div>
+                <span style="flex:1;"></span>
+                <span style="font-size:12px; font-weight:500; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">change</span>
+              </div>
+              <div style="display:flex; gap:12px; align-items:baseline; margin-top:16px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.red }};">02</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">HOW</span>
+              </div>
+              <div style="display:flex; gap:15px; flex-wrap:wrap; padding:8px 0 14px 30px; border-bottom:1px solid {{ t.hairSoft }};">
+                <sc-for list="{{ t.methodsR }}" as="me" hint-placeholder-count="4">
+                  <span style="font-family:'Shippori Mincho',serif; font-size:15.5px; font-weight:{{ me.w }}; color:{{ me.fg }}; box-shadow:{{ me.mark }}; padding:0 2px;">{{ me.l }}</span>
+                </sc-for>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline; padding:16px 0 0 30px;">
+                <span style="font-size:13px; color:{{ t.muted }};">More — vessel, grams, notes</span>
+                <span style="font-size:12px; color:{{ t.muted }};">▾</span>
+              </div>
+              <div style="padding:12px 0 0 30px; display:flex; flex-direction:column; gap:7px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }}; line-height:1.5;">↳ water temp — set per-steep in the steep, not here</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }}; line-height:1.5;">↳ taste &amp; flavour — captured in the steep (retrospective), not in setup (B3)</span>
+              </div>
+              <div style="flex:1;"></div>
+              <div style="background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; padding:14px 0; border-radius:16px 6px 14px 8px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -2px 0 rgba(0,0,0,0.18);">Keep this cup <svg viewBox="0 0 24 24" style="width:17px; height:17px;"><use href="#hanko"></use></svg></div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">LOG · WS1</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5;">{{ t.capLog }}</span>
+        </div>
+
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="height:1px; background:#B8AC92; max-width:1240px; margin-top:6px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:18px; max-width:1240px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">B4 SCRIPT</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2B2320; margin:0;">Per-origin script — each tea in its own culture's characters</h2>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8A2B1C;">DECISION · catalog-sourced, never guessed</span>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:840px; margin:0; line-height:1.65;">Not “a Japanese app” — each tea written as its own origin writes it: Chinese teas in Chinese characters (Traditional/Simplified per origin), Japanese in kanji/kana. Same three-tier pattern as the liquor swatch, off the v3.87 catalog's verified CJK names. <strong>Design owns the treatment; Code owns the data + read-path</strong> (flagged for hand-off). Hard rule: wrong characters are worse than none.</p>
+    <div style="display:flex; gap:26px; flex-wrap:wrap; align-items:stretch;">
+      <div style="flex:1.4; min-width:420px; background:#F6F2E9; border:1px solid #D8CFB9; border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:14px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.16em; color:#5C5148;">THREE TIERS · VERIFIED BEATS OVERRIDE BEATS ROMANIZED-ONLY</span>
+        <sc-for list="{{ scriptTiers }}" as="s" hint-placeholder-count="4">
+          <div style="display:flex; gap:16px; align-items:center; padding-bottom:12px; border-bottom:1px solid #E4DDCB;">
+            <div style="width:56px; flex:none; display:flex; align-items:center; justify-content:center; font-family:'Noto Serif SC',serif; font-weight:700; font-size:26px; color:{{ s.charFg }};">{{ s.char }}</div>
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <div style="display:flex; align-items:center; gap:8px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8A7A5E;">{{ s.tier }}</span><span style="font-size:13px; font-weight:600; color:#2B2320;">{{ s.name }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8A7A5E;">{{ s.origin }}</span></div>
+              <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ s.d }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="flex:1; min-width:280px; background:#F6F2E9; border:1px solid #D8CFB9; border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:12px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.16em; color:#5C5148;">TREATMENT</span>
+        <span style="font-size:12px; color:#5C5148; line-height:1.6;">Romanized name leads (always present, always legible); the script is the quiet companion — small beside the name in the Library, large as the vertical display character on the steeping screens (大紅袍 for a Wuyi oolong, 玉露 for a gyokuro). The romanized never disappears, so a missing script degrades gracefully.</span>
+        <div style="display:flex; gap:14px; align-items:flex-end; margin-top:2px;">
+          <div style="display:flex; flex-direction:column; gap:2px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:#2B2320;">Da Hong Pao</span><span style="font-family:'Noto Serif SC',serif; font-size:12px; color:#8A7A5E;">大紅袍</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8A7A5E;">library row</span></div>
+          <div style="writing-mode:vertical-rl; font-family:'Noto Serif SC',serif; font-weight:700; font-size:34px; color:#2B2320;">大紅袍</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:3px; background:#2B2320; max-width:1240px; margin-top:10px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:20px; max-width:1240px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">REV 4</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2B2320; margin:0;">Findings resolved · A · B · C · D</h2>
+    </div>
+
+    <sc-for list="{{ groups }}" as="grp" hint-placeholder-count="4">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; color:{{ grp.fg }}; background:{{ grp.bg }}; padding:3px 9px; border-radius:4px;">{{ grp.k }}</span>
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2B2320;">{{ grp.title }}</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;">
+          <sc-for list="{{ grp.items }}" as="it" hint-placeholder-count="3">
+            <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+              <div style="display:flex; align-items:baseline; gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ grp.fg }}; flex:none;">{{ it.id }}</span>
+                <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.4;">{{ it.t }}</span>
+              </div>
+              <span style="font-size:11.5px; color:#5C5148; line-height:1.55;">{{ it.d }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+
+    <div style="background:#F0EAD6; border:1px solid #C9BC9E; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#3F5E42;">NAV MODEL · SETTLED — clears Bundle 2 (m0060)</span>
+      <span style="font-size:12.5px; color:#5C5148; line-height:1.6; max-width:900px;">Bar back to the R2-locked five slots — quick-start “+” restored (A1), “Steep” gone (it launches from “+”, not a tab — C3). Every surface that exists today keeps an entry point; here is where each hangs.</span>
+      <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start;">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:flex-end; justify-content:space-around; background:#F6F2E9; border:1px solid #D8CFB9; border-radius:12px; padding:14px 18px 12px; width:340px; position:relative;">
+            <span style="font-size:12px; font-weight:600; color:#2B2320; box-shadow:inset 0 -6px 0 #E5AE2B;">Home</span>
+            <span style="font-size:12px; color:#8C7F6C;">Library</span>
+            <div style="width:44px; height:44px; border-radius:50%; background:#3F5E42; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-size:24px; margin-top:-24px; box-shadow:0 6px 14px rgba(0,0,0,0.25);">＋</div>
+            <span style="font-size:12px; color:#8C7F6C;">Sessions</span>
+            <span style="font-size:12px; color:#8C7F6C;">Insights</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8A7A5E; max-width:340px; line-height:1.5;">＋ = jade (brand), NOT clay — global quick-start, not a per-screen commit. Profile ⊙ sits top-right, off the bar.</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:9px; flex:1; min-width:300px;">
+          <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:12px 15px; display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#3F5E42;">INSIGHTS ▸ NESTS · 1 · RENAMED + REDEFINED</span>
+            <span style="font-size:12.5px; font-weight:600; color:#2B2320;">Origins — where your tea grows</span>
+            <span style="font-size:11.5px; color:#5C5148; line-height:1.55;">“Passport” retired: not where you <em>drink</em> (home), but a map of the growing regions your collection spans. Pairs with the per-origin script + the catalog's origin data. Nested in Insights alongside your stats.</span>
+          </div>
+          <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:12px 15px; display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#8A6A2E;">PROFILE ⊙ · TOP-RIGHT, PERSISTENT · 2 · CONFIRMED</span>
+            <span style="font-size:12.5px; font-weight:600; color:#2B2320;">Settings · Friends · Shopping list</span>
+            <span style="font-size:11.5px; color:#5C5148; line-height:1.55;">The avatar keeps its cluster — settings, social, and the shopping list all live behind it (now shown on Home). Off the tab bar, so nothing there is lost.</span>
+          </div>
+          <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:12px 15px; display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#5C5148;">TEA DATABASE · SHIPS PHASE-2 · 3 · HAS A HOME</span>
+            <span style="font-size:12.5px; font-weight:600; color:#2B2320;">“Go Deeper” — contextual + Browse</span>
+            <span style="font-size:11.5px; color:#5C5148; line-height:1.55;">Occasional lookup, not a daily tab: reached as “Go Deeper” from a tea, plus one Browse entry inside Library. It has a place in the model now even though it lands later.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#EEF3E6; border:1px solid #B9CBA0; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:8px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#3F5E42;">B1 · MY READ — I AGREE, WITH ONE REFRAME</span>
+      <span style="font-size:12.5px; color:#41503A; line-height:1.6; max-width:900px;">Agreed: “published newspaper” carries editorial/public connotations that fight a private ritual — a log is a <em>diary</em>. The typeset craft (Shippori, folios, dotted leaders, deckle band) is metaphor-neutral and stays; only the framing changed — “MORNING EDITION” → a dated entry, “Earlier in this issue” → “Earlier today”. <strong>One reframe rather than a deletion:</strong> I kept the count, but as a personal milestone — “Your 214th cup” — which in a diary reads as warmth, not a broadsheet edition number. Drops cleanly if you'd rather it go.</span>
+    </div>
+
+    <div style="background:#2B2320; border-radius:12px; padding:18px 20px; display:flex; flex-direction:column; gap:12px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">NEXT · FINAL RECONCILIATION → CODE HAND-OFF PINS</span>
+      <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;">
+        <sc-for list="{{ handoff }}" as="h" hint-placeholder-count="5">
+          <div style="border:1px solid #4A4234; border-radius:9px; padding:10px 12px; display:flex; flex-direction:column; gap:5px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#E5AE2B;">{{ h.k }}</span>
+            <span style="font-size:11px; color:#C9BFAC; line-height:1.5;">{{ h.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-size:11.5px; color:#9E9078; line-height:1.55;"><strong style="color:#A6BD66;">Bundle 2 CLEARED</strong> — A3 confirmed (with redefine) and D settled. Insights' scope is now known: it nests Origins (the renamed provenance map) + your stats. Bundle 2 starts after this final reconciliation.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const cap = {
+      capHome: "Diary, not newspaper (B1): 'a tea diary' replaces the edition line, 'Your 214th cup' replaces No. 214, 'EARLIER TODAY' replaces 'in this issue'. Recents are summaries not live-state (B2). Bar restored: Home·Library·[＋ quick-start]·Sessions·Insights (A1/A3/C3). Favourite leaf back (A2). Non-prescriptive mock (C1). Profile avatar top-right = settings/social/shopping hub (A3-2).",
+      capLib: "Search icon + one combined Filter (vendor+type+stock, open on dark) + Recent sort — capability behind quiet entry points, not chips (A2). Favourite leaf on favourites. Each tea carries its own-origin script beside the romanized name (B4). Restored 5-slot bar.",
+      capSteep: "NEW — the daily-logging surface (D). Light = mid-steep, notes collapsed; dark = pour finished, calibration + notes open. Brew-guide pills, standard bar timer (Focus is the immersive twin), per-steep ink-thumb slider (C4). Two feedback controls made unconfusable: CALIBRATE (prospective, tunes next pour, WRITES) vs TASTE (retrospective record, collapsible, per-tea chips C2). Da Hong Pao → 大紅袍 (B4). Bar recedes.",
+      capFocus: "Unchanged from Rev 3 except the C4 fix — slider thumb is now ink, so clay is the lone commit. Kachi-iro ring, brush ensō, Gyokuro 玉露 (correct JP script, B4).",
+      capLog: "Setup only — a cup recorded after the fact. Flavour REMOVED (B3, retrospective → lives in the steep); temp already gone (per-steep). Tea shows its script (B4). One clay commit; no bar (it's a sheet)."
+    };
+    const methodsData = [{ l: "gongfu", on: true }, { l: "western" }, { l: "cold brew" }, { l: "senchadō" }];
+    // Library — per-origin script + favourites. Earl Grey = Tier-3 romanized-only demo.
+    const teasData = [
+      { n: "Sencha Fukamushi", script: "煎茶", c: "#AEBB57", val: "plenty", tone: "plenty", fav: true },
+      { n: "Tie Guan Yin", script: "鐵觀音", c: "#CBA347", val: "running low", tone: "low" },
+      { n: "Genmaicha", script: "玄米茶", c: "#B07C3E", val: "plenty", tone: "plenty" },
+      { n: "Matcha Kiri", script: "抹茶", c: "#8FA83E", val: "running low", tone: "low" },
+      { n: "Gyokuro Okabe", script: "玉露", c: "#C9CF86", val: "plenty", tone: "plenty", fav: true },
+      { n: "Hōjicha Kyō", script: "ほうじ茶", empty: true, val: "empty", tone: "empty" },
+      { n: "Da Hong Pao", script: "大紅袍", c: "#843A1E", val: "not tracked", tone: "untracked", fav: true },
+      { n: "Earl Grey", script: "", c: "#B5732E", val: "plenty", tone: "plenty" },
+      { n: "White Peony", script: "白牡丹", c: "#E6D89B", val: "plenty", tone: "plenty" }
+    ];
+    const filterGroupsData = [
+      { k: "VENDOR", opts: [{ l: "All", on: true }, { l: "Yunomi" }, { l: "Ippodo" }, { l: "Local" }] },
+      { k: "TYPE", opts: [{ l: "All", on: true }, { l: "Green" }, { l: "Oolong" }, { l: "White" }, { l: "Pu'er" }] },
+      { k: "STOCK", opts: [{ l: "Any", on: true }, { l: "In stock" }, { l: "Low" }, { l: "Empty" }] }
+    ];
+    const guideData = [
+      { n: "rinse", t: "10s" }, { n: "1", t: "20s" }, { n: "2", t: "25s", cur: true },
+      { n: "3", t: "35s" }, { n: "4", t: "45s" }, { n: "5", t: "60s" }
+    ];
+    const calibData = [{ l: "too light" }, { l: "just right", on: true }, { l: "too strong" }];
+    const chipsDHP = [{ l: "roasty", on: true }, { l: "mineral", on: true }, { l: "stone fruit" }, { l: "cocoa" }, { l: "orchid" }, { l: "+ add", add: true }];
+    const resolve = (t) => {
+      const dark = t.key === "dark";
+      return { ...t, ...cap,
+        methodsR: methodsData.map(m => ({ l: m.l, fg: m.on ? t.ink : t.muted, w: m.on ? 700 : 500, mark: m.on ? "inset 0 -8px 0 " + t.hi : "none" })),
+        teasR: teasData.map(x => ({ ...x,
+          swBg: x.empty ? "transparent" : x.c,
+          swBd: x.empty ? "1.5px dashed " + t.hair : "1px solid rgba(0,0,0,0.06)",
+          op: x.empty ? 0.5 : 1,
+          valFg: x.tone === "empty" ? t.red : (x.tone === "low" ? t.lowFg : t.muted),
+          scriptFg: x.script ? t.muted : "transparent"
+        })),
+        filterOpen: dark,
+        filterGroups: filterGroupsData.map(g => ({ k: g.k, opts: g.opts.map(o => ({ l: o.l,
+          fg: o.on ? t.ink : t.muted, bg: o.on ? "rgba(229,174,43,0.20)" : "transparent",
+          bd: o.on ? t.hi : t.hair })) })),
+        recentsR: [
+          { sw: "#AEBB57", n: "Sencha Fukamushi", script: "煎茶", fav: true, m: "this morning · 2 steeps · 42g left" },
+          { sw: "#843A1E", n: "Da Hong Pao", script: "大紅袍", fav: true, m: "yesterday · gongfu · not tracked" }
+        ],
+        // in-session state, split across themes
+        sIState: dark ? "STEEP 2 · POURED" : "STEEPING · STEEP 2",
+        tNow: dark ? "0:00" : "0:18", tOf: dark ? "done — 0:25" : "of 0:25",
+        barPct: dark ? "100%" : "72%", tCtrl: dark ? "next steep →" : "pause",
+        calibActive: dark, calibIdle: !dark,
+        notesOpen: dark, notesClosed: !dark,
+        commit: dark ? "Save this steep" : "Log this steep",
+        guideR: guideData.map(g => ({ n: g.n, t: g.t,
+          bg: g.cur ? "rgba(229,174,43,0.20)" : "transparent",
+          mark: g.cur ? "inset 0 -20px 0 -17px " + t.hi : "none",
+          fg: g.cur ? t.ink : t.muted })),
+        calibR: calibData.map(c => ({ l: c.l, fg: c.on ? t.ink : t.muted, mark: c.on ? "inset 0 -7px 0 " + t.hi : "none" })),
+        chipsR: chipsDHP.map(c => ({ l: c.l, fg: c.on ? t.ink : t.muted, fs: c.add ? "italic" : "normal", mark: c.on ? "inset 0 -7px 0 " + t.hi : "none" })),
+        calibFg: dark ? t.ink : t.muted
+      };
+    };
+    return {
+      contracts: [
+        { k: "LIQUOR", v: "the swatch identifies a tea — identity only", tag: "never decoration", tagFg: "#8A7A5E", dot: "#AEBB57" },
+        { k: "CLAY", v: "one committing action per screen — never selection", tag: "slider thumb = ink now (C4)", tagFg: "#9C5B33", dot: "#9C5B33" },
+        { k: "XANTHOUS", v: "the marker behind a word means selected / active state", tag: "state only", tagFg: "#B98A16", dot: "#E5AE2B" },
+        { k: "BLUE", v: "Kachi-iro 勝色 appears on the Focus ring, nowhere else", tag: "1 surface total", tagFg: "#233A63", dot: "#233A63" },
+        { k: "WASHI", v: "the deckle band is the Home masthead only", tag: "on probation", tagFg: "#8A2B1C", dot: "#C9BC9E" }
+      ],
+      scriptTiers: [
+        { tier: "T1·JP", name: "Gyokuro", origin: "Japan", char: "玉露", charFg: "#2B2320", d: "Catalog-verified Japanese — kanji, correct for a Japanese tea." },
+        { tier: "T1·CN", name: "Da Hong Pao", origin: "Wuyi, China", char: "大紅袍", charFg: "#2B2320", d: "Catalog-verified Chinese — Traditional/Simplified variant is per-origin, from data." },
+        { tier: "T2", name: "user override", origin: "single-writer", char: "✎", charFg: "#B98A16", d: "The user can set or correct a tea's script; user always wins over catalog." },
+        { tier: "T3", name: "Earl Grey", origin: "Western / uncatalogued", char: "—", charFg: "#A89877", d: "No verified script → romanized name only, NEVER generated characters. (Same 'never guess' rule as the swatch's Tier 3.)" }
+      ],
+      groups: [
+        { k: "A", title: "Regressions restored", fg: "#8A2B1C", bg: "#FBEEE9", items: [
+          { id: "A1", t: "Quick-start “+” is back", d: "The raised centre “+” in the bar restores fast session-start from any screen — a removed function, not a restyle." },
+          { id: "A2", t: "Library: search · favourites · type-filter", d: "Search behind a quiet magnifier; favourites leaf on rows; type folded into one Filter control with vendor + stock. Calm = quiet entry, not absent." },
+          { id: "A3", t: "Insights restored; Origins nested — approved", d: "Insights is back on the bar; the renamed provenance map (Origins) nests inside it. Approved, and Bundle 2 cleared — see the NAV MODEL block below." }
+        ]},
+        { k: "B", title: "Metaphor / sequencing", fg: "#3F5E42", bg: "#EEF3E6", items: [
+          { id: "B1", t: "Newspaper → diary", d: "Kept the typeset elegance, dropped the broadsheet framing. My reasoning + the “214th cup” reframe are in the note below." },
+          { id: "B2", t: "Recents read as summary", d: "“this morning · 2 steeps · 42g left” — a settled summary, not a live “2nd steep” fragment on a screen where nothing's brewing." },
+          { id: "B3", t: "Flavour left setup", d: "Retrospective, so it can't sit in pre-brew setup — moved to the steep's tasting notes, exactly parallel to the temp fix. Log now shows the pointer." },
+          { id: "B4", t: "Per-origin script (decision)", d: "Each tea in its own script, catalog-sourced, three-tier, degrades to romanized-only. Full spec above; data-path flagged for Code." }
+        ]},
+        { k: "C", title: "Smaller mismatches", fg: "#8A6A2E", bg: "#F3E4C8", items: [
+          { id: "C1", t: "Realistic mock data", d: "Greeting no longer recommends a tea to brew (post-v3.90) — masthead is summary/reflection, never prescriptive." },
+          { id: "C2", t: "Flavour chips are per-tea", d: "On the steep screen the chips are Da Hong Pao's own vocabulary (roasty/mineral/cocoa) — a roasted oolong never offers “marine”." },
+          { id: "C3", t: "“Steep” isn't a tab", d: "Steeping launches from “+”; the bar labels match current terms (Home/Library/Sessions/Insights)." },
+          { id: "C4", t: "Slider thumb ≠ clay", d: "Per-steep temp thumb is now ink on both steep screens, so clay stays the lone commit — your ruling applied." }
+        ]},
+        { k: "D", title: "Scope gap closed — the in-session screen", fg: "#3A2A08", bg: "#E5AE2B", items: [
+          { id: "D1", t: "The standard steeping screen exists", d: "Above, third phone — the normal countdown where daily logging happens, twinned with Focus (the immersive mode)." },
+          { id: "D2", t: "Notes vs temp — no more swap", d: "Temp is a prospective per-steep control up with the brew controls; taste is retrospective, down after the pour. Different lifecycle moments, different regions." },
+          { id: "D3", t: "Collapsible tasting notes", d: "Quiet “＋ Note the taste” (light) opens to per-tea chips + stars + free text (dark) — more options only on demand." },
+          { id: "D4", t: "Two feedback controls, unconfusable", d: "CALIBRATE (tunes the next pour, and WRITES — no more silent gate-data loss) is separated in place and label from TASTE (the record). Both persist." }
+        ]}
+      ],
+      handoff: [
+        { k: "SWATCH MODEL", v: "3-tier liquor data model (user / catalog / none)" },
+        { k: "SCRIPT MODEL", v: "per-origin CJK script: catalog match → script, + override, degrade to romanized (B4)" },
+        { k: "FIVE CONTRACTS", v: "liquor · clay · xanthous · blue · washi — invariants" },
+        { k: "PER-STEEP tempC", v: "temp on each steep; schedule prefills the first" },
+        { k: "ENSŌ ANIMATION", v: "brush sweep via stroke-along-path / clip reveal — own slice" }
+      ],
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", bg: "#F5F0E3", band: "#E8DEC5", grain: "radial-gradient(rgba(42,31,20,0.05) 1px, transparent 1px)", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#69160F", clay: "#9C5B33", clayInk: "#F6EFE2", swSencha: "#AEBB57", lowFg: "#B07C3E" }),
+        resolve({ key: "dark", label: "DARK · NIGHT PRESS", bg: "#1C1610", band: "#282117", grain: "radial-gradient(rgba(239,231,214,0.04) 1px, transparent 1px)", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#C05B49", clay: "#B4693C", clayInk: "#241A13", swSencha: "#AEBB57", lowFg: "#D79A5A" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

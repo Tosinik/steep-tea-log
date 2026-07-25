@@ -1,0 +1,16 @@
+# The R3 board export (docs/r3/boards/) is an archival record: banked verbatim from Design's
+# zip and verified by sha256, file by file. Its bytes ARE the artifact, so no filter may touch
+# them. Git for Windows ships core.autocrlf=true system-wide, which smudges LF->CRLF on
+# checkout — the stored blobs stay byte-correct, but a Windows working copy would not match
+# the banked hashes.
+#
+# The hazard is the asymmetry, not the mismatch: a Linux clone hashes 26/26 green while a
+# Windows clone shows 23 text files failing. Someone reading those failures as corruption
+# could "repair" them by committing CRLF blobs, which would destroy the verbatim record for
+# real while looking like housekeeping. This rule makes both platforms agree.
+#
+# Deliberately narrow. It pins ONE path, whose bytes are the point, and leaves diffs working
+# normally. Do NOT widen it to `*` on a tidy-up: repo-wide normalisation would rewrite app
+# code line endings, which is a separate decision with its own churn and no bearing on
+# archiving a design export.
+docs/r3/boards/** -text

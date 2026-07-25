@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="20" y="22" width="26" height="32" rx="6" fill="#843A1E"></rect><rect x="54" y="26" width="44" height="7" rx="3" fill="#2A1F14"></rect><rect x="20" y="64" width="34" height="9" rx="4" fill="#EDE6D4"></rect><rect x="60" y="64" width="38" height="9" rx="4" fill="#EDE6D4"></rect><path d="M22 84l4 4 8-9" fill="none" stroke="#3F5E42" stroke-width="3"></path><rect x="20" y="98" width="52" height="12" rx="4" fill="#9C5B33"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #06</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">茶 ADD / EDIT TEA · rev 4</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Add &amp; edit tea — two states</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:980px; margin:0; line-height:1.65;">Rev 3 adds the three missing editables — <strong>rating · brew guide · favourite</strong> (brew guide is where “Borrow from Go Deeper” writes) — and draws <strong>Add and Edit as distinct states</strong>: on Add there's no tea yet, so the Tier-2 swatch default appears <em>live</em> only once a TYPE is picked; verbs differ, script auto-fills, and there's no delete. “Label photo” is now neutral <strong>“photo”</strong>. Both themes.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+        <sc-for list="{{ t.modes }}" as="f" hint-placeholder-count="2">
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+            <div style="padding:26px 24px 24px; display:flex; flex-direction:column;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:{{ t.ink }};">{{ f.title }}</span>
+                <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:14px; margin-top:16px;">
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">COLOUR — the swatch is identity</span>
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:50px; flex:none; background:{{ f.swBg }}; border-radius:10px 5px 9px 6px; border:{{ f.swBorder }};"></div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">{{ f.swNote }}</span>
+                      <span style="font-size:12.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }}; width:fit-content;">{{ f.colourVerb }}</span>
+                    </div>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ f.colourHintFg }};">{{ f.colourHint }}</span>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">NAME</span>
+                  <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:9px 12px; font-family:'Shippori Mincho',serif; font-style:{{ f.nameFs }}; font-size:15px; color:{{ f.nameFg }};">{{ f.nameShow }}</div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">TYPE — mirrors the six catalog families</span>
+                  <div style="display:flex; gap:11px; flex-wrap:wrap; align-items:center;">
+                    <sc-for list="{{ f.typeR }}" as="s" hint-placeholder-count="6"><span style="font-family:'Shippori Mincho',serif; font-size:14px; font-weight:{{ s.w }}; color:{{ s.fg }}; box-shadow:{{ s.mark }}; padding:0 2px;">{{ s.l }}</span></sc-for>
+                    <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.link }};">＋ your own</span>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ f.typeNoteFg }};">{{ f.typeNote }}</span>
+                  <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.1em; color:{{ t.muted }};">TISANES · not tea</span>
+                    <span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.muted }}; opacity:0.7;">rooibos · herbal · fruit</span>
+                    <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12px; color:{{ t.link }};">＋</span>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">SCRIPT</span>
+                    <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:9px 12px; font-family:'Noto Serif SC',serif; font-style:{{ f.scriptFs }}; font-size:14px; color:{{ f.scriptFg }};">{{ f.scriptShow }}</div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">ORIGIN</span>
+                    <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:9px 12px; font-family:'IBM Plex Mono',monospace; font-style:{{ f.originFs }}; font-size:11px; color:{{ f.originFg }};">{{ f.originShow }}</div>
+                  </div>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">{{ f.scriptNote }}</span>
+
+                <div style="display:flex; gap:10px;">
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">CULTIVAR</span>
+                    <div style="display:flex; align-items:center; gap:6px; border:1px solid {{ t.hair }}; border-radius:8px; padding:9px 12px;"><span style="font-family:'IBM Plex Mono',monospace; font-style:{{ f.cultivarFs }}; font-size:11px; color:{{ f.cultivarFg }};">{{ f.cultivarShow }}</span><span style="width:12px; height:12px; border-radius:50%; border:1px solid {{ t.hair }}; color:{{ t.muted }}; font-size:7px; display:inline-flex; align-items:center; justify-content:center;">i</span></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">VENDOR</span>
+                    <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:9px 12px; font-family:'Shippori Mincho',serif; font-style:{{ f.vendorFs }}; font-size:14px; color:{{ f.vendorFg }};">{{ f.vendorShow }}</div>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">LEAF FORM</span>
+                  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                    <sc-for list="{{ f.leafR }}" as="s" hint-placeholder-count="4"><span style="font-family:'Shippori Mincho',serif; font-size:14px; font-weight:{{ s.w }}; color:{{ s.fg }}; box-shadow:{{ s.mark }}; padding:0 2px;">{{ s.l }}</span></sc-for>
+                    <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.link }};">＋ your own</span>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:16px; align-items:flex-start;">
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">YOUR RATING</span>
+                    <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:17px; letter-spacing:0.08em; color:{{ t.ink }};">{{ f.rFull }}<span style="opacity:0.24;">{{ f.rEmpty }}</span></span><span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:11px; color:{{ t.muted }};">{{ f.ratingNote }}</span></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">FAVOURITE</span>
+                    <div style="display:flex; align-items:center; gap:7px;"><svg viewBox="0 0 24 24" style="width:16px; height:16px; color:{{ f.favFg }};"><path d="M6 18C6 10 11 5 19 5c0 8-5 13-13 13Z" fill="{{ f.favFill }}" stroke="currentColor" stroke-width="1.6"></path></svg><span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ f.favLabelFg }};">{{ f.favLabel }}</span></div>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">BREW GUIDE <span style="font-size:7px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 4px; border-radius:3px; letter-spacing:0.08em;">NEW SHAPE</span></span>
+                  <sc-if value="{{ f.brewFilled }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                      <sc-for list="{{ t.guideR }}" as="g" hint-placeholder-count="6"><div style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 7px; border-radius:7px; background:{{ t.factBg }};"><span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.ink }};">{{ g.n }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">{{ g.t }}</span></div></sc-for>
+                    </div>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">editable per step — a NEW structured shape. the shipped brew_guide is free text (often German, e.g. “100°C, 5g auf 200ml, 1min”); existing guides migrate/coexist (AT8). where “Borrow from Go Deeper” writes; rinse default is catalog per-type (canonical/contested), your edit overrides.</span>
+                  </sc-if>
+                  <sc-if value="{{ f.brewEmpty }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;"><span style="font-family:'Shippori Mincho',serif; font-size:13.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Add a guide ›</span><span style="display:flex; align-items:center; gap:6px;"><span style="font-family:'Shippori Mincho',serif; font-size:13.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Borrow from Go Deeper</span><span style="font-family:'IBM Plex Mono',monospace; font-size:7px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 4px; border-radius:3px;">NEW</span></span></div>
+                  </sc-if>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">STOCK</span>
+                    <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:8px 12px; font-family:'IBM Plex Mono',monospace; font-style:{{ f.stockFs }}; font-size:11.5px; color:{{ f.stockFg }};">{{ f.stockShow }}</div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1.2;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">COST</span>
+                    <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:8px 12px; font-family:'IBM Plex Mono',monospace; font-style:{{ f.costFs }}; font-size:11.5px; color:{{ f.costFg }};">{{ f.costShow }}</div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1.2;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ f.purchaseLabelFg }};">PURCHASED</span>
+                    <div style="border:1px solid {{ f.purchaseBorder }}; border-radius:8px; padding:8px 12px; font-family:'IBM Plex Mono',monospace; font-style:{{ f.purchaseFs }}; font-size:11.5px; color:{{ f.purchaseFg }};">{{ f.purchaseShow }}</div>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; max-width:210px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ f.openedLabelFg }};">OPENED <span style="font-size:7px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 4px; border-radius:3px; letter-spacing:0.08em;">NEW</span></span>
+                  <div style="border:1px solid {{ f.openedBorder }}; border-radius:8px; padding:8px 12px; font-family:'IBM Plex Mono',monospace; font-style:{{ f.openedFs }}; font-size:11.5px; color:{{ f.openedFg }};">{{ f.openedShow }}</div>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">{{ f.purchaseWhy }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">{{ f.openedWhy }}</span>
+
+                <div style="display:flex; flex-direction:column; gap:8px; padding-top:12px; border-top:1px solid {{ t.hairSoft }};">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">MORE · PROVENANCE</span>
+                  <sc-if value="{{ f.provFilled }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex; align-items:center; gap:11px;">
+                      <div style="width:36px; height:46px; flex:none; background:{{ t.factBg }}; border:1px solid {{ t.hairSoft }}; border-radius:8px 4px 7px 4px; display:flex; align-items:center; justify-content:center; color:{{ t.muted }};"><svg viewBox="0 0 24 24" style="width:14px; height:14px;"><path d="M4 8h3l1.6-2h6.8L23 8" fill="none" stroke="currentColor" stroke-width="1.4"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.4"></path><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.4"></circle></svg></div>
+                      <div style="display:flex; flex-direction:column; gap:1px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">PHOTO</span><span style="font-size:11.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }}; width:fit-content;">change</span></div>
+                    </div>
+                    <div style="display:flex; gap:7px; flex-wrap:wrap;">
+                      <div style="display:flex; align-items:center; gap:5px; border:1px solid {{ t.hair }}; border-radius:7px; padding:5px 9px;"><svg viewBox="0 0 24 24" style="width:11px; height:11px; color:{{ t.jadeText }};"><path d="M5 12.5l4.5 4.5L19 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.ink }};">would buy again</span></div>
+                      <div style="border:1px solid {{ t.hair }}; border-radius:7px; padding:5px 9px; font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.ink }};">full pouch</div>
+                      <div style="border:1px solid {{ t.hair }}; border-radius:7px; padding:5px 9px; font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.ink }};">spring 2024</div>
+                      <div style="border:1px solid {{ t.hair }}; border-radius:7px; padding:5px 9px; font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.hi2 }};">610 m · NEW</div>
+                    </div>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">a photo — leaves, dry leaf, or the cup. never identity; the swatch is. elevation optional, show-when-present.</span>
+                  </sc-if>
+                  <sc-if value="{{ f.provEmpty }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.link }};">＋ add a photo, purchase type, harvest, elevation…</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">a photo is evidence, never identity — the swatch is.</span>
+                  </sc-if>
+                </div>
+              </div>
+
+              <div style="margin-top:18px; background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; text-align:center; padding:13px 0; border-radius:15px 6px 13px 7px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">{{ f.commit }}</div>
+              <sc-if value="{{ f.showDelete }}" hint-placeholder-val="{{ false }}"><div style="display:flex; justify-content:center; margin-top:12px;"><span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.red }}; opacity:0.85;">Delete this tea — hold to confirm</span></div></sc-if>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">{{ f.caption }}</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ f.cap }}</span>
+        </div>
+        </sc-for>
+
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 4</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Two states, three new fields</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#3F5E42;">{{ n.k }}</span>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1060px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Type = six families</strong> — green · white · yellow · oolong · black · <strong>puerh</strong> (matcher resolves free text; unmatched → Tier-3). Chips carry the stored <code style="color:#C9BFAC;">puerh</code> token verbatim; renaming it to “dark” is a taxonomy change needing an explicit ruling, not done here. <strong style="color:#E5AE2B;">Tisane:</strong> Tier-3 by construction (intended). <strong style="color:#E5AE2B;">Elevation:</strong> new optional column, future Tier-2 dimension. <strong style="color:#E5AE2B;">“Borrow from Go Deeper”</strong> now has its destination — the editable brew guide (catalog <code style="color:#C9BFAC;">typical_brew</code> → <code style="color:#C9BFAC;">brew_guide</code>, user-initiated, suggest-never-auto-write). <strong style="color:#A6BD66;">leaf_form:</strong> real stored values — <code style="color:#C9BFAC;">green_jp · green_cn · compressed · rolled · open · bud</code> (green_cn was a stored value with no chip — now covered; 8 teas empty → unset); chip labels display-only, tokens stored verbatim. <strong style="color:#E5AE2B;">purchase_date:</strong> promoted above the fold (out of More) — drives <code style="color:#C9BFAC;">monthKey</code> (cost-by-month, undated bucket) + anchors the <code style="color:#C9BFAC;">inventorySparkline</code> and the <code style="color:#C9BFAC;">ledgerRate</code> forecast (≥ 10 days). <strong style="color:#A6BD66;">opened_date:</strong> NEW field beside it — the freshness clock (opened vs sealed is a 5–10× swing the app never tracked); Tier-1 → harvest Tier-2 → no reading. Neither purchase nor opened is the same join: purchase = cost + inventory, opened = freshness. Prominence follows load-bearing. → <code style="color:#C9BFAC;">SPEC-freshness-model.md</code></span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const guideData = [ { n: "rinse", t: "10s" }, { n: "1", t: "20s" }, { n: "2", t: "25s" }, { n: "3", t: "35s" }, { n: "4", t: "45s" }, { n: "5", t: "60s" } ];
+    const fams = ["green", "white", "yellow", "oolong", "black", "puerh"];
+    // real stored leaf_form values (8 teas empty → unset). labels are display-only; tokens stored verbatim.
+    const leaf = [ { v: "green_jp", l: "Japanese green" }, { v: "green_cn", l: "Chinese green" }, { v: "compressed", l: "compressed" }, { v: "rolled", l: "rolled" }, { v: "open", l: "open leaf" }, { v: "bud", l: "bud" } ];
+
+    const seg = (labels, selLabel, t) => labels.map(l => ({ l, w: l === selLabel ? 700 : 500, fg: l === selLabel ? t.ink : t.muted, mark: l === selLabel ? "inset 0 -8px 0 " + t.hi : "none" }));
+    const leafSeg = (items, selV, t) => items.map(o => ({ l: o.l, w: o.v === selV ? 700 : 500, fg: o.v === selV ? t.ink : t.muted, mark: o.v === selV ? "inset 0 -8px 0 " + t.hi : "none" }));
+
+    const editForm = (t) => ({
+      title: "Edit tea", commit: "Save tea", showDelete: true, caption: "EDIT TEA · existing", cap: "The full record. Rating, favourite and the editable brew guide (where Borrow-from-Go-Deeper writes) all set here. Colour “correct” opens the picker; provenance drawn out; hold-to-confirm delete.",
+      swBg: "#843A1E", swBorder: "1px solid rgba(0,0,0,0.1)", swNote: "catalog default · Wuyi oolong", colourVerb: "correct the colour ›", colourHint: "opens the picker · secondary path (Tea detail's ✎ is primary)", colourHintFg: t.muted,
+      nameShow: "Dawang Feng Da Hong Pao", nameFg: t.ink, nameFs: "normal",
+      typeR: [...seg(fams, null, t), { l: "Wuyi oolong", w: 700, fg: t.ink, mark: "inset 0 -8px 0 " + t.hi }], typeNote: "“Wuyi oolong” → catalog oolong · drives swatch default, script & cultivar hint", typeNoteFg: t.jadeText,
+      scriptShow: "大紅袍", scriptFg: t.ink, scriptFs: "normal", originShow: "China", originFg: t.ink, originFs: "normal", scriptNote: "origin shows as stored (China) — never upgraded to a region; the catalog offers Wuyi Shan via the R26 confirm-link (one tap, never auto-applied). Script auto-fills; your edit wins.",
+      cultivarShow: "not recorded", cultivarFg: t.muted, cultivarFs: "italic", vendorShow: "Si Fang Guan - Freiburg", vendorFg: t.ink, vendorFs: "normal",
+      leafR: leafSeg(leaf, "open", t),
+      rFull: "★★★★", rEmpty: "★", ratingNote: "",
+      favFg: t.jade, favFill: t.jade, favLabel: "favourite", favLabelFg: t.ink,
+      brewFilled: true, brewEmpty: false,
+      stockShow: "20 g", stockFg: t.ink, stockFs: "normal", costShow: "€15 / 30 g", costFg: t.ink, costFs: "normal",
+      purchaseShow: "15 May 2026", purchaseFg: t.ink, purchaseFs: "normal", purchaseBorder: t.hair, purchaseLabelFg: t.muted, purchaseWhy: "monthKey → cost-by-month · anchors the stock curve + the ledger consumption rate (the ≥10-day forecast). not freshness — that's the opened_date clock.",
+      openedShow: "7 Jun 2026", openedFg: t.ink, openedFs: "normal", openedBorder: t.hair, openedLabelFg: t.muted, openedWhy: "opened 6 wks ago, sealed since May ’26 — freshness is measured from here. Tier-1 · NEW field teas.opened_date.",
+      provFilled: true, provEmpty: false
+    });
+    const addForm = (t) => ({
+      title: "Add tea", commit: "Add tea", showDelete: false, caption: "ADD TEA · new", cap: "No tea yet — so the Tier-2 swatch default appears live only after you pick a TYPE; the swatch starts empty (dashed). Script auto-fills on save; verbs are “set a colour” / “Add tea”; no delete. Same shape for a new vessel.",
+      swBg: "transparent", swBorder: "1.5px dashed " + t.hair, swNote: "no colour yet", colourVerb: "set a colour ›", colourHint: "a Tier-2 default appears live once you pick a TYPE below", colourHintFg: t.jadeText,
+      nameShow: "name your tea", nameFg: t.muted, nameFs: "italic",
+      typeR: seg(fams, null, t), typeNote: "pick a family → its catalog default fills the swatch, and the script + cultivar hint follow", typeNoteFg: t.muted,
+      scriptShow: "fills when type + origin set", scriptFg: t.muted, scriptFs: "italic", originShow: "region", originFg: t.muted, originFs: "italic", scriptNote: "script auto-fills on save from the catalog match — you can override it",
+      cultivarShow: "—", cultivarFg: t.muted, cultivarFs: "italic", vendorShow: "where from", vendorFg: t.muted, vendorFs: "italic",
+      leafR: leafSeg(leaf, null, t),
+      rFull: "", rEmpty: "★★★★★", ratingNote: "tap to rate (optional)",
+      favFg: t.muted, favFill: "none", favLabel: "mark as favourite", favLabelFg: t.muted,
+      brewFilled: false, brewEmpty: true,
+      stockShow: "grams", stockFg: t.muted, stockFs: "italic", costShow: "price / grams", costFg: t.muted, costFs: "italic",
+      purchaseShow: "when you bought it", purchaseFg: t.link, purchaseFs: "italic", purchaseBorder: t.jadeText, purchaseLabelFg: t.jadeText, purchaseWhy: "monthKey → cost-by-month · stock curve + consumption forecast. fill it now — only 35% of teas have it.",
+      openedShow: "when you broke the seal", openedFg: t.link, openedFs: "italic", openedBorder: t.jadeText, openedLabelFg: t.jadeText, openedWhy: "when you broke the seal — freshness is measured from here, not from purchase; opened vs sealed differs 5–10×. Tier-1 · NEW field teas.opened_date.",
+      provFilled: false, provEmpty: true
+    });
+
+    const notes = [
+      { k: "AT1", t: "Add ≠ Edit — the live default", d: "On Add there's no tea, so the swatch starts empty (dashed) and the Tier-2 catalog default appears the moment you pick a TYPE — the interaction nobody had drawn. Edit shows the default already resolved." },
+      { k: "AT2", t: "Different verbs, no delete on Add", d: "“set a colour” / “Add tea” vs “correct the colour” / “Save tea”; script auto-fills on Add rather than sitting pre-filled; delete exists only on Edit." },
+      { k: "AT3", t: "Rating is editable", d: "Was displayed on Tea detail, set nowhere. Now here — the tea's own standing rating (teas.rating), optional on Add." },
+      { k: "AT4", t: "Brew guide is editable", d: "90% filled (18/20), shown as schedule pills on Tea detail, edited nowhere — now editable per step, and it's the destination “Borrow from Go Deeper” writes into. The per-step pills are a NEW structured shape over the shipped free-text field — see AT8." },
+      { k: "AT5", t: "Favourite toggle", d: "The leaf mark shows everywhere; nothing set it. A toggle here — 5 of 14 teas are favourites." },
+      { k: "AT6", t: "“Photo”, not “label”", d: "Renamed neutral — it could be the leaves, the dry leaf, the cup. The demotion holds: evidence, never identity; the swatch is always identity." },
+      { k: "AT7", t: "opened_date — the freshness clock (NEW)", d: "A new field beside purchase date. Per SPEC-freshness-model.md the dominant freshness variable isn't age, it's opened-vs-sealed (a 5–10× swing the app never tracked). Confidence ladder: opened_date (measured) → harvest (estimated, assumes sealed) → no reading. Purchase is deliberately NOT a freshness anchor — it'd read a 2023 harvest bought in 2026 as fresh, and the app never guesses; it keeps its stock-curve / ledger / cost jobs. Shows on Tea detail when present. New schema + Code slice — corrects last round's mistaken sincePurchaseDays→freshness link (that figure drives the consumption forecast)." },
+      { k: "AT8", t: "Rinse & brew-guide storage — decide, don't discover", d: "brew_guide is a free-text field; parseBrewGuide regex-extracts { tempC, rinseSeconds, times } (rinse pulled first so its seconds aren't read as a steep). Now that the guide is editable per step (AT4), decide: does per-step editing serialise back to a parseable string, or migrate to structured storage? It also sets what 'Borrow from Go Deeper' writes. Related: rinse guidance is three-tier catalog-informed (per-type default · canonical/contested · override wins · none when ungrounded) — see Tea detail TD13." }
+    ];
+
+    const resolve = (t) => ({ ...t,
+      jadeText: t.key === "dark" ? "#8FBE83" : "#3F5E42",
+      hi2: t.key === "dark" ? "#E3A15C" : "#B98A16",
+      guideR: guideData,
+      modes: [editForm(t), addForm(t)]
+    });
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", factBg: "#EDE6D4" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", factBg: "#262017" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

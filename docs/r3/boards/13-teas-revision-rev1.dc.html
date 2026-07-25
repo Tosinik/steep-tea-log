@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="20" y="28" width="36" height="12" rx="6" fill="#3F5E42"></rect><rect x="62" y="28" width="38" height="12" rx="6" fill="none" stroke="#9C5B33" stroke-width="3"></rect><rect x="20" y="52" width="18" height="24" rx="4" fill="#843A1E"></rect><rect x="44" y="52" width="18" height="24" rx="4" fill="#6E8A3C"></rect><rect x="68" y="52" width="18" height="24" rx="4" fill="#CBA347"></rect><rect x="20" y="86" width="66" height="7" rx="3" fill="#C9BC9E"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#DDD6C6;">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #13</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">TEAS REVISION · rev 1</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Teas</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1060px; margin:0; line-height:1.65;">The round's last open design question, and the only round-1 surface that carries new work (R53 accepts Bundle 1 for Home and the non-Focus steeping states). Four things land here at once: <strong>Go Deeper as a browsable second mode</strong> (R51), the <strong>vendor manager in the shelf's overflow</strong> (R52), the <strong>header rework</strong> open since round 1, and <strong>Vessels as this tab's second segment</strong> — which it already is in shipped code. Drawn as <strong>Teas</strong>, because that is the shipped tab name.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;">
+
+      <!-- SHELF MODE -->
+      <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }} · SHELF MODE</span>
+        <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+          <div style="padding:24px 22px; display:flex; flex-direction:column;">
+
+            <!-- HEADER REWORK -->
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:{{ t.ink }};">Teas</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:{{ t.muted }};">21 ON THE SHELF · 2 RUNNING LOW</span>
+              </div>
+              <span style="width:30px; height:30px; border-radius:50%; background:{{ t.clay }}; color:{{ t.clayInk }}; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:13px;">N</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:16px; color:{{ t.ink }};">⋯</span>
+            </div>
+
+            <!-- TWO MODES (R51) -->
+            <div style="display:flex; border:1px solid {{ t.hair }}; border-radius:10px; overflow:hidden; margin-top:14px;">
+              <span style="flex:1; text-align:center; padding:8px 0; font-family:'Shippori Mincho',serif; font-size:14.5px; font-weight:700; background:{{ t.selBg }}; color:{{ t.ink }};">Your shelf</span>
+              <span style="flex:1; text-align:center; padding:8px 0; font-family:'Shippori Mincho',serif; font-size:14.5px; border-left:1px solid {{ t.hair }}; color:{{ t.muted }};">Go Deeper</span>
+            </div>
+
+            <!-- SEGMENTS: teas / vessels (v3.46) -->
+            <div style="display:flex; gap:14px; margin-top:13px; padding-bottom:7px; border-bottom:1px solid {{ t.hair }};">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.ink }}; box-shadow:inset 0 -7px 0 {{ t.hi }}; padding:0 2px;">teas</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.muted }};">vessels</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }}; margin-left:auto;">teaSeg · v3.46</span>
+            </div>
+
+            <!-- shelf rows -->
+            <sc-for list="{{ t.shelfR }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:11px; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="width:23px; height:30px; flex:none; background:{{ s.sw }}; border:1px solid rgba(0,0,0,0.06); border-radius:8px 4px 7px 4px;"></div>
+                <div style="display:flex; flex-direction:column; gap:1px; flex:1; min-width:0;">
+                  <div style="display:flex; align-items:baseline; gap:6px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:14.5px; color:{{ t.ink }}; line-height:1.25;">{{ s.n }}</span><span style="font-family:'Noto Serif SC',serif; font-size:10.5px; color:{{ t.muted }};">{{ s.script }}</span></div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ s.statusFg }};">{{ s.status }}</span>
+                </div>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:9px;">status line is the freshness model's, single writer across shelf and detail — two-key: the clock <em>and</em> the window must both ground, else it falls through to the quantity tone (WS5: one line, same slot, every card).</span>
+
+            <!-- overflow sheet (R52) -->
+            <div style="margin-top:16px; border:1px solid {{ t.hair }}; border-radius:13px; background:{{ t.factBg }}; padding:12px 13px; display:flex; flex-direction:column; gap:9px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.12em; color:{{ t.muted }};">⋯ OVERFLOW</span>
+              <sc-for list="{{ t.overflowR }}" as="o" hint-placeholder-count="4">
+                <div style="display:flex; align-items:baseline; gap:8px;">
+                  <span style="font-size:13px; color:{{ o.fg }}; flex:1;">{{ o.l }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ o.tagFg }};">{{ o.tag }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+          </div>
+        </div>
+        <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capShelf }}</span>
+      </div>
+
+      <!-- GO DEEPER MODE -->
+      <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }} · GO DEEPER MODE · R51</span>
+        <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+          <div style="padding:24px 22px; display:flex; flex-direction:column;">
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:{{ t.ink }};">Go Deeper</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:{{ t.muted }};">THE REFERENCE · NOT YOUR SHELF</span>
+              </div>
+              <span style="width:30px; height:30px; border-radius:50%; background:{{ t.clay }}; color:{{ t.clayInk }}; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:13px;">N</span>
+            </div>
+
+            <div style="display:flex; border:1px solid {{ t.hair }}; border-radius:10px; overflow:hidden; margin-top:14px;">
+              <span style="flex:1; text-align:center; padding:8px 0; font-family:'Shippori Mincho',serif; font-size:14.5px; color:{{ t.muted }};">Your shelf</span>
+              <span style="flex:1; text-align:center; padding:8px 0; font-family:'Shippori Mincho',serif; font-size:14.5px; font-weight:700; border-left:1px solid {{ t.hair }}; background:{{ t.selBg }}; color:{{ t.ink }};">Go Deeper</span>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px; margin-top:13px; border:1px solid {{ t.hair }}; border-radius:9px; padding:8px 11px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.muted }};">search the reference</span>
+            </div>
+
+            <sc-for list="{{ t.familiesR }}" as="f" hint-placeholder-count="5">
+              <div style="display:flex; align-items:center; gap:11px; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="width:23px; height:30px; flex:none; background:{{ f.sw }}; border:1px solid rgba(0,0,0,0.06); border-radius:8px 4px 7px 4px; opacity:{{ f.op }};"></div>
+                <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                  <div style="display:flex; align-items:baseline; gap:6px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:14.5px; color:{{ t.ink }};">{{ f.n }}</span><span style="font-family:'Noto Serif SC',serif; font-size:10.5px; color:{{ t.muted }};">{{ f.script }}</span></div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">{{ f.meta }}</span>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ f.ownFg }};">{{ f.own }}</span>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:9px;">the reference is the catalog (steep-tea-types.js) — browsable here, and the same entries open contextually from Tea detail, the brew-guide's “borrow” action and R36's passed-tea path. <span style="color:{{ t.ink }};">on your shelf</span> marks families you own, so the two modes stay legibly different things.</span>
+
+          </div>
+        </div>
+        <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capDeep }}</span>
+      </div>
+
+      <!-- VENDORS SHEET -->
+      <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }} · EDIT VENDORS · R52</span>
+        <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+          <div style="padding:24px 22px; display:flex; flex-direction:column;">
+            <div style="display:flex; align-items:baseline; gap:10px; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+              <span style="font-size:18px; color:{{ t.ink }};">‹</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:20px; color:{{ t.ink }};">Edit vendors</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; margin-left:auto;">FROM ⋯ OVERFLOW</span>
+            </div>
+            <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.muted }}; margin-top:11px; line-height:1.5;">Names you've typed, gathered from your teas. Rename one and every tea follows.</span>
+
+            <sc-for list="{{ t.vendorsR }}" as="v" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                  <span style="font-family:'Shippori Mincho',serif; font-size:14.5px; color:{{ t.ink }};">{{ v.n }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">{{ v.count }}</span>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">rename</span>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:10px;">derived from <span style="color:{{ t.ink }};">teas.source</span> — a list of strings with counts, not an entity browser. no vendor record, no url, no logo (deferred with R12). rename rewrites the string on every tea that carries it; there is nothing else to edit.</span>
+          </div>
+        </div>
+        <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capVendor }}</span>
+      </div>
+
+    </div>
+  </sc-for>
+
+  <div style="display:flex; flex-direction:column; gap:13px; max-width:1240px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 1</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:21px; color:#2B2320; margin:0;">One tab, four pieces of open work</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">The tab is called Teas.</strong> <code style="color:#C9BFAC;">bottomNavHTML()</code> ships Home · Teas · Log · Sessions · Insights (<code style="color:#C9BFAC;">steep-core.js:894–903</code>), so every board says Teas. Renaming it to “Library” is a <strong>separate open decision</strong> — flagged, not assumed, and it would touch the nav, this header, and the hand-off's prose together.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Vessels is a segment, not an overlay:</strong> <code style="color:#C9BFAC;">goView('vessels')</code> → <code style="color:#C9BFAC;">goVessels()</code> sets <code style="color:#C9BFAC;">state.teaSeg='vessels'; state.view='teas'</code> (v3.46). The segment row draws that shipped truth; #05 Vessels rev 1 is the content behind it. <strong style="color:#E5AE2B;">#23 gates the shelf controls:</strong> <code style="color:#C9BFAC;">setTeaSort</code> / <code style="color:#C9BFAC;">setTeaFilter</code> are held (reinstate-vs-accept). No sort/filter control is drawn here — if they're reinstated, the header's second row is where they land. Decide before build.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Vendors is restyle-only:</strong> string-based for R3 — rename rewrites <code style="color:#C9BFAC;">teas.source</code> across matching teas; no vendor entity, no <code style="color:#C9BFAC;">url</code>, no logos. Shipped Settings copy already reads “Manage vendors from the Teas tab”, so this is continuity. <strong style="color:#E5AE2B;">Data (checked):</strong> 21 teas, 2 running low (Honey Oolong Gui Fei 7 g · Sencha Kagoshima Premium 8 g); vendor names and counts are <em>illustrative</em> (R27) pending the vendor slice of the export — the mechanism is real, the tallies are not yet checked.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    // CHECKED: 21 teas; running-low pair. Freshness status lines are two-key (clock AND window) else quantity tone.
+    const shelf = [
+      { sw: "#843A1E", n: "Dawang Feng Da Hong Pao", script: "大紅袍", status: "20 g · plenty", tone: "plain" },
+      { sw: "#8FA83E", n: "Chiran Sencha Okumidori", script: "煎茶", status: "opened 3 wks ago · drink soon", tone: "fresh" },
+      { sw: "#CBA347", n: "Honey Oolong Gui Fei", script: "貴妃", status: "7 g · running low", tone: "low" },
+      { sw: "#4B3621", n: "Fei Bing Beeng Cha", script: "餅茶", status: "96 g · ages well", tone: "plain" },
+      { sw: "#D8C98F", n: "2021 Fujian White Tea", script: "白茶", status: "quantity not tracked", tone: "muted" }
+    ];
+    // ILLUSTRATIVE (R27) — the catalog families a browsable reference would list
+    const families = [
+      { sw: "#843A1E", n: "Wuyi yancha", script: "武夷岩茶", meta: "oolong · rock-roasted · 6 entries", own: "on your shelf" },
+      { sw: "#CBA347", n: "Dancong", script: "單叢", meta: "oolong · single-bush", own: "on your shelf" },
+      { sw: "#6E8A3C", n: "Sencha", script: "煎茶", meta: "green · steamed", own: "on your shelf" },
+      { sw: "#4B3621", n: "Sheng puer", script: "生普洱", meta: "dark · ages", own: "on your shelf" },
+      { sw: "#B5632E", n: "Ceylon black", script: "", meta: "black · high-grown", own: "" },
+      { sw: "#E6D89B", n: "Gyokuro", script: "玉露", meta: "green · shaded", own: "" }
+    ];
+    // ILLUSTRATIVE (R27) — real vendor strings seen in the export; counts pending the vendor slice
+    const vendors = [
+      { n: "Si Fang Guan - Freiburg", count: "several teas · est" },
+      { n: "Bamboo Tea Room", count: "several teas · est" },
+      { n: "Yunomi", count: "a few teas · est" },
+      { n: "not recorded", count: "the teas with no source" }
+    ];
+    const overflow = [
+      { l: "Edit vendors", tag: "R52", isNew: true },
+      { l: "Sort · filter", tag: "#23 HELD", held: true },
+      { l: "Add a tea", tag: "" },
+      { l: "Import backup", tag: "ships" }
+    ];
+
+    const resolve = (t) => ({ ...t,
+      shelfR: shelf.map(s => ({ ...s, statusFg: s.tone === "low" ? t.lowFg : (s.tone === "fresh" ? t.jade : t.muted) })),
+      familiesR: families.map(f => ({ ...f, op: f.own ? 1 : 0.42, ownFg: f.own ? t.jade : t.muted })),
+      vendorsR: vendors.map(v => ({ ...v })),
+      overflowR: overflow.map(o => ({ l: o.l, tag: o.tag,
+        fg: o.held ? t.muted : t.ink,
+        tagFg: o.held ? t.red : (o.isNew ? t.jade : t.muted) }))
+    });
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const R = { tag: "RULED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...R, k: "T1", t: "Two modes, one tab (R51)", d: "Your shelf ↔ Go Deeper as a segmented pair in the header. The reference is browsable here and still opens contextually from Tea detail, the brew-guide's borrow action and R36's passed-tea path — both, not either. Never reached from the profile hub." },
+      { ...CK, k: "T2", t: "Vessels is the second segment", d: "Not an overlay: goVessels() sets teaSeg='vessels'; view='teas' (v3.46). The teas · vessels row draws the shipped routing, with #05 as the content. Map 2 filed it under overlays; that's corrected." },
+      { ...R, k: "T3", t: "Vendors in the overflow (R52)", d: "“Edit vendors” from the shelf's ⋯ — a list of teas.source strings with counts, rename-in-place. Shipped Settings copy already points here (“Manage vendors from the Teas tab”), so it's continuity, not a move. Restyle only." },
+      { ...CK, k: "T4", t: "The header rework, finally drawn", d: "Open since round 1: title + a live count line (21 on the shelf · 2 running low), the avatar (tab-level, R44), and ⋯ for everything that isn't browsing. The mode switch sits under it, so switching reference-vs-shelf never moves." },
+      { ...FL, k: "T5", t: "#23 gates sort and filter", d: "setTeaSort / setTeaFilter are held on reinstate-vs-accept, so no sort/filter control is drawn — the overflow lists it as HELD rather than pretending it's absent. If reinstated, it lands as the header's second row." },
+      { ...FL, k: "T6", t: "“Teas”, not “Library”", d: "The shipped tab is Teas (steep-core.js:894–903) and the board says Teas throughout. The rename is a separate open decision — drawing it as Library would have quietly assumed a ruling nobody made." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", ink: "#2A1F14", bg: "#F5F0E3", muted: "#8C7F6C", hair: "rgba(42,31,20,0.28)", hairSoft: "rgba(42,31,20,0.13)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", lowFg: "#B07C3E", factBg: "#EDE6D4", selBg: "rgba(229,174,43,0.14)",
+          capShelf: "The shelf keeps its swatch-led rows and the freshness status line — one line, same slot, every card. The header carries the count, the avatar and the overflow; the mode switch sits below it so it never moves as you browse.",
+          capDeep: "Go Deeper is the catalog, not your cupboard — same row rhythm, dimmed swatches for families you don't own, and an explicit “on your shelf” marker so the two modes can't be confused at a glance.",
+          capVendor: "A sheet, not a screen: names with counts and one verb. It reads as data hygiene because that is all it is — the string is the vendor, so rename is the only edit that exists." }),
+        resolve({ key: "dark", label: "DARK · NIGHT", ink: "#EFE7D6", bg: "#1C1610", muted: "#9E9078", hair: "rgba(239,231,214,0.24)", hairSoft: "rgba(239,231,214,0.12)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", lowFg: "#D79A5A", factBg: "#262017", selBg: "rgba(229,174,43,0.12)",
+          capShelf: "At night the swatches carry the shelf — the same two-key status rule, the same single line per card.",
+          capDeep: "The dimmed unowned families still read as unowned at low contrast, which is the one thing this mode must not lose.",
+          capVendor: "Unchanged in substance: strings, counts, rename. Nothing here needs an accent." })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

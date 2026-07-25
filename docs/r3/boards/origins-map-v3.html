@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SlowCup · Origins v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+<style>
+  :root{
+    --bg:#F5F0E3; --sea:#EADFC6; --land:#D8CDB2; --land2:#D2C6A8;
+    --ink:#2A1F14; --muted:#8C7F6C; --hair:rgba(42,31,20,0.30); --hairSoft:rgba(42,31,20,0.14);
+    --hi:#E5AE2B; --jade:#3F5E42; --red:#69160F; --neutralSw:#C7BA9C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#E7DEC9;font-family:Inter,sans-serif;color:var(--ink);padding:34px;display:flex;flex-direction:column;align-items:flex-start;gap:26px;}
+  .board{display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap;}
+  .screen{width:390px;min-height:812px;background:var(--bg);display:flex;flex-direction:column;box-shadow:0 24px 60px -30px rgba(60,45,25,0.6);border-radius:30px;overflow:hidden;}
+  .pad{padding:0 26px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.14em;color:var(--muted);}
+  .serif{font-family:'Shippori Mincho',serif;}
+  .cjk{font-family:'Noto Serif SC',serif;}
+  .chev{width:22px;height:22px;stroke:var(--ink);stroke-width:1.8;fill:none;}
+  .statline{font-family:'Shippori Mincho',serif;font-style:italic;font-size:14.5px;line-height:1.5;color:var(--ink);}
+  .mapwrap{position:relative;margin-top:12px;}
+  #map{display:block;width:390px;height:392px;}
+  .provribbon{position:absolute;left:0;bottom:0;width:100%;background:rgba(43,35,32,0.82);color:#E9DFCB;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.08em;padding:5px 26px;display:flex;justify-content:space-between;align-items:center;}
+  .provribbon b{color:var(--hi);font-weight:500;}
+  .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px 16px;margin-top:10px;}
+  .region{display:flex;gap:10px;align-items:flex-start;}
+  .sw{width:20px;height:26px;flex:none;border-radius:7px 4px 6px 4px;border:1px solid rgba(0,0,0,0.06);margin-top:1px;position:relative;}
+  .sw.multi{background:var(--neutralSw)!important;border:1px solid rgba(42,31,20,0.28);}
+  .sw .cnt{position:absolute;right:-4px;bottom:-4px;background:var(--ink);color:#F5F0E3;font-family:'IBM Plex Mono',monospace;font-size:8px;line-height:1;padding:2px 3px;border-radius:3px;}
+  .qmark{width:20px;height:26px;flex:none;border-radius:7px 4px 6px 4px;border:1.5px dashed var(--hair);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:1px;}
+  .rname{font-family:'Shippori Mincho',serif;font-weight:500;font-size:14px;color:var(--ink);}
+  .rscript{font-family:'Noto Serif SC',serif;font-size:11px;color:var(--muted);}
+  .rteas{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);line-height:1.5;margin-top:2px;}
+  .est{color:var(--red);}
+  .tab{display:flex;align-items:flex-end;justify-content:space-around;border-top:1px solid var(--hair);padding:14px 0 24px;margin-top:auto;position:relative;}
+  .tab span{font-size:11.5px;color:var(--muted);}
+  .tab .on{font-weight:600;color:var(--ink);box-shadow:inset 0 -6px 0 var(--hi);}
+  .plus{width:46px;height:46px;border-radius:50%;background:var(--jade);color:#F6F2E9;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;margin-top:-28px;box-shadow:0 6px 16px rgba(0,0,0,0.28);}
+  .loadmsg{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-align:center;padding:40px 0;}
+  .notes{width:530px;display:flex;flex-direction:column;gap:16px;}
+  .ntitle{display:flex;align-items:baseline;gap:12px;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;background:var(--hi);color:#3A2A08;padding:4px 10px;border-radius:4px;}
+  .h2{font-family:'Shippori Mincho',serif;font-weight:700;font-size:21px;color:#2B2320;margin:0;}
+  .lead{font-size:13px;color:#4A4038;line-height:1.6;}
+  .card{border:1px solid #C9BC9E;background:#F6F2E9;border-radius:11px;padding:13px 15px;display:flex;flex-direction:column;gap:5px;}
+  .card.big{border:1.5px solid var(--red);background:#F7EEE7;}
+  .ck{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;padding:1px 6px;border-radius:3px;width:fit-content;}
+  .ck.checked{background:rgba(63,94,66,0.16);color:#2F4A32;}
+  .ck.est2{background:rgba(105,22,15,0.14);color:#8A2B1C;}
+  .ck.mix{background:rgba(42,31,20,0.10);color:#5C5148;}
+  .ctitle{font-size:12.5px;font-weight:600;color:#2B2320;line-height:1.35;}
+  .cbody{font-size:11.5px;color:#5C5148;line-height:1.5;}
+  .cbody b{color:#2B2320;}
+  .rows{width:100%;border-collapse:collapse;margin-top:4px;}
+  .rows td{font-size:10.5px;color:#5C5148;padding:3px 6px 3px 0;vertical-align:top;border-top:1px solid #E3D9C2;line-height:1.4;}
+  .rows td.rg{font-family:'Shippori Mincho',serif;font-weight:600;color:#2B2320;white-space:nowrap;}
+  .flags{background:#2B2320;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:10px;}
+  .flabel{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--hi);}
+  .ftext{font-size:12px;color:#C9BFAC;line-height:1.6;}
+  .ftext b{color:var(--hi);}
+  .ftext .join{color:#A6BD66;}
+  code{font-family:'IBM Plex Mono',monospace;font-size:0.92em;color:#C9BFAC;}
+  .card code{color:#8A5A2B;}
+</style>
+</head>
+<body>
+<div class="board">
+  <!-- ============ THE PHONE ============ -->
+  <div class="screen">
+    <div class="pad" style="padding-top:26px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg class="chev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span class="eyebrow">INSIGHTS · ORIGINS</span>
+        </div>
+        <span class="eyebrow" style="color:var(--red);">no period filter</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-top:12px;border-bottom:2px solid var(--ink);padding-bottom:8px;">
+        <span class="serif" style="font-weight:700;font-size:28px;">Origins</span>
+        <span class="serif" style="font-style:italic;font-size:15px;color:var(--muted);">where your tea grows</span>
+      </div>
+      <p class="statline" style="margin:12px 0 0;">Twenty-one teas across five countries — from Kyūshū and Fujian to Yunnan and Nantou, with Thailand and Sri Lanka recorded only to the country.</p>
+    </div>
+
+    <div class="mapwrap">
+      <svg id="map" viewBox="0 0 390 392" role="img" aria-label="Map of tea growing regions across Asia"></svg>
+      <div id="loadmsg" class="loadmsg" style="display:none;"></div>
+    </div>
+
+    <div class="pad" style="margin-top:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--hair);padding-bottom:6px;">
+        <span class="eyebrow">SUB-REGION RECORDED</span>
+        <span class="eyebrow">11 TEAS · 7 PLACES</span>
+      </div>
+      <div id="regionList" class="rgrid"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--hair);padding:16px 0 6px;">
+        <span class="eyebrow">COUNTRY ONLY · SUB-REGION UNRECORDED</span>
+        <span class="eyebrow">10 TEAS</span>
+      </div>
+      <div id="countryList" class="rgrid"></div>
+
+      <div style="display:flex;gap:9px;align-items:flex-start;padding:14px 0 4px;">
+        <div class="qmark" style="width:15px;height:19px;font-size:9px;">?</div>
+        <span style="font-family:'Shippori Mincho',serif;font-style:italic;font-size:12.5px;color:var(--muted);line-height:1.45;">A <b style="font-style:normal;font-weight:600;color:var(--ink);">? N</b> pin marks a verified country whose sub-region you didn't record — the country is known, the hill isn't. It stands only for those N teas, not for the whole country. One tea has no origin at all; it isn't on the map.</span>
+      </div>
+    </div>
+
+    <div class="pad tab">
+      <span>Home</span>
+      <span>Library</span>
+      <div class="plus">＋</div>
+      <span>Sessions</span>
+      <span class="on">Insights</span>
+    </div>
+  </div>
+
+  <!-- ============ THE NOTES ============ -->
+  <div class="notes">
+    <div class="ntitle">
+      <span class="badge">HOW · O · rev 3 · CLOSE</span>
+      <h2 class="h2">The region tier, rebuilt on the real shelf</h2>
+    </div>
+    <p class="lead">Rev 3 <b>closes Origins</b> against the ledger (repo 9f695e2, 2026-07-19 export). All <b>8 region coordinates are verified</b>, so the provisional ribbon retires; the frame is now <b>computed from the user's own origins</b> (R19); the country tier's <code>? N</code> marks became <b>polygon labels</b> (R28); and the catalog join is ruled (R26). Region rows are <span class="est">checked</span>; liquor-swatch colours remain representative.</p>
+
+    <div class="card">
+      <span class="ck checked">CHECKED · STANDS</span>
+      <span class="ctitle">The country tier was right — kept as-is</span>
+      <span class="cbody">Five countries (<b>China 10 · Japan 5 · Taiwan 4 · Thailand 1 · Sri Lanka 1</b>), <code>? N</code> pins reading neutral-and-unresolved, real country-only names, pu-erh note. Country-only is now <b>ten</b> teas — Sri Lanka joined it (below).</span>
+    </div>
+
+    <div class="card">
+      <span class="ck mix">CHECKED ROWS · ESTIMATED SWATCH</span>
+      <span class="ctitle">Region tier rebuilt — the three invented pins are gone</span>
+      <span class="cbody">v2 drew <b>Wuyi/Da Hong Pao, Anxi/Tie Guan Yin, Fuding/White Peony</b> — the same three from the v1 panel, none of which Niklas owns. They were tagged “Confident”; the discipline inverted. Replaced with your real rows. Type corrected too: the “Fukuoka gyokuro” is a <b>sencha</b>. (“Ceylon” was mis-typed <i>and</i> mis-tiered — Moragella is an oolong, and Ceylon is a country; it moves to the <code>? N</code> tier, see below.) Swatch colours remain representative (estimated) until confirmed.</span>
+      <table class="rows">
+        <tr><td class="rg">Kagoshima ×4</td><td>Sencha Premium · Shincha Saemidori · Kabusecha · Chiran Sencha Okumidori <i>(Chiran = own row, clusters in)</i></td></tr>
+        <tr><td class="rg">Hoshino, Fukuoka</td><td>Sencha Megumi No. 1 Hoshino <i>(sencha; data misspells “Fukoaka”)</i></td></tr>
+        <tr><td class="rg">Fujian</td><td>2021 Fujian White Tea <i>(province, not Fuding)</i></td></tr>
+        <tr><td class="rg">Yunnan ×2</td><td>Moonlight White Yue Guang Bai · Yunnan Silver Bud Ya Bao</td></tr>
+        <tr><td class="rg">Guangdong</td><td>Yashi Xiang Dancong</td></tr>
+        <tr><td class="rg">Zhejiang</td><td>Spring White Anji Green</td></tr>
+        <tr><td class="rg">Nantou</td><td>Nantou Qingxin Gui Fei</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <span class="ck checked">CHECKED · TIER FIX</span>
+      <span class="ctitle">“Ceylon” is a country · Chiran stays distinct but clusters</span>
+      <span class="cbody"><b>Ceylon</b> is Sri Lanka's old name — a country, not a region, with no more locational content than “China.” It moves to the <code>? N</code> tier as <b>Sri Lanka ? 1</b>, so the real split is <b>11 region-level · 10 country-only</b>. Needs a country-synonym pass in the normaliser (Ceylon → Sri Lanka, Formosa → Taiwan); the passport's alias table already files <code>ceylon</code> under Sri Lanka.<br><br><b>Chiran</b> — its own tea town, ~27 km from Kagoshima City and a twice-verified coordinate — stays a distinct <i>row</i> in the table but clusters into Kagoshima in the atlas, since 27 km is ~1 px here. The shipped China/Japan zoom splits them.</span>
+    </div>
+
+    <div class="card">
+      <span class="ck checked">CHECKED · COORDINATES LANDED</span>
+      <span class="ctitle">The region → lat/lon table is complete — ribbon retired</span>
+      <span class="cbody">All <b>8 region coordinates verified</b> against independent sources, keyed on the normalised <code>teas.origin</code> string (never the catalog). Province strings anchor on the <b>provincial capital</b>, labelled as the province's marker — Fuzhou (Fujian), Kunming (Yunnan), Guangzhou (Guangdong), Hangzhou (Zhejiang); Japan/Taiwan anchor on the named place (Kagoshima City, Hoshino, Nantou City, Chiran). Precision: city-level, ~10 km, 2 dp. Country pins carry <b>no coordinate at all</b> (R28, below).</span>
+    </div>
+
+    <div class="card">
+      <span class="ck checked">CHECKED · CONTRACT 1</span>
+      <span class="ctitle">Multi-tea regions dropped the liquor swatch</span>
+      <span class="cbody">The swatch is identity — one tea’s liquor can’t stand for four. Same logic that makes <code>? N</code> neutral. So <b>Kagoshima (4)</b> and <b>Yunnan (2)</b> now carry a neutral swatch with a count; the six single-tea regions keep their liquor colour. Colour now means exactly <i>this tea</i>.</span>
+    </div>
+
+    <div class="card">
+      <span class="ck est2">ESTIMATED · NEW CAPABILITY</span>
+      <span class="ctitle">Non-CJK script · pu-erh ageing</span>
+      <span class="cbody">Thailand and Sri Lanka have no CJK script → per-origin script generalises to Thai / Sinhala (Latin fallback shown). And <b>Fei Bing Beeng Cha</b> is the first <b>pu-erh</b> (ageing:on), sitting in China <code>? 5</code> — the first origin that would read as <b>history, not countdown</b> if a pin ever shows freshness.</span>
+    </div>
+
+    <div class="flags">
+      <span class="flabel">⚑ HAND-OFF FLAGS &amp; ANSWERS</span>
+      <span class="ftext"><span class="join">⚑ JOIN — ruled (R26):</span> the catalog join becomes a <b>stored confirm-link</b> — a nullable <code>teas.catalog_slug</code>; <code>matchTeaType</code> <i>proposes</i>, the user <i>confirms</i>, and everything (type, swatch) reads the stored slug. Renames stop breaking pins, new teas prompt instead of silently missing, and coverage stops sliding (13/14 → 12/22 in ten days). Origin stays user-first for the map itself.</span>
+      <span class="ftext"><b>⚑ Placement dataset — done:</b> the region → lat/lon table is complete and verified (city-level, 2 dp), keyed on <code>teas.origin</code>. <code>elevation_m</code> is reserved but null — per-tea elevation (the Add/Edit <code>610 m · NEW</code> field) is the right home, not a per-region range.</span>
+      <span class="ftext"><b>⚑ Country pins are polygon labels (R28):</b> the <code>? N</code> marks carry no coordinate — the renderer places them inside the Natural Earth country shape (centroid / polylabel), the way an atlas sets a country's name. Region = verified point; country = labelled polygon. Two tiers, two geometries, one honesty ladder.</span>
+      <span class="ftext"><b>⚑ Clustering rule (define once):</b> marks whose centres fall within ~14 px (a pin's width) collide — <i>same tier</i> → merge to one mark, parent name + <code>×N</code>, zoom splits (Chiran → Kagoshima); <i>different tier</i> (resolved region vs <code>? N</code>) → don't merge unlike certainties, nudge with a leader (Taiwan <code>? 3</code> off Nantou).</span>
+      <span class="ftext"><b>⚑ Labels now Latin-primary:</b> a map label is wayfinding — one you can't read fails its only job. Script drops to secondary / on-tap, which also retires the Thailand/Sri Lanka Latin exception (it's now the rule). Tea detail keeps script-as-identity; that contract is unchanged.</span>
+      <span class="ftext"><b>⚑ Adaptive frame — ruled (R19):</b> the projection is now the <b>bounding box of the user's own pinned origins, plus padding</b> — no hardcoded frame. One rule resolves every shelf: single-country collapses the box to that country (still an atlas), a global shelf widens it to world scale (accepted), and zero teas hands off to the #09 Origins empty state.</span>
+      <span class="ftext"><b>⚑ Zoom preserved:</b> the passport ships China/Japan sub-region zoom — this board is the top atlas; that dive stays in the build (not re-drawn here).</span>
+      <span class="ftext"><b>Answers to your four:</b> sea rings were decoration reading as data — <b>removed</b>. <code>? N</code> tap = <b>those N country-only teas only</b>, never all-country (so China <code>? 5</code> = 5, not 10). Origins is inventory, not sessions → <b>exempt from the Insights period selector</b> (“last 30 days” is meaningless for an atlas); noted for the spec. The 22nd no-origin tea is the <b>“Test” 0 g junk row</b> — your cleanup, board reads 21 once it’s gone.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var W=390, H=392;
+
+  // TIER 1 — sub-region recorded. single-tea → liquor swatch; multi-tea → neutral swatch.
+  // PLACEMENT ESTIMATED: hand-placed, ~city level, pending the region→lat/lon table.
+  var regions=[
+    {name:"Kagoshima", script:"鹿児島", lon:130.56, lat:31.60, multi:true, count:4, teas:"4 greens", verified:true, anchor:"Kagoshima City", dx:13, dy:12},
+    {name:"Hoshino", script:"星野", lon:130.77, lat:33.25, color:"#8FA83E", count:1, teas:"sencha", verified:true, anchor:"Hoshino", dx:13, dy:-13},
+    {name:"Fujian", script:"福建", lon:119.31, lat:26.07, color:"#E6D89B", count:1, teas:"white", verified:true, anchor:"Fuzhou", dx:13, dy:-2},
+    {name:"Yunnan", script:"雲南", lon:102.72, lat:25.04, multi:true, count:2, teas:"2 whites", verified:true, anchor:"Kunming", dx:-11, dy:11},
+    {name:"Guangdong", script:"廣東", lon:113.25, lat:23.12, color:"#C58A3B", count:1, teas:"dancong", verified:true, anchor:"Guangzhou", dx:12, dy:14},
+    {name:"Zhejiang", script:"浙江", lon:120.16, lat:30.29, color:"#A6BE55", count:1, teas:"green", verified:true, anchor:"Hangzhou", dx:13, dy:-3},
+    {name:"Nantou", script:"南投", lon:120.68, lat:23.92, color:"#CBA347", count:1, teas:"gui fei oolong", verified:true, anchor:"Nantou City", dx:-13, dy:10}
+  ];
+
+  // TIER 2 — verified country, sub-region unrecorded → neutral ? N pin (aggregate, no liquor)
+  var countries=[
+    {name:"China", id:"156", n:5, lon:103.5, lat:35.4, teas:"Pipachá · Fei Bing Beeng Cha (pu-erh) · Dawang Feng Da Hong Pao · Oriental Beauty · Huang Ya Yellow Tips"},
+    {name:"Taiwan", id:"158", n:3, lon:120.9, lat:23.7, ndy:22, teas:"Hualien Chike · Honey Oolong Gui Fei · Ali Shan Fo Shou Dong Pian"},
+    {name:"Thailand", id:"764", n:1, lon:101, lat:15.5, teas:"Ruby Ruanzhi"},
+    {name:"Sri Lanka", id:"144", n:1, lon:80.7, lat:7.9, teas:"Moragella Oolong (oolong)"}
+  ];
+
+  function draw(topo){
+    var svg=d3.select("#map");
+    var feats=topojson.feature(topo, topo.objects.countries).features;
+    var byId={}; feats.forEach(function(f){ byId[String(f.id)]=f; });
+    // R19 — frame computed from the user's own origins (bbox of pinned points + padding), no hardcoded region
+    var pts=regions.map(function(r){return [r.lon,r.lat];});
+    countries.forEach(function(c){ var f=byId[c.id]; pts.push(f?d3.geoCentroid(f):[c.lon,c.lat]); });
+    var proj=d3.geoMercator().fitExtent([[54,66],[W-52,H-46]], {type:"MultiPoint",coordinates:pts});
+    var path=d3.geoPath(proj);
+
+    svg.append("rect").attr("width",W).attr("height",H).attr("fill","var(--sea)");
+
+    // land
+    svg.append("g").selectAll("path").data(feats).join("path")
+      .attr("d",path).attr("fill","var(--land)")
+      .attr("stroke","rgba(42,31,20,0.30)").attr("stroke-width",0.7)
+      .attr("stroke-linejoin","round");
+    svg.append("g").selectAll("path").data(feats).join("path")
+      .attr("d",path).attr("fill","none")
+      .attr("stroke","rgba(255,247,230,0.35)").attr("stroke-width",0.6)
+      .attr("transform","translate(0,-0.8)");
+
+    // compass rose
+    var cx=354, cy=44, r=13;
+    var comp=svg.append("g").attr("opacity",0.55);
+    comp.append("circle").attr("cx",cx).attr("cy",cy).attr("r",r).attr("fill","none").attr("stroke","var(--hair)").attr("stroke-width",1);
+    comp.append("path").attr("d","M"+cx+" "+(cy-r-2)+" L"+(cx+3)+" "+cy+" L"+cx+" "+(cy+r+2)+" L"+(cx-3)+" "+cy+" Z").attr("fill","var(--muted)");
+    comp.append("text").attr("x",cx).attr("y",cy-r-5).attr("text-anchor","middle").attr("font-family","IBM Plex Mono, monospace").attr("font-size","8").attr("fill","var(--muted)").text("N");
+
+    var pg=svg.append("g");
+    function leader(x,y,sx,sy){
+      pg.append("line").attr("x1",x).attr("y1",y).attr("x2",sx).attr("y2",sy)
+        .attr("stroke","var(--hair)").attr("stroke-width",0.8);
+    }
+
+    // TIER 1 — region pins
+    regions.forEach(function(p){
+      var xy=proj([p.lon,p.lat]); if(!xy) return;
+      var x=xy[0], y=xy[1], sx=x+(p.dx||8), sy=y+(p.dy||-6);
+      leader(x,y,sx,sy);
+      pg.append("circle").attr("cx",x).attr("cy",y).attr("r",2.4).attr("fill","var(--ink)");
+      var w=15,h=19, swx=sx-(sx>x?0:w), swy=sy-(sy>y?0:h);
+      var g=pg.append("g");
+      g.append("rect").attr("x",swx).attr("y",swy).attr("width",w).attr("height",h)
+        .attr("rx",3).attr("fill", p.multi ? "var(--neutralSw)" : p.color)
+        .attr("stroke", p.multi ? "rgba(42,31,20,0.30)" : "rgba(0,0,0,0.10)").attr("stroke-width", p.multi?1:0.8);
+      if(p.multi){
+        g.append("text").attr("x",swx+w/2).attr("y",swy+h/2+3.5).attr("text-anchor","middle")
+          .attr("font-family","IBM Plex Mono, monospace").attr("font-size",9).attr("fill","var(--ink)").text("×"+p.count);
+      }
+      var lx = sx>x ? swx+w+4 : swx-4, anc = sx>x ? "start" : "end";
+      g.append("text").attr("x",lx).attr("y",swy+11).attr("text-anchor",anc)
+        .attr("font-family","Shippori Mincho, serif").attr("font-weight",700).attr("font-size",11.5).attr("fill","var(--ink)")
+        .text(p.name);
+      if(p.script) g.append("text").attr("x",lx).attr("y",swy+20).attr("text-anchor",anc)
+        .attr("font-family","Noto Serif SC, serif").attr("font-size",8.5).attr("fill","var(--muted)")
+        .text(p.script);
+    });
+
+    // TIER 2 — country ? N pins are POLYGON LABELS (R28): placed inside the Natural Earth
+    // country shape (centroid), never at an invented coordinate. A short nudge+leader avoids
+    // colliding with a same-area region pin (Taiwan ? 3 off Nantou), per R17.
+    countries.forEach(function(p){
+      var f=byId[p.id];
+      var c = f ? path.centroid(f) : proj([p.lon,p.lat]);
+      if(!c || isNaN(c[0])) c = proj([p.lon,p.lat]);
+      var x=c[0]+(p.ndx||0), y=c[1]+(p.ndy||0);
+      if(p.ndx||p.ndy) leader(c[0],c[1],x,y);
+      var rr=8+p.n*1.6;
+      pg.append("circle").attr("cx",x).attr("cy",y).attr("r",rr)
+        .attr("fill","rgba(234,223,198,0.55)").attr("stroke","var(--ink)").attr("stroke-width",1.2)
+        .attr("stroke-dasharray","3 2.4");
+      pg.append("text").attr("x",x).attr("y",y+3.4).attr("text-anchor","middle")
+        .attr("font-family","IBM Plex Mono, monospace").attr("font-weight",500)
+        .attr("font-size",10).attr("fill","var(--ink)").text("? "+p.n);
+      pg.append("text").attr("x",x).attr("y",y-rr-5).attr("text-anchor","middle")
+        .attr("font-family","Shippori Mincho, serif").attr("font-weight",600).attr("font-size",10.5).attr("fill","var(--muted)")
+        .text(p.name);
+    });
+  }
+
+  function buildLists(){
+    var host=d3.select("#regionList");
+    regions.forEach(function(p){
+      var row=host.append("div").attr("class","region");
+      var sw=row.append("div").attr("class","sw"+(p.multi?" multi":""));
+      if(!p.multi) sw.style("background",p.color);
+      if(p.multi) sw.append("div").attr("class","cnt").text("×"+p.count);
+      var col=row.append("div").style("flex","1").style("min-width","0");
+      var top=col.append("div").style("display","flex").style("align-items","baseline").style("gap","6px");
+      top.append("span").attr("class","rname").text(p.name);
+      if(p.script) top.append("span").attr("class","rscript").text(p.script);
+      var tag = p.verified ? ' <span style="color:#2F4A32">· '+(p.anchor?p.anchor+' ':'')+'✓</span>' : ' <span class="est">· est place</span>';
+      col.append("div").attr("class","rteas").html(p.teas + tag);
+    });
+
+    var chost=d3.select("#countryList");
+    countries.forEach(function(p){
+      var row=chost.append("div").attr("class","region");
+      row.append("div").attr("class","qmark").text("?"+p.n);
+      var col=row.append("div").style("flex","1").style("min-width","0");
+      var top=col.append("div").style("display","flex").style("align-items","baseline").style("gap","6px");
+      top.append("span").attr("class","rname").text(p.name);
+      if(p.script) top.append("span").attr("class","rscript").text(p.script);
+      col.append("div").attr("class","rteas").text(p.teas);
+    });
+  }
+
+  buildLists();
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json")
+    .then(draw)
+    .catch(function(e){ var m=document.getElementById("loadmsg"); m.style.display="block"; m.textContent="map data unavailable offline"; console.error(e); });
+})();
+</script>
+</body>
+</html>

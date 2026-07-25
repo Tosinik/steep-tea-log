@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+<meta name="ext-resource-dependency" content="uploads/PXL_20260713_165741972.MP.jpg">
+<meta name="ext-resource-dependency" content="uploads/PXL_20260713_170010491.MP.jpg">
+<meta name="ext-resource-dependency" content="uploads/PXL_20260713_170114025.jpg">
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="22" y="22" width="76" height="13" rx="4" fill="#EDE6D4"></rect><rect x="27" y="25" width="13" height="7" rx="3" fill="#843A1E"></rect><rect x="22" y="41" width="76" height="13" rx="4" fill="#EDE6D4"></rect><circle cx="31" cy="47" r="5" fill="#4B3621"></circle><rect x="22" y="60" width="76" height="13" rx="4" fill="#EDE6D4"></rect><rect x="22" y="90" width="76" height="15" rx="4" fill="#9C5B33"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #04</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">＋ SETUP · PICKERS · rev 6</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 77cf800</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Session setup + the tea &amp; vessel pickers</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:980px; margin:0; line-height:1.65;">Rev 2 drops the traced teaware line-art (the disqualified Direction-A pipeline) for <strong>your real vessel photos</strong> — a vessel has no liquor colour, so the photo <em>is</em> its identity, nothing competes; photo-less vessels fall back to the type set typographically (the Tier-3 logic). The <strong>tea picker closes #14</strong> (scoped custom listbox). <code>water_ml</code> now has a home in setup. <strong>Rev 4</strong> works from the ledger: the method control is <strong>four segments</strong> — <strong>rev 6</strong> sets their order to the shipped one, <strong>gongfu · senchadō · western · cold brew</strong> (R50; senchadō shipped v3.91, no phase-2 badge), the <strong>mood check-in</strong> (R4) and <strong>in-setup quick log</strong> (R5) return, and blank water reads as the vessel's capacity (R6). <strong>Rev 5</strong> lands the real vessel (<strong>Main Kyusu, 210 ml</strong>) and real shelf rows in the picker, and <strong>folds the shipped “When” field away</strong> — a live cup is “now”, so it earns prominence on #12, not here.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+        <!-- SESSION SETUP -->
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+            <div style="padding:26px 24px 24px; display:flex; flex-direction:column;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:23px; color:{{ t.ink }};">New session</span>
+                <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+              </div>
+              <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:{{ t.muted }}; margin-top:12px;">What are you brewing?</span>
+
+              <div style="display:flex; gap:12px; align-items:baseline; margin-top:18px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.red }};">01</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">TEA</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:11px; padding:8px 0 14px 30px; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="width:24px; height:31px; flex:none; background:#843A1E; border-radius:8px 4px 7px 4px; border:1px solid rgba(0,0,0,0.06);"></div>
+                <div style="display:flex; flex-direction:column;">
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:17px; color:{{ t.ink }};">Da Hong Pao</span><span style="font-family:'Noto Serif SC',serif; font-size:12px; color:{{ t.muted }};">大紅袍</span></div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.muted }};">Wuyi oolong</span>
+                </div>
+                <span style="flex:1;"></span>
+                <span style="font-size:12px; font-weight:500; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">change</span>
+              </div>
+
+              <div style="display:flex; gap:12px; align-items:baseline; margin-top:16px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.red }};">02</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">VESSEL</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:11px; padding:6px 0 14px 30px; border-bottom:1px solid {{ t.hairSoft }};">
+                <img src="uploads/PXL_20260713_165741972.MP.jpg" style="width:30px; height:38px; flex:none; object-fit:cover; border-radius:8px 4px 7px 4px; border:1px solid rgba(0,0,0,0.08);">
+                <div style="display:flex; flex-direction:column;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">Main Kyusu</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.muted }};">clay · 210 ml</span>
+                </div>
+                <span style="flex:1;"></span>
+                <span style="font-size:12px; font-weight:500; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">change</span>
+              </div>
+
+              <div style="display:flex; gap:12px; align-items:baseline; margin-top:16px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.red }};">03</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">METHOD</span>
+              </div>
+              <div style="display:flex; margin:8px 0 7px 30px; border:1px solid {{ t.hair }}; border-radius:10px; overflow:hidden; width:fit-content;">
+                <sc-for list="{{ t.methodsR }}" as="m" hint-placeholder-count="4"><div style="display:flex; align-items:center; gap:6px; padding:8px 13px; background:{{ m.bg }}; border-left:{{ m.divider }};"><span style="font-family:'Shippori Mincho',serif; font-size:14.5px; font-weight:{{ m.w }}; color:{{ m.fg }};">{{ m.l }}</span></div></sc-for>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; padding-left:30px; line-height:1.5;">four methods (senchadō shipped v3.91). cold brew is mutually exclusive — it sets is_cold_brew and switches the flow. matcha isn't a method: it's the tea (#12 steepless whisk).</span>
+
+              <div style="display:flex; gap:12px; align-items:baseline; margin-top:16px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.red }};">04</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">LEAF · WATER</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; padding:8px 0 0 30px;">
+                <div style="border:1px solid {{ t.hair }}; border-radius:7px; padding:7px 12px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ t.ink }};">5 g</div>
+                <div style="border:1px solid {{ t.hair }}; border-radius:7px; padding:7px 12px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ t.muted }}; display:flex; align-items:baseline; gap:6px;">210 ml<span style="font-size:8px; letter-spacing:0.06em;">CAPACITY</span></div>
+                <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12px; color:{{ t.muted }};">blank = fill the vessel</span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; padding-left:30px; margin-top:6px;">blank water = the vessel's capacity (R6, v3.57) — shown as placeholder, never written as a value. session-level water_ml, the v3.85 litres-stat field.</span>
+
+              <div style="margin-top:18px; padding:11px 14px; border-radius:10px; background:{{ t.factBg }}; display:flex; flex-direction:column; gap:5px;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:{{ t.muted }};">SCHEDULE</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.ink }};">rinse + 5 · 95°C · first pour prefilled</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">derived: brew guide → ratio-scaled → feedback-learned · not the saved guide (R3)</span>
+              </div>
+
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding:9px 2px; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:{{ t.muted }};">WHEN</span><span style="font-size:13px; color:{{ t.ink }};">now</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.muted }};">change ›</span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; margin-top:5px; line-height:1.5;">sessionDate ships (steep-sessions.js:535) — folded away: a live cup is “now”, right 95% of the time, only interesting when wrong. It earns prominence on #12.</span>
+
+              <div style="margin-top:16px; padding:12px 14px; border-radius:10px; border:1px dashed {{ t.hair }}; display:flex; flex-direction:column; gap:9px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.ink }};">How are you arriving?</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">OPTIONAL · 48% · showMood</span></div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;"><sc-for list="{{ t.moodsR }}" as="md" hint-placeholder-count="4"><span style="font-family:'Shippori Mincho',serif; font-size:13px; color:{{ md.fg }}; border:1px solid {{ md.bd }}; background:{{ md.bg }}; border-radius:14px; padding:4px 12px;">{{ md.l }}</span></sc-for></div>
+              </div>
+              <div style="margin-top:16px; background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; text-align:center; padding:14px 0; border-radius:16px 6px 14px 8px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">Start steeping</div>
+              <div style="display:flex; align-items:center; justify-content:center; margin-top:12px;"><span style="font-family:'Shippori Mincho',serif; font-size:13px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Quick log — just infusions &amp; notes</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; text-align:center; margin-top:10px;">temp is per-steep (set in the steep) · taste is captured in the steep (B3) · quick log skips the timer (R5)</span>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SESSION SETUP · the ＋ flow</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capSetup }}</span>
+        </div>
+
+        <!-- TEA PICKER (#14) -->
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column;">
+            <div style="padding:26px 24px 0; display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:21px; color:{{ t.ink }};">Choose a tea</span>
+                <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-top:14px; padding:9px 12px; border:1px solid {{ t.hair }}; border-radius:10px;">
+                <svg viewBox="0 0 24 24" style="width:16px; height:16px; color:{{ t.muted }};"><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.8 15.8l4.4 4.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.muted }};">search your shelf…</span>
+                <span style="flex:1;"></span>
+                <span style="font-size:12px; font-weight:500; color:{{ t.muted }};">Filter ▾</span>
+              </div>
+              <div style="display:flex; flex-direction:column; margin-top:8px;">
+                <sc-for list="{{ t.teaListR }}" as="x" hint-placeholder-count="6">
+                  <div style="display:flex; align-items:center; gap:12px; padding:11px 8px; border-bottom:1px solid {{ t.hairSoft }}; background:{{ x.rowBg }}; border-radius:8px;">
+                    <div style="width:24px; height:31px; flex:none; background:{{ x.swBg }}; border:{{ x.swBd }}; border-radius:8px 4px 7px 4px; box-sizing:border-box;"></div>
+                    <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                      <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">{{ x.n }}</span><span style="font-family:'Noto Serif SC',serif; font-size:11.5px; color:{{ t.muted }};">{{ x.script }}</span></div>
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ x.statusFg }};">{{ x.status }}</span>
+                    </div>
+                    <sc-if value="{{ x.sel }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:17px; height:17px; color:{{ t.jade }}; flex:none;"><path d="M5 12.5l4.5 4.5L19 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="flex:1;"></div>
+              <div style="display:flex; flex-direction:column; gap:9px; padding:12px 0 22px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5;">long-press a swatch to correct its colour — scanning the shelf is where a wrong one shows most.</span>
+                <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }}; width:fit-content;">＋ Add a new tea</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">TEA PICKER · closes #14</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capTea }}</span>
+        </div>
+
+        <!-- VESSEL PICKER -->
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column;">
+            <div style="padding:26px 24px 0; display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:21px; color:{{ t.ink }};">Choose a vessel</span>
+                <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-top:14px; padding:9px 12px; border:1px solid {{ t.hair }}; border-radius:10px;">
+                <svg viewBox="0 0 24 24" style="width:16px; height:16px; color:{{ t.muted }};"><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.8 15.8l4.4 4.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.muted }};">search your shelf…</span>
+              </div>
+              <div style="display:flex; flex-direction:column; margin-top:8px;">
+                <sc-for list="{{ t.vesselListR }}" as="v" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; gap:13px; padding:12px 8px; border-bottom:1px solid {{ t.hairSoft }}; background:{{ v.rowBg }}; border-radius:8px;">
+                    <sc-if value="{{ v.hasPhoto }}" hint-placeholder-val="{{ true }}"><img src="{{ v.photo }}" style="width:44px; height:52px; flex:none; object-fit:cover; border-radius:9px 4px 8px 5px; border:1px solid rgba(0,0,0,0.1);"></sc-if>
+                    <sc-if value="{{ v.noPhoto }}" hint-placeholder-val="{{ false }}"><div style="width:44px; height:52px; flex:none; border-radius:9px 4px 8px 5px; background:{{ t.factBg }}; border:1px dashed {{ t.hair }}; display:flex; align-items:center; justify-content:center;"><span style="font-family:'Noto Serif SC',serif; font-size:17px; color:{{ t.muted }};">{{ v.kanji }}</span></div></sc-if>
+                    <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                      <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">{{ v.n }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.muted }};">{{ v.meta }}</span>
+                    </div>
+                    <sc-if value="{{ v.sel }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:17px; height:17px; color:{{ t.jade }}; flex:none;"><path d="M5 12.5l4.5 4.5L19 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; margin-top:10px; line-height:1.5;">the photo is the vessel's identity (no liquor colour competes) · photo-less → the type set typographically, the Tier-3 logic.</span>
+              <div style="flex:1;"></div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0 22px;">
+                <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">＋ Add a vessel</span>
+                <span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.muted }};">manage vessels ›</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">VESSEL PICKER · your photos</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capVessel }}</span>
+        </div>
+
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 5</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Setup, the pickers, and the four-segment method</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#3F5E42;">{{ n.k }}</span>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · SCHEMA WORK, DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Method is four (R1):</strong> <code style="color:#C9BFAC;">brew_style</code> holds gongfu · senchadō · western (senchadō shipped v3.91, R2); the fourth segment, cold brew, is mutually exclusive and sets <code style="color:#C9BFAC;">is_cold_brew</code> (no migration) while switching the flow. Matcha is not a method — it's the tea (#12 steepless). 4 shown, 3 + boolean stored, matcha inferred. Consequence to surface on #05: <code style="color:#C9BFAC;">western</code> is <em>empty</em>, not near-empty — every “western” sitting is really a kyūsu green (miscategorised). <strong style="color:#E5AE2B;">Mood (R4):</strong> restored — <code style="color:#C9BFAC;">showMood</code> ships, 43% opt-in; the earlier “does it survive?” is resolved, it stays. <strong style="color:#E5AE2B;">water_ml:</strong> blank = vessel capacity (R6, placeholder, never written); session-level, the litres-stat field.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">When folded, not omitted (R-followup):</strong> the shipped <code style="color:#C9BFAC;">sessionDate</code> field (<code style="color:#C9BFAC;">steep-sessions.js:535</code>, stamped now by <code style="color:#C9BFAC;">startSessionFor</code>) is present but collapsed — a live cup's time is right 95% of the time; it's promoted on #12 where a remembered cup needs it. <strong style="color:#E5AE2B;">Real shelf (R27):</strong> vessel is the real Main Kyusu (clay, 210 ml — no Tokoname Kyūsu at 180 exists), and the tea picker now lists real teas with the real running-low pair (Honey Oolong Gui Fei · Sencha Kagoshima Premium), retiring the invented set that had spread across four boards.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const methodsData = [ { l: "gongfu", on: true }, { l: "senchadō" }, { l: "western" }, { l: "cold brew" } ];
+    // real shelf (R27) — running-low pair matches Shopping; no invented rows
+    const teaData = [
+      { sw: "#843A1E", n: "Dawang Feng Da Hong Pao", script: "大紅袍", status: "plenty · 20 g", tone: "plenty", sel: true },
+      { sw: "#4B3621", n: "Fei Bing Beeng Cha", script: "餅茶", status: "plenty · 96 g", tone: "plenty" },
+      { sw: "#8FA83E", n: "Shincha Saemidori", script: "新茶", status: "empty · 0 g", tone: "empty" },
+      { sw: "#AEBB57", n: "Sencha Kagoshima Premium", script: "煎茶", status: "running low · 8 g", tone: "low" },
+      { sw: "#C58A3B", n: "Honey Oolong Gui Fei", script: "貴妃", status: "running low · 7 g", tone: "low" },
+      { sw: "#B8C06A", n: "Hualien Chike High Mountain Qingxin Premium", script: "青心", status: "plenty", tone: "plenty" }
+    ];
+    const vesselData = [
+      { kanji: "蓋碗", n: "Dragon Gaiwan", meta: "porcelain · 110 ml" },
+      { photo: "uploads/PXL_20260713_165741972.MP.jpg", n: "Main Kyusu", meta: "clay · 210 ml", sel: true },
+      { kanji: "絞", n: "Mogake Shiboridashi", meta: "shiboridashi · clay" },
+      { kanji: "旅", n: "Travel cuppa", meta: "tumbler · steel" },
+      { kanji: "冷", n: "Hario Coldbrew", meta: "cold brew · glass · 750 ml" }
+    ];
+
+    const moods = [ { l: "calm", sel: true }, { l: "tired" }, { l: "focused" }, { l: "restless" } ];
+
+    const cap = {
+      capSetup: "What ＋ launches: tea → vessel → method → leaf · water → steep. Numbered like Log, but live — it ends in steeping. Method is four segments (gongfu · senchadō · western · cold brew — senchadō shipped v3.91); cold brew is mutually exclusive and switches the flow, matcha is the tea not a method. A mood check-in (R4) and an in-setup quick log (R5) return. LEAF · WATER captures grams and the session-level water_ml (blank = vessel capacity, R6); temp &amp; taste stay in the steep (B3).",
+      capTea: "Closes #14. One scoped, justified custom listbox — the pre-R2 native select retired. Swatch + per-origin script + live stock, searchable, one quiet Filter. Selected row ✓; long-press a swatch to correct its colour; ＋ Add a new tea.",
+      capVessel: "Real vessel photos as identity — a vessel has no liquor colour, so nothing competes with a swatch. Kyūsu · houhin · kyūsu from your shelf; the photo-less Frog Yunomi falls back to its type kanji (湯呑), the Tier-3 logic. Line-art pipeline retired."
+    };
+
+    const resolve = (t) => ({ ...t, ...cap, isLight: t.key === "light",
+      methodsR: methodsData.map((m, i) => ({ l: m.l,
+        w: m.on ? 700 : 500,
+        fg: m.on ? t.ink : t.muted,
+        bg: m.on ? t.selBg : "transparent",
+        divider: i > 0 ? ("1px solid " + t.hair) : "none" })),
+      teaListR: teaData.map(x => ({ n: x.n, script: x.script, status: x.status, sel: !!x.sel,
+        swBg: x.sw, swBd: "1px solid rgba(0,0,0,0.06)",
+        statusFg: x.tone === "low" ? t.lowFg : t.muted,
+        rowBg: x.sel ? t.selBg : "transparent" })),
+      vesselListR: vesselData.map(v => ({ n: v.n, meta: v.meta, sel: !!v.sel,
+        hasPhoto: !!v.photo, noPhoto: !v.photo, photo: v.photo || "", kanji: v.kanji || "",
+        rowBg: v.sel ? t.selBg : "transparent" })),
+      moodsR: moods.map(m => ({ l: m.l, fg: m.sel ? t.ink : t.muted, bd: t.hair, bg: m.sel ? t.selBg : "transparent" }))
+    });
+
+    const notes = [
+      { k: "M1", t: "Method is four segments (R1)", d: "gongfu · senchadō · western · cold brew. Cold brew is mutually exclusive — it sets is_cold_brew (no migration) and switches to the cold-brew flow. Matcha isn't a method: it's a property of the tea (#12 steepless whisk). Closes the 5-shown-vs-3-stored pin: 4 shown, 3 + boolean stored, matcha inferred." },
+      { k: "M2", t: "senchadō shipped (R2)", d: "v3.91 — a real third brew_style, three-valued brewMethodFor, per-steep feedback fires for it, gongfu-side ratio baseline. The old PHASE 2 badge was stale: phase 2 is learned defaults, not senchadō. No badge, drawn as the shipped method it is." },
+      { k: "M3", t: "Mood check-in restored (R4)", d: "“How are you arriving?” is v3.31, gated by the shipped showMood toggle, filled on 48% of sessions (15/31) — a healthy opt-in on a fully optional control. The off-switch already ships; the card belongs back in setup." },
+      { k: "M4", t: "In-setup quick log restored (R5)", d: "The bottom-nav Log is quickLogSession; the in-setup “Quick log — just infusions & notes” shortcut returns beside Start steeping. Two entries to the same retrospective surface, both shipped." },
+      { k: "SU2", t: "water_ml has a home", d: "Grams was captured; the session-level water_ml wasn't. It's the v3.85 field the litres stat needs — added beside leaf, since it's set once per session, not per steep. Captured here or never." },
+      { k: "P1", t: "Tea picker closes #14", d: "The “still reads pre-R2” native select is retired for one scoped custom listbox — the justified exception. Swatch · script · live stock, searchable, one quiet Filter — Library's vocabulary, in a picker." },
+      { k: "P2", t: "Vessel photo = identity", d: "Your real photos, not traced art (the pipeline that failed Direction A). A vessel has no liquor colour, so a photo competes with nothing — and it's your kyūsu, not a generic drawing." },
+      { k: "P3", t: "Photo-less → typographic fallback", d: "No photo yet? The vessel's type is set typographically on the plate (湯呑 for the Frog Yunomi) — the same Tier-3 logic as the kanji swatch. Nothing looks broken; nothing is nudged." },
+      { k: "P4", t: "Colour-correct in the picker", d: "Long-press a swatch to fix a wrong colour on the spot — the shelf is where a catalog default reads wrong. A shortcut; the discoverable ✎ on Tea detail stays primary. No per-row badge." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", lowFg: "#B07C3E", factBg: "#EDE6D4", selBg: "rgba(229,174,43,0.14)" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", lowFg: "#D79A5A", factBg: "#262017", selBg: "rgba(229,174,43,0.12)" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+  @keyframes sc-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.82);}}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><circle cx="42" cy="48" r="13" fill="none" stroke="#2B2320" stroke-width="5"></circle><circle cx="80" cy="66" r="13" fill="none" stroke="#843A1E" stroke-width="5"></circle><path d="M53 54 l16 8" stroke="#9C5B33" stroke-width="4"></path><path d="M69 58 l-16 -8" stroke="#9C5B33" stroke-width="4"></path></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #08</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">SOCIAL · rev 3</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Social</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1010px; margin:0; line-height:1.65;">Rev 2 restores two forgotten mechanisms and corrects the graph. <strong>Passed cups</strong> (the receive side of Tea detail's “Pass this tea to the circle”) and <strong>Kindred notes</strong> come back, both hanging off R25's one <strong>pass-record</strong> table. The share badge reads plain <strong>“shared”</strong>, not “to Ruth” — <code>is_shared</code> carries no recipient until that record ships. The third edge resolves: <strong>pebbi → you</strong>. And the shared list is the real five, <strong>5 of 31 (16%)</strong>. Rev 3 adds two surfaces to <em>decide</em>, both drawn but flagged: what a <strong>passed tea</strong> opens (it isn't in your library), and <strong>presence</strong> — a quiet “someone's having tea now,” framed as the structural opposite of the activity feed the concept already rejected.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:26px 24px 26px; display:flex; flex-direction:column;">
+
+          <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:23px; color:{{ t.ink }};">Social</span>
+            <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+          </div>
+          <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:{{ t.muted }}; margin-top:12px; line-height:1.5;">A circle of three. Some cups you send, some arrive. Small on purpose.</span>
+
+          <!-- PRESENCE — PARKED (R35): right idea, wrong time; kept in file, nothing ships this release -->
+          <div style="display:flex; align-items:center; gap:11px; margin-top:16px; padding:12px 14px; border-radius:13px; background:{{ t.factBg }}; border:1px dashed {{ t.hair }}; opacity:0.7;">
+            <div style="width:9px; height:9px; flex:none; border-radius:50%; background:{{ t.jade }}; animation:sc-pulse 2.4s ease-in-out infinite;"></div>
+            <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+              <span style="font-family:'Shippori Mincho',serif; font-size:14.5px; color:{{ t.ink }};">Ruth is having tea, right now</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">presence · opt-in, reciprocal, writes nothing · parked for a later release (R35), not shipping now</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:0.06em; color:{{ t.hiInk }}; border:1px solid {{ t.hi }}; padding:2px 5px; border-radius:3px; flex:none;">PARKED</span>
+          </div>
+
+          <!-- YOUR CIRCLE -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }}; margin-top:20px;">YOUR CIRCLE</span>
+          <sc-for list="{{ t.circleR }}" as="p" hint-placeholder-count="2">
+            <div style="display:flex; align-items:center; gap:13px; padding:13px 0; border-bottom:1px solid {{ t.hairSoft }};">
+              <div style="width:40px; height:40px; flex:none; border-radius:50%; background:{{ p.avBg }}; color:{{ p.avFg }}; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px;">{{ p.initial }}</div>
+              <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                <div style="display:flex; align-items:baseline; gap:8px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16px; color:{{ t.ink }};">{{ p.name }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">{{ p.handle }}</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ p.relFg }};">{{ p.rel }}</span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ p.relFg }};">{{ p.glyph }}</span>
+            </div>
+          </sc-for>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:9px;">you follow only Ruth; Ruth and pebbi both follow you — the Ruth thread is the one mutual pair. 3 edges, resolved.</span>
+
+          <!-- SHARED BY YOU -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:22px; border-bottom:1px solid {{ t.hairSoft }}; padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">SHARED BY YOU</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.jade }};">5 of 31 · 16% ✓</span>
+          </div>
+          <sc-for list="{{ t.sharedR }}" as="s" hint-placeholder-count="5">
+            <div style="display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid {{ t.hairSoft }};">
+              <div style="width:22px; height:29px; flex:none; background:{{ s.sw }}; border:1px solid rgba(0,0,0,0.06); border-radius:8px 4px 7px 4px;"></div>
+              <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+                <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:14.5px; color:{{ t.ink }};">{{ s.tea }}</span><span style="font-family:'Noto Serif SC',serif; font-size:10.5px; color:{{ t.muted }};">{{ s.script }}</span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">{{ s.meta }}</span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.clayInk }}; background:{{ t.jade }}; padding:2px 5px; border-radius:3px; flex:none;">SHARED</span>
+            </div>
+          </sc-for>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:8px;">badge says only “shared” — <code>is_shared</code> holds no recipient (R25 adds one). two of the five are senchadō kyūsu sittings — the two-method story senchadō is about, and true.</span>
+
+          <!-- PASSED TO YOU (R25 receive shelf) -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:22px; border-bottom:1px solid {{ t.hairSoft }}; padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">PASSED TO YOU</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.hiInk }};">R25 · illustrative</span>
+          </div>
+          <div style="margin-top:12px; border:1px solid {{ t.hair }}; border-radius:13px; background:{{ t.factBg }}; padding:13px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:center; gap:11px;">
+              <div style="width:22px; height:29px; flex:none; background:#843A1E; border:1px solid rgba(0,0,0,0.06); border-radius:8px 4px 7px 4px;"></div>
+              <div style="display:flex; flex-direction:column; gap:2px; flex:1;"><span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:14.5px; color:{{ t.ink }};">Rou Gui</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">Ruth passed you a cup · 12 Jul</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.link }};">open reference · Wuyi yancha ›</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.ink }}; border:1px solid {{ t.hair }}; padding:2px 5px; border-radius:3px;">ADD TO SHELF</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:flex-start; padding-top:9px; border-top:1px solid {{ t.hairSoft }};">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.hiInk }}; flex:none; margin-top:2px;">KINDRED</span>
+              <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.ink }}; line-height:1.45;">“the second steep is where it opens — give it a minute.” <span style="font-style:normal; font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">— Ruth</span></span>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:8px;">the receive side of Tea detail's “Pass this tea to the circle”, plus a kindred note (the correspondence-shaped reply). affordances are real (R25); this row is illustrative until the pass record ships (R27). tapping a passed tea has no library record to open — so it opens the <span style="color:{{ t.link }};">Go Deeper reference</span> where the catalog covers it, else a minimal preview + Add to shelf (flagged below).</span>
+
+          <div style="display:flex; align-items:center; gap:8px; margin-top:20px;">
+            <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">＋ Find someone by handle</span>
+          </div>
+
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 3</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Send and receive, on one pass record</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">One pass record (R25):</strong> <code style="color:#C9BFAC;">(session_id or tea_id, to_profile nullable = circle, note, created_at)</code> yields all three at once — per-recipient sharing (the “to Ruth” the current <code style="color:#C9BFAC;">is_shared</code> can't express), the Passed-to-you shelf, and the kindred reply (a note on a passed cup). Not reactions. Until it ships, the badge says only “shared”.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Graph resolved (checked):</strong> 3 profiles (ruth/Ruth, tosinik/Niklas, pebbi), third edge <strong>pebbi → tosinik</strong> — you follow only Ruth, both follow you, so the Ruth mutual pair is right; 5 of 31 shared (16%). Shared five: Huang Ya Yellow Tips (4 Jul) · Ruby Ruanzhi (5 Jul) · Kabusecha Kagoshima (6 Jul) · Yashi Xiang Dancong (8 Jul) · Sencha Kagoshima Premium (11 Jul). <strong style="color:#E5AE2B;">Don't fix history:</strong> session snapshots keep their committed <code style="color:#C9BFAC;">tea_name</code> — old sittings still read “Guandong”; render as stored, never re-spell. The Passed-to-you row is illustrative (R27).</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">What a passed tea opens (flag):</strong> a passed cup isn't in your library, so tapping it can't open a tea record. Two honest destinations: the <strong>Go Deeper reference</strong> entry where the catalog covers it (Rou Gui is a Wuyi yancha, so it would), or a <strong>minimal preview</strong> — sender's note, swatch, script — with <strong>Add to shelf</strong> the only action. Ruled both (R36): coverage picks the destination — Go Deeper where the catalog covers the tea, the preview + Add to shelf where it doesn't. Not the user's choice.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Presence is not the feed you rejected:</strong> the concept ruled out an activity feed (<em>“brewed a gyokuro 2h ago” is performance</em>) and that stands. Presence is its structural opposite — <strong>present tense and gone</strong>, not past tense and permanent: nothing to scroll, no count, nothing to react to, and it vanishes when the steep ends. Two constraints keep it honest — <strong>opt-in and reciprocal</strong> (you see presence only if you share it) and it <strong>writes nothing</strong>, derived from a live steep timer, so unlike the pass record it costs <em>no schema</em>. Ruled: <strong>parked (R35)</strong> — right idea, wrong time. Kept in the file as the quiet “right now” strip, but nothing ships this release.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    // CHECKED — third edge resolved: pebbi → tosinik. You follow only Ruth; both follow you.
+    const circle = [
+      { name: "Ruth", handle: "ruth", rel: "mutual · you write to each other", glyph: "⇄", mutual: true },
+      { name: "pebbi", handle: "pebbi", rel: "follows you", glyph: "→ you", mutual: false }
+    ];
+    // CHECKED — the real shared five (ledger §2). Two are senchadō kyūsu sittings.
+    const shared = [
+      { sw: "#CBA347", tea: "Huang Ya Yellow Tips", script: "黄芽", meta: "4 Jul · yellow" },
+      { sw: "#9C4A2E", tea: "Ruby Ruanzhi", script: "", meta: "5 Jul · Thai oolong" },
+      { sw: "#6E8A3C", tea: "Kabusecha Kagoshima", script: "冠茶", meta: "6 Jul · senchadō · kyūsu" },
+      { sw: "#C58A3B", tea: "Yashi Xiang Dancong", script: "鴨屎香", meta: "8 Jul · Guangdong oolong" },
+      { sw: "#8FA83E", tea: "Sencha Kagoshima Premium", script: "煎茶", meta: "11 Jul · senchadō · kyūsu" }
+    ];
+
+    const resolve = (t) => ({ ...t, cap: t.capText,
+      circleR: circle.map(p => ({ name: p.name, handle: p.handle, rel: p.rel, glyph: p.glyph,
+        initial: p.name.charAt(0).toUpperCase(),
+        avBg: p.mutual ? t.clay : t.factBg, avFg: p.mutual ? t.clayInk : t.muted,
+        relFg: p.mutual ? t.jade : t.muted })),
+      sharedR: shared.map(s => ({ tea: s.tea, script: s.script, meta: s.meta, sw: s.sw }))
+    });
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const FX = { tag: "FIXED", tagBg: "rgba(105,22,15,0.14)", tagFg: "#8A2B1C" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...CK, k: "SC1", t: "Correspondence, not broadcast", d: "3 profiles and 3 edges is a circle, not an audience — no feed, no follower counts, no strangers. The concept the round assumed, confirmed by the real graph's size." },
+      { ...CK, k: "SC2", t: "The mutual pair is the spine", d: "You follow only Ruth, and Ruth follows back — the one mutual thread, drawn with a clay avatar and the ⇄ glyph so it reads before pebbi's one-way follow." },
+      { ...FX, k: "SC3", t: "Third edge resolved: pebbi → you", d: "Earlier tagged estimated; it's known. pebbi follows you (one-way, inbound). You don't follow back. So Ruth is the only mutual, exactly as drawn." },
+      { ...FX, k: "SC4", t: "The real shared five", d: "Huang Ya Yellow Tips, Ruby Ruanzhi, Kabusecha, Yashi Xiang, Sencha Kagoshima Premium — 5 of 31 (16%). Two are senchadō kyūsu sittings, a truer story than the invented Gyokuro pair. That tea name never existed." },
+      { ...FX, k: "SC5", t: "Passed cups + Kindred restored (R25)", d: "The send action on Tea detail had no receive side — now it does. Passed cups is the receiving shelf; Kindred notes are the reply on a passed cup. Both hang off one pass record, not a reactions system." },
+      { ...FL, k: "SC6", t: "Badge is “shared”, not “to Ruth”", d: "is_shared carries no recipient, so the per-recipient claim was unbacked. The badge says only “shared” until R25's to_profile column ships; then it can name the recipient truthfully." },
+      { ...FL, k: "SC7", t: "Where a passed tea leads", d: "A passed cup isn't in your library — no tea record to open. It leads to the Go Deeper reference where the catalog covers it (Rou Gui → Wuyi yancha), else a minimal preview with Add to shelf. Ruled both (R36): coverage decides, not the user." },
+      { ...FL, k: "SC8", t: "Presence — parked, not rejected (R35)", d: "A quiet “Ruth is having tea now.” Not the rejected activity feed: present tense and gone, not past and permanent — no scroll, no count, nothing to react to, vanishing when her steep ends. Opt-in, reciprocal, writes nothing (a live timer, no schema). Right idea, wrong time: kept in the file, nothing ships this release." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "The circle, then the two directions of a cup: what you've shared out, and what's been passed to you. The passed-cup card carries its kindred note inline — a reply shaped like correspondence, not a comment thread. The receive row is illustrative until the pass record ships.", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", hiInk: "#7A5A10", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", factBg: "#EDE6D4", selBg: "rgba(229,174,43,0.14)" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "The same circle at night. The kindred note still reads as a letter, not a like; the passed-cup shelf still waits quietly. Nothing broadcasts.", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", hiInk: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", factBg: "#262017", selBg: "rgba(229,174,43,0.12)" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

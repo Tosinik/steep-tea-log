@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="18" y="84" width="84" height="14" rx="7" fill="#2B2320"></rect><circle cx="30" cy="91" r="3" fill="#E5AE2B"></circle><circle cx="48" cy="91" r="3" fill="#F6F2E9"></circle><circle cx="66" cy="91" r="3" fill="#F6F2E9"></circle><circle cx="84" cy="91" r="3" fill="#F6F2E9"></circle><rect x="30" y="24" width="60" height="42" rx="6" fill="none" stroke="#9C5B33" stroke-width="5"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:24px; background:#DDD6C6;">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">MAP · 2 OF 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">NAVIGATION · rev 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Where everything lives</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1040px; margin:0; line-height:1.65;">Five tab slots, one avatar hub, and every designed surface hung off one of them. Per today's rulings: the hub is <strong>social · shopping · settings</strong> — the passport is absorbed by Origins (R45) and achievements are dropped, so both leave the hub; <strong>Origins nests in Insights</strong> as the default bottom card (R46). Both previously-flagged homes are now ruled — Go Deeper (R51) and the vendor manager (R52) land on the <strong>Teas</strong> tab; only the tab's <em>name</em> stays open.</p>
+  </div>
+
+  <!-- TAB SLOTS -->
+  <div style="display:flex; gap:14px; flex-wrap:wrap; max-width:1240px;">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+      <div style="width:232px; border:1px solid #C9BC9E; border-radius:13px; background:#F6F2E9; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="display:flex; align-items:center; gap:8px; padding:11px 13px; background:{{ t.headBg }};">
+          <span style="font-family:'Noto Serif SC',serif; font-size:14px; color:{{ t.headFg }};">{{ t.kanji }}</span>
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:{{ t.headFg }};">{{ t.name }}</span>
+        </div>
+        <sc-for list="{{ t.children }}" as="c" hint-placeholder-count="3">
+          <div style="display:flex; flex-direction:column; gap:2px; padding:9px 13px; border-top:1px solid #E2D9C2;">
+            <div style="display:flex; align-items:baseline; gap:6px;">
+              <span style="font-size:12.5px; font-weight:600; color:{{ c.fg }}; line-height:1.3;">{{ c.l }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ c.tagFg }};">{{ c.tag }}</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.4;">{{ c.sub }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- HUB + OVERLAYS -->
+  <div style="display:flex; gap:14px; flex-wrap:wrap; max-width:1240px;">
+    <div style="width:360px; border:1px solid #C9BC9E; border-radius:13px; background:#F6F2E9; overflow:hidden;">
+      <div style="padding:11px 14px; background:#9C5B33; display:flex; align-items:center; gap:9px;">
+        <span style="width:22px; height:22px; border-radius:50%; background:#F6EFE2; color:#9C5B33; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:12px;">N</span>
+        <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#F6EFE2;">Avatar hub</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#F1DCC8; margin-left:auto;">TAB-LEVEL ONLY · R44</span>
+      </div>
+      <sc-for list="{{ hub }}" as="h" hint-placeholder-count="3">
+        <div style="display:flex; flex-direction:column; gap:2px; padding:9px 14px; border-top:1px solid #E2D9C2;">
+          <div style="display:flex; align-items:baseline; gap:6px;"><span style="font-size:12.5px; font-weight:600; color:{{ h.fg }};">{{ h.l }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ h.tagFg }};">{{ h.tag }}</span></div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.4;">{{ h.sub }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="width:360px; border:1px solid #C9BC9E; border-radius:13px; background:#F6F2E9; overflow:hidden;">
+      <div style="padding:11px 14px; background:#2B2320;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#F6F2E9;">Overlays &amp; immersive</span></div>
+      <sc-for list="{{ overlays }}" as="o" hint-placeholder-count="3">
+        <div style="display:flex; flex-direction:column; gap:2px; padding:9px 14px; border-top:1px solid #E2D9C2;">
+          <div style="display:flex; align-items:baseline; gap:6px;"><span style="font-size:12.5px; font-weight:600; color:{{ o.fg }};">{{ o.l }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ o.tagFg }};">{{ o.tag }}</span></div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.4;">{{ o.sub }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ BOTH HOMES NOW RULED · ONE NAME STILL OPEN</span>
+    <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#A6BD66;">RULED · Go Deeper (R51):</strong> <strong>both</strong>, not either — a browsable reference as the <strong>Teas tab's second mode</strong> (your shelf ↔ the reference), <em>plus</em> contextual entries from Tea detail, the brew-guide “Borrow from Go Deeper” action, and R36's passed-tea path. Explicitly <strong>not</strong> reached through the profile hub. The second mode is drawn on the Teas revision board.</span>
+    <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#A6BD66;">RULED · vendor manager (R52):</strong> the <strong>Teas shelf's overflow</strong>, as “Edit vendors” — <code style="color:#C9BFAC;">teas.source</code>-derived, string-based for R3, a list of names with counts rather than an entity browser. Shipped Settings copy already ends “Manage vendors from the Teas tab”, so this is continuity, not a move. <strong style="color:#E5AE2B;">Vessels corrected:</strong> not an overlay — <code style="color:#C9BFAC;">goVessels()</code> sets <code style="color:#C9BFAC;">teaSeg='vessels'; view='teas'</code> (v3.46), so it is a <em>segment of the Teas tab</em>. Map 1 had this right; Map 2 now agrees.</span>
+    <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Still open — the tab's name:</strong> the shipped tab is <strong>Teas</strong> (<code style="color:#C9BFAC;">bottomNavHTML()</code> — Home · Teas · Log · Sessions · Insights, <code style="color:#C9BFAC;">steep-core.js:894–903</code>), so it is drawn as Teas throughout. Whether it becomes “Library” is a separate decision — flagged, not assumed. <strong style="color:#E5AE2B;">Settled elsewhere:</strong> hub = social · shopping · settings (R45); Origins = Insights' bottom MORE card, moveable (R46); avatar on tab-level screens only (R44); Wrapped from its Insights teaser (R38, monthly). <strong>Home</strong> stays round-1 (R53 accepts Bundle 1 for it).</span>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const D = { tag: "designed", tagFg: "#2F4A32", fg: "#2B2320" };
+    const R1 = { tag: "round-1 only", tagFg: "#7A3F1E", fg: "#5C5148" };
+    const U = { tag: "undesigned", tagFg: "#8A2B1C", fg: "#5C5148" };
+    const P = { tag: "PROPOSAL", tagFg: "#8A2B1C", fg: "#2B2320" };
+    const PK = { tag: "parked", tagFg: "#7A5A10", fg: "#8C7F6C" };
+    const it = (l, sub, s) => ({ l, sub, tag: s.tag, tagFg: s.tagFg, fg: s.fg });
+
+    return {
+      tabs: [
+        { name: "Home", kanji: "家", headBg: "#EDE6D4", headFg: "#2B2320", children: [
+          it("Today's shelf + prompt", "bundle-1 panel · no rev board", R1),
+          it("Resume a session", "hands off to Focus", R1)
+        ]},
+        { name: "Teas", kanji: "茶", headBg: "#EDE6D4", headFg: "#2B2320", children: [
+          it("Shelf ↔ Go Deeper (2 modes)", "R51 · second mode drawn on the Teas revision board", D),
+          it("Vessels (2nd segment)", "05-vessels-rev1 · teaSeg='vessels' (v3.46) — a segment, not an overlay", D),
+          it("Tea detail", "03-tea-detail-rev3", D),
+          it("Add / edit tea", "06-add-edit-tea-rev4", D),
+          it("Vendor manager", "R52 · shelf overflow → “Edit vendors” · teas.source", D),
+          it("Rename to “Library”?", "shipped tab is Teas (steep-core.js:894–903) — open decision", U)
+        ]},
+        { name: "＋ (centre)", kanji: "点", headBg: "#3F5E42", headFg: "#F6F2E9", children: [
+          it("Session setup", "04-session-setup-pickers-rev6", D),
+          it("Quick log", "12-quick-log-rev1 · retrospective twin", D)
+        ]},
+        { name: "Sessions", kanji: "席", headBg: "#EDE6D4", headFg: "#2B2320", children: [
+          it("List (default)", "02-sessions-rev3", D),
+          it("Brewing days heatmap", "secondary view · v3.44 · R42", D),
+          it("Session detail + edit", "02b-session-detail-edit-rev2", D)
+        ]},
+        { name: "Insights", kanji: "見", headBg: "#EDE6D4", headFg: "#2B2320", children: [
+          it("Cards + 3-window control", "08-insights-rev3", D),
+          it("Origins (bottom card)", "origins-map-v3 · moveable · R46", D),
+          it("Wrapped", "11-wrapped-rev1 · from teaser · monthly", D)
+        ]}
+      ],
+      hub: [
+        it("Social", "08-social-rev3 · circle · shared · passed", D),
+        it("Shopping", "08-shopping-rev3 · wishlist + running low", D),
+        it("Settings", "07-settings-rev2 · nine sections", D),
+        it("Passport → absorbed", "left the hub · lives as Origins (R45)", PK),
+        it("Achievements → dropped", "left the hub (R45)", PK)
+      ],
+      overlays: [
+        it("Focus (steeping)", "10-focus-rev2 · immersive · no avatar, no tabs (R44)", D),
+        it("Go Deeper (contextual entry)", "R51 · from Tea detail, borrow-guide + R36 passed-tea. Browsable mode lives in the Teas tab, not here", D),
+        it("First run / landing", "09-first-run-rev1 · pre-auth, outside the shell (R29)", D),
+
+        it("Profile hub menu itself", "contents designed; the menu sheet is not drawn", U),
+        it("Presence", "parked (R35) · strip kept in Social, ships nothing", PK)
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

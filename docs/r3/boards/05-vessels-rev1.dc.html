@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+<meta name="ext-resource-dependency" content="uploads/PXL_20260713_165741972.MP.jpg">
+<meta name="ext-resource-dependency" content="uploads/PXL_20260713_170010491.MP.jpg">
+<meta name="ext-resource-dependency" content="uploads/PXL_20260713_170114025.jpg">
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="20" y="26" width="30" height="34" rx="6" fill="#4B3621"></rect><rect x="58" y="30" width="42" height="6" rx="3" fill="#2A1F14"></rect><rect x="58" y="42" width="30" height="4" rx="2" fill="#8C7F6C"></rect><rect x="20" y="70" width="30" height="34" rx="6" fill="#C7A57C"></rect><rect x="58" y="74" width="42" height="6" rx="3" fill="#2A1F14"></rect><rect x="58" y="86" width="30" height="4" rx="2" fill="#8C7F6C"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #05</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">器 VESSELS</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Vessel library + add / edit</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:960px; margin:0; line-height:1.65;">The whole vessel entity. Home is the <strong>avatar ⊙ cluster</strong> (ruled — low-frequency), and the list is rich enough that tapping a vessel goes <strong>straight to edit</strong> (detail deferred). Photo carries identity; photo-less vessels fall back to the type kanji. Add/edit mirrors add-tea. The design handles the shapes — photo / no photo, any type &amp; capacity — real photos come at build. Both themes.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+        <!-- VESSEL LIBRARY -->
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column;">
+            <div style="padding:26px 24px 0; display:flex; flex-direction:column; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <svg viewBox="0 0 24 24" style="width:20px; height:20px; color:{{ t.ink }};"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:23px; color:{{ t.ink }};">Vessels</span>
+                </div>
+                <span style="font-size:24px; line-height:1; color:{{ t.jade }};">＋</span>
+              </div>
+              <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:{{ t.muted }}; margin-top:11px; padding-bottom:11px; border-bottom:1px solid {{ t.hair }};">Your vessels — tap any to edit.</span>
+
+              <div style="display:flex; flex-direction:column;">
+                <sc-for list="{{ t.vesselListR }}" as="v" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; gap:13px; padding:13px 4px; border-bottom:1px solid {{ t.hairSoft }};">
+                    <sc-if value="{{ v.hasPhoto }}" hint-placeholder-val="{{ true }}"><img src="{{ v.photo }}" style="width:52px; height:64px; flex:none; object-fit:cover; border-radius:10px 5px 9px 6px; border:1px solid rgba(0,0,0,0.1);"></sc-if>
+                    <sc-if value="{{ v.noPhoto }}" hint-placeholder-val="{{ false }}"><div style="width:52px; height:64px; flex:none; border-radius:10px 5px 9px 6px; background:{{ t.factBg }}; border:1px dashed {{ t.hair }}; display:flex; align-items:center; justify-content:center;"><span style="font-family:'Noto Serif SC',serif; font-size:20px; color:{{ t.muted }};">{{ v.kanji }}</span></div></sc-if>
+                    <div style="display:flex; flex-direction:column; gap:3px; flex:1;">
+                      <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:16.5px; color:{{ t.ink }};">{{ v.n }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.muted }};">{{ v.meta }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }}; opacity:0.85;">{{ v.usage }}</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" style="width:16px; height:16px; color:{{ t.muted }}; flex:none;"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="flex:1;"></div>
+              <div style="padding:14px 0 22px;">
+                <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">＋ Add a vessel</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">VESSEL LIBRARY · avatar ⊙ cluster</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capLib }}</span>
+        </div>
+
+        <!-- ADD / EDIT VESSEL -->
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+            <div style="padding:26px 24px 24px; display:flex; flex-direction:column;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:{{ t.ink }};">Edit vessel</span>
+                <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:15px; margin-top:16px;">
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">PHOTO — the vessel's identity</span>
+                  <div style="display:flex; align-items:center; gap:13px;">
+                    <img src="uploads/PXL_20260713_165741972.MP.jpg" style="width:60px; height:74px; flex:none; object-fit:cover; border-radius:11px 5px 9px 6px; border:1px solid rgba(0,0,0,0.1);">
+                    <div style="display:flex; flex-direction:column; gap:7px;">
+                      <span style="font-size:12px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }}; width:fit-content;">change photo</span>
+                      <span style="font-size:12px; color:{{ t.red }}; opacity:0.85;">remove</span>
+                    </div>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">no photo → the list shows the type kanji instead. never nudged.</span>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">NAME</span>
+                  <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:9px 12px; font-family:'Shippori Mincho',serif; font-size:15px; color:{{ t.ink }};">Main Kyusu</div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">TYPE</span>
+                  <div style="display:flex; gap:13px; flex-wrap:wrap;">
+                    <sc-for list="{{ t.typeR }}" as="s" hint-placeholder-count="5"><span style="font-family:'Shippori Mincho',serif; font-size:14.5px; font-weight:{{ s.w }}; color:{{ s.fg }}; box-shadow:{{ s.mark }}; padding:0 2px;">{{ s.l }}</span></sc-for><span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.link }};">＋ type your own</span>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">MATERIAL</span>
+                  <div style="display:flex; gap:13px; flex-wrap:wrap;">
+                    <sc-for list="{{ t.materialR }}" as="s" hint-placeholder-count="4"><span style="font-family:'Shippori Mincho',serif; font-size:14.5px; font-weight:{{ s.w }}; color:{{ s.fg }}; box-shadow:{{ s.mark }}; padding:0 2px;">{{ s.l }}</span></sc-for><span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.link }};">＋ type your own</span>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; line-height:1.5;">type &amp; material: common chips + free text, saved to a growing set (tagLibrary) — “Cold brew jar”, “red clay”, “yixing zisha” all fit. Same mechanic as flavour words.</span>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">CAPACITY</span>
+                  <div style="display:flex; align-items:center; gap:9px;">
+                    <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:9px 14px; font-family:'IBM Plex Mono',monospace; font-size:14px; color:{{ t.ink }};">210</div>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }};">ml</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:20px; background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; text-align:center; padding:13px 0; border-radius:15px 6px 13px 7px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">Save vessel</div>
+              <div style="display:flex; justify-content:center; margin-top:12px;">
+                <span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.red }}; opacity:0.85;">Delete this vessel — hold to confirm</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">ADD / EDIT VESSEL</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capEdit }}</span>
+        </div>
+
+      </div>
+    </div>
+  </sc-for>
+
+  <!-- EMPTY STATE -->
+  <div style="display:flex; flex-direction:column; gap:14px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">EMPTY STATE · TD9</span>
+    <div style="width:340px; height:400px; border-radius:26px; border:1px solid rgba(42,31,20,0.30); background:#F5F0E3; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column;">
+      <div style="padding:24px 22px 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #2A1F14; padding-bottom:8px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:21px; color:#2A1F14;">Vessels</span>
+          <span style="font-size:22px; color:#3F5E42;">＋</span>
+        </div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:13px; padding:0 30px;">
+        <div style="width:48px; height:60px; border:1.5px dashed rgba(42,31,20,0.3); border-radius:11px 5px 9px 6px;"></div>
+        <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2A1F14; text-align:center;">No vessels yet.</span>
+        <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:#8C7F6C; text-align:center; line-height:1.5;">Add the pot or cup you brew in — a photo makes it yours.</span>
+      </div>
+    </div>
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:#5C5148;">VESSEL LIBRARY · EMPTY</span>
+  </div>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">The vessel entity</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#3F5E42;">{{ n.k }}</span>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#A6BD66;">Vessel type &amp; material — resolved:</strong> both are <strong>free text</strong> (a growing tagLibrary set), not enums — “Cold brew jar” and “red clay” fit natively; the form gives common chips + type-your-own. <strong style="color:#E5AE2B;">Capacity unit:</strong> assumed <code style="color:#C9BFAC;">ml</code>; confirm the schema stores a number + unit. <strong style="color:#E5AE2B;">Vessel image:</strong> same storage path as tea/session photos? Decide, don't discover.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const vesselData = [
+      { kanji: "蓋碗", n: "Dragon Gaiwan", meta: "gaiwan · porcelain · 110 ml", usage: "16 sittings" },
+      { photo: "uploads/PXL_20260713_165741972.MP.jpg", n: "Main Kyusu", meta: "kyūsu · clay · 210 ml", usage: "9 sittings" },
+      { kanji: "絞", n: "Mogake Shiboridashi", meta: "shiboridashi · clay", usage: "4 sittings" },
+      { kanji: "旅", n: "Travel cuppa", meta: "tumbler · steel", usage: "1 sitting" },
+      { kanji: "冷", n: "Hario Coldbrew", meta: "cold brew · glass · 750 ml", usage: "1 sitting" }
+    ];
+    const typeData = [ { l: "kyūsu", on: true }, { l: "gaiwan" }, { l: "houhin" }, { l: "yunomi" }, { l: "other" } ];
+    const materialData = [ { l: "clay", on: true }, { l: "porcelain" }, { l: "stoneware" }, { l: "glass" } ];
+
+    const cap = {
+      capLib: "Behind the avatar ⊙ (ruled — low-frequency). Rich rows — photo, name, type · material · capacity, and usage — so a tap goes straight to edit; no separate detail page. Photo carries identity; the photo-less Frog Yunomi shows its type kanji (湯呑).",
+      capEdit: "Mirrors add-tea. Photo (change / remove), name, type, material, capacity in ml. One clay commit; delete is a calm hold-to-confirm. The add state is the same form, empty, with an “add a photo” slot."
+    };
+
+    const seg = (arr, t) => arr.map(s => ({ l: s.l, w: s.on ? 700 : 500, fg: s.on ? t.ink : t.muted, mark: s.on ? "inset 0 -8px 0 " + t.hi : "none" }));
+
+    const resolve = (t) => ({ ...t, ...cap,
+      vesselListR: vesselData.map(v => ({ n: v.n, meta: v.meta, usage: v.usage,
+        hasPhoto: !!v.photo, noPhoto: !v.photo, photo: v.photo || "", kanji: v.kanji || "" })),
+      typeR: seg(typeData, t),
+      materialR: seg(materialData, t)
+    });
+
+    const notes = [
+      { k: "V1", t: "Home is the avatar cluster", d: "Vessel management is low-frequency (three-ish vessels, rarely added), so it lives behind the profile ⊙ — not a tab, not a Library segment (both rejected). The high-frequency surface is the picker (#04)." },
+      { k: "V2", t: "List → edit, no detail page", d: "Ratified: four fields wouldn't fill a detail. So the row is rich (photo · type · material · capacity · usage) and tapping goes straight to edit. Revisit only if vessels gain depth." },
+      { k: "V3", t: "Photo = identity, kanji = fallback", d: "Real photos (yours at build); the design only needs the shapes — photo / no photo. Photo-less → the type kanji on the plate (蓋碗 · 絞), the Tier-3 pattern, consistent with teas." },
+      { k: "V4", t: "Edit mirrors add-tea", d: "Same form language — photo, name, type, material, capacity — so the two entity forms are learned once. One clay commit; hold-to-confirm delete; no native alert." },
+      { k: "V5", t: "Sparse state adapts (TD9)", d: "Empty library → an invitation (“add the pot or cup you brew in”), not a blank grid. The general rule applied here too." },
+      { k: "V6", t: "Flags collected, not assumed", d: "Vessel type set, capacity unit, image storage path — all raised as hand-off decisions rather than silently chosen, per the running discipline." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", factBg: "#EDE6D4" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", factBg: "#262017" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

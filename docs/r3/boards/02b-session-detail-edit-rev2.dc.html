@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="24" y="26" width="16" height="20" rx="4" fill="#843A1E"></rect><rect x="48" y="30" width="48" height="5" rx="2" fill="#2A1F14"></rect><g fill="#2A1F14"><rect x="24" y="60" width="7" height="9" rx="1"></rect><rect x="34" y="60" width="7" height="9" rx="1"></rect><rect x="44" y="60" width="7" height="9" rx="1" opacity="0.4"></rect></g><rect x="24" y="80" width="72" height="4" rx="2" fill="#8C7F6C"></rect><rect x="24" y="90" width="52" height="4" rx="2" fill="#8C7F6C"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1280px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #02b</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">D1–D8 + EDIT · rev 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 77cf800</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Session detail, rebuilt for the real data — plus edit-session</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:940px; margin:0; line-height:1.65;">Now carries what a session actually stores: per-steep taste (note · tags · the v3.89 strength tap), the growing vocabulary, the photo, session-level facts, and every out-link the connection map named (tea · vessel · edit · delete · share · brew-again). The edit-session screen it links to is here too, and the three variants that were unhandled. Both themes on the hero screens.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+        <!-- SESSION DETAIL v2 -->
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; position:relative;">
+            <div style="padding:26px 24px 24px; display:flex; flex-direction:column;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:9px;">
+                  <svg viewBox="0 0 24 24" style="width:20px; height:20px; color:{{ t.ink }};"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:{{ t.muted }};">MON 6 JUL · MORNING</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:16px; color:{{ t.ink }};">
+                  <svg viewBox="0 0 24 24" style="width:17px; height:17px;"><path d="M14.5 4.5l5 5M4 20l1.2-4.6L16 4.6l3.9 3.9L9.1 19.3 4 20Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path></svg>
+                  <svg viewBox="0 0 24 24" style="width:17px; height:17px; fill:currentColor;"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:13px; margin-top:18px; padding-bottom:14px; border-bottom:1px solid {{ t.hairSoft }};">
+                <div style="width:40px; height:52px; flex:none; background:#843A1E; border-radius:11px 5px 9px 6px; border:1px solid rgba(0,0,0,0.08);"></div>
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:21px; color:{{ t.ink }};">Da Hong Pao</span>
+                    <span style="font-family:'Noto Serif SC',serif; font-size:14px; color:{{ t.muted }};">大紅袍</span>
+                    <svg viewBox="0 0 24 24" style="width:12px; height:12px; color:{{ t.jade }};"><path d="M6 18C6 10 11 5 19 5c0 8-5 13-13 13Z" fill="currentColor"></path></svg>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:5px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.muted }};">Wuyi oolong · gongfu ·</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.link }}; border-bottom:1px solid {{ t.hair }};">Dragon Gaiwan</span>
+                  </div>
+                </div>
+                <svg viewBox="0 0 24 24" style="width:18px; height:18px; color:{{ t.muted }}; flex:none;"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </div>
+
+              <!-- FACTS (D5) -->
+              <div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:14px;">
+                <sc-for list="{{ t.factsR }}" as="f" hint-placeholder-count="4">
+                  <div style="display:flex; flex-direction:column; gap:1px; background:{{ t.factBg }}; border-radius:7px; padding:5px 9px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:0.1em; color:{{ t.muted }};">{{ f.k }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.ink }};">{{ f.v }}</span>
+                  </div>
+                </sc-for>
+                <div style="display:flex; align-items:center; gap:5px; padding:5px 10px; border:1px dashed {{ t.hair }}; border-radius:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">not shared · no mood logged</span>
+                </div>
+              </div>
+
+              <!-- STEEPS (D1) -->
+              <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">STEEPS · SIX</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.muted }};">total 5:30 · 100°C flat · 110 ml</span>
+                </div>
+                <sc-for list="{{ t.steepsR }}" as="s" hint-placeholder-count="6">
+                  <div style="display:flex; gap:9px; align-items:flex-start; padding:8px 0; border-bottom:1px solid {{ t.hairSoft }};">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.ink }}; width:32px; flex:none;">{{ s.i }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.muted }}; width:28px; flex:none;">{{ s.t }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ s.cFg }}; width:26px; flex:none;">{{ s.c }}</span>
+                    <div style="display:flex; align-items:center; gap:5px; width:54px; flex:none;">
+                      <div style="display:flex; gap:1.5px;">
+                        <span style="width:4px; height:10px; border-radius:1px; background:{{ s.g1 }};"></span>
+                        <span style="width:4px; height:10px; border-radius:1px; background:{{ s.g2 }};"></span>
+                        <span style="width:4px; height:10px; border-radius:1px; background:{{ s.g3 }};"></span>
+                      </div>
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">{{ s.strLabel }}</span>
+                    </div>
+                    <div style="flex:1; display:flex; flex-direction:column; gap:3px;">
+                      <sc-if value="{{ s.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:11.5px; color:{{ t.ink }}; line-height:1.35;">{{ s.note }}</span></sc-if>
+                      <sc-if value="{{ s.hasTags }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex; gap:7px; flex-wrap:wrap;">
+                          <sc-for list="{{ s.tags }}" as="tg" hint-placeholder-count="2"><span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">·{{ tg }}</span></sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">the v3.89 strength tap + note per steep — the phase-2 data, now readable. distinct from CALIBRATE (timer).</span>
+              </div>
+
+              <!-- VOCABULARY (D2) -->
+              <div style="margin-top:18px; padding-top:14px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:9px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">TASTE · YOUR VOCABULARY <span style="letter-spacing:0; text-transform:none;">— grows as you brew</span> <span style="letter-spacing:0.06em; color:{{ t.muted }}; border:1px solid {{ t.hi }}; padding:1px 4px; border-radius:3px; font-size:7.5px;">GATED · R46</span></span>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:baseline;">
+                  <sc-for list="{{ t.vocabUsedR }}" as="w" hint-placeholder-count="3"><span style="font-family:'Shippori Mincho',serif; font-size:14.5px; color:{{ t.ink }}; box-shadow:inset 0 -7px 0 {{ t.hi }}; padding:0 3px;">{{ w }}</span></sc-for>
+                  <sc-for list="{{ t.vocabLibR }}" as="w" hint-placeholder-count="4"><span style="font-family:'Shippori Mincho',serif; font-size:13px; color:{{ t.muted }}; opacity:0.6; padding:0 2px;">{{ w }}</span></sc-for>
+                  <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.link }};">＋ a word</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:11px; margin-top:2px;">
+                  <span style="font-size:16px; letter-spacing:0.07em; color:{{ t.ink }};">★★★★<span style="opacity:0.5;">½</span></span>
+                  <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.muted }};">Infusion progression with added time worked really well.</span>
+                </div>
+              </div>
+
+              <!-- CALIBRATE -->
+              <div style="margin-top:16px; padding-top:14px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:5px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">CALIBRATE · POUR FEEDBACK</span>
+                <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.ink }};">no pour feedback logged this sitting — nothing to tune forward.</span>
+              </div>
+
+              <!-- PHOTO (D3) -->
+              <div style="margin-top:16px; padding-top:14px; border-top:1px solid {{ t.hairSoft }}; display:flex; flex-direction:column; gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:{{ t.muted }};">PHOTO</span>
+                <div style="height:118px; border-radius:12px; background:{{ t.photoBg }}; border:1px solid {{ t.hairSoft }}; display:flex; align-items:center; justify-content:center; gap:9px; color:{{ t.muted }};">
+                  <svg viewBox="0 0 24 24" style="width:22px; height:22px;"><path d="M4 8h3l1.6-2h6.8L23 8" fill="none" stroke="currentColor" stroke-width="1.4"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.4"></path><circle cx="12" cy="13" r="3.4" fill="none" stroke="currentColor" stroke-width="1.4"></circle></svg>
+                  <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px;">the sitting — 6 Jul</span>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">~40% of sittings carry one · none → a quiet “＋ add a photo” line, not a big empty frame.</span>
+              </div>
+
+              <!-- COMMIT + DELETE (D4, D7) -->
+              <div style="margin-top:20px; background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; text-align:center; padding:13px 0; border-radius:15px 6px 13px 7px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">Brew this again</div>
+              <div style="display:flex; justify-content:center; margin-top:12px;">
+                <span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.red }}; opacity:0.85;">Delete this sitting — hold to confirm</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SESSION DETAIL · v2 · D1–D5·D7</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capDetail }}</span>
+          <sc-if value="{{ t.isLight }}" hint-placeholder-val="{{ true }}">
+            <div style="width:390px; box-sizing:border-box; margin-top:2px; border:1px dashed #B8AC92; border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; background:#F1EBDA;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#8A7A5E;">⋯ MENU · ENUMERATED — the header ⋯, not shown open on-screen</span>
+              <span style="font-size:12px; color:#2B2320;">Share sitting</span>
+              <span style="font-size:12px; color:#2B2320;">Pass this tea to the circle <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 5px; border-radius:3px;">NEW</span></span>
+              <span style="font-size:12px; color:#2B2320;">Copy to a new entry <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8A6A2E; background:rgba(229,174,43,0.2); padding:1px 5px; border-radius:3px;">NEW</span></span>
+              <span style="font-size:12px; color:#8A2B1C;">Delete sitting</span>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- EDIT SESSION -->
+        <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+          <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+            <div style="padding:26px 24px 24px; display:flex; flex-direction:column;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:{{ t.ink }};">Edit sitting</span>
+                <span style="font-size:15px; color:{{ t.muted }};">✕</span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:14px; margin-top:16px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">TEA · VESSEL</span>
+                  <div style="display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid {{ t.hair }}; border-radius:9px;">
+                    <div style="width:20px; height:26px; flex:none; background:#843A1E; border-radius:7px 3px 6px 4px;"></div>
+                    <span style="font-family:'Shippori Mincho',serif; font-weight:500; font-size:15px; color:{{ t.ink }};">Da Hong Pao</span>
+                    <span style="flex:1;"></span>
+                    <span style="font-size:11.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">change</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid {{ t.hair }}; border-radius:9px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.muted }};">vessel</span>
+                    <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ t.ink }};">Dragon Gaiwan</span>
+                    <span style="flex:1;"></span>
+                    <span style="font-size:11.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">change</span>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">METHOD</span>
+                  <div style="display:flex; gap:14px;">
+                    <sc-for list="{{ t.methodsR }}" as="m" hint-placeholder-count="4"><span style="font-family:'Shippori Mincho',serif; font-size:14.5px; font-weight:{{ m.w }}; color:{{ m.fg }}; box-shadow:{{ m.mark }}; padding:0 2px;">{{ m.l }}</span></sc-for>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">LEAF · WATER · WHEN</span>
+                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <sc-for list="{{ t.editFieldsR }}" as="e" hint-placeholder-count="4">
+                      <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:0.08em; color:{{ t.muted }};">{{ e.k }}</span>
+                        <div style="border:1px solid {{ t.hair }}; border-radius:7px; padding:7px 10px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ t.ink }}; min-width:52px;">{{ e.v }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">STEEPS · EDIT EACH (es_setSteep)</span>
+                  <sc-for list="{{ t.editSteepsR }}" as="s" hint-placeholder-count="4">
+                    <div style="display:flex; gap:7px; align-items:center;">
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.ink }}; width:16px; flex:none;">{{ s.i }}</span>
+                      <div style="border:1px solid {{ t.hair }}; border-radius:6px; padding:5px 8px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.ink }};">{{ s.t }}</div>
+                      <div style="border:1px solid {{ t.hair }}; border-radius:6px; padding:5px 8px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.ink }};">{{ s.c }}</div>
+                      <div style="flex:1; border:1px solid {{ t.hair }}; border-radius:6px; padding:5px 9px; font-family:'Shippori Mincho',serif; font-style:{{ s.noteStyle }}; font-size:11.5px; color:{{ s.noteFg }};">{{ s.noteOrHint }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">MOOD · RATING · NOTE</span>
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.ink }};">unhurried</span>
+                    <span style="font-size:15px; letter-spacing:0.06em; color:{{ t.ink }};">★★★★<span style="opacity:0.24;">★</span></span>
+                  </div>
+                  <div style="border:1px solid {{ t.hair }}; border-radius:8px; padding:8px 11px; font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.ink }};">the roast eased by the third…</div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">TASTE WORDS (this sitting's tags)</span>
+                  <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center;">
+                    <sc-for list="{{ t.vocabUsedR }}" as="w" hint-placeholder-count="3"><span style="font-family:'Shippori Mincho',serif; font-size:13.5px; color:{{ t.ink }}; box-shadow:inset 0 -6px 0 {{ t.hi }}; padding:0 4px;">{{ w }} <span style="font-size:10px; color:{{ t.muted }};">✕</span></span></sc-for>
+                    <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.link }};">＋ a word</span>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.14em; color:{{ t.muted }};">PHOTO (photo_url)</span>
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:56px; height:56px; border-radius:10px; background:{{ t.photoBg }}; border:1px solid {{ t.hairSoft }}; display:flex; align-items:center; justify-content:center; color:{{ t.muted }};">
+                      <svg viewBox="0 0 24 24" style="width:20px; height:20px;"><path d="M4 8h3l1.6-2h6.8L23 8" fill="none" stroke="currentColor" stroke-width="1.4"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.4"></path><circle cx="12" cy="13" r="3.2" fill="none" stroke="currentColor" stroke-width="1.4"></circle></svg>
+                    </div>
+                    <span style="font-size:11.5px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">change</span>
+                    <span style="font-size:11.5px; color:{{ t.red }}; opacity:0.85;">remove</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:20px; background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:14px; text-align:center; padding:13px 0; border-radius:15px 6px 13px 7px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -2px 0 rgba(0,0,0,0.2);">Save changes</div>
+              <div style="display:flex; justify-content:center; margin-top:12px;">
+                <span style="font-family:'Shippori Mincho',serif; font-size:12.5px; color:{{ t.red }}; opacity:0.85;">Delete this sitting — hold to confirm</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">EDIT SESSION · NEW · D4</span>
+          <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.capEdit }}</span>
+        </div>
+
+      </div>
+    </div>
+  </sc-for>
+
+  <!-- VARIANTS (D6) -->
+  <div style="display:flex; flex-direction:column; gap:14px;">
+    <div style="display:flex; align-items:baseline; gap:12px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">THREE VARIANTS · D6</span>
+      <span style="font-size:11.5px; color:#75695C;">the shapes a session takes that a single gongfu template can't — cold brew, steepless matcha (#12), and the empty tab.</span>
+    </div>
+    <div style="display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;">
+
+      <!-- COLD BREW -->
+      <div style="display:flex; flex-direction:column; gap:8px; width:340px;">
+        <div style="width:340px; height:520px; border-radius:26px; border:1px solid rgba(42,31,20,0.30); background:#F5F0E3; overflow:hidden; box-sizing:border-box; padding:24px 22px; display:flex; flex-direction:column;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#8C7F6C;">SUN 12 JUL · AFTERNOON</span>
+          <div style="display:flex; align-items:center; gap:11px; margin-top:14px; padding-bottom:12px; border-bottom:1px solid rgba(42,31,20,0.14);">
+            <div style="width:34px; height:44px; flex:none; background:#8FA83E; border-radius:10px 4px 8px 5px;"></div>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2A1F14;">Sencha Megumi No. 1 Hoshino</span><span style="font-family:'Noto Serif SC',serif; font-size:12px; color:#8C7F6C;">煎茶</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">green · cold brew · Hario Coldbrew</span>
+            </div>
+          </div>
+          <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:#8C7F6C;">STEEP · ONE (no gongfu arc)</span>
+            <div style="display:flex; align-items:baseline; gap:12px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:34px; color:#2A1F14;">8:00</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8C7F6C;">hours · in the fridge</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:4px;">
+              <div style="display:flex; flex-direction:column; gap:1px; background:#EDE6D4; border-radius:7px; padding:5px 9px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8C7F6C;">LEAF</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2A1F14;">8 g</span></div>
+              <div style="display:flex; flex-direction:column; gap:1px; background:#EDE6D4; border-radius:7px; padding:5px 9px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8C7F6C;">WATER</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2A1F14;">750 ml</span></div>
+              <div style="display:flex; flex-direction:column; gap:1px; background:#EDE6D4; border-radius:7px; padding:5px 9px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8C7F6C;">TEMP</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#B07C3E;">5°C</span></div>
+            </div>
+          </div>
+          <div style="margin-top:16px; padding-top:12px; border-top:1px solid rgba(42,31,20,0.14); display:flex; flex-direction:column; gap:7px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.16em; color:#8C7F6C;">TASTE</span>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.12em; color:#8C7F6C;">STRENGTH</span>
+                <div style="display:flex; gap:1.5px;"><span style="width:4px; height:10px; border-radius:1px; background:#2A1F14;"></span><span style="width:4px; height:10px; border-radius:1px; background:#2A1F14;"></span><span style="width:4px; height:10px; border-radius:1px; background:rgba(42,31,20,0.14);"></span></div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#2A1F14;">good</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;"><span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#2A1F14; box-shadow:inset 0 -7px 0 #E5AE2B; padding:0 3px;">sweet</span><span style="font-family:'Shippori Mincho',serif; font-size:14px; color:#2A1F14; box-shadow:inset 0 -7px 0 #E5AE2B; padding:0 3px;">grassy</span><span style="margin-left:auto; font-size:13px; letter-spacing:0.05em; color:#2A1F14;">★★★★<span style="opacity:0.24;">★</span></span></div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#8C7F6C;">session-level verdict (sessions.feedback) — the per-steep tap is gongfu-only.</span>
+          </div>
+          <div style="flex:1;"></div>
+          <div style="background:#9C5B33; color:#F6EFE2; font-weight:600; font-size:13.5px; text-align:center; padding:12px 0; border-radius:14px 6px 12px 7px;">Brew this again</div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:#5C5148;">VARIANT · COLD BREW (is_cold_brew)</span>
+      </div>
+
+      <!-- MATCHA STEEPLESS -->
+      <div style="display:flex; flex-direction:column; gap:8px; width:340px;">
+        <div style="width:340px; height:520px; border-radius:26px; border:1px solid rgba(42,31,20,0.30); background:#F5F0E3; overflow:hidden; box-sizing:border-box; padding:24px 22px; display:flex; flex-direction:column;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#8C7F6C;">#12 STEEPLESS · ILLUSTRATIVE</span>
+          <div style="display:flex; align-items:center; gap:11px; margin-top:14px; padding-bottom:12px; border-bottom:1px solid rgba(42,31,20,0.14);">
+            <div style="width:34px; height:44px; flex:none; background:#7BA23F; border-radius:10px 4px 8px 5px;"></div>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2A1F14;">Matcha</span><span style="font-family:'Noto Serif SC',serif; font-size:12px; color:#8C7F6C;">抹茶</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">matcha · whisked · chawan</span>
+            </div>
+          </div>
+          <div style="margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+            <div style="width:96px; height:96px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #A9C15A, #7BA23F); border:3px solid #EDE6D4; box-shadow:0 3px 10px rgba(0,0,0,0.12);"></div>
+            <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:#5C5148;">usucha — whisked, not steeped.</span>
+          </div>
+          <div style="margin-top:18px; display:flex; justify-content:center; flex-wrap:wrap; gap:7px;">
+            <div style="display:flex; flex-direction:column; gap:1px; background:#EDE6D4; border-radius:7px; padding:5px 9px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8C7F6C;">MATCHA</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2A1F14;">2 g</span></div>
+            <div style="display:flex; flex-direction:column; gap:1px; background:#EDE6D4; border-radius:7px; padding:5px 9px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8C7F6C;">WATER</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2A1F14;">60 ml</span></div>
+            <div style="display:flex; flex-direction:column; gap:1px; background:#EDE6D4; border-radius:7px; padding:5px 9px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8C7F6C;">TEMP</span><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#B07C3E;">70°C</span></div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; text-align:center; margin-top:14px;">#12 steepless mode — zero steeps; the STEEPS block becomes a whisk. shares structure with grandpa style. illustrative: no matcha in the library yet.</span>
+          <div style="flex:1;"></div>
+          <div style="background:#9C5B33; color:#F6EFE2; font-weight:600; font-size:13.5px; text-align:center; padding:12px 0; border-radius:14px 6px 12px 7px;">Brew this again</div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:#5C5148;">VARIANT · STEEPLESS MATCHA (#12)</span>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div style="display:flex; flex-direction:column; gap:8px; width:340px;">
+        <div style="width:340px; height:520px; border-radius:26px; border:1px solid rgba(42,31,20,0.30); background:#F5F0E3; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column;">
+          <div style="padding:24px 22px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid #2A1F14; padding-bottom:8px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2A1F14;">Sessions</span>
+              <span style="font-size:12px; color:#8C7F6C;">This year ▾</span>
+            </div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:0 30px;">
+            <div style="width:54px; height:70px; background:transparent; border:1.5px dashed rgba(42,31,20,0.3); border-radius:12px 6px 10px 7px;"></div>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:#2A1F14; text-align:center;">No sittings yet.</span>
+            <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:#8C7F6C; text-align:center; line-height:1.5;">Your first cup will open the diary. Tap ＋ when the kettle's on.</span>
+          </div>
+          <div style="display:flex; align-items:flex-end; justify-content:space-around; border-top:1px solid rgba(42,31,20,0.30); padding:14px 0 20px; position:relative;">
+            <span style="font-size:11px; color:#8C7F6C;">Home</span>
+            <span style="font-size:11px; color:#8C7F6C;">Library</span>
+            <div style="width:44px; height:44px; border-radius:50%; background:#3F5E42; color:#F6F2E9; display:flex; align-items:center; justify-content:center; font-size:24px; margin-top:-26px; box-shadow:0 6px 14px rgba(0,0,0,0.25);">＋</div>
+            <span style="font-size:11px; font-weight:600; color:#2A1F14; box-shadow:inset 0 -6px 0 #E5AE2B;">Sessions</span>
+            <span style="font-size:11px; color:#8C7F6C;">Insights</span>
+          </div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:#5C5148;">VARIANT · EMPTY SESSIONS</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:2px; background:#B8AC92; max-width:1280px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1280px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">D1–D8</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Every gap, addressed</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ fixes }}" as="f" hint-placeholder-count="8">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#3F5E42;">{{ f.k }}</span>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ f.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ f.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:7px; max-width:1000px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">CONNECTIONS WIRED · NEW CAPABILITIES FLAGGED</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;">Session detail now carries the out-links the map named — <strong style="color:#A6BD66;">tea ›</strong>, <strong style="color:#A6BD66;">vessel</strong>, <strong style="color:#A6BD66;">edit</strong>, <strong style="color:#A6BD66;">delete</strong>, <strong style="color:#A6BD66;">share</strong>. Three are <strong style="color:#E5AE2B;">new capability</strong> for the Code hand-off, not assumptions: <strong>“Brew this again”</strong> (live) carrying vessel + method (today's <code style="color:#C9BFAC;">startSessionFor()</code> is tea-only), <strong>“Copy to a new entry”</strong> (after-the-fact record — no duplicate feature exists today, only a double-submit guard), and <strong>pass this tea to the circle</strong>. Delete uses inline hold-to-confirm — no native alert.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const cap = {
+      capDetail: "The read-back, rebuilt for the real shape: per-steep strength tap + note + tags where logged (D1 — the v3.89 phase-2 data), the vocabulary shown as earned vs still-to-earn (D2, gated on the nested-vocab rework), the photo (D3), session facts shown-when-present — leaf/water/ratio always, mood/TDS/shared only when logged (D5), and the links out — tea ›, vessel, edit, share, delete (D4). CALIBRATE kept, distinct from taste.",
+      capEdit: "The edit surface that exists in the app but was never drawn (D4). Change tea/vessel/method, leaf·water·when, mood·rating·note, and every steep's time/°C/description (es_setSteep), plus taste words and the photo. One clay commit; delete is a calm hold-to-confirm."
+    };
+
+    const steepsData = [
+      { i: "1", t: "45s", c: "100°", str: 0, note: "", tags: ["floral", "spices"] },
+      { i: "2", t: "30s", c: "100°", str: 0, note: "", tags: [] },
+      { i: "3", t: "45s", c: "100°", str: 0, note: "", tags: [] },
+      { i: "4", t: "55s", c: "100°", str: 0, note: "", tags: [] },
+      { i: "5", t: "65s", c: "100°", str: 0, note: "", tags: [] },
+      { i: "6", t: "90s", c: "100°", str: 0, note: "", tags: [] }
+    ];
+    const strLabels = ["—", "weak", "good", "strong"];
+    const factsData = [ { k: "LEAF", v: "5 g" }, { k: "WATER", v: "110 ml" }, { k: "RATIO", v: "1:22" }, { k: "WHEN", v: "6 Jul" } ];
+    const editFieldsData = [ { k: "GRAMS", v: "5 g" }, { k: "WATER(ml)", v: "110" }, { k: "WHEN", v: "6 Jul · 08:12" } ];
+    const methodsData = [ { l: "gongfu", on: true }, { l: "senchadō" }, { l: "western" }, { l: "cold brew" } ];
+    const vocabUsed = ["floral", "spices"];
+    const vocabLib = ["stone fruit", "honey", "cocoa", "cedar"];
+
+    const resolve = (t) => {
+      const cell = (on) => on ? t.ink : t.hairSoft;
+      return { ...t, ...cap, isLight: t.key === "light",
+        factsR: factsData,
+        editFieldsR: editFieldsData,
+        vocabUsedR: vocabUsed,
+        vocabLibR: vocabLib,
+        methodsR: methodsData.map(m => ({ l: m.l, w: m.on ? 700 : 500, fg: m.on ? t.ink : t.muted, mark: m.on ? "inset 0 -8px 0 " + t.hi : "none" })),
+        steepsR: steepsData.map(s => ({ i: s.i, t: s.t, c: s.c,
+          cFg: t.muted,
+          g1: cell(s.str >= 1), g2: cell(s.str >= 2), g3: cell(s.str >= 3),
+          strLabel: strLabels[s.str], hasNote: !!s.note, note: s.note, hasTags: s.tags.length > 0, tags: s.tags })),
+        editSteepsR: steepsData.filter(s => s.i !== "rinse").map(s => ({ i: s.i, t: s.t, c: s.c,
+          noteOrHint: s.note || "add a note…", noteStyle: "italic", noteFg: s.note ? t.ink : t.muted }))
+      };
+    };
+
+    const fixes = [
+      { k: "D1", t: "Steeps carry taste, not just timing", d: "The steep row shows the v3.89 strength tap, note, and tags where logged — this sitting tagged the opening steep floral · spices and left the taps empty (shown blank, not invented). Gongfu logs the tap per steep; western / cold-brew / senchadō carry one session-level verdict (sessions.feedback), shown on the cold-brew variant. Distinct from CALIBRATE (timer)." },
+      { k: "D2", t: "Vocabulary shown as earned", d: "The words you've used are marked; the rest of your growing tagLibrary sits faint beside them, with ＋ a word. It's a lexicon that accrues, not a fixed set." },
+      { k: "D3", t: "The photo has a home", d: "photo_url gets the region below CALIBRATE — the most evocative thing a sitting holds, no longer dropped." },
+      { k: "D4", t: "Edit + delete, and the edit screen", d: "Header edit / share / ⋯, a calm hold-to-confirm delete, and the full edit-session screen (per-steep fields via es_setSteep) — the surface that existed in code but was never drawn." },
+      { k: "D5", t: "Session facts, show-when-present", d: "Leaf, water(ml) and ratio show always; water type/TDS, mood and is_shared appear only when logged. The 6 Jul sitting logged none of those three, so the strip stays lean — water reads the vessel's 110 ml capacity (left blank), and the session note sits apart from the per-steep notes." },
+      { k: "D6", t: "Three variants handled", d: "Cold brew (one long steep, no arc), steepless matcha (#12 — the block becomes a whisk), and the empty Sessions tab. Shown at right." },
+      { k: "D7", t: "Brew-again flagged as new", d: "Kept — it's a good idea — but named as new capability: startSessionFor() carries tea only today, so vessel + method forward is a Code slice." },
+      { k: "D8", t: "“unrated” ≠ “no note”", d: "The Sessions list copy fixed: a missing rating now reads “unrated”, since no rating and no note are different absences." }
+    ];
+
+    return { fixes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", lowFg: "#B07C3E", factBg: "#EDE6D4", photoBg: "#E7DFCC" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", lowFg: "#D79A5A", factBg: "#26201780", photoBg: "#241E16" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

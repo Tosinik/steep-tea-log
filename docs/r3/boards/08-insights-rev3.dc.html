@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="26" y="70" width="14" height="26" rx="3" fill="#5F7A34"></rect><rect x="46" y="54" width="14" height="42" rx="3" fill="#843A1E"></rect><rect x="66" y="62" width="14" height="34" rx="3" fill="#CBA347"></rect><rect x="86" y="46" width="14" height="50" rx="3" fill="#9C5B33"></rect><rect x="26" y="30" width="40" height="8" rx="4" fill="#2B2320"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #08</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">INSIGHTS · rev 3</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Insights</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1010px; margin:0; line-height:1.65;">Rev 2 restores what shipped and rev 1 had dropped or under-drawn. The one-month pill becomes the shipped <strong>three-window control</strong> (R21). The method row is <strong>four lanes</strong> with the real post-retag split — <strong>senchadō is the largest method, western is empty</strong>, and the PHASE 2 badge is gone (senchadō shipped, R2). Cost is <strong>per-gram &amp; per-session medians</strong> (reusing <code>costPerSession</code>), the <strong>brewing clock</strong> returns, <strong>Wrapped</strong> gets its teaser (R23), the <strong>card manager</strong> is ratified (R24), and the completeness panel <strong>leaves for Settings</strong> (R22). Rev 3 restores two figures Insights already computes but rev 2 under-drew: <strong>total leaf + litres</strong> beside the steeps count (<code>totalGrams</code> + the v3.85 water field), and the brewing clock as its full <strong>twelve <code>hourBuckets</code></strong> with an axis and <code>peakBucket</code> named in words. Count refreshed to <strong>21 teas</strong> — the <code>Test</code> junk row is gone.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:26px 24px 26px; display:flex; flex-direction:column;">
+
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:23px; color:{{ t.ink }};">Insights</span>
+          </div>
+          <div style="display:flex; border:1px solid {{ t.hair }}; border-radius:9px; overflow:hidden; margin-top:14px; width:fit-content;">
+            <sc-for list="{{ t.windowR }}" as="w" hint-placeholder-count="3"><span style="padding:6px 13px; font-family:'IBM Plex Mono',monospace; font-size:11px; background:{{ w.bg }}; color:{{ w.fg }}; font-weight:{{ w.wt }}; border-left:{{ w.divider }};">{{ w.l }}</span></sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; margin-top:7px;">gridPeriod ships three windows — all data sits in July, so week &amp; all-time resolve here too, honestly</span>
+
+          <!-- VOLUME -->
+          <div style="display:flex; align-items:flex-end; gap:20px; margin-top:18px;">
+            <div style="display:flex; flex-direction:column;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:38px; line-height:1; color:{{ t.ink }};">103</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:{{ t.muted }}; margin-top:4px;">STEEPS</span></div>
+            <div style="display:flex; flex-direction:column; padding-bottom:2px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; line-height:1; color:{{ t.ink }};">130.5 g</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:{{ t.muted }}; margin-top:5px;">LEAF</span></div>
+            <div style="display:flex; flex-direction:column; padding-bottom:2px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; line-height:1; color:{{ t.ink }};">~12.5 L</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:{{ t.muted }}; margin-top:5px;">WATER</span></div>
+          </div>
+          <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13.5px; color:{{ t.muted }}; margin-top:8px; line-height:1.5;">across 31 sessions and 21 teas · this month <span style="font-family:'IBM Plex Mono',monospace; font-style:normal; font-size:8px; color:{{ t.jade }};">· totalGrams · water×steeps ✓</span></span>
+
+          <!-- HOW YOU BREWED -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:22px; border-bottom:1px solid {{ t.hairSoft }}; padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">HOW YOU BREWED</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.jade }};">split ✓</span>
+          </div>
+          <sc-for list="{{ t.methodR }}" as="m" hint-placeholder-count="5">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 0;">
+              <span style="font-family:'Shippori Mincho',serif; font-size:14px; color:{{ m.labelFg }}; font-weight:{{ m.lw }}; width:82px; flex:none;">{{ m.l }}</span>
+              <div style="flex:1; height:13px; border-radius:7px 3px 6px 3px; background:{{ m.trackBg }}; overflow:hidden;"><div style="height:100%; width:{{ m.w }}; background:{{ m.barBg }}; border-radius:7px 3px 6px 3px;"></div></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ m.countFg }}; width:20px; flex:none; text-align:right;">{{ m.n }}</span>
+            </div>
+          </sc-for>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:4px;">four methods (R1). senchadō leads the diary; western is <span style="color:{{ t.red }};">empty</span> — its old sittings were miscategorised kyūsu greens. untagged = pre-retag sessions.</span>
+
+          <!-- COST -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:20px; border-bottom:1px solid {{ t.hairSoft }}; padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">COST</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.red }};">medians · computable · $ bug</span>
+          </div>
+          <div style="display:flex; gap:14px; padding:12px 0 4px;">
+            <div style="flex:1; border:1px solid {{ t.hairSoft }}; border-radius:10px; padding:11px 13px; display:flex; flex-direction:column; gap:3px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:{{ t.ink }};">€0.17</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">per gram · median</span></div>
+            <div style="flex:1; border:1px solid {{ t.hairSoft }}; border-radius:10px; padding:11px 13px; display:flex; flex-direction:column; gap:3px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:{{ t.ink }};">€0.86</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">per session · median</span></div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; margin-top:6px;">reuses tea detail's costPerSession (single writer, same hardcoded-$ bug) · € from the Settings pref · computable now (cost_total ÷ grams), not pending an export.</span>
+
+          <!-- ON THE SHELF -->
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:18px; padding:12px 13px; border-radius:10px; background:{{ t.factBg }};">
+            <div style="display:flex; flex-direction:column;"><span style="font-size:13px; color:{{ t.ink }};">2 teas running low</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">Honey Oolong Gui Fei · Sencha Kagoshima Premium</span></div>
+            <span style="font-size:12px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">Shopping ›</span>
+          </div>
+
+          <!-- WRAPPED teaser -->
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding:14px 15px; border-radius:12px; background:{{ t.clay }}; color:{{ t.clayInk }}; box-shadow:inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -2px 0 rgba(0,0,0,0.18);">
+            <div style="display:flex; flex-direction:column; gap:2px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px;">Your July, wrapped</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; opacity:0.85;">v3.64 · the monthly carousel, in miniature</span></div>
+            <span style="font-size:20px;">→</span>
+          </div>
+
+          <!-- MORE · card-managed -->
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-top:20px; border-bottom:1px solid {{ t.hairSoft }}; padding-bottom:6px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.16em; color:{{ t.muted }};">MORE</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.link }};">⋯ manage cards</span>
+          </div>
+
+          <!-- when you brew (clock) — full 12×2h hourBuckets + axis + peakBucket named -->
+          <div style="display:flex; flex-direction:column; gap:8px; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-size:13.5px; color:{{ t.ink }};">When you brew</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ t.ink }};">mostly 08–10</span></div>
+            <div style="display:flex; align-items:flex-end; gap:3px; height:46px;">
+              <sc-for list="{{ t.clockR }}" as="c" hint-placeholder-count="12"><div style="flex:1; border-radius:2px 2px 0 0; background:{{ c.bg }}; height:{{ c.h }};"></div></sc-for>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.45;">hourBuckets · twelve 2-hour bins, peakBucket names the busiest — a morning ritual with a midday second pour.</span>
+          </div>
+
+          <!-- type mix -->
+          <div style="display:flex; flex-direction:column; gap:6px; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:13.5px; color:{{ t.ink }};">Type mix</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">green 15 · oolong 11 · white 3 · yellow 1 · pu-erh 1 · by session</span></div>
+            <div style="display:flex; height:9px; border-radius:5px; overflow:hidden; gap:1px;">
+              <sc-for list="{{ t.typeR }}" as="ty" hint-placeholder-count="5"><div style="width:{{ ty.w }}; background:{{ ty.bg }};"></div></sc-for>
+            </div>
+          </div>
+
+          <!-- ORIGINS entry card (R46) — nested in Insights, default bottom, card-manager moveable -->
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:2px; padding:13px 14px; border-radius:12px; border:1px solid {{ t.hairSoft }}; background:{{ t.factBg }};">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15px; color:{{ t.ink }};">Origins</span><span style="font-family:'Noto Serif SC',serif; font-size:11px; color:{{ t.muted }};">産地</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">where your tea grows · 8 regions · 5 countries</span>
+            </div>
+            <span style="font-size:12px; color:{{ t.link }}; border-bottom:1px solid {{ t.link }};">open map ›</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.45; margin-top:7px;">Origins lives here (R45/R46) — the default bottom card, moveable via ⋯ manage cards. It absorbed the old passport; there's no separate hub tab.</span>
+
+          <!-- cadence + steep shape -->
+          <div style="display:flex; gap:14px; padding:12px 0; border-bottom:1px solid {{ t.hairSoft }};">
+            <div style="flex:1; display:flex; flex-direction:column;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:{{ t.ink }};">≈ 2 / day</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">cadence · 31 in 16 days</span></div>
+            <div style="flex:1; display:flex; flex-direction:column;"><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:{{ t.ink }};">3.3 steeps</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }};">steep shape · per session</span></div>
+          </div>
+
+          <!-- mood × rating (planted) -->
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0;">
+            <div style="display:flex; flex-direction:column;"><span style="font-size:13.5px; color:{{ t.muted }};">Mood × rating</span><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.hiInk }};">planted · shows when 15/31 grows enough to mean something</span></div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:0.06em; color:{{ t.hiInk }}; border:1px solid {{ t.hi }}; padding:2px 5px; border-radius:3px;">SOON</span>
+          </div>
+
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; padding-top:10px;">data health — what you've captured — moved to Settings (R22): it's hygiene, not a brewing insight.</span>
+
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 3</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">Shipped surfaces restored, split corrected</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Method split (checked):</strong> senchadō 13 · gongfu 10 · untagged 7 · western 0 · cold brew 1 — four lanes (R1), senchadō the largest method in the diary, western <em>empty</em> not near-empty. The old PHASE 2 badge is gone (senchadō shipped v3.91, R2); the method row is phase-2's landing zone for learned defaults. <strong style="color:#E5AE2B;">Restored shipped surfaces:</strong> three-window control (<code style="color:#C9BFAC;">gridPeriod</code>, R21), Wrapped teaser (R23, v3.64), the brewing clock (“when you brew”), and the quiet card manager (<code style="color:#C9BFAC;">dashLayout</code>, R24). Completeness left for Settings (R22).</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Cost (flagged):</strong> per-gram and per-session medians reuse tea detail's <code style="color:#C9BFAC;">costPerSession</code> — single writer, same hardcoded-<code style="color:#C9BFAC;">$</code> bug; the symbol comes from the Settings currency pref, and the amounts are estimated until the cost export lands. <strong style="color:#E5AE2B;">Rev 3 restorations:</strong> totalGrams (130.5 g) + litres (~12.5 L) now sit beside the steeps count, and the brewing clock is the full twelve 2-hour hourBuckets with an axis and peakBucket named in words (08–10, with a midday second pour) — both figures Insights already computes, previously under-drawn. Headline reads 21 teas: the Test junk row (0 g, no origin) is deleted. <strong style="color:#E5AE2B;">Estimated vs checked:</strong> the method split, type mix and peakBucket are computed (checked); the clock heights firm at the export refresh (est); totalGrams (130.5 g), litres and the cost medians are computable now. Type mix counts sessions (green 15 · oolong 11…) — a different subject from the 21-tea shelf, deliberately not reconciled to it. <strong style="color:#E5AE2B;">Mood × rating</strong> is planted — drawn as “soon”, surfaced once 15/31 grows enough to mean something.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    // CHECKED — post-retag method split (ledger §2/§3), sums to 31. western 0, senchadō largest, untagged = pre-retag.
+    const method = [
+      { l: "senchadō", n: 13, w: "100%" },
+      { l: "gongfu", n: 10, w: "77%" },
+      { l: "untagged", n: 7, w: "54%", muted: true },
+      { l: "cold brew", n: 1, w: "9%" },
+      { l: "western", n: 0, w: "0%", empty: true }
+    ];
+    // CHECKED — type mix by SESSION (shipped typeCounts), sums to 31 — NOT the 21-tea shelf. green-leaning month.
+    const types = [
+      { l: "green", n: 15, c: "#6E8A3C" },
+      { l: "oolong", n: 11, c: "#843A1E" },
+      { l: "white", n: 3, c: "#D8C98F" },
+      { l: "yellow", n: 1, c: "#CBA347" },
+      { l: "pu-erh", n: 1, c: "#4B3621" }
+    ];
+    // hourBuckets — twelve 2-hour bins (00–24). peakBucket = 08–10 (idx 4); midday second pour 12–14 (idx 6); nothing past mid-afternoon. ESTIMATED heights.
+    const clock = ["0%", "0%", "6%", "48%", "100%", "56%", "72%", "40%", "12%", "0%", "0%", "0%"];
+
+    const resolve = (t) => {
+      const isLight = t.key === "light";
+      return { ...t, cap: t.capText,
+        windowR: ["This week", "This month", "All-time"].map((l, i) => ({ l,
+          bg: i === 1 ? t.selBg : "transparent",
+          fg: i === 1 ? t.ink : t.muted,
+          wt: i === 1 ? 700 : 500,
+          divider: i > 0 ? ("1px solid " + t.hair) : "none" })),
+        methodR: method.map(m => ({ l: m.l, n: m.n, w: m.w,
+          lw: m.n === 13 ? 700 : 500,
+          labelFg: m.empty ? t.muted : t.ink,
+          countFg: m.empty ? t.red : t.muted,
+          trackBg: t.hairSoft,
+          barBg: m.muted ? t.muted : (m.empty ? "transparent" : t.clay) })),
+        typeR: types.map(ty => ({ w: (ty.n / 31 * 100) + "%", bg: ty.c })),
+        clockR: clock.map((h, i) => ({ h, bg: (i === 4 || i === 6) ? t.clay : t.barTrack }))
+      };
+    };
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const FX = { tag: "FIXED", tagBg: "rgba(105,22,15,0.14)", tagFg: "#8A2B1C" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...CK, k: "IN1", t: "Three-window control restored (R21)", d: "gridPeriod ships This week / This month / All-time. The one-month pill replaced shipped capability with less. All data is in July, so the three windows resolve to the same set right now — drawn honestly, not designed around a year that isn't there." },
+      { ...FX, k: "IN2", t: "Method is four lanes, split corrected", d: "senchadō 13 · gongfu 10 · untagged 7 · western 0 · cold brew 1. senchadō is the largest method in the diary; western is empty, not near-empty. Four lanes (R1); the PHASE 2 badge is gone — senchadō shipped (R2)." },
+      { ...FL, k: "IN3", t: "Cost = medians, one writer", d: "Per-gram and per-session medians reuse tea detail's costPerSession — single writer, so the same hardcoded-$ bug lives in one place. € from the Settings pref; computable now (cost_total ÷ grams), €0.17/g · €0.86/session median." },
+      { ...CK, k: "IN4", t: "Brewing clock + Wrapped back", d: "“When you brew” is the shipped brewing clock (hours estimated here). Wrapped (v3.64) gets its teaser card — the monthly carousel's home in Insights, not an unbuilt idea (R23)." },
+      { ...CK, k: "IN5", t: "Card manager ratified (R24)", d: "dashLayout order/hidden/reset is shipped; the board carries the quiet ‘⋯ manage cards’ affordance so the MORE stack reads as reorderable, not fixed. Nothing shouts." },
+      { ...FX, k: "IN6", t: "Completeness left for Settings (R22)", d: "The honest fractions were the wrong surface — data hygiene, not a brewing insight. They now live beside Settings' data-health checks. Mood × rating is planted here for when 15/31 grows enough to mean something." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "Volume, then the corrected method split, cost medians, the shelf link, and Wrapped — the load-bearing cards. The MORE stack (clock, type mix, cadence, steep shape, mood × rating) sits under the card manager, reorderable and quiet. Bars are clay, not chart ink.", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.30)", hairSoft: "rgba(42,31,20,0.14)", hi: "#E5AE2B", hiInk: "#7A5A10", link: "#21341F", jade: "#3F5E42", red: "#8A2B1C", clay: "#9C5B33", clayInk: "#F6EFE2", factBg: "#EDE6D4", selBg: "rgba(229,174,43,0.14)", barTrack: "#D8CFB9" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "The same cards at night. The empty western lane still reads as empty, the Wrapped teaser still glows clay, and mood × rating waits under its SOON tag — nothing changes meaning between themes.", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.26)", hairSoft: "rgba(239,231,214,0.13)", hi: "#E5AE2B", hiInk: "#E5AE2B", link: "#A6BD66", jade: "#6F9A66", red: "#D9776A", clay: "#B4693C", clayInk: "#241A13", factBg: "#262017", selBg: "rgba(229,174,43,0.12)", barTrack: "#3A352A" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

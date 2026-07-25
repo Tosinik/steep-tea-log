@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="22" y="26" width="76" height="10" rx="3" fill="#2B2320"></rect><rect x="22" y="44" width="34" height="8" rx="3" fill="#3F5E42"></rect><rect x="62" y="44" width="36" height="8" rx="3" fill="#9C5B33"></rect><rect x="22" y="60" width="34" height="8" rx="3" fill="#9C5B33"></rect><rect x="62" y="60" width="36" height="8" rx="3" fill="#C9BC9E"></rect><rect x="22" y="76" width="76" height="8" rx="3" fill="#C9BC9E"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#DDD6C6;">
+
+  <div style="max-width:1400px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">MAP · 1 OF 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">SURFACE MATRIX · rev 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Entities × surfaces</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1080px; margin:0; line-height:1.65;">What is actually designed, honestly. The old recon inventory is stale and <strong>Bundles 1–2 are round-1 snapshots</strong> — they are <em>not</em> authority. A surface counts as <strong>designed</strong> only if a post-bundle board file exists, cited by file + rev. Where the only artifact is a bundle panel, it reads <strong>bundle-round-1-only</strong> — not "designed" (R53 accepts that state for Home and the non-Focus steeping states). Five entities: <strong>teas · sessions · vessels · people · vendors</strong>, plus the five held decisions this map was asked to settle.</p>
+    <div style="display:flex; gap:9px; flex-wrap:wrap;">
+      <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5"><span style="display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#4A4038; border:1px solid #C9BC9E; background:#F6F2E9; padding:4px 9px; border-radius:5px;"><span style="width:9px; height:9px; border-radius:2px; background:{{ l.c }};"></span>{{ l.l }}</span></sc-for>
+    </div>
+  </div>
+
+  <div style="max-width:1400px; display:flex; flex-direction:column; gap:18px;">
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="5">
+      <div style="display:flex; flex-direction:column; gap:0; border:1px solid #C9BC9E; border-radius:12px; overflow:hidden; background:#F6F2E9;">
+        <div style="display:flex; align-items:baseline; gap:11px; padding:12px 16px; background:#2B2320;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#F6F2E9;">{{ g.entity }}</span>
+          <span style="font-family:'Noto Serif SC',serif; font-size:12px; color:#9E9078;">{{ g.script }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#C9BFAC;">{{ g.tally }}</span>
+        </div>
+        <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:250px 132px 1fr; gap:14px; padding:11px 16px; border-top:1px solid #E2D9C2; align-items:start;">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:13px; font-weight:600; color:#2B2320; line-height:1.3;">{{ r.surface }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8C7F6C;">{{ r.file }}</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:3px 7px; border-radius:4px; background:{{ r.bg }}; color:{{ r.fg }}; justify-self:start;">{{ r.state }}</span>
+            <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ r.note }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1080px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ WHAT THIS MAP SETTLES</span>
+    <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Two surfaces stay round-1 by ruling, one got a board:</strong> R53 accepts <strong>Bundle 1</strong> for <strong>Home</strong> and the <strong>non-Focus steeping states</strong> — they carry no new work, so they are deliberately not re-boarded. <strong>Teas</strong> was the exception and now has its revision board (rev 1): the surface where R51's second mode, R52's vendor overflow, the round-1 header rework and Vessels-as-segment all land.</span>
+    <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Vendors is a real shipped surface with no board:</strong> the vendor manager is folded into Teas on the v3.18 precedent — derived from <code style="color:#C9BFAC;">teas.source</code>, renameable under "Edit vendors", with per-vendor counts. It stays <strong>string-based for R3</strong>: no vendor entity, no <code style="color:#C9BFAC;">url</code> column (deferred with R12). The scope is a <strong>restyle</strong>, and its home is the nav map's call.</span>
+    <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Deferred, deliberately:</strong> the <strong>app icon</strong> is parked after round 3 (its round-3 board records what was rejected); <strong>presence</strong> is parked (R35); the <strong>pass record</strong> depends on a ruling that lands in code, not design. <strong>Go Deeper</strong> is no longer among them — R51 gives it the Teas tab's second mode. <strong>Five held decisions</strong> (#22, #23, #28, the Teas header rework, washi's probation) are stated in their own group rather than left unaddressed: four are open rulings, the header rework is drawn. <strong>N-A</strong> means the app has no such surface — not that it's missing.</span>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const S = {
+      done:  { state: "DESIGNED",   bg: "rgba(63,94,66,0.18)",   fg: "#2F4A32" },
+      r1:    { state: "ROUND-1 ONLY", bg: "rgba(156,91,51,0.20)", fg: "#7A3F1E" },
+      undes: { state: "UNDESIGNED", bg: "rgba(105,22,15,0.13)",  fg: "#8A2B1C" },
+      defer: { state: "DEFERRED",   bg: "rgba(229,174,43,0.22)", fg: "#7A5A10" },
+      na:    { state: "N-A",        bg: "rgba(42,31,20,0.08)",   fg: "#8C7F6C" }
+    };
+    const row = (surface, file, s, note) => ({ surface, file: file || "—", state: s.state, bg: s.bg, fg: s.fg, note });
+
+    const groups = [
+      { entity: "Teas", script: "茶", tally: "4 designed · 1 round-1 · 2 undesigned · 1 deferred", rows: [
+        row("Tea detail", "03-tea-detail-rev3", S.done, "Freshness (opened→harvest→none), inventory sparkline, provenance cluster, sittings, GATED taste panel."),
+        row("Add / edit tea", "06-add-edit-tea-rev4", S.done, "Real Dawang Feng record, puerh + green_cn chips, opened_date, brew-guide NEW shape (AT8)."),
+        row("Shopping (wishlist + running low)", "08-shopping-rev3", S.done, "True empty wishlist; running-low pair from stockTier; R11 restock, R12 vendor search."),
+        row("Origins map", "origins-map-v3", S.done, "Nested in Insights (R46). 8 verified region anchors, ?N polygon labels (R28), bbox frame (R19)."),
+        row("Teas tab (the shelf)", "13-teas-revision-rev1", S.done, "Was round-1 only; R53 rules one revision board for Teas — header rework, the two modes, Vessels as second segment, vendor overflow. Shipped tab name is Teas, not Library."),
+        row("Go Deeper (reference)", "13-teas-revision-rev1", S.done, "R51 rules BOTH: browsable second mode of the Teas tab, plus contextual entries (Tea detail, borrow-guide, R36 passed-tea). Not reached from the profile hub."),
+        row("Vendor manager", "13-teas-revision-rev1", S.done, "R52: Teas shelf overflow → “Edit vendors”. teas.source-derived, string-based — restyle only, per the vendors entity row below."),
+        row("App icon", "R3 App Icon Round 3 (rejects)", S.defer, "Parked after round 3. The board is kept as the record of what was already rejected.")
+      ]},
+      { entity: "Sessions", script: "席", tally: "5 designed · 1 round-1", rows: [
+        row("Sessions list + heatmap", "02-sessions-rev3", S.done, "List default, shipped Brewing-days heatmap as secondary view with toggle (R42)."),
+        row("Session detail + edit", "02b-session-detail-edit-rev2", S.done, "True 6 Jul record, per-steep taste, cold-brew variant, out-links (R40), R50 method order."),
+        row("Session setup + pickers", "04-session-setup-pickers-rev6", S.done, "Four-lane method (R50), mood check-in, quick-log shortcut, real pickers, folded WHEN."),
+        row("Focus (live steeping)", "10-focus-rev2", S.done, "Ensō timer in Kachi-iro, per-steep temp, feedback write (v3.92). No avatar — immersive (R44)."),
+        row("Quick log", "12-quick-log-rev1", S.done, "Retrospective twin: WHEN promoted, optional vessel (R43), no timer, empty tea picker."),
+        row("In-session states beyond Focus", "Bundle 1 panels only", S.r1, "Between-steeps rest, session end/save, cold-brew long-wait: round-1 panels, no rev-level board.")
+      ]},
+      { entity: "Vessels", script: "器", tally: "2 designed", rows: [
+        row("Vessels list + edit", "05-vessels-rev1", S.done, "Real five with usage counts; photo-or-kanji identity (R41 — line-art pipeline retired)."),
+        row("Vessel picker", "04-session-setup-pickers-rev6", S.done, "Same roster, same identity rules — crossover verified in the #09b sweep.")
+      ]},
+      { entity: "People", script: "人", tally: "2 designed · 1 undesigned · 2 deferred", rows: [
+        row("Social (circle + shared + passed)", "08-social-rev3", S.done, "3 profiles, pebbi→you, real shared five, Passed cups + Kindred on the R25 pass record."),
+        row("First run / landing", "09-first-run-rev1", S.done, "Doubles as landing (R29). Canonical new copy (R32), configured providers only (R47)."),
+        row("Profile hub (avatar menu)", "—", S.undes, "The hub itself is undrawn: social · shopping · settings (R45). Passport absorbed by Origins, achievements dropped. Contents are designed; the menu is not."),
+        row("Presence", "08-social-rev3 (PARKED strip)", S.defer, "Right idea, wrong time (R35). Kept in the file, marked PARKED — nothing ships."),
+        row("Pass record surfaces", "08-social-rev3 (illustrative)", S.defer, "Receive shelf + kindred note are drawn illustratively; they need R25's table before they are real.")
+      ]},
+      { entity: "Vendors", script: "商", tally: "1 undesigned (needs restyle)", rows: [
+        row("Vendor manager (in Teas)", "—", S.undes, "SHIPPED, no post-R2 board: derived from teas.source, rename under “Edit vendors”, per-vendor counts. String-based for R3 — no vendor entity, no url column (deferred with R12). Scope = restyle. Home = nav map's call."),
+        row("Vendor entity / links", "—", S.defer, "Deferred with R12: the web-search action covers the need without schema.")
+      ]},
+      { entity: "Held decisions", script: "保", tally: "the five this map was asked to settle", rows: [
+        row("#22", "—", S.defer, "HELD, in scope for this map: recorded as an open item, not resolved by any board. It needs a ruling before the hand-off resolves §4 — naming it here so it isn't mistaken for answered."),
+        row("#23 · setTeaSort / setTeaFilter / focusLogSteep", "—", S.defer, "HELD: reinstate-vs-accept still undecided. These are shipped entry points the boards neither draw nor retire — the Teas revision board is where sort/filter would land if reinstated, so the ruling gates that board's controls."),
+        row("#28", "—", S.defer, "HELD, same status as #22: open, unresolved, no board claims it."),
+        row("Teas header rework", "Teas revision board · rev1", S.done, "Open since round 1 and never drawn — now in scope on the Teas revision board (R53), so it moves from unaddressed to designed."),
+        row("washi texture · probation", "no board applies it", S.defer, "ON PROBATION and unused: no exported board renders a washi texture, so probation is untested rather than passed. Decide keep-or-drop before the hand-off, since nothing in R3 exercises it.")
+      ]},
+      { entity: "Cross-cutting", script: "共", tally: "4 designed · 1 round-1 · 1 undesigned", rows: [
+        row("Insights (incl. Origins card)", "08-insights-rev3", S.done, "Three-window control, four-lane split, cost medians, clock, Wrapped teaser, Origins card (R46)."),
+        row("Wrapped", "11-wrapped-rev1", S.done, "Monthly, explicitly (R38); pull-only share card (R37)."),
+        row("Settings", "07-settings-rev2", S.done, "Nine sections, Ratio-adjustment master switch, Supabase-truthful privacy, data health (R22), monoFont removed (R48)."),
+        row("Navigation shell", "Nav map (map 2 of 2)", S.done, "Five tabs + hub, drawn as the companion map board."),
+        row("Home", "Bundle 1 panel only", S.r1, "R53 accepts Bundle 1 for Home — it carries no new work this round, so it is deliberately not re-boarded rather than pending."),
+        row("Origins wrapper (Insights nesting)", "08-insights-rev3 card + origins-map-v3", S.undes, "The card and the map are both designed; the wrapper between them — header, back-affordance, card-manager position — is not drawn as its own surface.")
+      ]}
+    ];
+
+    return { groups,
+      legend: [
+        { l: "DESIGNED · board file + rev", c: "#3F5E42" },
+        { l: "ROUND-1 ONLY · bundle snapshot, not authority", c: "#9C5B33" },
+        { l: "UNDESIGNED · ships or needed, no board", c: "#8A2B1C" },
+        { l: "DEFERRED · parked by ruling", c: "#E5AE2B" },
+        { l: "N-A · no such surface", c: "#8C7F6C" }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

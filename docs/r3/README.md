@@ -41,9 +41,27 @@ ruled, and what was flagged as new capability.
   document's *purpose*, not its authorship. This one is Design's; `planning/` is the
   planning lane's.
 
-**`boards/`** — the visual record, latest locked revision only. Preview PNGs; the `.dc.html`
-standalone exports are deliberately *not* committed (~10 MB each of inlined runtime, no extra
-reviewable content — Design can re-export if a live artifact is ever wanted).
+**`boards/`** — the visual record, in two media. The `*-rev*.dc.html` files (plus
+`origins-map-v3.html`) are the **current visual authority**: the R3 final export, banked
+verbatim and MANIFEST-verified. The `.png` files are the **round-1 and parked record** — kept
+because they show what was rejected, and *not* authority for anything being built. `support.js`
+and `uploads/` are required dependencies, not clutter: every `.dc.html` loads `./support.js` by
+relative path and three boards reference `./uploads/*.jpg`, so the boards render only with both
+beside them. (An earlier note here said these exports were deliberately uncommitted at ~10 MB
+each of inlined runtime; the final export factors that runtime into the one shared `support.js`,
+putting all 21 boards at ~660 KB.)
+
+Current — the final export, listed in `MANIFEST.txt`:
+
+- `02-sessions` · `02b-session-detail-edit` · `03-tea-detail` · `04-session-setup-pickers` ·
+  `05-vessels` · `06-add-edit-tea` · `07-settings` · `08-insights` · `08-shopping` ·
+  `08-social` · `09-first-run` · `10-focus` · `11-wrapped` · `12-quick-log` ·
+  `13-teas-revision` · `37-origins-refinement` · `origins-map-v3`
+- `map-1-surface-matrix` · `map-2-navigation` — the entity×surface matrix and the navigation map
+- `bundle-1-*-snapshot`, `bundle-2-*-snapshot` — round-1 **behaviour** reference only, never
+  visual authority (R53)
+
+Round-1 / parked PNGs:
 
 - `direction-{a,b,c,d}-*.png` — the four directions. The record of why D won.
 - `bundle-1-canonical-screens.png`, `bundle-2-reflective-utility.png`

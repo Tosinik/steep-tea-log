@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+  @keyframes sc-breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.03);}}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><path d="M60 30 a30 30 0 1 0 22 10" fill="none" stroke="#9C5B33" stroke-width="6.5" stroke-linecap="round"></path><rect x="40" y="82" width="40" height="8" rx="4" fill="#2B2320"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #09</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">FIRST RUN · rev 1</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">First run &amp; landing</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1020px; margin:0; line-height:1.65;">The logged-out screen now does double duty (R29): it's what a returning brewer signs in on <em>and</em> the only thing a prospective invitee ever sees before signing in — so it carries the whole first impression. <strong>Auth is real</strong> (Supabase), drawn as a working sign-in, not decoration. The voice stays observational — <em>kept, not broadcast</em> — and <strong>Kachi-iro stays holstered</strong>: the landing runs on jade and clay, saving the indigo for Focus (contract 4). The copy is <strong>all newly written and adopted as canonical (R32)</strong> — nothing here is lifted from the app; tagline, the what-it-is sentence and the three pillar words, kept deliberately minimal. The ensō belongs to this door and the Focus timer, never the app icon (R33).</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; height:812px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column; padding:0 26px;">
+
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0 0;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }};">9:41</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.15em; color:{{ t.muted }};">● ● ●</span>
+        </div>
+
+        <!-- brand block -->
+        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; margin-top:64px;">
+          <div style="animation:sc-breathe 6s ease-in-out infinite;">
+            <svg viewBox="0 0 120 120" style="width:96px; height:96px; transform:rotate(-6deg);">
+              <path d="M60 16 a44 44 0 1 0 34 15" fill="none" stroke="{{ t.mark }}" stroke-width="7" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:40px; color:{{ t.ink }}; margin-top:20px; letter-spacing:0.01em;">SlowCup</div>
+          <div style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:16px; color:{{ t.muted }}; margin-top:8px;">a slower cup, better kept</div>
+          <p style="font-size:13.5px; color:{{ t.body }}; line-height:1.6; max-width:280px; margin:18px 0 0;">Keep the tea you brew — every steep, how it poured, what it cost and where it grew — and the few you share it with.</p>
+        </div>
+
+        <!-- three quiet pillars, grounded to real surfaces -->
+        <div style="display:flex; justify-content:center; gap:22px; margin-top:26px;">
+          <sc-for list="{{ t.pillarsR }}" as="p" hint-placeholder-count="3">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px; width:80px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15px; color:{{ t.ink }};">{{ p.l }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; text-align:center; line-height:1.4;">{{ p.sub }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- auth -->
+        <div style="margin-top:auto; padding-bottom:34px; display:flex; flex-direction:column; gap:11px;">
+          <div style="display:flex; align-items:center; border:1px solid {{ t.hair }}; border-radius:12px; padding:13px 15px; background:{{ t.field }};">
+            <span style="font-size:14px; color:{{ t.muted }};">you@example.com</span>
+          </div>
+          <div style="background:{{ t.jade }}; color:{{ t.jadeInk }}; font-weight:600; font-size:15px; text-align:center; padding:14px 0; border-radius:12px;">Continue</div>
+          <div style="display:flex; align-items:center; gap:10px; margin:2px 0;">
+            <div style="flex:1; height:1px; background:{{ t.hairSoft }};"></div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:{{ t.muted }};">OR</span>
+            <div style="flex:1; height:1px; background:{{ t.hairSoft }};"></div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px;">
+            <span style="font-size:12.5px; color:{{ t.muted }};">Invitation-only for now.</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; text-align:center; margin-top:4px;">build 9f695e2</span>
+        </div>
+
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 1</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">One door, two jobs</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Landing = logged-out screen (R29):</strong> one surface serves the returning brewer's sign-in and the prospective invitee's first impression. Drawn unified; if the two audiences ever diverge, split then — not now. <strong style="color:#E5AE2B;">Auth is Supabase (checked):</strong> email continue is the primary path (magic-link or password — Code's call); the Apple button is illustrative — which providers are enabled is a config decision, not drawn as fact.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Invitation-only, stated passively (R34):</strong> no redeem-a-code mechanism exists or is planned, so the door just says “invitation-only for now” — a fact, not an affordance. The earlier code-redemption line is cut. <strong style="color:#E5AE2B;">Kachi-iro holstered:</strong> even the hero mark avoids the reserved indigo — it's clay/ink here, jade for the action, so Focus stays the only place the accent is spent.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Copy is all new, adopted as canonical (R32):</strong> nothing on the door exists in the app — the earlier “shipped about line” claim was wrong. Tagline, the what-it-is sentence, and the three pillar words (keep · brew · share, mapping to the diary, the ensō timer, the circle) are all newly written and now canonical. Keep it this minimal — no expansion. <strong style="color:#E5AE2B;">Post-sign-in link:</strong> a brand-new account lands on zero teas → the empty shelf and the zero-tea Origins empty state (R19). This door opens onto those; they're separate surfaces #09 hands off to.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const pillars = [
+      { l: "Keep", sub: "your shelf, every steep" },
+      { l: "Brew", sub: "the ensō timer, led by the leaf" },
+      { l: "Share", sub: "a handful of people · no feed" }
+    ];
+
+    const resolve = (t) => ({ ...t, cap: t.capText,
+      pillarsR: pillars.map(p => ({ l: p.l, sub: p.sub }))
+    });
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...CK, k: "FR1", t: "The door does double duty", d: "R29 made the logged-out screen the landing page — the only thing an invitee sees before signing in. So it can't be a bare login: it has to say what SlowCup is, quietly, while still being the returning brewer's sign-in." },
+      { ...CK, k: "FR2", t: "Real auth, only real providers (R47)", d: "Supabase Auth ships. Email continue is the primary path; the door draws only configured providers — Apple isn't one, so the “Continue with Apple” button is dropped, not drawn as a prop. A working door, because it is one — the sign-in has to look load-bearing, not like a splash." },
+      { ...CK, k: "FR3", t: "Observational voice", d: "\"Keep the tea you brew… and the few you share it with\" — states what it does and lets the reader conclude. No \"start your journey.\" The \"no feed\" pillar is the honest differentiator, matching Social's correspondence model." },
+      { ...CK, k: "FR4", t: "Kachi-iro stays holstered", d: "Even the hero ensō mark uses clay, not the reserved indigo — the action is jade. Contract 4 holds on the most tempting screen to break it: the one selling the app. Focus remains the only place the accent is spent. The ensō motif belongs to the door and the timer, never the app icon (R33)." },
+      { ...CK, k: "FR5", t: "Copy is new and canonical", d: "The door's copy is all newly written — nothing here is lifted from the app (the earlier \"shipped about line\" note was wrong). Tagline, the what-it-is sentence, and the three pillar words are adopted as canonical, kept deliberately minimal (R32). No expansion." },
+      { ...FL, k: "FR6", t: "Opens onto empty states", d: "A brand-new account has zero teas — this door hands off to the empty shelf and the zero-tea Origins empty state (R19). Those are separate surfaces; #09 is just the threshold, drawn so the first signed-in moment isn't a blank." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "A quiet doorway on paper — the breathing ensō mark in clay, the wordmark, one honest line, and a working sign-in anchored to the bottom. The three pillars sit between, grounded to real surfaces. Nothing shouts; it reads like the app it opens.", bg: "#F5F0E3", ink: "#2A1F14", body: "#4A4038", muted: "#8C7F6C", hair: "rgba(42,31,20,0.20)", hairSoft: "rgba(42,31,20,0.12)", field: "#FFFEFB", mark: "#9C5B33", jade: "#3F5E42", jadeInk: "#F6F2E9" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "The same door at night. The mark warms to clay against the dark paper, the sign-in stays jade — the landing never reaches for the Focus indigo, so the accent still means one thing when you finally meet it.", bg: "#16130E", ink: "#EFE7D6", body: "#C6BBA6", muted: "#9E9078", hair: "rgba(239,231,214,0.18)", hairSoft: "rgba(239,231,214,0.11)", field: "#1E1A13", mark: "#B4693C", jade: "#6F9A66", jadeInk: "#14130E" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

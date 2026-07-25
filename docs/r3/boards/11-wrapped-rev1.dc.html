@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="20" y="34" width="52" height="70" rx="9" fill="#9C5B33"></rect><rect x="40" y="26" width="52" height="70" rx="9" fill="#3F5E42"></rect><rect x="60" y="18" width="40" height="70" rx="9" fill="#26343F"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #11</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">WRAPPED · rev 1</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Wrapped</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1020px; margin:0; line-height:1.65;">A shipped view (v3.64) the queue never boarded — the full-screen retrospective carousel. Rev 1 draws its <strong>card anatomy</strong> from the same numbers Insights already computes, so Wrapped is a <strong>reframing, not a second engine</strong>: same <code>totalGrams</code>, <code>hourBuckets</code>/<code>peakBucket</code>, method split and type mix, told one card at a time. Kept honest to a <strong>16-day July</strong>, not a fake year: it's "your month so far," and every figure is <span style="color:#2F4A32;">checked</span> against the export or <span style="color:#8A2B1C;">estimated</span> where noted. Kachi-iro stays holstered — Focus only.</p>
+  </div>
+
+  <!-- carousel: five story cards side by side (the swipe, flattened for review) -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">THE CAROUSEL · SWIPE FLATTENED · LIGHT</span>
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="5">
+        <div style="width:300px; height:600px; border-radius:28px; overflow:hidden; border:1px solid {{ c.line }}; background:{{ c.bg }}; box-sizing:border-box; display:flex; flex-direction:column; padding:26px 24px; position:relative;">
+          <!-- progress pips -->
+          <div style="display:flex; gap:5px;">
+            <sc-for list="{{ c.pipsR }}" as="p" hint-placeholder-count="5"><div style="flex:1; height:3px; border-radius:2px; background:{{ p.bg }};"></div></sc-for>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.16em; color:{{ c.kicker }};">{{ c.kick }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ c.tagFg }}; background:{{ c.tagBg }}; padding:2px 6px; border-radius:3px;">{{ c.tag }}</span>
+          </div>
+
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px;">
+            <div style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:{{ c.figSize }}; line-height:0.98; color:{{ c.figFg }};">{{ c.fig }}</div>
+            <div style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:17px; color:{{ c.leadFg }}; line-height:1.4;">{{ c.lead }}</div>
+            <div style="font-size:12.5px; color:{{ c.subFg }}; line-height:1.55;">{{ c.sub }}</div>
+
+            <sc-if value="{{ c.hasBars }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:7px; margin-top:6px;">
+                <sc-for list="{{ c.barsR }}" as="b" hint-placeholder-count="3"><div style="display:flex; align-items:center; gap:8px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:{{ c.subFg }}; width:64px; flex:none;">{{ b.l }}</span><div style="flex:1; height:10px; border-radius:5px; background:{{ c.trackBg }}; overflow:hidden;"><div style="height:100%; width:{{ b.w }}; background:{{ b.fill }};"></div></div></div></sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ c.hasClock }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:flex-end; gap:3px; height:56px; margin-top:6px;">
+                <sc-for list="{{ c.clockR }}" as="h" hint-placeholder-count="12"><div style="flex:1; border-radius:2px 2px 0 0; background:{{ h.bg }}; height:{{ h.h }};"></div></sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ c.footFg }}; line-height:1.5;">{{ c.foot }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- dark strip: opener + closer only, to prove the theme -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">DARK · OPENER + SHARE CARD</span>
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+      <sc-for list="{{ darkCards }}" as="c" hint-placeholder-count="2">
+        <div style="width:300px; height:600px; border-radius:28px; overflow:hidden; border:1px solid {{ c.line }}; background:{{ c.bg }}; box-sizing:border-box; display:flex; flex-direction:column; padding:26px 24px;">
+          <div style="display:flex; gap:5px;">
+            <sc-for list="{{ c.pipsR }}" as="p" hint-placeholder-count="5"><div style="flex:1; height:3px; border-radius:2px; background:{{ p.bg }};"></div></sc-for>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.16em; color:{{ c.kicker }};">{{ c.kick }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ c.tagFg }}; background:{{ c.tagBg }}; padding:2px 6px; border-radius:3px;">{{ c.tag }}</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px;">
+            <div style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:{{ c.figSize }}; line-height:0.98; color:{{ c.figFg }};">{{ c.fig }}</div>
+            <div style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:17px; color:{{ c.leadFg }}; line-height:1.4;">{{ c.lead }}</div>
+            <div style="font-size:12.5px; color:{{ c.subFg }}; line-height:1.55;">{{ c.sub }}</div>
+            <sc-if value="{{ c.isShare }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:8px; display:flex; gap:9px;">
+                <span style="flex:1; text-align:center; background:{{ c.shareBtnBg }}; color:{{ c.shareBtnFg }}; font-weight:600; font-size:13px; padding:11px 0; border-radius:11px;">Share card</span>
+                <span style="flex:1; text-align:center; border:1px solid {{ c.line }}; color:{{ c.subFg }}; font-weight:600; font-size:13px; padding:11px 0; border-radius:11px;">Save image</span>
+              </div>
+            </sc-if>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ c.footFg }}; line-height:1.5;">{{ c.foot }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 1</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">A reframing, not a second engine</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Same engine as Insights (checked):</strong> every card reads figures Insights already computes — <code style="color:#C9BFAC;">totalGrams</code> (130.5 g), <code style="color:#C9BFAC;">peakBucket</code> (08–10), the method split (senchadō 13 · gongfu 10 · western 0) and type mix. Wrapped is the carousel presentation of that one source, so there's no second set of numbers to keep in sync. <strong style="color:#E5AE2B;">Honest to 16 days, monthly by design:</strong> the opener says "your July so far," never a fake annual — v3.64 is period-scoped monthly; a yearly sibling comes later (R38), and v3.64's seasonal scope is confirmed at build.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Estimated:</strong> per-card figures (the clock bar heights, the 3.3 steeps/session) firm at the same export refresh as Insights; totalGrams (130.5 g) and the cost medians are computable now — structure checked. <strong style="color:#E5AE2B;">Share card (flag):</strong> the closer offers Share / Save-image — a rendered summary card. It exposes counts outward, which brushes the "correspondence not broadcast" line: keep it a <em>pull</em> (you choose to export a still), never an auto-post, and decide whether shared figures ever name people (they shouldn't). <strong style="color:#E5AE2B;">Kachi-iro holstered</strong> — clay/jade/green here, indigo saved for Focus.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const P = { paper:"#F5F0E3", ink:"#2A1F14", muted:"#8C7F6C", line:"rgba(42,31,20,0.16)", clay:"#9C5B33", jade:"#3F5E42", green:"#5F7A34", gold:"#CBA347", white:"#F6F2E9" };
+
+    const pips = (active) => Array.from({length:5}, (_,i) => ({ bg: i === active ? P.ink : "rgba(42,31,20,0.18)" }));
+    const CK = { tag:"CHECKED", tagBg:"rgba(63,94,66,0.16)", tagFg:"#2F4A32" };
+    const ES = { tag:"EST", tagBg:"rgba(105,22,15,0.14)", tagFg:"#8A2B1C" };
+
+    // five story cards — each reads a figure Insights already computes
+    const cards = [
+      { ...CK, i:0, bg:"#26343F", line:"#26343F", figFg:"#F1EEE6", leadFg:"#E7E2D6", subFg:"#B9C2C8", footFg:"#8FA0AA", kicker:"#8FA0AA", kick:"JULY 2026 · SO FAR",
+        fig:"31", figSize:"92px", lead:"sessions, this month", sub:"16 days, 103 steeps. Not a year — the month you've actually had.", foot:"opener · period-scoped (v3.64), never a fake annual" },
+      { ...CK, i:1, bg:"#F6F2E9", line:"rgba(42,31,20,0.16)", figFg:"#2B2320", leadFg:"#5C5148", subFg:"#5C5148", footFg:"#8b8371", kicker:"#9C5B33", kick:"HOW YOU BREWED",
+        fig:"senchadō", figSize:"34px", lead:"led your month", sub:"13 sittings — ahead of gongfu's 10. Western: none. The way you brew shifted.", hasBars:true, trackBg:"#E4DCC8",
+        barsR:[{l:"senchadō",w:"100%",fill:"#5F7A34"},{l:"gongfu",w:"77%",fill:"#9C5B33"},{l:"cold brew",w:"9%",fill:"#CBA347"}], foot:"reads the same method split as Insights (checked)" },
+      { ...ES, i:2, bg:"#3F5E42", line:"#3F5E42", figFg:"#F6F2E9", leadFg:"#E7ECDF", subFg:"#C4D2BE", footFg:"#9DB396", kicker:"#B9C9B2", kick:"LEAF BREWED",
+        fig:"130.5 g", figSize:"54px", lead:"through your pot", sub:"totalGrams, the figure an achievement already tracks — and the litres the water field was for.", foot:"totalGrams · computable now (checked)" },
+      { ...CK, i:3, bg:"#F6F2E9", line:"rgba(42,31,20,0.16)", figFg:"#2B2320", leadFg:"#5C5148", subFg:"#5C5148", footFg:"#8b8371", kicker:"#9C5B33", kick:"WHEN YOU BREW",
+        fig:"08–10", figSize:"64px", lead:"is your hour", sub:"peakBucket names it: a morning ritual, with a midday second pour.", hasClock:true,
+        clockR:["0%","0%","6%","48%","100%","56%","72%","40%","12%","0%","0%","0%"].map((h,idx)=>({h,bg: (idx===4||idx===6)?"#9C5B33":"#D8CFB9"})), foot:"hourBuckets (12×2h) + peakBucket, both computed (checked)" },
+      { ...CK, i:4, bg:"#9C5B33", line:"#9C5B33", figFg:"#F6EFE2", leadFg:"#F1E4D4", subFg:"#EAD6C2", footFg:"#D8B89C", kicker:"#EAD6C2", kick:"YOUR JULY",
+        fig:"Kagoshima\nmornings", figSize:"30px", lead:"a green-leaning month", sub:"green 15 · oolong 11 · white 3, brewed most in the Dragon Gaiwan. Share the card?", foot:"type mix (by session) + top vessel — real (checked)" }
+    ];
+
+    const darkCards = [
+      { i:0, bg:"#26343F", line:"#26343F", figFg:"#F1EEE6", leadFg:"#E7E2D6", subFg:"#B9C2C8", footFg:"#8FA0AA", kicker:"#8FA0AA", kick:"JULY 2026 · SO FAR",
+        fig:"31", figSize:"92px", lead:"sessions, this month", sub:"16 days, 103 steeps. Not a year — the month you've actually had.",
+        tag:"CHECKED", tagBg:"rgba(255,255,255,0.12)", tagFg:"#C6D2D8", foot:"opener · the carousel's dark palette", pipsR: pips(0).map((_,i)=>({bg:i===0?"#E7E2D6":"rgba(231,226,214,0.22)"})) },
+      { i:4, bg:"#1E1A13", line:"rgba(239,231,214,0.18)", figFg:"#EFE7D6", leadFg:"#C6BBA6", subFg:"#9E9078", footFg:"#7c745f", kicker:"#B4693C", kick:"YOUR JULY",
+        fig:"Kagoshima\nmornings", figSize:"30px", lead:"a green-leaning month", sub:"green 15 · oolong 11 · white 3, brewed most in the Dragon Gaiwan.",
+        tag:"SHARE", tagBg:"rgba(229,174,43,0.2)", tagFg:"#E5AE2B", isShare:true, shareBtnBg:"#6F9A66", shareBtnFg:"#14130E", foot:"closer · Share/Save is a pull, never an auto-post", pipsR: pips(4).map((_,i)=>({bg:i===4?"#EFE7D6":"rgba(239,231,214,0.22)"})) }
+    ];
+
+    const notes = [
+      { ...CK, k:"W1", t:"One engine, two views", d:"Wrapped reads the exact figures Insights computes — totalGrams, peakBucket, method split, type mix. It's the carousel telling of that one source, so there's no risk of two dashboards disagreeing." },
+      { ...CK, k:"W2", t:"Honest to 16 days, monthly", d:"The opener says \"July, so far\" — v3.64 is period-scoped monthly, and one month is what it holds. No invented annual; a yearly sibling comes later (R38), no padding a sparse period into a year that hasn't happened." },
+      { ...CK, k:"W3", t:"Story cards, one figure each", d:"Each card carries a single number and a plain line — sessions, method, grams, hour, mix. Full-bleed, swipeable, progress pips up top. The diary's voice at presentation scale, not a stats dump." },
+      { ...ES, k:"W4", t:"Amounts firm at refresh", d:"The clock bar heights and 3.3 steeps/session settle on the same export refresh as Insights; totalGrams (130.5 g) and cost medians are computable now. Tagged EST only where the exact number isn't in front of me; the shape is right." },
+      { ...CK, k:"W5", t:"Kachi-iro holstered", d:"The card palette runs clay, jade, green, and the Wrapped indigo-slate as a background — but the reserved Kachi-iro accent stays unspent. Focus is still the only place it lands." },
+      { ...ES, k:"W6", t:"Share card brushes the line", d:"The closer can export a summary still. That points counts outward, near the \"not broadcast\" edge — so it's a pull (you choose to save), never auto-posted, and shared figures never name people. Flagged for the ruling." }
+    ];
+
+    return { cards, darkCards, notes,
+      // attach pips to light cards
+      _: cards.forEach(c => { c.pipsR = pips(c.i); })
+    };
+  }
+}
+</script>
+</body>
+</html>

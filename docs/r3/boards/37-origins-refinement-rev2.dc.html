@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><circle cx="46" cy="52" r="17" fill="none" stroke="#2B2320" stroke-width="5" stroke-dasharray="5 4"></circle><text x="46" y="58" font-family="monospace" font-size="16" text-anchor="middle" fill="#2B2320">?5</text><path d="M70 52 h22" stroke="#9C5B33" stroke-width="4"></path><path d="M84 45 l8 7 -8 7" fill="none" stroke="#9C5B33" stroke-width="4"></path><circle cx="100" cy="52" r="5" fill="#843A1E"></circle></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#DDD6C6;">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #37</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">ORIGINS REFINEMENT · rev 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Refining an origin</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1060px; margin:0; line-height:1.65;">How a tea climbs out of the <code>? N</code> country tier. The mechanism is <strong>already two-thirds shipped</strong>: the user edits <code>teas.origin</code> free text (with the existing autofill), the coordinate table gains a row for that string, and <strong>the tier re-derives itself</strong> — no code change, because a tier is just “does this string resolve.” A string with no row yet falls back to its country pin, which is exactly the <code>? N</code> behaviour, so <strong>refining ahead of the table costs nothing</strong>. <strong>Ten</strong> teas sit in the country tier and <strong>six</strong> are catalog-covered — but coverage isn't an offer: <strong>R55</strong> lets the catalog offer only a region that names <em>one place inside the country already stored</em>, so of those six, <strong>three offer cleanly and three are suppressed</strong>.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:26px 24px; display:flex; flex-direction:column;">
+
+          <div style="display:flex; align-items:center; gap:10px; border-bottom:2px solid {{ t.ink }}; padding-bottom:8px;">
+            <span style="font-size:19px; color:{{ t.ink }};">‹</span>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:20px; color:{{ t.ink }};">Origin</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:{{ t.muted }}; margin-left:auto;">EDIT TEA · #06</span>
+          </div>
+
+          <!-- current stored value -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }}; margin-top:18px;">STORED NOW</span>
+          <div style="display:flex; align-items:center; gap:11px; margin-top:8px; padding:12px 13px; border:1px solid {{ t.hair }}; border-radius:10px;">
+            <div style="width:34px; height:34px; flex:none; border-radius:50%; border:1.5px dashed {{ t.hair }}; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.muted }};">? 10</div>
+            <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+              <span style="font-family:'Shippori Mincho',serif; font-size:16px; color:{{ t.ink }};">China</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">country tier · 5 teas at “China”, 10 country-only in all</span>
+            </div>
+          </div>
+
+          <!-- the catalog offer (R26) -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }}; margin-top:18px;">THE CATALOG KNOWS MORE</span>
+          <div style="margin-top:8px; border:1px solid {{ t.offerLine }}; background:{{ t.offerBg }}; border-radius:12px; padding:13px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:flex-start; gap:9px;">
+              <span style="font-family:'Noto Serif SC',serif; font-size:15px; color:{{ t.ink }}; margin-top:1px;">武夷</span>
+              <span style="font-size:12.5px; color:{{ t.ink }}; line-height:1.45; flex:1;">Its catalog entry records <strong>Wuyi Mountains, Fujian, China</strong>. Use that as this tea's origin?</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <span style="flex:1; text-align:center; font-size:12.5px; font-weight:600; color:{{ t.clayInk }}; background:{{ t.clay }}; padding:9px 0; border-radius:9px;">Use it</span>
+              <span style="flex:1; text-align:center; font-size:12.5px; color:{{ t.muted }}; border:1px solid {{ t.hair }}; padding:9px 0; border-radius:9px;">Keep “China”</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; line-height:1.45;">the string offered is <em>verbatim what the catalog stores</em> (inherited from wuyi-yancha) — not a prettier paraphrase, because the coordinate table is keyed on the normalised stored string. one tap, never automatic (R26); declining is a real answer and isn't asked again.</span>
+          </div>
+
+          <!-- R55 · suppression: a conflict is not an offer -->
+          <div style="margin-top:10px; border:1px dashed {{ t.hair }}; border-radius:12px; padding:12px 13px; display:flex; flex-direction:column; gap:7px;">
+            <div style="display:flex; align-items:center; gap:7px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.08em; color:{{ t.muted }}; border:1px solid {{ t.hair }}; padding:2px 5px; border-radius:3px;">NO OFFER SHOWN</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">on Oriental Beauty · R55</span>
+            </div>
+            <span style="font-size:11.5px; color:{{ t.ink }}; line-height:1.45;">Its catalog region reads <strong>Hsinchu / Miaoli, Taiwan</strong>, but you stored <strong>China</strong>. Different country — that's a conflict, not a refinement, so nothing is offered here.</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; line-height:1.45;">also suppressed: Huang Ya Yellow Tips (“Sichuan / Anhui / Hunan” — a list, not a place) · Ruby Ruanzhi (two countries). parentheticals are stripped, so Ali Shan offers “Chiayi County, Taiwan”.</span>
+          </div>
+
+          <!-- free text -->
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }}; margin-top:18px;">OR TYPE IT YOURSELF</span>
+          <div style="margin-top:8px; border:1px solid {{ t.ink }}; border-radius:10px; padding:11px 13px; display:flex; align-items:center; gap:7px;">
+            <span style="font-family:'Shippori Mincho',serif; font-size:15px; color:{{ t.ink }};">Wuyi Mountains, Fujian, China</span>
+            <span style="width:1px; height:17px; background:{{ t.ink }}; margin-left:auto;"></span>
+          </div>
+          <div style="display:flex; gap:7px; flex-wrap:wrap; margin-top:9px;">
+            <sc-for list="{{ t.suggR }}" as="s" hint-placeholder-count="3"><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:{{ t.muted }}; border:1px solid {{ t.hair }}; border-radius:999px; padding:5px 11px;">{{ s.l }}</span></sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; line-height:1.45; margin-top:8px;">suggestions come from the shipped origin autofill (steep-knowledge.js) — free text stays free text.</span>
+
+          <!-- what happens next — the HONEST today-state: no coordinate row yet, so the tier does not change -->
+          <div style="margin-top:18px; padding:13px; border-radius:12px; background:{{ t.factBg }}; display:flex; flex-direction:column; gap:9px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:{{ t.muted }};">WHAT CHANGES ON THE MAP</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.muted }}; border:1px solid {{ t.hair }}; padding:2px 5px; border-radius:3px;">TODAY · NO WUYI ROW</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:9px;">
+              <div style="width:26px; height:26px; flex:none; border-radius:50%; border:1.5px dashed {{ t.hair }}; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">? 5</div>
+              <span style="font-size:15px; color:{{ t.muted }};">→</span>
+              <div style="width:26px; height:26px; flex:none; border-radius:50%; border:1.5px dashed {{ t.hair }}; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">? 5</div>
+              <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:12.5px; color:{{ t.ink }}; line-height:1.4;">the pin doesn't move yet — the string is richer, the map has no row for it.</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:9px; padding-top:9px; border-top:1px solid {{ t.hairSoft }};">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ t.clayInk }}; background:{{ t.clay }}; padding:2px 5px; border-radius:3px; flex:none;">ONCE THE ROW LANDS</span>
+              <div style="display:flex; align-items:center; gap:7px;">
+                <div style="width:22px; height:22px; flex:none; border-radius:50%; border:1.5px dashed {{ t.hair }}; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">? 4</div>
+                <span style="font-size:14px; color:{{ t.clay }};">+</span>
+                <span style="width:15px; height:19px; background:#843A1E; border-radius:5px 3px 5px 3px;"></span>
+                <span style="font-family:'Shippori Mincho',serif; font-size:13px; color:{{ t.ink }};">Wuyi Mountains</span>
+              </div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }}; line-height:1.5;">the tier re-derives — nothing to migrate. the coordinate table has eight rows and none of the three offerable regions (Wuyi Mountains · Lugu · Chiayi) is among them, so today every accepted offer honestly stays in its country tier. those three rows are owed by the data lane.</span>
+          </div>
+
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="display:flex; flex-direction:column; gap:13px; max-width:1240px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 2</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:21px; color:#2B2320; margin:0;">Confirming beats typing</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Depends on R26 (the offer only):</strong> the free-text path works today; the "catalog says…" card needs the stored confirm-link (<code style="color:#C9BFAC;">teas.catalog_slug</code>) so a decline is remembered and a rename doesn't re-ask. Until it lands, ship the free-text half. <strong style="color:#E5AE2B;">Coverage vs offers (checked):</strong> ten country-only teas, six catalog-covered, but under <strong>R55</strong> only <strong>three</strong> offer — Dawang Feng Da Hong Pao (Wuyi Mountains, Fujian, China), Honey Oolong Gui Fei (Lugu, Nantou, Taiwan), Ali Shan Fo Shou Dong Pian (Chiayi County, Taiwan — parenthetical stripped). Suppressed: Oriental Beauty (country conflict), Huang Ya Yellow Tips (a list), Ruby Ruanzhi (two countries).</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">No auto-upgrade, ever:</strong> Tea detail keeps rendering the stored string (“China ›”), and this screen is the only place it changes — with a tap. <strong style="color:#E5AE2B;">Three coordinate rows owed (data lane):</strong> Wuyi Mountains · Lugu · Chiayi. <code style="color:#C9BFAC;">DATA-region-coordinates.md</code> has eight rows and is marked complete, so until those land an accepted offer stores the better string and leaves the pin in its country tier — drawn as the today-state, with the post-row outcome labelled as such. <strong style="color:#E5AE2B;">Illustrative (R27):</strong> the worked example is the real Dawang Feng Da Hong Pao row (origin stored “China”), and the offered region is its catalog value verbatim.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const sugg = ["Fujian, China", "Wuyi Shan, Fujian, China", "Anxi, Fujian, China"];
+    const resolve = (t) => ({ ...t, cap: t.capText, suggR: sugg.map(l => ({ l })) });
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...CK, k: "OR1", t: "The tier is derived, not stored", d: "Nothing marks a tea as “country tier.” It's simply whether its origin string resolves to a coordinate row. So refining an origin moves the pin with no migration, no backfill, and no code change — the map re-reads and re-tiers itself." },
+      { ...FL, k: "OR2", t: "The catalog offers, the user confirms", d: "A catalog-linked tea carries its region — Dawang Feng Da Hong Pao's entry stores “Wuyi Mountains, Fujian, China”, inherited from parent wuyi-yancha. The card offers that string verbatim, one tap to accept, because the coordinate table is keyed on the normalised stored string: a prettier board literal would mint a key the catalog never produces." },
+      { ...CK, k: "OR7", t: "Ten country-only, not nine", d: "Nine is the literal-string count (China ×5, Taiwan ×3, Thailand ×1). The tenth is Moragella Oolong at “Ceylon, Sri Lanka”, which normalises into the country tier because R16 rules Ceylon a country synonym. Ten country-only, eleven region-tier, 21 live teas." },
+      { ...FL, k: "OR8", t: "Coverage is not an offer (R55)", d: "Six of the ten are catalog-covered, but only three offer: the region must name ONE place INSIDE the country already stored, parentheticals stripped. Oriental Beauty is suppressed (catalog says Taiwan, stored says China — a country swap dressed as a refinement); Huang Ya Yellow Tips is a list of three provinces; Ruby Ruanzhi spans two countries. A conflict is a question with no default, never a one-tap “use it”." },
+      { ...CK, k: "OR3", t: "Refining ahead of the table is free", d: "The coordinate table has eight rows — Kagoshima, Chiran, Hoshino, Fujian, Yunnan, Guangdong, Zhejiang, Nantou — and none of the three offerable regions is among them. So today an accepted offer stores a richer string and the pin stays in its country tier. The before/after panel draws that honest outcome, with the post-row state labelled separately. Rows owed: Wuyi Mountains, Lugu, Chiayi." },
+      { ...CK, k: "OR4", t: "Free text stays free text", d: "The input is the shipped free-text field with the existing origin autofill offering suggestions. No enum, no forced picker — a user who writes “the hill above Fuding” keeps that, and it degrades gracefully." },
+      { ...FL, k: "OR5", t: "Declining must be remembered", d: "A decline is a real answer. Without R26's stored link there's nowhere to record it, so the offer would re-ask on every visit — nagging. That's why the offer half waits for the confirm-link while the free-text half can ship now." },
+      { ...CK, k: "OR6", t: "One writer for origin", d: "This screen is the only place teas.origin changes. Tea detail renders it as stored, the map reads it, Insights counts from it — so a refinement propagates everywhere at once without any surface holding its own copy." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "Stored value first, so the user sees what they have before being offered an alternative. The catalog card is a question, not a correction — and the before/after pins make the consequence legible: one leaves the ? 5 cluster and becomes its own place.", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.28)", hairSoft: "rgba(42,31,20,0.13)", clay: "#9C5B33", clayInk: "#F6EFE2", factBg: "#EDE6D4", offerBg: "rgba(229,174,43,0.10)", offerLine: "rgba(156,91,51,0.35)" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "The same three paths at night. The offer keeps its warm tint so it reads as an invitation rather than a warning — nothing here is an error state.", bg: "#1C1610", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.24)", hairSoft: "rgba(239,231,214,0.12)", clay: "#B4693C", clayInk: "#241A13", factBg: "#262017", offerBg: "rgba(229,174,43,0.09)", offerLine: "rgba(180,105,60,0.42)" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

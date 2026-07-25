@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="30" y="26" width="60" height="68" rx="8" fill="none" stroke="#2B2320" stroke-width="5"></rect><path d="M40 46 h40 M40 60 h40 M40 74 h24" stroke="#9C5B33" stroke-width="5" stroke-linecap="round"></path></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #12</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">QUICK LOG · rev 1</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Quick log</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1020px; margin:0; line-height:1.65;">The third unboarded shipped surface (<code>quickLogSession</code>) — the <strong>retrospective twin of #04</strong>. Same session record, opposite posture: it opens with <strong>no tea preselected</strong>, <strong>no timer</strong>, and records a cup you already had. The hierarchy that folded the "When" field away on #04 <strong>inverts here</strong> — a retrospective cup's date is the one thing that genuinely needs to be up front, so <code>sessionDate</code> earns prominence. Flavour is captured in the steep, not here (same as #04). Rows are the <strong>real shelf</strong>, not the invented set.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column; padding:0 26px;">
+
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0 0;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }};">9:41</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.15em; color:{{ t.muted }};">● ● ●</span>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid {{ t.ink }}; padding:14px 0 8px; margin-top:8px;">
+          <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-size:19px; color:{{ t.ink }};">‹</span><span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:{{ t.ink }};">Log a cup</span></div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ t.muted }};">no timer</span>
+        </div>
+        <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.muted }}; margin-top:10px;">A cup you already had — jot what you remember.</span>
+
+        <!-- WHEN — promoted to first, prefilled to now but obviously editable -->
+        <div style="margin-top:16px; border:1px solid {{ t.kachiLine }}; background:{{ t.factBg }}; border-radius:13px; padding:13px 15px; display:flex; flex-direction:column; gap:9px;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">WHEN</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.jade }};">sessionDate · ships</span>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <sc-for list="{{ t.whenR }}" as="w" hint-placeholder-count="4"><span style="font-family:'Inter',sans-serif; font-size:13px; color:{{ w.fg }}; background:{{ w.bg }}; border:1px solid {{ w.bd }}; border-radius:999px; padding:7px 14px;">{{ w.l }}</span></sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; border:1px solid {{ t.hair }}; border-radius:9px; padding:9px 12px; background:{{ t.field }};">
+            <span style="font-size:13.5px; color:{{ t.ink }};">Sun 19 Jul · 08:20</span>
+            <span style="margin-left:auto; font-size:12px; color:{{ t.muted }};">▾</span>
+          </div>
+        </div>
+
+        <!-- TEA — no preselection -->
+        <div style="margin-top:14px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">WHICH TEA</span>
+          <div style="display:flex; align-items:center; gap:10px; border:1px dashed {{ t.hair }}; border-radius:11px; padding:13px 14px; margin-top:7px;">
+            <div style="width:26px; height:33px; flex:none; border-radius:8px 4px 7px 4px; border:1.5px dashed {{ t.hair }};"></div>
+            <span style="font-size:14px; color:{{ t.muted }};">Choose from your shelf…</span>
+            <span style="margin-left:auto; font-size:15px; color:{{ t.muted }};">›</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; display:block; margin-top:6px;">nothing preselected — unlike Setup, which launches from a chosen tea. quick log starts empty and asks.</span>
+        </div>
+
+        <!-- VESSEL — optional (R43) -->
+        <div style="margin-top:14px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:{{ t.muted }};">VESSEL</span><span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.muted }};">OPTIONAL</span></div>
+          <div style="display:flex; align-items:center; gap:10px; border:1px dashed {{ t.hair }}; border-radius:11px; padding:11px 14px; margin-top:7px;">
+            <span style="font-size:14px; color:{{ t.muted }};">Which vessel? (optional)</span>
+            <span style="margin-left:auto; font-size:15px; color:{{ t.muted }};">›</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5; display:block; margin-top:6px;">a remembered cup often recalls its pot — vessel_id, optional (R43), never blocking the log.</span>
+        </div>
+
+        <!-- the lean core: infusions + rating + note -->
+        <div style="margin-top:16px; display:flex; gap:12px;">
+          <div style="flex:1; display:flex; flex-direction:column; gap:6px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:{{ t.muted }};">INFUSIONS</span><div style="display:flex; align-items:center; gap:12px; border:1px solid {{ t.hair }}; border-radius:9px; padding:9px 12px;"><span style="font-size:14px; color:{{ t.muted }};">–</span><span style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:{{ t.ink }}; margin:0 auto;">4</span><span style="font-size:14px; color:{{ t.muted }};">+</span></div></div>
+          <div style="flex:1; display:flex; flex-direction:column; gap:6px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:{{ t.muted }};">RATING</span><div style="display:flex; align-items:center; gap:3px; border:1px solid {{ t.hair }}; border-radius:9px; padding:9px 12px; justify-content:center;"><span style="color:{{ t.clay }}; font-size:16px;">★★★★</span><span style="color:{{ t.hair }}; font-size:16px;">★</span></div></div>
+        </div>
+        <div style="margin-top:14px; display:flex; flex-direction:column; gap:6px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:{{ t.muted }};">NOTE</span>
+          <div style="border:1px solid {{ t.hair }}; border-radius:11px; padding:12px 14px; min-height:52px;"><span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:13px; color:{{ t.muted }};">honeyed, a little past its best…</span></div>
+        </div>
+
+        <div style="margin-top:16px; margin-bottom:22px; background:{{ t.clay }}; color:{{ t.clayInk }}; font-weight:600; font-size:15px; text-align:center; padding:14px 0; border-radius:16px 6px 14px 8px;">Save cup</div>
+
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 1</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">The retrospective twin</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Same record, inverted posture (checked):</strong> quick log writes the same session row as Setup — <code style="color:#C9BFAC;">quickLogSession</code> just opens it with no tea, no timer, for a cup already drunk. So the "When" field the two share (<code style="color:#C9BFAC;">sessionDate</code>, <code style="color:#C9BFAC;">steep-sessions.js:535</code>) is <em>folded away on #04</em> (live = now) and <em>promoted here</em> (retrospective = needs saying). One field, two placements, driven by which posture the screen is in.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Flavour lives in the steep (checked):</strong> quick log keeps the note but not per-steep flavour chips — same rule as #04, and it's why the WS1 "Log a cup" drew flavour removed. When the nested flavour vocabulary lands, it changes the steep's capture, not this screen. <strong style="color:#E5AE2B;">Real shelf (R27):</strong> the tea picker opens on the real library; the quick-note example ("honeyed, a little past its best") is illustrative, not a stored record — tagged, not asserted.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Two entry points, one surface:</strong> the bottom-nav Log and the in-Setup "Quick log" shortcut (#04, R5) both open this. Drawn once here; on #04 it's the shortcut, here it's the destination. <strong style="color:#E5AE2B;">Kachi-iro holstered</strong> — clay save action, jade accents; the reserved indigo stays with Focus.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const when = [
+      { l: "Just now", sel: false },
+      { l: "This morning", sel: true },
+      { l: "Yesterday", sel: false },
+      { l: "Pick a date", sel: false }
+    ];
+
+    const resolve = (t) => ({ ...t, cap: t.capText,
+      whenR: when.map(w => ({ l: w.l,
+        fg: w.sel ? t.kachiInk : t.muted,
+        bg: w.sel ? t.jade : "transparent",
+        bd: w.sel ? t.jade : t.hair }))
+    });
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const ES = { tag: "EST", tagBg: "rgba(105,22,15,0.14)", tagFg: "#8A2B1C" };
+    const notes = [
+      { ...CK, k: "Q1", t: "The retrospective twin of #04", d: "Same session record, opposite stance: no tea preselected, no timer, and it's for a cup already had. quickLogSession is the shipped function; this is the screen the queue never drew for it." },
+      { ...CK, k: "Q2", t: "The date field inverts", d: "sessionDate is folded away on #04 (a live cup is now, 95% right) and promoted here — a cup you had this morning genuinely needs its 'when' up front. Same shipped field (steep-sessions.js:535), placed by posture." },
+      { ...CK, k: "Q3", t: "No tea preselected", d: "Setup launches from a chosen tea; quick log starts empty and asks. The picker opens on the real shelf — a dashed placeholder makes the 'nothing chosen yet' state read as intentional, not broken." },
+      { ...CK, k: "Q4", t: "Flavour stays in the steep", d: "The note survives; per-steep flavour chips don't — same rule as #04, and why WS1's 'Log a cup' drew flavour removed. The coming nested vocabulary changes the steep's capture, not this lean retrospective form." },
+      { ...CK, k: "Q5", t: "One surface, two doors", d: "The bottom-nav Log and the in-Setup 'Quick log' shortcut (R5) both land here. Drawn once as the destination; #04 only carries the shortcut to it." },
+      { ...ES, k: "Q6", t: "Example note is illustrative", d: "'honeyed, a little past its best' shows the note's voice, not a stored row (R27). The real shelf backs the picker; the freeform note is placeholder text, tagged rather than asserted as data." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "The retrospective form: When first, in a bordered card with quick relative chips over the full date — because a remembered cup's time is the thing most worth pinning. Then an empty tea picker, the lean core (infusions · rating · note), and Save. No ring, no live timer.", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.20)", hairSoft: "rgba(42,31,20,0.12)", field: "#FFFEFB", factBg: "#EDE6D4", kachiLine: "rgba(42,31,20,0.16)", clay: "#9C5B33", clayInk: "#F6EFE2", jade: "#3F5E42", kachiInk: "#F6F2E9" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "The same form at night. When still leads; the selected relative chip uses jade, not the Focus indigo. A retrospective log is quiet paperwork — no accent reaches for attention it doesn't need.", bg: "#16130E", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.18)", hairSoft: "rgba(239,231,214,0.11)", field: "#1E1A13", factBg: "#221E16", kachiLine: "rgba(239,231,214,0.16)", clay: "#B4693C", clayInk: "#F6EFE2", jade: "#6F9A66", kachiInk: "#14130E" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

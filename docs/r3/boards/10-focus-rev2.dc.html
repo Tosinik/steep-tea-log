@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+  @keyframes sc-breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><path d="M60 26 a34 34 0 1 0 25 11" fill="none" stroke="#26343F" stroke-width="7" stroke-linecap="round"></path><rect x="46" y="56" width="28" height="8" rx="4" fill="#2B2320"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:30px; background:#DDD6C6;">
+
+  <div style="max-width:1320px; display:flex; flex-direction:column; gap:13px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">BUILD · #10 · FIRST</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#26343F; color:#F6F2E9; padding:4px 9px; border-radius:4px;">FOCUS · rev 2</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-07-19 · repo 9f695e2</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Focus</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1020px; margin:0; line-height:1.65;">The hero, built first — it's the one board blocking a live bug. The ensō <em>is</em> the timer, drawn in <strong>Kachi-iro</strong>, the accent held back for exactly this moment (contract 4). It's where <strong>#04's per-steep temperature</strong> is finally used, and where <strong>v3.89's feedback taps</strong> live — drawn as a <strong>committed write to <code>steep.feedback</code></strong>, not the ephemeral nudge that ships today. Today "Just right" flashes and saves nothing; taste data is lost every session until this lands. Hero is real: <strong>Da Hong Pao</strong> in the <strong>Dragon Gaiwan</strong>, a gongfu run.</p>
+  </div>
+
+  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="2">
+    <div style="display:flex; flex-direction:column; gap:8px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#5C5148;">{{ t.label }}</span>
+      <div style="width:390px; border-radius:30px; border:1px solid {{ t.hair }}; background:{{ t.bg }}; overflow:hidden; box-sizing:border-box; display:flex; flex-direction:column;">
+
+        <!-- minimal status row — Focus stays chromeless so the ring leads -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px 0;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }};">9:41</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.15em; color:{{ t.muted }};">● ● ●</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 20px 0;">
+          <span style="font-size:20px; color:{{ t.ink }};">‹</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ t.muted }};">♪ bell</span>
+        </div>
+
+        <!-- tea + steep -->
+        <div style="text-align:center; padding:6px 24px 0;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:{{ t.muted }};">Da Hong Pao 大紅袍 · gongfu</div>
+          <div style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:25px; color:{{ t.ink }}; margin-top:5px;">Steep 2</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.kachi }}; margin-top:4px;">95°C · guide 25s · Dragon Gaiwan</div>
+        </div>
+
+        <!-- ensō ring -->
+        <div style="display:flex; justify-content:center; margin-top:20px;">
+          <div style="position:relative; width:250px; height:250px;">
+            <div style="position:absolute; inset:0; animation:sc-breathe 5.5s ease-in-out infinite; {{ t.ringGlow }}">
+              <svg viewBox="0 0 120 120" style="width:250px; height:250px; transform:rotate(-4deg);">
+                <path d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke="{{ t.track }}" stroke-width="5.5" stroke-linecap="round"></path>
+                <path d="M60 15 a45 45 0 1 0 33 14" fill="none" stroke="{{ t.kachi }}" stroke-width="6.5" stroke-linecap="round" stroke-dasharray="236" stroke-dashoffset="150"></path>
+              </svg>
+            </div>
+            <!-- steep track — 6 steeps, #2 active -->
+            <div style="position:absolute; top:-3px; left:0; right:0; display:flex; justify-content:center; gap:8px;">
+              <sc-for list="{{ t.dotsR }}" as="d" hint-placeholder-count="6"><span style="width:7px; height:7px; border-radius:50%; background:{{ d.bg }};"></span></sc-for>
+            </div>
+            <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:50px; color:{{ t.ink }}; line-height:1;">00:18</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ t.muted }}; margin-top:8px; letter-spacing:0.08em;">of 25s left</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- controls -->
+        <div style="display:flex; gap:10px; margin-top:22px; padding:0 22px;">
+          <div style="flex:1; background:{{ t.kachi }}; color:{{ t.kachiInk }}; font-weight:600; font-size:15px; text-align:center; padding:13px 0; border-radius:12px;">Pause</div>
+          <div style="flex:1; border:1px solid {{ t.hair }}; color:{{ t.muted }}; font-weight:600; font-size:15px; text-align:center; padding:13px 0; border-radius:12px;">Reset</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:7px; margin-top:12px;">
+          <div style="display:flex; border:1px solid {{ t.hair }}; border-radius:9px; overflow:hidden;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ t.kachiInk }}; background:{{ t.kachi }}; padding:6px 16px;">countdown</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ t.muted }}; padding:6px 16px; border-left:1px solid {{ t.hair }};">stopwatch</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }};">‘use this time’ appears in stopwatch mode only</span>
+        </div>
+
+        <!-- FEEDBACK — the fix: a committed write to steep.feedback, not an ephemeral nudge -->
+        <div style="margin:20px 20px 0; border:1px solid {{ t.kachiLine }}; background:{{ t.kachiSoft }}; border-radius:14px; padding:14px 15px; display:flex; flex-direction:column; gap:11px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between;">
+            <span style="font-family:'Shippori Mincho',serif; font-style:italic; font-size:14px; color:{{ t.ink }};">Steep 1 — how did it pour?</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:{{ t.jade }};">✓ SAVED</span>
+          </div>
+          <div style="display:flex; gap:7px;">
+            <sc-for list="{{ t.feedbackR }}" as="f" hint-placeholder-count="3"><span style="flex:1; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ f.fg }}; background:{{ f.bg }}; border:1px solid {{ f.bd }}; border-radius:9px; padding:8px 0;">{{ f.l }}</span></sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ t.muted }}; line-height:1.5;">written to <code>steep.feedback</code> — the next steep's guide leans on it (v3.89 ratio nudge). not a toast: it persists, so taste data stops leaking.</span>
+        </div>
+
+        <!-- quiet per-steep capture -->
+        <div style="margin:12px 20px 20px; border-top:1px solid {{ t.hairSoft }}; padding-top:14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ t.ink }}; border:1px solid {{ t.hair }}; border-radius:999px; padding:7px 13px;">95° temp</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ t.muted }}; border:1px solid {{ t.hair }}; border-radius:999px; padding:7px 13px;">＋ note</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ t.muted }}; border:1px solid {{ t.hair }}; border-radius:999px; padding:7px 13px;">＋ tasting</span>
+        </div>
+
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.5; max-width:390px;">{{ t.cap }}</span>
+    </div>
+  </sc-for>
+
+  <div style="height:2px; background:#B8AC92; max-width:1320px;"></div>
+
+  <div style="display:flex; flex-direction:column; gap:14px; max-width:1320px;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; background:#E5AE2B; color:#3A2A08; padding:4px 10px; border-radius:4px;">HOW · rev 1</span>
+      <h2 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:22px; color:#2B2320; margin:0;">The ring, the accent, and the write that was missing</h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="6">
+        <div style="border:1px solid #C9BC9E; background:#F6F2E9; border-radius:11px; padding:13px 15px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; gap:7px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; background:{{ n.tagBg }}; color:{{ n.tagFg }};">{{ n.tag }}</span><span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3F5E42;">{{ n.k }}</span></div>
+          <span style="font-size:12.5px; font-weight:600; color:#2B2320; line-height:1.35;">{{ n.t }}</span>
+          <span style="font-size:11.5px; color:#5C5148; line-height:1.5;">{{ n.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#2B2320; border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:9px; max-width:1040px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ HAND-OFF FLAGS · DECIDE DON'T DISCOVER</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">The live bug (build-first reason):</strong> today the "Just right" nudge is an ephemeral toast — it renders and writes nothing to <code style="color:#C9BFAC;">steep.feedback</code>, so per-steep taste is lost every session. STATE records the fix as <em>waiting on the Focus resolution</em>. This board resolves it: feedback is a persistent, three-way write (too light · just right · too strong) with a visible saved state, feeding v3.89's ratio nudge. Code is landing the persist now — the board resolved the design question that blocked it — so the write ships ahead of this restyle and the visual lands with R3. Nothing else was unblocked until #10; hence first, ahead of #09.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Kachi-iro under contract 4 (checked):</strong> the deep indigo is the reserved Focus accent — this is the only board that spends it, on the ensō stroke and the primary action. Elsewhere it stays holstered (Settings shows the swatch, marked "reserved for Focus"). On dark it lifts to a slate-blue to hold the hue's identity at contrast. <strong style="color:#E5AE2B;">Per-steep temp (checked):</strong> the 95°C is #04's per-steep <code style="color:#C9BFAC;">tempC</code>, editable in the capture chip — Focus is where that field is finally read, not just stored.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Real hero (R27):</strong> Da Hong Pao in the Dragon Gaiwan, a 6-steep gongfu run — both real, both from the session log, no invented rows. <strong style="color:#E5AE2B;">Estimated:</strong> the 00:18 / 25s guide time and steep-2 position are illustrative; the tea, vessel, method and 95°C are real. Countdown and stopwatch are the shipped modes; use-this-time renders only in stopwatch mode (steep-sessions.js:860–901), not as a third peer.</span>
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">Tasting chip (heads-up):</strong> the ＋ tasting chip here and #03's "what you taste" panel will draw from a forthcoming <strong>nested flavour vocabulary</strong> — specific word stored and shown, rolled up to its family for the bars — so the 20-chip tier stops punishing precision (Niklas's "apricot / fig / cocoa" are textbook, just finer than the chips). Nothing to redraw yet; the chip's <em>source</em> is changing under it, and #03's "also noted" line may become unnecessary once specific words count properly.</span>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const dots = [true, "active", false, false, false, false]; // 6-steep gongfu run, #2 active
+    const feedback = [
+      { l: "too light", sel: false },
+      { l: "just right", sel: true },
+      { l: "too strong", sel: false }
+    ];
+
+    const resolve = (t) => ({ ...t, cap: t.capText,
+      dotsR: dots.map(d => ({ bg: d === "active" ? t.kachi : (d === true ? t.kachi : t.track) })),
+      feedbackR: feedback.map(f => ({ l: f.l,
+        fg: f.sel ? t.kachiInk : t.muted,
+        bg: f.sel ? t.kachi : "transparent",
+        bd: f.sel ? t.kachi : t.hair }))
+    });
+
+    const CK = { tag: "CHECKED", tagBg: "rgba(63,94,66,0.16)", tagFg: "#2F4A32" };
+    const FX = { tag: "FIXES BUG", tagBg: "rgba(105,22,15,0.14)", tagFg: "#8A2B1C" };
+    const FL = { tag: "FLAG", tagBg: "rgba(229,174,43,0.20)", tagFg: "#7A5A10" };
+    const notes = [
+      { ...FX, k: "F1", t: "Feedback now writes (the fix)", d: "The shipped nudge is an ephemeral toast — it saves nothing. Redrawn as a committed three-way write to steep.feedback with a visible ✓ SAVED, so taste stops leaking. This is why Focus is built first: STATE blocks the fix on the Focus resolution." },
+      { ...CK, k: "F2", t: "Kachi-iro, spent here only", d: "The reserved deep indigo (contract 4) lands on the ensō and the primary action — the one moment the app spends it. Everywhere else it stays holstered. On dark it lifts to slate-blue to keep the hue readable." },
+      { ...CK, k: "F3", t: "The ensō is the timer", d: "No box, no chrome — the breathing ring on bare paper, digits inside, the six-steep track arced across its crown. Focus is deliberately chromeless so nothing competes with the brew you're watching." },
+      { ...CK, k: "F7", t: "No avatar here (R44)", d: "The profile avatar belongs to tab-level screens only — Sessions, Library, Insights, Home. Focus is an immersive surface, so it carries no avatar, no tab bar, no hub entry: back-chevron and bell are the only chrome. Deliberate absence, not an omission." },
+      { ...CK, k: "F4", t: "Per-steep temp, finally read", d: "95°C is #04's per-steep tempC — Focus is where that field is used, not just captured. It sits in the header and stays editable in the quiet capture chip, so a mid-session correction is one tap." },
+      { ...CK, k: "F5", t: "Two modes + one action", d: "Countdown and Stopwatch are the modes; ‘use this time’ appears only in stopwatch mode (steep-sessions.js:860–901), not as a third peer. Shown in countdown here. The 25s guide comes from the derived schedule — brew guide → ratio-scaled → feedback-learned — not the saved guide." },
+      { ...CK, k: "F6", t: "Real hero, no invented rows", d: "Da Hong Pao in the Dragon Gaiwan, a real 6-steep gongfu run from the log. Using the real tea and vessel (R27) rather than the invented set that spread across four boards — a live ritual screen especially can't read as someone else's shelf." }
+    ];
+
+    return { notes,
+      themes: [
+        resolve({ key: "light", label: "LIGHT · PAPER", capText: "The ensō on bare paper, Kachi-iro leading. The feedback panel sits just under the controls, tinted with the same reserved indigo so the one thing that must persist reads as belonging to this moment — and is visibly saved, not a toast.", bg: "#F5F0E3", ink: "#2A1F14", muted: "#8C7F6C", hair: "rgba(42,31,20,0.20)", hairSoft: "rgba(42,31,20,0.12)", track: "#E4DCC8", kachi: "#26343F", kachiInk: "#F1EEE6", kachiSoft: "rgba(38,52,63,0.08)", kachiLine: "rgba(38,52,63,0.22)", jade: "#3F5E42", ringGlow: "" }),
+        resolve({ key: "dark", label: "DARK · NIGHT", capText: "Focus goes darkest — a night ritual. The ring lifts to slate-blue (Kachi-iro at contrast) with a soft glow; the saved feedback still reads as committed. Nothing broadcasts, nothing competes with the timer.", bg: "#16130E", ink: "#EFE7D6", muted: "#9E9078", hair: "rgba(239,231,214,0.18)", hairSoft: "rgba(239,231,214,0.11)", track: "#2A271E", kachi: "#7FA6C4", kachiInk: "#14130E", kachiSoft: "rgba(127,166,196,0.12)", kachiLine: "rgba(127,166,196,0.30)", jade: "#6F9A66", ringGlow: "filter:drop-shadow(0 0 15px rgba(127,166,196,0.35));" })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
