@@ -1,6 +1,6 @@
 # R3-STATUS — the running state of the R3 round
 
-**Updated: 2026-07-25 · by the planning lane.** This is the single source of truth for where R3
+**Updated: 2026-07-25 (post-banking) · by the planning lane.** This is the single source of truth for where R3
 stands. Any fresh chat, fresh Design session, or Code session reads this FIRST. It is updated at
 the end of every working session and committed to the repo (`docs/r3/R3-STATUS.md`) at every
 natural milestone via Code. If this document and anyone's memory disagree, this document wins —
@@ -14,8 +14,9 @@ this status doc → boards (visual reference) → nobody's memory.
 
 ## 1 · Rulings issued this round (R32–R56)
 
-R32–R41: **committed** (ledger, commit `9f54672`). **R42–R56: issued, awaiting the banking
-session's commit 2.** A ruling is not real until it is in the committed ledger.
+R32–R41 committed in `9f54672`; **R42–R56 committed in `00009b6`** (banking session, 2026-07-25).
+All 56 are now in the ledger, verified unbroken from a fresh clone — no gaps, no duplicates. A
+ruling is not real until it is in the committed ledger; these are.
 
 - R32 Landing copy all-new, canonical as drawn, minimal.
 - R33 Ensō = door + timer, never the app icon.
@@ -88,9 +89,9 @@ session's commit 2.** A ruling is not real until it is in the committed ledger.
   only new affordance on that screen. A `distinctOrigins()` list mirroring `distinctVendors()` is
   the natural R4 follow-up.
 
-**Ledger reconciliation owed at commit 2:** R1's text reads `gongfu · western · senchadō ·
-cold brew`. Amend it with "superseded in part by R50 — control order is gongfu · senchadō ·
-western · cold brew" so no lane reads stale R1. (Caught by Design — correct challenge behaviour.)
+**Ledger reconciliation — DONE in `00009b6`.** R1 now carries "superseded in part by R50 —
+control order is gongfu · senchadō · western · cold brew", so no lane reads stale R1. (Caught by
+Design — correct challenge behaviour.)
 
 Confirmations recorded (not rulings): **°F stays** (explicit); **low-stock threshold 11 g is
 Niklas's real setting** (default is 15); **grandpa style ruled out** (three methods only).
@@ -157,8 +158,9 @@ Bottom nav ships **Home · Teas · Log · Sessions · Insights** (`steep-core.js
 
 ## 3 · Board inventory — final, as exported 2026-07-25
 
-25 files + MANIFEST, stamped repo ref `9f695e2`, superseded revs removed, MANIFEST verified exact
-in both directions against the folder. **In repo: pending the banking session's commit 1.**
+25 files + MANIFEST, stamped repo ref `9f695e2`, superseded revs removed. **Banked in `98891a6`
+and verified from a fresh clone of the remote: 26/26 sha256 byte-identical to Design's zip,
+MANIFEST exact 25/25 in both directions, 20 boards actually tracked, 13 round-1 PNGs preserved.**
 
 | Board | Rev | Verified against |
 |---|---|---|
@@ -208,18 +210,31 @@ reconciliation. No further Design work is queued for R3.
 flavour tree dataset + R31 recognition layer, citations complete (Gascoyne · Marchand · Desharnais
 · Américi, Third Edition), ledger R32–R41, allowlist tick, session-edit known-issue.
 
-**Banking session (docs-only, no deploy, no version or cache bump) — three commits:**
-1. the 25-file board export + MANIFEST into `docs/r3/boards/`, hash-verified, existing PNGs kept as
-   round-1/parked record, files banked verbatim;
-2. ledger addendum R42–R56 · the R1↔R50 amendment · the R48 amendment · closing §4's coordinates
-   item (`DATA-region-coordinates.md` reads 8/8 verified, table complete) · the untagged 7/8
-   definitional note · `milky` reconciled into `DATA-flavour-tree.md` §2 (code is one node ahead of
-   its doc);
-3. this document at `docs/r3/R3-STATUS.md`.
+**Banking session — PUSHED AND VERIFIED 2026-07-25** (docs-only: zero app files in the range,
+`CACHE_NAME` / `APP_VERSION` / `WHATS_NEW` / CHANGELOG all zero diffs, so nothing surfaced a
+Refresh banner).
 
-**Then, separately:** the implementation hand-off as its own session. Known shipped-control
-changes it must name: the Passport hub row removal (R45, real), the Teas→Library rename **if**
-ruled, and **not** monoFont (retired v3.53).
+1. `98891a6` — the 25-file board export + MANIFEST into `docs/r3/boards/`, banked verbatim,
+   existing PNGs kept as round-1/parked record.
+2. `00009b6` — ledger addendum R42–R56 · the R1↔R50 amendment · the R48 amendment · §4's
+   coordinates item CLOSED (`DATA-region-coordinates.md` reads 8/8, table complete) · the untagged
+   7/8 definitional note · `milky` reconciled into `DATA-flavour-tree.md` §2, with the
+   code-ahead-of-doc asymmetry recorded rather than quietly patched.
+3. `59715fd` — this document at `docs/r3/R3-STATUS.md`.
+4. `26bdb05` — `STATE.md` catches up: it now names this document as first read and outranked only
+   by repo and export.
+
+**Two repo rules the banking established — do not tidy either away.** `.gitignore` carries
+`!docs/r3/boards/*.dc.html`; the bare `*.dc.html` above it would otherwise silently drop all 20
+boards while committing the other six files, and the count check is what catches it.
+`.gitattributes` pins `docs/r3/boards/** -text`; without it Git-for-Windows `autocrlf` smudges
+LF→CRLF on checkout, so a Linux clone hashes 26/26 green while a Windows clone shows 23 text files
+failing — and the hazard is someone "repairing" that by committing CRLF blobs, which would destroy
+the verbatim record while looking like housekeeping. Both files carry comments saying so.
+
+**Next, and the last R3 task: the implementation hand-off, as its own session.** Known
+shipped-control changes it must name: the Passport hub row removal (R45, real), the Teas→Library
+rename **if** ruled, and **not** monoFont (retired v3.53).
 
 ## 6 · The hand-off
 
@@ -280,7 +295,10 @@ instruction.
    wishlist row and this lane discounted it on the strength of an ambiguous line in a *lower*
    authority document. Counter: when two tiers disagree, the higher tier wins and the lower one
    gets corrected, in that order, out loud.
-9. **Unverified self-report** — this lane twice described its own output as produced when no such
-   file or edit existed (a linked prompt that was never written; a "restructured" document that was
-   never touched). The same standard applies to our own deliverables as to Design's completion
-   summaries. Counter: list the output directory and grep the edit before claiming either.
+9. **Verifying a different representation than the one that ships** — three instances, one shape.
+   This lane twice described its own output as produced when no such file or edit existed, then a
+   third time edited a working copy and delivered a stale export, having verified the source rather
+   than the artifact. The `.gitattributes` bug was the same shape from the repo side: blob correct,
+   working copy smudged, check green against the wrong representation. Counter: **run the check on
+   the thing that travels** — hash the delivered file, not the one you edited; hash the checkout,
+   not the blob. (Generalisation owed to the Code lane.)

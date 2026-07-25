@@ -125,8 +125,7 @@ parked → R3; the held #15 vocab expansion stays out until phase-2. New bugs/id
 **R3 status (2026-07-25 — banking session pushed, docs-only, no deploy):** **read
 `docs/r3/R3-STATUS.md` FIRST.** It is the round's durable state document and outranks this paragraph on
 every R3 detail (authority order: live repo → 2026-07-19 export → rulings ledger → R3-STATUS → boards →
-nobody's memory). *Caveat as of this writing: R3-STATUS §§1/3/5 still describe the banking as pending —
-it is done and pushed (`98891a6` · `00009b6` · `59715fd`); the planning lane owes that refresh.*
+nobody's memory). It is current as of the post-banking refresh and records the commit hashes itself.
 The **binding reference** for the #09b sweep + Code hand-off is
 **`docs/r3/planning/R3-RULINGS-LEDGER.md`**, now **R1–R56 unbroken** (was 31 — R42–R56 landed 2026-07-25),
 with `DATA-region-coordinates.md` the Origins coordinate source (8/8, CLOSED).
