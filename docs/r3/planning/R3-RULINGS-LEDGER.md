@@ -22,6 +22,9 @@ mutually exclusive with the others, which is what "method" means; it stays store
 existing cold-brew flow. Design's own WS1 "Log a cup" already drew this row. **Matcha is not a
 method** — it's a property of the tea (#12 steepless whisk variant, tea-driven). This closes the
 R3 pin "method 5-shown-vs-3-stored": 4 shown, 3 + boolean stored, matcha inferred.
+*Superseded in part by R50 — the control order is `gongfu · senchadō · western · cold brew`,
+matching shipped `SESSION_METHODS` (`steep-sessions.js:549`) plus the cold-brew lane that sets
+`is_cold_brew`. R1's four-lane design stands; only the order changes.*
 
 **R2 — Senchadō is shipped, not pending.** v3.91: real third `brew_style`, three-valued
 `brewMethodFor`, per-steep feedback fires for it, gongfu-side ratio baseline. Any "PHASE 2 /
@@ -196,6 +199,99 @@ Pass-this-tea (rides R25).
 **R41 — Teaware line-art pipeline retired (retroactive record of an earlier chat decision).** Real
 photos are vessel identity; type-kanji is the fallback.
 
+**R42** Sessions keeps the shipped Brewing-days heatmap (v3.44 ruling reaffirmed), list default.
+
+**R43** Quick log gains an optional vessel field. *Scope note: `quickLogSession()` already sets
+`vesselId: state.vessels[0].id` silently — R43 exposes an existing draft field, it does not add one.*
+
+> *Code-lane citation note, 2026-07-25 (does not alter the ruling).* The setter is
+> `startSessionFor()` (`steep-sessions.js:359`, assignment at `:364`); `quickLogSession()`
+> (`:351`) reaches it by calling `startSessionFor(null)` and sets nothing itself. No vessel
+> control exists on the quick-log screen — `sessionQuickHTML()` runs `:427–473` with zero
+> vessel references, and the `vesselOpts` select at `:488` belongs to `sessionSetupHTML()`
+> (`:474`), a different screen. So R43 is **new UI over an existing field**, not already-shipped;
+> recorded so the citation is never later read as "done".
+
+**R44** Profile avatar on tab-level screens only; never immersive surfaces (Focus etc.).
+
+**R45** Hub = social · shopping · settings. Passport absorbed by Origins (#7 closed); achievements
+dropped. `steep-passport.js` fate → Code decision item. *The Passport hub row is genuinely
+shipped (`hubSheetHTML`), so this is a real shipped-control removal.*
+
+**R46** Origins nests in Insights, default bottom card (= bottom of the MORE stack), card-manager
+moveable — **as narrowed by R54**.
+
+**R47** The door draws only configured providers — "Continue with Apple" removed.
+
+**R48** monoFont row stays off the Settings board. **Amended 2026-07-25:** the clause instructing
+Code to remove the shipped control is **void**. `monoFont` was retired in **v3.53** (`87591dc`) —
+Settings row, `DEFAULT_SETTINGS` key, `html[data-mono="clean"]` CSS and the `data-mono` setter all
+went then, and the CHANGELOG records the leftover synced key as harmless with no migration. Zero
+occurrences in any `.js` at HEAD. The ledger's Settings note ("live in schema; one user has
+`pixel`") describes **stale synced data**, not a live control. No code work.
+
+**R49** Wishlist→library join = normalized-name match; misses flagged; revisit post-R26 slug.
+
+**R50** Method control = FOUR drawn lanes — **gongfu · senchadō · western · cold brew** (ruled
+2026-07-21). Clarifies R1 (four-lane design stands; the cold-brew lane sets `is_cold_brew`);
+order matches shipped `SESSION_METHODS` (`steep-sessions.js:549`, three entries + the boolean).
+Supersedes the hand-off's §0.1 three-plus-toggle instruction.
+
+**R51** Go Deeper is **both**: a browsable reference surface living as the **Teas tab's second mode**
+(your shelf ↔ the reference), plus contextual entries from Tea detail, the brew-guide
+"Borrow from Go Deeper" action, and R36's passed-tea path. Explicitly **not** reached through
+the profile hub.
+
+**R52** Vendor manager's home is the **Teas shelf's overflow** (vendors are `teas.source`-derived;
+Teas is where tea data is managed). Restyle only — `vendorManagerHTML()` and `distinctVendors()`
+already ship; string-based for R3, vendor entity + url deferred with R12.
+
+**R53 — Bundle-1 acceptance is split.** Home and the non-Focus steeping states are accepted as
+round-1: Bundle 1 is behavioural reference only, and just the visual contracts and the §0
+primitives apply. Teas gets one revision board, because it alone carries new R3 work — R51's
+second mode, R52's vendor manager, the header rework, and the open rename question. Closes the
+round's last open design question. Note that Focus and the non-Focus steeping states are the
+same shipped function (`sessionSteepingHTML`, plus `sessionFinishHTML` for end/save), so the
+Focus rebuild necessarily touches them: hold every state the Focus board doesn't draw to
+shipped behaviour and flag it rather than inventing one.
+
+**R54 — The Origins card is pinned to Insights for R3.** R46 makes it card-manager moveable,
+but `dashSurface()` lets a user move any card between Home and Insights (v3.47), which would
+let a map card land on a surface with no revision board. Pinned for R3; revisit when Home gets
+one. Register it with a `DASH_SURFACE` entry of `insights`.
+
+**R55 — Catalog origin offers must name one place.** R26's offer path may only propose a
+catalog region that (a) names a single place — no slash-pairs, no parenthetical lists, (b) sits
+inside the country already stored on the tea, and (c) has parentheticals stripped. A catalog
+region naming a different country than the stored origin is a **conflict, not an offer**: no
+default, no one-tap accept. Read the region from `resolveTeaType(slug).region`, never from a
+board literal — `region` inherits from the parent row (`TT_INHERIT`, `steep-tea-types.js:74`).
+Verified against the 2026-07-19 export: of the six catalog-covered country-only teas, three are
+offerable (Ali Shan only after stripping `(~1000-1500m)`) and three suppressed — Oriental
+Beauty as a country conflict, Huang Ya and Ruby Ruanzhi as disjunctions. The free-text path is
+unaffected.
+
+**R56 — the Origin field gains no suggestion list in R3.** #37's OR4 and its caption describe
+"the existing origin autofill" as shipped. There is none: the field is
+`<input type="text" name="origin">` with a placeholder and no `list=` attribute
+(`steep-teas.js:431`); the only datalists in the app are `vendorList` and `wishVendorList`, both
+fed by `distinctVendors()`. `KB_REGIONS` is a recognition table for `kbResolve()`, not a display
+vocabulary — its keys are bare lowercase tokens (`wuyi`, `alishan`, `nantou`) that the
+coordinate table, keyed on normalised full strings, could never resolve. So the field stays
+free text with its placeholder, and R55's offer card is the only new affordance on that screen.
+A suggestion list is deferred, and if it returns it needs its own source, not KB_REGIONS.
+Board note: #37 rev 2's illustrative suggestion array still contains "Wuyi Shan, Fujian, China",
+a string that appears nowhere in the shipped code — the same invention its own OR2 warns against.
+
+### Finding (not a ruling) — the final export's MANIFEST stamps
+
+The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not
+(`02b-session-detail-edit-rev2`, `04-session-setup-pickers-rev6`, both still reading
+`repo 77cf800`) and three carry no stamp at all (`03-tea-detail-rev3`, both bundle snapshots).
+The boards are banked verbatim regardless — editing them in transit would void the hashes and
+blur the lane. Noted here so those stamps are not later read as evidence of what those boards
+were verified against.
+
 ---
 
 ## 2 · Corrections owed, per board
@@ -215,8 +311,13 @@ stale. This section is the packet.
 - **SET3 is tagged CHECKED and is wrong**: `tempUnit` ships (°C/°F toggle, live screenshot
   evidence). Niklas accepts dropping °F *as a decision* — but it must be recorded as removing a
   shipped control, not as "no unit field exists."
-- Theme toggle gains **System**. `monoFont` (live in schema; one user has `"pixel"`) needs an
-  expose-or-kill decision. Build stamp reads `892cb0b`; current `77cf800` — stamp from build,
+- Theme toggle gains **System**. ~~`monoFont` (live in schema; one user has `"pixel"`) needs an
+  expose-or-kill decision.~~ **Re-scoped 2026-07-25 (amended R48): there is no live control to
+  expose or kill.** `monoFont` was retired in v3.53 (`87591dc`) — Settings row, `DEFAULT_SETTINGS`
+  key, `html[data-mono="clean"]` CSS and the `data-mono` setter all went then; zero occurrences in
+  any `.js` at HEAD. What remains is a **stale synced value** in `user_settings`, which the
+  CHANGELOG already records as harmless with no migration needed. No decision owed, no code work.
+  Build stamp reads `892cb0b`; current `77cf800` — stamp from build,
   not by hand. Accent row correct as display-only (contracts 3/4).
 - Currency preference stays (SET2 correct); completeness panel arrives here per R22.
 
@@ -250,6 +351,12 @@ stale. This section is the packet.
 - IN3 stale twice (R2 + post-retag): real split **senchadō 13 · gongfu 10 · untagged 8 ·
   western 0 · cold brew 1**. Western isn't near-empty, it's empty; senchadō is the largest
   method in the diary. Method row is four lanes (R1) and is phase-2's landing zone.
+  - **Definitional note (2026-07-25) — untagged is 8 *or* 7, and both are right.** The
+    difference is one session, not a discrepancy. **8** = rows with a null `brew_style`, which
+    includes the single `is_cold_brew` sitting (that row's `brew_style` is blank). **7** = the
+    same set minus that sitting, because a four-lane display counts it in the cold-brew lane.
+    Boards use the display form: `13 + 10 + 7 + 0 + 1 = 31`. Recorded so the two numbers stop
+    reading as a contradiction; neither should be "corrected" into the other.
 - Restore against shipped code: three-window control (R21), cost overview with per-gram and
   per-session medians (reuse `costPerSession` from tea detail — single writer; same hardcoded-$
   bug), **brewing clock** (= the missing "when you brew"), one-line shelf status linking to
@@ -296,10 +403,16 @@ stale. This section is the packet.
   gate-metric move to stored `brew_style` and senchadō KB ratios (gyokuro).
 - **Rinse research** — two constraints pre-fixed (structured supersedes prose; own contested
   field, not `confidence`).
-- **Coordinates pass 3** — Kagoshima City, Sri Lanka, Hoshino (gazetteer), Kunming centre.
+- ~~**Coordinates pass 3** — Kagoshima City, Sri Lanka, Hoshino (gazetteer), Kunming centre.~~
+  **CLOSED 2026-07-25.** `DATA-region-coordinates.md` at HEAD reads *"All eight rows verified
+  against independent sources. The table is complete"* — 8/8, and the pending Sri Lanka anchor
+  dissolves into the country tier under R28 (country pins are labelled polygons, not point data,
+  so there is nothing to look up). That file is the citation.
 - **Pillar B (launch)** — decision closed by R29; install guide + beta package gated on R3 implementation, owners assigned.
 - **Tea atlas Phase B** — after phase-2, per plan.
-- **monoFont** — expose or kill (see Settings).
+- ~~**monoFont** — expose or kill (see Settings).~~ **CLOSED 2026-07-25 (amended R48):** nothing
+  to expose or kill. The control was retired in v3.53; only a stale synced value survives, and it
+  is harmless. See §2 Settings.
 - **R30 fixed 2 of Niklas's 10 invisible tags, not the issue.** v3.93 recovered `roasted` and `sweet`
   (they became vocabulary). The other **eight** — `toasty · date · apricot · pear · cocoa · spices ·
   dried fruit · fig` — are near-misses or nesting cases that still need R31's alias layer / the nested

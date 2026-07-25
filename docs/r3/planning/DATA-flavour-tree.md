@@ -99,6 +99,7 @@ a German-typed word is stored as written and resolves through the alias to its n
 
 ### Milky
 - fresh butter [wheel] (frische Butter) · melted butter [wheel] (zerlassene Butter) · cream [wheel] (Sahne) · milk [wheel] (Milch) · **creamy** [chip] (cremig) · **buttery** [chip] (butterig) *(mapping [ours], high confidence — butter terms are the family's core)*
+- family-level: **milky** [user] (milchig) *(reconciled 2026-07-25 — doc follows code. Seeded live 2026-07-20 and shipped in v3.94's dataset (`steep-knowledge.js:324`) while this section still omitted it, so the code ran one node ahead of its own documentation. §1 lists the Milky family but §2 gave it no family-level adjective, where floral / fruity / marine each got one — the same asymmetry the shipped entry's comment records.)*
 
 ---
 
