@@ -1,6 +1,7 @@
 # R3-STATUS — the running state of the R3 round
 
-**Updated: 2026-07-25 (post-banking) · by the planning lane.** This is the single source of truth for where R3
+**Updated: 2026-07-26 (hand-off committed; R57–R62 issued 2026-07-25) · by the planning lane.**
+This is the single source of truth for where R3
 stands. Any fresh chat, fresh Design session, or Code session reads this FIRST. It is updated at
 the end of every working session and committed to the repo (`docs/r3/R3-STATUS.md`) at every
 natural milestone via Code. If this document and anyone's memory disagree, this document wins —
@@ -160,7 +161,9 @@ Bottom nav ships **Home · Teas · Log · Sessions · Insights** (`steep-core.js
 
 25 files + MANIFEST, stamped repo ref `9f695e2`, superseded revs removed. **Banked in `98891a6`
 and verified from a fresh clone of the remote: 26/26 sha256 byte-identical to Design's zip,
-MANIFEST exact 25/25 in both directions, 20 boards actually tracked, 13 round-1 PNGs preserved.**
+MANIFEST exact 25/25 in both directions, 20 `.dc.html` boards actually tracked, 13 round-1 PNGs
+preserved.** (There are 21 board files: the 20 `.dc.html` plus `origins-map-v3.html`, which is plain
+`.html` and was never in reach of the `*.dc.html` rule.)
 
 | Board | Rev | Verified against |
 |---|---|---|
@@ -220,7 +223,10 @@ Refresh banner).
    coordinates item CLOSED (`DATA-region-coordinates.md` reads 8/8, table complete) · the untagged
    7/8 definitional note · `milky` reconciled into `DATA-flavour-tree.md` §2, with the
    code-ahead-of-doc asymmetry recorded rather than quietly patched.
-3. `59715fd` — this document at `docs/r3/R3-STATUS.md`.
+3. `59715fd` — `docs/r3/R3-STATUS.md` created. That is the commit the file *first appeared* in, not
+   the commit holding the text you are reading: this document is amended in place at every
+   milestone (`ded1717` refreshed it post-banking, and the hand-off session amended it again). For
+   the current text, read it at HEAD.
 4. `26bdb05` — `STATE.md` catches up: it now names this document as first read and outranked only
    by repo and export.
 
@@ -232,22 +238,30 @@ LF→CRLF on checkout, so a Linux clone hashes 26/26 green while a Windows clone
 failing — and the hazard is someone "repairing" that by committing CRLF blobs, which would destroy
 the verbatim record while looking like housekeeping. Both files carry comments saying so.
 
-**Next, and the last R3 task: the implementation hand-off, as its own session.** Known
-shipped-control changes it must name: the Passport hub row removal (R45, real), the Teas→Library
-rename **if** ruled, and **not** monoFont (retired v3.53).
+**Hand-off session — committed 2026-07-26, docs-only, two commits.** The implementation hand-off entered the
+repo, and the ledger closed out with R57–R62. Again zero app files, so again no Refresh banner. See
+§6.
 
-## 6 · The hand-off
+## 6 · The hand-off — WRITTEN, COMMITTED, IN CODE'S HANDS
 
-`R3-IMPLEMENTATION-HANDOFF.md` drafted, twice repaired (v1 missed Social, Quick log, the bundles,
-visual contracts; v2 wrongly made bundles visual authority — they are round-1 base *behaviour*
-reference only). **The rewrite is the last R3 planning task**, and runs once the banking hashes are
-verified from a fresh clone. It must: replace §0.1 (R50 supersedes three-segments-plus-toggle),
-point §0.5 at the committed board paths and name `support.js` and `uploads/` as build dependencies,
-fix §0.5's citation to a "§6 open items" that does not exist (the document ends at §5), resolve §4's
-unknowns as far as Map 1 goes while leaving #22 · #23 · #28 · washi explicitly open, fold in
-R42–R56, add vendors as the fifth entity with the real distribution from §2, and carry the
-shipped-control-removal list. Code receives it with the explicit challenge-don't-absorb standing
-instruction.
+`docs/r3/R3-IMPLEMENTATION-HANDOFF.md` is committed, 457 lines, sha256 `82c8f55e36333ee3…` verified
+on both the working file and the staged blob. It supersedes two drafts that existed **only as chat
+attachments** — which is precisely how they drifted twice (v1 missed Social, Quick log, the bundles
+and the visual contracts; v2 wrongly promoted the bundles to visual authority — they are round-1
+base *behaviour* reference only). **If you are reading a copy that is not in the repo, stop and get
+the committed one.**
+
+The rewrite delivered what §6 previously owed: R50 replaces the three-segments-plus-toggle
+instruction in §0.1, §0.5 points at the committed board paths and names `support.js` and `uploads/`
+as required build dependencies, the phantom "§6 open items" citation is gone, R42–R56 are folded in,
+vendors are carried as the fifth entity with the real distribution from §2, and the
+shipped-control-removal list is explicit (Passport hub row = the round's only removal; **not**
+monoFont, retired v3.53; **not** a Teas→Library rename, ruled out by R62).
+
+The next R3 artefact is Code's implementation plan, which gets a plan-mode review in the planning
+lane before any app code is written. Code holds the hand-off with the challenge-don't-absorb standing
+instruction: a board or hand-off line that resists the shipped engine is a finding to flag, not a
+licence to adapt the engine.
 
 ## 7 · Open items and unknowns
 
