@@ -283,6 +283,55 @@ A suggestion list is deferred, and if it returns it needs its own source, not KB
 Board note: #37 rev 2's illustrative suggestion array still contains "Wuyi Shan, Fujian, China",
 a string that appears nowhere in the shipped code — the same invention its own OR2 warns against.
 
+*R57–R62 were issued 2026-07-25 and land with the implementation hand-off's commit. Their code
+citations were re-checked line by line against HEAD when appended (`ded1717` lineage), not against
+the `77cf800` in this file's header.*
+
+**R57 — Issue #22 (taste-note placement: collapsible, beneath water temp) is deferred post-R3.**
+The "beneath water temp" half already ships — each steep in the edit surface renders Temp → Time →
+Notes (`steep-sessions.js:286–288`). "Collapsible" is drawn on no board. The related gap — per-steep
+taste words not editable, `es_setSteep` being generic enough to write `tags` but nothing calling it
+that way — stands as a documented, non-destructive known issue. #02b rev 2 reproduces the gap: its
+`TASTE WORDS` block is session-level (`sessions.tags`), not per-steep. Build as drawn; do not invent
+the missing control.
+
+**R58 — Issue #28 (move the edit layout somewhere less intrusive) is closed.** Shipped,
+session-edit is a modal overlay (`steep-sessions.js:292–293` via `openSessionEdit()`); #02b rev 2
+draws a dedicated edit screen instead. The move satisfies the ask.
+
+**R59 — Washi is unchanged for R3.** Its probation stands as ruled in the direction lock: Home
+masthead only, kept for now, held to its contract, dropped without ceremony if it ever fights the
+masthead. Home is round-1 by R53, so nothing in this round touches it. Revisit when Home gets a
+revision board.
+
+**R60 — Issue #23 ("R2 capability regressions") splits three ways.** (a) The shelf sort control is
+preserved exactly as shipped — `steep-teas.js:248` renders a live seven-option select on the count
+row, handler `setTeaSort` at `:308`, restored in v3.84. #13 does not draw it; that is not
+authorisation to remove it. (b) `setTeaFilter` (`steep-teas.js:309`) and `focusLogSteep`
+(`steep-sessions.js:966`) have zero callers and stay dormant: the regressions are accepted for R3,
+the functions stay in place, and no controls are drawn — reinstating would mean drawing them on #13
+and reopening a closed Design queue. (c) Sort persistence stays session-scoped; making it durable is
+a `user_settings` question for later.
+
+**R61 — Absence from a board is not a removal instruction.** Any shipped control a board does not
+draw is preserved unless a ruling names it for removal. R3 removes exactly one shipped control: the
+Passport row from the hub sheet (R45). It does not remove monoFont — retired v3.53, R48's instruction
+void, nothing there to remove. This is the general form of the trap the sort control exposed, and the
+counter to failure mode 6.
+
+**R62 — No Teas→Library rename.** The shipped tab is Teas (`steep-core.js:894–903`) and stays Teas.
+Renaming would move the nav label, #13's header, Map 2's nodes and the hand-off's prose together for
+cosmetic gain in a closing round; it is cheap to do later on its own. The boards draw Teas with the
+rename flagged — the flag is now closed, not pending.
+
+**With R57–R62, R3 has no open design questions.** The four items Map 1 rev 2 carried as held —
+#22 · #23 · #28 · washi probation — are ruled (R57 · R60 · R58 · R59), and the tab name is ruled
+(R62). Nothing in the round is awaiting a Design or planning decision; what remains open is
+execution plus the items in `R3-STATUS.md` §7 that were never design questions (the three owed
+coordinate rows, the Insights cost-median provenance, the catalog accuracy item, the beta-hardening
+bundle). **An open question is not the same as a decision to make at build time** — if the build
+finds one, it is a finding to raise, not a gap to fill.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

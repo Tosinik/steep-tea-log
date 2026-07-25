@@ -13,11 +13,12 @@ this status doc → boards (visual reference) → nobody's memory.
 
 ---
 
-## 1 · Rulings issued this round (R32–R56)
+## 1 · Rulings issued this round (R32–R62)
 
-R32–R41 committed in `9f54672`; **R42–R56 committed in `00009b6`** (banking session, 2026-07-25).
-All 56 are now in the ledger, verified unbroken from a fresh clone — no gaps, no duplicates. A
-ruling is not real until it is in the committed ledger; these are.
+R32–R41 committed in `9f54672`; **R42–R56 committed in `00009b6`** (banking session, 2026-07-25);
+**R57–R62 committed with the hand-off** (2026-07-25 rulings, committed 2026-07-26). All 62 are now in
+the ledger, contiguous — no gaps, no duplicates. A ruling is not real until it is in the committed
+ledger; these are.
 
 - R32 Landing copy all-new, canonical as drawn, minimal.
 - R33 Ensō = door + timer, never the app icon.
@@ -89,6 +90,25 @@ ruling is not real until it is in the committed ledger; these are.
   the wrong source on shape, not just on scope. The field stays free text; R55's offer card is the
   only new affordance on that screen. A `distinctOrigins()` list mirroring `distinctVendors()` is
   the natural R4 follow-up.
+- R57 **#22 deferred post-R3** — "beneath water temp" already ships (`steep-sessions.js:286–288`),
+  "collapsible" is drawn nowhere, and the per-steep taste-words gap stays a documented
+  non-destructive known issue that #02b rev 2 reproduces. Build the gap as drawn.
+- R58 **#28 closed** — shipped edit is a modal overlay (`steep-sessions.js:292–293` via
+  `openSessionEdit()`); #02b rev 2's dedicated edit screen satisfies "somewhere less intrusive".
+- R59 **Washi unchanged for R3** — probation stands (Home masthead only, held to its contract). Home
+  is round-1 by R53, so nothing this round touches it. Revisit when Home gets a board.
+- R60 **#23 splits three ways** — (a) the shipped seven-option sort select is **preserved exactly**
+  (`steep-teas.js:248`, handler `:308`, restored v3.84); #13 not drawing it is not authorisation to
+  remove it. (b) `setTeaFilter` (`:309`) and `focusLogSteep` (`steep-sessions.js:966`) stay dormant
+  with zero callers — regressions accepted for R3, functions left in place, no controls drawn.
+  (c) Sort persistence stays session-scoped; durability is a later `user_settings` question.
+- R61 **Absence from a board is not a removal instruction** — any shipped control a board doesn't
+  draw is preserved unless a ruling names it. R3's only removal is the Passport hub row (R45); **not**
+  monoFont (retired v3.53, R48's instruction void). The general form of the trap the sort control
+  exposed, and the counter to failure mode 6.
+- R62 **No Teas→Library rename** — the shipped tab is Teas (`steep-core.js:894–903`) and stays Teas.
+  Cheap to do later on its own; not worth moving nav + #13's header + Map 2 + the hand-off's prose
+  together in a closing round. The boards' rename flag is **closed, not pending**.
 
 **Ledger reconciliation — DONE in `00009b6`.** R1 now carries "superseded in part by R50 —
 control order is gongfu · senchadō · western · cold brew", so no lane reads stale R1. (Caught by
@@ -258,6 +278,10 @@ vendors are carried as the fifth entity with the real distribution from §2, and
 shipped-control-removal list is explicit (Passport hub row = the round's only removal; **not**
 monoFont, retired v3.53; **not** a Teas→Library rename, ruled out by R62).
 
+**With R57–R62, R3 has no open design questions.** The four items Map 1 rev 2 carried as held —
+#22 · #23 · #28 · washi — are ruled (R57 · R60 · R58 · R59), and so is the tab name (R62). What
+remains open is execution plus the §7 items that were never design questions.
+
 The next R3 artefact is Code's implementation plan, which gets a plan-mode review in the planning
 lane before any app code is written. Code holds the hand-off with the challenge-don't-absorb standing
 instruction: a board or hand-off line that resists the shipped engine is a finding to flag, not a
@@ -265,11 +289,10 @@ licence to adapt the engine.
 
 ## 7 · Open items and unknowns
 
-- **Four held rulings**, all flagged on Map 1 rev 2 and none resolved by any board: **#22** · **#23**
-  (reinstate-vs-accept on `setTeaSort` / `setTeaFilter` / `focusLogSteep` — gates whether #13's
-  shelf draws sort/filter controls at all) · **#28** · **washi probation** (Home masthead only).
-- **Tab name:** shipped is Teas; renaming to Library would touch the nav, #13's header and the
-  hand-off's prose together. Flagged, not assumed.
+- ~~**Four held rulings** (#22 · #23 · #28 · washi probation)~~ — **all ruled 2026-07-25**: R57
+  defers #22 post-R3, R60 splits #23 (sort preserved as shipped, `setTeaFilter`/`focusLogSteep`
+  dormant, persistence session-scoped), R58 closes #28, R59 leaves washi unchanged for R3.
+- ~~**Tab name**~~ — **ruled out (R62).** The tab stays Teas.
 - **Three coordinate rows owed by the data lane:** Wuyi Mountains · Lugu · Chiayi. Without them
   R55's three offerable regions all land back in the country tier.
 - **Insights cost medians** — §2, not reproduced.
