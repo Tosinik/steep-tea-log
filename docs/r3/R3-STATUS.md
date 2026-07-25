@@ -1,0 +1,286 @@
+# R3-STATUS — the running state of the R3 round
+
+**Updated: 2026-07-25 · by the planning lane.** This is the single source of truth for where R3
+stands. Any fresh chat, fresh Design session, or Code session reads this FIRST. It is updated at
+the end of every working session and committed to the repo (`docs/r3/R3-STATUS.md`) at every
+natural milestone via Code. If this document and anyone's memory disagree, this document wins —
+and if this document and the live repo/export disagree, the repo/export win and this document
+gets corrected.
+
+**Authority order (unchanged, binding):** live repo → 2026-07-19 export → rulings ledger →
+this status doc → boards (visual reference) → nobody's memory.
+
+---
+
+## 1 · Rulings issued this round (R32–R56)
+
+R32–R41: **committed** (ledger, commit `9f54672`). **R42–R56: issued, awaiting the banking
+session's commit 2.** A ruling is not real until it is in the committed ledger.
+
+- R32 Landing copy all-new, canonical as drawn, minimal.
+- R33 Ensō = door + timer, never the app icon.
+- R34 Invite line passive ("invitation-only for now"), no redeem mechanism. *Caveat recorded:
+  Supabase signups are toggled ON — the line is copy, not enforcement; gating = beta-hardening task.*
+- R35 Presence parked post-beta (kept in Social file, marked PARKED).
+- R36 Passed-tea destination three-tier: catalog Go-Deeper when covered, else minimal preview.
+- R37 Wrapped Share/Save accepted — pull-only, never auto, never names people; Save-image may slip.
+- R38 Wrapped period = monthly, explicit; yearly sibling later; v3.64 seasonal scope changes at build.
+- R39 Picker swatch long-press colour correction ratified.
+- R40 #02b out-links accepted: brew-again (carries vessel+method), copy-to-new-entry, pass-tea.
+- R41 Line-art pipeline retired (retroactive record) — photos are vessel identity, kanji fallback.
+- R42 Sessions keeps the shipped Brewing-days heatmap (v3.44 ruling reaffirmed), list default.
+- R43 Quick log gains an optional vessel field. *Scope note: the draft already carries a
+  `vesselId` — `startSessionFor()` (`steep-sessions.js:359`) sets `vesselId: state.vessels[0].id`
+  at `:364`; `quickLogSession()` (`:351`) sets nothing itself, it calls `startSessionFor(null)`.
+  The quick-log screen has no vessel control at all: `sessionQuickHTML()` runs `:427–473` with
+  zero vessel references, and the `vesselOpts` select at `:488` belongs to `sessionSetupHTML()`
+  (`:474`). So R43 is **new UI over an existing field**, not already-shipped.*
+- R44 Profile avatar on tab-level screens only; never immersive surfaces (Focus etc.).
+- R45 Hub = social · shopping · settings. Passport absorbed by Origins (#7 closed); achievements
+  dropped. `steep-passport.js` fate → Code decision item. *The Passport hub row is genuinely
+  shipped (`hubSheetHTML`), so this is a real shipped-control removal.*
+- R46 Origins nests in Insights, default bottom card (= bottom of the MORE stack), card-manager
+  moveable — **as narrowed by R54**.
+- R47 The door draws only configured providers — "Continue with Apple" removed.
+- R48 monoFont row stays off the Settings board. **Amended 2026-07-25:** the clause instructing
+  Code to remove the shipped control is **void**. `monoFont` was retired in **v3.53** (`87591dc`) —
+  Settings row, `DEFAULT_SETTINGS` key, `html[data-mono="clean"]` CSS and the `data-mono` setter all
+  went then, and the CHANGELOG records the leftover synced key as harmless with no migration. Zero
+  occurrences in any `.js` at HEAD. The ledger's Settings note ("live in schema; one user has
+  `pixel`") describes **stale synced data**, not a live control. No code work.
+- R49 Wishlist→library join = normalized-name match; misses flagged; revisit post-R26 slug.
+- R50 Method control = FOUR drawn lanes — **gongfu · senchadō · western · cold brew** (ruled
+  2026-07-21). Clarifies R1 (four-lane design stands; the cold-brew lane sets `is_cold_brew`);
+  order matches shipped `SESSION_METHODS` (`steep-sessions.js:549`, three entries + the boolean).
+  Supersedes the hand-off's §0.1 three-plus-toggle instruction.
+- R51 Go Deeper is **both**: a browsable reference surface living as the **Teas tab's second mode**
+  (your shelf ↔ the reference), plus contextual entries from Tea detail, the brew-guide
+  "Borrow from Go Deeper" action, and R36's passed-tea path. Explicitly **not** reached through
+  the profile hub.
+- R52 Vendor manager's home is the **Teas shelf's overflow** (vendors are `teas.source`-derived;
+  Teas is where tea data is managed). Restyle only — `vendorManagerHTML()` and `distinctVendors()`
+  already ship; string-based for R3, vendor entity + url deferred with R12.
+- R53 **Bundle-1 acceptance is split** (ruled 2026-07-25). Home and the non-Focus steeping states
+  are accepted as round-1: Bundle 1 is behavioural reference only, and just the visual contracts
+  and §0 primitives apply. **Teas gets one revision board** (#13), because it alone carries new R3
+  work — R51's second mode, R52's vendor overflow, the header rework, the open rename. Closes the
+  round's last open design question. *Engine note: Focus and the non-Focus steeping states are the
+  same shipped function — `sessionSteepingHTML()`, plus `sessionFinishHTML()` for end/save — so the
+  Focus rebuild necessarily touches them. Hold every state the Focus board doesn't draw to shipped
+  behaviour and flag it; do not invent one.*
+- R54 **The Origins card is pinned to Insights for R3** (ruled 2026-07-25). R46 makes it
+  card-manager moveable, but `dashSurface()` lets a user move any card between Home and Insights
+  (v3.47), which would let a map card land on a surface with no revision board. Register it with a
+  `DASH_SURFACE` entry of `insights`; revisit when Home gets a board.
+- R55 **Catalog origin offers must name one place** (ruled 2026-07-25). R26's offer path may only
+  propose a catalog region that (a) names a single place — no slash-pairs, no parenthetical lists,
+  (b) sits **inside the country already stored** on the tea, (c) has parentheticals stripped. A
+  catalog region naming a different country than the stored origin is a **conflict, not an offer**:
+  no default, no one-tap accept. Read the region from `resolveTeaType(slug).region`, never from a
+  board literal — `region` inherits from the parent row (`TT_INHERIT`, `steep-tea-types.js:74`).
+- R56 **The Origin field gains no suggestion list in R3** (ruled 2026-07-25). #37's OR4 describes
+  "the existing origin autofill" as shipped; there is none. The field is
+  `<input type="text" name="origin">` with a placeholder and no `list=` (`steep-teas.js:431`); the
+  only datalists are `vendorList` and `wishVendorList`, both fed by `distinctVendors()`.
+  `KB_REGIONS` is a recognition table for `kbResolve()` — bare lowercase tokens (`wuyi`, `alishan`,
+  `nantou`) that a coordinate table keyed on normalised full strings could never resolve, so it is
+  the wrong source on shape, not just on scope. The field stays free text; R55's offer card is the
+  only new affordance on that screen. A `distinctOrigins()` list mirroring `distinctVendors()` is
+  the natural R4 follow-up.
+
+**Ledger reconciliation owed at commit 2:** R1's text reads `gongfu · western · senchadō ·
+cold brew`. Amend it with "superseded in part by R50 — control order is gongfu · senchadō ·
+western · cold brew" so no lane reads stale R1. (Caught by Design — correct challenge behaviour.)
+
+Confirmations recorded (not rulings): **°F stays** (explicit); **low-stock threshold 11 g is
+Niklas's real setting** (default is 15); **grandpa style ruled out** (three methods only).
+
+## 2 · Canonical numbers — re-verified against the 2026-07-19 CSVs on 2026-07-25
+
+The five relayed CSVs (teas · sessions · steeps · vessels · tag_library) were recomputed row by
+row this session. **Verified:** 22 tea rows (21 live, Test deleted) · 31 sessions · 103 steeps ·
+5 vessels · dates 3–19 Jul, **16 distinct days** · totalGrams **130.5 g** · **12.51 L**
+((water_ml or vessel capacity) × steeps) · type mix BY SESSION **green 15 · oolong 11 · white 3 ·
+yellow 1 · puerh 1** · mood **15/31 (48%)** · shared **5/31 (16%)**, dates 4 · 5 · 6 · 8 · 11 Jul ·
+running low **Honey Oolong Gui Fei 7 g · Sencha Kagoshima Premium 8 g** · vessel usage **Dragon
+Gaiwan 16 · Main Kyusu 9 · Mogake Shiboridashi 4 · Travel cuppa 1 · Hario Coldbrew 1** ·
+tag_library **15** (spinach and milky arrived 07-20 and are correctly absent from an 07-19 export).
+
+**Method split, with its definition.** `brew_style` is senchado 13 · gongfu 10 · **blank 8**, and
+`is_cold_brew` is true on exactly one row **whose `brew_style` is blank**. So 8 is the null count
+and 7 is the display count once the cold-brew lane claims its session: `13 + 10 + 7 + 0 + 1 = 31`.
+Boards use the display form. Both numbers are correct; they are not a contradiction, and the
+ledger's "untagged 8" should carry this note rather than be changed.
+
+**Clock peak is local, not stored.** Raw hours peak at 07 UTC; rendered in local time (CEST) that
+is 09. The **08–10 peak, 12–14 second, nothing after ~14:00** claim is correct as displayed. Do
+not "correct" it from the raw column.
+
+**Origin split.** Country-only strings: China ×5, Taiwan ×3, Thailand ×1 = nine. The tenth is
+Moragella Oolong at `Ceylon, Sri Lanka`, which normalises into the country tier because R16 rules
+Ceylon a country synonym. **Ten country-only · eleven region-tier · 21 live teas.** R16 verified.
+
+**Catalog coverage of the country-only ten** (`covers` match, region resolved through
+`TT_INHERIT`): six covered, three offerable under R55 — Dawang Feng Da Hong Pao
+("Wuyi Mountains, Fujian, China"), Honey Oolong Gui Fei ("Lugu, Nantou, Taiwan"), Ali Shan Fo Shou
+Dong Pian ("Chiayi County, Taiwan" after stripping "(~1000-1500m)"). Three suppressed — Oriental
+Beauty (catalog says Taiwan, stored says China: a country conflict), Huang Ya Yellow Tips
+("China (Sichuan / Anhui / Hunan)" is a list), Ruby Ruanzhi ("N. Thailand (Santikhiri) & Taiwan"
+spans two countries). **None of the three offerable regions has a coordinate row**, so today every
+accepted offer honestly leaves the tea in its country tier.
+
+**Vendors — new, from `teas.source` across the 21 live teas.** MainTee Würzburg 5 · Tee Kontor
+Kiel 3 · Si Fang Guan - Freiburg 3 · Bamboo Tea Room 3 · Bohea Telehandlung Berlin 2 · Diez GmbH 1
+· Teerausch 1 · Tea Addicts 1 · Jesse's Tea Housr 1 · **one tea with no vendor**. Nine names, not
+five. Two are live rename cases for R52 — the typo "Jesse's Tea Housr" and the stray hyphen in
+"Si Fang Guan - Freiburg" — and the blank source is an edge no board draws: a tea with no vendor
+must not surface under an empty-name row.
+
+**Not export-verified, held as Niklas-confirmed:** the wishlist row (Shincha Saemidori Kagoshima ·
+Bamboo Tea Room · `done=false`, naming a tea on the shelf at **0 g** — the 0 g is export-verified).
+The `wishlist` and `user_settings` tables are not in the relayed CSV set.
+
+**NOT REPRODUCED — do not draw as fact.** Insights rev 3 shows **€0.17/g · €0.86/session** and
+states its method as `cost_total ÷ grams`. That method on this export gives median **€0.236/g**
+across the 14 costed teas and **€0.99/session** across 23 sessions; pooled cost ÷ pooled grams
+gives €0.234/g. The 07-08 export gives 0.22 / 1.70, so this is not simple staleness. The figure's
+provenance is unknown. Either its method is stated and it reproduces, or the board takes the
+recomputed pair.
+
+**Engine models.** Method control = `gongfu · senchadō · western` + `is_cold_brew` toggle. Stock
+tiers = FIVE (`empty · untracked · low · few · plenty`), cups-based when guide data exists, else
+grams < threshold (Niklas: 11). Vessel image = photo → tinted stripe → kanji (kanji map being
+extended per hand-off §0.3). `brew_guide` is free text today; structured pills = NEW schema.
+Bottom nav ships **Home · Teas · Log · Sessions · Insights** (`steep-core.js:894–903`) — the tab is
+**Teas**, not Library. Vessels is a **segment of the Teas tab** (`goVessels()` sets
+`state.teaSeg='vessels'; state.view='teas'`, v3.46), not an overlay.
+
+## 3 · Board inventory — final, as exported 2026-07-25
+
+25 files + MANIFEST, stamped repo ref `9f695e2`, superseded revs removed, MANIFEST verified exact
+in both directions against the folder. **In repo: pending the banking session's commit 1.**
+
+| Board | Rev | Verified against |
+|---|---|---|
+| #02 Sessions (list + Brewing-days toggle) | rev3 | R42; heatmap real (`steep-dashboard.js:355`) |
+| #02b Session detail + edit | rev2 | R50 order ✓ |
+| #03 Tea detail | rev3 | export ✓ |
+| #04 Session setup + pickers | rev6 | R50 in control, 3 annotations **and** header prose ✓ |
+| #05 Vessels | rev1 | real five ✓ |
+| #06 Add / edit tea | rev4 | export ✓ |
+| #07 Settings | rev2 | SET5's monoFont code instruction void per amended R48 |
+| #08 Insights (incl. Origins card) | rev3 | figures ✓ **except the cost medians (§2)** |
+| #08 Shopping | rev4 | wishlist restored to the one-row state; SH1 CHECKED |
+| #08 Social | rev3 | presence PARKED |
+| #09 First run / landing | rev1 | R32–34, R47 |
+| #10 Focus (steeping) | rev2 | R44 scope note ✓ |
+| #11 Wrapped | rev1 | 16 d · 130.5 g · 08–10 ✓ |
+| #12 Quick log | rev1 | R43 (exposes an existing field) |
+| **#13 Teas revision** | **rev1** | **R53 · R51 · R52 · header rework · Vessels segment; #23 shown HELD** |
+| #37 Origins refinement | rev2 | R55 drawn in full; ten-not-nine; catalog string verbatim |
+| Origins map | v3 | 8/8 coordinate rows verified |
+| Map 1 — surface matrix | rev2 | held-decisions group added |
+| Map 2 — navigation | rev2 | R51/R52 on Teas; Vessels corrected to a segment |
+| Bundles 1 & 2 | snapshots | round-1 **behaviour** reference only, never visual authority |
+
+**Two defects recorded, banked verbatim rather than fixed in transit.** (a) The MANIFEST claims
+"ALL BOARDS 77cf800 → 9f695e2"; `02b` and `04` still read `repo 77cf800`, and `03` plus both
+bundles carry no stamp. Do not later read those stamps as evidence of what the boards were checked
+against. (b) #37 rev 2's illustrative suggestion array still contains "Wuyi Shan, Fujian, China", a
+string that appears nowhere in shipped code — the invention its own OR2 warns against, now moot
+under R56.
+
+## 4 · Design queue — CLOSED
+
+The final pass delivered all six commissioned items: Shopping restored to the verified one-row
+state (rev 4, withdrawal noted), the new #13 Teas revision board, #37 rev 2 carrying R55 in full,
+Map 2 rev 2 placing R51/R52 on Teas and correcting Vessels, Map 1 rev 2 with the held-decisions
+group, and #04's header prose corrected. Each was verified individually against the boards' own
+content, not against the completion summary.
+
+The MANIFEST's open-items list accurately states what Design did **not** decide: the tab name,
+#23 gating sort/filter, #22 · #28 · washi, the three owed coordinate rows, and the R1↔R50 ledger
+reconciliation. No further Design work is queued for R3.
+
+## 5 · Code state
+
+**v3.94 live and fresh-clone verified** at HEAD `9f695e2` (with `e21ee72` · `9f54672` · `ac49794`):
+flavour tree dataset + R31 recognition layer, citations complete (Gascoyne · Marchand · Desharnais
+· Américi, Third Edition), ledger R32–R41, allowlist tick, session-edit known-issue.
+
+**Banking session (docs-only, no deploy, no version or cache bump) — three commits:**
+1. the 25-file board export + MANIFEST into `docs/r3/boards/`, hash-verified, existing PNGs kept as
+   round-1/parked record, files banked verbatim;
+2. ledger addendum R42–R56 · the R1↔R50 amendment · the R48 amendment · closing §4's coordinates
+   item (`DATA-region-coordinates.md` reads 8/8 verified, table complete) · the untagged 7/8
+   definitional note · `milky` reconciled into `DATA-flavour-tree.md` §2 (code is one node ahead of
+   its doc);
+3. this document at `docs/r3/R3-STATUS.md`.
+
+**Then, separately:** the implementation hand-off as its own session. Known shipped-control
+changes it must name: the Passport hub row removal (R45, real), the Teas→Library rename **if**
+ruled, and **not** monoFont (retired v3.53).
+
+## 6 · The hand-off
+
+`R3-IMPLEMENTATION-HANDOFF.md` drafted, twice repaired (v1 missed Social, Quick log, the bundles,
+visual contracts; v2 wrongly made bundles visual authority — they are round-1 base *behaviour*
+reference only). **The rewrite is the last R3 planning task**, and runs once the banking hashes are
+verified from a fresh clone. It must: replace §0.1 (R50 supersedes three-segments-plus-toggle),
+point §0.5 at the committed board paths and name `support.js` and `uploads/` as build dependencies,
+fix §0.5's citation to a "§6 open items" that does not exist (the document ends at §5), resolve §4's
+unknowns as far as Map 1 goes while leaving #22 · #23 · #28 · washi explicitly open, fold in
+R42–R56, add vendors as the fifth entity with the real distribution from §2, and carry the
+shipped-control-removal list. Code receives it with the explicit challenge-don't-absorb standing
+instruction.
+
+## 7 · Open items and unknowns
+
+- **Four held rulings**, all flagged on Map 1 rev 2 and none resolved by any board: **#22** · **#23**
+  (reinstate-vs-accept on `setTeaSort` / `setTeaFilter` / `focusLogSteep` — gates whether #13's
+  shelf draws sort/filter controls at all) · **#28** · **washi probation** (Home masthead only).
+- **Tab name:** shipped is Teas; renaming to Library would touch the nav, #13's header and the
+  hand-off's prose together. Flagged, not assumed.
+- **Three coordinate rows owed by the data lane:** Wuyi Mountains · Lugu · Chiayi. Without them
+  R55's three offerable regions all land back in the country tier.
+- **Insights cost medians** — §2, not reproduced.
+- **Catalog accuracy item** (tea-reference lane, not R3-blocking): `oriental-beauty` is
+  `confidence: canonical` with region "Hsinchu / Miaoli, Taiwan" and no acknowledgement of mainland
+  production, which is why it collides with a real Chinese-sourced tea on the shelf.
+- Niklas, when convenient: Google OAuth consent-screen publishing status (Testing vs Published) —
+  completes the signup-gate picture from the toggled-ON finding.
+- Next CSV gate: relay `wishlist` + `user_settings` alongside the five, not just export them.
+- Beta-hardening bundle (later, one milestone): signup gating (hook/allowlist, NOT the blunt
+  toggle) · R34 copy honesty · beta package · domain-stability confirmation.
+
+## 8 · Failure modes this round produced (watch list for every lane)
+
+1. **Confident invention** — invented rows/vendors/claims tagged "checked" (Gyokuro set, "after
+   dark", 247 g, tagline provenance). Counter: claims/counts/affordances verified against export
+   and code before any board is called done; R27 tags visible ON the board.
+2. **Honest-and-stale** — summaries true when written, wrong by send time (log 03–18, 43%, 12/28).
+   Counter: figures carry their export stamp; refresh-at-build is explicit, never implied.
+3. **Phantom references** — self-minted R-numbers; citations to code lines that aren't the thing;
+   the hand-off's own citation to a "§6" that does not exist. Counter: only ledger numbers cite;
+   line-cites spot-checked.
+4. **Session-memory decisions** — line-art retirement, allowlist "done", inventory staleness.
+   Counter: THIS DOCUMENT; rulings numbered the moment they're made; committed within a day.
+5. **Completeness blindness** — verifying what's in front of us, not the set (hand-off v1; the
+   missing vendors entity; the final MANIFEST's "ALL BOARDS restamped" when five weren't).
+   Counter: checks run against the set, never against recall; an "all" claim is checked per item.
+6. **Model shrinkage** — "four states", "photo or kanji", dropped R43; describing an origin
+   autofill that was never shipped (R56). Counter: engine predicates quoted from code with the
+   function named, never paraphrased from a board.
+7. **Planning-lane invention by misreading** — an ambiguous one-line answer ("is empty, havent
+   rebought it") was resolved as "the wishlist is empty", relayed to Design as verified fact, and a
+   correct board was redrawn to a false empty state; a real vendor was called invented. Counter:
+   when a user answer is ambiguous, quote it back before relaying; never relay a user answer as
+   "verified" — verified means checked against repo or export.
+8. **Authority inversion** — the same episode, one layer down: the ledger header recorded 1
+   wishlist row and this lane discounted it on the strength of an ambiguous line in a *lower*
+   authority document. Counter: when two tiers disagree, the higher tier wins and the lower one
+   gets corrected, in that order, out loud.
+9. **Unverified self-report** — this lane twice described its own output as produced when no such
+   file or edit existed (a linked prompt that was never written; a "restructured" document that was
+   never touched). The same standard applies to our own deliverables as to Design's completion
+   summaries. Counter: list the output directory and grep the edit before claiming either.
