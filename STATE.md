@@ -122,12 +122,26 @@ library); `setTeaSort`/`setTeaFilter`/`focusLogSteep` stay in the code as its re
 parked → R3; the held #15 vocab expansion stays out until phase-2. New bugs/ideas land as GitHub issues
 (the live inbox), not here.
 
-**R3 status (2026-07-19):** the design record lives in `docs/r3/`; the **binding reference** for the #09b
-conformance sweep + Code hand-off is **`docs/r3/planning/R3-RULINGS-LEDGER.md`** (31 rulings — R30 shipped
-v3.93, R31 deferred — boards verify against it + the code, never completion summaries), with
-`DATA-region-coordinates.md` the Origins coordinate
-source. R29 closed Pillar B (no root split — app stays at `slowcup.app/`, landing = #09's logged-out screen).
-Shipped-but-unboarded: **Focus/steeping** + **Wrapped** (need board numbers before hand-off).
+**R3 status (2026-07-25 — banking session pushed, docs-only, no deploy):** **read
+`docs/r3/R3-STATUS.md` FIRST.** It is the round's durable state document and outranks this paragraph on
+every R3 detail (authority order: live repo → 2026-07-19 export → rulings ledger → R3-STATUS → boards →
+nobody's memory). *Caveat as of this writing: R3-STATUS §§1/3/5 still describe the banking as pending —
+it is done and pushed (`98891a6` · `00009b6` · `59715fd`); the planning lane owes that refresh.*
+The **binding reference** for the #09b sweep + Code hand-off is
+**`docs/r3/planning/R3-RULINGS-LEDGER.md`**, now **R1–R56 unbroken** (was 31 — R42–R56 landed 2026-07-25),
+with `DATA-region-coordinates.md` the Origins coordinate source (8/8, CLOSED).
+Design's **final board export is in-repo and is the visual authority**: `docs/r3/boards/*-rev*.dc.html`
+plus `origins-map-v3.html`, banked verbatim and hash-verified, with `support.js` + `uploads/` as required
+build dependencies (every board loads them by relative path). The `.png` files in that folder are
+round-1/parked record only — **not** authority. R29 closed Pillar B (no root split — app stays at
+`slowcup.app/`, landing = #09's logged-out screen). Focus and Wrapped are **no longer unboarded**: #10
+Focus rev2 and #11 Wrapped rev1 shipped in that export.
+**Next, and the last R3 task: the implementation hand-off, as its own session.** Four rulings stay held
+(#22 · #23 · #28 · washi probation) and the Teas→Library rename is unruled.
+Two repo rules exist *because of* the banking and must not be "tidied away": `.gitignore`'s scoped
+`!docs/r3/boards/*.dc.html` negation (the bare `*.dc.html` above it silently drops all 20 boards), and
+`.gitattributes` pinning `docs/r3/boards/** -text` — without it Git-for-Windows `autocrlf` makes a Windows
+clone's hashes disagree with a Linux one on an archive whose whole point is hash-verifiability.
 
 **Pending Code cleanups (were ephemeral task-chips — recorded here so a session-clear doesn't lose them):**
 (a) delete dead `ratioSetupHTML` (`steep-sessions.js:562`, never called; also in CLAUDE.md cleanup backlog —
