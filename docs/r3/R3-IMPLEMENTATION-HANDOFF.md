@@ -15,7 +15,8 @@ an archival record like `docs/r3/boards/`.
 
 - *2026-07-26, Code lane's plan-mode review:* **§0.3 replaced in full (R63)** — it had cited
   `shelfPhoto`, the tea tile, as the vessel fallback; the vessel ladder is new code and 旅 is
-  dropped. **§1's method-split warning widened (R64)** — the quintuple is not a lane set. Rulings in
+  dropped. **§1's method-split warning widened (R64)** — the quintuple is not a lane set, and §0.1
+  gained the null-row pointer so it cannot be read alone and still light an inferred lane. Rulings in
   `planning/R3-RULINGS-LEDGER.md`; the findings behind them in `R3-BUILD-PLAN.md` §1.
 
 **Authority order, binding:** live repo → 2026-07-19 export → `docs/r3/planning/R3-RULINGS-LEDGER.md`
@@ -37,7 +38,8 @@ the shipped engine. Build to the engine.
 
 ### 0.1 · Method control is FOUR drawn lanes (R50 — this replaces the previous instruction)
 
-**`gongfu · senchadō · western · cold brew`, in that order.**
+**`gongfu · senchadō · western · cold brew`, in that order** (no lane when `brew_style` is null —
+R64).
 
 The earlier draft of this section said "three segments plus a toggle" and it was wrong. R1 ruled a
 four-lane control; R50 fixed its order and clarified the mechanism. The first three lanes map to
