@@ -83,6 +83,15 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
   as CSV into `fixtures/` (e.g. `teas_rows.csv`; gitignore it if you prefer) and run the
   logic over those. Real data is what catches the actual bugs — Japanese cultivar names,
   quoted commas in descriptions, blank/edge fields — that hand-written cases pass right over.
+- **Run `node fixtures/export-gate-test.js` FIRST, before any other suite.** Real data only helps
+  if it is the *current* real data. On 2026-07-26 a fresh export was added without the old files
+  being deleted; browser downloads land suffixed (`sessions_rows (3).csv`), so every suite kept
+  reading the stale unsuffixed paths and kept reporting green — against a **mixed-vintage** set
+  (28 sessions beside a 3-row vessels file, 5 of those sessions referencing vessels missing from
+  it) that the database never held. The gate asserts count floors, `senchado`'s presence, and
+  referential integrity across sessions→vessels/teas and steeps→sessions. **When you re-export,
+  replace the whole set** — never the files that look wrong — and move superseded copies to
+  `fixtures/archive/`, which nothing reads.
 
 ## Deploy ritual (do this every deploy)
 
