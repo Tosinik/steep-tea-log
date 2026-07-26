@@ -13,12 +13,16 @@ this status doc → boards (visual reference) → nobody's memory.
 
 ---
 
-## 1 · Rulings issued this round (R32–R62)
+## 1 · Rulings issued this round (R32–R66)
 
 R32–R41 committed in `9f54672`; **R42–R56 committed in `00009b6`** (banking session, 2026-07-25);
-**R57–R62 committed with the hand-off** (2026-07-25 rulings, committed 2026-07-26). All 62 are now in
-the ledger, contiguous — no gaps, no duplicates. A ruling is not real until it is in the committed
-ledger; these are.
+**R57–R62 committed with the hand-off** (2026-07-25 rulings, committed 2026-07-26); **R63–R66 at the
+Code lane's plan-mode review** (2026-07-26). All 66 are in the ledger, contiguous — no gaps, no
+duplicates. A ruling is not real until it is in the committed ledger; these are.
+
+**R63–R66 are build rulings, not reopened design questions.** They correct the engine model where
+the hand-off's §0 described it more loosely than the code — which is the challenge-don't-absorb
+instruction working as intended, not a regression in the round's closure.
 
 - R32 Landing copy all-new, canonical as drawn, minimal.
 - R33 Ensō = door + timer, never the app icon.
@@ -109,6 +113,21 @@ ledger; these are.
 - R62 **No Teas→Library rename** — the shipped tab is Teas (`steep-core.js:894–903`) and stays Teas.
   Cheap to do later on its own; not worth moving nav + #13's header + Map 2 + the hand-off's prose
   together in a closing round. The boards' rename flag is **closed, not pending**.
+- R63 **The vessel identity ladder is new code, not a map extension** — §0.3 cited `shelfPhoto`
+  (the *tea* tile, kanji on `tea.type`); the vessel thumb is `steep-sessions.js:111`, two steps, no
+  kanji. Build `vesselPhoto(v,kind)` + `VESSEL_KANJI` + `.v-<type>` tints in both themes. Map covers
+  **Gaiwan 蓋碗 · Shiboridashi 絞 · Cold brew jar 冷 only**; **旅 dropped** (no traveller type). Every
+  export vessel has a photo, so the rung is invisible today — graceful degradation, built small.
+- R64 **The method control draws no lane when `brew_style` is null** — `brewMethodFor()` never
+  returns null (capacity ≤150 ml → gongfu, else western), so a lit lane on a null row would present
+  a capacity guess as a record. Stored value only; the derived reading stays in read-only
+  `esMethodReadLabel()`. JC1 verbatim: `es_setBrewStyle` the only writer, `saveSessionEdit` passes
+  `brewStyle` through untouched — **opening a null session and saving writes nothing.**
+- R65 **`brew_guide` structured pills are out of R3** — no ruling requires them; #03/#06 state free
+  text; not worth a migration for a presentation change.
+- R66 **`steep-passport.js` kept, stripped, mined** — drop the hub row and the passport view; retain
+  `passportCountryFor()` (`:100`), `PASSPORT_GEO` (`:40`), `PASSPORT_LAND` / `PASSPORT_SUB` for
+  Origins. Verified zero cross-module consumers today.
 
 **Ledger reconciliation — DONE in `00009b6`.** R1 now carries "superseded in part by R50 —
 control order is gongfu · senchadō · western · cold brew", so no lane reads stale R1. (Caught by

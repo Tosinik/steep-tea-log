@@ -330,7 +330,55 @@ rename flagged — the flag is now closed, not pending.
 execution plus the items in `R3-STATUS.md` §7 that were never design questions (the three owed
 coordinate rows, the Insights cost-median provenance, the catalog accuracy item, the beta-hardening
 bundle). **An open question is not the same as a decision to make at build time** — if the build
-finds one, it is a finding to raise, not a gap to fill.
+finds one, it is a finding to raise, not a gap to fill. R63–R66 below are that mechanism working:
+Code-lane build rulings correcting the engine model, not reopened design questions.
+
+*R63–R66 were issued 2026-07-26 at the Code lane's plan-mode review, in response to the build plan's
+findings (`docs/r3/R3-BUILD-PLAN.md` §1). Citations re-checked against HEAD when appended.*
+
+**R63 — The vessel identity ladder is new code, not a map extension.** The hand-off's §0.3 cited
+`steep-teas.js:87–93`, which is `shelfPhoto(tea, kind)` — the tea tile, keyed on `tea.type`
+(白 white, 餅 puerh) with `t-<teatype>` tints. The vessel thumb is `steep-sessions.js:111`:
+`v.image` or `.is-ph`, two steps, no kanji, no tint. Build `vesselPhoto(v, kind)` mirroring
+`shelfPhoto`'s shape, a `VESSEL_KANJI` map, and `.v-<type>` tints in both theme blocks. The map
+covers only types present in `VESSEL_TYPES` that the boards drew: Gaiwan 蓋碗 · Shiboridashi 絞 ·
+Cold brew jar 冷. 旅 is dropped — there is no traveller type (`VESSEL_TYPES`, `steep-core.js:113`)
+and the "Travel cuppa" is typed `Porcelain teapot`; the glyph was drawn for a vessel's free-text
+name. Adding further glyphs is a Design decision, not a build one. Scope note: all five vessels in
+the 2026-07-19 export carry photos, so this rung is invisible on current data — it is the
+graceful-degradation floor for future photo-less vessels. Build it small, fixture it, don't
+gold-plate it.
+
+> *Code-lane citation note, 2026-07-26 (does not alter the ruling).* Two of the scope note's facts
+> could not be checked at HEAD: `fixtures/vessels_rows.csv` holds **three** vessels, not five —
+> Mogake Shiboridashi and Travel cuppa are absent from the local set (the F3 staleness). The three
+> present (Dragon Gaiwan · Main Kyusu · Hario Coldbrew) all carry photos, and `PASSPORT`-style geo
+> aside, nothing else was checkable. So **"Travel cuppa is typed `Porcelain teapot`" and "all five
+> carry photos" rest on the 2026-07-19 export, not on a repo check.** The ruling does not depend on
+> either: dropping 旅 rests on `VESSEL_TYPES` having no traveller entry, which **is** verified
+> (`steep-core.js:113`). Confirm both when the fresh export lands.
+
+**R64 — The method control draws no lane when `brew_style` is null.** `brewMethodFor()`
+(`steep-core.js:377`) never returns null: explicit wins, else capacity ≤ `GONGFU_VESSEL_MAX_ML`
+(150) → gongfu, else western. So a lit lane on a null row would be a capacity guess presented as a
+record — and it isn't even uniform: Dragon Gaiwan (110 ml) infers gongfu, Main Kyusu (210 ml)
+western. The control shows the stored value and shows nothing when there is none. The derived
+reading stays where it already lives, in the separate read-only `esMethodReadLabel()`
+(`steep-sessions.js:207`). JC1 survives verbatim: `es_setBrewStyle` remains the only writer and
+`saveSessionEdit` passes `brewStyle` through untouched (`:203–205`), so opening a null session and
+saving writes nothing. Manufacturing the phase-2 gate metric out of a heuristic would corrupt the
+one measurement the next round depends on. Storage mutual-exclusion already holds and needs no new
+logic: `commitSession` writes `brewStyle: (!d.isColdBrew) ? brewMethodFor(…) : null`
+(`steep-sessions.js:1285`).
+
+**R65 — `brew_guide` structured pills are out of R3.** No ruling requires them, #03 and #06 both
+state free text as today's model, and the three-tier cascade already covers presentation. Not worth
+opening a migration for a presentation change.
+
+**R66 — `steep-passport.js` is kept, stripped, and mined.** R45 handed its fate to the Code lane and
+the call is: keep the file, drop the hub row and the passport view, retain `passportCountryFor()`
+(`:100`), `PASSPORT_GEO` (`:40`) and the `PASSPORT_LAND` / `PASSPORT_SUB` tables for Origins to
+reuse. Deleting real geo data to satisfy a tidiness instinct would cost Origins work later.
 
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
