@@ -283,9 +283,12 @@ repo, and the ledger closed out with R57–R62. Again zero app files, so again n
 
 ## 6 · The hand-off — WRITTEN, COMMITTED, IN CODE'S HANDS
 
-`docs/r3/R3-IMPLEMENTATION-HANDOFF.md` is committed, 457 lines, sha256 `82c8f55e36333ee3…` verified
-on both the working file and the staged blob. It supersedes two drafts that existed **only as chat
-attachments** — which is precisely how they drifted twice (v1 missed Social, Quick log, the bundles
+`docs/r3/R3-IMPLEMENTATION-HANDOFF.md` is committed. It was banked verbatim as delivered — 457
+lines, sha256 `82c8f55e36333ee3…`, verified on both the working file and the staged blob — and has
+been **amended since**, so the file at HEAD deliberately no longer matches that hash. It is a living
+document, not an archival record like `docs/r3/boards/`; the amendments are logged in its own header.
+**Amended 2026-07-26 at the Code lane's plan-mode review:** §0.3 replaced in full (R63) and §1's
+method-split warning widened (R64). It supersedes two drafts that existed **only as chat attachments** — which is precisely how they drifted twice (v1 missed Social, Quick log, the bundles
 and the visual contracts; v2 wrongly promoted the bundles to visual authority — they are round-1
 base *behaviour* reference only). **If you are reading a copy that is not in the repo, stop and get
 the committed one.**

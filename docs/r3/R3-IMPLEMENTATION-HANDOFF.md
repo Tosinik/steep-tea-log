@@ -9,6 +9,15 @@ surface reads from.
 chat attachments, which is why they could drift. If you are reading a copy that is not in the repo,
 stop and get the committed one.
 
+**Amendment log.** Banked verbatim as delivered (sha256 `82c8f55e36333ee3…`, 457 lines) and amended
+since — so the file at HEAD no longer matches that hash, by design. This is a living document, not
+an archival record like `docs/r3/boards/`.
+
+- *2026-07-26, Code lane's plan-mode review:* **§0.3 replaced in full (R63)** — it had cited
+  `shelfPhoto`, the tea tile, as the vessel fallback; the vessel ladder is new code and 旅 is
+  dropped. **§1's method-split warning widened (R64)** — the quintuple is not a lane set. Rulings in
+  `planning/R3-RULINGS-LEDGER.md`; the findings behind them in `R3-BUILD-PLAN.md` §1.
+
 **Authority order, binding:** live repo → 2026-07-19 export → `docs/r3/planning/R3-RULINGS-LEDGER.md`
 → `docs/r3/R3-STATUS.md` → the boards → nobody's memory. Boards are visual authority, the engine is
 behavioural authority, the ledger is rulings authority. **A conflict between them is a finding, not
@@ -57,12 +66,25 @@ plenty (20 g) · Fei Bing Beeng Cha plenty (96 g) · Shincha Saemidori Kagoshima
 · Honey Oolong Gui Fei low (7 g) · Sencha Kagoshima Premium low (8 g). Any copy saying "four states"
 has dropped `few`.
 
-### 0.3 · Vessel image fallback is a THREE-step ladder: photo → type-tinted stripe → kanji
+### 0.3 · Vessel identity is a THREE-step ladder — and it is new code (R63)
 
-Shipped (`steep-teas.js:87–93`) has kanji for two types only (白 white, 餅 puerh); every other
-photo-less type falls to the tinted stripe. #04 and #05 draw kanji for more (蓋碗 gaiwan, 絞
-shiboridashi, 旅 traveller, 冷 coldbrew). **Extend the kanji map to cover the types the boards use.**
-Photo stays first priority; the tinted stripe stays the floor for anything still unmapped.
+An earlier version of this section cited `steep-teas.js:87–93` as the vessel fallback. That is
+`shelfPhoto(tea, kind)`, the tea tile: its kanji keys on `tea.type` (白 white, 餅 puerh) and its
+tints are `t-<teatype>`. Adding 蓋碗 there would mean a tea of type gaiwan. The vessel thumb is
+`steep-sessions.js:111` — `v.image` or a `.is-ph` placeholder. Two steps, no kanji, no tint.
+
+So the ladder is a new primitive, not a map extension: `vesselPhoto(v, kind)` mirroring
+`shelfPhoto`'s shape, a `VESSEL_KANJI` map, and `.v-<type>` tints in `:root` and
+`html[data-theme="dark"]`. Photo stays first priority; the tinted stripe is the floor.
+
+The kanji map covers Gaiwan 蓋碗 · Shiboridashi 絞 · Cold brew jar 冷 — and nothing else. 旅 is
+dropped: `VESSEL_TYPES` (`steep-core.js:113`) has no traveller entry and the "Travel cuppa" is typed
+`Porcelain teapot`, so the glyph was keyed off a vessel's name. Identity never keys off free text.
+Every other type falls to the tint, by design.
+
+All five vessels in the 2026-07-19 export carry photos, so nothing below the first rung is visible
+on current data. This is insurance for future photo-less vessels: build it small, fixture it, and
+don't let it become a rabbit hole.
 
 ### 0.4 · Absence from a board is not a removal instruction (R61)
 
@@ -124,7 +146,11 @@ days · dates 3–19 Jul.
 13, gongfu 10, and **8 nulls**; `is_cold_brew` is true on exactly one row, and that row's
 `brew_style` is null. So the null count is 8 and the *display* count is 7, because the four-lane
 control claims that session for the cold-brew lane. Boards use the display form. Both numbers are
-correct; never show them in one row.
+correct; never show them in one row. And the whole quintuple is not a lane set —
+`13 · 10 · 7 · 0 · 1` is five slots ordered senchadō-first, while the control is four lanes ordered
+gongfu-first, and untagged is not a lane at all. Rendering the split into the control's lanes would
+put senchadō's 13 under Gongfu. They are different axes; keep them visually distinct wherever both
+appear.
 
 **Type mix BY SESSION:** green 15 · oolong 11 · white 3 · yellow 1 · puerh 1. **Do not reconcile
 this to the 21-tea shelf** — the subject is sessions, and that is what makes "green-leaning" true.
