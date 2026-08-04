@@ -502,6 +502,23 @@ control, and R57 forbids exactly that move in the analogous case.
 > 115 ml — which is what gets stored. Gaiwan/Kyusu/Shiboridashi all prefill explicitly and were never
 > ambiguous. Both contracts are pinned in `fixtures/vessel-identity-test.js` §C.
 
+**R73 — Line-based source scanning must split on `/\r?\n/`.** With `core.autocrlf` the working copy
+carries `\r`, and JS `.` does not cross a line terminator — so a regex-based comment-stripper or
+similar scan matches nothing and the check silently degrades. Found in slice A when E5 flagged its own
+explanatory comment: the scan failed **green-adjacent**, reporting a problem that wasn't there. The
+same mechanism could as easily hide a real one. Any suite that reads source line-by-line splits on
+`/\r?\n/` first. Note `.gitattributes` does **not** help here — it pins `docs/r3/boards/**` only,
+deliberately, so app source still smudges on Windows checkout.
+
+> *Companion finding — a guard citing the wrong renderer passes vacuously forever.* Three
+> misattributed-assertion findings now share one shape: slice A's E4 checked `teaShelfHTML()` when the
+> sort control lives in `viewTeas()` (`steep-teas.js:266`); the build plan's F1 caught §0.3 citing
+> `shelfPhoto` as the vessel fallback; and R63 recorded the same error in the hand-off. **All three
+> were found by running, never by re-reading** — which is the point: the failure mode of a test is
+> silence, not noise. A wrong citation produces no output to notice, so an assertion is only worth
+> what its target reference is worth. Verify the symbol a guard names, not just the behaviour it
+> describes.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

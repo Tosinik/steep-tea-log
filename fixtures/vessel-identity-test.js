@@ -120,7 +120,12 @@ ok(JSON.stringify(activeLanes(cold))===JSON.stringify(['Cold brew']),
    'C8 cold brew is the only lit lane, even with a stale stored brewStyle; got '+JSON.stringify(activeLanes(cold)));
 ok(/d_pickColdLane\(\)/.test(lanesDraft) && /es_pickColdLane\(\)/.test(lanesRec),
    'C9 each surface wires its own cold-lane picker');
-console.log('  C method lanes: 13 checks');
+// C8 pinned the ENTRY direction on the record side only. It must hold on the draft side too, where
+// resolve:true would otherwise be free to resolve a stale brewStyle into a second lit lane.
+const coldDraft = ctx.methodLanesHTML(Object.assign({},draft,{isColdBrew:true, brewStyle:'gongfu'}));
+ok(JSON.stringify(activeLanes(coldDraft))===JSON.stringify(['Cold brew']),
+   'C10 DRAFT side: cold brew still wins alone over a stale brewStyle — isColdBrew is read before resolve; got '+JSON.stringify(activeLanes(coldDraft)));
+console.log('  C method lanes: 14 checks');
 
 /* ---- D. no second writer, and the old controls are gone ---- */
 const sesSrc = fs.readFileSync(path.join(repo,'steep-sessions.js'),'utf8');
@@ -156,6 +161,42 @@ ok(!/'\$'/.test(decomment(teasSrc)) && !/'\$'/.test(decomment(dashSrc)),
    'E5 no hardcoded \'$\' remains in live code in either file');
 ok(ctx.currencyFmt(null)==='€0.00', 'E6 a null cost formats rather than printing NaN');
 console.log('  E currency single writer: 6 checks');
+
+/* ---- G. the cold-brew ENTRY path, as a state sequence ----
+   C8/C10 pin what RENDERS. This pins what the lane taps DO, because the render is only half the
+   question: entering cold brew leaves a stale brewStyle and a still-locked brewStyleLocked behind it.
+   Both are inert, and that is a tested claim here rather than an argument: the ONLY exit from
+   cold-brew mode is tapping a method lane, and that tap sets brewStyle explicitly, so a prefill the
+   lock suppressed can never become visible. Storage is unaffected either way — commitSession writes
+   brewStyle null whenever isColdBrew (steep-sessions.js:1285). */
+S.vessels=[{id:'g',name:'Gaiwan',type:'Gaiwan',capacityMl:110},{id:'k',name:'Kyusu',type:'Kyusu',capacityMl:210}];
+const savedRender = ctx.render; ctx.render = ()=>{};
+const lit = () => activeLanes(ctx.methodLanesHTML({ brewStyle:S.sessionDraft.brewStyle,
+  isColdBrew:S.sessionDraft.isColdBrew, capacityMl:(ctx.vesselById(S.sessionDraft.vesselId)||{}).capacityMl,
+  resolve:true, onMethod:'d_pickMethodLane', onCold:'d_pickColdLane()' }));
+
+S.sessionDraft={teaId:'t',vesselId:'g',isColdBrew:false,brewStyle:null,steeps:[]};
+ctx.d_setBrewStyle('gongfu');
+ok(S.sessionDraft.brewStyleLocked===true, 'G1 an explicit method tap locks the vessel prefill (v3.91)');
+ctx.d_pickColdLane();
+ok(S.sessionDraft.isColdBrew===true && S.sessionDraft.brewStyle==='gongfu',
+   'G2 entering cold brew sets the boolean and leaves brewStyle untouched (storage nulls it at commit)');
+ok(JSON.stringify(lit())===JSON.stringify(['Cold brew']), 'G3 exactly one lane lights on entry, and it is the cold one');
+ok(S.sessionDraft.brewStyleLocked===true,
+   'G4 the lock SURVIVES the cold-brew tap — deliberately: clearing it would let a later vessel change silently overwrite an explicit choice, which is a new surprise traded for one that cannot occur');
+ctx.d_setVessel('k');
+ok(S.sessionDraft.brewStyle==='gongfu', 'G5 a vessel change while cold does not re-prefill (lock holds) — invisible, because…');
+ctx.d_pickMethodLane('senchado');
+ok(S.sessionDraft.isColdBrew===false && S.sessionDraft.brewStyle==='senchado',
+   'G6 …the ONLY cold exit is a lane tap, which sets brewStyle explicitly — so the suppressed prefill never surfaces');
+ok(JSON.stringify(lit())===JSON.stringify(['Senchadō']), 'G7 after the exit exactly the tapped lane lights');
+// And with no prior explicit tap the prefill is free to run, unchanged from v3.91.
+S.sessionDraft={teaId:'t',vesselId:'g',isColdBrew:false,brewStyle:null,steeps:[]};
+ctx.d_pickColdLane(); ctx.d_setVessel('k');
+ok(S.sessionDraft.brewStyle==='senchado' && !S.sessionDraft.brewStyleLocked,
+   'G8 with no explicit tap, the vessel prefill still runs while cold — v3.91 behaviour unchanged');
+ctx.render = savedRender;
+console.log('  G cold-brew entry path: 8 checks');
 
 if(failures){ console.log(`VESSEL-IDENTITY TESTS FAILED (${failures} failed, ${passed} passed)`); process.exit(1); }
 console.log(`ALL VESSEL-IDENTITY TESTS PASSED (${passed} passed)`);
