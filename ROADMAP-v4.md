@@ -230,8 +230,10 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   OR senchadō). Ratio-aware (the B5 reversal): senchadō rides the gongfu side in `baselineRatioFor`; the 2.8
   green_jp leaf-seed is currently KB-shadowed (every library Japanese green resolves to 3.0) → the gyokuro
   revisit needs senchadō ratios IN THE KB. Regression: 0 verdicts changed across 28 sessions. Part A repaired
-  the brew-feedback R section against fresh exports (54→59). Known downstream: R3 board #04 needs a 3-button
-  method segment (Design's, routed separately).
+  the brew-feedback R section against fresh exports (54→59). ~~Known downstream: R3 board #04 needs a 3-button
+  method segment~~ — **closed by v3.95**: R50 ruled a FOUR-lane control (`gongfu · senchadō · western ·
+  cold brew`, cold brew a peer lane rather than a checkbox), and slice A shipped it as the single writer
+  `methodLanesHTML()`.
 - **NEXT: phase-2 gate-fill** — A2 shipped v3.89; the gate (~3/15, measured 2026-07-15) now fills UNDER the
   new per-steep control, ~2–3 wks of complete logging. **The gate metric should move to stored `brew_style`,
   not `brewMethodFor`** (a phase-2 spec change — now that senchadō/western are real, the metric should count

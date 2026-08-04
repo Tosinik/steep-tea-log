@@ -249,9 +249,26 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v3.94 live and fresh-clone verified** at HEAD `9f695e2` (with `e21ee72` · `9f54672` · `ac49794`):
-flavour tree dataset + R31 recognition layer, citations complete (Gascoyne · Marchand · Desharnais
-· Américi, Third Edition), ledger R32–R41, allowlist tick, session-edit known-issue.
+**v3.95 LIVE — R3's first code deploy** (`d34af32`, cache **v105**, pushed 2026-07-26; entry-path pins
+in `e29cc17`). **Slice A: the shared primitives, before any surface.** Currency is a preference
+(`DEFAULT_SETTINGS.currency='€'` + `currencyFmt()`, six sites, one writer — three had the wrong symbol
+including a dormant one, three had none) · `methodLanesHTML()` is the single writer for the four drawn
+lanes, with cold brew a **peer lane** replacing both checkboxes (tapping a lane still exits cold-brew
+mode, which is what makes R61's "replacement not removal" true) · dead `ratioSetupHTML` **deleted** ·
+`vesselPhoto(v,kind)` + `VESSEL_KANJI` (蓋碗 · 絞 · 冷; **旅 dropped**) + `.v-<type>` tints in both theme
+blocks · two guards that *are* the deliverable (`shelf-order` +E R61 sort preservation, +F tier
+single-writer) · new `fixtures/vessel-identity-test.js` (62 checks, 17th suite). **No SQL.**
+
+Two behavioural contracts a later slice must not break: **R72's `resolve` flag** (a draft lights what
+`commitSession` will store; a record shows only stored `brew_style` and lights nothing when null — JC1
+verbatim, opening a null session and saving writes nothing) and **cold-brew entry** (`isColdBrew` is
+read *before* `resolve`, so the cold lane always wins alone; `brewStyleLocked` deliberately survives
+the tap because it is inert — the only exit is an explicit lane tap that overrides any prefill). Both
+pinned in that suite, §C and §G.
+
+**Previously: v3.94** at HEAD `9f695e2` (with `e21ee72` · `9f54672` · `ac49794`): flavour tree dataset
++ R31 recognition layer, citations complete (Gascoyne · Marchand · Desharnais · Américi, Third
+Edition), ledger R32–R41, allowlist tick, session-edit known-issue.
 
 **Banking session — PUSHED AND VERIFIED 2026-07-25** (docs-only: zero app files in the range,
 `CACHE_NAME` / `APP_VERSION` / `WHATS_NEW` / CHANGELOG all zero diffs, so nothing surfaced a

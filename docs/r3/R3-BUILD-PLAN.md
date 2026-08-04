@@ -134,7 +134,14 @@ magic string (below).
 
 ---
 
-## 2 · Slice A — the §0 primitives, before any surface
+## 2 · Slice A — the §0 primitives, before any surface — **SHIPPED v3.95**
+
+> **Shipped 2026-07-26** (`d34af32`, cache v105; entry-path pins `e29cc17`). All six items landed as
+> planned, with two scope corrections found during the build: **currency was six sites, not two**
+> (three wrong symbols including `big_spender`'s dormant `unit:'$'`, three printing none at all), and
+> **R64 needed scoping to record surfaces** — R72, encoded as `methodLanesHTML`'s `resolve` flag.
+> Rulings R72 (draft-vs-record contracts) and R73 (`/\r?\n/` source scanning) came out of it. See
+> `R3-STATUS.md` §5 for the live state and CHANGELOG v3.95 for the file list. **Next: slice B.**
 
 One deploy, no surface rebuilt. Building a surface first and retrofitting the method control is how
 the four-lane order went wrong the first time; this slice exists so that cannot recur.
@@ -169,7 +176,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 
 | Slice | Contents | Schema |
 |---|---|---|
-| **A** | the primitives above | none |
+| ~~**A**~~ | ~~the primitives above~~ — **SHIPPED v3.95** | none |
 | **B** | **#13 Teas revision** (R51 second mode · R52 vendor overflow · header rework · Vessels segment) + **#05 Vessels** (rides A's `vesselPhoto`) | none |
 | **C** | **#04 setup + pickers** and **#12 Quick log** — twins sharing the method primitive and the inverted date posture | none |
 | **D** | **#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)** as its own commit | none |

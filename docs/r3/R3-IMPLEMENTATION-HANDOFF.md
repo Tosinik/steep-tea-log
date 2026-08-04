@@ -24,6 +24,13 @@ an archival record like `docs/r3/boards/`.
   2026-07-26 export, cross-checked by two independent writers (the reporter via the shipped engine in
   a `vm` sandbox; the planning lane independently in Python). **§0.2's coverage aside corrected** —
   `few` now has five live examples and `untracked` none.
+- *2026-07-26, slice A shipped as v3.95:* **three §0 primitives are now BUILT, not pending.** §0.1's
+  four lanes ship as the single writer `methodLanesHTML()` (with `ratioSetupHTML` deleted), §0.3's
+  ladder as `vesselPhoto()` + `VESSEL_KANJI`, and §07's currency as `DEFAULT_SETTINGS.currency` +
+  `currencyFmt()` — so read those sections as descriptions of **shipped engine**, and don't re-derive
+  them. #07 still owes the user-facing currency row. **R72** scopes R64 to record surfaces (a draft
+  lights what `commitSession` will store); **R73** requires `/\r?\n/` for line-based source scanning.
+  Live state and the two contracts a later slice must not break: `R3-STATUS.md` §5.
 
 **Authority order, binding:** live repo → the current export, stamped (R67) → `docs/r3/planning/R3-RULINGS-LEDGER.md`
 → `docs/r3/R3-STATUS.md` → the boards → nobody's memory. Boards are visual authority, the engine is
@@ -374,8 +381,13 @@ R3 per R60, functions left in place, no controls drawn.
 
 ### #07 Settings (rev 2)
 
-- Currency preference is the one genuinely new capability: the app hard-codes `'$'` at
-  `steep-teas.js:722–723`. Every cost surface reads the pref.
+- ~~Currency preference is the one genuinely new capability: the app hard-codes `'$'`.~~ **The engine
+  half shipped in v3.95** (slice A): `DEFAULT_SETTINGS.currency` defaults to `'€'`, `currencyFmt()` is
+  the single writer, and all **six** cost sites read it — three had printed the wrong symbol (including
+  `big_spender`'s dormant `unit:'$'`) and three had printed none at all. **What #07 still owes is the
+  user-facing row**: a control that writes `settings.currency`. Do not re-derive the plumbing, and
+  never re-hardcode a symbol at a render site or in data (guarded by
+  `fixtures/vessel-identity-test.js` §E).
 - **°F stays** (explicit confirmation). Low-stock threshold reads the user's setting (11), not the
   default (15).
 - **No monoFont work.** The board correctly has no monoFont row; its SET5 note telling you to remove

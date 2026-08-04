@@ -267,14 +267,13 @@ only the rendering gets replaced. See ROADMAP/STATE.
 
 ## Cleanup backlog (dead / superseded code — remove when touching the area)
 
-- **`ratioSetupHTML` (steep-sessions.js) is dead as of v3.77.** WS1 moved the method segment into the
-  session-setup core-trio card (`SESSION_METHODS` + `brewMethodFor`) and the optional water(ml) field
-  into the "More details" fold, so nothing calls `ratioSetupHTML` any more. Left in place to keep the
-  WS1 diff focused; delete it next time steep-sessions.js setup code is edited.
-  Now also stale in a second way: as of v3.91 `brewMethodFor` is three-valued
-  (`gongfu | senchado | western`), while `ratioSetupHTML`'s hard-coded two-button segment is fed by
-  neither `SESSION_METHODS` nor the new value — so if revived, its `method===m` check would light
-  **neither** button for a senchadō session. Delete rather than patch.
+- ~~**`ratioSetupHTML` (steep-sessions.js) is dead as of v3.77.**~~ **DELETED in v3.95** (R3 slice A),
+  alongside the four-lane method control that replaced it. It had been dead since WS1 moved the method
+  segment into the core-trio card, and doubly stale since v3.91 made `brewMethodFor` three-valued: its
+  hard-coded two-button segment would have lit **neither** button for a senchadō session. The trigger
+  ("delete it next time steep-sessions.js setup code is edited") fired and was missed twice, at v3.85
+  and v3.91 — kept here as the record of why a backlog entry needs a *deploy* to discharge it, not a
+  reminder.
 
 - **`KB_FLAVOR_AXES` (steep-knowledge.js) is dead as of R30/v3.93** — an 11-item list declared "a
   separate analytic list" and referenced by nothing (the vocabulary is `KB_FLAVOR_CHIPS`, the capture
@@ -288,13 +287,15 @@ only the rendering gets replaced. See ROADMAP/STATE.
 
 Live issues (see STATE.md / ROADMAP for the full backlog):
 
-- **Currency is hard-coded to `$`.** `steep-teas.js:722–723` print `'$'` for Cost/gram and
-  Cost/session. `cost_total` stores a bare number and there is no currency field anywhere in the
-  app. Every vendor in the library is German (MainTee Würzburg ×5, Tee Kontor Kiel ×3, Si Fang Guan
-  ×3, Bohea Berlin ×2, Diez, Teerausch…), so the figure shown is wrong for every tea. Not urgent, but
-  it is a *wrong number shown to the user*, not a missing feature. The intended home for the fix is a
-  currency preference in **R3 #07 Settings**, which is unbuilt — flagged to Design as an input rather
-  than patched separately.
+- ~~**Currency is hard-coded to `$`.**~~ **FIXED in v3.95** (R3 slice A). `DEFAULT_SETTINGS.currency`
+  defaults to `'€'` (every vendor on the shelf is German/EU) and **every** cost figure reads
+  `currencyFmt()` — the single writer. It was worse than the entry said: **six** sites, not two. Three
+  printed the wrong symbol (Tea detail's Cost/gram + Cost/session, plus `big_spender`'s dormant
+  `unit:'$'`) and three printed **no symbol at all** (the monthly cost card, Insights' Total-spent and
+  Avg-per-gram). The achievement `unit` is now the marker `'cur'`, resolved through `aUnit` →
+  `currencySymbol()`, so the symbol is not re-hardcoded a layer down. **Never re-hardcode a currency
+  symbol at a render site or in data** — `fixtures/vessel-identity-test.js` §E guards it. The
+  user-facing Settings *row* still rides **R3 #07**; only the key and the helper shipped.
 - **Session-edit modal's "TAGS" is session-level only.** The edit modal (`sessionEditModal`) surfaces
   the session's overall `tags`; **per-steep taste words (`steeps[].tags`) and the per-steep `feedback`
   are not shown/editable there.** Verified **non-destructive at HEAD**: the modal deep-copies the session
