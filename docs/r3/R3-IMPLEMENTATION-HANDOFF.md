@@ -2,7 +2,7 @@
 
 **Planning lane, 2026-07-25.** This supersedes both earlier drafts (v1 omitted Social, Quick log,
 the bundles and the visual contracts; v2 wrongly promoted the bundles to visual authority). It is
-the complete build package: twenty-one boards, fifty-six rulings, and the verified data every
+the complete build package: twenty-one boards, seventy rulings, and the verified data every
 surface reads from.
 
 **This document lives at `docs/r3/R3-IMPLEMENTATION-HANDOFF.md`.** Earlier drafts existed only as
@@ -74,6 +74,11 @@ real "even though it doesn't surface on #04's five example teas". That has inver
 carries **five** `few` teas and **no** `untracked` one. Per R70 neither fact bears on the tier — five
 tiers is an invariant, tier *coverage* is a snapshot, and a tier with no live example is not a defect.
 `untracked` is now the one without an example, and it must still be built.
+
+**The split is a property of figures, not of sections.** The tier *semantics* above — five tiers, the
+cups-vs-grams rule, the thresholds — are invariant and timeless. **The five example teas below them
+are a snapshot and carry the §1 stamp.** Do not build from those five without re-deriving them; §0
+reads as timeless and this list is not.
 
 The five example teas resolve, all verified against the 2026-07-19 export: Dawang Feng Da Hong Pao
 plenty (20 g) · Fei Bing Beeng Cha plenty (96 g) · Shincha Saemidori Kagoshima empty (0 g, tracked)
@@ -492,9 +497,9 @@ them as separate blocks deliberately — don't blur them.
 
 ## 3 · Ledger note (no action)
 
-The ledger is contiguous **R1–R56**, verified unbroken from a fresh clone — no gaps, no duplicates.
+The ledger is contiguous **R1–R70**, verified unbroken from a fresh clone — no gaps, no duplicates.
 Boards happen not to cite many of them; those are real rulings, not gaps, and none should be
-"reconciled" away. R57–R62 were issued 2026-07-25 and land with this document's commit.
+"reconciled" away.
 
 **R43's ledger entry carries its original text verbatim plus a blockquoted Code-lane citation note
 beneath it.** The note is correct; the ruling text's `quickLogSession()`-as-setter phrasing is the

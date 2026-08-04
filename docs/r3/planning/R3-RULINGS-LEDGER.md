@@ -454,6 +454,28 @@ low 2 · empty 2. §0.2's aside needs inverting: it notes `few` as the tier with
 five sample teas, and `few` now has **five** live examples while `untracked` has **none**. Neither
 fact bears on whether the tier exists.
 
+**R71 — A document's description of itself is the one uninstrumented surface.** Three mechanical
+guards now cover this round's figures: `export-gate-test.js` asserts invariants, `figures-report.js`
+generates snapshots, `.gitattributes` pins archival bytes. None of them can check whether a document's
+account of itself still matches — "twenty-one boards, fifty-six rulings", "contiguous R1–R56", "issued
+2026-07-25 and land with this commit". Every other stale figure this round had a guard available;
+these have only the habit of looking. When a document states its own counts, ranges or pending state,
+that claim is re-read whenever the document is touched. Prefer phrasing that cannot go stale — "the
+ledger is contiguous, verified from a fresh clone" needs no number.
+
+> *Code-lane note, 2026-07-26 (does not alter the ruling).* Applied as instructed, and the tension is
+> recorded rather than resolved: the two repairs this ruling prompted **both insert a number** —
+> "seventy rulings" at the hand-off's `:5` and "contiguous R1–R70" at its §3 — so each will go stale
+> the next time a ruling is written, which is what R71 says to prefer against. The stale-proof
+> phrasings exist ("the full rulings ledger"; "contiguous, verified from a fresh clone"). Kept as
+> instructed because the planning lane owns the document's self-description; flagged so the next
+> restamp can take the phrasing instead of the count.
+>
+> R67's framing is also narrowed by its own first counter-example: it split invariants from snapshots
+> as if that were a property of *sections*, and §0.2 disproved that — a snapshot (five example teas
+> with their tiers, one already moved) sitting inside the model-precision section, which reads as
+> timeless. **The split is a property of figures.** §0.2 now says so explicitly.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not
