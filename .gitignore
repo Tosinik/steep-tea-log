@@ -19,6 +19,10 @@ fixtures/*
 # single-vintage. It reads the exports rather than generating from source, but it must be tracked —
 # a gate that only exists on one machine is not a gate. Run it before every other suite.
 !fixtures/export-gate-test.js
+# The figures reporter (R67): §1's snapshot block is GENERATED from fixtures/, never hand-copied.
+# Tracked for the same reason as the gate — a generator that lives on one machine can't be the
+# source of truth for a document everyone reads.
+!fixtures/figures-report.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

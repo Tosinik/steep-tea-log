@@ -92,6 +92,13 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
   referential integrity across sessions→vessels/teas and steeps→sessions. **When you re-export,
   replace the whole set** — never the files that look wrong — and move superseded copies to
   `fixtures/archive/`, which nothing reads.
+- **`node fixtures/figures-report.js` generates the R3 hand-off §1 snapshot block** — counts, grams,
+  litres, method split, type mix, clock buckets, running-low, vendors, origins. Snapshot figures are
+  **never hand-copied** (R67): run it, check the output, paste. It calls the shipped engine
+  (`gridStats`/`computeStats`/`isRunningLow`/`distinctVendors`) in a `vm` sandbox rather than
+  recomputing, so it can't drift from what the app renders, and it **scopes by `user_id`** — the
+  export is not user-scoped (one `teas` row belongs to another account), and an unscoped read
+  silently reports two vendorless teas where there is one.
 
 ## Deploy ritual (do this every deploy)
 

@@ -19,7 +19,7 @@ an archival record like `docs/r3/boards/`.
   gained the null-row pointer so it cannot be read alone and still light an inferred lane. Rulings in
   `planning/R3-RULINGS-LEDGER.md`; the findings behind them in `R3-BUILD-PLAN.md` §1.
 
-**Authority order, binding:** live repo → 2026-07-19 export → `docs/r3/planning/R3-RULINGS-LEDGER.md`
+**Authority order, binding:** live repo → the current export, stamped (R67) → `docs/r3/planning/R3-RULINGS-LEDGER.md`
 → `docs/r3/R3-STATUS.md` → the boards → nobody's memory. Boards are visual authority, the engine is
 behavioural authority, the ledger is rulings authority. **A conflict between them is a finding, not
 a thing to resolve quietly.**

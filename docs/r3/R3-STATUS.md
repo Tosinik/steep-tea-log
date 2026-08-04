@@ -8,8 +8,9 @@ natural milestone via Code. If this document and anyone's memory disagree, this 
 and if this document and the live repo/export disagree, the repo/export win and this document
 gets corrected.
 
-**Authority order (unchanged, binding):** live repo → 2026-07-19 export → rulings ledger →
-this status doc → boards (visual reference) → nobody's memory.
+**Authority order (binding):** live repo → the current export, stamped → rulings ledger →
+this status doc → boards (visual reference) → nobody's memory. *(R67 — the tier names no date: one
+that does becomes wrong the next time a cup is brewed, and did.)*
 
 ---
 

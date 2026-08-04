@@ -5,7 +5,7 @@ against HEAD.** Plan-mode review held in the planning lane the same day; R63–R
 and land alongside this document.
 
 **Authority position.** This is a *plan*, the lowest tier in the round's order: live repo →
-2026-07-19 export → `planning/R3-RULINGS-LEDGER.md` → `R3-STATUS.md` → the boards → this. It
+the current export, stamped (R67) → `planning/R3-RULINGS-LEDGER.md` → `R3-STATUS.md` → the boards → this. It
 sequences work; it rules nothing. Where it disagrees with any of those, they win and this gets
 corrected.
 
@@ -90,6 +90,25 @@ was genuinely unrelayed; `R3-STATUS.md` §7 over-stated what was missing.
 presentation.
 
 > **RULED — R65.** Out of R3. Not worth opening a migration for a presentation change.
+
+### F5 · The export is not user-scoped
+
+`teas_rows.csv` carries a row belonging to **another account** (a "Test" green tea, 0 g, no vendor);
+`user_settings_rows.csv` carries every beta user. Sessions, steeps, vessels and wishlist are
+single-owner.
+
+The failure mode is silent and it already fired: the foreign row is vendorless, so an unscoped read
+reports **two** teas with no vendor where §1 correctly says one. The app scopes by `user_id` on
+purpose — the v3.21 hotfix, because a social RLS policy lets followers read others' shared sessions
+and an unfiltered load leaks them into personal stats. Anything reading `fixtures/` inherits that
+requirement. `figures-report.js` derives the owner from whoever owns the sessions rather than
+hardcoding a UUID, and `export-gate-test.js` now asserts sessions are single-owner.
+
+### F6 · §1's "22 rows, Test deleted" mis-describes that row
+
+It is not a deleted tea on the shelf — it is another user's tea, present because the export isn't
+scoped. The count (21 live) is right; the reason given for it is wrong, which matters because
+"deleted" implies a soft-delete state the schema does not have here. Rides the §1 restamp.
 
 ### Also settled at review
 

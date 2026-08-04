@@ -103,6 +103,18 @@ const dangT = S.filter(s => s.tea_id && !tids.has(s.tea_id));
 ok(dangT.length === 0,
    `every session's tea_id resolves in teas_rows — ${dangT.length} dangling`);
 
+// The export is NOT user-scoped: teas_rows carries another account's row, user_settings carries
+// every beta user. That is fine and expected — but anything reading these files must scope, the way
+// the app does (v3.21). The failure mode is silent: the foreign tea row is vendorless, so an
+// unscoped read reports "two teas with no vendor" where the truth is one. Sessions must stay
+// single-owner, because every derived figure assumes it.
+const owners = [...new Set(S.map(s => s.user_id).filter(Boolean))];
+ok(owners.length === 1,
+   `all sessions belong to ONE user_id — found ${owners.length}${owners.length > 1 ? ' (' + owners.map(o => o.slice(0,8)).join(', ') + '): every derived figure would be contaminated' : ''}`);
+const foreign = TE.filter(t => t.user_id && t.user_id !== owners[0]).length;
+console.log(`  note  ${foreign} tea row(s) belong to another account — consumers MUST scope by user_id ` +
+            `(figures-report.js does; ${TE.length} rows in, ${TE.length - foreign} owned)`);
+
 // ---- D · facts the R3 rulings rest on --------------------------------------------------------
 // R63's scope note was flagged uncheckable when the local vessels file had 3 rows. Pinned here so
 // it stays checked rather than re-derived from memory.
