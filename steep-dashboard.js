@@ -139,7 +139,7 @@ function viewSpend(){
     .sort((a,b)=>(Number(b.costTotal)||0)-(Number(a.costTotal)||0))
     .map(t=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer;" onclick="openTeaDetail('${t.id}','teas')">
       <div style="min-width:0;"><div style="font-weight:600;">${escapeHtml(t.name)}</div><div style="font-size:11px;color:var(--ink-soft);">${t.source?escapeHtml(t.source)+' · ':''}${t.purchaseDate?fmtDate(t.purchaseDate):''}</div></div>
-      <div class="mono" style="white-space:nowrap;">${(Number(t.costTotal)||0).toFixed(2)}</div>
+      <div class="mono" style="white-space:nowrap;">${currencyFmt(Number(t.costTotal)||0)}</div>
     </div>`).join('');
 
   const thisMonthName = new Date().toLocaleDateString(undefined,{month:'long',year:'numeric'});
@@ -203,7 +203,10 @@ const ACHIEVEMENTS = [
   {id:'perfect_cup',    title:'Perfect Cup',     tiers:[1,10,25,50],    metric:s=>s.fiveStarSessions,                          label:n=>`Rate ${n} session${n>1?'s':''} 5 stars`},
   {id:'cold_brewer',    title:'Cold Brewer',     tiers:[1,10,25,50],    metric:s=>s.coldBrewCount,                             label:n=>`Log ${n} cold brew${n>1?'s':''}`},
   {id:'night_owl',      title:'Night Owl',       tiers:[1,10,25,50],    metric:s=>s.nightSessionCount,                         label:n=>`Log ${n} session${n>1?'s':''} after 10pm`},
-  {id:'big_spender',    title:'Big Spender', unit:'$', tiers:[50,200,500,1000], metric:s=>s.totalSpent,                        label:n=>`Spend ${n} on tea`},
+  // unit:'cur' is a MARKER, not a symbol — aUnit resolves it through currencySymbol() so the currency
+  // pref is the single writer here too. A hardcoded '$' here was a wrong value waiting for someone to
+  // flip ACHIEVEMENTS_ENABLED back on.
+  {id:'big_spender',    title:'Big Spender', unit:'cur', tiers:[50,200,500,1000], metric:s=>s.totalSpent,                      label:n=>`Spend ${n} on tea`},
   {id:'type_master',    title:'Type Master',     tiers:[1,3,6],         metric:s=>Object.values(s.typeCounts).filter(t=>t.count>=10).length, label:n=>`Brew ${n} type${n>1?'s':''} 10+ times each`},
 ];
 function computeAchievements(s){
@@ -216,7 +219,7 @@ function computeAchievements(s){
   });
 }
 function fmtMetric(a,v){ return a.unit==='L' ? (Math.round(v*10)/10) : Math.round(v); }
-function aUnit(a){ return a.unit==='L' ? ' L' : (a.unit||''); }
+function aUnit(a){ return a.unit==='L' ? ' L' : (a.unit==='cur' ? ' '+currencySymbol() : (a.unit||'')); }
 function badgeHTML(a){
   const denom = a.maxed ? a.unlockedTier : (a.nextTier ?? a.tiers[0]);
   const pct = a.maxed ? 100 : Math.min(100, Math.round(a.value/denom*100));
@@ -1019,8 +1022,8 @@ function dashCardsHome(s){
     cost: `<div class="section card">
       <div class="section-title"><h2>Cost overview</h2></div>
       <div class="grid grid-3">
-        <div class="stat" onclick="goView('spend')" style="cursor:pointer;" title="Monthly spending"><div class="num">${s.totalSpent.toFixed(0)}</div><div class="lbl">Total spent ›</div></div>
-        <div class="stat"><div class="num">${s.avgCostPerGram.toFixed(2)}</div><div class="lbl">Avg / gram</div></div>
+        <div class="stat" onclick="goView('spend')" style="cursor:pointer;" title="Monthly spending"><div class="num">${currencyFmt(s.totalSpent,0)}</div><div class="lbl">Total spent ›</div></div>
+        <div class="stat"><div class="num">${currencyFmt(s.avgCostPerGram)}</div><div class="lbl">Avg / gram</div></div>
         ${s.lowStock.length
           ? `<div class="stat" onclick="goLowStock()" style="cursor:pointer;" title="View low-stock teas"><div class="num">${s.lowStock.length}</div><div class="lbl">Low stock ›</div></div>`
           : `<div class="stat"><div class="num">0</div><div class="lbl">Low stock</div></div>`}

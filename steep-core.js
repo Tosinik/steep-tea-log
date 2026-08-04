@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.94';
+const APP_VERSION = 'v3.95';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "More tasting words now count — and German notes are recognised too, so what you write in either language reaches your flavour profile.";
+const WHATS_NEW = "Costs now show in euros instead of dollars, and choosing how you're brewing — gongfu, senchadō, western or cold brew — is one row of four instead of a switch and a checkbox.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -118,8 +118,14 @@ const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
 // Settings rows, unlock confetti) regardless of any stored showAchievements/quietMode, so the feature
 // goes quiet for everyone. All the code stays intact for a future redesign — flip to true to revive.
 const ACHIEVEMENTS_ENABLED = false;
-const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:false, showAchievements:false, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true, ratioAdjust:false }; // WS3: sound OFF by default — opt-in via the steeping mute glyph
+const DEFAULT_SETTINGS = { tempUnit:'c', soundEnabled:false, showAchievements:false, quietMode:false, lowStockThreshold:15, defaultPackagingTareG:10, brewGuideAutofill:true, brewAdvice:true, showMood:true, ratioAdjust:false, currency:'€' }; // WS3: sound OFF by default — opt-in via the steeping mute glyph
 function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return (v>0 && v<10000) ? v : 15; }
+// Currency (R3 slice A): every cost figure reads the pref — the app hard-coded '$' on Tea detail and
+// printed three more cost numbers with no symbol at all. Default '€' because every vendor on the
+// shelf is German/EU, so '$' was wrong for all 21 teas. Synced like the rest of settings, not
+// device-local. ONE writer: never re-hardcode a symbol at a render site or in achievement data.
+function currencySymbol(){ return (state.settings && state.settings.currency) || DEFAULT_SETTINGS.currency; }
+function currencyFmt(n, digits){ return currencySymbol() + Number(n||0).toFixed(digits==null ? 2 : digits); }
 
 let state = {
   teas: [], vessels: [], sessions: [], tagLibrary: [...DEFAULT_TAGS],

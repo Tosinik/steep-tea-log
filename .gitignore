@@ -23,6 +23,9 @@ fixtures/*
 # Tracked for the same reason as the gate — a generator that lives on one machine can't be the
 # source of truth for a document everyone reads.
 !fixtures/figures-report.js
+# R3 slice A: the vessel identity ladder is invisible on current data (every vessel has a photo), so
+# this suite is the only thing that can see rungs 2 and 3. It also pins the R64/R72 lane contracts.
+!fixtures/vessel-identity-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

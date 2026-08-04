@@ -123,5 +123,53 @@ if(fs.existsSync(teasCsv)){
   console.log('  D real-data grounding: SKIPPED (private CSVs absent) — 3 checks not run');
 }
 
+/* ---- E. R61 preservation: absence from a board is not a removal instruction ----
+   #13 draws the Teas shelf with NO sort control while the app ships a live seven-option select.
+   Building the board literally would delete it. A preservation rule that lives only in prose is
+   what this round kept getting caught by; asserted here it cannot be built past. */
+const teasSrc = fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8');
+const SORT_KEYS = ['type','newest','oldest','name','stock-high','stock-low','rating'];
+const optsLine = /const SORT_OPTS\s*=\s*\[([\s\S]*?)\];/.exec(teasSrc);
+ok(!!optsLine, 'E1 SORT_OPTS still exists in steep-teas.js');
+if(optsLine){
+  const keys = [...optsLine[1].matchAll(/\['([a-z-]+)'/g)].map(m=>m[1]);
+  ok(keys.length===7 && SORT_KEYS.every(k=>keys.includes(k)),
+     'E2 all seven sort keys present (got '+keys.length+': '+keys.join(', ')+')');
+}
+ok(/onchange="setTeaSort\(/.test(teasSrc), 'E3 the sort select still has a live setTeaSort caller (R60a)');
+// The select lives in viewTeas() (the count row), NOT teaShelfHTML() — asserting against the shelf
+// builder passes vacuously forever. Render the real view and look for the handler.
+S.teas=[{id:'x',name:'A',type:'green',amountGrams:10,rating:3}]; S.teaSort='type'; S.teaSearch='';
+S.teaFilter={type:'',vendor:'',lowStock:false,favorite:false}; S.teaSeg='teas';
+ok(/onchange="setTeaSort\(/.test(ctx.viewTeas()), 'E4 the rendered Teas view actually contains the control');
+console.log('  E R61 sort preservation: 4 checks');
+
+/* ---- F. Stock tiers: no second writer ----
+   stockTier() is THE tier writer and statusLine() THE label writer; every surface derives from them
+   so no two can disagree (the #13 bug class). Slice A adds no tier code — this guard IS the
+   deliverable, because a duplicate writer is the failure this primitive exists to prevent. */
+const allSrc = fs.readdirSync(repo).filter(f=>/^steep-.*\.js$/.test(f))
+  .map(f=>({f, s:fs.readFileSync(path.join(repo,f),'utf8')}));
+const defCount = (needle)=>allSrc.reduce((a,x)=>a+(x.s.split(needle).length-1),0);
+ok(defCount('function stockTier(')===1, 'F1 exactly one stockTier() definition app-wide (got '+defCount('function stockTier(')+')');
+ok(defCount('function statusLine(')===1, 'F2 exactly one statusLine() definition app-wide (got '+defCount('function statusLine(')+')');
+// The five tier strings may only be RETURNED from inside stockTier's body — anything else returning
+// them is a second writer wearing a different name.
+const bodyStart = teasSrc.indexOf('function stockTier(');
+const bodyEnd = teasSrc.indexOf('\nfunction ', bodyStart+1);
+const tierBody = teasSrc.slice(bodyStart, bodyEnd);
+const strays = [];
+for(const tier of ['empty','untracked','low','few','plenty']){
+  const re = new RegExp("return\\s+(?:[^;]*\\?\\s*)?'"+tier+"'","g");
+  allSrc.forEach(x=>{ for(const m of x.s.matchAll(re)){
+    const frag = x.s.slice(Math.max(0,m.index-0), m.index+m[0].length);
+    if(!(x.f==='steep-teas.js' && tierBody.includes(m[0]))) strays.push(x.f+': '+frag.trim());
+  }});
+}
+ok(strays.length===0, 'F3 no tier string is returned outside stockTier() (strays: '+(strays.join(' | ')||'none')+')');
+ok(/function isRunningLow\(tea\)\{\s*return stockTier\(tea\)==='low';\s*\}/.test(teasSrc),
+   'F4 isRunningLow still delegates to stockTier rather than re-deriving');
+console.log('  F stock-tier single writer: 4 checks');
+
 if(failures){ console.log(`SHELF-ORDER TESTS FAILED (${failures} failed, ${passed} passed)`); process.exit(1); }
 console.log(`ALL SHELF-ORDER TESTS PASSED (${passed} passed)`);

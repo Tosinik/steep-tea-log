@@ -108,7 +108,7 @@ function viewSessions(){
 function viewVessels(){
   const rows = state.vessels.length ? state.vessels.map(v=>`
     <div class="rank-row">
-      <span class="vessel-thumb${v.image?'':' is-ph'}" style="${v.image?`background-image:url(${escapeHtml(v.image)})`:''}"></span>
+      ${vesselPhoto(v,'thumb')}
       <span class="rname">${escapeHtml(v.name)} <span style="color:var(--ink-soft);font-weight:400;">— ${escapeHtml(v.type)}${v.material?', '+escapeHtml(v.material):''}</span></span>
       <span class="rval">${v.capacityMl?v.capacityMl+'ml':`<button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))" style="color:var(--ink-soft);font-size:11px;text-decoration:underline;padding:0;">· ml?</button>`}</span>
       <button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))">edit</button>
@@ -304,11 +304,12 @@ function sessionEditModal(){
           (state.vessels.some(v=>v.id===e.vesselId) ? '' : `<option value="${escapeHtml(e.vesselId||'')}" selected>${escapeHtml(e.vesselName||'(unknown vessel)')}</option>`)
           + state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${e.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}${v.capacityMl?` · ${v.capacityMl}ml`:''}</option>`).join('')
         }</select></div>
-        ${!e.isColdBrew ? `<div class="field span2"><label>Method</label>
-          <div class="seg seg-sm">${SESSION_METHODS.map(m=>`<button type="button" class="${e.brewStyle===m.k?'active':''}" onclick="es_setBrewStyle('${m.k}')">${escapeHtml(m.label)}</button>`).join('')}</div>
-          ${!e.brewStyle ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:5px;">no method recorded — currently read as ${escapeHtml(esMethodReadLabel(e))} from the vessel</div>` : ''}
-        </div>` : ''}
-        <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isColdBrew?'checked':''} onchange="es_set('isColdBrew', this.checked)"> Cold brew</label></div>
+        <div class="field span2"><label>Method</label>
+          ${methodLanesHTML({ brewStyle:e.brewStyle, isColdBrew:e.isColdBrew,
+            capacityMl:(vesselById(e.vesselId)||{}).capacityMl, resolve:false,
+            onMethod:'es_pickMethodLane', onCold:'es_pickColdLane()', small:true })}
+          ${(!e.isColdBrew && !e.brewStyle) ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:5px;">no method recorded — currently read as ${escapeHtml(esMethodReadLabel(e))} from the vessel</div>` : ''}
+        </div>
         <div class="field span2"><label class="checkrow"><input type="checkbox" ${e.isShared?'checked':''} onchange="es_set('isShared', this.checked)"> Shared with followers</label></div>
         <div class="field span2"><label>Overall rating</label><div id="editRatingWrap">${renderStarsInteractive(Number(e.rating)||0,true,'setEditSessionRating')}</div></div>
         ${(state.settings.showMood || e.mood!=null) ? `<div class="field span2"><label>Mood</label><div id="editMoodWrap">${moodChipsHTML(e.mood||null,'setEditSessionMood')}</div></div>` : ''}
@@ -493,10 +494,11 @@ function sessionSetupHTML(d){
     ? `<button type="button" onclick="openVesselForm(vesselById('${escapeJsArg(selVes.id)}'))" style="margin-top:5px;background:none;border:0;padding:0;color:var(--ink-soft);font-size:11px;text-decoration:underline;cursor:pointer;">set capacity — sharpens brew advice</button>`
     : '';
   // WS1: the segment renders the resolved method; senchadō added v3.91 — brewMethodFor returns it for an
-  // explicit brewStyle, which the vessel-type prefill (d_setVessel) sets. No layout change.
+  // explicit brewStyle, which the vessel-type prefill (d_setVessel) sets. R72: this is a DRAFT, so
+  // resolve:true — the lit lane is what commitSession will store.
   const cap = (selVes||{}).capacityMl || null;
-  const curMethod = brewMethodFor(d.brewStyle, cap);
-  const methodBtns = SESSION_METHODS.map(m=>`<button type="button" class="${curMethod===m.k?'active':''}" onclick="d_setBrewStyle('${m.k}')">${escapeHtml(m.label)}</button>`).join('');
+  const methodLanes = methodLanesHTML({ brewStyle:d.brewStyle, isColdBrew:d.isColdBrew, capacityMl:cap,
+    resolve:true, onMethod:'d_pickMethodLane', onCold:'d_pickColdLane()', small:true });
   const caret = `<span class="trio-caret">${icon('i-caret-hl',20)}</span>`;
   return `
     <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
@@ -512,10 +514,10 @@ function sessionSetupHTML(d){
         <div class="trio-line"><select class="trio-select" onchange="d_setVessel(this.value)" aria-label="Vessel">${vesselOpts}</select>${caret}</div>
         ${capLink}
       </div>
-      ${!d.isColdBrew ? `<div class="trio-row trio-method-row">
+      <div class="trio-row trio-method-row">
         <div class="trio-eyebrow">Method</div>
-        <div class="seg seg-sm">${methodBtns}</div>
-      </div>` : ''}
+        ${methodLanes}
+      </div>
     </div>
     ${!d.isColdBrew ? brewGuidePreviewHTML(d) : ''}
     ${state.settings.showMood ? `<div class="mood-card">
@@ -533,7 +535,6 @@ function sessionSetupHTML(d){
       <div class="field"><label>Water type</label><input type="text" value="${escapeHtml(d.waterType)}" oninput="d_set('waterType', this.value)" placeholder="filtered, spring…"></div>
       <div class="field"><label>TDS (ppm)</label><input type="number" value="${d.waterTDS}" oninput="d_set('waterTDS', this.value)" placeholder="—"></div>
       <div class="field span2"><label>When</label><input type="datetime-local" value="${d.sessionDate}" onchange="d_set('sessionDate', this.value)"></div>
-      <div class="field span2"><label class="checkrow"><input type="checkbox" ${d.isColdBrew?'checked':''} onchange="d_setColdBrew(this.checked)"> Cold brew</label></div>
     </div>` : ''}
     ${d.isColdBrew ? `
       <button class="btn btn-primary begin-btn" onclick="beginColdBrewLog()">Log cold brew →</button>
@@ -547,6 +548,36 @@ function sessionSetupHTML(d){
 // WS1: the session method segment — senchadō added v3.91 (a data change, no layout rebuild). Gongfu
 // beside it (both East-Asian multi-infusion), western last.
 const SESSION_METHODS = [{k:'gongfu',label:'Gongfu'},{k:'senchado',label:'Senchadō'},{k:'western',label:'Western'}];
+// R50/R64/R72 — the method control is FOUR drawn lanes: the three above plus cold brew as a peer
+// lane, replacing the old separate checkbox. Storage is unchanged: the cold lane sets is_cold_brew,
+// and commitSession already nulls brewStyle for a cold brew (:1285), so mutual exclusion needs no
+// new logic.
+//
+// `resolve` is the whole point of the flag, and the two surfaces genuinely differ (R72):
+//   resolve:true  — a DRAFT (#04 setup). Light the lane commitSession will actually store. The show
+//                   IS the store, one moment early, so a resolved lane is a prediction the app then
+//                   honours rather than a guess presented as a fact.
+//   resolve:false — a RECORD (#02b edit). Show only stored brew_style. A lit lane over a null column
+//                   would be the app claiming to know something it doesn't (R64). The derived reading
+//                   lives separately in the read-only esMethodReadLabel().
+const COLD_LANE_KEY = '__cold';
+function methodLanesHTML(cfg){
+  const cur = cfg.isColdBrew ? COLD_LANE_KEY
+            : (cfg.resolve ? brewMethodFor(cfg.brewStyle, cfg.capacityMl) : (cfg.brewStyle || ''));
+  const lanes = SESSION_METHODS.concat([{k:COLD_LANE_KEY, label:'Cold brew'}]);
+  return `<div class="seg${cfg.small?' seg-sm':''} seg-lanes">` + lanes.map(m=>{
+    const cb = m.k===COLD_LANE_KEY ? cfg.onCold : `${cfg.onMethod}('${m.k}')`;
+    return `<button type="button" class="${cur===m.k?'active':''}" onclick="${cb}">${escapeHtml(m.label)}</button>`;
+  }).join('') + `</div>`;
+}
+// Lane pickers: composition only. Every state assignment still happens inside the existing setters
+// (d_setColdBrew / d_setBrewStyle / es_set / es_setBrewStyle) — picking a method lane has to leave
+// cold-brew mode now that the two are peers, and the double render on that rare transition is
+// cheaper than a second writer.
+function d_pickMethodLane(m){ const d=state.sessionDraft; if(!d) return; if(d.isColdBrew) d_setColdBrew(false); d_setBrewStyle(m); }
+function d_pickColdLane(){ if(state.sessionDraft) d_setColdBrew(true); }
+function es_pickMethodLane(m){ const e=state.editingSession; if(!e) return; if(e.isColdBrew) es_set('isColdBrew', false); es_setBrewStyle(m); }
+function es_pickColdLane(){ if(!state.editingSession) return; es_set('isColdBrew', true); render(); }
 function d_toggleMoreDetails(){ const d=state.sessionDraft; if(d){ d.showMoreDetails=!d.showMoreDetails; render(); } }
 function d_set(key, val){
   state.sessionDraft[key] = val;
@@ -556,18 +587,6 @@ function d_setcur(key, val){
 }
 function d_setTea(val){ state.sessionDraft.teaId = val; render(); }   // re-render so the guide preview follows the tea
 function d_showFinishedTeas(){ state.sessionDraft.showFinishedTeas = true; render(); }   // reveal finished teas in the picker (they stay loggable)
-// v3.57 ratio setup: a quiet gongfu|western switch (prefilled from vessel capacity) + an optional
-// water-volume override. Only rendered when ratio adjustment is on. brewStyle stays null until the
-// user flips it, so changing the vessel re-infers the default until then.
-function ratioSetupHTML(d){
-  const ves = vesselById(d.vesselId);
-  const cap = ves && ves.capacityMl ? Number(ves.capacityMl) : null;
-  const method = brewMethodFor(d.brewStyle, cap);
-  const mBtn = (m,l)=>`<button type="button" class="${method===m?'active':''}" onclick="d_setBrewStyle('${m}')">${l}</button>`;
-  return `<div class="field span2"><label>Brewing method <span style="color:var(--ink-soft);font-weight:400;">— sets the leaf-to-water baseline${d.brewStyle?'':' (from vessel)'}</span></label>
-      <div class="seg">${mBtn('gongfu','Gongfu')}${mBtn('western','Western')}</div></div>
-    <div class="field"><label>Water (ml, optional)</label><input type="number" value="${d.waterMl}" oninput="d_set('waterMl', this.value)" placeholder="${cap?cap:'vessel capacity'}"></div>`;
-}
 function d_setBrewStyle(m){ const d=state.sessionDraft; d.brewStyle = m; d.brewStyleLocked = true; render(); } // explicit tap wins over the vessel-type prefill
 // Vessel-type → method default (B4, v3.91): the capacity heuristic misclassifies both Japanese vessels
 // (a 210ml kyusu reads western, a 73ml shiboridashi gongfu), so selecting a vessel sets brewStyle

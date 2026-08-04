@@ -94,6 +94,25 @@ function shelfPhoto(tea, kind){
   return `<div class="shelf-${kind} shelf-ph t-${escapeHtml(type||'unknown')}"></div>`;
 }
 function shelfPill(tea){ return `<span class="shelf-pill t-${escapeHtml(tea.type||'')}">${escapeHtml(typeLabel(tea.type))}</span>`; }
+
+// Vessel identity ladder (R63): photo → kanji plate → type-tinted stripe. NOT an extension of
+// shelfPhoto — that one is the TEA tile and its kanji key on tea.type (白 white, 餅 puerh), so 蓋碗
+// there would mean a tea of type gaiwan. Vessels have no liquor swatch; photo/kanji IS their identity.
+// Kanji covers only the types the boards drew. 旅 is deliberately absent: VESSEL_TYPES has no
+// traveller entry and the "Travel cuppa" is typed Porcelain teapot, so that glyph was keyed off a
+// vessel's free-text NAME — identity never keys off free text. Every unmapped type falls to the
+// stripe, by design. Invisible on current data (all five vessels have photos); this is the
+// graceful-degradation floor, fixtured rather than gold-plated.
+const VESSEL_KANJI = { 'Gaiwan':'蓋碗', 'Shiboridashi':'絞', 'Cold brew jar':'冷' };
+function vesselTypeSlug(type){ return ((type||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')) || 'unknown'; }
+function vesselPhoto(v, kind){
+  const cls = `vessel-${kind}`;                       // 'thumb' ships today; #05's larger tile arrives with slice B
+  const slug = vesselTypeSlug(v && v.type);
+  if(v && v.image) return `<span class="${cls}" style="background-image:url(${escapeHtml(v.image)})"></span>`;
+  const kanji = VESSEL_KANJI[(v && v.type) || ''] || '';
+  if(kanji) return `<span class="${cls} vessel-kanji v-${slug}"><span>${kanji}</span></span>`;
+  return `<span class="${cls} is-ph v-${slug}"></span>`;
+}
 function statusLineHTML(tea){
   const st = statusLine(tea);
   // plain fav-leaf (no .i-fav jade override) so it inherits the clay status colour on 'low'.
@@ -719,8 +738,8 @@ function viewTeaDetail(){
         <div><div class="eyebrow">Harvest</div><div>${escapeHtml([t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—')}</div>${freshnessCueHTML(t)}</div>
         <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}</div></div>
         <div><div class="eyebrow">Source</div><div>${escapeHtml(t.source||'—')}</div></div>
-        <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?'$'+(t.costTotal/t.costOriginalGrams).toFixed(2):'—'}</div></div>
-        <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?'$'+costPerSession.toFixed(2):'—'}</div></div>
+        <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?currencyFmt(t.costTotal/t.costOriginalGrams):'—'}</div></div>
+        <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?currencyFmt(costPerSession):'—'}</div></div>
       </div>
       ${t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t)}
       ${flavorProfileHTML(t)}

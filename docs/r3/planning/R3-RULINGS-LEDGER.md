@@ -476,6 +476,32 @@ ledger is contiguous, verified from a fresh clone" needs no number.
 > with their tiers, one already moved) sitting inside the model-precision section, which reads as
 > timeless. **The split is a property of figures.** §0.2 now says so explicitly.
 
+**R72 — R64 is scoped to record surfaces.** The control shows only stored `brew_style` where it
+renders a record (#02b). Where it renders a **draft** (#04), it shows the resolved lane, because that
+resolution is what `commitSession` will write (`steep-sessions.js:1285`, the deliberate v3.85 decision
+that `brewStyle` snapshots the method actually used — explicit pick or vessel inference).
+`esMethodReadLabel()` (`:207`) stays the separate read-only derived label on the record side.
+
+The distinction that makes it coherent: on #02b you are looking at what **was recorded**, and a lit
+lane over a null column would be the app claiming to know something it doesn't. On #04 you are looking
+at what is **about to happen**, and the resolved lane is a prediction the app then honours by writing
+exactly that. Show and store agree because the show *is* the store, one moment early. Suppressing it
+there would leave setup silent about a value it is about to commit — worse than what R64 protects
+against. R64 was written while looking at the record side and the phase-2 gate; every citation in it is
+an edit-surface one.
+
+The coherent alternative — setup shows nothing **and** `commitSession` stores null — is a storage
+change that would increase untagged rows and move the phase-2 gate metric. Not slice A; **recorded as
+an open product call.** A "will be recorded as Gongfu" hint was declined separately: #04 draws no such
+control, and R57 forbids exactly that move in the analogous case.
+
+> *Code-lane note, 2026-07-26 (shipped in v3.95).* Encoded as the `resolve` flag on
+> `methodLanesHTML()` so the divergence is legible rather than implicit — a reader can see the two
+> contracts are intentional. Concretely it differs for exactly one vessel: Travel cuppa, typed
+> `Porcelain teapot`, which `VESSEL_METHOD_PREFILL` doesn't cover, so its draft resolves to gongfu at
+> 115 ml — which is what gets stored. Gaiwan/Kyusu/Shiboridashi all prefill explicitly and were never
+> ambiguous. Both contracts are pinned in `fixtures/vessel-identity-test.js` §C.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

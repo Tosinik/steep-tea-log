@@ -856,4 +856,17 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 /* WS4 thumb placeholders (no emoji) — .sess-thumb.shelf-ph needs (0,2,0) to beat .sess-thumb's bg */
 .sess-thumb.shelf-ph{background:repeating-linear-gradient(135deg,var(--ph-a,#E7E0CE),var(--ph-a,#E7E0CE) 7px,var(--ph-b,#EFE9DA) 7px,var(--ph-b,#EFE9DA) 14px);}
 .sess-thumb.shelf-kanji span{font-size:20px;}
-.vessel-thumb.is-ph{background:repeating-linear-gradient(135deg,var(--porcelain-dim),var(--porcelain-dim) 6px,var(--white) 6px,var(--white) 12px);}
+/* Vessel identity ladder (R63): photo → kanji plate → type-tinted stripe. The stripe keeps its exact
+   shipped appearance — --vph-a/--vph-b fall back to the original vars, so an unmapped type renders
+   byte-identically to before and a future per-type tint is a one-line addition. Same local-custom-prop
+   pattern as .shelf-ph above. Kanji plates are defined for the three drawn types only. */
+.vessel-thumb.is-ph{background:repeating-linear-gradient(135deg,var(--vph-a,var(--porcelain-dim)),var(--vph-a,var(--porcelain-dim)) 6px,var(--vph-b,var(--white)) 6px,var(--vph-b,var(--white)) 12px);}
+.vessel-kanji{display:flex;align-items:center;justify-content:center;font-family:var(--font-display);background:var(--vk-bg,var(--porcelain-dim));}
+.vessel-kanji span{color:var(--vk-ink,var(--ink-soft));line-height:1;}
+.vessel-thumb.vessel-kanji span{font-size:15px;}
+.vessel-kanji.v-gaiwan{--vk-bg:#ECE7DA;--vk-ink:#c3baa4;}
+.vessel-kanji.v-shiboridashi{--vk-bg:#E8E4D6;--vk-ink:#bdb49d;}
+.vessel-kanji.v-cold-brew-jar{--vk-bg:#E4E8EA;--vk-ink:#a8b3b8;}
+html[data-theme="dark"] .vessel-kanji.v-gaiwan{--vk-bg:#26241d;--vk-ink:#494434;}
+html[data-theme="dark"] .vessel-kanji.v-shiboridashi{--vk-bg:#25231c;--vk-ink:#464130;}
+html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#3e4a4e;}

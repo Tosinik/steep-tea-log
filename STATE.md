@@ -168,7 +168,40 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.94 R31 recognition layer** (cache **v104**, APP_VERSION v3.94): the nested
+**NOW (just shipped) — v3.95 R3 slice A: the shared primitives** (cache **v105**, APP_VERSION v3.95).
+**R3's first code deploy** after a week of docs-only commits, so this is the first Refresh banner users
+see in that time. Cross-cutting primitives land *before* any surface is rebuilt — retrofitting the method
+control onto a finished surface is how the four-lane order went wrong the first time.
+- **Currency is a preference (six sites, one writer).** `DEFAULT_SETTINGS.currency` = **`€`** (every
+  vendor on the shelf is German/EU, so `$` was wrong for all 21 teas) + `currencyFmt()`. Three sites had
+  the **wrong** symbol (Tea detail ×2 + `big_spender`'s dormant `unit:'$'`), three had **none** (the
+  monthly cost card, Insights' Total-spent and Avg-per-gram). `unit:'cur'` resolves through `aUnit` so the
+  symbol isn't re-hardcoded a layer down. **Settings row rides #07** — the key lands now because every
+  cost surface downstream reads it.
+- **Four-lane method control** (`methodLanesHTML`, R50/R64/R72): `gongfu · senchadō · western · cold brew`,
+  one writer, both call sites. Cold brew is a **peer lane**, so both checkboxes are *replaced* (R61 holds).
+  Storage untouched. The `resolve` flag encodes R72: a **draft** lights what `commitSession` will store,
+  a **record** shows only stored `brew_style` and lights nothing when null. JC1 verbatim — opening a null
+  session and saving writes nothing. Differs for exactly one vessel (Travel cuppa, `Porcelain teapot`,
+  not in `VESSEL_METHOD_PREFILL`).
+- **Dead `ratioSetupHTML` deleted** — its two-button segment would have lit *neither* lane for senchadō.
+  Backlogged since v3.77, trigger fired and missed twice.
+- **Vessel identity ladder** (`vesselPhoto`, R63): photo → kanji → type-tinted stripe. Separate from
+  `shelfPhoto` (the *tea* tile, keyed on `tea.type`). `VESSEL_KANJI` = Gaiwan 蓋碗 · Shiboridashi 絞 ·
+  Cold brew jar 冷; **旅 dropped** (no traveller type; it was keyed off a free-text name). Stripe keeps its
+  shipped look exactly. `kind` present for #05's tile in slice B.
+- **Two guards ARE the deliverable, not code.** `shelf-order-test.js` +E (R61: seven `SORT_OPTS` keys and
+  a live `setTeaSort` caller still render — #13 not drawing it is not authorisation to delete it) and +F
+  (`stockTier`/`statusLine` are the only tier/label writers; no tier string returned elsewhere). New
+  **`fixtures/vessel-identity-test.js`** (53 checks, 17th suite) — the ladder is **invisible on current
+  data** (all five vessels have photos), so the fixture is the only thing that can see rungs 2 and 3.
+- **Known red, tracked separately, NOT from this slice:** `status-line-test.js` (E1/E3/G1/G2) and
+  `tea-types-test.js` (G) hold expectations frozen against an older, smaller export; failure sets verified
+  identical before and after. Local-only `freshness-test.js` and `lifecycle-test.js` are red for the same
+  reason (ungated). Fix needs the threshold seeded from the fixture `user_settings` row and the engine's
+  answer tracked — **no pinned literals** — plus `user_id` scoping per R69.
+
+**Previously — v3.94 R31 recognition layer** (cache **v104**, APP_VERSION v3.94): the nested
 flavour tree from `docs/r3/planning/DATA-flavour-tree.md` (Gascoyne wheel, 12 families, 111 recognition
 nodes) lands as **recognition + roll-up DATA and a resolver** in steep-knowledge.js. `isFlavorVocab` now
 resolves **exact → alias (EN word-forms + DE) → bare**; `flavorResolve` returns the `{term, subFamily,
