@@ -422,6 +422,38 @@ something false about their own year is worse than one that says less.
 > `user_id` deliberately, v3.21), and §1's "22 rows, Test deleted" therefore mis-describes that row —
 > it is not a deleted tea, it is another user's. The gate now asserts single-owner sessions.
 
+**R69 — Fixture data is user-scoped before it is read.** The export is not user-scoped:
+`teas_rows.csv` carries another account's row and `user_settings_rows.csv` carries every beta user.
+Anything reading `fixtures/` scopes by `user_id` first, with the **owner derived from session
+ownership** — never a hardcoded UUID, which would rot the moment the fixture set is regenerated for
+anyone else. The gate **prints** the foreign count rather than asserting it away, because a foreign
+row is legitimate in an unscoped export; what must not happen is a consumer reading it silently.
+
+The failure mode is quiet and had already fired twice. `figures-report.js`'s first run reported *two*
+teas with no vendor where §1 correctly says one, because the foreign row is vendorless. And
+`export-gate-test.js`'s first version floored teas at **22** — the *unscoped* count — so scoping the
+export would have failed the gate on correct data: F5 inside the tool written to catch F5, found by
+running the audit rather than reasoning about it. Floors are on owned rows.
+
+> *Code-lane audit, 2026-07-26.* All 15 committed suites were run against unscoped and scoped
+> `teas_rows.csv` and diffed. **No committed suite scopes by `user_id`**; 13 report identically
+> anyway, and the reason is luck, not design — the foreign row is inert (0 g, no vendor, no origin,
+> rating 0, no sessions), and several assertions are relative (`list.length === real.length`) rather
+> than absolute. Two are structurally fragile: `status-line-test.js` E1 asserts an absolute
+> `low.length === 2`, which survives only because the foreign row is 0 g and therefore `untracked`
+> (a foreign row at 5 g would break it); and `tea-types-test.js` G excludes the row **by name** —
+> `t.name !== 'Test'` plus `ok(match('Test')===null)` — so it asserts a property of another user's
+> data and a rename would break it. That name is also the likely origin of the "Test deleted" story:
+> the string reads like a scratch row, so the invented mechanism was self-confirming. Both ride the
+> stale-expectation repair already queued.
+
+**R70 — `untracked` having no live example is not a defect.** The five stock tiers are an invariant
+under R67 and carry no stamp; tier *coverage* on any given shelf is a snapshot. The foreign row was
+the only `untracked` tea, so scoping leaves Niklas's shelf showing four of five — plenty 12 · few 5 ·
+low 2 · empty 2. §0.2's aside needs inverting: it notes `few` as the tier with no example on #04's
+five sample teas, and `few` now has **five** live examples while `untracked` has **none**. Neither
+fact bears on whether the tier exists.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

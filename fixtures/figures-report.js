@@ -134,8 +134,20 @@ console.log('='.repeat(78));
 const live = teas;   // 21 live + the deleted Test row are both present in the export
 console.log(`\nShape: ${live.length} tea rows · ${sessions.length} sessions · ${steeps.length} steeps · ` +
             `${vessels.length} vessels · ${st.days.size} distinct days · dates ${dates[0]} to ${dates[dates.length-1]}.`);
-console.log(`\nTotals: totalGrams ${st.totalGrams.toFixed(1)} g · ${st.totalLiters.toFixed(2)} L ` +
-            `((water_ml or vessel capacity) x steeps).`);
+// Litres has an UNDECLARED FALLBACK that §1's "x steeps" hides. gridStats multiplies by
+// steepCountOf(s) (steep-core.js:728), which is "real steeps if it has them, else infusionCount" —
+// the quick-log count. One session (Chiran Sencha Okumidori, 3 infusions, 73 ml, zero steep rows)
+// contributes 0.219 L through that branch. Counting steep ROWS alone gives 15.29 L, not 15.51.
+// Both are defensible; only one is what the app renders. State the formula in full.
+const fb = sessions.filter(s => !(s.steeps && s.steeps.length) && Number(s.infusionCount) > 0);
+const fbSteeps = fb.reduce((a, s) => a + Number(s.infusionCount), 0);
+console.log(`\nTotals: totalGrams ${st.totalGrams.toFixed(1)} g · ${st.totalLiters.toFixed(2)} L`);
+console.log(`  formula: sum over sessions of (water_ml, else vessel capacity) x steepCountOf(session),`);
+console.log(`  where steepCountOf = real steep rows if any, ELSE the quick-log infusion_count.`);
+console.log(`  ${fb.length} session(s) used the infusion_count fallback (${fbSteeps} inferred infusions):` +
+            ` ${fb.length ? fb.map(s => `${s.teaName||'(untitled)'} x${s.infusionCount}`).join(', ') : '—'}.`);
+console.log(`  Steep ROWS alone (no fallback) would give ${(st.totalLiters - fb.reduce((a,s)=>{const v=vessels.find(x=>x.id===s.vesselId);const ml=Number(s.waterMl)>0?Number(s.waterMl):(v?Number(v.capacityMl)||0:0);return a+(ml*Number(s.infusionCount))/1000;},0)).toFixed(2)} L —` +
+            ` the app renders the fallback figure, so §1 must too.`);
 
 // ---- method split: FIVE slots, and it is not the lane set (R64) --------------------------------
 const styles = {}; sessions.forEach(s => { const k = (s.brewStyle || '').trim() || 'untagged'; styles[k] = (styles[k] || 0) + 1; });
@@ -170,7 +182,9 @@ console.log(`  latest bucket with any session: ${lbl(latest.i)} (${latest.v}) �
 // ---- engagement ---------------------------------------------------------------------------------
 const mood = sessions.filter(s => s.mood && String(s.mood).trim()).length;
 const shared = sessions.filter(s => s.isShared);
-const pct = n => ((n / sessions.length) * 100).toFixed(0);
+// One decimal, trailing .0 stripped: 21/40 is 52.5%, not 53%. #04's pill draws this number, and
+// rounding it to a whole percent both loses the half and stops it reconciling with 21/40.
+const pct = n => (Math.round((n / sessions.length) * 1000) / 10).toString();
 console.log(`\nEngagement: mood ${mood}/${sessions.length} (${pct(mood)}%) · shared ${shared.length}/${sessions.length} (${pct(shared.length)}%)` +
             `, dates ${[...new Set(shared.map(s => (s.date||'').slice(5,10)))].sort().join(' · ')}.`);
 

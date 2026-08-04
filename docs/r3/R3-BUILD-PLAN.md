@@ -104,11 +104,26 @@ and an unfiltered load leaks them into personal stats. Anything reading `fixture
 requirement. `figures-report.js` derives the owner from whoever owns the sessions rather than
 hardcoding a UUID, and `export-gate-test.js` now asserts sessions are single-owner.
 
-### F6 · §1's "22 rows, Test deleted" mis-describes that row
+### F6 · §1's "22 rows, Test deleted" is wrong in both halves
 
-It is not a deleted tea on the shelf — it is another user's tea, present because the export isn't
-scoped. The count (21 live) is right; the reason given for it is wrong, which matters because
-"deleted" implies a soft-delete state the schema does not have here. Rides the §1 restamp.
+It asserts a soft-delete state the schema does not have, *and* misattributes a foreign row. The count
+(21 for this user) is right; both stated reasons are wrong — in the document that says what to build.
+Restamps as **21 rows for this user, with the unscoped-export warning attached**.
+
+The row is literally named `Test`, which is why the invented mechanism went unchallenged: the name
+reads like a scratch row, so "deleted" was self-confirming. `tea-types-test.js` encodes the same
+magic string (below).
+
+> **Audit (R69), all 15 committed suites run unscoped vs scoped and diffed.** **None scopes by
+> `user_id`.** 13 report identically — but by luck: the foreign row is inert (0 g, no vendor, no
+> origin, rating 0, no sessions) and several assertions are relative rather than absolute. Clean but
+> latently exposed: `greeting-v4`, `log-guard`, `shelf-order` (relative `list.length===real.length`),
+> `stat-period` (session-driven sums), `tea-search`. **Structurally fragile:**
+> `status-line-test.js` E1 (`low.length===2` absolute — a foreign row at 5 g breaks it) and
+> `tea-types-test.js` G (excludes by `t.name!=='Test'` and asserts `match('Test')===null`, so it pins
+> a property of another account's data). Both ride the stale-expectation repair.
+> The gate itself had the bug: it floored teas at the **unscoped** 22, so scoping would have failed
+> it on correct data. Fixed to floor owned rows at 21; re-audited, all 16 now scope-invariant.
 
 ### Also settled at review
 
