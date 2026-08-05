@@ -725,6 +725,43 @@ rather than latent.
 > keyed on the catalog alone. The rung is now **defensive rather than routine**, which is strictly
 > better, and the suite reports its zero live examples rather than requiring one — the R70 shape.
 
+**R87 — The bottom-nav Log button keeps opening setup.** #12 rev 1's flag claims both the nav Log and
+the in-setup shortcut reach quick log, marked **"as checked"**; at HEAD the nav calls
+`quickLogSession()` → `startSessionFor(null)` → `stage:'setup'`, and `beginQuickLog()` from setup's
+shortcut (R5) is the **only** entry to `stage:'quick'`. The claim is false and is recorded as a board
+finding, not built to. The nav's destination stays setup: it is the app's most-used control, the
+prospective posture is the **recoverable** one — setup reaches quick log in one more tap, quick log
+cannot reach the timer at all — and a verified-false premise is not grounds for changing it. A
+disambiguation screen in front of the commonest action was rejected as the friction this app is built
+against. Revisit only with a ruling that argues the posture on its own merits.
+
+**R88 — Quick log gains a tea picker and a vessel picker, and carries the tea forward.** #12 says
+"nothing preselected — quick log starts empty and asks"; at HEAD `startSessionFor(null)` defaults
+`teaId` to the first in-stock tea and `sessionQuickHTML` offers **no control at all**. Both pickers are
+built — the vessel by **R43**, the tea because "starts empty and asks" is otherwise unbuildable, since
+a screen that opens empty with no way to fill it is worse than one opening on a sensible default. The
+**empty start is not built**: under R87 quick log is entered from setup, where a tea was chosen one tap
+earlier, so starting empty would discard a live user choice. The tea carries forward and the picker
+changes it. R43's vessel stays optional and never blocks the log; a **tea** does block it, because a
+cup with no tea is not a record. Reuse #04's shipped `<select>` mechanics — one vocabulary across both
+screens, not a second control.
+
+**R89 — #14's custom listbox is deferred out of R3.** #04 rev 6 says its picker "closes #14" — a
+searchable scoped listbox with swatch-led rows for teas and a photo/kanji twin for vessels. Its
+**long-press swatch colour correction (R39) cannot ship regardless**: there is no per-tea colour column
+(**R78**) and the palette's data model was never written (**R82**). Building the listbox without it
+half-closes #14 while omitting the board's own primary affordance. The `<select>` + `<optgroup>`
+controls stay. **#14 reopens when the swatch data model lands.**
+
+> *Code-lane note, 2026-07-26 (shipped in v3.99).* Two things worth the record. **(a) #04's half of the
+> date inversion needed no work at all** — `sessionDate` has shipped inside *More details* since it
+> landed, so "folded away on #04" was already true and the entire inversion is #12's. A board
+> describing a shipped state as work is the third distinct shape this round beside R81's unscoped
+> demands and #06's closed-gap claim. **(b) The active WHEN chip is derived from the date rather than
+> stored beside it**, so a date typed in the picker lights the matching chip — the alternative keeps a
+> second source of truth for one field, which is the drift every single-writer ruling this round has
+> been about.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

@@ -257,7 +257,22 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v3.98 LIVE — R3 slice B3: the freshness model** (cache **v108**, **`sql/v3_11-opened-date.sql`
+**v3.99 LIVE — R3 slice C: #04 Session setup + #12 Quick log** (cache **v109**, no SQL). Built to
+**R87–R89** rather than to #12 rev 1, because three of its premises were false at HEAD: the nav Log
+opens **setup** (the board says "as checked" that it opens quick log), `startSessionFor(null)`
+**defaults** the tea rather than clearing it, and quick log had **no tea or vessel control at all**.
+So: the nav keeps its destination, both pickers are built on setup's own `<select>` mechanics, and the
+tea **carries forward** instead of starting empty — clearing it would discard a choice made one tap
+earlier. The date inverts with relative chips on #12; **#04's half was already shipped**, folded inside
+*More details*. The schedule strip names its derivation, generated; the mood pill is computed from the
+user's own sessions rather than transcribing the board's stamped `48% (15/31)`. **#14's listbox is
+deferred (R89)** — its long-press colour correction cannot ship while R78 and R82 stand.
+
+Two things a later slice inherits. **(a)** The active WHEN chip is **derived from `sessionDate`**, not
+stored beside it — one field, one source. **(b)** R72 is untouched: setup is still `resolve:true`, the
+edit surface still `resolve:false`, and `draftFingerprint` still guards `sessionDate`, now user-visible.
+
+**Previously: v3.98 — R3 slice B3: the freshness model** (cache **v108**, **`sql/v3_11-opened-date.sql`
 applied before the push** — the round's first migration). Freshness counts from `teas.opened_date`,
 not harvest; harvest is a fallback that says it assumes the pouch stayed sealed; purchase is
 deliberately off the ladder. Two groundings failing independently — clock × window — with **no clock →

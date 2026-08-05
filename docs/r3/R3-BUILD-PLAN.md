@@ -180,7 +180,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 | ~~**B**~~ | ~~**#13 Teas revision** + **#05 Vessels**~~ — **SHIPPED v3.96** (R75–R78 came out of its plan review) | none |
 | ~~**B2**~~ | ~~**#06 Add / edit tea** + **#03 Tea detail**~~ — **SHIPPED v3.97** (R80–R84 came out of its plan review) | none — but see R81 |
 | ~~**B3**~~ | ~~**The freshness model**~~ — **SHIPPED v3.98** (R85–R86 came out of its plan review) | **`sql/v3_11-opened-date.sql`** — applied by hand, before the push |
-| **C** | **#04 setup + pickers** and **#12 Quick log** — twins sharing the method primitive and the inverted date posture | none |
+| ~~**C**~~ | ~~**#04 setup + pickers** and **#12 Quick log**~~ — **SHIPPED v3.99** (R87–R89 came out of its plan review) | none |
 | **D** | **#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)** as its own commit | none |
 | **E** | **#10 Focus** — alone | none |
 | **F** | **Social + the R25 pass record** | **`sql/v3_10-pass-record.sql`** — ~~the round's only required migration~~ one of **two**, since R84 gave B3 its own |
@@ -218,8 +218,13 @@ Notes that shape the order:
   thing, which bites whichever slice touches it first; and **7.3**, `matchTeaType` is exact-name and
   hand-curated, so a rename silently breaks the join, and freshness windows would be the **fourth**
   system hung off it.
-- **C**: R43 is new UI over the existing `vesselId`. Confirmed — `sessionQuickHTML()` (`:427–473`)
-  has **zero** vessel references; the `vesselOpts` select at `:488` belongs to a different screen.
+- ~~**C**: R43 is new UI over the existing `vesselId`.~~ **SHIPPED v3.99.** That much was right, and
+  three of #12's other premises were **false at HEAD**, which is why the slice is built to R87–R89
+  rather than to the board: the nav Log opens **setup**, not quick log (the board says "as checked");
+  `startSessionFor(null)` **defaults** the tea rather than leaving it empty; and quick log had no tea
+  control either, so R43's vessel was one of *two* missing pickers. A fourth finding was a saving —
+  **#04's half of the date inversion was already shipped**, `sessionDate` having lived inside *More
+  details* since it landed, so the whole inversion was #12's work.
 - **D** holds the riskiest single item in the package. The shipped modal's deep copy
   (`state.editingSession = JSON.parse(JSON.stringify(s))`, `:189`) plus whole-object writeback
   (`state.sessions[idx] = e`, `:262`) is *precisely* what keeps the un-surfaced per-steep taste and

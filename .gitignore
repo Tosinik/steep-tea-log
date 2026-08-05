@@ -26,6 +26,9 @@ fixtures/*
 # R3 slice A: the vessel identity ladder is invisible on current data (every vessel has a photo), so
 # this suite is the only thing that can see rungs 2 and 3. It also pins the R64/R72 lane contracts.
 !fixtures/vessel-identity-test.js
+# R3 slice C: #12's guard. It pins the DECISIONS (R87-R89) rather than the board, because three of
+# #12's premises were false at HEAD — a suite written to the board would have pinned the errors.
+!fixtures/quick-log-test.js
 # R3 slice B2: both were local-only and red against three exports for the same stale-expectation
 # reason (a pinned count, an unscoped read). Repaired to assert the engine's own rule, then tracked —
 # a suite that only exists on one machine guards nothing, and B3 rewrites both to the new freshness

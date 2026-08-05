@@ -251,7 +251,11 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   new per-steep control, ~2–3 wks of complete logging. **The gate metric should move to stored `brew_style`,
   not `brewMethodFor`** (a phase-2 spec change — now that senchadō/western are real, the metric should count
   what was brewed, not the capacity heuristic). Post-gate (separate specs): learned defaults; senchadō method
-  **shipped v3.91** (was listed here as a post-gate append). #14 parked → R3; #11 closed; #15 held until phase-2.
+  **shipped v3.91** (was listed here as a post-gate append). ~~#14 parked → R3~~ — **#14 deferred back
+  out of R3 by R89 (v3.99)**: #04's picker was to close it with a searchable listbox, but that board's
+  primary affordance is the long-press swatch colour correction, which cannot ship while there is no
+  per-tea colour column (R78) and no palette data model (R82). It reopens when the swatch model lands,
+  with the tea-reference lane's other batched work. #11 closed; #15 held until phase-2.
 
 ## Suggested sequencing (parallel-friendly)
 Now: **R2 implementation deploys — WS6 ✓, WS2 ✓, WS5 ✓, WS3 ✓, WS1 ✓, WS4 ✓ (COMPLETE)** → the post-R2 issue

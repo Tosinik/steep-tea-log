@@ -392,6 +392,7 @@ function startSessionFor(teaId){
     teaId: teaId || (state.teas.find(t=>!isTeaFinished(t)) || state.teas[0]).id,  // default to an in-stock tea
     vesselId: state.vessels[0].id,
     sessionDate: toLocalDatetimeValue(new Date()),
+    whenPick: 'now',                                    // #12's WHEN chips; derived from sessionDate, not a second source of truth
     isColdBrew: false,
     waterType: '',
     waterTDS: '',
@@ -453,13 +454,72 @@ function adjustInfusions(delta){
   const el = document.getElementById('infusionCountVal');
   if(el) el.textContent = d.infusionCount;
 }
+/* #12's WHEN field (slice C). The date field is ONE field with two placements, driven by posture:
+   folded away on setup (a live cup is "now", right almost always, interesting only when wrong — and
+   it already ships inside More details) and promoted here, because a retrospective cup's date is the
+   one thing that genuinely needs saying. The chips are relative because that is how the memory
+   arrives — "this morning", not "2026-08-05T09:20". Selected chip is JADE: kachi-iro is reserved for
+   the Focus ring and appears on exactly one surface (§0.5 contract 4). */
+const QUICK_WHEN_CHIPS = [
+  { k:'now',       l:'Just now',     at:()=>new Date() },
+  { k:'morning',   l:'This morning', at:()=>{ const d=new Date(); d.setHours(9,0,0,0); return d; } },
+  { k:'yesterday', l:'Yesterday',    at:()=>{ const d=new Date(); d.setDate(d.getDate()-1); d.setHours(15,0,0,0); return d; } }
+];
+function d_setWhenChip(k){
+  const d = state.sessionDraft; const c = QUICK_WHEN_CHIPS.find(x=>x.k===k); if(!d||!c) return;
+  d.sessionDate = toLocalDatetimeValue(c.at());
+  d.whenPick = k;
+  render();
+}
+function d_openWhenPicker(){ const d=state.sessionDraft; if(d){ d.whenPick='pick'; render(); } }
+// Which chip a date corresponds to, derived from the DATE rather than remembered separately — so a
+// date typed in the picker lights the matching chip, and two sources can't disagree about one field.
+function quickWhenActive(d){
+  if(d.whenPick==='pick') return 'pick';
+  const val = d.sessionDate || '';
+  for(const c of QUICK_WHEN_CHIPS){ if(toLocalDatetimeValue(c.at()).slice(0,16)===val.slice(0,16)) return c.k; }
+  return 'pick';
+}
+function quickWhenHTML(d){
+  const active = quickWhenActive(d);
+  const chips = QUICK_WHEN_CHIPS.map(c=>
+    `<button type="button" class="when-chip${active===c.k?' active':''}" onclick="d_setWhenChip('${c.k}')">${c.l}</button>`).join('');
+  const picked = active==='pick';
+  return `<div class="field" style="margin-bottom:16px;">
+      <label>When</label>
+      <div class="when-chips">${chips}<button type="button" class="when-chip${picked?' active':''}" onclick="d_openWhenPicker()">Pick a date</button></div>
+      ${picked ? `<input type="datetime-local" style="margin-top:8px;width:100%;" value="${escapeHtml(d.sessionDate||'')}" onchange="d_set('sessionDate', this.value)">` : ''}
+      <div class="when-read mono">${escapeHtml(fmtDateTime(d.sessionDate))}</div>
+    </div>`;
+}
 function sessionQuickHTML(d){
   const tea = teaById(d.teaId);
+  /* R88: both pickers, reusing setup's select mechanics rather than inventing a second control — one
+     vocabulary across the twins. The tea CARRIES FORWARD from setup (quick log is entered from there
+     under R87, where a tea was chosen one tap earlier), so #12's "starts empty" is deliberately not
+     built: it would discard a live user choice. The picker changes it; the vessel stays optional and
+     never blocks the log (R43). */
+  const teaOpts = groupTeasByType(state.teas.filter(t=>!isTeaFinished(t)))
+    .map(g=>`<optgroup label="${escapeHtml(g.label)}">${g.teas.map(t=>`<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`).join('')}</optgroup>`).join('');
+  const vesselOpts = `<option value="" ${!d.vesselId?'selected':''}>Which vessel? (optional)</option>` +
+    state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
+  const caret = `<span class="trio-caret">${icon('i-caret-hl',20)}</span>`;
   return `
     <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
     <div class="card">
-      <h2 style="margin-top:0;">${d.isColdBrew?'Cold brew':'Quick log'}: ${tea?escapeHtml(tea.name):''}</h2>
-      <div class="eyebrow">${d.isColdBrew?'A single long steep — just how it went.':'No timed steeps — just how it went.'}</div>
+      <h2 style="margin-top:0;">${d.isColdBrew?'Cold brew':'Log a cup'}</h2>
+      <div class="eyebrow">${d.isColdBrew?'A single long steep — just how it went.':'A cup you already had — jot what you remember.'}</div>
+      ${quickWhenHTML(d)}
+      <div class="trio-card" style="margin-bottom:16px;">
+        <div class="trio-row">
+          <div class="trio-eyebrow">Which tea</div>
+          <div class="trio-line"><select class="trio-select trio-tea" onchange="d_setTea(this.value)" aria-label="Tea">${teaOpts}</select>${caret}</div>
+        </div>
+        <div class="trio-row">
+          <div class="trio-eyebrow">Vessel <span class="trio-optional">optional</span></div>
+          <div class="trio-line"><select class="trio-select" onchange="d_setVessel(this.value)" aria-label="Vessel">${vesselOpts}</select>${caret}</div>
+        </div>
+      </div>
       ${d.isColdBrew ? `
       <div class="field" style="margin:14px 0;">
         <label>Steep</label>
@@ -495,7 +555,10 @@ function sessionQuickHTML(d){
         ${tagLibraryChipsHTML('session')}
       </div>
       <label class="checkrow" style="margin-top:16px;"><input type="checkbox" ${d.isShared?'checked':''} onchange="state.sessionDraft.isShared=this.checked"> Share this session with followers</label>
-      <button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save session</button>
+      ${d.teaId
+        ? `<button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save cup</button>`
+        : `<button class="btn btn-primary" style="margin-top:14px;" disabled>Save cup</button>
+           <div class="hint" style="margin-top:6px;">Pick a tea first — a cup with no tea isn't a record.</div>`}
     </div>
   `;
 }
@@ -552,6 +615,7 @@ function sessionSetupHTML(d){
       <div class="mood-title">How are you arriving?</div>
       <div class="mood-sub">optional — quietly helps spot patterns later</div>
       ${moodChipsHTML(d.mood, 'd_setMood')}
+      ${moodUptakeHTML()}
     </div>` : ''}
     <div class="fold-row" onclick="d_toggleMoreDetails()" role="button" aria-expanded="${!!d.showMoreDetails}">
       <span class="fold-label">More details <span class="fold-sub">· leaf, water, cold brew</span></span>
@@ -624,6 +688,19 @@ const VESSEL_METHOD_PREFILL = { 'Gaiwan':'gongfu', 'Kyusu':'senchado', 'Shiborid
 function methodPrefillFor(vesselId){ const v=vesselById(vesselId); return (v && VESSEL_METHOD_PREFILL[v.type]) || null; }
 function d_setVessel(val){ const d=state.sessionDraft; if(!d) return; d.vesselId = val; if(!d.brewStyleLocked) d.brewStyle = methodPrefillFor(val); render(); }
 
+/* #04 draws the mood card with a "48% (15/31)" pill. That literal is a stamped SNAPSHOT (R67/R68) —
+   it was 48% of 31 sessions when the board was drawn and it is a different number now. So it is
+   COMPUTED from the user's own sessions rather than transcribed, and it is omitted entirely below a
+   handful of sessions, when a percentage of almost nothing says less than silence. It is a quiet
+   fact about the user's own habit, not a nudge: no target, no comparison, no encouragement. */
+const MOOD_UPTAKE_MIN_SESSIONS = 8;
+function moodUptakeHTML(){
+  const all = (state.sessions||[]).length;
+  if(all < MOOD_UPTAKE_MIN_SESSIONS) return '';
+  const withMood = state.sessions.filter(s=>s.mood).length;
+  if(!withMood) return '';
+  return `<div class="mood-uptake mono">noted on ${withMood} of your ${all} sittings</div>`;
+}
 // v3.31 optional pre-brew mood/energy — captured at setup so it's tied to the session
 // (and the time of day), the reading the future sleep/caffeine correlation will lean on.
 const MOODS = ['Drained','Low','Steady','Lively','Wired'];
@@ -676,9 +753,22 @@ function brewGuidePreviewHTML(d){
     : (d.brewMode==='tuned' ? 'Prefills each steep from your tuned times \u2014 still fully editable.'
       : (generatedNow ? 'Suggested from the leaf type \u2014 no guide saved yet, so adjust freely as you go.'
         : 'Prefills each steep\u2019s timer and temperature \u2014 adjust as you go.'));
+  /* #04 rev 6: the strip names its own derivation \u2014 "not the saved guide" is the whole point, and a
+     reader who can't see the chain has to take the numbers on faith. GENERATED, never a static string
+     (R68): each stage is listed only when it actually fired, so the line can't claim a ratio scaling
+     that didn't happen or omit one that did. `off` shows nothing, because nothing is derived. */
+  const chain = [];
+  if(d.brewMode!=='off'){
+    chain.push(generatedNow ? 'leaf type' : 'your brew guide');
+    if(ratio && ratio.applied) chain.push('ratio-scaled');
+    if(d.brewMode==='tuned') chain.push('your tuning');
+  }
+  const derivation = chain.length>1
+    ? `<div class="mono sched-derivation">${chain.map(escapeHtml).join(' \u2192 ')}</div>` : '';
   return `<div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
     <div class="eyebrow">${d.brewMode==='tuned'?'Your tuning':(generatedNow?'Suggested \u00b7 '+LEAF_PROFILES[base.form].label:'From your brew guide')}</div>
     ${summary}
+    ${derivation}
     ${seg}
     ${memory}
     ${ratioMemo}

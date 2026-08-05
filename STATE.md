@@ -176,7 +176,32 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.98 R3 slice B3: the freshness model** (cache **v108**, APP_VERSION v3.98).
+**NOW (just shipped) — v3.99 R3 slice C: #04 Session setup + #12 Quick log** (cache **v109**, APP_VERSION v3.99).
+**Three of #12's premises were false at HEAD**, so the slice is built to R87–R89, not to the board.
+- **R87 — the nav Log button still opens SETUP.** #12 claims "as checked" that the nav and the
+  in-setup shortcut both reach quick log; they don't (`quickLogSession` → `startSessionFor(null)` →
+  `stage:'setup'`; `beginQuickLog()` is the only path to `'quick'`). Not built to. The prospective
+  posture is the recoverable one — setup reaches quick log in one more tap, quick log can't reach the
+  timer at all.
+- **R88 — quick log gains BOTH pickers and carries the tea forward.** It had no tea control and no
+  vessel control; it printed a name in a heading. The empty start is deliberately **not** built —
+  you arrive from setup where a tea was chosen one tap earlier. Vessel optional and never blocking
+  (R43); **a tea does block the save** — a cup with no tea isn't a record.
+- **The date inverts, and #04's half was already shipped** (`sessionDate` inside *More details*), so
+  the work was entirely #12's: relative chips (Just now · This morning · Yesterday · Pick a date),
+  **selected chip in jade** — kachi-iro stays on the Focus ring. The active chip is **derived from the
+  date**, not stored beside it, so no second source of truth for one field.
+- **The schedule strip names its derivation, generated** — only stages that fired
+  (`your brew guide → ratio-scaled`), nothing when off; the board's example string is not hard-coded.
+- **The mood pill is computed**, never the board's stamped `48% (15/31)`: "noted on 5 of your 12
+  sittings", omitted below 8 sessions and when unused.
+- **R89 — #14's custom listbox deferred**; its long-press colour correction can't ship at all (R78 no
+  column, R82 no palette data model). The `<select>` controls stay. **#14 reopens with the swatch model.**
+- New `fixtures/quick-log-test.js` (38 checks) — **20 committed suites, all green.**
+  **NEXT: slice D** (#02 Sessions + #02b detail, then the edit-screen move as its own commit — the
+  riskiest item in the package, because the modal's deep-copy semantics must survive verbatim).
+
+**Previously — v3.98 R3 slice B3: the freshness model** (cache **v108**, APP_VERSION v3.98).
 **The round's first migration: `sql/v3_11-opened-date.sql`, applied BEFORE the push.** Adding a
 nullable column is backward-compatible with v3.97, which never touched it; the reverse is not, because
 v3.98's `teaToDb` sends `opened_date` on every save and PostgREST rejects an unknown column outright.
