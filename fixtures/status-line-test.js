@@ -17,7 +17,9 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const repo=path.join(__dirname,'..');
-const src=['steep-knowledge.js','steep-core.js','steep-teas.js'].map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
+// steep-tea-types.js joins the bundle in v3.98: statusLine → freshnessReading → ttFreshness → the
+// catalog. The shelf's status line now depends on catalog data, which is the point of the model.
+const src=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-teas.js'].map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
 const ctx={}; ctx.window=ctx; ctx.globalThis=ctx; ctx.console=console;
 ctx.document={documentElement:{setAttribute(){},getAttribute(){return 'light';}},getElementById(){return null;},querySelectorAll(){return[];},createElement(){return{style:{},setAttribute(){},appendChild(){},classList:{add(){}}};}};
 ctx.localStorage={getItem(){return null;},setItem(){},removeItem(){}}; ctx.matchMedia=()=>({matches:false}); ctx.navigator={onLine:true};
@@ -74,14 +76,34 @@ let passed=0, failures=0;
 const ok=(c,m)=>{ if(c)passed++; else{failures++;console.log('  FAIL: '+m);} };
 const S = t => ctx.statusLine(t);
 
-// ---- 1. statusCategory mapping ----
-ok(ctx.statusCategory({type:'green'})==='delicate', 'A1 green → delicate');
-ok(ctx.statusCategory({type:'yellow'})==='delicate', 'A2 yellow → delicate');
-ok(ctx.statusCategory({type:'white'})==='ages', 'A3 white → ages');
-ok(ctx.statusCategory({type:'puerh'})==='ages', 'A4 puerh → ages');
-ok(ctx.statusCategory({type:'oolong'})==='neutral', 'A5 oolong → neutral');
-ok(ctx.statusCategory({type:'black'})==='neutral', 'A6 black → neutral');
-console.log('  A statusCategory: 6 checks');
+/* ---- A. the three-rung window cascade (v3.98, R85) — REWRITTEN, not patched ----
+   This section used to pin statusCategory's type→ages|delicate|neutral map. That function is RETIRED:
+   it was a second type→class writer beside freshnessClass, and both are subsumed by catalog data
+   reached through slug → family → teas.type. What is pinned now is the cascade itself, because rung 3
+   is the whole reason the model doesn't regress: at 21 teas the catalog covers 13, and slug→family
+   alone would have taken a working freshness reading away from four teas on the most-seen surface. */
+ok(typeof ctx.statusCategory==='undefined', 'A1 statusCategory is gone, not dormant (no second type→class writer)');
+ok(typeof ctx.freshnessClass==='undefined', 'A1b freshnessClass is gone too — same reason');
+ok(typeof ctx.FRESH_WINDOW_MONTHS==='undefined' && typeof ctx.FRESH_NEAR_WEEKS==='undefined',
+   'A1c the two global window constants are gone — one window for every tea is what the model replaces');
+const fr = t => ctx.ttFreshness(t);
+ok(fr({name:'Shincha Saemidori Kagoshima',type:'green'}).rung==='slug', 'A2 a covered tea with a slug override grounds at rung 1 (slug)');
+ok(fr({name:'Dawang Feng Da Hong Pao',type:'oolong'}).rung==='family', 'A3 a covered tea with no slug override grounds at rung 2 (family)');
+ok(fr({name:'A Tea Nobody Curated 12345',type:'green'}).rung==='type', 'A4 an UNCOVERED tea still grounds at rung 3 (teas.type) — the anti-regression rung');
+ok(fr({name:'Fei Bing Beeng Cha',type:'puerh'}).ageing===true,
+   'A5 the shelf\'s only pu-erh has no catalog row, so ageing reaches it only through teas.type→dark (R85)');
+ok(fr({name:'x',type:'not-a-type'})===null, 'A6 an unknown type grounds nothing — no window is invented');
+// The R85 constant is the ONE place the two vocabularies meet. Inlining the mapping elsewhere is the
+// drift it exists to prevent, so assert it stays a named constant and stays correct.
+// A top-level `const` stays in the vm script's lexical scope — only function declarations become
+// sandbox properties — so the constant is read through the context, as the other suites do.
+const TYPE_MAP = vm.runInContext('TT_TYPE_TO_FAMILY', ctx);
+ok(TYPE_MAP && TYPE_MAP.puerh==='dark', 'A7 TT_TYPE_TO_FAMILY maps puerh→dark by name (§7.2)');
+ok(Object.keys(TYPE_MAP).length===6, 'A8 …and covers all six teas.type values');
+const ttSrc = fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8').split(/\r?\n/)
+  .filter(l=>!/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
+ok(!/['"]puerh['"]\s*:\s*['"]dark['"]/.test(ttSrc), 'A9 the puerh→dark mapping is not inlined a second time in steep-teas.js');
+console.log('  A window cascade (R85): 10 checks');
 
 // ---- 2. fmtStockG ----
 ok(ctx.fmtStockG(16)==='16g', 'B1 whole grams → "16g"');
@@ -96,22 +118,61 @@ ok(/running low$/.test(S({type:'oolong',amountGrams:5}).text), 'C2 low text ends
 ok(S({type:'white',amountGrams:30}).tone==='ages' && /ages well$/.test(S({type:'white',amountGrams:30}).text), 'C3 white → ages well');
 ok(S({type:'puerh',amountGrams:30}).tone==='ages' && /ages gracefully$/.test(S({type:'puerh',amountGrams:30}).text), 'C4 puerh → ages gracefully');
 ok(S({type:'oolong',amountGrams:30}).tone==='plenty' && /· plenty$/.test(S({type:'oolong',amountGrams:30}).text), 'C5 stocked oolong → "· plenty"');
-ok(S({type:'green',amountGrams:30}).tone==='plenty' && /fresh, plenty$/.test(S({type:'green',amountGrams:30}).text), 'C6 stocked green, no harvest → "fresh, plenty"');
+// C6 v3.98: a green with no harvest and no opened date has NO CLOCK, so the shelf falls through to
+// the plain quantity tone. It used to read "fresh, plenty" — an affirmation the app could not ground,
+// which is exactly what the two-key rule removes. "30g · plenty" is a stock statement, not a
+// freshness claim, and that is what keeps never-guess intact on a surface that cannot be blank.
+ok(S({type:'green',amountGrams:30}).tone==='plenty' && /· plenty$/.test(S({type:'green',amountGrams:30}).text), 'C6 stocked green, no clock → plain quantity tone, no freshness claim');
 console.log('  C tone rules (synthetic): 6 checks');
 
-// ---- 4. freshness-window branch (needs a near harvest; relative to now so it stays true) ----
+/* ---- C2. the shelf is TWO-KEY (§2) ---- */
+const clockNoWindow = {name:'A Tea Nobody Curated 12345',type:'not-a-type',amountGrams:30,harvestYear:String(new Date().getFullYear()-1),harvestSeason:'spring'};
+ok(ctx.freshnessReading(clockNoWindow) && ctx.freshnessReading(clockNoWindow).grounded===false,
+   'C7 clock without window → a reading that knows it is ungrounded');
+ok(S(clockNoWindow).tone==='plenty', 'C8 …and the SHELF falls through to quantity, never an empty slot (WS5)');
+ok(ctx.freshnessCueHTML(clockNoWindow)!=='', 'C9 …while DETAIL still shows the elapsed-only rung — a date fact, not a freshness claim');
+const noClock = {name:'Dawang Feng Da Hong Pao',type:'oolong',amountGrams:30};
+ok(ctx.freshnessReading(noClock)===null, 'C10 window without clock → no reading at all');
+ok(ctx.freshnessCueHTML(noClock)==='', 'C11 …and detail renders NO BLOCK — absent, not a zero');
+console.log('  C2 two-key shelf: 5 checks');
+
+/* ---- D. the graded ladder (§2) — REWRITTEN to the opened-vs-sealed model ----
+   The old section pinned one global 12-month window and a 26-week countdown threshold for every tea.
+   Both are retired. What is pinned now is the ladder's SHAPE, which is what the model actually
+   promises: measured beats estimated, an estimate says it is one, and the countdown stays relative to
+   the tea's own window rather than to a constant. Dates are relative to now, so nothing goes stale. */
 const now=new Date();
-const nearGreen={type:'green',amountGrams:30,harvestYear:String(now.getFullYear()-1),harvestSeason:'autumn'};
-const nearWk=ctx.freshnessWeeksLeft(nearGreen);
-ok(nearWk!=null, 'D1 harvest → a computable week count');
-const nearRes=S(nearGreen);
-// last-autumn harvest + 12mo window: some weeks should remain but < ~6mo → countdown fires.
-ok(nearRes.tone==='freshness' && /best within \d+ wks?$|best enjoyed soon$/.test(nearRes.text), 'D2 near/late window green → freshness phrasing');
-const farGreen={type:'green',amountGrams:30,harvestYear:String(now.getFullYear()),harvestSeason:'spring'};
-ok(S(farGreen).tone==='plenty', 'D3 this-year spring green (window wide open) → plenty not countdown');
-const oldGreen={type:'green',amountGrams:30,harvestYear:String(now.getFullYear()-3),harvestSeason:'spring'};
-ok(S(oldGreen).tone==='freshness' && /best enjoyed soon$/.test(S(oldGreen).text), 'D4 long-past window → "best enjoyed soon"');
-console.log('  D freshness window: 4 checks');
+const daysAgo = n => { const d=new Date(now); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); };
+// Rung 1 — measured. A sencha opened 5 weeks ago is past its ~45-day opened window.
+const openedSencha={name:'Sencha Kagoshima Premium',type:'green',amountGrams:30,openedDate:daysAgo(35)};
+const r1=ctx.freshnessReading(openedSencha);
+ok(r1 && r1.measured===true && r1.grounded===true, 'D1 opened_date → a measured, grounded reading');
+ok(r1.totalDays===45, 'D2 …against the OPENED window (45d for sencha), not the sealed one');
+ok(!/assumes sealed/.test(ctx.freshnessCueHTML(openedSencha)), 'D3 …and a measured reading carries no sealed-assumption hedge');
+// Rung 2 — estimated from harvest. Same tea, no opened date: the sealed window applies, hedged.
+const sealedSencha={name:'Sencha Kagoshima Premium',type:'green',amountGrams:30,harvestYear:String(now.getFullYear()),harvestSeason:'spring'};
+const r2=ctx.freshnessReading(sealedSencha);
+ok(r2 && r2.measured===false && r2.totalDays===270, 'D4 harvest only → the SEALED window (270d)');
+ok(/assumes sealed until opened/.test(ctx.freshnessCueHTML(sealedSencha)), 'D5 …and says so, rather than passing an estimate off as measured');
+// Measured beats estimated when both exist — the ladder is ordered, not merged.
+const both=Object.assign({},sealedSencha,{openedDate:daysAgo(35)});
+ok(ctx.freshnessReading(both).measured===true && ctx.freshnessReading(both).totalDays===45,
+   'D6 with both, the measured clock wins outright');
+// The countdown is WINDOW-RELATIVE, not a global threshold: past halfway it speaks, before that it doesn't.
+const fresh=Object.assign({},sealedSencha,{harvestYear:String(now.getFullYear()),harvestSeason:'spring',openedDate:daysAgo(3)});
+ok(S(fresh).tone==='plenty', 'D7 a just-opened tea reads as stock — a calm app does not count down from far');
+const late=Object.assign({},sealedSencha,{openedDate:daysAgo(40)});
+ok(S(late).tone==='freshness', 'D8 …and speaks up once past the halfway mark of its OWN window');
+// Ageing reads as history: no countdown, no urgency, on either surface.
+const aged={name:'Fei Bing Beeng Cha',type:'puerh',amountGrams:96,harvestYear:'2016'};
+ok(ctx.freshnessReading(aged).ageing===true && ctx.freshnessReading(aged).leftDays===undefined,
+   'D9 an ageing tea has no countdown at all');
+ok(/deepens with age/.test(ctx.freshnessCueHTML(aged)) && !/best (within|enjoyed)/.test(ctx.freshnessCueHTML(aged)),
+   'D10 …and detail frames it as a record, never an alarm');
+// Seeds render soft (§3): guidance disagrees by up to ~2x, so no exact day count reaches the UI.
+const allCopy = [openedSencha,sealedSencha,late,aged].map(t=>ctx.freshnessCueHTML(t)+' '+S(t).text).join(' ');
+ok(!/\b\d{2,3} days?\b/.test(allCopy), 'D11 no reading renders a raw day count — "~5 wks", never "35 days"');
+console.log('  D graded ladder: 11 checks');
 
 // ---- 5. real data (teas_rows.csv) ----
 if(haveCSV){
@@ -134,17 +195,33 @@ if(haveCSV){
      teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams) < (TH==null?15:TH) && ctx.cupsLeft(t)==null)
          .every(t=>ctx.isRunningLow(t)),
      'E3 the threshold is the boundary in both directions (grams-based teas; cups-based ones use their own rule)');
-  // every in-stock, non-low tea's tone agrees with its category
-  teas.filter(t=>Number(t.amountGrams)>0 && !ctx.isRunningLow(t)).forEach(t=>{
-    const cat=ctx.statusCategory(t), tone=S(t).tone;
-    const okTone = cat==='ages' ? tone==='ages'
-      : cat==='neutral' ? tone==='plenty'
-      : (tone==='plenty'||tone==='freshness'); // delicate → plenty, or countdown if harvest-dated
-    ok(okTone, 'E4 '+t.name+' ('+t.type+', cat '+cat+') → unexpected tone '+tone);
+  /* E4 v3.98: the tone used to be checked against statusCategory, which is retired. It is now checked
+     against the READING, which is the single writer — the point being that no surface may reach a tone
+     the engine did not ground. Ungrounded must be quantity-only; grounded-and-ageing must be 'ages';
+     grounded-with-a-window may be plenty or a countdown depending on where in its own window it sits. */
+  teas.filter(t=>Number(t.amountGrams)>0 && !ctx.isRunningLow(t) && ctx.stockTier(t)!=='few').forEach(t=>{
+    const w=ctx.ttFreshness(t), r=ctx.freshnessReading(t), tone=S(t).tone;
+    // Ageing is read from the WINDOW (no clock required — "ages well" is about the leaf); the
+    // countdown is read from the READING (two-key). The assertion mirrors that split deliberately.
+    const okTone = (w && w.ageing) ? tone==='ages'
+      : (!r || !r.grounded) ? tone==='plenty'
+      : (tone==='plenty'||tone==='freshness');
+    ok(okTone, 'E4 '+t.name+' ('+t.type+') → tone '+tone+' disagrees with window '+JSON.stringify(w&&{a:w.ageing,r:w.rung})+' / reading '+JSON.stringify(r&&{g:r.grounded}));
   });
-  // whites in the export read "ages well"
-  teas.filter(t=>t.type==='white' && Number(t.amountGrams)>0).forEach(t=>
-    ok(/ages well$/.test(S(t).text), 'E5 '+t.name+' (white) → "ages well"'));
+  /* E5 REPLACED. It pinned "whites read ages well", which was true only because statusCategory keyed
+     ageing on teas.type. Ageing is catalog data now (R86), so what matters is that the two surfaces
+     AGREE: a tea the engine calls ageing says so on the shelf and on detail, and one it doesn't,
+     doesn't. Two clocks disagreeing about one tea is the bug class this whole slice closes. */
+  teas.filter(t=>Number(t.amountGrams)>0).forEach(t=>{
+    const w=ctx.ttFreshness(t), r=ctx.freshnessReading(t);
+    const shelfAges=/ages (well|gracefully)$/.test(S(t).text), detailAges=/deepens with age/.test(ctx.freshnessCueHTML(t));
+    const ageing = !!(w && w.ageing);
+    // Detail needs a clock to say anything at all, so it only claims ageing when one exists; the
+    // shelf claims it whenever the window does, unless quantity has outranked it (#18 precedence).
+    const shelfOk = ageing ? (shelfAges || ctx.stockTier(t)!=='plenty') : !shelfAges;
+    const detailOk = (ageing && r) ? detailAges : !detailAges;
+    ok(shelfOk && detailOk, 'E5 '+t.name+' — shelf/detail disagree on ageing (window says '+ageing+', clock '+(r?'yes':'no')+')');
+  });
   // shelfSort puts every running-low tea ahead of every non-low one
   const sorted=ctx.shelfSort(teas.filter(t=>Number(t.amountGrams)>0));
   const firstNonLow=sorted.findIndex(t=>!ctx.isRunningLow(t));

@@ -176,7 +176,36 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.97 R3 slice B2: #06 Add/edit tea + #03 Tea detail** (cache **v107**, APP_VERSION v3.97).
+**NOW (just shipped) — v3.98 R3 slice B3: the freshness model** (cache **v108**, APP_VERSION v3.98).
+**The round's first migration: `sql/v3_11-opened-date.sql`, applied BEFORE the push.** Adding a
+nullable column is backward-compatible with v3.97, which never touched it; the reverse is not, because
+v3.98's `teaToDb` sends `opened_date` on every save and PostgREST rejects an unknown column outright.
+- **Freshness counts from the seal, not the harvest.** `teas.opened_date` is the measured rung; harvest
+  is a fallback that **assumes sealed and says so**; purchase is deliberately not on the ladder (it
+  says when the tea reached *you*) and keeps all its other jobs.
+- **Two groundings, failing independently** — clock (openedDate → harvest → nothing) × window (catalog
+  slug → family → `teas.type`). No clock → **no block at all**, absent rather than a zero.
+- **R85: the third rung is load-bearing, not cosmetic.** The spec keyed windows on the catalog alone,
+  decided at 13-of-14 coverage. At 21 teas it is 13, and slug→family alone would have removed a working
+  reading from **Fei Bing Beeng Cha, Moonlight White, Chiran Sencha Okumidori, Spring White Anji**. Fei
+  Bing is the only pu-erh and has no catalog row, so `ageing` could never have reached the one tea that
+  actually ages. `puerh ↔ dark` lives in **one named constant** (`TT_TYPE_TO_FAMILY`), guarded against
+  being inlined twice.
+- **The shelf is two-key, quantity still first.** Ungrounded → plain quantity tone (a stock statement,
+  not a freshness claim — WS5 forbids an empty slot). `empty · untracked · low · few` short-circuit
+  ahead of any freshness branch, unchanged.
+- **Ageing needs no clock** — the first build required both keys and silently dropped "ages well" from
+  every ageing tea without a harvest date. Caught by the suite, not by review.
+- **`FRESH_NEAR_WEEKS` retired as a global, kept as an idea** — the countdown threshold is now
+  window-relative (half of a 30-day opened shincha vs half of a two-year oolong).
+- **§7.1 done: `isTeaUnopened` is the fallback rung**, measured `openedDate` wins outright. Live for 3 teas.
+- **DELETED**: `statusCategory` · `freshnessClass` · `freshnessStyleWord` · `freshnessWeeksLeft` ·
+  `FRESH_WINDOW_MONTHS` · `FRESH_NEAR_WEEKS`. Both freshness suites **rewritten, not patched** —
+  `status-line-test.js` for the second time in two slices, as the spec said it would be.
+- **Quiet by design on ship day**: `opened_date` is 0/21, 3 teas read ageing, 3 ground a window, one
+  countdown. Don't read it as a failed build. **NEXT: slice C** (#04 setup + pickers, #12 Quick log).
+
+**Previously — v3.97 R3 slice B2: #06 Add/edit tea + #03 Tea detail** (cache **v107**, APP_VERSION v3.97).
 R51's other half — slice B built the browsable mode, this builds the contextual entries.
 - **Borrow from Go Deeper** is the shipped `saveSuggestedGuide` gesture against the **catalog** instead
   of the KB. No per-step times in `typical_brew`, so a borrow is temp + ratio over a `generateFormTimes`

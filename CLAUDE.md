@@ -205,11 +205,17 @@ template-literal HTML; `bindDynamic()` re-wires the few handlers that can't be i
   that touches that table (bulk `loadKey`/`saveKey` and the per-row `put*`).
 
 **Schema management:** migrations live in **`sql/`**, applied by hand in the Supabase
-SQL editor, in filename order (`schema.sql` first, then the `vX_Y-*.sql` files in
-ascending version order — see the `sql/` folder for the current set). **Read the
-actual `sql/` files for real column names/types instead of guessing.** When you add a
-column/table, commit a new `sql/vX_Y-*.sql` file, hand the user the exact SQL to run,
-and note it in the CHANGELOG `Deploy:` line.
+SQL editor, in **version order** — `schema.sql` first, then the `vX_Y-*.sql` files by
+ascending *version*, which since v3.98 is **no longer the same as filename order**:
+`v3_11-opened-date.sql` sorts as a string between `v3_1` and `v3_2`. It happens to be
+order-independent (`add column if not exists` on a table `schema.sql` already created),
+but read the version, not the sort. **Read the actual `sql/` files for real column
+names/types instead of guessing.** When you add a column/table, commit a new
+`sql/vX_Y-*.sql` file, hand the user the exact SQL to run, and note it in the CHANGELOG
+`Deploy:` line. **A migration is applied BEFORE the code that needs it is pushed** —
+adding a nullable column is backward-compatible with the running build, while pushing
+first breaks every write to that table until the SQL lands (PostgREST rejects an unknown
+column outright).
 
 **Brew-guide / leaf-form logic** (in `steep-core.js`): a tea's free-text `brewGuide` is
 parsed by `parseBrewGuide`/`bg_extractTimes` into `{tempC, rinseSeconds, times}` via

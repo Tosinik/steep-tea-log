@@ -81,11 +81,16 @@ They fail independently, so the reading degrades on two axes:
 | **none** | any | **no reading.** The block is absent — not a guess, not a zero. |
 
 **Elapsed-only is not a guess.** A date the user typed is measured; only the *window* would be
-invented, and that is exactly what we withhold. This matters practically: `covers` is
-hand-curated in source and Phase C is confirm-not-auto-write, so **every new tea starts
-uncovered by construction**. Without this rung, the field we are asking Niklas to start filling
-would show nothing until someone hand-edits the catalog — a bad loop for the one input the whole
-model depends on.
+invented, and that is exactly what we withhold. ~~This matters practically: every new tea starts
+uncovered by construction, and without this rung the field we are asking Niklas to fill would show
+nothing until someone hand-edits the catalog.~~
+> **Amended 2026-07-26 (R85).** That justification no longer holds, and the rung is kept anyway.
+> `teas.type` as rung 3 means a real tea is **never** window-less — the column is CHECK-constrained to
+> six values that all carry a window — so a newly added tea gets a real window immediately rather than
+> a bare date, which is the better version of what this paragraph wanted. Elapsed-only is now
+> **defensive rather than routine**: zero live examples, reachable only by a row with an unrecognised
+> type. That is not a defect (the R70 shape), and `freshness-test.js` reports its coverage instead of
+> requiring an example the shelf can no longer produce.
 
 **Purchase is not on the ladder.** It tempts as a fallback because it's more-filled than harvest
 (35% vs 14%, measured), but that is the trap: purchase says when the tea reached *you*, not when
@@ -116,10 +121,17 @@ carries the full record.
 Windows live in the **catalog as sealed/opened pairs**, with the same three-tier provenance as
 the swatch (catalog value, user override wins, nothing when ungrounded).
 
-**Key: catalog `slug`, falling back to the matched row's `family`.** Not `teas.type` — the split
-that matters most (Japanese vs Chinese green, ~2× apart) and matcha both exist only at slug
-level. `matchTeaType` resolves 13 of the 14 real teas; the one miss is the junk "Test" row, which
-is the correct outcome.
+~~**Key: catalog `slug`, falling back to the matched row's `family`.** Not `teas.type`… `matchTeaType`
+resolves 13 of the 14 real teas; the one miss is the junk "Test" row.~~
+> **Amended 2026-07-26 (R85) — the key is a THREE-rung cascade: slug → family → `teas.type`.** The
+> figure above was true when written and the argument rested on it: rejecting `teas.type` for
+> precision costs nothing when coverage is 13/14. At **21 teas the catalog covers 13**, and the eight
+> misses are real teas, not a junk row. Slug→family alone would have taken a working freshness reading
+> away from **Fei Bing Beeng Cha, Moonlight White, Chiran Sencha Okumidori and Spring White Anji** —
+> and Fei Bing is the shelf's only pu-erh with no catalog row, so `dark`'s `ageing: on` could never
+> have reached it. The slug rung still carries the splits this section names (Japanese green, matcha);
+> `teas.type` is the coarser final rung, and authoring a `covers` entry upgrades a tea from rung 3 to
+> rung 2. The `puerh ↔ dark` mapping lives in one named constant, `TT_TYPE_TO_FAMILY`, citing §7.2.
 
 > ⚠ **SEED VALUES, not settled fact.** Published guidance disagrees by up to ~2×, which is *why*
 > these live in editable catalog data rather than hard-coded. Never present a number below as
@@ -150,6 +162,13 @@ behaviour is a per-tea flag.
 ---
 
 ## 4 · Ageing — a per-tea flag
+
+> **Amended 2026-07-26 (R86) — this section contradicts §5, and the contradiction is recorded rather
+> than silently resolved.** §4 below calls `ageing` "flippable per tea"; §5 lists only `opened_date`
+> and catalog data as the model's inputs. A per-tea override needs a `teas.ageing` column, which is a
+> second migration column for a feature with no board and no ruling (R81). **v3.98 ships catalog-only**
+> — "per tea" is built as *per catalog row*. The user-level override (a roasted Wuyi its owner ages,
+> against a catalog row that says otherwise) is a real case and an **open product call**, not a defect.
 
 **Ageing is a boolean on the catalog entry, not a property of the family.** A light TGY and a
 re-fired Wuyi are both "oolong"; only the second ages. So there is no roasted-vs-unroasted

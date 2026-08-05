@@ -76,8 +76,10 @@ Each with its data prerequisite — the point is they get better every season:
   per-tea and per-style.
 - **Mood correlations** [mood logging since v3.31, unused]: "Lively, mostly after morning sencha" —
   Insights card, observational only.
-- **Freshness × rating** [needs purchase dates + a year of time]: does the shincha really fade? The
-  freshness cues get evidence.
+- **Freshness × rating** [needs **opened** dates + a year of time]: does the shincha really fade? The
+  freshness readings get evidence. *(Corrected v3.98: purchase is deliberately NOT the freshness
+  anchor — it says when the tea reached you, not when the seal broke. `teas.opened_date` shipped in
+  B3 and is the input this idea actually waits on.)*
 - **Restock lead-time learning** [needs shopping-list + rebuy history]: "you usually rebuy ~5 days after
   the low warning" → earlier, smarter Running-low timing.
 - **Seasonal palate** [needs 2+ seasons]: Wrapped gains year-over-year texture.

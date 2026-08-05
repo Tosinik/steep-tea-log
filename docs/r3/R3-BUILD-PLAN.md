@@ -179,7 +179,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 | ~~**A**~~ | ~~the primitives above~~ — **SHIPPED v3.95** | none |
 | ~~**B**~~ | ~~**#13 Teas revision** + **#05 Vessels**~~ — **SHIPPED v3.96** (R75–R78 came out of its plan review) | none |
 | ~~**B2**~~ | ~~**#06 Add / edit tea** + **#03 Tea detail**~~ — **SHIPPED v3.97** (R80–R84 came out of its plan review) | none — but see R81 |
-| **B3** | **The freshness model** — `opened_date`, catalog windows, the `ageing` flag; `statusCategory` and both global constants retire. Build authority is `planning/SPEC-freshness-model.md` rev 2, **not this table** | **`sql/v3_11-opened-date.sql`** — the round's second migration (R83/R84) |
+| ~~**B3**~~ | ~~**The freshness model**~~ — **SHIPPED v3.98** (R85–R86 came out of its plan review) | **`sql/v3_11-opened-date.sql`** — applied by hand, before the push |
 | **C** | **#04 setup + pickers** and **#12 Quick log** — twins sharing the method primitive and the inverted date posture | none |
 | **D** | **#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)** as its own commit | none |
 | **E** | **#10 Focus** — alone | none |
@@ -204,8 +204,13 @@ Notes that shape the order:
   found: #06's "three missing editables" already shipped, folded, so that work was a *promotion*; and
   Borrow had a shipped twin in `saveSuggestedGuide`, differing only in source, so reusing that writer
   kept the round-trip contract intact for free.
-- **B3 is the freshness model and it is bigger than a detail block** — its own spec says so in its own
-  text, and this table under-estimated it. It is the single writer for freshness on **every** surface:
+- ~~**B3 is the freshness model and it is bigger than a detail block**~~ — **SHIPPED v3.98.** The
+  estimate was right about the size and wrong about one premise: the spec's window key rested on
+  `matchTeaType` covering 13 of 14 shelf teas, and at 21 teas it covers 13, so slug→family alone would
+  have removed a working reading from four teas. **R85** added `teas.type` as the third rung and
+  settled §7.2's `puerh`/`dark` split in one named constant on the way. Original note follows.
+- **B3 was bigger than a detail block** — its own spec said so in its own text, and this table
+  under-estimated it. It is the single writer for freshness on **every** surface:
   the shelf status line, the picker and the running-low sort, not just #03. **`status-line-test.js` §D
   gets rewritten, not patched** — one slice after B2 repaired that same suite, which is expected, not
   a conflict. Two items from spec §7 are findings for its plan rather than build instructions:

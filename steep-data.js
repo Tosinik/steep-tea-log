@@ -56,6 +56,9 @@
     isFavorite: !!r.is_favorite, wouldRebuy: !!r.would_rebuy,
     purchaseType: r.purchase_type || 'first', image: r.image_data || null,
     purchaseDate: r.purchase_date || null,
+    // v3.98: the freshness clock's rung 1. NOT the same join as purchase_date — purchase says when
+    // the tea reached you, opened says when the seal broke, and only the second starts the real clock.
+    openedDate: r.opened_date || null,
     leafForm: r.leaf_form || null,
     dateAdded: r.created_at
   });
@@ -70,6 +73,7 @@
       is_favorite: !!t.isFavorite, would_rebuy: !!t.wouldRebuy,
       purchase_type: t.purchaseType || 'first', image_data: t.image || null,
       purchase_date: t.purchaseDate || null,
+      opened_date: t.openedDate || null,   // v3.98 — requires sql/v3_11-opened-date.sql to be applied FIRST
       leaf_form: t.leafForm || null
     };
     // Preserve the original creation date across import/restore. dateAdded mirrors the DB

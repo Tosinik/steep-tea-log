@@ -47,10 +47,16 @@ ctx.typeLabel=k=>({green:'Green',white:'White',oolong:'Oolong',puerh:'Pu-erh',ye
 // stubs for the rest of steep-teas.js top-level (only the freshness helpers are exercised)
 ctx.state={}; ctx.teaById=()=>null; ctx.render=()=>{};
 vm.createContext(ctx);
-vm.runInContext(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'), ctx, {filename:'steep-teas.js'});
+// v3.98: steep-tea-types.js joins the bundle — freshnessReading reaches the catalog through
+// ttFreshness, so without it every tea silently degrades to the elapsed-only rung and the suite
+// would "pass" a model that had lost its windows entirely.
+vm.runInContext(['steep-tea-types.js','steep-teas.js'].map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n'), ctx, {filename:'freshness-bundle.js'});
 
-// extract the inner text of the cue (strip the wrapping div)
-const cueText=tea=>{ const h=ctx.freshnessCueHTML(tea); const m=/italic;">([\s\S]*?)<\/div>/.exec(h); return m?m[1]:''; };
+// Inner text of the cue. Keyed on the CLASS, not on an inline style string — the v3.62 extractor
+// matched `italic;">` and would have gone quietly blank the moment the styling moved to a stylesheet,
+// reporting "no cue" for every tea rather than failing.
+const cueText=tea=>{ const h=ctx.freshnessCueHTML(tea); const m=/class="fresh-cue">([\s\S]*?)<\/div>$/.exec(h);
+  return m ? m[1].replace(/<[^>]+>/g,'') : ''; };
 
 let pass=0, fail=0;
 const check=(n,c)=>{ if(c)pass++; else{fail++; console.log('  FAIL: '+n);} };
@@ -59,35 +65,66 @@ const cues=TEAS.map(t=>({name:t.name, cue:cueText(t)})).filter(x=>x.cue);
 console.log('cues fired on real data ('+cues.length+' of '+TEAS.length+' owner-scoped teas):');
 cues.forEach(c=>console.log('  '+c.name+' -> '+c.cue));
 
-/* The rule, not the count. A cue fires for a row exactly when BOTH keys ground — the style has a
-   freshness class and the harvest year parses — and stays silent otherwise. Checked per row across
-   the whole real shelf, so a new tea extends the coverage instead of breaking the suite. */
-let biconditional=true, wording=true, offenders=[];
+/* THE BLOCK IS THE CLOCK'S. A cue renders for a row exactly when the CLOCK grounds — openedDate, else
+   a parseable harvest year — regardless of whether a window does. That is the elapsed-only rung, and
+   it is the reason the model doesn't punish the field it is asking Niklas to start filling: `covers`
+   is hand-curated, so every newly added tea starts uncovered, and without this rung a freshly typed
+   opened_date would show nothing until someone edited the catalog. */
+let biconditional=true, offenders=[];
 TEAS.forEach(t=>{
   const fires = cueText(t)!=='';
-  const grounded = ctx.freshnessClass(t)!==null && ctx.freshnessYear(t)!==null;
-  if(fires!==grounded){ biconditional=false; offenders.push(t.name+' (fires='+fires+', grounded='+grounded+')'); }
-  if(!fires) return;
-  const cls = ctx.freshnessClass(t);
-  const ok = cls==='ages' ? /deepens with age\.$/.test(cueText(t)) : /is at its best young\.$/.test(cueText(t));
-  if(!ok){ wording=false; offenders.push(t.name+' (class '+cls+', wrong wording)'); }
+  const hasClock = ctx.freshnessClock(t)!==null;
+  if(fires!==hasClock){ biconditional=false; offenders.push(t.name+' (fires='+fires+', clock='+hasClock+')'); }
 });
-check('a cue fires exactly when class AND year both ground'+(offenders.length?' — '+offenders.join('; '):''), biconditional);
-check('every fired cue\'s wording follows its class (ages vs young)', wording);
-// Both branches must be exercised by the real shelf, or the biconditional above proves little.
-const classes=new Set(TEAS.map(t=>ctx.freshnessClass(t)).filter(Boolean));
-check('the real shelf exercises both classes (got: '+[...classes].sort().join(', ')+')', classes.has('young')&&classes.has('ages'));
-// A tea with a class but no parseable year is the silent case that matters most — never invent an age.
-const classNoYear=TEAS.filter(t=>ctx.freshnessClass(t)!==null && ctx.freshnessYear(t)===null);
-check('classed teas with no parseable year stay silent ('+classNoYear.length+' such: '+
-  (classNoYear.map(t=>t.name).join(', ')||'none')+')', classNoYear.every(t=>cueText(t)===''));
+check('a cue renders exactly when the CLOCK grounds'+(offenders.length?' — '+offenders.join('; '):''), biconditional);
 
-// synthetic edge cases
-check('young style + future/garbage year silent', cueText({name:'Test Sencha',type:'green',harvestYear:'nextyear',harvestSeason:'Spring'})==='');
-check('young style + valid year, no season -> no season prefix', cueText({name:'Dragonwell',type:'green',harvestYear:'2025',harvestSeason:''})==='2025 harvest — longjing is at its best young.');
-check('ages style (puerh) + year -> ages cue', cueText({name:'Sheng Cake',type:'puerh',harvestYear:'2018',harvestSeason:'Autumn'})==='Autumn 2018 harvest — this style deepens with age.');
-check('neutral style (black) stays silent even with year', cueText({name:'Keemun',type:'black',harvestYear:'2024',harvestSeason:'Spring'})==='');
-check('generic green fallback word "green tea"', cueText({name:'House Green',type:'green',harvestYear:'2025',harvestSeason:''})==='2025 harvest — green tea is at its best young.');
+/* Every rung must be exercised by the real shelf, or the biconditional above proves little. At the
+   time of writing: 2 teas ground both keys, 4 are clock-only (elapsed rung), 15 have no clock. Those
+   are reported, never pinned — they move whenever a cup is brewed or a covers entry is authored. */
+const rungOf = t => { const r=ctx.freshnessReading(t); if(!r) return 'none';
+  return !r.grounded ? 'elapsed' : (r.ageing ? 'ageing' : 'window'); };
+const tally = TEAS.reduce((a,t)=>(a[rungOf(t)]=(a[rungOf(t)]||0)+1,a),{});
+console.log('  rungs on the real shelf: '+JSON.stringify(tally));
+/* The elapsed-only rung has NO live example, and that is not a defect — the R70 shape again.
+   §2 justified it as the rung "every new tea starts on, by construction", which was true when the
+   window keyed on the catalog alone. R85's third rung changed that: `teas.type` is CHECK-constrained
+   to six values that all carry a window, so a real tea can no longer be window-less. The rung is now
+   defensive rather than routine, which is strictly better — a newly added tea gets a real window
+   immediately instead of a bare date. So this REPORTS coverage and asserts the rung still WORKS,
+   synthetically, rather than requiring the shelf to contain an example it can no longer produce. */
+check('at least one fully grounded reading on the real shelf', (tally.window||0)+(tally.ageing||0)>0);
+check('every real tea grounds a window (R85 rung 3 — elapsed-only is now defensive, '+(tally.elapsed||0)+' live)', (tally.elapsed||0)===0);
+// The estimated rung says so. A harvest-grounded reading must never pass itself off as measured.
+TEAS.filter(t=>!t.openedDate && rungOf(t)==='window').forEach(t=>
+  check(t.name+' (harvest-grounded) carries the sealed-assumption hedge', /assumes sealed until opened/.test(ctx.freshnessCueHTML(t))));
+// R85's anti-regression clause, asserted as a SET and not a count: every tea that reads a window
+// today must still read one. A count survives one tea gaining coverage while another loses it —
+// exactly the shape the `Guandong` typo produced.
+const WINDOW_GROUNDED = ['2021 Fujian White Tea','Fei Bing Beeng Cha','Shincha Saemidori Kagoshima',
+  'Moonlight White - Yue Guang Bai','Chiran Sencha Okumidori','Spring White Anji Green Tea'];
+WINDOW_GROUNDED.forEach(n=>{ const t=TEAS.find(x=>x.name===n);
+  check('R85: "'+n+'" still grounds a reading (it would lose one under slug→family alone)',
+    !!t && ctx.freshnessReading(t)!==null); });
+
+// synthetic — the ladder, rung by rung
+// Relative to the vm's PINNED now, not the real one. The first draft used the host clock while the
+// sandbox ran at 2026-07-10, so "30 days ago" arrived as 4 — a synthetic that silently tested a
+// different case than it named. Same wrong-representation shape as the rest of this round.
+const D = n => { const d=new Date(NOW); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); };
+check('no clock at all -> no block (absent, not a zero)', cueText({name:'Keemun',type:'black'})==='');
+check('garbage year is not a clock', cueText({name:'Test Sencha',type:'green',harvestYear:'nextyear'})==='');
+check('openedDate alone grounds the clock even with no harvest',
+  /^Opened /.test(cueText({name:'Sencha Kagoshima Premium',type:'green',openedDate:D(30)})));
+check('an UNCOVERED tea with an opened date reads elapsed-only, no window claim',
+  cueText({name:'A Tea Nobody Curated 12345',type:'not-a-type',openedDate:D(30)})==='Opened 4 wks ago');
+check('ageing (pu-erh, via teas.type -> dark) frames as history, never a countdown',
+  /deepens with age\.$/.test(cueText({name:'Sheng Cake',type:'puerh',harvestYear:'2018',harvestSeason:'Autumn'})));
+check('a measured ageing clock does not repeat itself ("Opened 2 yrs ago — 2 yrs rested")',
+  !/rested/.test(cueText({name:'Sheng Cake',type:'puerh',openedDate:D(800)})));
+check('harvest-grounded reading is hedged as an assumption',
+  /assumes sealed until opened/.test(ctx.freshnessCueHTML({name:'Sencha Kagoshima Premium',type:'green',harvestYear:String(new Date().getFullYear()),harvestSeason:'Spring'})));
+check('no reading anywhere renders a raw day count (seeds stay soft, §3)',
+  !/\b\d{2,3} days?\b/.test(TEAS.map(cueText).join(' ')));
 
 // Same banner shape as the other committed suites. It read only "N passed, M failed" while this file
 // was local-only; now that it is tracked and runs on every deploy, an output line that differs from

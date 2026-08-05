@@ -1,28 +1,78 @@
 /* ============ WS5 shelf status line (the core rule) ============
-   ONE status line, same slot + weight on every card — only the words + tone change, by type.
+   ONE status line, same slot + weight on every card — only the words + tone change.
    tone ∈ { low(clay·sorts top) · few(ink-soft·no sort, #18) · freshness(ink-soft) · plenty(jade) ·
-   ages(jade) }. Computed from type + amount + a harvest-grounded freshness window (reuses lowStockG
-   + freshnessYear/Season) — never free text. #18 made quantity session-aware: cups left = on-hand ÷
-   this tea's average logged dose; the gram floor only decides when a tea has no brewing history. Design note (2026-07-11): the mock renders oolong as "plenty", not "ages", so
-   the ages bucket is white + pu'er only here (the README prose grouped oolong in — resolved toward
-   the mock + the app's existing freshnessClass, which never calls oolong 'ages'). Flagged at pause. */
-const FRESH_WINDOW_MONTHS = 12;   // a delicate green stays "best within" ~a year of harvest
-const FRESH_NEAR_WEEKS = 26;      // only show a countdown once ≤ ~6 months of that window remain
-function statusCategory(tea){
-  const type = (tea.type||'').toLowerCase();
-  if(type==='white' || type==='puerh') return 'ages';       // age is a feature — no clock
-  if(type==='green' || type==='yellow') return 'delicate';  // time-to-drink leaf
-  return 'neutral';                                          // oolong, black, herbal, unknown
-}
+   ages(jade) }. Computed from amount + the freshness reading — never free text. #18 made quantity
+   session-aware: cups left = on-hand ÷ this tea's average logged dose; the gram floor only decides
+   when a tea has no brewing history.
+   v3.98 (slice B3): the ages bucket is no longer a type map. It is the catalog `ageing` flag reached
+   through the three-rung cascade (R85), so the 2026-07-11 note about oolong — resolved then toward
+   the mock because freshnessClass "never calls oolong 'ages'" — is now data, not a hard-coded
+   grouping: oolong defaults ageing:false and widens with roast, per tea, in editable catalog data. */
+/* ============ Freshness, v3.98 (slice B3) — SPEC-freshness-model.md ============
+   RETIRED here: statusCategory (a type→ages|delicate|neutral map — subsumed by the catalog `ageing`
+   flag plus per-type windows), and the FRESH_WINDOW_MONTHS / FRESH_NEAR_WEEKS globals (one window
+   for every tea, which is the thing the model exists to stop). freshnessReading is now the SINGLE
+   WRITER for freshness on every surface: two clocks disagreeing about one tea is the bug class this
+   project guards by name, and "detail is richer, the shelf is legacy" is how that starts.
+
+   TWO independent groundings, and they fail independently (§2):
+     clock  — when the tea started ageing:  openedDate → harvest → nothing
+     window — how long this kind holds:     catalog slug → family → teas.type (R85)
+
+     clock measured  + window → full            (countdown, or history when ageing)
+     clock estimated + window → full, softened  (harvest assumes the pouch stayed sealed)
+     clock any       + no window → elapsed-only ("opened 6 wks ago") — no countdown, no window claim
+     no clock        + any      → NO READING. Absent. Not a guess, not a zero.
+
+   Elapsed-only is not a guess: the DATE is measured, only the window would be invented, and that is
+   exactly what gets withheld. It matters practically — `covers` is hand-curated, so every newly
+   added tea starts uncovered, and without this rung the one field we are asking Niklas to start
+   filling would show nothing until someone edits the catalog. */
 function fmtStockG(g){ g = Number(g)||0; return (Math.round(g)===g ? String(g) : g.toFixed(1)) + 'g'; }
-// Weeks left in a delicate tea's freshness window, or null when it can't be grounded in a real harvest.
-function freshnessWeeksLeft(tea){
+// Seeds are soft by contract (§3): published guidance disagrees by up to ~2x. Days are the storage
+// unit; nothing renders a day count. "~5 wks", never "35 days", and never as settled fact.
+function fmtSoftDays(days){
+  if(days==null) return '';
+  const wk = Math.round(days/7);
+  if(wk < 9) return '~' + Math.max(wk,1) + ' wk' + (wk===1?'':'s');
+  const mo = Math.round(days/30);
+  if(mo < 18) return '~' + mo + ' month' + (mo===1?'':'s');
+  return '~' + Math.round(days/365) + ' yr' + (Math.round(days/365)===1?'':'s');
+}
+function fmtElapsed(days){
+  if(days==null) return '';
+  const wk = Math.round(days/7);
+  if(days < 14) return days <= 1 ? 'today' : days + ' days ago';
+  if(wk < 9) return wk + ' wks ago';
+  const mo = Math.round(days/30);
+  if(mo < 18) return mo + ' months ago';
+  const yr = Math.round(days/365);
+  return yr + ' yr' + (yr===1?'':'s') + ' ago';
+}
+// The clock. Measured when the user typed a date; estimated from harvest, which ASSUMES the pouch
+// stayed sealed until now — stated in the copy rather than hidden. Purchase is deliberately absent:
+// it says when the tea reached you, not when it was made, so a 2023 harvest bought in 2026 would
+// read as fresh. It keeps every one of its other jobs (stock curve, ledger rate, cost-by-month).
+function freshnessClock(tea){
+  const od = tea && tea.openedDate ? new Date(tea.openedDate) : null;
+  if(od && !isNaN(od)) return { since: od, measured: true };
   const y = freshnessYear(tea); if(!y) return null;
   const seasonMonth = { spring:3, summer:6, autumn:9, fall:9, winter:0 };
   const s = String(tea.harvestSeason||'').trim().toLowerCase();
-  const bestBy = new Date(y, (s in seasonMonth) ? seasonMonth[s] : 5, 1); // no season → mid-year anchor
-  bestBy.setMonth(bestBy.getMonth() + FRESH_WINDOW_MONTHS);
-  return Math.round((bestBy - Date.now()) / (7*86400000));
+  return { since: new Date(y, (s in seasonMonth) ? seasonMonth[s] : 5, 1), measured: false };
+}
+function freshnessReading(tea){
+  const clock = freshnessClock(tea);
+  if(!clock) return null;                                    // no clock → no reading, on every surface
+  const days = Math.max(0, Math.round((Date.now() - clock.since.getTime()) / 86400000));
+  const win = (typeof ttFreshness==='function') ? ttFreshness(tea) : null;
+  if(!win) return { grounded:false, measured:clock.measured, days, ageing:false };
+  // An ageing tea reads elapsed time as a RECORD, never an alarm — no countdown, no urgency tone.
+  if(win.ageing) return { grounded:true, measured:clock.measured, days, ageing:true, rung:win.rung };
+  const total = clock.measured ? win.opened_days : win.sealed_days;
+  if(total==null) return { grounded:false, measured:clock.measured, days, ageing:false };
+  return { grounded:true, measured:clock.measured, days, ageing:false, rung:win.rung,
+           leftDays: total - days, totalDays: total };
 }
 // #18 session-aware tiers. One grams-logged session anchors the average (the teaForecast
 // precedent — a real shelf rarely has two); no history → the lowStockG() floor keeps the
@@ -57,17 +107,33 @@ function statusLine(tea){
   // quantity wins while remarkable: 'few' outranks ages + the freshness countdown — an
   // "ages well" or "best within N wks" on a nearly-empty tin hides the #18 lie.
   if(tier==='few') return { text:`${g} · a few cups left`, tone:'few' };
-  const cat = statusCategory(tea);
-  if(cat==='ages'){
+  /* THE SHELF IS TWO-KEY (§2): a freshness tone fires only when clock AND window both ground.
+     Ungrounded falls through to the plain quantity tone — WS5 requires one status line in the same
+     slot on every card, so "the block is absent" has no shelf equivalent; an empty slot is not an
+     option and a guess is not either. `23 g · plenty` is a STOCK statement, not a freshness claim,
+     so never-guess survives intact. A tea can therefore read `23 g · plenty` here and "opened 6 wks
+     ago" on detail: one is a stock fact, the other a date fact, and neither claims freshness. */
+  /* AGEING NEEDS NO CLOCK. A countdown is meaningless without a date, but "ages well" is a statement
+     about the LEAF, not about elapsed time — it says this one isn't going off, and that is knowable
+     from the window rung alone. Requiring both keys here dropped the label from every ageing tea with
+     no harvest date (Yunnan Silver Bud on the real shelf), which §4 explicitly rules out: ageing is
+     shipped behaviour for white and pu-erh and this slice is a COPY replacement over it, not a
+     removal. Detail still needs the clock for the elapsed figure — that part is genuinely two-key. */
+  const win = (typeof ttFreshness==='function') ? ttFreshness(tea) : null;
+  if(win && win.ageing){
     const phrase = (tea.type||'').toLowerCase()==='puerh' ? 'ages gracefully' : 'ages well';
     return { text:`${g} · ${phrase}`, tone:'ages' };
   }
-  if(cat==='delicate'){
-    const wk = freshnessWeeksLeft(tea);
-    if(wk!=null && wk<=FRESH_NEAR_WEEKS)
-      return wk>=1 ? { text:`${g} · best within ${wk} wk${wk===1?'':'s'}`, tone:'freshness' }
-                   : { text:`${g} · best enjoyed soon`, tone:'freshness' };
-    return { text:`${g} · fresh, plenty`, tone:'plenty' };
+  const fr = freshnessReading(tea);
+  if(fr && fr.grounded){
+    /* FRESH_NEAR_WEEKS retires as a GLOBAL, not as an idea. It withheld the countdown until ≤26 of
+       a 12-month window remained — half — so a tea with most of its life ahead read as stock, not as
+       a clock. Keeping that posture window-RELATIVE is the actual upgrade: half of a 30-day opened
+       shincha is two weeks, half of a two-year oolong is a year, and one global number could never
+       say both. Beyond halfway, the plain quantity tone; a calm app does not count down from far. */
+    if(fr.leftDays > fr.totalDays/2) return { text:`${g} · plenty`, tone:'plenty' };
+    if(fr.leftDays >= 7) return { text:`${g} · best within ${fmtSoftDays(fr.leftDays).replace(/^~/,'')}`, tone:'freshness' };
+    return { text:`${g} · best enjoyed soon`, tone:'freshness' };
   }
   return { text:`${g} · plenty`, tone:'plenty' };
 }
@@ -531,6 +597,15 @@ function teaFormModal(){
               <button type="button" class="lib-chip" onclick="setPurchaseToday(this)">Today</button>
             </div>
           </div>
+          <!-- v3.98: beside purchase date because they share a provenance cluster, NOT because they
+               are the same join. Purchase = cost + inventory; opened = the freshness clock. Sealed
+               vs opened is roughly a 5-10x swing, which is why this is the one measured rung. -->
+          <div class="field span2"><label>Opened <span style="color:var(--ink-soft);font-weight:400;">— when you broke the seal; this is what freshness counts from</span></label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="date" name="openedDate" value="${escapeHtml(t.openedDate||'')}" style="flex:1;">
+              <button type="button" class="lib-chip" onclick="setOpenedToday(this)">Today</button>
+            </div>
+          </div>
           <div class="field span2"><label>Leaf form <span style="color:var(--ink-soft);font-weight:400;">— shapes suggested steep times when there's no guide, and how they ramp past the last listed steep</span></label>
             <select name="leafForm">
               <option value="" ${!t.leafForm?'selected':''}>Auto — infer from type &amp; name</option>
@@ -569,6 +644,7 @@ function setTeaFormRating(v){
   document.getElementById('teaRatingWrap').innerHTML = renderStarsInteractive(v,true,'setTeaFormRating');
 }
 function setPurchaseToday(btn){ const f=btn.closest('form'); if(f&&f.purchaseDate) f.purchaseDate.value = dayKey(new Date()); }
+function setOpenedToday(btn){ const f=btn.closest('form'); if(f&&f.openedDate) f.openedDate.value = dayKey(new Date()); }
 let _teaFormSaving = false;
 async function submitTeaForm(e){
   e.preventDefault();
@@ -596,6 +672,7 @@ async function submitTeaForm(e){
     wouldRebuy: f.wouldRebuy.checked,
     purchaseType: f.isRepeat.checked?'repeat':'first',
     purchaseDate: f.purchaseDate.value || null,
+    openedDate: f.openedDate.value || null,
     leafForm: f.leafForm.value || null,
     image: imageUrl,
     dateAdded: state.editingTea?.dateAdded || new Date().toISOString()
@@ -632,32 +709,39 @@ const FRESH_SEASONS = { spring:'Spring', summer:'Summer', autumn:'Autumn', winte
 function freshnessYear(tea){ const y = parseInt(String(tea.harvestYear||'').trim(),10);
   const nowY = new Date().getFullYear(); return (y>=1980 && y<=nowY+1) ? y : null; }
 function freshnessSeason(tea){ return FRESH_SEASONS[String(tea.harvestSeason||'').trim().toLowerCase()] || null; }
-function freshnessClass(tea){
-  const type = (tea.type||'').toLowerCase();
-  const name = ((tea.name||'')+' '+(tea.cultivar||'')).toLowerCase();
-  if(type==='green' || /shincha|sencha|gyokuro|matcha|first[\s-]?flush|long ?jing|dragon ?well/.test(name)) return 'young';
-  if(type==='white' || type==='puerh' || /sheng|raw pu|hei ?cha|liu ?bao|shou ?mei|aged/.test(name)) return 'ages';
-  return null;
-}
-function freshnessStyleWord(tea){
-  const name = (tea.name||'').toLowerCase();
-  if(/shincha/.test(name)) return 'shincha';
-  if(/sencha/.test(name)) return 'sencha';
-  if(/gyokuro/.test(name)) return 'gyokuro';
-  if(/matcha/.test(name)) return 'matcha';
-  if(/first[\s-]?flush/.test(name)) return 'a first flush';
-  if(/long ?jing|dragon ?well/.test(name)) return 'longjing';
-  return (typeLabel(tea.type)||'green').toLowerCase()+' tea';
-}
+/* freshnessClass and freshnessStyleWord are DELETED in v3.98 (slice B3), not left dormant.
+   freshnessClass was a second type→class writer sitting beside statusCategory — the exact drift the
+   single-writer rule exists to prevent — and its name-regex heuristics (`/shincha|sencha|gyokuro/`)
+   are what the catalog's curated `covers` join replaces. freshnessStyleWord only ever fed its copy.
+   Both are subsumed by ttFreshness + freshnessReading; keeping them "just in case" would leave two
+   answers to one question, which is the bug class this slice closes. */
+/* Detail's ladder is GRADED where the shelf's tone is binary (§2). The four rungs, in order, and
+   each says how much it knows rather than rounding up to a confident answer.
+   v3.98 replaces the v3.62 cue: that one keyed on freshnessClass + harvest only, so it could not
+   distinguish an opened pouch from a sealed one — the 5–10× variable the whole model exists for. */
 function freshnessCueHTML(tea){
-  const cls = freshnessClass(tea); if(!cls) return '';
-  const year = freshnessYear(tea); if(!year) return '';           // age needs a real year
-  const season = freshnessSeason(tea);
-  const when = (season ? season+' ' : '') + year + ' harvest';
-  const line = cls==='young'
-    ? `${when} — ${freshnessStyleWord(tea)} is at its best young.`
-    : `${when} — this style deepens with age.`;
-  return `<div style="margin-top:10px;font-size:12.5px;color:var(--ink-soft);font-style:italic;">${line}</div>`;
+  const fr = freshnessReading(tea);
+  if(!fr) return '';                                   // rung 4 — no clock, no block. Absent, not zero.
+  const wrap = s => `<div class="fresh-cue">${s}</div>`;
+  const opened = tea && tea.openedDate;
+  const when = opened ? `Opened ${fmtElapsed(fr.days)}` : `${freshnessSeason(tea)?freshnessSeason(tea)+' ':''}${freshnessYear(tea)} harvest`;
+  // rung 3 — elapsed only. The date is measured; only the WINDOW would be invented, so it is withheld.
+  if(!fr.grounded) return wrap(escapeHtml(when) + (opened ? '' : ' — no window for this type yet.'));
+  if(fr.ageing){
+    // "Opened 2 yrs ago — 2 yrs rested" says one thing twice: a measured clock already carries the
+    // elapsed figure in its own lead. Only a harvest lead ("2021 harvest") needs the years spelled out.
+    const rested = (!opened && fr.days>=365) ? ` — ${escapeHtml(fmtElapsed(fr.days).replace(' ago',' rested'))}` : '';
+    return wrap(escapeHtml(when) + rested + ' — this style deepens with age.');
+  }
+  const soft = fmtSoftDays(Math.max(fr.leftDays,0));
+  // "about another 1 wk" is grammatical and reads badly; the singular gets a word, not a numeral.
+  const span = soft.replace(/^~/,'');
+  const body = fr.leftDays >= 7
+    ? `at its best for about another ${span==='1 wk' ? 'week' : escapeHtml(span)}`
+    : 'best enjoyed soon';
+  // rung 2 — harvest-grounded. Say the assumption out loud rather than presenting an estimate as measured.
+  const hedge = fr.measured ? '' : ' <span class="fresh-hedge">(assumes sealed until opened)</span>';
+  return wrap(escapeHtml(when) + ' — ' + body + '.' + hedge);
 }
 // v3.62 rider — when the stock curve is absent only because there's no purchase date (but there IS a
 // bought amount to draw from), offer a quiet way to complete it. Silent otherwise.

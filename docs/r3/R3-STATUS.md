@@ -257,7 +257,23 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v3.97 LIVE — R3 slice B2: #06 Add / edit tea + #03 Tea detail** (cache **v107**). R51's other half:
+**v3.98 LIVE — R3 slice B3: the freshness model** (cache **v108**, **`sql/v3_11-opened-date.sql`
+applied before the push** — the round's first migration). Freshness counts from `teas.opened_date`,
+not harvest; harvest is a fallback that says it assumes the pouch stayed sealed; purchase is
+deliberately off the ladder. Two groundings failing independently — clock × window — with **no clock →
+no block at all**. **R85** made the window key a three-rung cascade (slug → family → `teas.type`)
+because the spec's catalog-only key was decided at 13-of-14 coverage and the shelf is now 21 teas at
+13; slug→family alone would have removed a working reading from four teas, including the only pu-erh,
+which has no catalog row. `statusCategory`, `freshnessClass`, `freshnessStyleWord`,
+`freshnessWeeksLeft` and both global window constants are **deleted**. **R86** keeps `ageing` as
+catalog data; the per-tea override is an open product call.
+
+Two things a later slice inherits. **(a)** `TT_TYPE_TO_FAMILY` is the single place the `puerh`/`dark`
+vocabularies meet (§7.2) — a guard asserts it is not inlined twice. **(b)** The elapsed-only rung now
+has zero live examples and that is not a defect: rung 3 means a real tea is never window-less, so the
+rung is defensive rather than routine (the R70 shape).
+
+**Previously: v3.97 — R3 slice B2: #06 Add / edit tea + #03 Tea detail** (cache **v107**). R51's other half:
 slice B built the browsable mode, B2 builds the **contextual entries** — Go Deeper reached from Tea
 detail, and **Borrow from Go Deeper**, which is the shipped `saveSuggestedGuide` gesture against the
 catalog instead of the KB. The catalog has no per-step times, so a borrow is temp + ratio over a

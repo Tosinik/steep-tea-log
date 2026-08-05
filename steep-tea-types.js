@@ -150,6 +150,69 @@ function cultivarNameHint(value){
   return null;
 }
 
+/* ============ Freshness windows (v3.98, slice B3) ============
+   SPEC-freshness-model.md §3/§4. A freshness reading needs TWO independent groundings — the clock
+   (when the tea started ageing) and the window (how long this kind of tea holds). This is the
+   window half, and it lives here because it is catalog data, editable, not engine constants.
+
+   ⚠ SEEDS, NOT SETTLED FACT. Published guidance disagrees by up to ~2x, which is exactly why these
+   are data rather than hard-coded numbers. Never render one as authoritative — the UI shows "~5 wks",
+   never "35 days". Days are the storage unit only.
+
+   `ageing: true` means elapsed time reads as HISTORY ("3 yrs rested"), never a countdown and never
+   an urgency tone. White and dark default on; oolong defaults OFF and widens with roast, which is a
+   property of the individual tea rather than the family — one Oolong row spanning the range, not a
+   roasted/unroasted split.
+
+   R86: `ageing` is CATALOG data in R3. The spec contradicts itself — §4 calls it "flippable per tea"
+   while §5 lists only opened_date and catalog data as the model's inputs — and a per-tea override is
+   a second migration column for a feature with no board and no ruling. Recorded as an open product
+   call, not built. */
+const TT_FRESHNESS = {
+  // by catalog family (rung 2)
+  green:  { sealed_days: 365, opened_days:  75, ageing:false },
+  yellow: { sealed_days: 365, opened_days:  60, ageing:false },
+  oolong: { sealed_days: 730, opened_days: 240, ageing:false },
+  black:  { sealed_days: 900, opened_days: 270, ageing:false },
+  white:  { sealed_days: null, opened_days: null, ageing:true },
+  dark:   { sealed_days: null, opened_days: null, ageing:true }
+};
+// Per-slug overrides (rung 1) — only where the slug genuinely differs from its family. Japanese
+// green and matcha are the splits §3 names as the reason to key on slug at all: they sit ~2x apart
+// from Chinese green and cannot be expressed at family level.
+const TT_FRESHNESS_SLUG = {
+  'sencha':   { sealed_days: 270, opened_days: 45 },
+  'shincha':  { sealed_days: 180, opened_days: 30 },
+  'gyokuro':  { sealed_days: 270, opened_days: 45 },
+  'kabusecha':{ sealed_days: 270, opened_days: 45 },
+  'matcha':   { sealed_days: 365, opened_days: 25 }
+};
+/* R85 — the third rung, and the ONE place the two vocabularies meet.
+   `teas.type` uses `puerh`; `TEA_TYPES.family` uses `dark`. Two names for one thing (§7.2), latent
+   until now: freshness windows are the first consumer that needs to cross between them, because the
+   shelf's only pu-erh has no catalog row at all, so `dark`'s ageing default could never reach the
+   one tea on the shelf that actually ages. WHEN THE VOCABULARIES ARE UNIFIED, THIS CONSTANT IS THE
+   ONE PLACE TO CHANGE. Do not inline the mapping anywhere else. */
+const TT_TYPE_TO_FAMILY = { green:'green', yellow:'yellow', oolong:'oolong', black:'black', white:'white', puerh:'dark' };
+
+/* The cascade: catalog slug -> catalog family -> teas.type (R85). Returns
+   { sealed_days, opened_days, ageing, rung } or null when nothing grounds.
+   Rung 3 is coarser, not worse — it is what a final rung is for, and it is why authoring a `covers`
+   entry UPGRADES a tea from rung 3 to rung 2 rather than switching it on from nothing. */
+function ttFreshness(tea){
+  if(!tea) return null;
+  const row = (typeof matchTeaType==='function') ? matchTeaType(tea.name) : null;
+  if(row){
+    const fam = TT_FRESHNESS[row.family];
+    const slug = TT_FRESHNESS_SLUG[row.slug];
+    if(slug && fam) return Object.assign({}, fam, slug, { rung:'slug' });
+    if(fam) return Object.assign({}, fam, { rung:'family' });
+  }
+  const mapped = TT_TYPE_TO_FAMILY[String(tea.type||'').toLowerCase()];
+  const byType = mapped && TT_FRESHNESS[mapped];
+  return byType ? Object.assign({}, byType, { rung:'type' }) : null;
+}
+
 // Content contract (§3): contested/unconfirmed rows must render WITH a hedge, never as flat
 // fact. The DECISION lives here (data layer); Phase B places the string visually. Copy is a
 // calm placeholder — final wording is Phase-B/Niklas's. Empty string = nothing to hedge.

@@ -685,6 +685,46 @@ The round now carries **two** migrations, B3's and slice F's pass record.
 > round-trip contract (`fixtures/brew-roundtrip-test.js`) intact for free. **Both were found by
 > reading the shipped code against the board, which is the audit R81 says was skipped once already.**
 
+**R85 — Freshness windows key on a three-rung cascade, and this settles §7.2 in one place.**
+`TEA_TYPES` slug → `family` → `teas.type`. The spec's §3 rejected `teas.type` on precision grounds
+when `matchTeaType` covered **13 of 14** shelf teas; at **21** teas it covers 13, and slug→family
+alone would take a working freshness reading away from four — **Fei Bing Beeng Cha, Moonlight White,
+Chiran Sencha Okumidori, Spring White Anji** — on the most-seen surface in the app. That is a
+**regression**, categorically different from §6's designed quiet: §6's silence is data not yet
+entered, this would be existing readings disappearing. Fei Bing is the shelf's only pu-erh and has no
+catalog row, so `ageing: on` could never reach the one tea on the shelf that actually ages.
+
+Three reasons beyond "nothing regresses". **It is the app's own pattern** — user value → catalog
+default → broader fallback is §0.5's three-tier cascade, and slug→family is that cascade with its last
+rung deleted; `teas.type` is not a worse kind of answer, it is a *coarser* one, which is what a final
+rung is for. **Losing four working readings to a content gap inverts a refinement** — #37 exists so a
+tea can climb tiers as data arrives, and authoring a `covers` entry upgrades a tea from rung 3 to rung
+2, a ladder rather than a cliff. **And gating a code slice on content authoring** would have blocked a
+migration on eight queued tea-reference entries.
+
+The `puerh ↔ dark` mapping is a **single named constant citing §7.2** — when the two vocabularies are
+unified, that constant is the one place to change.
+
+**R86 — `ageing` is catalog data in R3; a per-tea override is not built.** The spec contradicts
+itself: **§4** calls it "flippable per tea" while **§5** lists only `opened_date` and catalog data as
+the model's inputs. A `teas.ageing` column would be a second migration column for a feature with no
+board and no ruling — **R81 is precisely the ruling against it**. The roasted-Wuyi case is genuine but
+it is one hypothetical tea against a column added on the strength of a contradiction. Catalog-only
+ships; the override is an open product call, and the spec is amended so the contradiction is visible
+rather than latent.
+
+> *Code-lane note, 2026-07-26 (shipped in v3.98).* Two consequences worth recording. **(a) Ageing
+> needs no clock**, and the first build got it wrong: requiring both keys for "ages well" silently
+> dropped the label from every ageing tea with no harvest date — Yunnan Silver Bud on the real shelf.
+> A countdown is meaningless without a date; "ages well" is a statement about the *leaf*, knowable
+> from the window rung alone. §4 calls this section a copy replacement over shipped behaviour, and a
+> replacement that drops the label is a removal. Caught by the suite, not by review. **(b) R85's third
+> rung makes the elapsed-only rung unreachable in production** — `teas.type` is CHECK-constrained to
+> six values that all carry a window, so a real tea can no longer be window-less. §2 justified
+> elapsed-only as the rung "every new tea starts on, by construction", which was true when the window
+> keyed on the catalog alone. The rung is now **defensive rather than routine**, which is strictly
+> better, and the suite reports its zero live examples rather than requiring one — the R70 shape.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not
