@@ -1,8 +1,22 @@
 # SPEC — Freshness model
 
-2026-07-19 · **Planning-lane spec**, pinned at the Bundle 1 + 2 Design → Code hand-off. Joins
-the **swatch data-model** and the **per-origin script data-model** as a hand-off pin. Supersedes
+2026-07-19 · **Planning-lane spec**, pinned at the Bundle 1 + 2 Design → Code hand-off. Supersedes
 the earlier "re-anchor freshness on harvest" instruction — harvest is a *fallback*, not the anchor.
+
+> **Sibling pins — amended 2026-07-26 (R82).** This header previously read "Joins the **swatch
+> data-model** and the **per-origin script data-model** as a hand-off pin". **Neither of those was ever
+> written.** `R3-BUNDLE1-RECONCILIATION.md:106` says all three "are what get pinned at that build
+> hand-off" — future tense — and only this one was delivered. So #03's declared primary path (the
+> swatch picker) and its script field have a locked visual design and **no data model at all**; the
+> 14-colour palette described as "derived from the 55 catalog liquors" has no source to derive from,
+> because `TEA_TYPES` carries no colour, liquor, rinse or script key. Both are tea-reference-lane
+> work, queued beside the eight uncovered `covers` entries and the three owed coordinate rows — not
+> R3. *A document referring to a sibling artifact does not establish that the sibling exists.*
+
+> **Scheduling — R84, 2026-07-26.** This spec ships **inside R3 as slice B3**, sequenced B2 → B3 → C,
+> carrying `sql/v3_11-opened-date.sql`. It is the build authority for that slice's scope. §7.1's
+> `isTeaUnopened` collision is resolved **inside** the slice: `opened_date` set → opened, measured;
+> absent → stock inference as today; `isTeaUnopened` becomes the fallback rung, not the authority.
 
 **Rev 2 (2026-07-19)** — reviewed against the live build at `9ce9492`. Rev 1 mis-stated what
 ships today in three places and under-specified the blast radius; both are corrected below. See
@@ -222,7 +236,10 @@ to own the shelf (§0), and conflated clock-grounding with window-grounding (§2
 - **`sincePurchaseDays`** — stays with the **consumption forecast** (`ledgerRate → daysLeft`),
   confident at ≥10 days of ledger (`steep-dashboard.js:403`). Not a freshness input.
 - **`inventoryHistory` / `inventorySparkline`** (v3.28) — the stock curve, anchored by
-  `purchase_date` + grams bought. R3 had dropped it to a flat bar; restored on Tea detail.
+  `purchase_date` + grams bought. ~~R3 had dropped it to a flat bar; restored on Tea detail.~~
+  **Stale description, corrected 2026-07-26 — R80 governs.** It was never dropped: it ships at
+  `steep-dashboard.js:427`, is called at `steep-teas.js:785`, and #03 rev 3's "dropped in R3" caption
+  contradicts its own next sentence. Nothing to restore; leave it alone in the literal sense.
 - **`statusLine`'s quantity-first precedence** — see §0. The engine's most important rule.
 - **`freshnessClass` / `freshnessCueHTML`** — superseded by §3 + §4, which subsume the
   young/ages split and add the opened/sealed pair. Note this is a *replacement of rendered copy*.

@@ -176,6 +176,69 @@ ok(ctx.viewTeas().indexOf('value="<script>"')<0, 'H2 the search value is escaped
 S.refSearch=''; S.refOpen=null; S.teas=[];
 console.log('  H escaping: 2 checks');
 
+/* ---- J. R51's contextual half (slice B2): the deep link and the borrow ----
+   Two failure modes here are silent by nature. A deep link that passes a MEMBER slug to state.refOpen
+   opens nothing, and a closed row looks exactly like a row nobody tapped. A borrow that quietly
+   widened its no-guide guard would overwrite a user's own words with no symptom at all. Both pinned. */
+const SRC_TEAS_B2 = fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8');
+/* borrowGuideFrom is the first thing here that WRITES, so it needs the persistence and re-render
+   seams stubbed. Deliberately narrow: putTea records the call so J-section can assert the write
+   actually reached the persistence layer rather than only mutating state in memory. */
+let putCalls = 0;
+ctx.SteepDB = { putTea: () => { putCalls++; return Promise.resolve(); } };
+ctx.render = () => {};
+ctx.showToast = () => {};
+const parentCovered = cats.find(c=>c.members.some(m=>(m.covers||[]).length));
+if(parentCovered){
+  const covered = parentCovered;
+  const member = covered.members.find(m=>(m.covers||[]).length);
+  S.teas=[{id:'m1',name:member.covers[0],type:'oolong',amountGrams:10}];
+  ok(ctx.matchTeaType(member.covers[0]).slug===member.slug, 'J1 the matcher resolves this name to the MEMBER row');
+  ok(ctx.refCategoryFor(S.teas[0])===covered.type.slug,
+     'J2 the deep link walks the member up to its browse CATEGORY (a member slug would open nothing)');
+  ok(ctx.refEntryLabel(S.teas[0])===member.display_name, 'J3 the source line names the matched row, not the parent');
+}
+// A top-level match resolves to itself — the walk must not over-climb.
+const topCovered = cats.find(c=>(c.type.covers||[]).length);
+if(topCovered){
+  const tt={id:'m2',name:topCovered.type.covers[0],type:'oolong',amountGrams:10};
+  ok(ctx.refCategoryFor(tt)===topCovered.type.slug, 'J4 a top-level match resolves to itself');
+}
+// An uncovered tea gets NO deep link and NO borrow — absent, not disabled (the honest-absence rule).
+const un={id:'u1',name:'A Tea Nobody Curated 12345',type:'green',amountGrams:10};
+ok(ctx.refCategoryFor(un)===null, 'J5 an uncovered tea has no category to link to');
+ok(ctx.borrowButtonHTML(un)==='' && ctx.goDeeperLinkHTML(un)==='', 'J6 …so neither control renders at all');
+ok(ctx.borrowButtonHTML({id:'c1',name:topCovered?topCovered.type.covers[0]:'x',type:'oolong'})!=='',
+   'J7 …while a covered tea does get the borrow button');
+// The guard is KEPT, not widened: borrow returns early on an existing guide, exactly as saveSuggestedGuide does.
+ok(/if\(!tea \|\| tea\.brewGuide\) return;/.test(SRC_TEAS_B2),
+   'J8 borrowGuideFrom keeps the no-guide guard — replacing a saved guide is a separate decision');
+ok(/scheduleToGuideText/.test(SRC_TEAS_B2), 'J9 borrow writes through the one parser-safe emitter');
+ok(!/typical_brew[\s\S]{0,80}times/.test(SRC_TEAS_B2), 'J10 borrow never invents per-step times from the catalog');
+// End to end: borrow, then re-parse. The written guide must round-trip or the timer reads it wrong.
+if(topCovered && (topCovered.type.covers||[]).length){
+  const name = topCovered.type.covers[0];
+  S.teas=[{id:'b1',name:name,type:'oolong',amountGrams:10,brewGuide:''}];
+  S.sessions=[];
+  ctx.borrowGuideFrom('b1');
+  const written = S.teas[0].brewGuide;
+  const reparsed = ctx.parseBrewGuide(written);
+  ok(!!written, 'J11 borrow writes a guide ('+JSON.stringify(written)+')');
+  ok(reparsed && reparsed.times && reparsed.times.length>0, 'J12 the written guide re-parses to a real schedule');
+  const before = ctx.effectiveGuideSchedule({id:'x',name:name,type:'oolong'}, true);
+  ok(before && JSON.stringify(reparsed.times)===JSON.stringify(before.times),
+     'J13 the times survive the round trip unchanged (generateFormTimes → text → parseBrewGuide)');
+  const catTemp = (topCovered.type.typical_brew||{}).temp_c;
+  if(catTemp && catTemp.length) ok(reparsed.tempC===catTemp[0], 'J14 the CATALOG temp is what got written, not the KB\'s');
+  // Second borrow must be a no-op: the guard, exercised rather than only grepped.
+  const snapshot = S.teas[0].brewGuide, callsBefore = putCalls;
+  ctx.borrowGuideFrom('b1');
+  ok(S.teas[0].brewGuide===snapshot, 'J15 borrowing again leaves the saved guide untouched');
+  ok(putCalls===callsBefore, 'J16 …and writes nothing to the persistence layer either');
+  S.teas=[];
+}
+console.log('  J deep link + borrow: '+((parentCovered?3:0)+(topCovered?12:0)+3)+' checks');
+
 /* ---- I. real data (owner-scoped per R69) ---- */
 function parseCSV(t){const rows=[];let f='',r=[],q=false;
   for(let i=0;i<t.length;i++){const c=t[i];

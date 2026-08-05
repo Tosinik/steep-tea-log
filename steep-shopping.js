@@ -94,8 +94,18 @@ function removeWish(id){
   state.wishlist = (state.wishlist||[]).filter(x=>x.id!==id);
   window.SteepDB.removeWishItem(id).catch(saveErr); render();
 }
+// R49's join, as a predicate: normalized-name match against the wishlist. Same fold as :11's onList
+// set, so the two can't drift.
+function wishHasTeaName(name){
+  const q = (name||'').trim().toLowerCase(); if(!q) return false;
+  return (state.wishlist||[]).some(w=>(w.name||'').trim().toLowerCase()===q);
+}
 function addWishFromTea(teaId){
   const t = teaById(teaId); if(!t) return;
+  // #03 forbids a duplicate add outright ("already listed → On your list ✓"). Guarded HERE rather
+  // than only at the call site, so the invariant survives a caller that forgets to draw the state —
+  // rebuyYes is the other one.
+  if(wishHasTeaName(t.name)){ showToast(`"${t.name}" is already on your list`); render(); return; }
   const w = { id:uid(), name:t.name, vendor:t.source||'', type:t.type||'', note:'', done:false, createdAt:new Date().toISOString() };
   state.wishlist = state.wishlist||[]; state.wishlist.push(w);
   persistWish(w); showToast(`Added "${t.name}" to your list`); render();

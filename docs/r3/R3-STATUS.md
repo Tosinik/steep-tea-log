@@ -257,7 +257,25 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v3.96 LIVE — R3 slice B: #13 Teas revision + #05 Vessels** (cache **v106**). The Teas tab gains **Go
+**v3.97 LIVE — R3 slice B2: #06 Add / edit tea + #03 Tea detail** (cache **v107**). R51's other half:
+slice B built the browsable mode, B2 builds the **contextual entries** — Go Deeper reached from Tea
+detail, and **Borrow from Go Deeper**, which is the shipped `saveSuggestedGuide` gesture against the
+catalog instead of the KB. The catalog has no per-step times, so a borrow is temp + ratio over a
+`generateFormTimes` schedule, written through `scheduleToGuideText` so it round-trips. **The no-guide
+guard is kept, not widened**; the source line names which rung answered; and where the catalog doesn't
+cover a tea, every control is **absent, not disabled**. #03 splits into character and provenance
+clusters with empty fields **omitted rather than dashed**; the ⋯ menu carries only what exists (pass-tea
+rides F). #06 makes Add and Edit distinct states — rating, brew guide and favourite promoted **on Edit
+only**, and nothing else. **R80–R84** came out of the plan review. **No SQL.**
+
+Three things a later slice inherits. **(a) R81's fence**: these two boards demand seven data-model
+items and the hand-off scopes none — B2 built the schema-none half, and the rest needs rulings and
+migrations first. **(b) The freshness block is untouched, position included** — B3 replaces the
+reading per the spec's §3/§4, not the slot. **(c) The read-only guard caught its own slice**:
+`borrowGuideFrom` was drafted into `steep-reference.js` and section A failed immediately, so it and
+`goDeeperFor` live in `steep-teas.js` beside their twin.
+
+**Previously: v3.96 — R3 slice B: #13 Teas revision + #05 Vessels** (cache **v106**). The Teas tab gains **Go
 Deeper** as its second mode (R51) — new `steep-reference.js` over `browseTeaTypes()`, **read-only by
 contract** and guarded structurally by `fixtures/reference-test.js` — plus the header rework (title ·
 generated count line · ⋯ sheet), the mode pair over a shelf-mode-only segment row (one three-valued

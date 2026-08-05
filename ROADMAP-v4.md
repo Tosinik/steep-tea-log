@@ -210,7 +210,11 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   browsable page) is HELD until phase-2 ships; Phase C rides R3.**~~ **Phase B SHIPPED v3.96** as **Go
   Deeper**, the Teas tab's second mode (R51) — `steep-reference.js` over `browseTeaTypes()`, read-only by
   contract, with `fixtures/reference-test.js` guarding that it never writes. The hold was lifted by R51
-  making it an R3 surface rather than a phase-2 one; Phase C's styling landed with it.
+  making it an R3 surface rather than a phase-2 one; Phase C's styling landed with it. **v3.97 adds the
+  contextual half** — Go Deeper from Tea detail, and *Borrow from Go Deeper* writing the catalog's
+  temp/ratio into the free-text `brew_guide` through the shipped `scheduleToGuideText`. **Still owed to
+  the tea-reference lane, batched:** the 8 shelf teas the catalog does not cover, the swatch/script data
+  models that were never written (R82), and the 3 coordinate rows.
 - [x] **greeting pass — #25 + #17 + ack** (v3.88) — `d_scorePick` soft recency penalty (2 prior days,
   tunable; today excluded, deterministic) stops re-suggesting a just-had tea; new `isTeaUnopened` gates the
   rediscovery copy so an opened tea is never called "unopened"; ack pool rewritten retrospective. Hygiene

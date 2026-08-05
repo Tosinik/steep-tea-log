@@ -145,3 +145,23 @@ function onRefSearchInput(val){
 }
 function clearRefSearch(){ state.refSearch=''; render(); }
 function toggleRefEntry(slug){ state.refOpen = (state.refOpen===slug) ? null : slug; render(); }
+
+/* ---- R51's contextual half (slice B2): reaching the reference from a tea ----
+   matchTeaType resolves to the most specific row, which for a two-level entry is the MEMBER (Da Hong
+   Pao → `dhp`). browseTeaTypes() keys on top-level categories only, so a deep link that passed the
+   member slug straight to state.refOpen would open nothing — silently, since a closed row looks
+   exactly like a row nobody tapped. Walk to the parent. */
+function refCategoryFor(tea){
+  const m = tea && matchTeaType(tea.name);
+  if(!m) return null;                                  // uncovered — the caller draws nothing at all
+  return m.parent || m.slug;
+}
+function refEntryLabel(tea){
+  const m = tea && matchTeaType(tea.name);
+  return m ? m.display_name : '';
+}
+/* Both of the above are pure READS, which is why they live here. The two actions they feed —
+   goDeeperFor (navigation) and borrowGuideFrom (which writes a tea's brewGuide) — deliberately do
+   NOT: they are in steep-teas.js beside saveSuggestedGuide, their shipped twin. Section A of
+   fixtures/reference-test.js caught the first draft with borrowGuideFrom in this file, which is the
+   guard working on the first slice after it was written: the reference suggests, it never writes. */

@@ -631,6 +631,60 @@ which is the same hazard one layer down.
 > test proves only that the source equals itself.** Ground the expectation in the *other* representation —
 > here, the export — which is what section G now does and what surfaced the typo.
 
+*R80–R84 were issued 2026-07-26 at the Code lane's slice-B2 plan review, and every load-bearing claim
+was re-verified in the planning lane first: `TEA_TYPES`' field set enumerated through the resolver (no
+colour, liquor, rinse or script key exists), `sql/schema.sql:8`'s CHECK confirmed at six types,
+`inventorySparkline` confirmed shipping at `steep-dashboard.js:427` and called at `steep-teas.js:785`.*
+
+**R80 — `inventorySparkline` stays.** #03 rev 3's caption calls it "v3.28, dropped in R3" and then
+describes the curve in full, including its fallback. It ships (`steep-dashboard.js:427`, called at
+`steep-teas.js:785`), the board contradicts itself inside one sentence, and **R61 governs**: absence
+from a board is not a removal instruction, and this is not even absence. Keep it, and keep
+`sparklineHintHTML` as its fallback.
+
+**R81 — Boards may demand data the schema does not have, and that is a finding, not a build
+instruction.** #03 rev 3 and #06 rev 4 together require **seven** new data-model items: `opened_date`,
+`elevation`, a per-tea liquor colour with a 14-value catalog-derived palette, structured per-step brew
+guides, tisane types beyond the six-value CHECK, catalog rinse defaults with a contested flag, and a
+`script` field. The hand-off's §2 entry for these boards scopes **none** of them — it covers
+`brew_guide` and the cascade only. **The build authority is what is scoped, not what is drawn.** Each
+unscoped item is built only after it has a ruling and, where needed, a migration. Recorded so the gap
+is visible rather than rediscovered: that §2 entry was written from the boards' *behaviour* without
+auditing their *data demands* — a planning-lane omission, not a Design error.
+
+**R82 — Two of the three declared "hand-off pins" were never written.** `SPEC-freshness-model.md`'s
+header names itself alongside a **swatch data model** and a **per-origin script data model**.
+`R3-BUNDLE1-RECONCILIATION.md:106` says all three "are what get pinned at that build hand-off" —
+future tense, and only the freshness one was delivered. So #03's declared primary path (the swatch
+picker) and its script field both have a **locked visual design and no data model at all**. *A document
+referring to a sibling artifact does not establish that the sibling exists.* Both are queued as
+tea-reference-lane work, not built in R3. The spec's header is amended to say which siblings exist.
+
+**R83 — The freshness model is its own slice, not a detail-page block.** `opened_date` is not a field:
+per its spec it becomes the single writer for freshness on **every** surface, retires
+`statusCategory`, retires `FRESH_WINDOW_MONTHS` and `FRESH_NEAR_WEEKS` as global constants, rewrites
+`status-line-test.js` §D, and feeds the shelf, the picker and the running-low sort. It carries
+`sql/v3_11-opened-date.sql`. The spec's own text warned this would be under-estimated, and it was — in
+the build plan, by the planning lane.
+
+**R84 — The freshness model ships INSIDE R3, as slice B3.** Ruled 2026-07-26 by Niklas. Sequenced
+**B2 → B3 → C**. Its own spec is the build authority for scope
+(`docs/r3/planning/SPEC-freshness-model.md`, rev 2). **§7.1's `isTeaUnopened` collision is resolved
+inside the slice, not deferred**: `opened_date` set → opened, measured; absent → stock inference as
+today; `isTeaUnopened` becomes the fallback rung rather than the authority. §9's claim that
+`inventorySparkline` was dropped in R3 is a **stale description** — R80 governs and the curve ships.
+The round now carries **two** migrations, B3's and slice F's pass record.
+
+> *Code-lane note, 2026-07-26 (shipped in v3.97).* R81's fence held in the build with two additions
+> worth recording. **(a)** #06 rev 4's "adds the three missing editables — rating · brew guide ·
+> favourite" describes a gap that had already closed: all three ship, folded behind Specifics
+> (`steep-teas.js:495`/`:522`/`:525`). The work was a *promotion*, on Edit only, and the board's claim
+> was stale rather than unscoped — a third failure mode beside R81's. **(b)** The board's Borrow
+> action turned out to have a shipped twin, `saveSuggestedGuide`, differing only in source: the KB
+> versus the catalog. Reusing that writer rather than building a parallel one is what kept the
+> round-trip contract (`fixtures/brew-roundtrip-test.js`) intact for free. **Both were found by
+> reading the shipped code against the board, which is the audit R81 says was skipped once already.**
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

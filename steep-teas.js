@@ -467,9 +467,27 @@ function dismissKbSuggest(){
 }
 function closeTeaForm(){ state.teaFormOpen=false; state.editingTea=null; state.teaPrefill=null; state._draftImage=null; render(); }
 
+/* #06 rev 4 draws Add and Edit as DISTINCT STATES, and the build treated them identically. Rating,
+   brew guide and favourite already shipped — folded behind Specifics — so this is a promotion, not
+   three new fields (the board's "adds the three missing editables" describes a gap that closed
+   earlier). They move above the fold on EDIT ONLY:
+     · Add exists to get a new tin recorded before you forget it. Everything past name and type is
+       friction, and WS1's "name and type are all you need" stays exactly as it is.
+     · Edit is opened because something specific changed — a rating formed, the brewing got worked
+       out, it earned favourite. Making you expand a fold to reach the field you came for is the
+       wrong default on that path.
+   THOSE THREE AND NOTHING ELSE. The fold holds thirteen fields; "promote what Edit is for" drifts
+   into harvest, origin, cultivar, vendor, cost very easily, and that is scope creep dressed as
+   layout. The fields are rendered once by a shared builder and placed on one side or the other, so
+   the two states cannot drift into two different forms. */
 function teaFormModal(){
   const t = state.editingTea || state.teaPrefill || {};
+  const isEdit = !!t.id;
   const typeOpts = TYPES.map(ty=>`<option value="${ty.k}" ${t.type===ty.k?'selected':''}>${ty.label}</option>`).join('');
+  const ratingField = `<div class="field"><label>Your rating</label><div id="teaRatingWrap">${renderStarsInteractive(Number(t.rating)||0,true,'setTeaFormRating')}</div><input type="hidden" name="rating" id="teaRatingInput" value="${t.rating||0}"></div>`;
+  const brewField = `<div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${escapeHtml(t.brewGuide||'')}</textarea></div>`;
+  const favField = `<label class="checkrow"><input type="checkbox" name="isFavorite" ${t.isFavorite?'checked':''}> Favorite</label>`;
+  const promoted = isEdit ? `<div class="form-grid" style="margin-top:14px;">${ratingField}<div class="field">${favField}</div>${brewField}</div>` : '';
   return `<div class="overlay" onclick="if(event.target===this) teaFormBackdrop()">
     <div class="modal">
       <div class="modal-head"><h2>${t.id?'Edit tea':'Add a tea'}</h2><button class="close-x" onclick="teaFormCloseGuard(this)">✕</button></div>
@@ -483,6 +501,7 @@ function teaFormModal(){
         </div>
         <div class="field" style="margin-top:14px;"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}" oninput="teaFormNameSuggest()" placeholder="e.g. Sencha Kagoshima"><div id="teaKbSuggest"></div></div>
         <div class="field" style="margin-top:12px;"><label>Tea type</label><select name="type">${typeOpts}</select></div>
+        ${promoted}
         <div class="fold-row" onclick="toggleSpecifics(this)" role="button" aria-expanded="false" style="margin-top:14px;">
           <span class="fold-label">Specifics <span class="fold-sub">· amount, harvest, origin…</span></span>
           <span class="fold-caret">${icon('i-caret-hl',22)}</span>
@@ -492,7 +511,7 @@ function teaFormModal(){
             <label class="checkrow" style="margin-top:6px;font-size:12px;"><input type="checkbox" name="inclPackaging" onchange="var r=document.getElementById('tareRow'); if(r) r.style.display=this.checked?'flex':'none';"> Weighed with packaging</label>
             <div id="tareRow" style="display:none;align-items:center;gap:8px;margin-top:6px;"><span style="font-size:12px;color:var(--ink-soft);">subtract</span><input type="number" step="0.1" name="packagingTare" value="${state.settings.defaultPackagingTareG??10}" style="width:64px;"><span style="font-size:12px;color:var(--ink-soft);">g packaging</span></div>
           </div>
-          <div class="field"><label>Your rating</label><div id="teaRatingWrap">${renderStarsInteractive(Number(t.rating)||0,true,'setTeaFormRating')}</div><input type="hidden" name="rating" id="teaRatingInput" value="${t.rating||0}"></div>
+          ${isEdit?'':ratingField}
           <div class="field"><label>Harvest year</label><input type="text" name="harvestYear" value="${escapeHtml(t.harvestYear||'')}" placeholder="2025"></div>
           <div class="field"><label>Harvest season</label><select name="harvestSeason">
             <option value="" ${!t.harvestSeason?'selected':''}>—</option>
@@ -519,10 +538,10 @@ function teaFormModal(){
             </select>
             ${!t.leafForm?`<div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">Currently reads as <b>${LEAF_PROFILES[effectiveLeafForm(t)].label}</b>.</div>`:''}
           </div>
-          <div class="field span2"><label>How to brew</label><textarea name="brewGuide" placeholder="95°C, 5s rinse, 15s / 20s / 30s...">${escapeHtml(t.brewGuide||'')}</textarea></div>
+          ${isEdit?'':brewField}
           <div class="field span2"><label>Description</label><textarea name="description" placeholder="Tasting notes, character, story...">${escapeHtml(t.description||'')}</textarea></div>
           <div class="field span2" style="flex-direction:row;gap:18px;flex-wrap:wrap;">
-            <label class="checkrow"><input type="checkbox" name="isFavorite" ${t.isFavorite?'checked':''}> Favorite</label>
+            ${isEdit?'':favField}
             <label class="checkrow"><input type="checkbox" name="wouldRebuy" ${t.wouldRebuy?'checked':''}> Would rebuy</label>
             <label class="checkrow"><input type="checkbox" name="isRepeat" ${t.purchaseType==='repeat'?'checked':''}> Repeat buy (unchecked = first time)</label>
           </div>
@@ -600,7 +619,7 @@ function deleteTea(id){
   render();
 }
 
-function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail'; state.flavorView='bars'; // WS4: bars is the default view on every visit — the toggle is deliberately NOT persisted (radar must never become sticky)
+function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail'; state.flavorView='bars'; state.teaMenuOpen=false; // WS4: bars is the default view on every visit — the toggle is deliberately NOT persisted (radar must never become sticky)
   try{ localStorage.setItem('tealog_view','tea-detail'); localStorage.setItem('tealog_activeTea', id); }catch(e){}
   render(); }
 
@@ -743,6 +762,64 @@ function flavorProfileHTML(tea){
   </div>`;
 }
 
+/* #03 rev 3, slice B2. The detail splits into character (what the leaf is) and provenance (where it
+   came from and what it cost). Empty fields are OMITTED, not dashed — the three-tier cascade the
+   hand-off states for this board: user value → catalog default → show nothing. A missing origin means
+   no origin row at all; nothing reads as broken.
+
+   FRESHNESS STAYS PUT. freshnessCueHTML rides Harvest in this block, exactly where the shipped layout
+   has it, and is untouched by this slice. Slice B3 replaces the READING (opened_date + catalog windows
+   per SPEC-freshness-model.md §3 windows / §4 ageing) — not the position. Do not draw the board's
+   confidence ladder here: it needs a column that does not exist until B3's migration, and drawing a
+   ladder over absent data is what R81 was written for. */
+function teaCharacterHTML(t){
+  const cells = [];
+  const cell = (label, val, extra) => { if(val) cells.push(`<div><div class="eyebrow">${label}</div><div>${escapeHtml(val)}</div>${extra||''}</div>`); };
+  cell('Origin', t.origin);
+  cell('Cultivar', t.cultivar);
+  const harvest = [t.harvestSeason,t.harvestYear].filter(Boolean).join(' ');
+  if(harvest) cells.push(`<div><div class="eyebrow">Harvest</div><div>${escapeHtml(harvest)}</div>${freshnessCueHTML(t)}</div>`);
+  else if(freshnessCueHTML(t)) cells.push(`<div>${freshnessCueHTML(t)}</div>`);   // cue can ground on year alone
+  if(!cells.length) return '';
+  return `<div class="grid grid-2" style="margin-top:16px;">${cells.join('')}</div>`;
+}
+// "Where this came from" — vendor · cost · purchase. The photo is a LABEL: provenance evidence, never
+// identity (identity is the type tint, R78), so it never leads and a photo-less tea is whole.
+function teaProvenanceHTML(t, costPerSession){
+  const rows = [];
+  const row = (label, val) => { if(val) rows.push(`<div><div class="eyebrow">${label}</div><div>${val}</div></div>`); };
+  row('Vendor', t.source ? escapeHtml(t.source) : '');
+  row('Purchase', `${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}`);
+  row('Cost / gram', t.costOriginalGrams ? currencyFmt(t.costTotal/t.costOriginalGrams) : '');
+  row('Cost / session', costPerSession>0 ? currencyFmt(costPerSession) : '');
+  if(!rows.length && !t.image) return '';
+  return `<div style="margin-top:18px;">
+      <div class="eyebrow">Where this came from</div>
+      <div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>
+      ${t.image?`<div class="tea-label-note">The photo is the label — evidence for where it came from, never the tea's identity.</div>`:''}
+    </div>`;
+}
+/* The ⋯ menu (#03), enumerated to what actually exists. "Pass this tea to the circle" is drawn on the
+   board and NOT built: it needs slice F's pass record and its migration. Go Deeper appears only when
+   the catalog covers the tea. */
+function toggleTeaMenu(){ state.teaMenuOpen = !state.teaMenuOpen; render(); }
+function teaMenuHTML(t){
+  if(!state.teaMenuOpen) return '';
+  const listed = (typeof wishHasTeaName==='function') && wishHasTeaName(t.name);
+  const deeper = (typeof refCategoryFor==='function') && refCategoryFor(t)
+    ? `<button class="hub-row" onclick="goDeeperFor('${escapeJsArg(t.id)}')">${icon('i-cup-hl',20)}<span>Go Deeper — reference entry</span></button>` : '';
+  return `<div class="hub-scrim" onclick="toggleTeaMenu()"></div>
+    <div class="hub-sheet" role="dialog" aria-label="Tea options">
+      <div class="hub-grab"></div>
+      ${listed
+        ? `<div class="hub-row" style="color:var(--ink-soft);">${icon('i-shopping-hl',20)}<span>On your list ✓</span></div>`
+        : `<button class="hub-row" onclick="teaMenuAddWish('${escapeJsArg(t.id)}')">${icon('i-shopping-hl',20)}<span>Add to shopping list</span></button>`}
+      ${deeper}
+      <button class="hub-row" style="color:var(--red);" onclick="armConfirm(this,'Delete this tea? Session history stays but shows as an unknown tea.',()=>deleteTea('${escapeJsArg(t.id)}'))">${icon('i-settings-hl',20)}<span>Delete this tea</span></button>
+    </div>`;
+}
+function teaMenuAddWish(id){ state.teaMenuOpen=false; addWishFromTea(id); }   // addWishFromTea renders
+
 function viewTeaDetail(){
   const t = teaById(state.activeTeaId);
   if(!t) return '<div class="empty">Tea not found.</div>';
@@ -753,20 +830,27 @@ function viewTeaDetail(){
   // #27 F: the tier is cups, not grams — the honest math lives here (ledger surface), never on the shelf.
   const _cups = cupsLeft(t), _dose = teaAvgDose(t), _f1 = v => String(Math.round(v*10)/10);
   const cupsLine = (_cups!=null && _dose) ? `<div class="mono" style="font-size:12px;color:var(--ink-soft);">≈ ${_f1(_cups)} cup${_f1(_cups)==='1'?'':'s'} at your usual ${_f1(_dose)}g</div>` : '';
+  // #03: the diary starts at the first cup — no count, no stars, no average until there is history.
   const histHTML = mySessions.length ? mySessions.map(s=>{
     const v = vesselById(s.vesselId);
     return `<div class="session-hist-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
       <span style="display:flex;align-items:center;gap:8px;">${s.photoUrl?`<img src="${escapeHtml(s.photoUrl)}" alt="" class="session-thumb" loading="lazy">`:''}<span><strong>${fmtDateTime(s.date)}</strong> · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)} ${s.isColdBrew?'· cold brew':''} ${s.rating?'· '+renderStarsStatic(s.rating,false):''}</span></span>
       <button class="btn-ghost" onclick="openSessionEdit('${escapeJsArg(s.id)}')">edit</button>
     </div>`;
-  }).join('') : '<div class="empty">No sessions logged for this tea yet.</div>';
+  }).join('') : `<div class="empty">The diary for this tea starts with your first cup.
+      <div style="margin-top:8px;"><button class="btn-ghost" style="color:var(--jade-deep);text-decoration:underline;padding:0;" onclick="startSessionFor('${escapeJsArg(t.id)}')">Start the first ›</button></div>
+    </div>`;
 
   // Back target honours where we came from — #20 adds 'sessions' (tapping a session's tea) alongside passport.
   const back = state.teaDetailFrom==='passport' ? {v:'passport',l:'passport'}
              : state.teaDetailFrom==='sessions' ? {v:'sessions',l:'sessions'}
              : {v:'teas',l:'teas'};
   return `
-    <button class="detail-back" onclick="goView('${back.v}')">← Back to ${back.l}</button>
+    <div class="detail-head">
+      <button class="detail-back" onclick="goView('${back.v}')">← Back to ${back.l}</button>
+      <button class="tea-more" onclick="toggleTeaMenu()" aria-label="More" aria-expanded="${state.teaMenuOpen?'true':'false'}">⋯</button>
+    </div>
+    ${teaMenuHTML(t)}
     <div class="card">
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
         <div style="width:140px;height:140px;border-radius:12px;background:${t.image?`url(${escapeHtml(t.image)}) center/cover`:'var(--jade-pale)'};flex:0 0 auto;"></div>
@@ -786,18 +870,11 @@ function viewTeaDetail(){
         </div>
       </div>
 
-      <div class="grid grid-2" style="margin-top:16px;">
-        <div><div class="eyebrow">Origin</div><div>${escapeHtml(t.origin||'—')}</div></div>
-        <div><div class="eyebrow">Cultivar</div><div>${escapeHtml(t.cultivar||'—')}</div></div>
-        <div><div class="eyebrow">Harvest</div><div>${escapeHtml([t.harvestSeason,t.harvestYear].filter(Boolean).join(' ')||'—')}</div>${freshnessCueHTML(t)}</div>
-        <div><div class="eyebrow">Purchase</div><div>${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}</div></div>
-        <div><div class="eyebrow">Source</div><div>${escapeHtml(t.source||'—')}</div></div>
-        <div><div class="eyebrow">Cost / gram</div><div>${t.costOriginalGrams?currencyFmt(t.costTotal/t.costOriginalGrams):'—'}</div></div>
-        <div><div class="eyebrow">Cost / session</div><div>${costPerSession>0?currencyFmt(costPerSession):'—'}</div></div>
-      </div>
+      ${teaCharacterHTML(t)}
       ${t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t)}
       ${flavorProfileHTML(t)}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div></div>`:''}
+      ${teaProvenanceHTML(t, costPerSession)}
 
       <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="startSessionFor('${t.id}')">Start session</button>
@@ -836,7 +913,14 @@ function savedBrewHTML(tea){
       <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
       <div style="font-size:12.5px;white-space:pre-wrap;margin-top:10px;">${escapeHtml(tea.brewGuide)}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${note}</div>
+      ${goDeeperLinkHTML(tea)}
     </div>`;
+}
+// R51's contextual entry, drawn ONLY where the catalog covers the tea. For the eight uncovered teas
+// there is no row at all — absent, not disabled — the same honesty #03 gives the origin link.
+function goDeeperLinkHTML(tea){
+  if(typeof refCategoryFor!=='function' || !refCategoryFor(tea)) return '';
+  return `<div style="margin-top:10px;"><button class="btn-ghost" style="padding:0;color:var(--jade-deep);text-decoration:underline;font-size:12.5px;" onclick="goDeeperFor('${escapeJsArg(tea.id)}')">Why → Go Deeper</button></div>`;
 }
 
 // A "Suggested brew" card for teas with no saved brewGuide — the same schedule the session timer
@@ -867,8 +951,60 @@ function suggestedBrewHTML(tea){
       <div class="eyebrow">Suggested brew · ${escapeHtml(source)}</div>
       <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin-top:10px;">A starting point from ${kb&&kb.style?'the tea knowledge base':'the leaf type'} — not a saved guide. The session timer uses these times until you save your own.</div>
-      <div style="margin-top:10px;"><button class="btn" onclick="saveSuggestedGuide('${tea.id}')">Save as brew guide</button></div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" onclick="saveSuggestedGuide('${tea.id}')">Save as brew guide</button>${borrowButtonHTML(tea)}</div>
+      ${borrowSourceHTML(tea)}${goDeeperLinkHTML(tea)}
     </div>`;
+}
+/* Borrow from Go Deeper (R51, slice B2) — the same gesture as "Save as brew guide" against the
+   CATALOG instead of the KB. Both can match one tea and disagree on temp, which is why the line
+   below names which rung answered: a user who borrows and then sees a different number has an
+   explanation rather than a mystery. Drawn only when matchTeaType covers the tea (13 of 21 today),
+   and only from the no-guide card — the guard against overwriting a saved guide is kept, not
+   widened (borrowGuideFrom returns early on tea.brewGuide, exactly as saveSuggestedGuide does). */
+function borrowButtonHTML(tea){
+  if(typeof refCategoryFor!=='function' || !refCategoryFor(tea)) return '';
+  return `<button class="btn" onclick="borrowGuideFrom('${escapeJsArg(tea.id)}')">Borrow from Go Deeper</button>`;
+}
+function borrowSourceHTML(tea){
+  if(typeof refCategoryFor!=='function' || !refCategoryFor(tea)) return '';
+  return `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">Borrowing takes the temperature and leaf ratio from the catalog — <b>${escapeHtml(refEntryLabel(tea))}</b> — over the steep times above. A starting point, not a rule.</div>`;
+}
+/* R51's contextual actions. They live HERE, not in steep-reference.js, because they act on a tea:
+   goDeeperFor navigates, borrowGuideFrom writes. The reference module is read-only by contract, and
+   section A of fixtures/reference-test.js enforces it — it caught the first draft of borrowGuideFrom
+   sitting in the wrong file, one slice after that guard was written. */
+function goDeeperFor(teaId){
+  const tea = teaById(teaId);
+  const cat = (typeof refCategoryFor==='function') ? refCategoryFor(tea) : null;
+  if(!cat) return;                                  // never a dead tap: uncovered teas draw no control
+  state.refOpen = cat; state.refSearch = '';
+  state.teaMenuOpen = false;
+  setTeaSeg('deeper');                              // setTeaSeg renders
+}
+/* Borrow from Go Deeper — the same GESTURE as saveSuggestedGuide below, against a different SOURCE:
+   the catalog's typical_brew rather than the KB. Three things hold it honest:
+     · the catalog carries NO per-step times, so the schedule still comes from generateFormTimes via
+       effectiveGuideSchedule — a borrow is temp + ratio over a generated schedule, never invented steps;
+     · it writes through scheduleToGuideText, the one parser-safe emitter, so the guide round-trips
+       through parseBrewGuide (fixtures/brew-roundtrip-test.js owns that contract);
+     · the no-guide guard is KEPT, not relaxed. Letting a borrow replace a guide the user wrote is a
+       confirm dialog and a deliberate decision, not a silently widened condition — so this returns
+       early on tea.brewGuide exactly as saveSuggestedGuide does.
+   Where both the KB and the catalog match one tea they can disagree on temp; the catalog wins here
+   because the user asked for the catalog by name, and borrowSourceHTML says which row answered. */
+function borrowGuideFrom(teaId){
+  const tea = teaById(teaId); if(!tea || tea.brewGuide) return;
+  const row = matchTeaType(tea.name); if(!row) return;
+  const sched = effectiveGuideSchedule(tea, true);
+  if(!sched || !sched.times || !sched.times.length) return;
+  const b = row.typical_brew || {};
+  const tempC = (b.temp_c && b.temp_c.length) ? b.temp_c[0] : sched.tempC;
+  let text = scheduleToGuideText({ ...sched, tempC });
+  if(Number(b.g_per_100ml) > 0) text += (text?', ':'') + b.g_per_100ml + 'g/100ml';
+  tea.brewGuide = text;
+  persistTea(tea);
+  showToast('Borrowed from “'+row.display_name+'”');
+  render();
 }
 // Write the current suggestion into the tea's brewGuide (free text), so it becomes the real guide
 // the timer + advice read from — e.g. "90°C, 25s / 18s / 30s, 4g/100ml". Uses scheduleToGuideText

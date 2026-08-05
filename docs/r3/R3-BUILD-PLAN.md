@@ -178,11 +178,12 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 |---|---|---|
 | ~~**A**~~ | ~~the primitives above~~ — **SHIPPED v3.95** | none |
 | ~~**B**~~ | ~~**#13 Teas revision** + **#05 Vessels**~~ — **SHIPPED v3.96** (R75–R78 came out of its plan review) | none |
-| **B2** | **#06 Add / edit tea** + **#03 Tea detail** — added 2026-07-26; they were "ready to build" in the hand-off §2 and verified in `R3-STATUS.md` §3 but appeared in **no slice** | none |
+| ~~**B2**~~ | ~~**#06 Add / edit tea** + **#03 Tea detail**~~ — **SHIPPED v3.97** (R80–R84 came out of its plan review) | none — but see R81 |
+| **B3** | **The freshness model** — `opened_date`, catalog windows, the `ageing` flag; `statusCategory` and both global constants retire. Build authority is `planning/SPEC-freshness-model.md` rev 2, **not this table** | **`sql/v3_11-opened-date.sql`** — the round's second migration (R83/R84) |
 | **C** | **#04 setup + pickers** and **#12 Quick log** — twins sharing the method primitive and the inverted date posture | none |
 | **D** | **#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)** as its own commit | none |
 | **E** | **#10 Focus** — alone | none |
-| **F** | **Social + the R25 pass record** | **`sql/v3_10-pass-record.sql`** — the round's only required migration |
+| **F** | **Social + the R25 pass record** | **`sql/v3_10-pass-record.sql`** — ~~the round's only required migration~~ one of **two**, since R84 gave B3 its own |
 | **G** | **Insights** + Origins card (R54) + **#11 Wrapped** | none |
 | **H** | **#37 Origins** · **#08 Shopping** · **#07 Settings row** · **#09 landing** | none — `user_settings.settings` is a JSON blob |
 
@@ -197,12 +198,21 @@ Notes that shape the order:
   parent's facts** verbatim, eight lines nine times, so members now render only what they add; and a
   **CSS cascade bug invisible to any "the rule exists" assertion** — `.vessel-tile` declared below
   `.vessel-kanji` silently overrode the plate tint, caught by reading computed background in both themes.
-- **B2** was a genuine gap in this table, not a scheduling preference — found at slice B's plan
-  review and filed the same day. It sits **adjacent to B on purpose**: R51's contextual Go Deeper
-  entry and the brew-guide "Borrow from Go Deeper" action both live on **Tea detail**, so scheduling
-  #03 apart from Go Deeper would strand part of R51. Two rulings from B land on it: **R78** (the
-  swatch is the type tint; a stored per-tea liquor colour is unruled new schema) and the three-tier
-  cascade the hand-off already states for #03/#06.
+- ~~**B2** was a genuine gap in this table~~ — **SHIPPED v3.97**, and its "schema: none" was **wrong
+  when written**. #03 rev 3 and #06 rev 4 together demand **seven** data-model items and the hand-off
+  scopes none of them (**R81**); B2 built the schema-none half only. Two further corrections the build
+  found: #06's "three missing editables" already shipped, folded, so that work was a *promotion*; and
+  Borrow had a shipped twin in `saveSuggestedGuide`, differing only in source, so reusing that writer
+  kept the round-trip contract intact for free.
+- **B3 is the freshness model and it is bigger than a detail block** — its own spec says so in its own
+  text, and this table under-estimated it. It is the single writer for freshness on **every** surface:
+  the shelf status line, the picker and the running-low sort, not just #03. **`status-line-test.js` §D
+  gets rewritten, not patched** — one slice after B2 repaired that same suite, which is expected, not
+  a conflict. Two items from spec §7 are findings for its plan rather than build instructions:
+  **7.2**, `teas.type` says `puerh` while `TEA_TYPES.family` says `dark` — two vocabularies for one
+  thing, which bites whichever slice touches it first; and **7.3**, `matchTeaType` is exact-name and
+  hand-curated, so a rename silently breaks the join, and freshness windows would be the **fourth**
+  system hung off it.
 - **C**: R43 is new UI over the existing `vesselId`. Confirmed — `sessionQuickHTML()` (`:427–473`)
   has **zero** vessel references; the `vesselOpts` select at `:488` belongs to a different screen.
 - **D** holds the riskiest single item in the package. The shipped modal's deep copy
@@ -216,7 +226,8 @@ Notes that shape the order:
   non-Focus steeping state R53 accepted as round-1. Hold each undrawn state to shipped behaviour and
   flag it. The timer is genuinely two modes + one action (`setTimerMode` `:975`, `useTimerValue`
   `:1067`); a board showing three peers is wrong.
-- **F** is the only hand-applied migration in the round: `(id, from_profile, to_profile nullable,
+- ~~**F** is the only hand-applied migration in the round~~ — **one of two since R84**; B3 carries
+  `sql/v3_11-opened-date.sql`. F's own is: `(id, from_profile, to_profile nullable,
   session_id nullable, tea_id nullable, note, created_at)` + RLS, filed after `sql/v3_9-steep-feedback.sql`.
   It gates the Passed-to-you shelf, the per-recipient badge, the kindred reply, R36's three-tier
   destination and #02b's pass-tea link. **Until `to_profile` ships the badge says only "shared".**
@@ -237,8 +248,9 @@ alone justifies it). **B2 is one** — the two tea-form surfaces together. C is 
 because a regression there is silent. E alone. F alone: the only migration, and hand-applied SQL
 wants undivided attention. G and H each one sitting, splittable by appetite.
 
-**The hard constraints are only two:** A lands before B–H, and F lands before #02b's pass-tea link.
-Everything else is order-flexible.
+**The hard constraints are now three:** A lands before B–H; F lands before #02b's pass-tea link; and
+**B3 follows B2** (R84) — its migration and its retirement of `statusCategory` reach the shelf, so it
+wants a settled Teas surface under it. Everything else is order-flexible.
 
 Per-surface discipline, unchanged: one deploy per commit, `CACHE_NAME` / `APP_VERSION` / `WHATS_NEW`
 in lockstep, CHANGELOG naming exact files, fixtures against real CSVs, verifier dry-run,

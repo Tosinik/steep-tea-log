@@ -151,9 +151,10 @@ twice at v3.85 and v3.91; (b) promote the R3 handover's §6 (review method) + §
 into CLAUDE.md as standing discipline — see the banner in `docs/r3/HANDOVER-planning-lane.md`. **Partly
 discharged in v3.96:** R74 put the *doc sweep* into CLAUDE.md's deploy ritual and `slowcup-deploy` step 5;
 §6/§7's review method and failure-mode list are still owed.
-(c) **Four stale fixture suites**, on one chip: `status-line` E1/E3/G1/G2 · `tea-types` G · plus local-only
-`freshness-test.js` and `lifecycle-test.js`. Threshold seeded from the fixture row, the engine's answer
-tracked, no pinned literals, `user_id` scoping per R69.
+~~(c) **Four stale fixture suites**, on one chip~~ — **ALL FOUR DONE**: `status-line` + `tea-types`
+repaired in v3.96b, `freshness` + `lifecycle` repaired **and newly tracked** in v3.97. **19 committed
+suites, all green.** Note B3 rewrites `status-line-test.js` §D and both freshness suites to the new
+model (spec §0) — expected, not a regression.
 
 **Historical — the Round-2 design pass is COMPLETE** (WS6 → WS2 → WS5 → WS3 → WS1 → WS4, shipped v3.73–v3.78;
 bundle at `SlowCup R2 bundle handoff/` in the repo root). WS4 was the only data-model change (semantic, not
@@ -175,7 +176,33 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.96 R3 slice B: #13 Teas revision + #05 Vessels** (cache **v106**, APP_VERSION v3.96).
+**NOW (just shipped) — v3.97 R3 slice B2: #06 Add/edit tea + #03 Tea detail** (cache **v107**, APP_VERSION v3.97).
+R51's other half — slice B built the browsable mode, this builds the contextual entries.
+- **Borrow from Go Deeper** is the shipped `saveSuggestedGuide` gesture against the **catalog** instead
+  of the KB. No per-step times in `typical_brew`, so a borrow is temp + ratio over a `generateFormTimes`
+  schedule, written through `scheduleToGuideText` and round-tripping through `parseBrewGuide` (verified:
+  Da Hong Pao → `95°C, 30s / 21s / 27s / 35s / 44s / 57s, 6g/100ml`). **The no-guide guard is kept, not
+  widened** — replacing a guide the user wrote is a separate decision. The source line names which rung
+  answered, because on Da Hong Pao the KB says 1.5 g/100 ml and the catalog says 6.
+- **Absent, not disabled**: for the 8 uncovered teas the borrow button, source line and Go Deeper link
+  render nothing. The deep link **walks member → category** (`dhp` → `wuyi-yancha`), or it would have
+  opened nothing, silently.
+- **#03** splits into character + provenance clusters, empty fields **omitted not dashed** (zero dashes
+  on a bare tea); the diary reads "starts with your first cup"; ⋯ = shopping · Go Deeper · delete
+  (**pass-tea rides F**); `inventorySparkline` stays (R80); **freshness untouched, slot included** — B3
+  replaces the reading per `SPEC-freshness-model.md` §3/§4, and the board's ladder is not drawn because
+  its column doesn't exist yet (R81).
+- **`addWishFromTea` was not idempotent** — guarded at the writer (`wishHasTeaName`, R49's join), not
+  just at the call site, so `rebuyYes` inherits it too.
+- **#06**: rating · brew guide · favourite promoted **on Edit only** — they already shipped, folded, so
+  this was a promotion not an addition. Add keeps WS1's minimum. **Those three and nothing else.**
+- **The read-only guard caught its own slice**: `borrowGuideFrom` drafted into `steep-reference.js`
+  failed section A on the first run, so it and `goDeeperFor` moved to `steep-teas.js`.
+- **First commit of the deploy repaired `freshness` + `lifecycle` and tracked them (R79)** — 19
+  committed suites, all green. **NEXT: slice B3, the freshness model** (R84) with
+  `sql/v3_11-opened-date.sql`; its spec is the build authority, not the build plan's table.
+
+**Previously — v3.96 R3 slice B: #13 Teas revision + #05 Vessels** (cache **v106**, APP_VERSION v3.96).
 The Teas tab gains its second mode and its header rework; the vessel list becomes the surface #05 drew.
 - **Go Deeper (R51)** — new `steep-reference.js` over `browseTeaTypes()`: 27 categories / 55 rows, search,
   expandable bodies, an "on your shelf" mark from `matchTeaType`. **Read-only by contract**, asserted
