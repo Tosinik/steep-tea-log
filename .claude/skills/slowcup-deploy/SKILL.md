@@ -25,18 +25,28 @@ The ritual, in order. Do not skip, reorder, or batch steps silently:
    of what shipped, anything the next session must know.
 4. **ROADMAP-v4.md** — tick the shipped item; move parked/decided notes if the deploy
    resolved one.
-5. **Checks** — `node --check` on EVERY touched `.js` file (use the full node path from
+5. **Sweep the instructing documents (R74)** — every document a fresh session reads *before* it
+   reads the code: **`CLAUDE.md`'s cleanup backlog and known-bugs list**, `STATE.md`, both
+   roadmaps, `docs/r3/R3-BUILD-PLAN.md`, and any hand-off section describing engine state.
+   Anything this deploy shipped is **struck with its version noted, never deleted** — the record
+   of what was planned is worth as much as the correction. Historical provenance and CHANGELOG
+   entries are never rewritten. *Why it sits here and not before step 1: striking an item names
+   the version, so the sweep needs the number step 1 assigns. Why it exists at all: a stale
+   figure misinforms, a stale backlog item **commands** — slice A left six such claims across
+   five documents, each a live instruction to rebuild finished work.* Sweep for what this deploy
+   invalidated, don't just re-read the items you already remember.
+6. **Checks** — `node --check` on EVERY touched `.js` file (use the full node path from
    memory if node isn't on PATH).
-6. **Fixtures** — run ALL committed suites (`fixtures/brew-roundtrip-test.js` at minimum,
+7. **Fixtures** — run ALL committed suites (`fixtures/brew-roundtrip-test.js` at minimum,
    plus insights-room / wrapped-cards and any suite covering touched modules). Local
    gitignored suites for the changed feature run too. ANY red = stop, fix, rerun; never
    ship red. The gitignored `fixtures/*.csv` exports must be **current** before this step
    counts — a fresh clone has none, so real-data sections (e.g. brew-feedback's R) graceful-
    skip and their guards never fire; drop the latest Supabase exports in first.
-7. **Commit & push** — message `vX.YY — <title>` (matches the changelog heading). Docs-only
-   changes use a `docs:` prefix and SKIP steps 1 and 6 (no bumps for non-app artifacts —
-   the landing-page precedent).
-8. **Report** — in the pause message: commit hash, cache number, what shipped, verification
+8. **Commit & push** — message `vX.YY — <title>` (matches the changelog heading). Docs-only
+   changes use a `docs:` prefix and SKIP steps 1 and 7 (no bumps for non-app artifacts —
+   the landing-page precedent). Step 5 still runs: a docs-only deploy is often the sweep itself.
+9. **Report** — in the pause message: commit hash, cache number, what shipped, verification
    summary, judgment calls flagged, what's next in the tail.
 
 House rules that override anything else: one coherent change per version · pause after each

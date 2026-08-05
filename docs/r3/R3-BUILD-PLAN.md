@@ -178,6 +178,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 |---|---|---|
 | ~~**A**~~ | ~~the primitives above~~ — **SHIPPED v3.95** | none |
 | **B** | **#13 Teas revision** (R51 second mode · R52 vendor overflow · header rework · Vessels segment) + **#05 Vessels** (rides A's `vesselPhoto`) | none |
+| **B2** | **#06 Add / edit tea** + **#03 Tea detail** — added 2026-07-26; they were "ready to build" in the hand-off §2 and verified in `R3-STATUS.md` §3 but appeared in **no slice** | none |
 | **C** | **#04 setup + pickers** and **#12 Quick log** — twins sharing the method primitive and the inverted date posture | none |
 | **D** | **#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)** as its own commit | none |
 | **E** | **#10 Focus** — alone | none |
@@ -191,6 +192,12 @@ Notes that shape the order:
   `vendorManagerHTML()` (`steep-teas.js:153`) and `distinctVendors()` (`:150`) already ship — but two
   real rename cases exist and **one tea has no vendor at all**, which must not surface as an
   empty-name row.
+- **B2** was a genuine gap in this table, not a scheduling preference — found at slice B's plan
+  review and filed the same day. It sits **adjacent to B on purpose**: R51's contextual Go Deeper
+  entry and the brew-guide "Borrow from Go Deeper" action both live on **Tea detail**, so scheduling
+  #03 apart from Go Deeper would strand part of R51. Two rulings from B land on it: **R78** (the
+  swatch is the type tint; a stored per-tea liquor colour is unruled new schema) and the three-tier
+  cascade the hand-off already states for #03/#06.
 - **C**: R43 is new UI over the existing `vesselId`. Confirmed — `sessionQuickHTML()` (`:427–473`)
   has **zero** vessel references; the `vesselOpts` select at `:488` belongs to a different screen.
 - **D** holds the riskiest single item in the package. The shipped modal's deep copy
@@ -219,8 +226,9 @@ Notes that shape the order:
 
 ## 4 · Session seams
 
-**Not one session — roughly eight, ten to fourteen deploys.** A is one sitting. B is its own (#13
-alone justifies it). C is one. **D splits in two** — list-and-detail, then the edit-screen move —
+**Not one session — one per slice, and more deploys than slices.** A is one sitting. B is its own (#13
+alone justifies it). **B2 is one** — the two tea-form surfaces together. C is one. **D splits in two**
+— list-and-detail, then the edit-screen move —
 because a regression there is silent. E alone. F alone: the only migration, and hand-applied SQL
 wants undivided attention. G and H each one sitting, splittable by appetite.
 

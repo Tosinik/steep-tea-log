@@ -119,7 +119,14 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
 3. **Update CHANGELOG.md** with a new version entry: a version heading, a `Deploy:`
    line naming exactly which files changed (and the new SW cache version), whether any
    SQL must be run, then bullets.
-4. **Keep deploys small and explicit** — one coherent change per version, listing the
+4. **Sweep the documents that instruct future sessions** (R74, v3.96) — this file's cleanup
+   backlog and known-bugs list, `STATE.md`, both roadmaps, `docs/r3/R3-BUILD-PLAN.md`, and any
+   hand-off section describing engine state. Strike what this deploy shipped, **noting its
+   version, never deleting the entry**; never rewrite CHANGELOG entries or historical
+   provenance. A fresh session reads these *before* it reads the code, so a stale figure
+   misinforms but a stale backlog item **commands** — v3.95 left six such claims across five
+   documents, each an instruction to rebuild work already done.
+5. **Keep deploys small and explicit** — one coherent change per version, listing the
    precise files. Don't bundle unrelated edits.
 
 The service worker deliberately does **not** auto-`skipWaiting()`. On a new SW install

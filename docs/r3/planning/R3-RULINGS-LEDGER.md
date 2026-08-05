@@ -519,6 +519,96 @@ deliberately, so app source still smudges on Windows checkout.
 > what its target reference is worth. Verify the symbol a guard names, not just the behaviour it
 > describes.
 
+> *Second companion, same shape — recorded 2026-08-04 from slice A's own turn.* A suite-status loop
+> reported `exit=0` for two suites already known to be red. The line was of the form
+> `node "$f"; echo "$(basename "$f") exit=$?"` — the command substitution runs **during argument
+> expansion**, so `$?` is read after `basename` has already overwritten it, and every suite reports
+> the status of `basename`. Third instance in one turn of a check whose failure mode is **silence**:
+> the line-ending scan that matched nothing, the guard citing the wrong renderer, and a status loop
+> that could only ever print zero. R73's case is one instance; **the pattern is the general one** — a
+> check that cannot fail loudly is not a check, and the three found this round were all caught by
+> running something else, never by re-reading the check.
+
+**R74 — A document's description of the code is uninstrumented, and it fails dangerously.** R71 named
+a document's account of *itself* as the one surface no guard reaches. Slice A found the larger case:
+**six claims across five documents** described shipped work as pending, and because a fresh session
+reads those before it reads the code, each was a live instruction to redo finished work. The
+`CLAUDE.md` pair was the sharp one — a session told "currency is hard-coded to `$`, the fix belongs
+in #07" would have rebuilt a primitive that already exists, and might well have added the second
+writer the guard exists to prevent. **A stale figure misinforms; a stale backlog item commands.**
+
+So: **every deploy sweeps the documents that instruct future sessions** — `CLAUDE.md`'s cleanup
+backlog and known-bugs list, `STATE.md`, the roadmaps, the build plan, and any hand-off section
+describing engine state. A shipped item is **struck with its version noted, never deleted**; the
+record of what was planned is worth as much as the correction. Historical provenance and CHANGELOG
+entries are never rewritten.
+
+The family is now four: `export-gate-test.js` guards figures, `figures-report.js` generates
+snapshots, `.gitattributes` pins bytes — and prose about code has no guard but the sweep.
+
+> *Code-lane note, 2026-08-04 (does not alter the ruling).* Two corrections to the ruling as dictated,
+> both of the shape it describes. **(a)** It read "six documents"; `e6ac37a` touched **five** files
+> carrying **six** claims — `CLAUDE.md` holds two of them, the cleanup backlog and the known-bugs
+> entry. Written above as found. **(b)** That commit is itself a further instance, in miniature: its
+> message opens "Slice A shipped code that four documents still described as pending" above a list of
+> six bullets, because the opening was written before the sweep turned up the last two and was never
+> restamped — as its own later line concedes ("the four found by hand"). The record of the sweep went
+> stale inside the message announcing it, which is the strongest available argument for the ruling.
+>
+> **Where this ruling has to live to fire.** The ledger is a *reference* — read when verifying a
+> claim. The sweep is a *step* — it happens at deploy or not at all. `.claude/skills/slowcup-deploy`
+> steps 3–4 cover `STATE.md` and `ROADMAP-v4.md` and nothing else; `CLAUDE.md`'s own deploy ritual
+> stops at the CHANGELOG. So R74 as filed instructs no one at the moment they act. Flagged, not
+> unilaterally fixed: extending the deploy checklist is a change to how every future deploy runs.
+
+*R75–R78 were issued 2026-07-26 at the Code lane's slice-B plan review. Each load-bearing finding was
+re-verified in the planning lane before ruling — `browseTeaTypes()` in a sandbox (27 categories over
+55 rows, all with `aka`, exactly three `contested`: `ruan-zhi-oolong` · `dhp` · `jin-xuan-milky`) and
+the shelf through `matchTeaType` (12 matched, 9 unmatched). The Code lane's list of nine is the
+correct one; this lane's first pass produced two phantom rows from a naive CSV split on embedded
+commas — the same shape as R69's unscoped read, and the reason a figure gets re-derived by the tool
+rather than by hand.*
+
+**R75 — A board-versus-board conflict resolves to the newer board when it was commissioned by a
+later ruling and matches shipped code.** #05 rev 1's note V1 puts vessel management behind the profile
+⊙ and explicitly rejects a Library segment ("not a tab, not a Library segment (both rejected)"); #13's
+T2 puts Vessels in the Teas tab as its second segment. **#13 wins.** It is newer, commissioned by R53,
+matches shipped `goVessels()` (`teaSeg='vessels'`, v3.46), and matches the hub sheet having no Vessels
+row (`steep-core.js:940`) — so the ⊙ home #05 describes was never built either. #05 rev 1 predates R53
+and its V1 note is superseded **on this point only**; the rest of that board stands.
+
+**R76 — Vessel type stays a `VESSEL_TYPES` select; only material is free text.** #05 draws "type &
+material: free text saved to `tagLibrary`". Material free text is correct and already ships
+(`<input name="material">`, `steep-sessions.js:146`). Type is the nine-value select R63's kanji and
+tint keying reads, so free-text type would break identity keying on precisely the principle R63
+states — **identity never keys off free text**. The board's example chips `houhin` and `yunomi` are
+not in `VESSEL_TYPES`. Do not build the free-text type. **Adding values to `VESSEL_TYPES` is a Design
+decision, not a build one.**
+
+**R77 — #05's two undrawn-detail flags are already decided in the repo, and a board must not reopen
+settled storage.** Capacity is `capacity_ml`, integer, number only, **no unit stored**. Vessel images
+are Supabase Storage public URLs in the **`tea-photos`** bucket at `<user_id>/<uuid>.jpg` — the same
+bucket as tea photos; sessions use their own `photo_url` column. `sql/schema.sql`'s comment describing
+`image_data` as a "base64 data URL (v2.1: move to Supabase Storage bucket)" is **stale** — the move
+shipped, and the comment is an R74 case inside a SQL file. Corrected on both the `teas` and `vessels`
+columns; the applied SQL is untouched.
+
+**R78 — The shelf liquor swatch renders as the shipped type tint in R3.** #13 draws a per-tea liquor
+swatch. `teas` has no colour column in `sql/schema.sql` or any later migration, and slice B is
+schema-none, so the swatch is the existing `t-<type>` tint. Recorded beside it: **R39's long-press
+colour correction implies a stored per-tea colour, which is new schema** — it is not in slice C's
+"none" and no ruling authorises a migration for it. **Open product call, flagged not built.**
+
+> *Recorded beside R75–R78, not as rulings.* (a) #13's overflow item **"Import backup" is dropped** —
+> it ships in Settings (`triggerImport()`, `steep-settings.js:10`) and is the most destructive action
+> in the app, so a second entry point is new work no ruling requires. (b) #05's **湯呑 for a "Frog
+> Yunomi" is failure mode 1 on a board**: no such vessel is on the shelf (the five are Dragon Gaiwan ·
+> Main Kyusu · Mogake Shiboridashi · Travel cuppa · Hario Coldbrew), and it would be a fourth kanji
+> besides. Don't build it, and don't build 旅 — R63 dropped it. (c) **#13's overflow item "Sort ·
+> filter" is un-greyed, not dropped:** it was drawn `#23 HELD` while #23 was open, and R60 closed #23
+> in the direction of *keeping* the control. The board's greying encodes a decision that has since
+> been made, in the direction of building it live.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

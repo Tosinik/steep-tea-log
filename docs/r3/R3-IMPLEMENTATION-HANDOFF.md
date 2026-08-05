@@ -2,7 +2,7 @@
 
 **Planning lane, 2026-07-25.** This supersedes both earlier drafts (v1 omitted Social, Quick log,
 the bundles and the visual contracts; v2 wrongly promoted the bundles to visual authority). It is
-the complete build package: twenty-one boards, seventy rulings, and the verified data every
+the complete build package: twenty-one boards, the full rulings ledger, and the verified data every
 surface reads from.
 
 **This document lives at `docs/r3/R3-IMPLEMENTATION-HANDOFF.md`.** Earlier drafts existed only as
@@ -509,7 +509,7 @@ them as separate blocks deliberately — don't blur them.
 
 ## 3 · Ledger note (no action)
 
-The ledger is contiguous **R1–R70**, verified unbroken from a fresh clone — no gaps, no duplicates.
+The ledger is **contiguous, verified unbroken from a fresh clone** — no gaps, no duplicates.
 Boards happen not to cite many of them; those are real rulings, not gaps, and none should be
 "reconciled" away.
 

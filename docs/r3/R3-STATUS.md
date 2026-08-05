@@ -14,12 +14,14 @@ that does becomes wrong the next time a cup is brewed, and did.)*
 
 ---
 
-## 1 · Rulings issued this round (R32–R66)
+## 1 · Rulings issued this round (from R32; the ledger holds the current tail)
 
 R32–R41 committed in `9f54672`; **R42–R56 committed in `00009b6`** (banking session, 2026-07-25);
 **R57–R62 committed with the hand-off** (2026-07-25 rulings, committed 2026-07-26); **R63–R66 at the
-Code lane's plan-mode review** (2026-07-26). All 66 are in the ledger, contiguous — no gaps, no
-duplicates. A ruling is not real until it is in the committed ledger; these are.
+Code lane's plan-mode review** (2026-07-26); **R67–R73 across slice A's build and ship**, and **R74
+after it** (2026-08-04). All are in the ledger, contiguous — no gaps, no duplicates. A ruling is not
+real until it is in the committed ledger; these are. **R67 onward are summarised in the ledger only**
+— this section is not a mirror of it, and the ledger is the tier that wins.
 
 **R63–R66 are build rulings, not reopened design questions.** They correct the engine model where
 the hand-off's §0 described it more loosely than the code — which is the challenge-don't-absorb

@@ -20,7 +20,8 @@ create table teas (
   is_favorite boolean default false,
   would_rebuy boolean default false,
   purchase_type text default 'first' check (purchase_type in ('first','repeat')),
-  image_data text,          -- base64 data URL (v2.1: move to Supabase Storage bucket)
+  image_data text,          -- Supabase Storage public URL, bucket 'tea-photos', <user_id>/<uuid>.jpg
+                            -- (the v2.1 move off base64 data URLs shipped; name kept, contents changed)
   created_at timestamptz default now()
 );
 
@@ -30,8 +31,9 @@ create table vessels (
   name text not null,
   type text,
   material text,
-  capacity_ml integer,
-  image_data text,          -- base64 data URL (v2.1: move to Supabase Storage bucket)
+  capacity_ml integer,      -- a number, in ml. No unit is stored (R77).
+  image_data text,          -- Supabase Storage public URL, SAME bucket as teas ('tea-photos');
+                            -- sessions use their own photo_url column, not this one (R77)
   created_at timestamptz default now()
 );
 
