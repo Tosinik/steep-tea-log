@@ -21,6 +21,12 @@ The ritual, in order. Do not skip, reorder, or batch steps silently:
    `## vX.YY — <title>` · `Deploy: <exact file list> (vNN). [SQL note or "No SQL."]` ·
    bullets that explain *why*, name the key functions/constants, and record any judgment
    calls. Match the voice of recent entries.
+   **Build the Deploy list from `git diff --name-only <remote>..HEAD`, never from memory of what
+   you meant to touch.** Three deploys running (v3.96, v3.98, v4.00) shipped a Deploy line that
+   over- or under-stated the set — a file named but unchanged, a doc changed but unnamed, a file
+   attributed to the wrong commit. Every one was written from intention rather than from the diff,
+   and every one was caught by the verifier rather than by re-reading. Name doc files individually;
+   a generic "docs" is what the v3.98 entry was pulled up on.
 3. **STATE.md** — update the "Continue here"/NOW block: new cache + version, one-line summary
    of what shipped, anything the next session must know.
 4. **ROADMAP-v4.md** — tick the shipped item; move parked/decided notes if the deploy
