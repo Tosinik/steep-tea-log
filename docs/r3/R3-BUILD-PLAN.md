@@ -182,7 +182,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 | ~~**B3**~~ | ~~**The freshness model**~~ — **SHIPPED v3.98** (R85–R86 came out of its plan review) | **`sql/v3_11-opened-date.sql`** — applied by hand, before the push |
 | ~~**C**~~ | ~~**#04 setup + pickers** and **#12 Quick log**~~ — **SHIPPED v3.99** (R87–R89 came out of its plan review) | none |
 | ~~**D**~~ | ~~**#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)**~~ — **SHIPPED v4.00**, two commits as planned (R90–R92) | none |
-| **E** | **#10 Focus** — alone | none |
+| ~~**E**~~ | ~~**#10 Focus** — alone~~ — **SHIPPED v4.01** (R94–R95) | none |
 | **F** | **Social + the R25 pass record** | **`sql/v3_10-pass-record.sql`** — ~~the round's only required migration~~ one of **two**, since R84 gave B3 its own |
 | **G** | **Insights** + Origins card (R54) + **#11 Wrapped** | none |
 | **H** | **#37 Origins** · **#08 Shopping** · **#07 Settings row** · **#09 landing** | none — `user_settings.settings` is a JSON blob |
@@ -238,7 +238,10 @@ Notes that shape the order:
   feedback non-destructive today. R57 says build the gap as drawn — **so that copy semantics must
   survive the modal→screen move verbatim, or a documented non-destructive gap becomes silent data
   loss.** R40's brew-again and copy-to-new land here; **pass-tea waits for F.**
-- **E** is alone by its own scope warning: `sessionSteepingHTML()` (`:844`), the timer block
+- ~~**E** is alone by its own scope warning~~ — **SHIPPED v4.01**, and the warning was the load-bearing
+  part: `fixtures/focus-test.js` §D pins six undrawn steeping states against shipped output, which is
+  R53 asserted rather than intended. Two findings: **kachi-iro had never been implemented** (the ring was amber, no token existed, two comments deferred to it as real — R94), and **#10's BUILD-FIRST stamp was expired**, its live-bug headline describing a fix that shipped in v3.92 (R95). Original note follows.
+- **E was alone by its own scope warning:** `sessionSteepingHTML()` (`:844`), the timer block
   (`:925–1155`) and `sessionFinishHTML()` (`:1188`) are one surface, and Focus shares it with every
   non-Focus steeping state R53 accepted as round-1. Hold each undrawn state to shipped behaviour and
   flag it. The timer is genuinely two modes + one action (`setTimerMode` `:975`, `useTimerValue`

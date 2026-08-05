@@ -9,6 +9,11 @@
   --amber:#C17A3E;
   --amber-pale:#F1DFC7;
   --xanthous-wash:rgba(229,174,43,.14);   /* #13: the xanthous SELECTED marker, state only (§0.5 contract 3) */
+  /* Kachi-iro (R94) — visual contract 4: the Focus ring and NOWHERE ELSE, one surface in the whole
+     app. The scarcity is the mechanism; an accent on two surfaces is a colour, not a signal. Values
+     from #10 rev 2. Focus is always dark, so the ring takes the dark lift below; the light pair
+     exists so the token is complete and a future ruling has somewhere to land. */
+  --kachi:#26343F; --kachi-ink:#F1EEE6; --kachi-soft:rgba(38,52,63,.08); --kachi-line:rgba(38,52,63,.22);
   --clay:#8B5E4A;
   --line:#D8CFB9;
   --white:#FFFEFB;
@@ -42,6 +47,7 @@ html[data-theme="dark"]{
   --amber:#E3A15C;
   --amber-pale:#3A2C1A;
   --xanthous-wash:rgba(229,174,43,.12);
+  --kachi:#7FA6C4; --kachi-ink:#14130E; --kachi-soft:rgba(127,166,196,.12); --kachi-line:rgba(127,166,196,.30);
   --clay:#C99872;
   --line:#332F24;
   --white:#1C1A14;
@@ -602,18 +608,24 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .pp-unmapped{font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;}
 
 /* WS3 — focus mode: a breath-led place. Always dark (a meditative night state), not theme-flipped. */
-.focus-screen{position:fixed;inset:0;z-index:60;background:#100F0B;overflow:hidden;}
+/* Focus is deliberately ALWAYS DARK, independent of the page theme — so it pins kachi's dark lift
+   locally rather than inheriting :root's light value, which would put a deep indigo arc on a
+   near-black field and disappear. Scoping the token here (the same pattern --vk-bg and --vph-a use)
+   keeps --kachi the single definition; the alternative is a hex at the render site, which is the
+   thing the v3.95 currency lesson forbids. */
+.focus-screen{position:fixed;inset:0;z-index:60;background:#100F0B;overflow:hidden;
+  --kachi:#7FA6C4; --kachi-ink:#14130E; --kachi-soft:rgba(127,166,196,.12); --kachi-line:rgba(127,166,196,.30);}
 .focus-glow{position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, rgba(227,161,92,.14), transparent 60%);pointer-events:none;}
 .focus-mala{position:absolute;top:150px;right:26px;display:flex;flex-direction:column;gap:13px;align-items:center;}
 .mala-dot{width:8px;height:8px;border-radius:50%;background:#332F24;}
 .mala-dot.on{background:#E3A15C;}
 .focus-head{position:relative;text-align:center;padding:44px 24px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7c745f;}
 .focus-ringwrap{position:relative;width:276px;height:276px;max-width:82vw;max-height:82vw;margin:96px auto 0;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.focus-halo{position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid #E3A15C;animation:sc-halo 6s ease-out infinite;}
-.focus-enso-breathe{position:absolute;inset:0;filter:drop-shadow(0 0 20px rgba(227,161,92,.4));animation:sc-breathe-slow 6s ease-in-out infinite;}
+.focus-halo{position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid var(--kachi);animation:sc-halo 6s ease-out infinite;}
+.focus-enso-breathe{position:absolute;inset:0;filter:drop-shadow(0 0 20px var(--kachi-line));animation:sc-breathe-slow 6s ease-in-out infinite;}
 .focus-enso{width:100%;height:100%;transform:rotate(-4deg);}
 .focus-enso .enso-track{stroke:#2a271e;}
-.focus-enso .enso-arc{stroke:#E3A15C;transition:stroke-dashoffset .9s linear;}
+.focus-enso .enso-arc{stroke:var(--kachi);transition:stroke-dashoffset .9s linear;}
 .focus-center{position:relative;text-align:center;}
 .focus-digit{font-family:var(--font-mono);font-weight:400;font-size:36px;color:#8f866f;line-height:1;animation:sc-digit 6s ease-in-out infinite;}
 .focus-cue{font-family:var(--font-display);font-size:16px;color:#A79C87;margin-top:16px;}
@@ -912,6 +924,14 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .ovf-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px;border-top:1px solid var(--line);}
 .ovf-k{font-size:12px;color:var(--ink-soft);}
 .ovf-row .lib-sort select{font-size:13px;color:var(--ink);}
+
+/* ===== slice E — #10's steeping chrome. Jade and amber, NOT kachi: this is the non-Focus steeping
+   surface, round-1 under R53, and contract 4 spends the indigo on the ring alone (R94). ===== */
+.steep-context{font-size:11px;color:var(--ink-soft);letter-spacing:.04em;margin:-6px 0 12px;text-align:center;}
+.pour-row{margin:-4px 0 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pour-q{font-size:11.5px;color:var(--ink-soft);}
+.pour-chips{display:inline-flex;gap:6px;flex-wrap:wrap;}
+.pour-saved{font-size:10.5px;color:var(--jade-deep);letter-spacing:.06em;}
 
 /* ===== #02b session detail (slice D) ===== */
 .sd-kicker{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);}

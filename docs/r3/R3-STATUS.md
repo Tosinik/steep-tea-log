@@ -257,7 +257,24 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.00 LIVE — R3 slice D: #02 Sessions + #02b detail + the edit-screen move** (cache **v110**, no
+**v4.01 LIVE — R3 slice E: #10 Focus** (cache **v111**, no SQL). A **restyle, not a rescue**: #10's
+live-bug headline describes a fix that shipped in v3.92 (**R95**), and its `BUILD · FIRST` stamp
+expired with it. **R94** makes visual contract 4 real for the first time — kachi-iro had shipped
+unimplemented for the whole round, with the ring on `#E3A15C` amber and two repo comments deferring to
+a token nobody had created. Four tokens now land in both theme blocks and the ring reads them; the
+non-Focus steeping chrome keeps its shipped amber and jade, because that surface is round-1 under R53
+and "one surface total" is the contract. Focus is always dark regardless of page theme, so it pins
+kachi's dark lift in a scoped re-declaration rather than a hex at the render site. The `✓ saved` state
+is a **read** of the v3.92 write, drawn because that write had been silent for weeks.
+
+Three things a later slice inherits. **(a)** Kachi is confined by a guard, and confinement is the
+assertion that decays silently — nothing breaks when an accent spreads. **(b)** `focus-test.js` §D is
+R53's guarantee made executable: six undrawn steeping states pinned against shipped output, because
+Focus and every non-Focus state are the same function. **(c)** The timer's two-modes-plus-one-action
+shape, R44's no-avatar and Focus's dark field were **verified and left alone** — stated so they are
+not "corrected" later.
+
+**Previously: v4.00 — R3 slice D: #02 Sessions + #02b detail + the edit-screen move** (cache **v110**, no
 SQL). Two commits by design. **The guard came first and held**: `fixtures/session-edit-test.js` was
 written against the working modal, run green before the move existed, and is byte-unchanged across it
 — 67 field-values ride on the deep copy + whole-object writeback and nothing in the UI would show

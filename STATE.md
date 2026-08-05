@@ -176,7 +176,34 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.00 R3 slice D: #02 Sessions + #02b detail + the edit-screen move** (cache
+**NOW (just shipped) — v4.01 R3 slice E: #10 Focus** (cache **v111**, APP_VERSION v4.01, no SQL).
+**A restyle, not a rescue** — #10's headline ("taste data is lost every session until this lands")
+describes a bug fixed in v3.92.
+- **R94 — kachi-iro is real now, on the Focus ring and nowhere else.** Visual contract 4 shipped
+  **unimplemented for the whole round**: the ring was `#E3A15C` amber, no token existed, and the only
+  two mentions of the word in the repo were comments deferring to a token nobody had created. Four
+  tokens in both theme blocks; the ring reads them. **The steeping screen keeps its shipped amber and
+  jade** — the board paints its chrome kachi, but that surface is round-1 under R53, and one surface
+  total is the contract. The scarcity is the mechanism.
+- **Focus is always dark regardless of page theme**, so `.focus-screen` pins the dark lift in a scoped
+  re-declaration rather than inheriting `:root`'s deep indigo (which would be near-black on
+  near-black). Verified `#7FA6C4` in **both** page themes. No hex at a render site.
+- **`✓ saved` is a read, not a new write** — and worth drawing precisely because the write has been
+  silent since v3.92: registered and stored looked identical on screen for weeks.
+- **The steep context line is generated** (R68), each part omitted when absent.
+- **R95 — a board's build-first stamp expires with its reason.** Fourth instance this round of a board
+  describing shipped state as pending (after #06, #04, #02b). Priority stamps read as live instructions.
+- **Verified correct and LEFT ALONE** so nobody "fixes" them: the timer is already two modes + one
+  action; R44's no-avatar holds; Focus's dark field is shipped behaviour.
+- **`fixtures/focus-test.js` (54 checks) — its most important section isn't about Focus.** §D pins six
+  undrawn steeping states against shipped output (R53 asserted, not intended); §B's confinement check
+  was verified to fail by leaking kachi onto `.pour-saved`. **22 committed suites, all green.**
+  **NEXT: slice F — Social + the R25 pass record, carrying `sql/v3_10-pass-record.sql`.** It is the
+  round's second and last migration, and the one where **filename order genuinely differs from version
+  order** (`v3_10` sorts between `v3_1` and `v3_2`) — CLAUDE.md's schema section says read the version.
+  Apply the SQL BEFORE pushing, as B3 did.
+
+**Previously — v4.00 R3 slice D: #02 Sessions + #02b detail + the edit-screen move** (cache
 **v110**, APP_VERSION v4.00). **Two commits by design** — the guard first, the move second.
 - **The guard held green across the move, UNEDITED.** `fixtures/session-edit-test.js` was written
   against the working modal and run green *before* any move existed; `git diff` on it across the move

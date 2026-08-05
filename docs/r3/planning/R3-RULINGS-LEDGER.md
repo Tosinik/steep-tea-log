@@ -820,6 +820,39 @@ untouched by the redesign**. R4 commissions a Home revision board.
 says which. Nothing in this ruling changes slices E–H; it exists so the next round's scope lives in
 the repo rather than in a chat log.
 
+**R94 — Kachi-iro becomes real in slice E, on the Focus ring and nowhere else.** Visual contract 4 has
+shipped **unimplemented for the whole round**: the Focus ring is `#E3A15C` amber (`styles.css:612`,
+`:616`), no kachi token exists, and the only two mentions in the repo are comments deferring to it as
+though it were already there. Land `--kachi`, `--kachi-ink`, `--kachi-soft`, `--kachi-line` in `:root`
+and `html[data-theme="dark"]` from #10 rev 2's values (light `#26343F` / `#F1EEE6` / `.08` / `.22`;
+dark `#7FA6C4` / `#14130E` / `.12` / `.30`), applied only to `.focus-enso .enso-arc` and
+`.focus-halo`. **Never hardcoded at a render site** — the v3.95 currency lesson. The board paints the
+steeping screen's Pause button, mode pill and feedback card in kachi; **that surface is round-1 under
+R53 and keeps its shipped amber and jade.** "One surface total" is the contract, and *the scarcity is
+what makes the accent mean anything.* A guard asserts kachi appears on no other selector.
+
+**R95 — A board's build-first rationale expires when its reason is discharged.** #10 rev 2 leads with
+*"today 'Just right' flashes and saves nothing; taste data is lost every session until this lands"*
+and is stamped `BUILD · #10 · FIRST`. The write shipped in **v3.92** (`steep-sessions.js:1009`, gated
+by `steepFbActive`), and the board half-concedes it in passing while its headline and its hand-off
+flag still describe live data loss. Slice E is a **restyle, not a rescue**, and stays where the build
+plan puts it. This is the **fourth instance this round** of a board describing already-shipped state
+as pending — after #06's already-closed editables, #04's already-folded date, and #02b's
+verified-false "as checked" nav claim (R87). Per R74, *a stale backlog item commands*: a session
+reading that flag would set out to fix a data-loss bug that does not exist. **Priority stamps on
+boards are read as live instructions and expire the same way.**
+
+> *Code-lane note, 2026-07-26 (shipped in v4.01).* Two things worth the record. **(a) Focus is always
+> dark independent of page theme**, so the ring pins kachi's dark lift in a scoped re-declaration on
+> `.focus-screen` rather than inheriting `:root`'s deep indigo — which would have put a near-black arc
+> on a near-black field. Scoping keeps `--kachi` the single definition; a hex at the render site was
+> the alternative, and that is the thing R94's own last sentence forbids. Verified `#7FA6C4` in both
+> page themes. **(b) The most important assertion in `focus-test.js` is not about Focus.** Focus and
+> every non-Focus steeping state are the same function, so section D pins six undrawn states against
+> shipped output — R53's guarantee, asserted rather than intended. Section B's confinement check was
+> verified to fail by leaking kachi onto `.pour-saved`: nothing breaks when an accent spreads, it just
+> stops meaning anything.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.00';
+const APP_VERSION = 'v4.01';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Tapping a sitting now opens its own page — every steep, note and taste word you recorded — and editing one opens a full screen instead of a pop-up.";
+const WHATS_NEW = "Focus mode's ring is now its own deep blue, and after each pour you can see plainly that how it tasted was saved, not just noted.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){

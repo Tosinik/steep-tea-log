@@ -1016,11 +1016,16 @@ function brewNudgeRowHTML(d){
   const rec = steepFbActive(d) ? (d.steeps[d.steeps.length-1].feedback||null) : null; // recorded verdict for this pour
   const on = { weak:'weak', ok:'good', strong:'strong' };
   const chip=(k,l)=>`<button type="button" class="lib-chip ${rec===on[k]?'active':''}" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;
-  const saved = rec ? `<span style="font-size:11px;color:var(--jade-deep);">saved</span>` : ''; // visible saved state, not a toast
+  /* #10's ✓ SAVED (v4.01). The WRITE has shipped since v3.92 and this is a read of
+     steeps[i].feedback — no write change. It is worth drawing precisely because the write has been
+     silent for weeks: a verdict registered and a verdict stored looked identical on screen, so the
+     app was under-reporting its own reliability. The distinction the board draws is committed-vs-
+     ephemeral, which is exactly what the old bare "saved" word failed to carry. */
+  const saved = rec ? `<span class="pour-saved mono">✓ saved</span>` : '';
   const note = shift ? `<span style="font-size:11px;color:var(--ink-soft);">next steep ${shift>0?'+':''}${shift}s vs guide</span>` : '';
-  return `<div style="margin:-4px 0 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-    <span style="font-size:11.5px;color:var(--ink-soft);">How was that pour?</span>
-    ${chip('weak','Weak → longer')}${chip('ok','Just right')}${chip('strong','Strong → shorter')}
+  return `<div class="pour-row">
+    <span class="pour-q">Steep ${d.steeps.length} — how did it pour?</span>
+    <span class="pour-chips">${chip('weak','Weak → longer')}${chip('ok','Just right')}${chip('strong','Strong → shorter')}</span>
     ${saved}${note}
   </div>`;
 }
@@ -1184,6 +1189,7 @@ function sessionSteepingHTML(d){
       <button class="steep-mute" onclick="toggleSound()" aria-label="${soundOn?'Sound on':'Sound off'}" title="${soundOn?'Chime on — tap to mute':'Muted — tap for a single gentle chime at 0:00'}">${icon(soundOn?'i-sound-hl':'i-mute-hl',21)}</button>
     </div>
 
+    ${steepContextHTML(d)}
     ${scheduleStripHTML(d)}
     ${brewNudgeRowHTML(d)}
 
@@ -1226,6 +1232,22 @@ function sessionSteepingHTML(d){
   `;
 }
 
+/* #10's context line under the title: "95°C · guide 25s · Dragon Gaiwan". GENERATED from the draft
+   (R68), with each part omitted when it has no value rather than rendered empty — a fixed string
+   here would claim a temperature the session doesn't carry. It is a read of what is already on
+   screen elsewhere, gathered into one place at the moment the ring is what you're looking at. */
+function steepContextHTML(d){
+  const parts = [];
+  const temp = d.curTemp!=='' && d.curTemp!=null ? d.curTemp : (d.schedule && d.schedule.tempC!=null ? cToDisplay(d.schedule.tempC) : '');
+  if(temp!=='' && temp!=null) parts.push(temp + tempUnitLabel());
+  const active = (d.activeSteep!=null ? d.activeSteep : d.steeps.length);
+  const guide = d.schedule ? scheduleTimeForIndex(d.schedule, active) : null;
+  if(guide) parts.push('guide ' + fmtSecShort(guide));
+  const ves = vesselById(d.vesselId);
+  if(ves) parts.push(ves.name);
+  if(!parts.length) return '';
+  return `<div class="steep-context mono">${escapeHtml(parts.join(' · '))}</div>`;
+}
 function toggleFocusMode(){ state.sessionDraft.focusMode=!state.sessionDraft.focusMode; render(); }
 function focusProgress(tm){ return tm.mode==='timer' ? (tm.target>0?Math.min(1,tm.elapsed/tm.target):0) : Math.min(1,tm.elapsed/60); }
 // WS3: opt-in sound. The steeping mute glyph toggles the synced soundEnabled setting; default OFF.

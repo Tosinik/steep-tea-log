@@ -26,6 +26,12 @@ fixtures/*
 # R3 slice A: the vessel identity ladder is invisible on current data (every vessel has a photo), so
 # this suite is the only thing that can see rungs 2 and 3. It also pins the R64/R72 lane contracts.
 !fixtures/vessel-identity-test.js
+# R3 slice E: #10 Focus. Its section D is the load-bearing one and is not about Focus at all — Focus
+# and every non-Focus steeping state are the SAME function (sessionSteepingHTML), and R53 accepted the
+# undrawn states as round-1, so a Focus restyle must not quietly edit them. Section B's confinement
+# check is the one that decays silently: nothing breaks if kachi leaks onto a second selector, the
+# accent just stops meaning anything. Verified to fail by leaking it onto .pour-saved.
+!fixtures/focus-test.js
 # R3 slice D, commit 1: the session-edit round trip. Written against the WORKING modal and run green
 # BEFORE the edit-screen move (R58), so it measures known-good behaviour rather than whatever the move
 # produced. 67 field-values across 40 sessions survive an edit only via the deep copy + whole-object
