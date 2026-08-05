@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.95';
+const APP_VERSION = 'v3.96';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Costs now show in euros instead of dollars, and choosing how you're brewing — gongfu, senchadō, western or cold brew — is one row of four instead of a switch and a checkbox.";
+const WHATS_NEW = "The Teas tab has a second mode — Go Deeper, a browsable reference of tea types — plus a calmer header, and your vessels now list with their photos, capacity and how often you've brewed in them.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -142,6 +142,8 @@ let state = {
   calMonth: null, calSelDay: null,
   teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false }, teaSeg: 'teas',
   teaSearch: '',      // #19: transient Library search — cleared by goView on leaving the Teas tab (not on same-tab round-trips)
+  teaOverflowOpen:false,          // #13: the shelf's ⋯ sheet (sort · density · edit vendors)
+  refSearch:'', refOpen:null,     // R51 Go Deeper: reference search + the one expanded category
   recapPeriod: 'week',
   passportSel: null, passportZoom: null, passportSub: null,
   social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null, err:null, feedLoadingMore:false },
@@ -948,8 +950,9 @@ function hubSheetHTML(){
 function goView(v){
   if(v==='vessels') return goVessels();                 // vessels folded into the Teas tab (v3.46)
   state.view=v; state.activeTeaId=null; state.dashEdit=false;
-  if(v!=='teas') state.teaSearch='';                     // #19: leaving the Library clears search; same-tab round-trips (tea-detail → back = goView('teas')) keep it
-  if(v==='teas') state.teaSeg='teas';                    // tapping Teas shows the teas segment
+  if(v!=='teas'){ state.teaSearch=''; state.refSearch=''; state.refOpen=null; }   // #19: leaving the Library clears search; same-tab round-trips (tea-detail → back = goView('teas')) keep it
+  if(v==='teas') state.teaSeg='teas';                    // tapping Teas shows the teas segment (not vessels, not Go Deeper)
+  state.teaOverflowOpen=false;
   if(v!=='passport'){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; }
   saveView(v); render();
 }

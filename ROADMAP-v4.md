@@ -191,7 +191,11 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   neutral "Brewing days" heatmap. Committed `log-guard-test.js` (24). The audit's regression bundle = issue **#23**.
 - [x] **#23 F1 — interim Library sort** (v3.84) — the 7 engine sorts return as a styled select on the count
   row (reinstated `setTeaSort`; session-scoped); low-float default-sort-only; "M in stock" segment restored (F3).
-  Committed `shelf-order-test.js` (19). #23 still holds F2/F7/F8 (reinstate-vs-accept, R3-gated).
+  Committed `shelf-order-test.js` (19). ~~#23 still holds F2/F7/F8 (reinstate-vs-accept, R3-gated).~~
+  **#23 RULED by R60 (2026-07-25):** the seven-option sort is **preserved** (relocated into #13's ⋯ sheet
+  in v3.96 — capability, not markup, and `shelf-order-test.js` §E guards it); `setTeaFilter` and
+  `focusLogSteep` stay **dormant with zero callers**, those regressions accepted for R3; sort persistence
+  stays session-scoped. Nothing here is still held.
 - [x] **#24 + #29 — water counts, word keeps** (v3.85) — `waterMl` un-gated in commitSession + `gridStats`
   liters honour it + edit-modal Water(ml); **brewStyle un-gated** (feeds phase-2 method data; cold brew null);
   #29 onblur tag-commit + `enterkeyhint` + mousedown suggest picks. `stat-period-test.js` G, `flavor-ladder-test.js` H.
@@ -202,8 +206,11 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
 - [x] **Tea reference layer — Phase A** (v3.87) — data + read path shipped **dormant** (no UI yet):
   `steep-tea-types.js` (55-row `TEA_TYPES` script-global + `resolveTeaType`/`matchTeaType`/`browseTeaTypes`/
   `typeConfidenceHedge`), reconciled from TEA-TYPES-SEED.md (see `TEA-REFERENCE-HANDOVER.md` §6). Confidence
-  per-row (not inherited); covers member-only; committed `fixtures/tea-types-test.js` (48). **Phase B (the
-  browsable page) is HELD until phase-2 ships; Phase C rides R3.**
+  per-row (not inherited); covers member-only; committed `fixtures/tea-types-test.js` (48). ~~**Phase B (the
+  browsable page) is HELD until phase-2 ships; Phase C rides R3.**~~ **Phase B SHIPPED v3.96** as **Go
+  Deeper**, the Teas tab's second mode (R51) — `steep-reference.js` over `browseTeaTypes()`, read-only by
+  contract, with `fixtures/reference-test.js` guarding that it never writes. The hold was lifted by R51
+  making it an R3 surface rather than a phase-2 one; Phase C's styling landed with it.
 - [x] **greeting pass — #25 + #17 + ack** (v3.88) — `d_scorePick` soft recency penalty (2 prior days,
   tunable; today excluded, deterministic) stops re-suggesting a just-had tea; new `isTeaUnopened` gates the
   rediscovery copy so an opened tea is never called "unopened"; ack pool rewritten retrospective. Hygiene

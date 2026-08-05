@@ -226,24 +226,99 @@ function filteredSortedTeas(){
   else if(s==='rating') list.sort((a,b)=>(Number(b.rating)||0)-(Number(a.rating)||0));
   return list;
 }
+/* #13 header rework (R3 slice B). Two controls, one three-valued state: the MODE pair (your shelf ↔
+   Go Deeper, R51) is always drawn; the teas/vessels segment row is shelf-mode only, which is what
+   #13 draws and what makes the two axes collapse into one variable. Go Deeper draws neither the
+   segment row nor the overflow. */
+function teaSegOf(){ const s = state.teaSeg; return (s==='vessels'||s==='deeper') ? s : 'teas'; }
+function teaHeadHTML(seg){
+  const low = state.teas.filter(t=>isRunningLow(t)).length;
+  const empty = state.teas.filter(t=>isTeaFinished(t)).length;
+  // The count line is GENERATED (R68) — a zeroed segment is dropped rather than printed as "0".
+  const shelfCount = [ `${state.teas.length} on the shelf`, low?`${low} running low`:'', empty?`${empty} empty`:'' ].filter(Boolean).join(' · ');
+  const sittings = (state.sessions||[]).filter(s=>s.vesselId).length;
+  const vesselCount = [ `${state.vessels.length} vessel${state.vessels.length===1?'':'s'}`, sittings?`${sittings} sittings logged`:'' ].filter(Boolean).join(' · ');
+  const meta = seg==='deeper' ? 'the reference · not your shelf'
+             : seg==='vessels' ? vesselCount : shelfCount;
+  const title = seg==='deeper' ? 'Go Deeper' : (seg==='vessels' ? 'Vessels' : 'Teas');
+  // One committing action per screen (§0.5 contract 2) — it stays VISIBLE, never behind the ⋯.
+  const add = seg==='deeper' ? ''
+    : `<button class="btn-add" onclick="${seg==='vessels'?'openVesselForm()':'openTeaForm()'}">${icon('i-plus-hl',14)} Add</button>`;
+  // Overflow is the shelf's, not the reference's or the vessel list's.
+  const more = seg==='teas'
+    ? `<button class="tea-more" onclick="toggleTeaOverflow()" aria-label="More" aria-expanded="${state.teaOverflowOpen?'true':'false'}">⋯</button>` : '';
+  return `<div class="lib-head">
+      <div class="lib-title">
+        <h2>${title}</h2>
+        <span class="lib-kicker mono">${escapeHtml(meta)}</span>
+      </div>
+      <div class="lib-head-actions">${add}${more}</div>
+    </div>`;
+}
+function teaModeHTML(seg){
+  const on = seg==='deeper' ? 'deeper' : 'shelf';
+  const modes = `<div class="tea-modes" role="group" aria-label="Shelf or reference">
+      <button class="tea-mode ${on==='shelf'?'active':''}" onclick="setTeaSeg('teas')">Your shelf</button>
+      <button class="tea-mode ${on==='deeper'?'active':''}" onclick="setTeaSeg('deeper')">Go Deeper</button>
+    </div>`;
+  if(on==='deeper') return modes;    // the reference has no segment row (#13 draws none)
+  return `${modes}<div class="tea-segs">
+      <button class="tea-seg ${seg==='teas'?'active':''}" onclick="setTeaSeg('teas')">teas</button>
+      <button class="tea-seg ${seg==='vessels'?'active':''}" onclick="setTeaSeg('vessels')">vessels</button>
+    </div>`;
+}
+/* The ⋯ sheet. Holds the controls the header rework moved off the count row — sort (R60a: the seven
+   engine sorts are PRESERVED, relocated, not removed) and density. Filter chips and search stay
+   visible; "Import backup" is deliberately NOT here (it ships in Settings and is the app's most
+   destructive action — a second entry point is new work no ruling asked for). */
+function teaOverflowHTML(){
+  if(!state.teaOverflowOpen) return '';
+  const density = teaDensity();
+  const vendors = distinctVendors();
+  return `<div class="hub-scrim" onclick="toggleTeaOverflow()"></div>
+    <div class="hub-sheet" role="dialog" aria-label="Shelf options">
+      <div class="hub-grab"></div>
+      <div class="ovf-row">
+        <span class="ovf-k mono">Sort</span>
+        <div class="lib-sort">
+          <select onchange="setTeaSort(this.value)" aria-label="Sort teas">${TEA_SORT_OPTS.map(([k,l])=>`<option value="${k}" ${state.teaSort===k?'selected':''}>${l}</option>`).join('')}</select>
+          <span class="lib-sort-caret">${icon('i-caret-hl',14)}</span>
+        </div>
+      </div>
+      <div class="ovf-row">
+        <span class="ovf-k mono">Density</span>
+        <div class="density-toggle" role="group" aria-label="Density">
+          <button class="density-seg ${density==='rows'?'active':''}" onclick="setTeaDensity('rows')" aria-label="List view">${icon('i-rows-hl',16)}</button>
+          <button class="density-seg ${density==='grid'?'active':''}" onclick="setTeaDensity('grid')" aria-label="Grid view">${icon('i-grid-hl',16)}</button>
+        </div>
+      </div>
+      ${vendors.length ? `<button class="hub-row" onclick="openVendorManager()">${icon('i-shopping-hl',20)}<span>Edit vendors</span></button>` : ''}
+    </div>`;
+}
+function toggleTeaOverflow(){ state.teaOverflowOpen = !state.teaOverflowOpen; render(); }
+function openVendorManager(){ state.teaOverflowOpen=false; state.vendorsOpen=true; render(); }
+// v3.84 (#23 F1): the 7 engine sorts. Module-level since v3.96 so the overflow sheet and the R61
+// preservation guard read the same list — R60a preserves the capability, not the markup that
+// happened to express it.
+const TEA_SORT_OPTS = [['type','Type'],['newest','Recently added'],['oldest','Oldest first'],['name','Name A–Z'],['stock-high','Most stock'],['stock-low','Least stock'],['rating','Highest rated']];
 function viewTeas(){
-  // Teas + Vessels live under one tab (v3.46) — a segmented control switches between them
-  // (following the v3.18 vendor-manager precedent of folding a surface into Teas).
-  const seg = (state.teaSeg==='vessels') ? 'vessels' : 'teas';
-  const segControl = `<div style="display:flex;gap:8px;margin-bottom:14px;">
-    <button class="lib-chip ${seg==='teas'?'active':''}" onclick="setTeaSeg('teas')">Teas</button>
-    <button class="lib-chip ${seg==='vessels'?'active':''}" onclick="setTeaSeg('vessels')">Vessels</button>
-  </div>`;
-  if(seg==='vessels') return `${segControl}${viewVessels()}`;   // viewVessels lives in steep-sessions.js
+  // Teas + Vessels live under one tab (v3.46); Go Deeper joins them as the third state of the same
+  // variable (R51/#13). One segmented control switches segments, one switches modes.
+  const seg = teaSegOf();
+  const head = teaHeadHTML(seg) + teaModeHTML(seg);
+  if(seg==='vessels') return `${head}${viewVessels()}`;         // viewVessels lives in steep-sessions.js
+  if(seg==='deeper') return `${head}
+    <div class="lib-search">
+      <input id="refSearchInput" type="text" placeholder="Search the reference…" value="${escapeHtml(state.refSearch||'')}" oninput="onRefSearchInput(this.value)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search the reference">
+      <button id="refSearchX" class="lib-search-x" onclick="clearRefSearch()" aria-label="Clear search" style="${state.refSearch?'':'display:none;'}">✕</button>
+    </div>
+    <div id="refList">${refListHTML()}</div>`;                  // refListHTML lives in steep-reference.js
   const F = state.teaFilter;
   const vendors = distinctVendors();
-  const density = teaDensity();
-  // running-low count for the header line (WS5; tier-aware since #18).
-  const lowCount = state.teas.filter(t=>isRunningLow(t)).length;
-  // #26 A: empty joins the tallies — isTeaFinished, so untracked 0g never counts as empty.
-  const emptyCount = state.teas.filter(t=>isTeaFinished(t)).length;
-  // Filter chips: All · <types you own, in canonical order> · Low · Favs. Cleaner than the old
-  // sort/vendor dropdowns (those are dropped from the shelf; vendor rename stays under "Edit vendors").
+  // The counts moved into teaHeadHTML's generated kicker (#13's header rework).
+  // Filter chips: All · <types you own, in canonical order> · Low · Favs. These stay VISIBLE — only
+  // sort and density moved into the ⋯ sheet. "Edit vendors" left the chip row for that sheet (R52
+  // names the shelf's overflow as the vendor manager's home).
   const typesPresent = [...new Set(state.teas.map(t=>(t.type||'').toLowerCase()).filter(Boolean))].sort((a,b)=>typeRank(a)-typeRank(b));
   const noFilter = !F.type && !F.lowStock && !F.favorite;
   const chips = state.teas.length ? `
@@ -252,20 +327,6 @@ function viewTeas(){
       ${typesPresent.map(ty=>`<button class="lib-chip ${F.type===ty?'active':''}" onclick="toggleTypeFilter('${ty}')">${escapeHtml(typeLabel(ty))}</button>`).join('')}
       <button class="lib-chip ${F.lowStock?'active':''}" onclick="toggleLowStockFilter()">Low</button>
       <button class="lib-chip ${F.favorite?'active':''}" onclick="toggleFavoriteFilter()">${favLeaf(13)} Favs</button>
-      ${vendors.length ? `<button class="lib-chip ${state.vendorsOpen?'active':''}" onclick="toggleVendors()">${state.vendorsOpen?'✕ Vendors':'Edit vendors'}</button>` : ''}
-    </div>` : '';
-  const densityToggle = state.teas.length ? `<div class="density-toggle" role="group" aria-label="Density">
-      <button class="density-seg ${density==='rows'?'active':''}" onclick="setTeaDensity('rows')" aria-label="List view">${icon('i-rows-hl',16)}</button>
-      <button class="density-seg ${density==='grid'?'active':''}" onclick="setTeaDensity('grid')" aria-label="Grid view">${icon('i-grid-hl',16)}</button>
-    </div>` : '';
-  // v3.84 (#23 F1): the 7 engine sorts return as one compact styled select on the count row —
-  // outside #teaShelf, so search keystrokes never touch it; `selected` re-derives from state.teaSort
-  // on every render, so a mid-session render() can't snap the label back to Type while the order
-  // stays sorted. Session-scoped on purpose (resets on reload); persistence is an R3 question.
-  const SORT_OPTS = [['type','Type'],['newest','Recently added'],['oldest','Oldest first'],['name','Name A–Z'],['stock-high','Most stock'],['stock-low','Least stock'],['rating','Highest rated']];
-  const sortSelect = state.teas.length ? `<div class="lib-sort">
-      <select onchange="setTeaSort(this.value)" aria-label="Sort teas">${SORT_OPTS.map(([k,l])=>`<option value="${k}" ${state.teaSort===k?'selected':''}>${l}</option>`).join('')}</select>
-      <span class="lib-sort-caret">${icon('i-caret-hl',14)}</span>
     </div>` : '';
   // #19 quiet hairline search — sits below the chips (chips stay the primary WS5 control). The ✕ is
   // always in the DOM, hidden when empty, so onTeaSearchInput can toggle it without a full re-render.
@@ -275,21 +336,12 @@ function viewTeas(){
       <button id="teaSearchX" class="lib-search-x" onclick="clearTeaSearch()" aria-label="Clear search" style="${state.teaSearch?'':'display:none;'}">✕</button>
     </div>` : '';
   return `
-    ${segControl}
-    <div class="lib-head">
-      <h2 style="font-family:var(--font-display);font-size:24px;margin:0;">My teas</h2>
-      <div class="lib-head-actions">${densityToggle}
-        <button class="btn-add" onclick="openTeaForm()">${icon('i-plus-hl',14)} Add</button>
-      </div>
-    </div>
-    <div class="lib-countrow">
-      <div class="mono lib-count">${state.teas.length} tea${state.teas.length===1?'':'s'} · ${state.teas.filter(t=>Number(t.amountGrams)>0).length} in stock${lowCount?` · <span style="color:var(--clay);">${lowCount} running low</span>`:''}${emptyCount?` · ${emptyCount} empty`:''}</div>
-      ${sortSelect}
-    </div>
+    ${head}
     ${chips}
     ${searchRow}
     ${state.vendorsOpen && vendors.length ? vendorManagerHTML() : ''}
     <div id="teaShelf">${teaShelfHTML()}</div>
+    ${teaOverflowHTML()}
   `;
 }
 // #19: the shelf body (active + finished, or the empty line). Split out so onTeaSearchInput can swap
@@ -323,7 +375,9 @@ function onTeaSearchInput(val){
 function clearTeaSearch(){ state.teaSearch=''; render(); }
 // Type chip toggles: pick a type, or clear it if it's already the active one (back to All).
 function toggleTypeFilter(type){ state.teaFilter.type = (state.teaFilter.type===type) ? '' : type; render(); }
-function setTeaSeg(seg){ state.teaSeg = (seg==='vessels') ? 'vessels' : 'teas'; state.view='teas'; render(); }
+// Three states, one variable (#13): teas · vessels · deeper. Anything else normalises to teas, so a
+// stale persisted value can never render an empty tab.
+function setTeaSeg(seg){ state.teaSeg = (seg==='vessels'||seg==='deeper') ? seg : 'teas'; state.view='teas'; state.teaOverflowOpen=false; render(); }
 function setTeaSort(v){ state.teaSort=v; render(); }
 function setTeaFilter(key, val){ state.teaFilter[key]=val; render(); }
 function toggleLowStockFilter(){ state.teaFilter.lowStock=!state.teaFilter.lowStock; render(); }

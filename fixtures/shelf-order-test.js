@@ -129,20 +129,33 @@ if(fs.existsSync(teasCsv)){
    what this round kept getting caught by; asserted here it cannot be built past. */
 const teasSrc = fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8');
 const SORT_KEYS = ['type','newest','oldest','name','stock-high','stock-low','rating'];
-const optsLine = /const SORT_OPTS\s*=\s*\[([\s\S]*?)\];/.exec(teasSrc);
-ok(!!optsLine, 'E1 SORT_OPTS still exists in steep-teas.js');
+const optsLine = /const TEA_SORT_OPTS\s*=\s*\[([\s\S]*?)\];/.exec(teasSrc);
+ok(!!optsLine, 'E1 TEA_SORT_OPTS still exists in steep-teas.js');
 if(optsLine){
   const keys = [...optsLine[1].matchAll(/\['([a-z-]+)'/g)].map(m=>m[1]);
   ok(keys.length===7 && SORT_KEYS.every(k=>keys.includes(k)),
      'E2 all seven sort keys present (got '+keys.length+': '+keys.join(', ')+')');
 }
 ok(/onchange="setTeaSort\(/.test(teasSrc), 'E3 the sort select still has a live setTeaSort caller (R60a)');
-// The select lives in viewTeas() (the count row), NOT teaShelfHTML() — asserting against the shelf
-// builder passes vacuously forever. Render the real view and look for the handler.
+/* E4/E5 AMENDED v3.96, one deploy after landing — #13's header rework moved sort and density off the
+   count row into the ⋯ sheet. The old E4 ("the rendered Teas view contains the control") would now be
+   asserting something FALSE, so keeping it would have blocked a ruled relocation rather than caught a
+   removal. R61 protects the CAPABILITY, not the markup that happened to express it (R60a: preserved,
+   not pinned in place). The replacement is strictly stronger than what E4 checked: the trigger must
+   render by default AND the seven-option control must render once the sheet is open — the old form
+   asserted only the second half, and only in the one layout that then existed. */
 S.teas=[{id:'x',name:'A',type:'green',amountGrams:10,rating:3}]; S.teaSort='type'; S.teaSearch='';
 S.teaFilter={type:'',vendor:'',lowStock:false,favorite:false}; S.teaSeg='teas';
-ok(/onchange="setTeaSort\(/.test(ctx.viewTeas()), 'E4 the rendered Teas view actually contains the control');
-console.log('  E R61 sort preservation: 4 checks');
+S.teaOverflowOpen=false;
+const closedView = ctx.viewTeas();
+ok(/onclick="toggleTeaOverflow\(\)"/.test(closedView), 'E4 the default Teas view renders the ⋯ trigger that reaches the control');
+ok(!/onchange="setTeaSort\(/.test(closedView), 'E4b sanity: with the sheet closed the select is genuinely absent (else E5 proves nothing)');
+S.teaOverflowOpen=true;
+const openView = ctx.viewTeas();
+S.teaOverflowOpen=false;
+ok(/onchange="setTeaSort\(/.test(openView), 'E5 opening the ⋯ sheet renders the live sort control');
+ok(SORT_KEYS.every(k=>openView.indexOf('value="'+k+'"')>=0), 'E6 all seven options reach the rendered sheet, not just the constant');
+console.log('  E R61 sort preservation: 6 checks');
 
 /* ---- F. Stock tiers: no second writer ----
    stockTier() is THE tier writer and statusLine() THE label writer; every surface derives from them

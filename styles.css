@@ -8,6 +8,7 @@
   --jade-deep:#2A4130;
   --amber:#C17A3E;
   --amber-pale:#F1DFC7;
+  --xanthous-wash:rgba(229,174,43,.14);   /* #13: the xanthous SELECTED marker, state only (§0.5 contract 3) */
   --clay:#8B5E4A;
   --line:#D8CFB9;
   --white:#FFFEFB;
@@ -40,6 +41,7 @@ html[data-theme="dark"]{
   --jade-deep:#8FBE83;
   --amber:#E3A15C;
   --amber-pale:#3A2C1A;
+  --xanthous-wash:rgba(229,174,43,.12);
   --clay:#C99872;
   --line:#332F24;
   --white:#1C1A14;
@@ -468,6 +470,8 @@ html[data-theme="dark"] .steep-pill.active{color:#15140F;}
 
 /* vessel thumbnail in list */
 .vessel-thumb{width:34px;height:34px;border-radius:8px;flex:0 0 auto;background:var(--jade-pale);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:16px;}
+/* Both `kind` base rules sit HERE, above .vessel-kanji — see the note in the ladder block below. */
+.vessel-tile{width:58px;height:58px;border-radius:12px;flex:0 0 auto;background:var(--jade-pale);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;}
 
 /* ---------- tiered achievements ---------- */
 .badge-tier{display:inline-block;margin-left:5px;font-family:var(--font-mono);font-size:9px;color:var(--amber);vertical-align:middle;}
@@ -870,3 +874,66 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 html[data-theme="dark"] .vessel-kanji.v-gaiwan{--vk-bg:#26241d;--vk-ink:#494434;}
 html[data-theme="dark"] .vessel-kanji.v-shiboridashi{--vk-bg:#25231c;--vk-ink:#464130;}
 html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#3e4a4e;}
+/* v3.96 (#05): the second `kind`. The BASE .vessel-tile rule lives up beside .vessel-thumb, above
+   .vessel-kanji — same specificity, so whichever comes last wins, and declaring the size rule down
+   here silently overrode the kanji plate's tint with the plain jade base. Only the rungs belong in
+   this block. The per-type STRIPE tints still don't exist (R63: build it small), so the two vessels
+   that would reach rung 3 render identically — invisible today, all five carry photos. */
+.vessel-tile.is-ph{background:repeating-linear-gradient(135deg,var(--vph-a,var(--porcelain-dim)),var(--vph-a,var(--porcelain-dim)) 7px,var(--vph-b,var(--white)) 7px,var(--vph-b,var(--white)) 14px);}
+.vessel-tile.vessel-kanji span{font-size:23px;}
+
+/* ===== #05 vessel list — rich rows, tap goes straight to edit (V2, no detail page) ===== */
+.vessel-list{display:flex;flex-direction:column;}
+.vessel-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+.vessel-row:last-child{border-bottom:none;}
+.vessel-rowmid{flex:1;min-width:0;}
+.vessel-row .shelf-name{font-size:15.5px;line-height:1.2;}
+.vessel-meta{display:block;font-size:11.5px;color:var(--ink-soft);margin-top:5px;}
+.vessel-nocap{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);text-decoration:underline;padding:0;}
+.vessel-usage{font-size:11.5px;color:var(--ink-soft);flex:0 0 auto;}
+.vessel-empty-sub{margin-top:6px;font-size:13px;color:var(--ink-soft);}
+.vessel-danger{border-top:1px solid var(--line);margin-top:14px;padding-top:11px;text-align:center;}
+.vessel-danger .btn-ghost{color:var(--red);font-size:13px;}
+
+/* ===== #13 header rework + the two control rows ===== */
+.lib-title{min-width:0;}
+.lib-title h2{font-family:var(--font-display);font-size:24px;margin:0;line-height:1.15;}
+.lib-kicker{display:block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:3px;}
+.tea-more{border:none;background:none;color:var(--ink);font-family:var(--font-mono);font-size:19px;line-height:1;padding:2px 6px;}
+.tea-modes{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:14px 0 0;}
+.tea-mode{flex:1;border:none;background:none;font-family:var(--font-display);font-size:14.5px;color:var(--ink-soft);padding:8px 0;}
+.tea-mode + .tea-mode{border-left:1px solid var(--line);}
+.tea-mode.active{background:var(--xanthous-wash);color:var(--ink);font-weight:700;}
+.tea-segs{display:flex;gap:14px;align-items:center;margin-top:13px;padding-bottom:7px;border-bottom:1px solid var(--line);}
+.tea-seg{border:none;background:none;font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);padding:0 2px 1px;}
+.tea-seg.active{color:var(--ink);box-shadow:inset 0 -7px 0 var(--xanthous-wash);}
+.chip-row{margin-top:13px;}
+/* the ⋯ sheet reuses the hub-sheet shell; only the control rows are new */
+.ovf-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px;border-top:1px solid var(--line);}
+.ovf-k{font-size:12px;color:var(--ink-soft);}
+.ovf-row .lib-sort select{font-size:13px;color:var(--ink);}
+
+/* ===== R51 Go Deeper — the reference ===== */
+.ref-list{display:flex;flex-direction:column;}
+.ref-row{border-bottom:1px solid var(--line);}
+.ref-row:last-child{border-bottom:none;}
+.ref-rowhead{display:flex;align-items:center;gap:11px;padding:11px 0;cursor:pointer;}
+.ref-row.is-unowned .ref-rowhead{opacity:.55;}
+.ref-swatch{width:23px;height:30px;flex:0 0 auto;border-radius:8px 4px 7px 4px;border:1px solid var(--line);background:var(--porcelain-dim);}
+.ref-rowmid{flex:1;min-width:0;}
+.ref-rowname{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+.ref-rowname .shelf-name{font-size:14.5px;font-weight:500;line-height:1.25;}
+.ref-script{font-size:10.5px;color:var(--ink-soft);}
+.ref-meta{display:block;font-size:9.5px;color:var(--ink-soft);margin-top:2px;}
+.ref-own-tag{font-size:9.5px;color:var(--jade);flex:0 0 auto;}
+.ref-body{padding:2px 0 13px 34px;}
+.ref-entry{padding:9px 0;}
+.ref-entry.is-member{border-top:1px solid var(--line);}
+.ref-entry-head{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+.ref-entry-name{font-family:var(--font-display);font-weight:600;font-size:13.5px;color:var(--ink);}
+.ref-sig{font-size:13px;color:var(--ink);margin:5px 0 7px;line-height:1.5;}
+.ref-fact{display:flex;gap:9px;font-size:12px;margin-top:3px;}
+.ref-fact-k{flex:0 0 66px;color:var(--ink-soft);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding-top:2px;}
+.ref-fact-v{color:var(--ink);}
+.ref-hedge{margin-top:7px;font-size:12px;color:var(--ink-soft);font-style:italic;}
+.ref-own{margin-top:7px;font-family:var(--font-mono);font-size:10.5px;color:var(--jade);}

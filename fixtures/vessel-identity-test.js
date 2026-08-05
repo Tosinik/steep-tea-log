@@ -87,6 +87,41 @@ ok(/--vph-a,var\(--porcelain-dim\)/.test(css) && /--vph-b,var\(--white\)/.test(c
    'B3 the stripe falls back to its shipped colours, so unmapped vessels look identical to before');
 console.log('  B tints in both themes: 7 checks');
 
+/* ---- B2. the 'tile' kind (v3.96, #05) ----
+   Slice A shipped `kind` as a parameter with only 'thumb' in use, and wrote that the larger tile
+   "arrives with slice B". A second kind is where a ladder silently loses a rung: if .vessel-tile
+   existed but .vessel-tile.is-ph did not, rung 3 would render as a bare box at the new size and
+   nobody would see it, because every real vessel has a photo. Assert all three rungs at BOTH kinds. */
+for(const kind of ['thumb','tile']){
+  const p = ctx.vesselPhoto({type:'Gaiwan',image:'https://x/y.jpg'},kind);
+  const k = ctx.vesselPhoto({type:'Gaiwan'},kind);
+  const s = ctx.vesselPhoto({type:'Kyusu'},kind);
+  ok(new RegExp('vessel-'+kind).test(p) && new RegExp('vessel-'+kind).test(k) && new RegExp('vessel-'+kind).test(s),
+     'B4 all three rungs carry the vessel-'+kind+' class');
+  ok(/蓋碗/.test(k) && /vessel-kanji/.test(k), 'B5 rung 2 (kanji) renders at kind='+kind);
+  ok(/is-ph/.test(s) && /v-kyusu/.test(s), 'B6 rung 3 (stripe) renders at kind='+kind);
+  ok(new RegExp('\\.vessel-'+kind+'\\{').test(css), 'B7 .vessel-'+kind+' is styled');
+  ok(new RegExp('\\.vessel-'+kind+'\\.is-ph\\{').test(css), 'B8 .vessel-'+kind+'.is-ph is styled — the stripe is not a bare box at this size');
+  ok(new RegExp('\\.vessel-'+kind+'\\.vessel-kanji span\\{').test(css), 'B9 the kanji is sized for .vessel-'+kind);
+  /* B9b — CASCADE ORDER, not just presence. `.vessel-<kind>` and `.vessel-kanji` are both (0,1,0),
+     so the later declaration wins: a base rule written BELOW .vessel-kanji silently replaces the
+     kanji plate's per-type tint with the plain jade base. That is exactly what happened on the
+     first tile build, and it was invisible to "the rule exists" — caught in the browser by reading
+     computed background, then pinned here as source order. */
+  ok(css.indexOf('.vessel-'+kind+'{') < css.indexOf('.vessel-kanji{'),
+     'B9b .vessel-'+kind+'’s base rule is declared ABOVE .vessel-kanji, so the tint still wins');
+}
+console.log("  B2 both kinds carry all three rungs: 12 checks");
+
+/* ---- B3. #05's list renders through the ladder, not around it ---- */
+const sessSrc = fs.readFileSync(path.join(repo,'steep-sessions.js'),'utf8');
+ok(/vesselPhoto\(v,'tile'\)/.test(sessSrc), 'B10 the vessel list uses vesselPhoto — no second image path');
+ok(!/v\.image\s*\?/.test(sessSrc), 'B11 no inline v.image branch survives outside vesselPhoto (the pre-R63 two-step thumb)');
+// Delete moved off the row and into the form; armConfirm stays the primitive (never a native confirm).
+ok(/armConfirm\(this,'Delete this vessel\?'/.test(sessSrc), 'B12 vessel delete still goes through armConfirm');
+ok(!/confirm\(|alert\(/.test(sessSrc.replace(/armConfirm\(/g,'')), 'B13 no browser confirm()/alert() reached the vessel surface');
+console.log('  B3 #05 list wiring: 4 checks');
+
 /* ---- C. method lanes: four drawn, three stored + a boolean ---- */
 const draft = {brewStyle:null, isColdBrew:false, capacityMl:110, resolve:true, onMethod:'d_pickMethodLane', onCold:'d_pickColdLane()'};
 const lanesDraft = ctx.methodLanesHTML(draft);

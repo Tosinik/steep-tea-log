@@ -122,31 +122,38 @@ library); `setTeaSort`/`setTeaFilter`/`focusLogSteep` stay in the code as its re
 parked → R3; the held #15 vocab expansion stays out until phase-2. New bugs/ideas land as GitHub issues
 (the live inbox), not here.
 
-**R3 status (2026-07-25 — banking session pushed, docs-only, no deploy):** **read
-`docs/r3/R3-STATUS.md` FIRST.** It is the round's durable state document and outranks this paragraph on
+**R3 status (building — slice B shipped v3.96):** **read `docs/r3/R3-STATUS.md` FIRST.** It is the round's
+durable state document and outranks this paragraph on
 every R3 detail (authority order: live repo → the current export, stamped → rulings ledger → R3-STATUS → boards →
-nobody's memory). It is current as of the post-banking refresh and records the commit hashes itself.
+nobody's memory). It records the commit hashes itself.
 The **binding reference** for the #09b sweep + Code hand-off is
-**`docs/r3/planning/R3-RULINGS-LEDGER.md`**, now **R1–R56 unbroken** (was 31 — R42–R56 landed 2026-07-25),
-with `DATA-region-coordinates.md` the Origins coordinate source (8/8, CLOSED).
+**`docs/r3/planning/R3-RULINGS-LEDGER.md`**, **contiguous and verified unbroken from a fresh clone**,
+with `DATA-region-coordinates.md` the Origins coordinate source (8/8, CLOSED). The build order is
+`docs/r3/R3-BUILD-PLAN.md` — slices A and B are struck as SHIPPED there; **B2 (#06 + #03) is next**.
 Design's **final board export is in-repo and is the visual authority**: `docs/r3/boards/*-rev*.dc.html`
 plus `origins-map-v3.html`, banked verbatim and hash-verified, with `support.js` + `uploads/` as required
 build dependencies (every board loads them by relative path). The `.png` files in that folder are
 round-1/parked record only — **not** authority. R29 closed Pillar B (no root split — app stays at
 `slowcup.app/`, landing = #09's logged-out screen). Focus and Wrapped are **no longer unboarded**: #10
 Focus rev2 and #11 Wrapped rev1 shipped in that export.
-**Next, and the last R3 task: the implementation hand-off, as its own session.** Four rulings stay held
-(#22 · #23 · #28 · washi probation) and the Teas→Library rename is unruled.
+~~**Next, and the last R3 task: the implementation hand-off.** Four rulings stay held (#22 · #23 · #28 ·
+washi probation) and the Teas→Library rename is unruled.~~ **All discharged.** The hand-off is committed
+(`docs/r3/R3-IMPLEMENTATION-HANDOFF.md`), the four held rulings landed as R57–R60 (2026-07-25), and **R62
+ruled out the rename — the tab stays Teas.** R3 has no open design questions; what remains is execution.
 Two repo rules exist *because of* the banking and must not be "tidied away": `.gitignore`'s scoped
 `!docs/r3/boards/*.dc.html` negation (the bare `*.dc.html` above it silently drops all 20 boards), and
 `.gitattributes` pinning `docs/r3/boards/** -text` — without it Git-for-Windows `autocrlf` makes a Windows
 clone's hashes disagree with a Linux one on an archive whose whole point is hash-verifiability.
 
 **Pending Code cleanups (were ephemeral task-chips — recorded here so a session-clear doesn't lose them):**
-(a) delete dead `ratioSetupHTML` (`steep-sessions.js:562`, never called; also in CLAUDE.md cleanup backlog —
-its "remove when touching setup code" trigger has fired-and-missed twice, v3.85 + v3.91; a real deploy, not
-docs); (b) promote the R3 handover's §6 (review method) + §7 (recurring failure modes) into CLAUDE.md as
-standing discipline — see the banner in `docs/r3/HANDOVER-planning-lane.md`.
+~~(a) delete dead `ratioSetupHTML`~~ **DONE in v3.95** (slice A), after its trigger fired and was missed
+twice at v3.85 and v3.91; (b) promote the R3 handover's §6 (review method) + §7 (recurring failure modes)
+into CLAUDE.md as standing discipline — see the banner in `docs/r3/HANDOVER-planning-lane.md`. **Partly
+discharged in v3.96:** R74 put the *doc sweep* into CLAUDE.md's deploy ritual and `slowcup-deploy` step 5;
+§6/§7's review method and failure-mode list are still owed.
+(c) **Four stale fixture suites**, on one chip: `status-line` E1/E3/G1/G2 · `tea-types` G · plus local-only
+`freshness-test.js` and `lifecycle-test.js`. Threshold seeded from the fixture row, the engine's answer
+tracked, no pinned literals, `user_id` scoping per R69.
 
 **Historical — the Round-2 design pass is COMPLETE** (WS6 → WS2 → WS5 → WS3 → WS1 → WS4, shipped v3.73–v3.78;
 bundle at `SlowCup R2 bundle handoff/` in the repo root). WS4 was the only data-model change (semantic, not
@@ -168,7 +175,34 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.95 R3 slice A: the shared primitives** (cache **v105**, APP_VERSION v3.95).
+**NOW (just shipped) — v3.96 R3 slice B: #13 Teas revision + #05 Vessels** (cache **v106**, APP_VERSION v3.96).
+The Teas tab gains its second mode and its header rework; the vessel list becomes the surface #05 drew.
+- **Go Deeper (R51)** — new `steep-reference.js` over `browseTeaTypes()`: 27 categories / 55 rows, search,
+  expandable bodies, an "on your shelf" mark from `matchTeaType`. **Read-only by contract**, asserted
+  structurally (the module may not name `SteepDB`/`persistTea`/`putTea`/`saveKey`; it assigns only
+  `refSearch`/`refOpen`). Coverage is rendered **honestly**: 12/21 teas match, 11/27 categories marked,
+  **16 dimmed** — the same gap `tea-types-test.js` G reports. A member row shows only what it **adds**;
+  confidence is exempt, so a contested member keeps its hedge.
+- **Header rework + where sort went.** Title · a generated count line · ⋯ overflow. The mode pair
+  (`Your shelf`/`Go Deeper`) always draws; the `teas`/`vessels` segment row is **shelf-mode only**, which
+  is what collapses two drawn controls into one three-valued `state.teaSeg`. Sort + density moved into the
+  ⋯ sheet — **R60a preserves the capability, not the markup**; chips and search stay visible; **Add stays
+  visible** (§0.5 contract 2), not in the overflow the board drew it in; Import backup is **not**
+  duplicated out of Settings.
+- **`shelf-order-test.js` E4 amended one deploy after landing** — the old assertion would now be asserting
+  something false. Replaced by a stronger pair (trigger renders by default · control renders with the
+  sheet open) plus a sanity check that the closed state genuinely lacks it, and E6 that all seven options
+  reach the rendered sheet.
+- **#05 Vessels** rides slice A's `kind`: `vesselPhoto(v,'tile')` at 58 px, rich rows, tap → edit (V2),
+  usage counts read from sessions every render (R68 — "9 sittings" stopped distinguishing Main Kyusu once
+  Mogake also hit 9). Delete moved off the row into the form, still `armConfirm`.
+- **A cascade bug no "the rule exists" check could see:** `.vessel-tile` and `.vessel-kanji` are both
+  (0,1,0), so declaring the tile's base rule below the kanji block replaced the per-type plate tint with
+  the plain jade base. Found by reading computed background in **both** themes. Base rule moved above the
+  ladder block; **B9b now pins the source order**.
+- **R75–R78** in the ledger; **R74's doc sweep is now deploy step 5** in `slowcup-deploy` and CLAUDE.md.
+
+**Previously — v3.95 R3 slice A: the shared primitives** (cache **v105**, APP_VERSION v3.95).
 **R3's first code deploy** after a week of docs-only commits, so this is the first Refresh banner users
 see in that time. Cross-cutting primitives land *before* any surface is rebuilt — retrofitting the method
 control onto a finished surface is how the four-lane order went wrong the first time.

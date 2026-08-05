@@ -105,20 +105,39 @@ function viewSessions(){
 }
 
 /* ================= VESSELS ================= */
-function viewVessels(){
-  const rows = state.vessels.length ? state.vessels.map(v=>`
-    <div class="rank-row">
-      ${vesselPhoto(v,'thumb')}
-      <span class="rname">${escapeHtml(v.name)} <span style="color:var(--ink-soft);font-weight:400;">— ${escapeHtml(v.type)}${v.material?', '+escapeHtml(v.material):''}</span></span>
-      <span class="rval">${v.capacityMl?v.capacityMl+'ml':`<button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))" style="color:var(--ink-soft);font-size:11px;text-decoration:underline;padding:0;">· ml?</button>`}</span>
-      <button class="btn-ghost" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))">edit</button>
-      <button class="btn-ghost" onclick="armConfirm(this,'Remove this vessel?',()=>deleteVessel('${escapeJsArg(v.id)}'))">remove</button>
+// #05 rev 1 (R3 slice B). Rich rows — photo tile · name · type · material · capacity · usage — and a
+// tap goes STRAIGHT to edit (V2: four fields wouldn't fill a detail page). The header, the ＋ and the
+// segment row live in viewTeas(); this renders the list only.
+//
+// Not built, deliberately: #05's V1 puts this behind the profile ⊙ and rejects a Library segment —
+// superseded by R75 (shipped goVessels() has made it the Teas tab's second segment since v3.46, and
+// the hub sheet has no Vessels row). 旅 for the Travel cuppa (R63) and 湯呑 for a "Frog Yunomi" (no
+// such vessel exists) are not built either.
+function vesselUsageCount(id){ return (state.sessions||[]).filter(s=>s.vesselId===id).length; }
+function vesselRowHTML(v){
+  // Generated, never a literal (R68): "9 sittings" stopped being distinguishing the moment a second
+  // vessel reached 9, so the number is read from sessions on every render.
+  const n = vesselUsageCount(v.id);
+  const meta = [v.type, v.material, v.capacityMl ? v.capacityMl+' ml' : ''].filter(Boolean).join(' · ');
+  // Capacity is the one field brew advice reads (leaf-to-water ratio), so its absence gets a quiet
+  // prompt rather than a blank — the separator is a text node so the meta line still reads as one.
+  const cap = v.capacityMl ? '' : `${meta?' · ':''}<button class="btn-ghost vessel-nocap" onclick="event.stopPropagation();openVesselForm(vesselById('${escapeJsArg(v.id)}'))">add capacity</button>`;
+  return `<div class="vessel-row" onclick="openVesselForm(vesselById('${escapeJsArg(v.id)}'))">
+    ${vesselPhoto(v,'tile')}
+    <div class="vessel-rowmid">
+      <div class="shelf-name">${escapeHtml(v.name)}</div>
+      <div class="vessel-meta mono">${escapeHtml(meta)}${cap}</div>
     </div>
-  `).join('') : '<div class="empty">No vessels yet — add your gaiwan, kyusu, or teapot.</div>';
-  return `
-    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">My vessels</h2><button class="btn btn-primary" onclick="openVesselForm()">＋ Add vessel</button></div>
-    <div class="card">${rows}</div>
-  `;
+    <span class="vessel-usage mono">${n ? n+' sitting'+(n===1?'':'s') : ''}</span>
+    <span class="shelf-caret">${icon('i-caret-hl',20)}</span>
+  </div>`;
+}
+function viewVessels(){
+  if(!state.vessels.length) return `<div class="card empty vessel-empty">
+      <div>No vessels yet.</div>
+      <div class="vessel-empty-sub">Add the pot or cup you brew in — a photo makes it yours.</div>
+    </div>`;
+  return `<div class="vessel-list">${state.vessels.map(vesselRowHTML).join('')}</div>`;
 }
 function openVesselForm(existing){
   state.editingVessel = existing || null;
@@ -145,8 +164,9 @@ function vesselFormModal(){
         <div class="field" style="margin-bottom:12px;"><label>Type</label><select name="type">${opts}</select></div>
         <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..." value="${escapeHtml(v.material||'')}"></div>
         <div class="field" style="margin-bottom:12px;"><label>Capacity (ml) <span style="color:var(--ink-soft);font-weight:400;">— helps tune brew advice by leaf-to-water ratio</span></label><input type="number" name="capacityMl" placeholder="e.g. 110 for a gaiwan, 200 for a kyusu" value="${v.capacityMl??''}"></div>
-        <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="closeVesselForm()">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="closeVesselForm()">Cancel</button><button type="submit" class="btn btn-primary">Save vessel</button></div>
       </form>
+      ${v.id ? `<div class="vessel-danger"><button type="button" class="btn-ghost" onclick="armConfirm(this,'Delete this vessel?',()=>deleteVesselFromForm('${escapeJsArg(v.id)}'))">Delete this vessel</button></div>` : ''}
     </div>
   </div>`;
 }
@@ -180,6 +200,14 @@ async function submitVesselForm(e){
 function deleteVessel(id){
   state.vessels = state.vessels.filter(v=>v.id!==id);
   dropVessel(id); render();
+}
+// #05 moved delete off the list row and into the edit form (V2: the row is a tap target now, so a
+// destructive button riding it would be one mis-tap from the edit it sits inside). armConfirm stays
+// the primitive — the board's "hold to confirm" describes the same two-step intent (R76's sibling
+// call): the house has one destructive-confirm control and it is not a native gesture.
+function deleteVesselFromForm(id){
+  state.vesselFormOpen=false; state.editingVessel=null; state._draftImage=null;
+  deleteVessel(id);
 }
 
 /* ================= SESSION EDITING ================= */

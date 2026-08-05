@@ -177,7 +177,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 | Slice | Contents | Schema |
 |---|---|---|
 | ~~**A**~~ | ~~the primitives above~~ — **SHIPPED v3.95** | none |
-| **B** | **#13 Teas revision** (R51 second mode · R52 vendor overflow · header rework · Vessels segment) + **#05 Vessels** (rides A's `vesselPhoto`) | none |
+| ~~**B**~~ | ~~**#13 Teas revision** + **#05 Vessels**~~ — **SHIPPED v3.96** (R75–R78 came out of its plan review) | none |
 | **B2** | **#06 Add / edit tea** + **#03 Tea detail** — added 2026-07-26; they were "ready to build" in the hand-off §2 and verified in `R3-STATUS.md` §3 but appeared in **no slice** | none |
 | **C** | **#04 setup + pickers** and **#12 Quick log** — twins sharing the method primitive and the inverted date posture | none |
 | **D** | **#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)** as its own commit | none |
@@ -188,10 +188,15 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 
 Notes that shape the order:
 
-- **B** carries the most new work of any single board (#13). Its vendor manager is restyle-only —
-  `vendorManagerHTML()` (`steep-teas.js:153`) and `distinctVendors()` (`:150`) already ship — but two
-  real rename cases exist and **one tea has no vendor at all**, which must not surface as an
-  empty-name row.
+- ~~**B** carries the most new work of any single board (#13).~~ **SHIPPED v3.96.** Its vendor manager was
+  restyle-only as planned — `vendorManagerHTML()` and `distinctVendors()` already shipped, and the
+  vendorless tea is correctly excluded by `distinctVendors()` rather than surfacing as an empty-name row
+  (verified in the browser: nine names, one tea absent). Three things the build found that the plan did
+  not: the shipped **sort control had to move** rather than stack (R60a preserves the capability, so
+  slice A's E4 was amended one deploy after landing); **`TT_INHERIT` made member rows repeat their
+  parent's facts** verbatim, eight lines nine times, so members now render only what they add; and a
+  **CSS cascade bug invisible to any "the rule exists" assertion** — `.vessel-tile` declared below
+  `.vessel-kanji` silently overrode the plate tint, caught by reading computed background in both themes.
 - **B2** was a genuine gap in this table, not a scheduling preference — found at slice B's plan
   review and filed the same day. It sits **adjacent to B on purpose**: R51's contextual Go Deeper
   entry and the brew-guide "Borrow from Go Deeper" action both live on **Tea detail**, so scheduling

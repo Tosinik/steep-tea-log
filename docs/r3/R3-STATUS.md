@@ -191,13 +191,19 @@ gives €0.234/g. The 07-08 export gives 0.22 / 1.70, so this is not simple stal
 provenance is unknown. Either its method is stated and it reproduces, or the board takes the
 recomputed pair.
 
-**Engine models.** Method control = `gongfu · senchadō · western` + `is_cold_brew` toggle. Stock
+**Engine models** *(restamped v3.96 — three of these described work that has since shipped, which is
+exactly R74's case)*. Method control = **four drawn lanes** over three stored values plus the boolean,
+`methodLanesHTML()` the single writer since **v3.95**; ~~three segments + an `is_cold_brew` toggle~~ — cold
+brew is a peer lane and both checkboxes are gone. Stock
 tiers = FIVE (`empty · untracked · low · few · plenty`), cups-based when guide data exists, else
-grams < threshold (Niklas: 11). Vessel image = photo → tinted stripe → kanji (kanji map being
-extended per hand-off §0.3). `brew_guide` is free text today; structured pills = NEW schema.
+grams < threshold (Niklas: 11). Vessel image = **photo → kanji plate → type-tinted stripe** —
+~~photo → tinted stripe → kanji, map "being extended"~~: the order was stated backwards and the map is
+**built**, `VESSEL_KANJI` + `vesselPhoto(v,kind)` since **v3.95**, with `kind:'tile'` added in **v3.96**.
+`brew_guide` is free text today; structured pills = NEW schema (out of R3 per R65).
 Bottom nav ships **Home · Teas · Log · Sessions · Insights** (`steep-core.js:894–903`) — the tab is
-**Teas**, not Library. Vessels is a **segment of the Teas tab** (`goVessels()` sets
-`state.teaSeg='vessels'; state.view='teas'`, v3.46), not an overlay.
+**Teas**, not Library (R62). Vessels is a **segment of the Teas tab** (`goVessels()` sets
+`state.teaSeg='vessels'; state.view='teas'`, v3.46), not an overlay — and since **v3.96** `teaSeg` is
+three-valued (`teas · vessels · deeper`), Go Deeper being the tab's second mode.
 
 ## 3 · Board inventory — final, as exported 2026-07-25
 
@@ -251,7 +257,21 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v3.95 LIVE — R3's first code deploy** (`d34af32`, cache **v105**, pushed 2026-07-26; entry-path pins
+**v3.96 LIVE — R3 slice B: #13 Teas revision + #05 Vessels** (cache **v106**). The Teas tab gains **Go
+Deeper** as its second mode (R51) — new `steep-reference.js` over `browseTeaTypes()`, **read-only by
+contract** and guarded structurally by `fixtures/reference-test.js` — plus the header rework (title ·
+generated count line · ⋯ sheet), the mode pair over a shelf-mode-only segment row (one three-valued
+`state.teaSeg`), R52's vendor manager reached from the ⋯, and #05's vessel list on slice A's
+`vesselPhoto(v,'tile')`. **R75–R78** came out of the plan review. **No SQL.**
+
+Three things a later slice inherits. **(a) Coverage is drawn honestly** — `matchTeaType` is exact-fold
+`covers`-only, so 12 of 21 teas match and **16 of 27 categories render dimmed**; that is the catalog's real
+reach, and the same gap `tea-types-test.js` G reports. **(b) R60a means relocation, not pinning** — sort
+moved into the ⋯ sheet and slice A's E4 was amended one deploy after landing, to a strictly stronger pair.
+**(c) `TT_INHERIT` makes member rows near-empty by design** — they render only what they add, with
+confidence exempt so a contested member keeps its hedge.
+
+**Previously: v3.95 — R3's first code deploy** (`d34af32`, cache **v105**, pushed 2026-07-26; entry-path pins
 in `e29cc17`). **Slice A: the shared primitives, before any surface.** Currency is a preference
 (`DEFAULT_SETTINGS.currency='€'` + `currencyFmt()`, six sites, one writer — three had the wrong symbol
 including a dormant one, three had none) · `methodLanesHTML()` is the single writer for the four drawn
