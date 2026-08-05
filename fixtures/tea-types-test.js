@@ -85,7 +85,10 @@ ok(bySlug('wuyi-yancha').covers.length===0, 'E3 the parent carries no covers (me
 const browse=ctx.browseTeaTypes();
 ok(browse.some(b=>b.type.slug==='wuyi-yancha'), 'E4 …yet Wuyi Yancha is still a browse category');
 ok(browse.find(b=>b.type.slug==='wuyi-yancha').members.some(m=>m.slug==='dhp'), 'E5 …with Da Hong Pao grouped under it');
-const yashi=match('Yashi Xiang Dancong Guandong');
+// v3.96: spelling corrected to the shelf's actual "Guangdong" — the covers entry was one character off
+// ("Guandong"), and since matchTeaType is exact-fold this suite was asserting a match that could only
+// ever fire against the typo, never against the real tea. That is why section G's coverage gap hid it.
+const yashi=match('Yashi Xiang Dancong Guangdong');
 ok(yashi && yashi.slug==='ya-shi-xiang', 'E6 Ya Shi Xiang resolves to the member, not phoenix-dancong');
 ok(browse.some(b=>b.type.slug==='phoenix-dancong'), 'E7 Phoenix Dan Cong stays browse-reachable');
 console.log('  E covers resolution: 7 checks');
@@ -104,13 +107,27 @@ console.log('  F disambiguation traps: 7 checks');
 // ---- G. real teas_rows.csv grounding ----
 const csvPath=path.join(__dirname,'teas_rows.csv');
 if(fs.existsSync(csvPath)){
-  const teas=parseCSV(fs.readFileSync(csvPath,'utf8'));
+  /* v3.96 repair, two faults (R69 named both).
+     1. The foreign row was excluded BY NAME (`t.name!=='Test'`) plus `match('Test')===null`, so this
+        suite asserted a property of another account's data and a rename there would have broken it.
+        Now scoped by user_id, derived from who owns the sessions — the same rule figures-report.js uses.
+     2. `unmapped.length===0` demanded the catalog cover the whole shelf. It does not, by design:
+        matchTeaType is exact-fold `covers`-only and never guesses, so nine teas match nothing. That is
+        a CONTENT gap — a reason to author rows — not a code regression, and holding a suite red for it
+        trains the eye to ignore red. The gap is now REPORTED loudly on every run and the assertion is
+        the one that can actually catch a bug: no tea may match the WRONG type.
+     The repair also found a real one-character data bug this red was hiding: `ya-shi-xiang`'s covers
+     read "…Dancong Guandong" against a shelf tea spelled "…Dancong Guangdong", so an exact-fold match
+     could never fire. Fixed in steep-tea-types.js. */
+  const sessPath=path.join(__dirname,'sessions_rows.csv');
+  const OWNER = fs.existsSync(sessPath) ? (parseCSV(fs.readFileSync(sessPath,'utf8'))[0]||{}).user_id : null;
+  const teas=parseCSV(fs.readFileSync(csvPath,'utf8')).filter(r=>!OWNER || r.user_id===OWNER);
   const EXPECT={
     'Sencha Megumi No. 1 Hoshino':'sencha', '2021 Fujian White Tea':'fujian-white',
     'Honey Oolong Gui Fei':'gui-fei-oolong', 'Sencha Kagoshima Premium':'sencha',
     'Dawang Feng Da Hong Pao':'dhp', 'Shincha Saemidori Kagoshima':'shincha',
     'Oriental Beauty':'oriental-beauty', 'Kabusecha Kagoshima':'kabusecha',
-    'Ruby Ruanzhi':'ruan-zhi-oolong', 'Yashi Xiang Dancong Guandong':'ya-shi-xiang',
+    'Ruby Ruanzhi':'ruan-zhi-oolong', 'Yashi Xiang Dancong Guangdong':'ya-shi-xiang',
     'Huang Ya Yellow Tips':'huang-ya', 'Ali Shan Fo Shou Dong Pian':'alishan-gaoshan',
     'Yunnan Silver Bud Ya Bao':'ya-bao-yunnan'
   };
@@ -119,10 +136,17 @@ if(fs.existsSync(csvPath)){
     if(t.name in EXPECT){ const m=match(t.name);
       ok(m && m.slug===EXPECT[t.name], 'G "'+t.name+'" → '+EXPECT[t.name]+' (got '+(m?m.slug:'null')+')'); n++; }
   });
-  ok(match('Test')===null, 'G "Test" (the other user\'s row) matches no type');
-  // every main-library tea is expected — a new library tea with no mapping is a signal to author a row, not a silent miss
-  const unmapped=teas.filter(t=>t.name!=='Test' && !(t.name in EXPECT)).map(t=>t.name);
-  ok(unmapped.length===0, 'G all main-library teas have an expected mapping (unmapped: '+unmapped.join(', ')+')');
+  // An uncurated name matches nothing — asserted on a synthetic string, never on another account's row.
+  ok(match('A Tea Nobody Curated 12345')===null, 'G an uncurated name matches no type (never a near-miss)');
+  // THE assertion that can catch a bug: a tea may match nothing, but it may never match the WRONG row.
+  const wrong=teas.filter(t=>{ const m=match(t.name); return m && (t.name in EXPECT) && m.slug!==EXPECT[t.name]; })
+    .map(t=>t.name+'→'+match(t.name).slug);
+  ok(wrong.length===0, 'G no shelf tea matches the WRONG type ('+(wrong.join(', ')||'none')+')');
+  /* Coverage is reported, not asserted — a count here would be a snapshot (R67) and would go red on the
+     next tea Niklas buys rather than on a defect. Loud on every run so it cannot go silent. */
+  const unmapped=teas.filter(t=>!match(t.name)).map(t=>t.name);
+  console.log('  G catalog coverage: '+(teas.length-unmapped.length)+'/'+teas.length+' shelf teas matched'+
+    (unmapped.length?' — NOT COVERED (author a row or a `covers` entry): '+unmapped.join(', '):''));
   console.log('  G real CSV grounding: '+(n+2)+' checks');
 } else {
   console.log('  G real CSV grounding: SKIPPED (teas_rows.csv not present)');

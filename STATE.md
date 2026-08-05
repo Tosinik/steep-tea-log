@@ -201,6 +201,17 @@ The Teas tab gains its second mode and its header rework; the vessel list become
   the plain jade base. Found by reading computed background in **both** themes. Base rule moved above the
   ladder block; **B9b now pins the source order**.
 - **R75–R78** in the ledger; **R74's doc sweep is now deploy step 5** in `slowcup-deploy` and CLAUDE.md.
+- **Second commit, same deploy — the stale suites are repaired and all 18 committed suites are green.**
+  `status-line` was comparing two worlds (never seeded `lowStockThreshold`, so it ran at the default 15
+  against a shelf counted at the owner's 11) and was unscoped; it now seeds the threshold from the
+  owner's `user_settings` row, scopes by `user_id`, and asserts the **engine agreeing with itself**
+  instead of pinned names. `tea-types` G demanded coverage the catalog never claimed — coverage is now
+  *reported loudly*, and the assertion is that no tea matches the **wrong** type. That red was hiding a
+  real bug: `ya-shi-xiang`'s `covers` said `…Dancong Guandong` against a tea spelled `…Guangdong`, so an
+  exact-fold match could never fire, and E6 "passed" by asserting the typo against itself. Coverage
+  **12 → 13 of 21**. Local-only `freshness-test.js` ("exactly 2 cues fire") and `lifecycle-test.js` ("no
+  real tea is finished") are red for the same stale-expectation reason — untracked, so a fresh clone
+  sees neither.
 
 **Previously — v3.95 R3 slice A: the shared primitives** (cache **v105**, APP_VERSION v3.95).
 **R3's first code deploy** after a week of docs-only commits, so this is the first Refresh banner users

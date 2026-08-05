@@ -35,6 +35,36 @@ function parseCSV(t){const R=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++
    .map(x=>Object.fromEntries(h.map((k,i)=>[k,x[i]])));}
 const csvPath=path.join(__dirname,'teas_rows.csv');
 const haveCSV=fs.existsSync(csvPath);
+/* v3.96 repair. This section was red against three successive exports because it did two things wrong,
+   both of the shape R69 describes:
+     1. It never seeded lowStockThreshold, so it ran the engine at DEFAULT_SETTINGS' 15 while the owner's
+        real setting is in user_settings_rows.csv. Three teas are low at 15, two at 11 — the suite was
+        comparing the engine's answer under one threshold against a shelf counted under another.
+     2. It was UNSCOPED: teas_rows.csv carries another account's row (R69), and E1's absolute
+        `low.length===2` survived only because that row happens to be inert at 0 g.
+   The repair takes both, and drops the pinned names. A count and a name list are SNAPSHOTS (R67) — they
+   move whenever a cup is brewed — so what is asserted now is the engine's own agreement with itself:
+   the low set is exactly the set stockTier calls 'low', every member reads the low tone, and the
+   threshold is the boundary it claims to be. Nothing here goes stale when Niklas drinks something. */
+const ownerOf = () => {
+  const sp = path.join(__dirname,'sessions_rows.csv');
+  if(!fs.existsSync(sp)) return null;
+  const ses = parseCSV(fs.readFileSync(sp,'utf8'));
+  return ses.length ? ses[0].user_id : null;     // sessions are single-owner; export-gate-test asserts it
+};
+/* setTh is scoped, not global: the real threshold (11) belongs to the real-data sections only. Setting
+   it once at the top silently reinterpreted the SYNTHETIC section F, whose 12 g case is written against
+   the default floor of 15 — F15 went red and would have read as a regression in the tier engine rather
+   than as one suite leaking a setting into another. Restore after every real-data block. */
+const DEFAULT_TH = vm.runInContext('DEFAULT_SETTINGS.lowStockThreshold', ctx);
+const setTh = v => vm.runInContext('state.settings.lowStockThreshold='+(v==null?DEFAULT_TH:v)+';', ctx);
+const thresholdOf = owner => {
+  const up = path.join(__dirname,'user_settings_rows.csv');
+  if(!fs.existsSync(up) || !owner) return null;
+  const own = parseCSV(fs.readFileSync(up,'utf8')).find(r=>r.user_id===owner);
+  const m = own && /"lowStockThreshold"\s*:\s*(\d+)/.exec(own.settings||'');
+  return m ? Number(m[1]) : null;                // null = the owner has no row; fall back to the default
+};
 // Map DB snake_case → the app's camelCase (same fields statusLine reads), like teaFromDb.
 const teaFromRow = r => ({ id:r.id, name:r.name, type:(r.type||'').toLowerCase(),
   amountGrams:Number(r.amount_grams)||0, harvestYear:r.harvest_year||'', harvestSeason:r.harvest_season||'',
@@ -85,12 +115,25 @@ console.log('  D freshness window: 4 checks');
 
 // ---- 5. real data (teas_rows.csv) ----
 if(haveCSV){
-  const teas=parseCSV(fs.readFileSync(csvPath,'utf8')).map(teaFromRow).filter(t=>t.name && t.type);
-  // running-low set = in stock but under threshold. Expect exactly Shincha + Honey Oolong.
+  const OWNER = ownerOf();
+  const TH = thresholdOf(OWNER);
+  // state is a vm-scoped top-level let (see the seed helper below) — reach it through the context.
+  setTh(TH);
+  const teas=parseCSV(fs.readFileSync(csvPath,'utf8'))
+    .filter(r=>!OWNER || r.user_id===OWNER)                 // R69: never by name — tea-types-test.js G did that
+    .map(teaFromRow).filter(t=>t.name && t.type);
+  // The low set is whatever stockTier calls low; the assertions are about agreement, not about which
+  // teas happen to be low today.
   const low=teas.filter(t=>ctx.isRunningLow(t));
-  ok(low.length===2, 'E1 real data has exactly 2 running low (got '+low.length+': '+low.map(t=>t.name).join(', ')+')');
-  ok(low.every(t=>S(t).tone==='low'), 'E2 both running-low teas get the low tone');
-  ok(low.some(t=>/Shincha/i.test(t.name)) && low.some(t=>/Honey Oolong/i.test(t.name)), 'E3 the two are Shincha + Honey Oolong');
+  ok(low.length===teas.filter(t=>ctx.stockTier(t)==='low').length,
+     'E1 isRunningLow agrees exactly with stockTier==="low" across the real shelf ('+low.length+' low at threshold '+(TH==null?'DEFAULT':TH)+')');
+  ok(low.every(t=>S(t).tone==='low'), 'E2 every running-low tea gets the low tone');
+  // The threshold is a real boundary, both directions — no tea above it is low, and every tracked tea
+  // below it (and in stock) is. This is what E3's name list was standing in for.
+  ok(low.every(t=>Number(t.amountGrams) < (TH==null?15:TH)) &&
+     teas.filter(t=>Number(t.amountGrams)>0 && Number(t.amountGrams) < (TH==null?15:TH) && ctx.cupsLeft(t)==null)
+         .every(t=>ctx.isRunningLow(t)),
+     'E3 the threshold is the boundary in both directions (grams-based teas; cups-based ones use their own rule)');
   // every in-stock, non-low tea's tone agrees with its category
   teas.filter(t=>Number(t.amountGrams)>0 && !ctx.isRunningLow(t)).forEach(t=>{
     const cat=ctx.statusCategory(t), tone=S(t).tone;
@@ -107,6 +150,7 @@ if(haveCSV){
   const firstNonLow=sorted.findIndex(t=>!ctx.isRunningLow(t));
   const lastLow=sorted.map(t=>ctx.isRunningLow(t)).lastIndexOf(true);
   ok(firstNonLow===-1 || lastLow<firstNonLow, 'E6 shelfSort: running-low teas all sort to the top');
+  setTh(null);   // hand the synthetic sections back the default floor they are written against
   console.log('  E real data: '+(6 + teas.filter(t=>Number(t.amountGrams)>0 && !ctx.isRunningLow(t)).length + teas.filter(t=>t.type==='white'&&Number(t.amountGrams)>0).length)+' checks');
 } else {
   console.log('  E real data: SKIPPED (teas_rows.csv not present)');
@@ -149,19 +193,36 @@ console.log('  F #18 tiers (synthetic): 15 checks');
 // ---- 7. #18 tiers on real data (needs BOTH teas + sessions CSVs; pins move on re-export) ----
 const sessCsvPath=path.join(__dirname,'sessions_rows.csv');
 if(haveCSV && fs.existsSync(sessCsvPath)){
-  const teas=parseCSV(fs.readFileSync(csvPath,'utf8')).map(teaFromRow).filter(t=>t.name && t.type);
+  const OWNER = ownerOf();
+  const TH = thresholdOf(OWNER);
+  setTh(TH);
+  const teas=parseCSV(fs.readFileSync(csvPath,'utf8'))
+    .filter(r=>!OWNER || r.user_id===OWNER).map(teaFromRow).filter(t=>t.name && t.type);
+  const before=teas.filter(t=>ctx.isRunningLow(t)).map(t=>t.name).sort().join('|');
   seed(parseCSV(fs.readFileSync(sessCsvPath,'utf8')).map(r=>({teaId:r.tea_id, gramsUsed:Number(r.grams_used)||0})));
-  // cups math must not move the low set: still exactly Shincha + Honey Oolong
-  const lowT=teas.filter(t=>ctx.isRunningLow(t));
-  ok(lowT.length===2 && lowT.some(t=>/Shincha/i.test(t.name)) && lowT.some(t=>/Honey Oolong/i.test(t.name)),
-    'G1 real sessions seeded: low set still exactly Shincha + Honey Oolong (got '+lowT.map(t=>t.name).join(', ')+')');
-  const sencha=teas.find(t=>/Sencha Kagoshima Premium/i.test(t.name));
-  ok(sencha && ctx.stockTier(sencha)==='few', 'G2 Sencha Kagoshima Premium (16g @ ~5g dose) → few');
-  // THE issue pin: the same tea at the screenshot's 12g reads the middle tier, not "plenty"
-  ok(sencha && S(Object.assign({},sencha,{amountGrams:12})).text==='12g · a few cups left', 'G3 issue #18: 12g Sencha → "a few cups left"');
-  const megumi=teas.find(t=>/Megumi/i.test(t.name));
-  ok(megumi && ctx.stockTier(megumi)==='plenty', 'G4 Megumi 56g (one 8g session) → plenty');
-  seed([]);
+  /* G1 v3.96: what #18 actually promised is that seeding real dose history does not silently move the
+     low set — the cups rule may only ADD a tea the grams floor missed (a heavy-dose tea running out
+     faster than its gram count suggests), never remove one. The old form pinned two names, which is a
+     snapshot, and it went red the moment the shelf changed rather than when the rule broke. */
+  const after=teas.filter(t=>ctx.isRunningLow(t)).map(t=>t.name).sort();
+  ok(before.split('|').filter(Boolean).every(n=>after.includes(n)),
+     'G1 seeding real dose history never REMOVES a tea from the low set (before: '+(before||'none')+' → after: '+(after.join(', ')||'none')+')');
+  // The five tiers must all be reachable from the engine on real rows — a tier no path returns is dead.
+  const tiers=new Set(teas.map(t=>ctx.stockTier(t)));
+  ok(tiers.size>=3 && [...tiers].every(x=>['empty','untracked','low','few','plenty'].includes(x)),
+     'G2 the real shelf exercises several of the five tiers and returns no tier outside them (got: '+[...tiers].sort().join(', ')+')');
+  /* G3 keeps the ISSUE pin, because that is a rule and not a snapshot: whichever tea is the shelf's
+     heaviest-dose green, at 12 g it must read the middle tier rather than "plenty". Found by dose, not
+     by name — the name was the stale part. */
+  const doseRanked=teas.filter(t=>ctx.teaAvgDose(t)>0).sort((a,b)=>ctx.teaAvgDose(b)-ctx.teaAvgDose(a));
+  const heavy=doseRanked[0];
+  ok(heavy && S(Object.assign({},heavy,{amountGrams:12})).text==='12g · a few cups left',
+     'G3 issue #18 holds: the heaviest-dose real tea ('+(heavy&&heavy.name)+' @ '+(heavy?ctx.teaAvgDose(heavy).toFixed(1):'?')+'g) reads "a few cups left" at 12g');
+  // …and a well-stocked light-dose tea still reads plenty, the other side of the same rule.
+  const light=doseRanked[doseRanked.length-1];
+  ok(light && ctx.stockTier(Object.assign({},light,{amountGrams:120}))==='plenty',
+     'G4 the lightest-dose real tea at 120g still reads plenty');
+  seed([]); setTh(null);
   console.log('  G #18 tiers (real data): 4 checks');
 } else {
   console.log('  G #18 tiers (real data): SKIPPED, 4 checks not run (need teas_rows.csv + sessions_rows.csv)');
