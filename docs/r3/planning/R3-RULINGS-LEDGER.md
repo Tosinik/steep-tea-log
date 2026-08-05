@@ -609,6 +609,28 @@ colour correction implies a stored per-tea colour, which is new schema** — it 
 > in the direction of *keeping* the control. The board's greying encodes a decision that has since
 > been made, in the direction of building it live.
 
+**R79 — `fixtures/*` blanket-ignore has now silently dropped three intended commits.** The pattern is a
+blanket ignore plus a per-file exception list, so **`git add -A` skips a new fixture silently** — no
+warning, no error, exit 0. Three instances this round: the boards' `*.dc.html` (caught by a count check),
+`figures-report.js` (caught when the planning lane couldn't read it from a clone), and
+`reference-test.js` (caught by the verifier, after its own header claimed "committed; every deploy" while
+it existed on one machine only). **Each was caught downstream, never at `git add`.** So: any new file
+under `fixtures/` carries its exception line **in the same change**, and **`git ls-files` — never the
+working tree — is what counts committed suites.** Slice B's first draft said "18 committed suites" from a
+directory listing; it is **17**.
+
+Companion to R73's family — *a check whose failure mode is silence*. Here the **tool** fails silently,
+which is the same hazard one layer down.
+
+> *Recorded beside it — a test can be self-consistent and still assert nothing.* `tea-types-test.js` E6
+> matched `ya-shi-xiang`'s `covers` string against a literal copy of that same string, both carrying the
+> typo `Guandong` where the shelf tea reads `Guangdong`. The assertion was **true and meaningless**: an
+> exact-fold match could never fire against real data, and the suite reported green for as long as the
+> typo survived. This is worse than a missing test, because it occupies the slot a real check would take.
+> The general rule: **when a fixture's expected value is derived from the same source as the actual, the
+> test proves only that the source equals itself.** Ground the expectation in the *other* representation —
+> here, the export — which is what section G now does and what surfaced the typo.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not
