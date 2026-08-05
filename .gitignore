@@ -26,6 +26,12 @@ fixtures/*
 # R3 slice A: the vessel identity ladder is invisible on current data (every vessel has a photo), so
 # this suite is the only thing that can see rungs 2 and 3. It also pins the R64/R72 lane contracts.
 !fixtures/vessel-identity-test.js
+# R3 slice B2: both were local-only and red against three exports for the same stale-expectation
+# reason (a pinned count, an unscoped read). Repaired to assert the engine's own rule, then tracked —
+# a suite that only exists on one machine guards nothing, and B3 rewrites both to the new freshness
+# model, which it cannot do to files it can't see.
+!fixtures/freshness-test.js
+!fixtures/lifecycle-test.js
 # R3 slice B: the one guard that Go Deeper NEVER WRITES. A read-only contract has no runtime symptom
 # when it breaks — the surface would just quietly start saving — so this suite must exist everywhere,
 # not on one machine. `git add -A` skips an ignored file SILENTLY, which is how it shipped untracked
