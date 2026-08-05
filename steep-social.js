@@ -4,14 +4,26 @@ async function loadSocial(){
   try{
     so.profile = await window.SteepDB.getMyProfile();
     if(so.profile){
-      const feed = await window.SteepDB.getFeed();
+      // BOTH directions of the follow graph (v4.02). The circle draws people who follow you without
+      // you following back — only getFollowers() can see them, and the shipped app never read it.
+      const [feed, followers] = await Promise.all([window.SteepDB.getFeed(), window.SteepDB.getFollowers()]);
       so.feed = feed;
       so.following = feed.following || [];
+      so.followers = followers || [];
+      const ids = [...new Set(so.following.concat(so.followers))];
+      so.profiles = { ...(feed.profiles||{}), ...(ids.length ? await window.SteepDB.getProfilesByIds(ids) : {}) };
+      // Passes load SEPARATELY and fail SOFT: v3_10-pass-record.sql is hand-applied, so between a
+      // push and the migration this read is the one that 404s. A missing pass shelf must not take
+      // the circle down with it — and it must not render as "nothing yet", which would be a lie.
+      try{
+        const p = await window.SteepDB.getPasses();
+        so.passes = p; so.passesFailed = false;
+        so.profiles = { ...so.profiles, ...(p.profiles||{}) };
+      }catch(pe){ so.passes=null; so.passesFailed=true; console.warn('[Steep] pass record unavailable', pe); }
     }
   }catch(e){ console.warn('[Steep] social load failed', e); }
   so.busy=false; so.loaded=true; render();
 }
-function setSocialTab(t){ state.social.tab=t; if(t==='feed'){ refreshFeed(); } else render(); }
 async function refreshFeed(){
   try{ const f=await window.SteepDB.getFeed(); state.social.feed=f; state.social.following=f.following||[]; }catch(e){}
   render();
@@ -87,18 +99,17 @@ function profileSetupHTML(){
       </form>
     </div>`;
 }
+/* #08 Social rev 3 — one screen, four sections, in the board's order: the circle, then the two
+   directions a cup travels (out, and in). Three shipped tabs are ABSORBED, not dropped: `following`
+   became YOUR CIRCLE (which also draws people the old tab could not see), `find` became the ＋ row,
+   and the feed is a section below Passed-to-you, since "shared with you" and "passed to you" are
+   both what arrived. feedRowHTML and its paging are untouched. R61 protects the capability, not the
+   chrome — every one of the three still renders. Presence is PARKED (R35): nothing is built. */
 function viewFriends(){
   const so=state.social;
-  if(!so.loaded) return '<div class="card empty">Loading friends…</div>';
+  if(!so.loaded) return '<div class="card empty">Loading your circle…</div>';
   if(!so.profile || so.profileEditOpen) return profileSetupHTML();
   const me=so.profile;
-  const tabs=`<div class="tabs" style="margin-bottom:16px;">
-    ${['feed','find','following'].map(t=>`<button class="tab ${so.tab===t?'active':''}" onclick="setSocialTab('${t}')">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}
-  </div>`;
-  let body='';
-  if(so.tab==='feed') body=feedHTML();
-  else if(so.tab==='find') body=findHTML();
-  else body=followingHTML();
   // Sticky inline notice (v3.66) — replaces the old socialErr alert(). Setup diagnostics are
   // multi-sentence, so a toast is wrong; this stays until dismissed or the next action clears it.
   const notice = so.err ? `<div class="social-notice">
@@ -106,15 +117,169 @@ function viewFriends(){
     <button class="social-notice-x" onclick="dismissSocialErr()" aria-label="Dismiss">×</button>
   </div>` : '';
   return `
-    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Friends</h2>
+    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Social</h2>
       <button class="btn-ghost" onclick="editProfile()">edit profile</button></div>
     ${notice}
-    <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+    <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
       ${avatarHTML(me,48)}
       <div><div style="font-weight:600;">${escapeHtml(me.displayName||me.username)}</div>
-      <div style="font-size:12px;color:var(--ink-soft);">@${escapeHtml(me.username)} · following ${so.following.length}</div></div>
+      <div style="font-size:12px;color:var(--ink-soft);">@${escapeHtml(me.username)}</div></div>
     </div>
-    ${tabs}${body}`;
+    <div class="social-lede">Some cups you send, some arrive. Small on purpose.</div>
+    ${circleHTML()}
+    ${sharedByYouHTML()}
+    ${passesHTML()}
+    ${circleFeedHTML()}
+    ${findHTML()}`;
+}
+// R68 — the board's "A circle of three" is a claim about the graph, so it is counted, not written.
+// Nobody in the circle yet → the count line is omitted rather than reading "a circle of 0".
+function circleCountLine(mutual, total){
+  if(!total) return '';
+  const people = total===1 ? '1 person' : `${total} people`;
+  return `<div class="circle-count mono">${people}${mutual?` · ${mutual} mutual`:''}</div>`;
+}
+function circleHTML(){
+  const so=state.social;
+  const following=new Set(so.following||[]), followers=new Set(so.followers||[]);
+  const ids=[...new Set([...following, ...followers])];
+  // Mutual threads first — the spine of a correspondence circle, and what the board draws first.
+  const rank=id=>(following.has(id)&&followers.has(id))?0:(followers.has(id)?1:2);
+  ids.sort((a,b)=>rank(a)-rank(b));
+  const mutual=ids.filter(id=>following.has(id)&&followers.has(id)).length;
+  const rows = ids.length ? ids.map(id=>{
+    const p=(so.profiles||{})[id];
+    const isMutual=following.has(id)&&followers.has(id);
+    const rel = isMutual ? 'mutual · you write to each other' : (followers.has(id) ? 'follows you' : 'you follow');
+    const glyph = isMutual ? '⇄' : (followers.has(id) ? '→ you' : '→');
+    // doUnfollow is shipped capability and stays reachable: without it a follow could never be
+    // undone in-app. Quiet, and only on edges you actually own.
+    const undo = following.has(id) ? `<button class="btn-ghost circle-undo" onclick="doUnfollow('${escapeJsArg(id)}')">unfollow</button>` : '';
+    return `<div class="circle-row${isMutual?' is-mutual':''}">
+      ${avatarHTML(p,40)}
+      <div style="flex:1;min-width:0;">
+        <div class="circle-name">${p?escapeHtml(p.displayName||p.username):'…'}<span class="circle-handle mono">${p?('@'+escapeHtml(p.username)):escapeHtml(id.slice(0,8))}</span></div>
+        <div class="circle-rel mono">${rel}</div>
+      </div>
+      ${undo}<span class="circle-glyph mono">${glyph}</span>
+    </div>`;
+  }).join('') : `<div class="empty" style="padding:12px 0;">Nobody in your circle yet — find someone by handle below.</div>`;
+  return `<div class="card">
+    <div class="eyebrow">Your circle</div>
+    ${rows}
+    ${circleCountLine(mutual, ids.length)}
+  </div>`;
+}
+/* The small tile beside a tea name on the social surfaces. It is the shipped TYPE tint (six
+   colours keyed on teas.type), NOT the liquor swatch the boards draw — that needs a per-tea colour
+   column, a liquor value on all 55 catalog rows and the data model R82 found was never written, all
+   of which R93 puts in R4. The CJK script rides in the tile when the catalog covers the tea, and is
+   absent otherwise: script has no field either, and its only source is a CJK entry in a catalog
+   row's `aka` (R98). So on R36's minimal-preview branch — which is by definition the no-catalog
+   case — the script can never render, and the tile carries the tint alone. */
+function socialTileHTML(type, name){
+  const t=(type||'').toLowerCase();
+  return `<span class="social-tile t-${escapeHtml(t||'unknown')}">${escapeHtml(passScriptFor(name))}</span>`;
+}
+function passScriptFor(name){
+  if(typeof matchTeaType!=='function' || typeof refScript!=='function') return '';
+  const m = matchTeaType(name||''); return m ? refScript(m) : '';
+}
+// R36's destination, resolved at READ time against the bundled catalog (R97): covered → the Go
+// Deeper entry, uncovered → the row itself IS the minimal preview. Coverage decides, not the user.
+// The member→category walk is refCategoryFor's, not a second copy of it — a pass snapshot is
+// {name}-shaped for exactly this question, and a duplicated walk is how deep links drift apart.
+function passCategoryFor(name){
+  if(typeof refCategoryFor!=='function' || !name) return null;
+  return refCategoryFor({ name });
+}
+function sharedByYouHTML(){
+  const all=(state.sessions||[]), shared=all.filter(s=>s.isShared).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!shared.length) return '';                    // absent, not an empty frame
+  // R68 — generated, never the board's stamped "5 of 31 · 16%". The percentage keeps its half.
+  const pct=Math.round((shared.length/all.length)*1000)/10;
+  const rows=shared.map(s=>{
+    const v=vesselById(s.vesselId);
+    // "as stored" is literal here: an old sitting keeps the spelling it was committed with.
+    // sessionMethodLabel is the R90 single writer: stored brew_style only, cold brew handled,
+    // nothing at all on a null row. A second method-label writer here is what R90 forbids.
+    const meta=[fmtDate(s.date), s.teaType?typeLabel(s.teaType):'', sessionMethodLabel(s), v?v.name:''].filter(Boolean).join(' · ');
+    return `<div class="social-row">
+      ${socialTileHTML(s.teaType, s.teaName)}
+      <div style="flex:1;min-width:0;">
+        <div class="social-row-name">${escapeHtml(s.teaName||'a tea')}</div>
+        <div class="social-row-meta mono">${escapeHtml(meta)}</div>
+      </div>
+      <span class="social-badge">shared</span>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="social-head"><div class="eyebrow">Shared by you</div>
+      <span class="mono social-frac">${shared.length} of ${all.length} · ${pct}%</span></div>
+    ${rows}
+    <div class="social-foot mono">the badge says only “shared” — a shared sitting has no recipient. Passing names one.</div>
+  </div>`;
+}
+function passesHTML(){
+  const so=state.social;
+  // Honest about WHY it is empty. A failed read must not render as "nothing passed yet" — that
+  // would be a lie shaped exactly like the truth.
+  if(so.passesFailed) return `<div class="card">
+    <div class="eyebrow">Passed to you</div>
+    <div class="empty" style="padding:12px 0;">Passed cups aren't available yet — run <code>sql/v3_10-pass-record.sql</code> in the Supabase SQL editor.</div>
+  </div>`;
+  const got=(so.passes&&so.passes.received)||[];
+  if(!got.length) return `<div class="card">
+    <div class="eyebrow">Passed to you</div>
+    <div class="empty" style="padding:12px 0;">Nothing passed your way yet. When someone in your circle sends a cup, it waits here.</div>
+  </div>`;
+  return `<div class="card">
+    <div class="eyebrow">Passed to you</div>
+    ${got.map(p=>passRowHTML(p, (so.profiles||{})[p.fromProfile])).join('')}
+  </div>`;
+}
+function passRowHTML(p, prof){
+  const who = prof ? (prof.displayName||prof.username) : 'Someone';
+  // Generated from the row, never a placeholder: to-the-circle and to-you read differently.
+  const line = `${who} passed ${p.toProfile ? 'you a cup' : 'this to the circle'} · ${fmtDate(p.createdAt)}`;
+  const cat = passCategoryFor(p.teaName);
+  const deeper = cat ? `<button class="btn-ghost pass-deeper" onclick="goDeeperCat('${escapeJsArg(cat)}')">open reference · ${escapeHtml(refCategoryLabel(cat))} ›</button>` : '';
+  const onShelf = (state.teas||[]).some(t=>(t.name||'').trim().toLowerCase()===(p.teaName||'').trim().toLowerCase());
+  const add = onShelf
+    ? `<span class="pass-on-shelf mono">on your shelf ✓</span>`
+    : `<button class="btn pass-add" onclick="addPassToShelf('${escapeJsArg(p.id)}')">Add to shelf</button>`;
+  return `<div class="pass-card">
+    <div class="social-row" style="border:0;padding:0;">
+      ${socialTileHTML(p.teaType, p.teaName)}
+      <div style="flex:1;min-width:0;">
+        <div class="social-row-name">${escapeHtml(p.teaName)}</div>
+        <div class="social-row-meta mono">${escapeHtml(line)}</div>
+        ${deeper}
+      </div>
+      ${add}
+    </div>
+    ${p.note?`<div class="kindred"><span class="kindred-tag mono">Kindred</span><span class="kindred-note">“${escapeHtml(p.note)}” <span class="kindred-who mono">— ${escapeHtml(who)}</span></span></div>`:''}
+  </div>`;
+}
+function refCategoryLabel(slug){
+  if(typeof resolveTeaType!=='function') return slug;
+  const r=resolveTeaType(slug); return r ? r.display_name : slug;
+}
+// Add to shelf opens the create form PREFILLED — the same gesture teaFromWishItem uses. Nothing is
+// written until the user commits it themselves; a pass never silently grows your shelf.
+function addPassToShelf(passId){
+  const so=state.social, p=((so.passes&&so.passes.received)||[]).find(x=>x.id===passId); if(!p) return;
+  state.teaPrefill = { name:p.teaName, type:p.teaType||'' };
+  openTeaForm();
+}
+// JC-C — the feed keeps its renderer and its paging verbatim; only its home moved. "Shared with
+// you" and "passed to you" are the same question asked twice, so they sit together.
+function circleFeedHTML(){
+  const so=state.social;
+  if(!so.following.length) return '';
+  const feed=so.feed;
+  if(!feed || !feed.sessions.length) return '';
+  return `<div class="social-head" style="margin:20px 0 8px;"><div class="eyebrow">Shared with you</div></div>${feedHTML()}`;
 }
 function dismissSocialErr(){ state.social.err=null; render(); }
 const FEED_PAGE = 50; // page size for the shared-session feed (v3.66)
@@ -164,11 +329,17 @@ function feedRowHTML(s, prof){
     ${tags?`<div class="sess-tags" style="margin-top:6px;">${tags}</div>`:''}
   </div>`;
 }
+/* The board's "＋ Find someone by handle" — the shipped Find tab, folded to a quiet link that opens
+   the same search. Quiet affordances: a fold, never a chip row (§0.5). */
+function toggleUserSearch(){ const so=state.social; so.searchOpen=!so.searchOpen; if(!so.searchOpen) so.search=null; render(); }
 function findHTML(){
-  const results=state.social.search;
+  const so=state.social;
+  if(!so.searchOpen) return `<div class="find-row"><button class="btn-ghost find-open" onclick="toggleUserSearch()">＋ Find someone by handle</button></div>`;
+  const results=so.search;
   const rows = results===null ? '<div class="empty" style="padding:12px 0;">Search for a friend by their username.</div>'
     : (results.length? results.map(userRowHTML).join('') : '<div class="empty" style="padding:12px 0;">No users found.</div>');
-  return `<div class="card">
+  return `<div class="card" style="margin-top:16px;">
+    <div class="social-head"><div class="eyebrow">Find someone</div><button class="btn-ghost" onclick="toggleUserSearch()">close</button></div>
     <div style="display:flex;gap:8px;">
       <input type="text" id="userSearch" placeholder="username…" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:13.5px;background:var(--porcelain);color:var(--ink);" onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch();}">
       <button class="btn btn-primary" onclick="doSearch()">Search</button>
@@ -185,19 +356,86 @@ function userRowHTML(p){
     ${following?`<button class="btn" onclick="doUnfollow('${escapeJsArg(p.id)}')">Following</button>`:`<button class="btn btn-primary" onclick="doFollow('${escapeJsArg(p.id)}')">Follow</button>`}
   </div>`;
 }
-function followingHTML(){
-  const so=state.social;
-  if(!so.following.length) return '<div class="card empty">Not following anyone yet.</div>';
-  const profs=(so.feed&&so.feed.profiles)||{};
-  return `<div class="card">${so.following.map(id=>{
-    const p=profs[id];
-    return `<div class="user-row">
-      ${avatarHTML(p,40)}
-      <div style="flex:1;min-width:0;"><div style="font-weight:600;">${p?escapeHtml(p.displayName||p.username):'…'}</div>
-      <div style="font-size:12px;color:var(--ink-soft);">${p?('@'+escapeHtml(p.username)):escapeHtml(id.slice(0,8))}</div></div>
-      <button class="btn" onclick="doUnfollow('${escapeJsArg(id)}')">Unfollow</button>
+/* followingHTML() is GONE, not relocated: circleHTML draws every edge it drew and two it could not
+   (a follower you don't follow back was invisible to the old tab), and it keeps doUnfollow on the
+   rows that own one. The capability is preserved; only the tab that held it is replaced. */
+
+/* ================= R25 PASS RECORD — the send side ================= */
+/* Both entry points (#03's ⋯ and #02b's ⋯) open this one sheet. It is deliberately the ONLY writer:
+   two send surfaces sharing one control is the lesson slice A learned with methodLanesHTML.
+   The circle is fetched on demand rather than at boot — a follower list on every launch is a real
+   cost for an action taken rarely (JC-D). */
+function openPassSheet(o){
+  state.teaMenuOpen=false; state.sessionMenuOpen=false;
+  state.passSheet={ teaId:o.teaId||null, sessionId:o.sessionId||null, teaName:o.teaName||'', teaType:o.teaType||'', to:'', note:'', busy:false, err:null };
+  render();
+  if(!state.social.loaded && !state.social.busy) loadSocial();
+}
+function closePassSheet(){ state.passSheet=null; render(); }
+function setPassTo(id){ if(state.passSheet){ state.passSheet.to=id; state.passSheet.err=null; render(); } }
+function setPassNote(v){ if(state.passSheet) state.passSheet.note=v; }   // no render: never fight the caret
+function passSheetHTML(){
+  const d=state.passSheet, so=state.social;
+  const shell = inner => `<div class="hub-scrim" onclick="closePassSheet()"></div>
+    <div class="hub-sheet pass-sheet" role="dialog" aria-label="Pass this tea">
+      <div class="hub-grab"></div>
+      <div class="pass-sheet-title">Pass <strong>${escapeHtml(d.teaName)}</strong></div>
+      ${inner}
     </div>`;
-  }).join('')}</div>`;
+  if(!so.loaded) return shell(`<div class="empty" style="padding:14px 0;">Looking up your circle…</div>`);
+  // Two honest dead ends, each with the one thing that would fix it — never a disabled control.
+  if(!so.profile) return shell(`<div class="empty" style="padding:14px 0;">You need a profile before you can pass a cup.
+    <div style="margin-top:10px;"><button class="btn btn-primary" onclick="closePassSheet();goFriends()">Create one</button></div></div>`);
+  const circle=(so.followers||[]);
+  if(!circle.length) return shell(`<div class="empty" style="padding:14px 0;">Nobody in your circle yet — a cup needs someone to pass it to.
+    <div style="margin-top:10px;"><button class="btn" onclick="closePassSheet();goFriends()">Find someone by handle</button></div></div>`);
+  // Recipients are the people who FOLLOW you: they opted in by following, and it is the same set
+  // the circle option reaches, so the two choices can never mean different audiences.
+  const chips=circle.map(id=>{
+    const p=(so.profiles||{})[id];
+    return `<button type="button" class="when-chip${d.to===id?' active':''}" onclick="setPassTo('${escapeJsArg(id)}')">${p?escapeHtml(p.displayName||p.username):escapeHtml(id.slice(0,8))}</button>`;
+  }).join('');
+  return shell(`
+    <div class="pass-field">
+      <div class="eyebrow">Who</div>
+      <div class="when-chips">${chips}<button type="button" class="when-chip${d.to==='*'?' active':''}" onclick="setPassTo('*')">Everyone in your circle</button></div>
+    </div>
+    <div class="pass-field">
+      <div class="eyebrow">A line to go with it</div>
+      <textarea class="pass-note" rows="2" placeholder="optional — “the second steep is where it opens”" oninput="setPassNote(this.value)">${escapeHtml(d.note)}</textarea>
+    </div>
+    ${d.err?`<div class="pass-err">${escapeHtml(d.err)}</div>`:''}
+    <div class="pass-actions">
+      <button class="btn" onclick="closePassSheet()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitPass()"${d.busy?' disabled':''}>${d.busy?'Passing…':'Pass it on'}</button>
+    </div>`);
+}
+let _passSending=false;
+async function submitPass(){
+  const d=state.passSheet; if(!d || _passSending) return;
+  if(!d.to){ d.err='Choose who this goes to.'; render(); return; }
+  _passSending=true; d.busy=true; d.err=null; render();
+  const so=state.social;
+  const toId = d.to==='*' ? null : d.to;
+  try{
+    await window.SteepDB.sendPass({
+      toProfile: toId, teaId: d.teaId, sessionId: d.sessionId,
+      teaName: d.teaName, teaType: d.teaType, note: d.note
+    });
+    const p = toId ? (so.profiles||{})[toId] : null;
+    const who = toId ? (p ? (p.displayName||p.username) : 'them') : 'your circle';
+    state.passSheet=null;
+    showToast(`✓ Passed to ${who}`);
+    try{ const fresh=await window.SteepDB.getPasses(); so.passes=fresh; so.passesFailed=false; }catch(_){}
+    render();
+  }catch(e){
+    d.busy=false;
+    const m=((e&&e.message)||String(e)).toLowerCase();
+    d.err = (m.includes('does not exist')||m.includes('relation')||m.includes('schema cache'))
+      ? 'Passing needs sql/v3_10-pass-record.sql run in the Supabase SQL editor.'
+      : 'Could not pass it on: '+((e&&e.message)||e);
+    render();
+  }finally{ _passSending=false; }
 }
 async function doSearch(){
   const inp=document.getElementById('userSearch'); const q=inp?inp.value:'';

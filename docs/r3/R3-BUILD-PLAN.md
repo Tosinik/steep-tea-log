@@ -183,7 +183,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 | ~~**C**~~ | ~~**#04 setup + pickers** and **#12 Quick log**~~ — **SHIPPED v3.99** (R87–R89 came out of its plan review) | none |
 | ~~**D**~~ | ~~**#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)**~~ — **SHIPPED v4.00**, two commits as planned (R90–R92) | none |
 | ~~**E**~~ | ~~**#10 Focus** — alone~~ — **SHIPPED v4.01** (R94–R95) | none |
-| **F** | **Social + the R25 pass record** | **`sql/v3_10-pass-record.sql`** — ~~the round's only required migration~~ one of **two**, since R84 gave B3 its own |
+| ~~**F**~~ | ~~**Social + the R25 pass record**~~ — **SHIPPED v4.02** (R96–R98) | **`sql/v3_10-pass-record.sql`** — applied by hand, before the push; ~~the round's only required migration~~ one of **two**, since R84 gave B3 its own |
 | **G** | **Insights** + Origins card (R54) + **#11 Wrapped** | none |
 | **H** | **#37 Origins** · **#08 Shopping** · **#07 Settings row** · **#09 landing** | none — `user_settings.settings` is a JSON blob |
 
@@ -246,11 +246,21 @@ Notes that shape the order:
   non-Focus steeping state R53 accepted as round-1. Hold each undrawn state to shipped behaviour and
   flag it. The timer is genuinely two modes + one action (`setTimerMode` `:975`, `useTimerValue`
   `:1067`); a board showing three peers is wrong.
-- ~~**F** is the only hand-applied migration in the round~~ — **one of two since R84**; B3 carries
+- ~~**F** is the only hand-applied migration in the round~~ — **SHIPPED v4.02**, and the shape grew by
+  two columns in review: `teas` is owner-only under RLS, so a recipient handed `tea_id` resolves
+  nothing (**R96**), and the row needs a denormalised `tea_name`/`tea_type` snapshot exactly as
+  `v3_0-social.sql` gave the feed one. **R97** kept `catalog_slug` out — R36's tier resolves at read
+  time, so a later `covers` entry upgrades passes already sent. Two further findings: the board's own
+  worked example (Rou Gui → Wuyi yancha) takes the *preview* branch, because `matchTeaType` is
+  `covers`-only and `rou-gui` has none (**R98** note); and the **feed had no home on the board**, so
+  it became a section rather than being dropped (R61). Original note follows.
+- **F was the only hand-applied migration in the round** — **one of two since R84**; B3 carries
   `sql/v3_11-opened-date.sql`. F's own is: `(id, from_profile, to_profile nullable,
   session_id nullable, tea_id nullable, note, created_at)` + RLS, filed after `sql/v3_9-steep-feedback.sql`.
   It gates the Passed-to-you shelf, the per-recipient badge, the kindred reply, R36's three-tier
-  destination and #02b's pass-tea link. **Until `to_profile` ships the badge says only "shared".**
+  destination and #02b's pass-tea link. **Until `to_profile` ships the badge says only "shared"**
+  — which, as built, stays true of the *shared-sessions* badge even after the migration: a shared
+  sitting and a passed cup are different objects.
 - **G**: R54 is a one-line `DASH_SURFACE` entry of `insights` (`steep-dashboard.js:538`) plus a guard
   that the card is not Home-moveable via `dashSurface()`. Cost medians recomputed at build (needs A's
   currency) or rendered as nothing — never 0.17/0.86. Taste-vocabulary panel is GATED: build nothing.

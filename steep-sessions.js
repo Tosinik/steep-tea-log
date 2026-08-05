@@ -421,15 +421,17 @@ function viewSessionDetail(){
       </div>
     </div>`;
 }
-/* The ⋯ menu, enumerated to what exists. #02b draws "Pass this tea to the circle" as NEW — it needs
-   slice F's pass record and its migration, so it is OMITTED rather than drawn disabled: a dead
-   control invites a tap and explains nothing (the honest-absence pattern, #03's missing Go Deeper
-   row and #37's no-row panel). It returns in F. */
+/* The ⋯ menu. #02b's "Pass this tea to the circle" was OMITTED rather than drawn disabled in v4.00
+   (a dead control invites a tap and explains nothing) and RETURNS HERE in v4.02, now that the R25
+   pass record exists. The tea name passed on is `s.teaName` — the snapshot committed with the
+   sitting, spelling included. An old sitting still reads "Guandong" and is passed on that way;
+   history is not re-spelled on its way out the door. */
 function sessionMenuHTML(s){
   if(!state.sessionMenuOpen) return '';
   return `<div class="hub-scrim" onclick="toggleSessionMenu()"></div>
     <div class="hub-sheet" role="dialog" aria-label="Sitting options">
       <div class="hub-grab"></div>
+      <button class="hub-row" onclick="openPassSheet({teaId:'${escapeJsArg(s.teaId||'')}',sessionId:'${escapeJsArg(s.id)}',teaName:'${escapeJsArg(s.teaName||'')}',teaType:'${escapeJsArg(s.teaType||'')}'})">${icon('i-friends-hl',20)}<span>Pass this tea to the circle</span></button>
       <button class="hub-row" onclick="copySessionToNew('${escapeJsArg(s.id)}')">${icon('i-plus-hl',20)}<span>Copy to a new entry</span></button>
       <button class="hub-row" style="color:var(--red);" onclick="armConfirm(this,'Delete this sitting? Its grams go back to the tea stock.',()=>deleteSessionById('${escapeJsArg(s.id)}'))">${icon('i-settings-hl',20)}<span>Delete sitting</span></button>
     </div>`;

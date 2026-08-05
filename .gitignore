@@ -51,6 +51,11 @@ fixtures/*
 # not on one machine. `git add -A` skips an ignored file SILENTLY, which is how it shipped untracked
 # the first time while both the CHANGELOG and its own header called it committed.
 !fixtures/reference-test.js
+# R3 slice F: the pass record. Its section E is the app's FIRST guard on text another user authored
+# — the sender controls the note, the tea name and their own display name, and all three land in an
+# innerHTML template — so it belongs on every machine, not this one. Section A also pins the
+# migration's columns against the mapper pair, which is the drift `git add -A` cannot see either.
+!fixtures/pass-record-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

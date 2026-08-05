@@ -70,9 +70,13 @@ steep-teas → steep-shopping → steep-passport → steep-social → steep-sess
   infusionCount + steeps=[]. Cold brew skips the timer (single long steep).
 - **Wishlist** (`wishlist` table): `{id,name,vendor,type,note,done,createdAt}`.
 
-## DB migrations run (Supabase SQL editor, in order)
+## DB migrations run (Supabase SQL editor, in **version** order — NOT filename order)
 schema.sql · v2_1-migration · v2_2-photos-storage · v3_0-social · v3_1-quick-log ·
-v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date · v3_6-leaf-form · v3_7-mood.
+v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date · v3_6-leaf-form ·
+v3_7-mood · v3_8-water-ml · v3_9-steep-feedback · **v3_10-pass-record (v4.02)** ·
+**v3_11-opened-date (v3.98)**.
+**Read the version, not the sort.** `v3_10` sorts between `v3_1` and `v3_2` as a string, and it was
+applied *after* `v3_11`. Both happen to be order-independent; the list above is by version.
 
 ## Conventions / principles
 - Calm-first; achievements/XP dormant app-wide (`ACHIEVEMENTS_ENABLED=false`, v3.72 — the old
@@ -176,7 +180,39 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.01 R3 slice E: #10 Focus** (cache **v111**, APP_VERSION v4.01, no SQL).
+**NOW (just shipped) — v4.02 R3 slice F: Social + the R25 pass record** (cache **v112**, APP_VERSION
+v4.02, **`sql/v3_10-pass-record.sql` applied by hand BEFORE the push**). The round's second and last
+migration, and the one where filename order genuinely differs from version order.
+- **R96 — a pass carries a snapshot, not just an id.** `teas` is owner-only under RLS, so a recipient
+  handed `tea_id` resolves nothing and the shelf renders blank rows. `tea_name` is `not null`, the
+  same denormalisation `v3_0-social.sql` §3 already gave the feed. **R97** kept `catalog_slug` out:
+  R36's tier resolves at read time, so authoring a `covers` entry later upgrades passes already sent.
+- **The RLS was read against the shipped gate, not approved from a plan.** Circle reads use the same
+  direction as "followers read shared sessions". A policy subquery does **not** bypass RLS — both
+  `follows` lookups name the current user on one side of the edge, so they resolve; one that named
+  them on neither side would have made every pass vanish with no error. No UPDATE policy; DELETE is
+  owner-only with no UI, so a mis-send is recoverable at all.
+- **Passed-to-you is empty by construction on ship day** (the v3.98 `opened_date` 0/21 shape), and a
+  **failed** read renders differently from an empty one — "nothing passed yet" over a 404 would be a
+  lie shaped exactly like the truth.
+- **Social is one screen, and the feed kept its home (R61).** The board absorbed `following` into
+  YOUR CIRCLE and `find` into the ＋ row, and drew no home for the feed — so it is a section below
+  Passed-to-you, `feedRowHTML` and v3.66 paging untouched. The circle draws **both directions**:
+  `getFollowers()` is new, and pebbi (follows Niklas, not followed back) was invisible to every read
+  the app had.
+- **R98 — the minimal preview has no script by construction**, and the board's own worked example
+  fails its own rule: Rou Gui takes the *preview* branch, because `matchTeaType` is `covers`-only and
+  `rou-gui` has none. Verified live alongside Kabusecha, which takes Go Deeper with 冠茶 in the tile.
+- **A cascade bug shipped and was caught in the same slice** — `.social-tile` and `.t-green` are both
+  (0,1,0) and this CSS block sits below the palette, so a base `background` flattened every type
+  tint. Slice B's `.vessel-tile` bug, found the same way (computed background, not "the rule
+  exists"). Guarded at §D7.
+- **`fixtures/pass-record-test.js` (74 checks) — §E is the app's first guard on text another user
+  authored.** Two negative controls bite: unescaping the note reddens E1+E2, narrowing the circle to
+  `following` reddens B2+B4. **23 committed suites, all green.**
+  **NEXT: slice G** — Insights + the Origins card (R54) + #11 Wrapped.
+
+**Previously — v4.01 R3 slice E: #10 Focus** (cache **v111**, APP_VERSION v4.01, no SQL).
 **A restyle, not a rescue** — #10's headline ("taste data is lost every session until this lands")
 describes a bug fixed in v3.92.
 - **R94 — kachi-iro is real now, on the Focus ring and nowhere else.** Visual contract 4 shipped
@@ -198,10 +234,9 @@ describes a bug fixed in v3.92.
 - **`fixtures/focus-test.js` (54 checks) — its most important section isn't about Focus.** §D pins six
   undrawn steeping states against shipped output (R53 asserted, not intended); §B's confinement check
   was verified to fail by leaking kachi onto `.pour-saved`. **22 committed suites, all green.**
-  **NEXT: slice F — Social + the R25 pass record, carrying `sql/v3_10-pass-record.sql`.** It is the
-  round's second and last migration, and the one where **filename order genuinely differs from version
-  order** (`v3_10` sorts between `v3_1` and `v3_2`) — CLAUDE.md's schema section says read the version.
-  Apply the SQL BEFORE pushing, as B3 did.
+  ~~**NEXT: slice F — Social + the R25 pass record, carrying `sql/v3_10-pass-record.sql`.**~~
+  **SHIPPED v4.02** (above) — its migration applied before the push, as B3 did, and the version-order
+  point held: `v3_10` was applied *after* `v3_11`.
 
 **Previously — v4.00 R3 slice D: #02 Sessions + #02b detail + the edit-screen move** (cache
 **v110**, APP_VERSION v4.00). **Two commits by design** — the guard first, the move second.
@@ -225,7 +260,7 @@ describes a bug fixed in v3.92.
   the capacity heuristic *would* say gongfu) yields **null**. `quick-log-test.js` §H.
 - **R92 — one "Brewing days" toggle** for the calendar *and* the heatmap, list default; closing it
   clears any day filter so the list is never left silently narrowed by an off-screen control.
-- **Pass-tea omitted, not disabled** — it needs slice F's migration. **21 committed suites, all green.**
+- **Pass-tea omitted, not disabled** — it needs slice F's migration. **Landed in v4.02.** **21 committed suites, all green.**
   **NEXT: slice E** (#10 Focus, alone — it shares `sessionSteepingHTML` with every non-Focus steeping
   state R53 accepted as round-1, so hold each undrawn state to shipped behaviour and flag it).
 
@@ -296,7 +331,7 @@ R51's other half — slice B built the browsable mode, this builds the contextua
   opened nothing, silently.
 - **#03** splits into character + provenance clusters, empty fields **omitted not dashed** (zero dashes
   on a bare tea); the diary reads "starts with your first cup"; ⋯ = shopping · Go Deeper · delete
-  (**pass-tea rides F**); `inventorySparkline` stays (R80); **freshness untouched, slot included** — B3
+  (**pass-tea rides F** — landed v4.02); `inventorySparkline` stays (R80); **freshness untouched, slot included** — B3
   replaces the reading per `SPEC-freshness-model.md` §3/§4, and the board's ladder is not drawn because
   its column doesn't exist yet (R81).
 - **`addWishFromTea` was not idempotent** — guarded at the writer (`wishHasTeaName`, R49's join), not

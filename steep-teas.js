@@ -883,9 +883,9 @@ function teaProvenanceHTML(t, costPerSession){
       ${t.image?`<div class="tea-label-note">The photo is the label — evidence for where it came from, never the tea's identity.</div>`:''}
     </div>`;
 }
-/* The ⋯ menu (#03), enumerated to what actually exists. "Pass this tea to the circle" is drawn on the
-   board and NOT built: it needs slice F's pass record and its migration. Go Deeper appears only when
-   the catalog covers the tea. */
+/* The ⋯ menu (#03), enumerated to what actually exists. Pass-tea LANDS HERE in v4.02, on the R25
+   pass record — it was omitted rather than disabled in v3.97 because its migration hadn't shipped.
+   Go Deeper still appears only when the catalog covers the tea. */
 function toggleTeaMenu(){ state.teaMenuOpen = !state.teaMenuOpen; render(); }
 function teaMenuHTML(t){
   if(!state.teaMenuOpen) return '';
@@ -895,6 +895,7 @@ function teaMenuHTML(t){
   return `<div class="hub-scrim" onclick="toggleTeaMenu()"></div>
     <div class="hub-sheet" role="dialog" aria-label="Tea options">
       <div class="hub-grab"></div>
+      <button class="hub-row" onclick="openPassSheet({teaId:'${escapeJsArg(t.id)}',teaName:'${escapeJsArg(t.name)}',teaType:'${escapeJsArg(t.type||'')}'})">${icon('i-friends-hl',20)}<span>Pass this tea to the circle</span></button>
       ${listed
         ? `<div class="hub-row" style="color:var(--ink-soft);">${icon('i-shopping-hl',20)}<span>On your list ✓</span></div>`
         : `<button class="hub-row" onclick="teaMenuAddWish('${escapeJsArg(t.id)}')">${icon('i-shopping-hl',20)}<span>Add to shopping list</span></button>`}
@@ -1061,8 +1062,15 @@ function goDeeperFor(teaId){
   const tea = teaById(teaId);
   const cat = (typeof refCategoryFor==='function') ? refCategoryFor(tea) : null;
   if(!cat) return;                                  // never a dead tap: uncovered teas draw no control
+  goDeeperCat(cat);
+}
+/* The navigation half, split out in v4.02 so a passed cup can reach the same entry. A pass is not a
+   tea — it has no library row to look up — so it resolves its category from the snapshot name and
+   arrives here. One writer for "open the reference at this category", two callers. */
+function goDeeperCat(cat){
+  if(!cat) return;
   state.refOpen = cat; state.refSearch = '';
-  state.teaMenuOpen = false;
+  state.teaMenuOpen = false; state.sessionMenuOpen = false;
   setTeaSeg('deeper');                              // setTeaSeg renders
 }
 /* Borrow from Go Deeper — the same GESTURE as saveSuggestedGuide below, against a different SOURCE:

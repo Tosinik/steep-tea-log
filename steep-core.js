@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.01';
+const APP_VERSION = 'v4.02';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Focus mode's ring is now its own deep blue, and after each pour you can see plainly that how it tasted was saved, not just noted.";
+const WHATS_NEW = "You can pass a tea to someone in your circle now, with a line to go with it — and Social is one screen: who you write to, what you've shared, and what's arrived.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -150,7 +150,8 @@ let state = {
   refSearch:'', refOpen:null,     // R51 Go Deeper: reference search + the one expanded category
   recapPeriod: 'week',
   passportSel: null, passportZoom: null, passportSub: null,
-  social: { loaded:false, busy:false, profile:null, tab:'feed', following:[], feed:null, search:null, profileEditOpen:false, draft:null, err:null, feedLoadingMore:false },
+  social: { loaded:false, busy:false, profile:null, following:[], followers:[], feed:null, passes:null, search:null, searchOpen:false, profileEditOpen:false, draft:null, err:null, feedLoadingMore:false },
+  passSheet:null,     // R25 send sheet: {teaName,teaType,teaId,sessionId,to,note,busy,err} — opened from #03 and #02b
   hubOpen:false,      // WS6: avatar-opened hub sheet (friends/shopping/passport/achievements/settings)
   navRestored:false,  // WS6: user swiped the bottom bar back up during steeping (else it recedes)
   loaded:false
@@ -203,7 +204,7 @@ function installResumeSync(){
 async function refreshData(){
   if(!state.loaded) return;
   // never refetch over unsaved work
-  if(state.sessionDraft || state.teaFormOpen || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen) return;
+  if(state.sessionDraft || state.teaFormOpen || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen || state.passSheet) return;
   try{
     const [teas, vessels, sessions, tagLibrary, wishlist] = await Promise.all([
       loadKey('teas', state.teas), loadKey('vessels', state.vessels),
@@ -903,6 +904,7 @@ function render(){
     <div style="padding-top:18px;">${body}</div>
     ${navRecessed ? navRecedeHTML() : bottomNavHTML()}
     ${state.hubOpen ? hubSheetHTML() : ''}
+    ${state.passSheet ? passSheetHTML() : ''}
     ${state.teaFormOpen ? teaFormModal() : ''}
     ${state.vesselFormOpen ? vesselFormModal() : ''}
     ${state.settingsOpen ? settingsModal() : ''}

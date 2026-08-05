@@ -1,6 +1,6 @@
 # R3-STATUS — the running state of the R3 round
 
-**Updated: 2026-07-26 (hand-off committed; R57–R62 issued 2026-07-25) · by the planning lane.**
+**Updated: 2026-08-05 (slice F shipped as v4.02; R96–R98 issued at its plan review) · §5 by the Code lane.**
 This is the single source of truth for where R3
 stands. Any fresh chat, fresh Design session, or Code session reads this FIRST. It is updated at
 the end of every working session and committed to the repo (`docs/r3/R3-STATUS.md`) at every
@@ -18,8 +18,9 @@ that does becomes wrong the next time a cup is brewed, and did.)*
 
 R32–R41 committed in `9f54672`; **R42–R56 committed in `00009b6`** (banking session, 2026-07-25);
 **R57–R62 committed with the hand-off** (2026-07-25 rulings, committed 2026-07-26); **R63–R66 at the
-Code lane's plan-mode review** (2026-07-26); **R67–R73 across slice A's build and ship**, and **R74
-after it** (2026-08-04). All are in the ledger, contiguous — no gaps, no duplicates. A ruling is not
+Code lane's plan-mode review** (2026-07-26); **R67–R73 across slice A's build and ship**, **R74
+after it** (2026-08-04), and **R75–R98 across slices B–F**, the tail being **R96–R98 at slice F's
+plan review** (2026-08-05). All are in the ledger, contiguous — no gaps, no duplicates. A ruling is not
 real until it is in the committed ledger; these are. **R67 onward are summarised in the ledger only**
 — this section is not a mirror of it, and the ledger is the tier that wins.
 
@@ -257,7 +258,34 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.01 LIVE — R3 slice E: #10 Focus** (cache **v111**, no SQL). A **restyle, not a rescue**: #10's
+**v4.02 LIVE — R3 slice F: Social + the R25 pass record** (cache **v112**, **`sql/v3_10-pass-record.sql`
+applied before the push** — the round's second and last migration, and the one where filename order
+genuinely differs from version order). The migration grew by two columns at review: **R96** —
+`teas` is owner-only under RLS, so a recipient handed a `tea_id` resolves nothing, and the row needs
+the same denormalised snapshot `v3_0-social.sql` §3 gave the feed. **R97** kept `catalog_slug` out,
+so R36's destination resolves at read time and a later `covers` entry upgrades passes already sent.
+The RLS was read against the shipped gate rather than approved from a plan: circle reads use the same
+direction as "followers read shared sessions", and both `follows` subqueries name the current user on
+one side of the edge — a policy subquery does not bypass RLS, so a lookup naming them on neither side
+would have made every pass vanish with no error.
+
+Social is now **one screen**. The board absorbed two of three shipped tabs and orphaned the feed, so
+the feed is a section below Passed-to-you (R61 protects the capability, not the chrome), and the
+circle draws **both directions** of the follow graph — `getFollowers()` is new, and a follower you
+don't follow back was invisible to every read the app had.
+
+Three things a later slice inherits. **(a) The Passed-to-you shelf is empty by construction** and a
+*failed* read renders differently from an empty one — "nothing passed yet" over a 404 is a lie shaped
+exactly like the truth. **(b) `.social-tile` carries no `background` on its base rule**: it and
+`.t-green` are both (0,1,0) and this CSS block sits below the palette, so a base background flattens
+every type tint — slice B's `.vessel-tile` bug, reproduced and caught the same way, now guarded.
+**(c) §E of `pass-record-test.js` is the app's first guard on text another user authored** — note,
+tea name and sender name all reach an innerHTML template, and the assertion counts handlers in
+*attribute position*, because escaping neutralises rather than strips. **23 committed suites, all green.**
+**NEXT: slice G** — Insights + the Origins card (R54) + #11 Wrapped. R68 governs its prose and the
+cost medians must be recomputed or rendered as nothing.
+
+**Previously: v4.01 — R3 slice E: #10 Focus** (cache **v111**, no SQL). A **restyle, not a rescue**: #10's
 live-bug headline describes a fix that shipped in v3.92 (**R95**), and its `BUILD · FIRST` stamp
 expired with it. **R94** makes visual contract 4 real for the first time — kachi-iro had shipped
 unimplemented for the whole round, with the ring on `#E3A15C` amber and two repo comments deferring to
@@ -281,7 +309,7 @@ written against the working modal, run green before the move existed, and is byt
 their loss. Editing is a screen (R58); only the shell changed. Rows open **detail**, not the edit form.
 **R90** shows no method on a null row including the hero; **R91** carries the vessel always and the
 method only when stored; **R92** merges the calendar and the heatmap behind one toggle with the list
-as default. Pass-tea is **omitted** until slice F's migration.
+as default. Pass-tea is **omitted** until slice F's migration — **it landed in v4.02**.
 
 Three things a later slice inherits. **(a)** The two copy mechanisms are load-bearing and now guarded —
 do not "simplify" either. **(b)** `esMethodReadLabel()` is the *only* place a derived method may

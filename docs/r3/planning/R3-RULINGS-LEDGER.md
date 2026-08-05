@@ -853,6 +853,63 @@ boards are read as live instructions and expire the same way.**
 > verified to fail by leaking kachi onto `.pour-saved`: nothing breaks when an accent spreads, it just
 > stops meaning anything.
 
+**R96 — A pass carries a denormalised tea snapshot, not just `tea_id`.** `teas` is owner-only under
+RLS (`sql/schema.sql:88`), so a recipient handed a `tea_id` resolves nothing and the Passed-to-you
+shelf renders blank rows. `tea_name` is `not null` and `tea_type` nullable, following the precedent
+`sql/v3_0-social.sql` §3 already set for the feed — denormalise so teas and vessels stay private.
+R25's shape was a subset, not a contradiction. `session_id` and `tea_id` are the sender's
+provenance, `on delete set null`: the sender deleting their own tea must not delete the record of
+what someone else was sent. The snapshot is written **as stored** and never re-spelled.
+
+> *Code-lane note, 2026-08-05 (shipped in v4.02).* The rule has a live example and it costs
+> something. The 8 Jul shared sitting's snapshot reads **"Yashi Xiang Dancong Guandong"** while the
+> tea row and the catalog's `covers` both read **"Guangdong"** — the tea was renamed after that
+> sitting was committed, and later sittings carry the corrected spelling. So the row renders
+> "Guandong" as stored, correctly, **and gets no script**, because `matchTeaType` is exact-fold and
+> the snapshot predates the fix. Not re-spelling history is the ruling; losing the script on that
+> one row is its price, and it is the right trade.
+
+**R97 — R36's tier resolves at read time; no `catalog_slug` column.** `matchTeaType` runs
+client-side against a catalog that ships in the bundle. Storing the slug would freeze the answer at
+send time; resolving on read means authoring a `covers` entry later upgrades passes **already
+sent**. With 8 of 21 shelf teas uncovered, that is not hypothetical. One fewer column.
+
+**R98 — The minimal preview has no script, by construction.** R36's tier 2 is the no-catalog-match
+branch, and script's only source is a CJK entry in a catalog row's `aka` via `refScript()`. So the
+field the board draws for that tier can never render on it. The preview is sender's note + name +
+the shipped **type tint** — not a liquor swatch, which R93 puts in R4. This is the third consequence
+of R82's never-written script data model, and it is recorded rather than worked around.
+
+> *Code-lane note, 2026-08-05 (shipped in v4.02).* **#08 Social rev 3's own worked example fails its
+> own rule.** The board's flag reads *"the Go Deeper reference entry where the catalog covers it (Rou
+> Gui is a Wuyi yancha, so it would)"*. `TEA_TYPES` does carry a `rou-gui` row — but `matchTeaType`
+> is `covers`-only by design (v3.96), and `rou-gui`'s `covers` is absent, so the board's illustrative
+> passed cup takes the **preview** branch, not the reference one. Verified live. The R27 family: an
+> affordance claim derived from example data, where the class is right and the instance is not.
+
+**R99 — A specificity tie between a component base rule and a palette class is resolved by source
+order, and no "the rule exists" assertion can see it.** Second instance this round, same shape both
+times: `.vessel-tile` versus `.t-<teatype>` in slice B, `.social-tile` versus `.t-green` in slice F.
+Both are `(0,1,0)`; both blocks are appended below the palette; both silently flattened every type
+tint to one flat colour. Neither was caught by checking the rule was present — both were caught by
+reading the **computed background in both themes**. Any new component carrying a palette class
+either declares no competing property on its base rule, or uses a compound selector, and its guard
+reads computed style rather than asserting a rule exists.
+
+### Also recorded (not rulings) — from the slice F build
+
+- **The SHARED badge does not upgrade when `to_profile` ships.** "Until `to_profile` ships the badge
+  says only 'shared'" reads like this slice changes it. It does not: those five rows are
+  `sessions.is_shared`, a different object with no recipient. Only a *passed* row can name a person,
+  and the surface says so in one line beneath the list.
+- **The KINDRED line is the note riding with the pass, not a reply.** The board quotes *Ruth* — the
+  sender — on the card of the cup she sent. A reply-back would be a second pass in the reverse
+  direction and needs a screen nobody has designed. Build the note, not the thread.
+- **`fixtures/teas_rows.csv` is a newer vintage than the rest of the set and lacks `opened_date`**,
+  so B3's rung 1 is **structurally** invisible to fixtures rather than merely empty (the column the
+  v3.11 migration added is not in the file at all). Every figure still reproduces and the gate is
+  green. Full-set re-export at the next gate; not blocking.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

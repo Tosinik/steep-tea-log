@@ -553,6 +553,10 @@
   async function follow(id) { const { error } = await sb.from('follows').insert({ follower_id: userId(), followee_id: id }); if (error && error.code !== '23505') throw error; }
   async function unfollow(id) { const { error } = await sb.from('follows').delete().eq('follower_id', userId()).eq('followee_id', id); if (error) throw error; }
   async function getFollowing() { const { data, error } = await sb.from('follows').select('followee_id').eq('follower_id', userId()); if (error) throw error; return (data || []).map(r => r.followee_id); }
+  // The other direction of the same edge list (v4.02). The circle draws both — someone who follows
+  // you without you following back is in it (pebbi), and only this read can see them. Permitted by
+  // the shipped "follows selectable" policy (auth.uid() = follower_id OR followee_id); no schema.
+  async function getFollowers() { const { data, error } = await sb.from('follows').select('follower_id').eq('followee_id', userId()); if (error) throw error; return (data || []).map(r => r.follower_id); }
 
   // Paged with .range() (v3.66) — `offset` skips already-loaded rows; `hasMore` is true when the
   // page came back full, so the UI can show a quiet "load more". A secondary sort on `id` makes the
@@ -575,6 +579,49 @@
     const profiles = await getProfilesByIds(following);
     return { sessions, profiles, following, hasMore: sessions.length === limit };
   }
+
+  /* ---------- pass record (v4.02, R25) ----------
+     One row = "I passed you this tea". The snapshot columns are load-bearing, not convenience
+     (R96): `teas` is owner-only under RLS, so a recipient handed only a tea_id resolves nothing.
+     tea_name/tea_type carry what the receive side renders, exactly as v3_0-social.sql denormalized
+     tea_name/tea_type onto sessions for the feed. Social writes stay ONLINE-ONLY — never queued;
+     the offline queue replays owner-scoped upserts, and a pass is addressed to someone else. */
+  const passFromDb = r => ({
+    id: r.id, fromProfile: r.from_profile, toProfile: r.to_profile || null,
+    sessionId: r.session_id || null, teaId: r.tea_id || null,
+    teaName: r.tea_name || '', teaType: r.tea_type || '',
+    note: r.note || '', createdAt: r.created_at
+  });
+  const passToDb = p => ({
+    id: p.id || newId(), from_profile: userId(), to_profile: p.toProfile || null,
+    session_id: p.sessionId || null, tea_id: p.teaId || null,
+    tea_name: p.teaName, tea_type: p.teaType || null,
+    note: (p.note || '').trim() || null
+  });
+  async function sendPass(p) {
+    if (!p || !p.teaName) throw new Error('A pass needs a tea name.');
+    const { data, error } = await sb.from('passes').insert(passToDb(p)).select().maybeSingle();
+    if (error) throw error;
+    return data ? passFromDb(data) : null;
+  }
+  // ONE read, split by direction afterwards. RLS decides what comes back — a named pass reaches
+  // only its recipient, a circle pass reaches the sender's followers — so the client never filters
+  // for privacy, only for which list a row belongs in.
+  async function getPasses(limit = 50) {
+    const { data, error } = await sb.from('passes').select('*')
+      .order('created_at', { ascending: false }).limit(limit);
+    if (error) throw error;
+    const rows = (data || []).map(passFromDb);
+    const me = userId();
+    const sent = rows.filter(r => r.fromProfile === me);
+    const received = rows.filter(r => r.fromProfile !== me);
+    const ids = [...new Set(rows.map(r => r.fromProfile).concat(rows.map(r => r.toProfile).filter(Boolean)))].filter(id => id !== me);
+    const profiles = ids.length ? await getProfilesByIds(ids) : {};
+    return { sent, received, profiles };
+  }
+  // No unsendPass() client function: the DELETE policy ships so a mis-send is recoverable at all
+  // (from the SQL editor), but no UI draws it in v4.02 — and a new zero-caller function is the
+  // dead code the backlog exists to remove, not to add.
 
   /* ============================ settings (synced) ============================ */
   const SETTINGS_CACHE = 'tealog_cache_settings';
@@ -723,7 +770,8 @@
     loadKey, saveKey, loadSettings, saveSettings, uploadImage, boot, signIn, signInWithGoogle, signOut, newId, migrateFromLocalStorage,
     putTea, removeTea, putTeas, putVessel, removeVessel, putVessels, putSession, removeSession, addTag,
     putWishItem, removeWishItem,
-    getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFeed,
+    getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFollowers, getFeed,
+    sendPass, getPasses,
     getUser: () => currentUser,
     flushQueue, pendingWrites: queueLength
   };

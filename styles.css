@@ -996,3 +996,50 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .ref-fact-v{color:var(--ink);}
 .ref-hedge{margin-top:7px;font-size:12px;color:var(--ink-soft);font-style:italic;}
 .ref-own{margin-top:7px;font-family:var(--font-mono);font-size:10.5px;color:var(--jade);}
+
+/* ===== #08 Social, one screen (slice F, v4.02) ===== */
+.social-lede{font-family:var(--font-display);font-style:italic;font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 2px 14px;}
+.circle-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);}
+.circle-row:last-of-type{border-bottom:none;}
+.circle-name{font-family:var(--font-display);font-size:15.5px;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+.circle-handle{font-size:11px;color:var(--ink-soft);}
+.circle-rel{font-size:10px;color:var(--ink-soft);margin-top:2px;}
+.circle-row.is-mutual .circle-rel{color:var(--jade);}
+.circle-glyph{font-size:13px;color:var(--ink-soft);flex:none;}
+.circle-row.is-mutual .circle-glyph{color:var(--jade);}
+.circle-undo{font-size:11px;color:var(--ink-soft);padding:0 6px;}
+.circle-count{font-size:10px;color:var(--ink-soft);margin-top:9px;letter-spacing:.06em;}
+.social-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.social-frac{font-size:10.5px;color:var(--jade);}
+.social-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
+.social-row:last-child{border-bottom:none;}
+.social-row-name{font-family:var(--font-display);font-size:14.5px;color:var(--ink);}
+.social-row-meta{font-size:10.5px;color:var(--ink-soft);margin-top:2px;}
+.social-badge{flex:none;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;color:var(--white);background:var(--jade);padding:2px 6px;border-radius:3px;}
+.social-foot{font-size:10px;color:var(--ink-soft);line-height:1.5;margin-top:9px;}
+/* The TYPE tint, not a liquor swatch (R93 puts that in R4). The CJK script rides inside when the
+   catalog covers the tea, and the tile is simply empty when it doesn't — R98. */
+/* NO `background` on the base rule, deliberately. `.social-tile` and `.t-green` are both (0,1,0), so
+   equal specificity hands it to source order — and this block is appended BELOW the .t-* palette at
+   :267, which means a base background here silently replaces every type tint with one flat colour.
+   That is slice B's `.vessel-tile` cascade bug exactly, found again the same way: by reading the
+   computed background rather than by checking the rule exists. The unknown case gets its own
+   compound rule instead, so every tile is coloured by a .t-* class and none by the base. */
+.social-tile{flex:none;display:flex;align-items:center;justify-content:center;width:26px;height:34px;border-radius:8px 4px 7px 4px;border:1px solid var(--line);font-family:var(--font-display);font-size:10px;line-height:1;text-align:center;overflow:hidden;}
+.social-tile.t-unknown{background:var(--porcelain-dim);color:var(--ink-soft);}
+.pass-card{border:1px solid var(--line);border-radius:13px;background:var(--porcelain-dim);padding:12px;margin-top:10px;}
+.pass-deeper{display:block;padding:4px 0 0;font-family:var(--font-mono);font-size:10px;color:var(--jade-deep);text-decoration:underline;}
+.pass-add{flex:none;font-size:12px;padding:6px 10px;}
+.pass-on-shelf{flex:none;font-size:10px;color:var(--ink-soft);}
+.kindred{display:flex;gap:9px;align-items:flex-start;margin-top:10px;padding-top:9px;border-top:1px solid var(--line);}
+.kindred-tag{flex:none;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-top:3px;}
+.kindred-note{font-family:var(--font-display);font-style:italic;font-size:12.5px;color:var(--ink);line-height:1.45;}
+.kindred-who{font-style:normal;font-size:10px;color:var(--ink-soft);}
+.find-row{margin-top:16px;text-align:center;}
+.find-open{font-family:var(--font-display);font-size:13px;color:var(--jade-deep);border-bottom:1px solid var(--line);padding:2px 0;}
+.pass-sheet-title{font-family:var(--font-display);font-size:16px;color:var(--ink);padding:4px 2px 12px;}
+.pass-field{padding:10px 2px 0;}
+.pass-field .eyebrow{margin-bottom:7px;}
+.pass-note{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-family:inherit;font-size:13.5px;background:var(--porcelain);color:var(--ink);resize:vertical;}
+.pass-err{margin-top:10px;font-size:12.5px;color:var(--red);}
+.pass-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
