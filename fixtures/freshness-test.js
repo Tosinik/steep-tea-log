@@ -89,5 +89,8 @@ check('ages style (puerh) + year -> ages cue', cueText({name:'Sheng Cake',type:'
 check('neutral style (black) stays silent even with year', cueText({name:'Keemun',type:'black',harvestYear:'2024',harvestSeason:'Spring'})==='');
 check('generic green fallback word "green tea"', cueText({name:'House Green',type:'green',harvestYear:'2025',harvestSeason:''})==='2025 harvest — green tea is at its best young.');
 
-console.log(`\n${pass} passed, ${fail} failed`);
+// Same banner shape as the other committed suites. It read only "N passed, M failed" while this file
+// was local-only; now that it is tracked and runs on every deploy, an output line that differs from
+// its eighteen siblings is one a reader scanning a wall of results can skim straight past.
+console.log(fail ? `\n${fail} FRESHNESS TEST(S) FAILED` : `\nALL FRESHNESS TESTS PASSED (${pass} passed)`);
 process.exit(fail?1:0);
