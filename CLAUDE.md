@@ -309,13 +309,19 @@ Live issues (see STATE.md / ROADMAP for the full backlog):
   `currencySymbol()`, so the symbol is not re-hardcoded a layer down. **Never re-hardcode a currency
   symbol at a render site or in data** — `fixtures/vessel-identity-test.js` §E guards it. The
   user-facing Settings *row* still rides **R3 #07**; only the key and the helper shipped.
-- **Session-edit modal's "TAGS" is session-level only.** The edit modal (`sessionEditModal`) surfaces
-  the session's overall `tags`; **per-steep taste words (`steeps[].tags`) and the per-steep `feedback`
-  are not shown/editable there.** Verified **non-destructive at HEAD**: the modal deep-copies the session
-  in (`state.editingSession = JSON.parse(JSON.stringify(s))`, steep-sessions.js:189) and `saveSessionEdit`
-  writes the whole object back (`state.sessions[idx] = e`, :262), so the un-surfaced per-steep fields are
-  carried through untouched — editing session tags never drops per-steep taste/feedback. The real fix
-  (surfacing per-steep taste in the edit UI) rides the **#02b** rebuild; **no interim change requested**.
+- **The session-edit screen's "Tags" is session-level only — and that is now GUARDED, not just noted.**
+  It surfaces the session's overall `tags`; **per-steep taste words (`steeps[].tags`) and the per-steep
+  `feedback` are not shown or editable there.** ~~The real fix rides the #02b rebuild.~~ **#02b shipped
+  in v4.00 and the gap was deliberately left as drawn** — R57 rules it a documented non-destructive gap,
+  not a defect to fill in passing. What changed: the surface moved from a modal to its own screen (R58),
+  and `sessionEditModal` is now **`viewSessionEdit`**. What did *not* change is the pair of mechanisms
+  the non-destructiveness rests on — `openSessionEdit`'s deep copy
+  (`state.editingSession = JSON.parse(JSON.stringify(s))`) and `saveSessionEdit`'s whole-object
+  writeback (`state.sessions[idx] = e`). **67 field-values ride on them** (30 steeps with real taste
+  words, 37 with per-steep feedback, across the current export) and nothing in the UI would surface
+  their loss, so **`fixtures/session-edit-test.js` now pins both** — written against the modal, run
+  green before the move, unchanged across it. Do not "simplify" either mechanism, and if that suite
+  ever needs editing to pass, that is the finding, not the fix.
 - ~~**Double stock decrement.**~~ **Fixed v3.35.** Cause was a re-entrant double-fire of
   `commitSession` (not the offline queue, which replays idempotent absolute-value
   upserts). Fixed with a shared `_sessionSaving` guard on `commitSession` +

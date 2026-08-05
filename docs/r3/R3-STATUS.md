@@ -257,7 +257,21 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v3.99 LIVE — R3 slice C: #04 Session setup + #12 Quick log** (cache **v109**, no SQL). Built to
+**v4.00 LIVE — R3 slice D: #02 Sessions + #02b detail + the edit-screen move** (cache **v110**, no
+SQL). Two commits by design. **The guard came first and held**: `fixtures/session-edit-test.js` was
+written against the working modal, run green before the move existed, and is byte-unchanged across it
+— 67 field-values ride on the deep copy + whole-object writeback and nothing in the UI would show
+their loss. Editing is a screen (R58); only the shell changed. Rows open **detail**, not the edit form.
+**R90** shows no method on a null row including the hero; **R91** carries the vessel always and the
+method only when stored; **R92** merges the calendar and the heatmap behind one toggle with the list
+as default. Pass-tea is **omitted** until slice F's migration.
+
+Three things a later slice inherits. **(a)** The two copy mechanisms are load-bearing and now guarded —
+do not "simplify" either. **(b)** `esMethodReadLabel()` is the *only* place a derived method may
+appear, on the edit surface. **(c)** Closing the Brewing-days toggle clears `calSelDay`, so no
+off-screen control can leave the list narrowed.
+
+**Previously: v3.99 — R3 slice C: #04 Session setup + #12 Quick log** (cache **v109**, no SQL). Built to
 **R87–R89** rather than to #12 rev 1, because three of its premises were false at HEAD: the nav Log
 opens **setup** (the board says "as checked" that it opens quick log), `startSessionFor(null)`
 **defaults** the tea rather than clearing it, and quick log had **no tea or vessel control at all**.

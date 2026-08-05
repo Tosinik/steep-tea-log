@@ -762,6 +762,40 @@ controls stay. **#14 reopens when the swatch data model lands.**
 > second source of truth for one field, which is the drift every single-writer ruling this round has
 > been about.
 
+**R90 — Record surfaces show stored `brew_style` only; the hero header is a record surface.** R64 was
+written about the edit control; #02b's hero line is the same class and the **stricter** case, because
+an identity line reads as fact rather than as a reading. The 6 Jul Da Hong Pao hero has `brew_style`
+empty and a 110 ml vessel, so a derived lane would print "gongfu" over a null column. Nothing is shown
+on a null row — on the hero, in the lane control, and anywhere else rendering a stored session.
+`esMethodReadLabel()` remains the one place a derived reading appears, on the edit surface, visibly a
+reading.
+
+**R91 — Brew-again carries the vessel always and the method only when stored.** R40 says "carries
+vessel + method". Carrying a derived method from a null-`brew_style` session would let the capacity
+heuristic become a stored record on the next save — **R64's laundering, one step removed**.
+`startSessionFor` gains optional prefill; the method argument is passed only when the source row
+actually holds one.
+
+**R92 — The Sessions tab's two date surfaces merge behind one toggle.** `viewSessions` ships a month
+calendar (a *filter control*, `selectCalDay`) and `streakCardHTML()`'s Brewing-days heatmap (a
+*read-only reading*). R42 names only the heatmap; #02 redraws away from stacked date surfaces. Both go
+behind one "Brewing days" toggle with the list as default — the calendar's day-filter stays reachable,
+so **R61 is satisfied: the capability survives, its position changes**.
+
+> *Code-lane note, 2026-07-26 (shipped in v4.00).* Three things worth the record. **(a) The guard held
+> unedited.** `fixtures/session-edit-test.js` was written against the working modal, run green before
+> the move existed, and its diff across the move commit is empty — which is the evidence that it
+> measures known-good behaviour rather than what the move produced. **(b) Two negative controls showed
+> the guard's two halves catch different failures**: a shallow copy turns section B red while C stays
+> green (aliasing shares data rather than losing it, so nothing looks missing — and an aliased draft
+> also means a *cancelled* edit silently keeps its changes), while a field-by-field writeback turns C
+> and D red while B stays green. Neither section may later be dropped as redundant. **(c) R91's trap
+> needed a case that separates the two mechanisms.** "Brew-again from a null session yields gongfu"
+> looks like a violation but is the shipped v3.91 vessel-type prefill doing what picking that vessel by
+> hand does. **Travel cuppa** separates them — typed `Porcelain teapot` so the prefill map misses it,
+> 115 ml so `brewMethodFor` would say gongfu — and brew-again yields **null**. Pinned in
+> `quick-log-test.js` §H.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not

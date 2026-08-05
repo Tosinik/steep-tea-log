@@ -171,5 +171,35 @@ ok(ctx.draftFingerprint(S.sessionDraft).split('|').length>=10, 'G3 draftFingerpr
 ok(/d\.sessionDate/.test(/function draftFingerprint[\s\S]*?\n}/.exec(sessSrc)[0]), 'G4 …including sessionDate, which slice C made user-visible on #12');
 console.log('  G R72 + draft guard: 4 checks');
 
+/* ---- H. R91: brew-again carries the vessel always, the method only when STORED ----
+   This file owns the startSessionFor entry points, so the carry belongs here. The failure it guards
+   is subtle and would look correct in passing: brew-again from a null-brew_style session must not
+   turn the capacity heuristic into a stored record on the next save — R64's laundering, arriving
+   through a door nobody was watching. The distinction that makes it testable: the v3.91 vessel-TYPE
+   prefill may still apply (it is the same thing choosing that vessel by hand does), but brewMethodFor's
+   capacity inference may not. Travel cuppa separates them — typed Porcelain teapot so the prefill map
+   misses it, 115 ml so the capacity heuristic says gongfu. */
+seed();
+S.vessels.push({id:'v3',name:'Travel cuppa',type:'Porcelain teapot',capacityMl:115});
+const nullSrc = {id:'x1',teaId:'t1',vesselId:'v3',brewStyle:null,gramsUsed:3,steeps:[]};
+const storedSrc = {id:'x2',teaId:'t1',vesselId:'v2',brewStyle:'senchado',gramsUsed:4,steeps:[]};
+S.sessions=[nullSrc,storedSrc];
+ok(ctx.brewMethodFor(null,115)==='gongfu', 'H1 the capacity heuristic WOULD say gongfu for this vessel — the trap is real');
+ok(ctx.methodPrefillFor('v3')===null, 'H2 …while the vessel-type prefill has no opinion about it');
+ctx.brewAgain('x1');
+ok(S.sessionDraft.vesselId==='v3', 'H3 brew-again carries the vessel always');
+ok(S.sessionDraft.brewStyle===null, 'H4 …and carries NO method from a null session — the inference is not laundered');
+ctx.cancelSession();
+ctx.brewAgain('x2');
+ok(S.sessionDraft.brewStyle==='senchado', 'H5 a STORED method does carry forward');
+ctx.cancelSession();
+// Copy-to-new carries the same, plus leaf/water, and writes nothing until the user commits.
+const before = S.sessions.length;
+ctx.copySessionToNew('x1');
+ok(S.sessionDraft.gramsUsed===3 && S.sessionDraft.stage==='setup', 'H6 copy-to-new opens a prefilled DRAFT');
+ok(S.sessions.length===before, 'H7 …and writes nothing — a copy is a starting point, never a silent duplicate');
+ctx.cancelSession();
+console.log('  H R91 brew-again carry: 7 checks');
+
 console.log(failures ? '\n'+failures+' QUICK-LOG TEST(S) FAILED' : '\nALL QUICK-LOG TESTS PASSED ('+passed+' passed)');
 process.exit(failures?1:0);

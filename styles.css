@@ -913,6 +913,27 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .ovf-k{font-size:12px;color:var(--ink-soft);}
 .ovf-row .lib-sort select{font-size:13px;color:var(--ink);}
 
+/* ===== #02b session detail (slice D) ===== */
+.sd-kicker{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);}
+.sd-title{font-family:var(--font-display);font-size:22px;margin:4px 0 2px;line-height:1.2;}
+.sd-ident{font-size:13px;color:var(--ink-soft);}
+.sd-link{color:var(--jade-deep);text-decoration:underline;cursor:pointer;}
+.sd-quiet{font-size:10.5px;color:var(--ink-soft);margin-top:12px;}
+.sd-soft{font-size:11.5px;color:var(--ink-soft);}
+.sd-h{font-family:var(--font-display);font-size:15px;}
+.sd-steeps{display:flex;flex-direction:column;}
+.sd-steep{padding:10px 0;border-bottom:1px solid var(--line);}
+.sd-steep:last-child{border-bottom:none;}
+.sd-steep-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.sd-steep-i{width:18px;flex:0 0 auto;font-size:10.5px;color:var(--ink-soft);}
+.sd-steep-t{font-size:13px;color:var(--ink);}
+.sd-steep-c{font-size:11.5px;color:var(--ink-soft);}
+.steep-strength{font-size:10.5px;color:var(--jade);margin-left:auto;}
+.sd-steep-note{font-size:13px;margin-top:5px;white-space:pre-wrap;line-height:1.5;}
+.sd-steep-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
+.sd-note{font-size:13.5px;white-space:pre-wrap;line-height:1.55;}
+.sd-photo{width:100%;border-radius:14px;display:block;}
+
 /* ===== slice C — #12 quick log + #04 strip ===== */
 .when-chips{display:flex;flex-wrap:wrap;gap:7px;}
 .when-chip{font-family:var(--font-mono);font-size:12px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--white);color:var(--ink-soft);}

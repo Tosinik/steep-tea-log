@@ -181,7 +181,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 | ~~**B2**~~ | ~~**#06 Add / edit tea** + **#03 Tea detail**~~ — **SHIPPED v3.97** (R80–R84 came out of its plan review) | none — but see R81 |
 | ~~**B3**~~ | ~~**The freshness model**~~ — **SHIPPED v3.98** (R85–R86 came out of its plan review) | **`sql/v3_11-opened-date.sql`** — applied by hand, before the push |
 | ~~**C**~~ | ~~**#04 setup + pickers** and **#12 Quick log**~~ — **SHIPPED v3.99** (R87–R89 came out of its plan review) | none |
-| **D** | **#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)** as its own commit | none |
+| ~~**D**~~ | ~~**#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)**~~ — **SHIPPED v4.00**, two commits as planned (R90–R92) | none |
 | **E** | **#10 Focus** — alone | none |
 | **F** | **Social + the R25 pass record** | **`sql/v3_10-pass-record.sql`** — ~~the round's only required migration~~ one of **two**, since R84 gave B3 its own |
 | **G** | **Insights** + Origins card (R54) + **#11 Wrapped** | none |
@@ -225,7 +225,14 @@ Notes that shape the order:
   control either, so R43's vessel was one of *two* missing pickers. A fourth finding was a saving —
   **#04's half of the date inversion was already shipped**, `sessionDate` having lived inside *More
   details* since it landed, so the whole inversion was #12's work.
-- **D** holds the riskiest single item in the package. The shipped modal's deep copy
+- ~~**D** holds the riskiest single item in the package.~~ **SHIPPED v4.00, and the split paid.** The
+  guard (`fixtures/session-edit-test.js`) was written against the working modal, run green *before* the
+  move existed, and its diff across the move commit is **empty** — so it measured known-good behaviour
+  rather than what the move produced. Two negative controls showed its halves catch different failures:
+  a shallow copy reddens the identity checks while the round trip stays green (aliasing shares data
+  rather than losing it), and a field-by-field writeback reddens the round trip while the identity
+  checks stay green. Original note follows.
+- **D held the riskiest single item in the package.** The shipped modal's deep copy
   (`state.editingSession = JSON.parse(JSON.stringify(s))`, `:189`) plus whole-object writeback
   (`state.sessions[idx] = e`, `:262`) is *precisely* what keeps the un-surfaced per-steep taste and
   feedback non-destructive today. R57 says build the gap as drawn — **so that copy semantics must

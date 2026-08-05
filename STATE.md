@@ -176,7 +176,33 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v3.99 R3 slice C: #04 Session setup + #12 Quick log** (cache **v109**, APP_VERSION v3.99).
+**NOW (just shipped) — v4.00 R3 slice D: #02 Sessions + #02b detail + the edit-screen move** (cache
+**v110**, APP_VERSION v4.00). **Two commits by design** — the guard first, the move second.
+- **The guard held green across the move, UNEDITED.** `fixtures/session-edit-test.js` was written
+  against the working modal and run green *before* any move existed; `git diff` on it across the move
+  commit is empty. 67 field-values ride on the deep copy + whole-object writeback (30 steeps with real
+  taste words, 37 with per-steep feedback, over 40 sessions / 133 steeps), and nothing in the UI would
+  surface their loss. **Two negative controls proved its halves catch different failures** — a shallow
+  copy reddens the identity checks only (aliasing *shares* data rather than losing it, and also means a
+  *cancelled* edit silently keeps its changes); a field-by-field writeback reddens the round trip only.
+  Neither section may be dropped as redundant.
+- **R58 — editing is a screen.** Only the shell changed; the body, every setter and both copy
+  mechanisms are untouched, which is what let the guard stay unedited. Cancel returns to the sitting.
+- **#02b detail is new**, and rows now open **detail** rather than the edit form — reading a record and
+  changing it are different intents.
+- **R90 — no method shown on a null row, hero included.** The 6 Jul Da Hong Pao (`brew_style` empty,
+  110 ml gaiwan) renders `Oolong · Dragon Gaiwan`; a stored row reads `Oolong · Senchadō · Main Kyusu`.
+  8 of 40 render without a method line — correct, not a gap.
+- **R91 — brew-again carries the vessel always, method only when stored.** Pinned with the case that
+  separates the mechanisms: **Travel cuppa** (`Porcelain teapot`, so no vessel-type prefill; 115 ml, so
+  the capacity heuristic *would* say gongfu) yields **null**. `quick-log-test.js` §H.
+- **R92 — one "Brewing days" toggle** for the calendar *and* the heatmap, list default; closing it
+  clears any day filter so the list is never left silently narrowed by an off-screen control.
+- **Pass-tea omitted, not disabled** — it needs slice F's migration. **21 committed suites, all green.**
+  **NEXT: slice E** (#10 Focus, alone — it shares `sessionSteepingHTML` with every non-Focus steeping
+  state R53 accepted as round-1, so hold each undrawn state to shipped behaviour and flag it).
+
+**Previously — v3.99 R3 slice C: #04 Session setup + #12 Quick log** (cache **v109**, APP_VERSION v3.99).
 **Three of #12's premises were false at HEAD**, so the slice is built to R87–R89, not to the board.
 - **R87 — the nav Log button still opens SETUP.** #12 claims "as checked" that the nav and the
   in-setup shortcut both reach quick log; they don't (`quickLogSession` → `startSessionFor(null)` →

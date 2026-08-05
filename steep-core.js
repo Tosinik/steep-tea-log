@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v3.99';
+const APP_VERSION = 'v4.00';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Logging a cup you already had now asks when — Just now, this morning, yesterday — and lets you pick the tea and the pot right there.";
+const WHATS_NEW = "Tapping a sitting now opens its own page — every steep, note and taste word you recorded — and editing one opens a full screen instead of a pop-up.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -134,6 +134,9 @@ let state = {
   teaFormOpen: false, editingTea: null,
   vesselFormOpen: false, editingVessel: null,
   sessionEditOpen: false, editingSession: null,
+  activeSessionId: null,          // #02b: the sitting whose detail is open
+  sessionMenuOpen: false,         // #02b's ⋯ sheet
+  sessionsCalOpen: false,         // R92: ONE toggle for the calendar + Brewing-days heatmap; list is default
   sessionDraft: null, // {teaId, vesselId, isColdBrew, waterType, waterTDS, gramsUsed, steeps:[], currentSteep:{}, timer:{...}}
   settings: {...DEFAULT_SETTINGS},
   settingsOpen: false,
@@ -878,6 +881,8 @@ function render(){
   else if(state.view==='tea-detail') body = viewTeaDetail();
   else if(state.view==='vessels'){ state.teaSeg='vessels'; state.view='teas'; body = viewTeas(); } // stray/persisted 'vessels' → Teas tab, vessels segment
   else if(state.view==='sessions') body = viewSessions();
+  else if(state.view==='session-detail') body = viewSessionDetail();
+  else if(state.view==='session-edit') body = viewSessionEdit();   // R58: a screen since v4.00, not an overlay
   else if(state.view==='friends') body = viewFriends();
   else if(state.view==='achievements' && ACHIEVEMENTS_ENABLED) body = viewAchievements();
   else if(state.view==='passport') body = viewPassport();
@@ -900,7 +905,6 @@ function render(){
     ${state.hubOpen ? hubSheetHTML() : ''}
     ${state.teaFormOpen ? teaFormModal() : ''}
     ${state.vesselFormOpen ? vesselFormModal() : ''}
-    ${state.sessionEditOpen ? sessionEditModal() : ''}
     ${state.settingsOpen ? settingsModal() : ''}
   `;
   bindDynamic();
@@ -916,7 +920,7 @@ function bottomNavHTML(){
     ${item(v==='dashboard','i-home-hl','Home',"goView('dashboard')")}
     ${item(v==='teas'||v==='tea-detail','i-cup-hl','Teas',"goView('teas')")}
     <button class="bn-log" onclick="quickLogSession(this)" aria-label="Log session" title="Log session"><span class="bn-log-circle">${icon('i-plus-hl',27)}</span><span class="bn-log-lbl">Log</span></button>
-    ${item(v==='sessions','i-calendar-hl','Sessions',"goView('sessions')")}
+    ${item(v==='sessions'||v==='session-detail'||v==='session-edit','i-calendar-hl','Sessions',"goView('sessions')")}
     ${item(v==='insights'||v==='wrapped','i-chart-hl','Insights',"goView('insights')")}
   </div></nav>`;
 }

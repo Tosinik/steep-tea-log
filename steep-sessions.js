@@ -47,7 +47,9 @@ function sessionRowHTML(s){
   const teaName = tea
     ? `<strong class="sess-tealink" role="link" onclick="event.stopPropagation();openTeaDetail('${escapeJsArg(tea.id)}','sessions')">${escapeHtml(tea.name)}</strong>`
     : `<strong>Unknown tea</strong>`;
-  return `<div class="sess-row" onclick="openSessionEdit('${escapeJsArg(s.id)}')">
+  // v4.00: a row opens the sitting's DETAIL, not the edit form. Reading a record and changing it are
+  // different intents, and the list was doing the second by default.
+  return `<div class="sess-row" onclick="openSessionDetail('${escapeJsArg(s.id)}')">
     ${sessThumbHTML(tea, !!tea)}
     <div class="sess-main">
       <div class="sess-top">${teaName}${s.rating?renderStarsStatic(s.rating,false):''}</div>
@@ -80,11 +82,16 @@ function viewSessions(){
       <span class="cal-num">${day}</span>${has?`<span class="cal-dot">${list.length>1?list.length:''}</span>`:''}
     </div>`;
   }
-  const cal = `<div class="card">
+  /* R92 — the tab shipped TWO date surfaces stacked above the list: this month calendar (a filter
+     control — selectCalDay narrows the list) and streakCardHTML()'s Brewing-days heatmap (a read-only
+     reading). R42 names only the heatmap and #02 redraws away from the stack, so both go behind ONE
+     toggle with the list as default. The calendar's day-filter stays reachable, so R61 holds: the
+     capability survives, its position changes. */
+  const cal = state.sessionsCalOpen ? `<div class="card">
     <div class="cal-head"><button class="btn-ghost" onclick="calShift(-1)">‹</button><strong>${monthLabel}</strong><button class="btn-ghost" onclick="calShift(1)">›</button></div>
     <div class="cal-grid cal-dows">${dow}</div>
     <div class="cal-grid">${cells}</div>
-  </div>`;
+  </div>` : '';
 
   let listSessions = [...state.sessions].sort((a,b)=>new Date(b.date)-new Date(a.date));
   let listTitle = 'All sessions';
@@ -93,15 +100,28 @@ function viewSessions(){
     listTitle = fmtDate(state.calSelDay);
   }
   const rows = listSessions.map(sessionRowHTML).join('');
+  const open = !!state.sessionsCalOpen;
   return `
-    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Sessions</h2>
-      <span class="mono" style="font-size:12px;color:var(--ink-soft);">${state.sessions.length} total</span></div>
+    <div class="lib-head">
+      <div class="lib-title"><h2>Sittings</h2>
+        <span class="lib-kicker mono">${state.sessions.length} logged${state.calSelDay?' · filtered to one day':''}</span></div>
+      <div class="lib-head-actions">
+        <button class="lib-chip${open?' active':''}" onclick="toggleSessionsCal()" aria-expanded="${open?'true':'false'}">Brewing days</button>
+      </div>
+    </div>
     ${cal}
-    ${streakCardHTML()}
+    ${open ? streakCardHTML() : ''}
     <div class="section-title" style="margin-top:20px;"><h2>${listTitle}</h2>
       ${state.calSelDay?`<button class="btn-ghost" onclick="selectCalDay('${state.calSelDay}')">show all</button>`:''}</div>
-    <div>${rows || '<div class="card empty">No sessions on this day.</div>'}</div>
+    <div>${rows || '<div class="card empty">No sittings on this day.</div>'}</div>
   `;
+}
+// One toggle for both date surfaces (R92). Closing it clears any day filter, so the list can never be
+// left silently narrowed by a control that is no longer on screen.
+function toggleSessionsCal(){
+  state.sessionsCalOpen = !state.sessionsCalOpen;
+  if(!state.sessionsCalOpen) state.calSelDay = null;
+  render();
 }
 
 /* ================= VESSELS ================= */
@@ -211,17 +231,33 @@ function deleteVesselFromForm(id){
 }
 
 /* ================= SESSION EDITING ================= */
+/* R58 (v4.00): editing is a SCREEN now, not a modal overlay. What did NOT change is the pair of
+   mechanisms underneath — the deep copy here and the whole-object writeback in saveSessionEdit.
+   Those are the only reason the un-surfaced per-steep taste words and strength taps survive an edit
+   (R57 documents the gap; 67 field-values ride on it across the current export), and nothing in the
+   UI would show their loss. `fixtures/session-edit-test.js` was written against the modal and run
+   green BEFORE this move, and stays green and unedited across it. If it ever needs editing to pass,
+   that is the finding, not the fix. */
 function openSessionEdit(sessionId){
   const s = state.sessions.find(x=>x.id===sessionId);
   if(!s) return;
-  state.editingSession = JSON.parse(JSON.stringify(s));
+  state.editingSession = JSON.parse(JSON.stringify(s));   // DEEP — see above; do not "simplify"
   state.editingSession.tags = state.editingSession.tags || [];
   state.sessionEditOpen = true;
+  state.view = 'session-edit';
   render();
 }
-function closeSessionEdit(){ state.sessionEditOpen=false; state.editingSession=null; render(); }
-// #20: jump from the open session-edit modal to the tea's page. Closes the modal FIRST (it's appended
-// in render() regardless of view, so leaving it open would linger over tea-detail), then one render.
+// Back to the sitting it belongs to, not to the list — the edit screen is reached from detail.
+function closeSessionEdit(){
+  const id = state.editingSession && state.editingSession.id;
+  state.sessionEditOpen=false; state.editingSession=null;
+  if(id && state.sessions.some(s=>s.id===id)){ state.activeSessionId=id; state.view='session-detail'; }
+  else state.view='sessions';
+  render();
+}
+// #20: jump from the edit screen to the tea's page. Clears the draft FIRST so a half-edited session
+// can't linger behind another view (it was a modal appended by render() until v4.00; the reason
+// survives the move — openTeaDetail sets its own view, and a live editingSession would outlast it).
 function es_viewTea(){
   const id = state.editingSession && state.editingSession.teaId;
   state.sessionEditOpen=false; state.editingSession=null;
@@ -305,8 +341,134 @@ function deleteSession(){
     closeSessionEdit();
   } finally { _sessionSaving = false; }
 }
-function sessionEditModal(){
+/* ================= #02b SESSION DETAIL (v4.00) ================= */
+function openSessionDetail(id){ state.activeSessionId=id; state.view='session-detail'; state.sessionMenuOpen=false; render(); }
+function toggleSessionMenu(){ state.sessionMenuOpen=!state.sessionMenuOpen; render(); }
+
+/* R90 — a record surface shows STORED brew_style only, and the hero is the stricter case: an
+   identity line reads as fact rather than as a reading. The 6 Jul Da Hong Pao has brew_style empty
+   with a 110 ml gaiwan, so a derived lane would print "gongfu" over a null column. Eight of forty
+   sessions render without a method line. That is correct, not a gap — esMethodReadLabel() stays the
+   one place a derived reading appears, on the edit surface, visibly beside editable fields. */
+function sessionMethodLabel(s){
+  if(s.isColdBrew) return 'cold brew';
+  if(!s.brewStyle) return '';                        // null → nothing. Never the capacity inference.
+  return (SESSION_METHODS.find(m=>m.k===s.brewStyle)||{}).label || s.brewStyle;
+}
+function sessionSteepRowHTML(st, i){
+  const tags = (st.tags||[]).map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join('');
+  // The v3.89 strength tap, read-only here. Distinct from CALIBRATE (which tunes forward).
+  const str = st.feedback ? `<span class="steep-strength mono">${escapeHtml(st.feedback)}</span>` : '';
+  return `<div class="sd-steep">
+    <div class="sd-steep-head"><span class="sd-steep-i mono">${i+1}</span>
+      <span class="sd-steep-t mono">${st.timeSeconds!=null?fmtSecShort(st.timeSeconds):'—'}</span>
+      ${st.tempC!=null?`<span class="sd-steep-c mono">${cToDisplay(st.tempC)}${tempUnitLabel()}</span>`:''}
+      ${str}</div>
+    ${st.description?`<div class="sd-steep-note">${escapeHtml(st.description)}</div>`:''}
+    ${tags?`<div class="sd-steep-tags">${tags}</div>`:''}
+  </div>`;
+}
+function viewSessionDetail(){
+  const s = state.sessions.find(x=>x.id===state.activeSessionId);
+  if(!s) return '<div class="empty">Sitting not found.</div>';
+  const tea = teaById(s.teaId), ves = vesselById(s.vesselId);
+  const method = sessionMethodLabel(s);
+  const ident = [tea?typeLabel(tea.type):'', method,
+    ves?`<span class="sd-link" onclick="goVessels()">${escapeHtml(ves.name)}</span>`:''].filter(Boolean).join(' · ');
+  // Facts render only when stored — honest empties, never a dash (the #03 cascade).
+  const facts = [];
+  const fact = (k,v)=>{ if(v) facts.push(`<div><div class="eyebrow">${k}</div><div>${v}</div></div>`); };
+  fact('Leaf', Number(s.gramsUsed)>0 ? Number(s.gramsUsed)+' g' : '');
+  fact('Water', s.waterMl ? s.waterMl+' ml' : (ves&&ves.capacityMl ? ves.capacityMl+' ml <span class="sd-soft">capacity</span>' : ''));
+  fact('Water type', escapeHtml(s.waterType||''));
+  fact('TDS', s.waterTDS!=null ? s.waterTDS+' ppm' : '');
+  const steeps = (s.steeps||[]).slice().sort((a,b)=>(a.order||0)-(b.order||0));
+  const total = steeps.reduce((a,x)=>a+(Number(x.timeSeconds)||0),0);
+  const temps = [...new Set(steeps.map(x=>x.tempC).filter(v=>v!=null))];
+  const steepMeta = steeps.length
+    ? [total?'total '+fmtSecShort(total):'', temps.length===1?cToDisplay(temps[0])+tempUnitLabel()+' flat':'',
+       s.waterMl?s.waterMl+' ml':(ves&&ves.capacityMl?ves.capacityMl+' ml':'')].filter(Boolean).join(' · ')
+    : '';
+  const sessTags = (s.tags||[]).map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join('');
+  const quiet = [!s.isShared?'not shared':'', !s.mood?'no mood logged':''].filter(Boolean).join(' · ');
+  return `
+    <div class="detail-head">
+      <button class="detail-back" onclick="goView('sessions')">← Back to sittings</button>
+      <button class="tea-more" onclick="toggleSessionMenu()" aria-label="More" aria-expanded="${state.sessionMenuOpen?'true':'false'}">⋯</button>
+    </div>
+    ${sessionMenuHTML(s)}
+    <div class="card">
+      <div class="sd-kicker mono">${escapeHtml(fmtDateTime(s.date))}</div>
+      <h2 class="sd-title">${tea?`<span class="sd-link" onclick="openTeaDetail('${escapeJsArg(tea.id)}','sessions')">${escapeHtml(tea.name)}</span>`:'Unknown tea'}</h2>
+      ${ident?`<div class="sd-ident">${ident}</div>`:''}
+      ${s.rating?`<div style="margin-top:8px;">${renderStarsStatic(Number(s.rating),true)}</div>`:''}
+      ${facts.length?`<div class="grid grid-2" style="margin-top:14px;">${facts.join('')}</div>`:''}
+      ${quiet?`<div class="sd-quiet mono">${quiet}</div>`:''}
+
+      ${steeps.length ? `<div class="section-title" style="margin-top:20px;"><h2 class="sd-h">Steeps · ${steeps.length}</h2>
+        ${steepMeta?`<span class="mono sd-soft">${escapeHtml(steepMeta)}</span>`:''}</div>
+        <div class="sd-steeps">${steeps.map(sessionSteepRowHTML).join('')}</div>`
+      : `<div class="section-title" style="margin-top:20px;"><h2 class="sd-h">Infusions</h2></div>
+         <div class="sd-soft">${brewCountLabel(s)} — logged without timed steeps.</div>`}
+
+      ${s.description?`<div style="margin-top:18px;"><div class="eyebrow">Your note</div><div class="sd-note">${escapeHtml(s.description)}</div></div>`:''}
+      ${sessTags?`<div style="margin-top:14px;"><div class="eyebrow">Taste words</div><div class="sd-steep-tags">${sessTags}</div></div>`:''}
+      ${s.photoUrl?`<div style="margin-top:16px;"><img src="${escapeHtml(s.photoUrl)}" alt="" class="sd-photo" loading="lazy"></div>`:''}
+
+      <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="brewAgain('${escapeJsArg(s.id)}')">Brew this again</button>
+        <button class="btn" onclick="openSessionEdit('${escapeJsArg(s.id)}')">Edit</button>
+      </div>
+    </div>`;
+}
+/* The ⋯ menu, enumerated to what exists. #02b draws "Pass this tea to the circle" as NEW — it needs
+   slice F's pass record and its migration, so it is OMITTED rather than drawn disabled: a dead
+   control invites a tap and explains nothing (the honest-absence pattern, #03's missing Go Deeper
+   row and #37's no-row panel). It returns in F. */
+function sessionMenuHTML(s){
+  if(!state.sessionMenuOpen) return '';
+  return `<div class="hub-scrim" onclick="toggleSessionMenu()"></div>
+    <div class="hub-sheet" role="dialog" aria-label="Sitting options">
+      <div class="hub-grab"></div>
+      <button class="hub-row" onclick="copySessionToNew('${escapeJsArg(s.id)}')">${icon('i-plus-hl',20)}<span>Copy to a new entry</span></button>
+      <button class="hub-row" style="color:var(--red);" onclick="armConfirm(this,'Delete this sitting? Its grams go back to the tea stock.',()=>deleteSessionById('${escapeJsArg(s.id)}'))">${icon('i-settings-hl',20)}<span>Delete sitting</span></button>
+    </div>`;
+}
+/* R40 + R91 — brew-again carries the vessel ALWAYS and the method ONLY when the source row actually
+   stored one. Carrying a derived method forward would let the capacity heuristic become a stored
+   record on the next save: R64's laundering, arriving through a door nobody was watching. A
+   brew-again from a null session starts null, and the four-lane control shows nothing until the user
+   picks. */
+function brewAgain(sessionId){
+  const s = state.sessions.find(x=>x.id===sessionId); if(!s) return;
+  state.sessionMenuOpen=false;
+  startSessionFor(s.teaId, { vesselId:s.vesselId || null, brewStyle:s.brewStyle || null });
+}
+// Copy-to-new-entry: the same sitting as a starting point, never a silent duplicate — it opens the
+// setup draft prefilled, so nothing is written until the user commits it themselves.
+function copySessionToNew(sessionId){
+  const s = state.sessions.find(x=>x.id===sessionId); if(!s) return;
+  state.sessionMenuOpen=false;
+  startSessionFor(s.teaId, { vesselId:s.vesselId || null, brewStyle:s.brewStyle || null,
+    gramsUsed:s.gramsUsed || '', waterMl:s.waterMl || '' });
+}
+function deleteSessionById(id){
+  const s = state.sessions.find(x=>x.id===id); if(!s) return;
+  const tea = teaById(s.teaId);
+  if(tea && Number(s.gramsUsed)>0){ tea.amountGrams = (Number(tea.amountGrams)||0) + Number(s.gramsUsed); persistTea(tea); }
+  state.sessions = state.sessions.filter(x=>x.id!==id);
+  dropSession(id);
+  state.sessionMenuOpen=false; state.activeSessionId=null; state.view='sessions'; render();
+}
+
+/* R58 (v4.00) — the edit surface moved from a modal overlay to its own screen. Only the SHELL
+   changed: the overlay/modal wrapper became a back button and a card, and the ✕ became Cancel. The
+   body, every setter and both copy mechanisms are untouched, which is what lets
+   fixtures/session-edit-test.js stay green and unedited across the move. #02b rev 2's dedicated edit
+   screen is what satisfied "somewhere less intrusive" and closed #28. */
+function viewSessionEdit(){
   const e = state.editingSession;
+  if(!e) return '<div class="empty">No session being edited.</div>';
   const steepsHTML = e.steeps.map((st,i)=>`
     <div class="steep-item">
       <div class="steep-head"><span>Steep ${i+1}</span><button class="btn-ghost" onclick="removeEditSteepClick(this,${i})">remove</button></div>
@@ -317,12 +479,12 @@ function sessionEditModal(){
       </div>
     </div>
   `).join('');
-  return `<div class="overlay" onclick="if(event.target===this) closeSessionEdit()">
-    <div class="modal">
-      <div class="modal-head"><h2>Edit session</h2>
+  return `
+    <button class="detail-back" onclick="closeSessionEdit()">← Back to the sitting</button>
+    <div class="card">
+      <div class="modal-head"><h2 style="margin:0;">Edit sitting</h2>
         <div style="display:flex;align-items:center;gap:12px;">
           ${teaById(e.teaId)?`<button class="btn-ghost sess-viewtea" onclick="es_viewTea()">view tea →</button>`:''}
-          <button class="close-x" onclick="closeSessionEdit()">✕</button>
         </div></div>
       <div class="form-grid">
         <div class="field span2"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
@@ -358,11 +520,10 @@ function sessionEditModal(){
       </div>
       <button class="btn" style="margin-top:10px;" onclick="es_convertToSteeps()">Switch to detailed steeps</button>`}
       <div style="display:flex;justify-content:space-between;margin-top:16px;">
-        <button class="btn btn-danger" onclick="armConfirm(this,'Delete this session? Its grams go back to the tea stock.',()=>deleteSession())">Delete session</button>
+        <button class="btn btn-danger" onclick="armConfirm(this,'Delete this sitting? Its grams go back to the tea stock.',()=>deleteSession())">Delete this sitting</button>
         <div style="display:flex;gap:8px;"><button class="btn" onclick="closeSessionEdit()">Cancel</button><button class="btn btn-primary" onclick="saveSessionEdit()">Save changes</button></div>
       </div>
-    </div>
-  </div>`;
+    </div>`;
 }
 
 /* ================= SESSION LOGGING ================= */
@@ -385,20 +546,27 @@ function quickLogSession(btn){
   }
   startSessionFor(null);
 }
-function startSessionFor(teaId){
+/* `pre` is R40's brew-again / copy-to-new carry (v4.00), and R91 governs what may travel: the vessel
+   ALWAYS, the method ONLY when the source row actually stored one. `pre.brewStyle` is passed as null
+   from a null session, so a derived lane can never become a stored record on the next save — that is
+   R64's laundering one step removed, and this is the door it would have come through. */
+function startSessionFor(teaId, pre){
   if(state.vessels.length===0){ showToast('Add a vessel first — Teas → Vessels.'); goVessels(); return; }
   clearTimerInterval();   // v3.83: never orphan a running tick when the draft is replaced
+  const carriedVessel = (pre && pre.vesselId && vesselById(pre.vesselId)) ? pre.vesselId : state.vessels[0].id;
   state.sessionDraft = {
     teaId: teaId || (state.teas.find(t=>!isTeaFinished(t)) || state.teas[0]).id,  // default to an in-stock tea
-    vesselId: state.vessels[0].id,
+    vesselId: carriedVessel,
     sessionDate: toLocalDatetimeValue(new Date()),
     whenPick: 'now',                                    // #12's WHEN chips; derived from sessionDate, not a second source of truth
     isColdBrew: false,
     waterType: '',
     waterTDS: '',
-    gramsUsed: '',
-    brewStyle: methodPrefillFor(state.vessels[0].id),   // v3.91: vessel-type default (B4); null → capacity infer
-    waterMl: '',                                        // v3.57 optional per-session override; blank = vessel capacity
+    gramsUsed: (pre && pre.gramsUsed) || '',
+    // A carried method wins over the vessel-type prefill because it is a RECORD; when the source row
+    // held none, the prefill applies as usual — carrying `null` must not mean "no method at all".
+    brewStyle: (pre && pre.brewStyle) || methodPrefillFor(carriedVessel),   // v3.91: vessel-type default (B4); null → capacity infer
+    waterMl: (pre && pre.waterMl) || '',                // v3.57 optional per-session override; blank = vessel capacity
     steeps: [],
     infusionCount: 1,
     stage: 'setup', // setup -> steeping -> finish  (or setup -> quick)
