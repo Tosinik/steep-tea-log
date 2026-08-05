@@ -201,7 +201,12 @@ The Teas tab gains its second mode and its header rework; the vessel list become
   the plain jade base. Found by reading computed background in **both** themes. Base rule moved above the
   ladder block; **B9b now pins the source order**.
 - **R75–R78** in the ledger; **R74's doc sweep is now deploy step 5** in `slowcup-deploy` and CLAUDE.md.
-- **Second commit, same deploy — the stale suites are repaired and all 18 committed suites are green.**
+- **`fixtures/reference-test.js` shipped untracked at first** — `.gitignore` blanket-ignores `fixtures/*`
+  with a per-file exception list, no exception was added, and **`git add -A` skips an ignored file
+  silently**. The pre-push verifier caught it; the exception is in and the file is committed. **When you
+  add a committed suite, add its `.gitignore` line in the same edit** — and take the suite count from
+  `git ls-files 'fixtures/*-test.js'`, never from the working tree. It is **17**.
+- **Second commit, same deploy — the stale suites are repaired and all 17 committed suites are green.**
   `status-line` was comparing two worlds (never seeded `lowStockThreshold`, so it ran at the default 15
   against a shelf counted at the owner's 11) and was unscoped; it now seeds the threshold from the
   owner's `user_settings` row, scopes by `user_id`, and asserts the **engine agreeing with itself**

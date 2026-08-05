@@ -26,6 +26,11 @@ fixtures/*
 # R3 slice A: the vessel identity ladder is invisible on current data (every vessel has a photo), so
 # this suite is the only thing that can see rungs 2 and 3. It also pins the R64/R72 lane contracts.
 !fixtures/vessel-identity-test.js
+# R3 slice B: the one guard that Go Deeper NEVER WRITES. A read-only contract has no runtime symptom
+# when it breaks — the surface would just quietly start saving — so this suite must exist everywhere,
+# not on one machine. `git add -A` skips an ignored file SILENTLY, which is how it shipped untracked
+# the first time while both the CHANGELOG and its own header called it committed.
+!fixtures/reference-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.
