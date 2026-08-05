@@ -66,6 +66,25 @@ cards · menu decision boards. Each workstream returns as its own versioned depl
   edge, deliberate: quick and cold-brew sessions carry no steeps, so they never feed the tea-page
   profile (choke point: `distinctVocab()`, steep-teas.js — see STATE.md).
 
+### Design round 4 — SCOPED 2026-07-26 (R93), after R3 finishes E–H
+The binding text is `docs/r3/planning/R3-RULINGS-LEDGER.md` **R93**; this is the pointer, not the
+authority. **Two items**, both of which drifted out of R3 through individually-correct local
+decisions rather than any single ruling:
+- **The liquor swatch** — visual contract #1 (*identity only, never decoration*) and #06's declared
+  primary path, **shipping unimplemented**. Today's swatch is a **type tint**, six colours keyed on
+  `teas.type`, so every green tea is the same colour; a liquor swatch is per-tea. Needs a per-tea
+  colour **column**, a **liquor value on each of the 55 `TEA_TYPES` rows**, and the swatch data model
+  **R82** found was never written. Unblocks **#14** (R89) and **R39**. Size it like slice B3.
+- **Home** — R53 gave it the §0 primitives and no revision board, correct for R3 since it carried no
+  new R3 affordances. It is also the first surface opened on every launch and the last untouched by
+  the redesign. R4 commissions its board.
+
+**The register is scheduled, not parked** (ledger §4): R4 · the tea-reference content batch (8
+uncovered teas, 3 coordinate rows, 55 liquor values — the first two also lift freshness from R85's
+rung 3 to rung 2) · post-beta. **`delete-everything` is a correctness matter, not a feature** —
+Settings' privacy copy is untrue until it ships, so it gates the public launch with the
+beta-hardening bundle.
+
 ## Pillar E — the smarter-over-time backlog (Theme 2, ship as data matures)
 Each with its data prerequisite — the point is they get better every season:
 - **Sweet-spot detection** [after phase 2]: per tea, the parameter fingerprint of its best-rated sessions

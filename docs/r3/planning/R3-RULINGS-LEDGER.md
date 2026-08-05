@@ -796,6 +796,30 @@ so **R61 is satisfied: the capability survives, its position changes**.
 > 115 ml so `brewMethodFor` would say gongfu — and brew-again yields **null**. Pinned in
 > `quick-log-test.js` §H.
 
+**R93 — R4 is the swatch and Home, and the deferred register gets a schedule.** Ruled by Niklas,
+2026-07-26. R3's build finishes as planned (E–H). The round after is scoped **now**, because the two
+largest gaps left in the app both drifted out of R3 through individually-correct local decisions
+rather than any single ruling — which is exactly how a gap becomes invisible.
+
+**(a) The liquor swatch.** Contract #1 of the visual contracts — *"identifies a tea, identity only,
+never decoration"* — and #06's declared primary path, **shipping unimplemented**. What renders today
+is a **type tint** (`t-green`, `t-oolong`: six colours keyed on `teas.type`), so every green tea is
+the same colour; a liquor swatch is **per tea**. Landing it needs three things and only one is code:
+a per-tea colour **column** (migration), a **liquor value on each of the 55 `TEA_TYPES` rows** (the
+source #06's "14-colour palette derived from the catalog liquors" was to derive from), and the
+**swatch data model R82 found was never written**. It also unblocks **#14**'s custom listbox (R89),
+whose primary affordance is the long-press colour correction (R39). Scope it as a slice comparable
+to B3.
+
+**(b) Home.** R53 accepted Bundle 1 for Home and the non-Focus steeping states, so Home receives the
+§0 primitives and nothing else — no revision board, none scheduled. That was **correct for R3**: Home
+carried no new R3 affordances. But it is the **first surface opened on every launch and the last
+untouched by the redesign**. R4 commissions a Home revision board.
+
+**§4 is a queue, not a graveyard.** Everything in it is scheduled to one of three places, and §4 now
+says which. Nothing in this ruling changes slices E–H; it exists so the next round's scope lives in
+the repo rather than in a chat log.
+
 ### Finding (not a ruling) — the final export's MANIFEST stamps
 
 The final export's MANIFEST claims all boards were restamped `77cf800 -> 9f695e2`. Two were not
@@ -899,6 +923,26 @@ stale. This section is the packet.
   task, trigger missed twice).
 
 ## 4 · Deferred / parked (nothing here is forgotten)
+
+> **Scheduled, 2026-07-26 (R93) — this is a queue, not a graveyard.** Every item below belongs to one
+> of three destinations, and saying *when* is what stops "deferred" from meaning "dropped quietly".
+>
+> **→ R4** — the **liquor swatch** (with **#14**'s listbox and **R39**'s long-press correction, both
+> blocked on it) and **Home**'s revision board. Both drifted out of R3 through individually-correct
+> local decisions rather than any ruling.
+>
+> **→ The tea-reference content batch** — the **8 uncovered shelf teas**, the **3 owed coordinate
+> rows** (Wuyi Mountains · Lugu · Chiayi), and the **55 catalog liquor values** the swatch palette
+> must derive from. The first two also upgrade freshness precision from R85's **rung 3 to rung 2**, so
+> that batch now pays twice.
+>
+> **→ Post-beta or later** — presence (R35), the app icon, per-tea `ageing` (R86), structured
+> brew-guide pills (R65), the origin suggestion list (R56), the vendor entity and URL (R52/R12),
+> per-tea elevation, the sample flag, #22's taste-note placement (R57), and the phase-2 brewing agenda.
+>
+> **One item here is a correctness matter, not a feature: `delete-everything`.** Settings' privacy copy
+> is **untrue until it ships**, and the beta welcome note must not promise deletion before then. It
+> belongs with the **beta-hardening bundle** — it gates the public launch the way F1 and F2 do.
 
 - **App icon + splash** — parked after 3 rounds/12 concepts; two rulings stand (icon outside the
   contracts but honours Kachi-iro scarcity; ensō belongs to the timer exclusively).
