@@ -450,8 +450,32 @@ html[data-theme="dark"] .steep-pill.active{color:#15140F;}
 
 .detail-back{display:flex;align-items:center;gap:6px;color:var(--ink-soft);font-size:13px;background:none;border:none;margin-bottom:10px;}
 
+/* ---------- the door (#09, v4.09) ----------
+   R29 made the logged-out screen the landing, so this one surface is both the returning brewer's
+   sign-in and the only thing a prospective invitee ever sees. It runs on clay and jade:
+   KACHI-IRO IS NOT SPENT HERE (visual contract 4, R94). This is the most tempting screen in the app
+   to break that on — it is the one selling the app — which is exactly why it holds. */
+.door{min-height:100vh;max-width:390px;margin:0 auto;padding:34px 26px 34px;display:flex;flex-direction:column;}
+.door-brand{display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:48px;}
+.door-enso{color:var(--clay);line-height:0;animation:sc-breathe 6s ease-in-out infinite;}
+.door-enso svg{transform:rotate(-6deg);}
+.door-name{font-family:var(--font-display);font-weight:700;font-size:40px;color:var(--ink);margin:20px 0 0;letter-spacing:.01em;}
+.door-tag{font-family:var(--font-display);font-style:italic;font-size:16px;color:var(--ink-soft);margin:8px 0 0;}
+.door-lede{font-size:13.5px;color:var(--ink-soft);line-height:1.6;max-width:280px;margin:18px 0 0;}
+.door-pillars{display:flex;justify-content:center;gap:22px;margin-top:26px;}
+.door-pillar{display:flex;flex-direction:column;align-items:center;gap:5px;width:80px;text-align:center;}
+.door-p-l{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--ink);}
+.door-p-s{font-family:var(--font-mono);font-size:8.5px;color:var(--ink-soft);line-height:1.4;}
+.door-auth{margin-top:auto;padding-top:40px;display:flex;flex-direction:column;gap:11px;}
+.door-field{border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:14px;font-family:'Inter',sans-serif;background:var(--white);color:var(--ink);width:100%;}
+.door-btn{width:100%;padding:14px 0;border-radius:12px;font-size:15px;font-weight:600;}
+.door-invite{font-size:12.5px;color:var(--ink-soft);text-align:center;margin:2px 0 0;}
+.door-build{font-size:8px;color:var(--ink-soft);text-align:center;margin:4px 0 0;opacity:.7;}
+@media (prefers-reduced-motion: reduce){ .door-enso{animation:none;} }
+
 /* ---------- auth / migration screens (v2) ---------- */
 .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+.auth-card .door-enso{display:inline-block;color:var(--clay);}
 .auth-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:26px 22px;max-width:380px;width:100%;box-shadow:var(--glow);}
 .auth-sub{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 18px;text-align:center;}
 .auth-card .field input[type=email]{border:1px solid var(--line);border-radius:8px;padding:10px 11px;font-size:14px;font-family:'Inter',sans-serif;background:var(--porcelain);color:var(--ink);width:100%;}

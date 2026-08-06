@@ -1179,6 +1179,35 @@ correctly so.
 > number arrives after the code. That order is the finding, not an irregularity to smooth over — see
 > the v4.08 block below, and the note above the frame-ruling summary.
 
+**R111 — `landing.html` is a SUPERSEDED SURFACE with a live public URL.** It ships at the repo root:
+a self-contained WS4 marketing page with its own tokens, referenced by nothing in `index.html` or
+`service-worker.js`, deliberately outside the precache, and reachable at `slowcup.app/landing.html`.
+**R29 closed the root split and made the logged-out screen the landing**, which orphaned this file
+without removing it. Not a tidiness item: a public URL serving a superseded surface can contradict
+the door that replaced it, and nobody would notice, because nothing links to it.
+
+**Not touched in H3, under R61** — a shipped artifact is not removed without a ruling naming it.
+It goes to §4's deferred register **flagged for the beta-hardening bundle**, not general deferral: it
+needs a decision before anything is public. Three options to rule then — delete it, redirect it to
+the door, or keep it deliberately as a marketing page and link it.
+
+**R112 — the door's fixture asserts SOURCE, and says so in its header.** `renderLogin` is
+closure-private inside an IIFE requiring the Supabase global, so no sandbox can call it — the door is
+the one surface that runs *before* boot, with no `state` and no `render()`.
+`fixtures/landing-test.js` therefore proves the door's **source** contains the canonical copy, no
+"Apple", no redeem control, no kachi token in its CSS block, and the ensō reached by `href="#enso"`
+rather than a second copy of the path. **It cannot prove the door renders.** The three hand-off empty
+states are ordinary views, reachable, and are rendered against an empty account — that half is
+behavioural, and the suite labels which half is which. Same family as R104's stated limitation and
+`origins-test.js` §F's: an instrument that does not name its blind spot is read as covering it.
+
+> *Code-lane note, 2026-08-06 (built in v4.09).* B1 failed on its first run against **this suite's own
+> comment** saying "there is no Apple" — a negative check that reads prose is testing the prose. The
+> door's source is now comment-stripped before any absence check. Four negative controls bite, each
+> on the intended check: re-adding Apple reddens B1 alone, paraphrasing the tagline reddens A1,
+> pointing `.door-enso` at `--kachi` reddens B6, and copying the ensō path instead of referencing the
+> symbol reddens C1 **and** C3.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
@@ -1433,6 +1462,11 @@ stale. This section is the packet.
 > **→ Post-beta or later** — presence (R35), the app icon, per-tea `ageing` (R86), structured
 > brew-guide pills (R65), the origin suggestion list (R56), the vendor entity and URL (R52/R12),
 > per-tea elevation, the sample flag, #22's taste-note placement (R57), and the phase-2 brewing agenda.
+>
+> **→ The beta-hardening bundle also inherits `landing.html` (R111).** A superseded surface on a live
+> public URL, linked from nothing, contradicting the door that replaced it — and invisible precisely
+> because nothing links to it. Delete, redirect to the door, or keep it deliberately and link it.
+> It gates the public launch the same way the two items below do.
 >
 > **One item here is a correctness matter, not a feature: `delete-everything`.** Settings' privacy copy
 > is **untrue until it ships**, and the beta welcome note must not promise deletion before then. It

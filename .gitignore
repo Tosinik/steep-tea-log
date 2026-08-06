@@ -65,6 +65,11 @@ fixtures/*
 # threshold in pixels, a tier split — each ruled after measurement. A number ruled after measurement
 # drifts silently when a pin radius or a coordinate row changes, so the suite ships everywhere.
 !fixtures/origins-test.js
+# #09 the door: the one surface that runs BEFORE boot, so `renderLogin` is closure-private and no
+# sandbox can call it (R112). This suite asserts against SOURCE — canonical copy, no dropped
+# provider, no kachi on the screen most tempting to spend it on — plus the three empty states the
+# door opens onto, which do render. Ships because those are brand rules, not local expectations.
+!fixtures/landing-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

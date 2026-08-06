@@ -180,7 +180,28 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.08: the Origins map, rendered to the frame ruling** (cache **v118**,
+**NOW (just shipped) — v4.09 R3 slice H3: #09 the door. THE R3 BUILD IS COMPLETE** (cache **v119**,
+APP_VERSION v4.09, **no SQL**). Slices A · B · B2 · B3 · C · D · E · F · G · H1 · H2 · H3 all shipped.
+- **`renderLogin()` stayed in `steep-data.js`**, as instructed and for a structural reason: it runs
+  before boot, so there is no `state`, no `render()` and no inline-onclick pattern, and its handlers
+  are wired directly because the auth functions are closure-private. Said in the code.
+- **R29's door does double duty** — breathing ensō (clay) · wordmark · *"a slower cup, better kept"* ·
+  the what-it-is line · Keep · Brew · Share · email → **Send magic link** · OR · Google · *"Invitation-only
+  for now."* · version stamp. **The board's "Continue" was not taken**: its own flag delegates the
+  mechanism, so "Continue" was the label for an *undecided* one. **Autofocus removed** — the keyboard
+  covered the half of the screen that says what SlowCup is.
+- **R33 by reuse:** the `#enso` symbol already existed in `index.html`'s sprite, **outside `#app`** —
+  checked, because `renderLogin` overwrites `#app`. One definition, shared with the timer.
+- **R94 holds on the most tempting screen:** no kachi token and **no hex** in the door's CSS.
+- **The addendum was VERIFIED PRESENT, not written** — R19's zero-tea Origins state shipped in v4.07,
+  the empty shelf and onboarding hero already read properly. Three surfaces checked, nothing authored.
+- **R111** — `landing.html` is a superseded surface on a live public URL, orphaned by R29, **not
+  touched** under R61 and flagged to the beta-hardening bundle. **R112** — the new suite asserts
+  **source** (a closure-private function cannot be sandboxed) and says so; §D's empty states do render.
+- **NOT verified visually, second deploy running** — the Browser pane refused localhost all session.
+  **26 committed suites, all green.**
+
+**Previously — v4.08: the Origins map, rendered to the frame ruling** (cache **v118**,
 APP_VERSION v4.08, **no SQL**). Three commits. **Niklas opened the map on a phone and two of its
 seven marks rendered as one letter each** — "H" and "K", the two most-brewed origins.
 - **The board that ruled direction 2 had never been banked.** It arrived after the export and lived

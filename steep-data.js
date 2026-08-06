@@ -693,28 +693,56 @@
     startApp();
   }
 
-  /* ---------- minimal screens (styled by .auth-* rules in styles.css) ---------- */
-  function shell(inner) {
+  /* ---------- the door (#09) + migration, styled by the .door- and .auth- rules in styles.css ----
+     WHY THIS UI LIVES IN THE DATA LAYER, deliberately and not by accident: it runs BEFORE boot, so
+     there is no `state`, no `render()`, and the inline-onclick pattern the rest of the app uses does
+     not exist yet. Its handlers are wired directly because `signIn`/`signInWithGoogle` are private
+     to this closure. Moving it out is a refactor larger than the board and is not what #09 asked
+     for. Leave it here. */
+  function ensoMark(px) {  // R33 — the ensō belongs to this door and the timer, never the app icon.
+    return `<div class="door-enso"><svg viewBox="0 0 120 120" width="${px}" height="${px}" aria-hidden="true"><use href="#enso"/></svg></div>`;
+  }
+  function shell(inner) {  // the migration prompt wears the same brand block, so the two are one family
     return `<div class="auth-wrap"><div class="auth-card">
-      <div class="brand" style="justify-content:center;margin-bottom:14px;">
-        <div class="brand-mark"></div><h1 style="font-family:var(--font-display);font-size:26px;margin:0;">SlowCup</h1>
+      <div style="text-align:center;margin-bottom:14px;">${ensoMark(52)}
+        <h1 style="font-family:var(--font-display);font-size:26px;margin:8px 0 0;">SlowCup</h1>
       </div>${inner}</div></div>`;
   }
 
   function renderLogin() {
     const app = document.getElementById('app');
     if (!app) return;
-    app.innerHTML = shell(`
-      <p class="auth-sub">Your tea log, synced across every device. Sign in to get started.</p>
-      <button class="btn" id="googleBtn" style="width:100%;margin-bottom:14px;font-weight:600;">Continue with Google</button>
-      <div class="auth-divider"><span>or use email</span></div>
-      <div class="field" style="margin:12px 0;">
-        <label>Email</label>
-        <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+    /* The stamp is read defensively because this door is the surface you land on when something has
+       gone wrong. `APP_VERSION` is a const in steep-core.js, so if that file failed to load the
+       reference would throw and hand a logged-out user a blank screen instead of a sign-in. Before
+       #09 the door had no cross-module dependency at all; this keeps that property. */
+    let ver = ''; try { ver = APP_VERSION; } catch (e) {}
+    /* R32 — the tagline, the what-it-is sentence and the three pillar words are canonical as drawn
+       and deliberately minimal. Do not expand them. R34 — the invite line is passive: it states an
+       intention, and claims no enforcement, because signups are toggled ON and gating them is a
+       beta-hardening task. R47 — only configured providers are drawn; there is no Apple. */
+    app.innerHTML = `<div class="door">
+      <div class="door-brand">
+        ${ensoMark(96)}
+        <h1 class="door-name">SlowCup</h1>
+        <p class="door-tag">a slower cup, better kept</p>
+        <p class="door-lede">Keep the tea you brew — every steep, how it poured, what it cost and where it grew — and the few you share it with.</p>
       </div>
-      <button class="btn btn-primary" style="width:100%;" id="authSendBtn">Send magic link</button>
-      <div id="authMsg" class="auth-msg"></div>
-    `);
+      <div class="door-pillars">
+        <div class="door-pillar"><span class="door-p-l">Keep</span><span class="door-p-s">your shelf, every steep</span></div>
+        <div class="door-pillar"><span class="door-p-l">Brew</span><span class="door-p-s">the ens&#x14D; timer, led by the leaf</span></div>
+        <div class="door-pillar"><span class="door-p-l">Share</span><span class="door-p-s">a handful of people &middot; no feed</span></div>
+      </div>
+      <div class="door-auth">
+        <input type="email" id="authEmail" class="door-field" placeholder="you@example.com" autocomplete="email" aria-label="Email">
+        <button class="btn btn-primary door-btn" id="authSendBtn">Send magic link</button>
+        <div class="auth-divider"><span>OR</span></div>
+        <button class="btn door-btn" id="googleBtn">Continue with Google</button>
+        <div id="authMsg" class="auth-msg"></div>
+        <p class="door-invite">Invitation-only for now.</p>
+        <p class="door-build mono">${ver}</p>
+      </div>
+    </div>`;
     const gbtn = document.getElementById('googleBtn');
     if (gbtn) gbtn.onclick = async () => { gbtn.disabled = true; const { error } = await signInWithGoogle(); if (error) { gbtn.disabled = false; document.getElementById('authMsg').textContent = 'Google sign-in failed: ' + error.message; } };
     const btn = document.getElementById('authSendBtn');
@@ -731,7 +759,9 @@
     };
     btn.onclick = submit;
     emailEl.onkeydown = e => { if (e.key === 'Enter') submit(); };
-    emailEl.focus();
+    /* No autofocus, and that is the change R29 forces. When this was a bare login card, focusing the
+       field was a courtesy; now the same screen is the only thing a prospective invitee ever sees,
+       and raising the keyboard on arrival covers the half of it that says what SlowCup is. */
   }
 
   function renderMigratePrompt(startApp) {

@@ -277,7 +277,38 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.08 LIVE — the Origins map, rendered to the frame ruling** (cache **v118**, no SQL, three commits).
+**v4.09 LIVE — R3 slice H3: #09 the door. THE R3 BUILD IS COMPLETE** (cache **v119**, no SQL).
+A · B · B2 · B3 · C · D · E · F · G · H1 · H2 · H3 have all shipped.
+
+**`renderLogin()` stayed in `steep-data.js`.** It runs before boot — no `state`, no `render()`, no
+inline-onclick pattern — and its handlers are wired directly because the auth functions are private
+to that closure. The reason is now in the code, so the next reader does not "fix" it.
+
+**Two board instructions were not taken, both deliberately.** The board's **"Continue"** is the label
+for a mechanism its own flag delegates to Code ("magic-link or password"); the mechanism is decided,
+so the label names it — **Send magic link**. And the shipped **autofocus is removed**: it was a
+courtesy on a bare login card, but R29 made this the only thing an invitee sees, and the keyboard
+covers the half that says what SlowCup is.
+
+**R33 was satisfied by reuse.** The `#enso` symbol already existed in `index.html`'s sprite and —
+checked rather than assumed — sits **outside `#app`**, which matters because `renderLogin` overwrites
+`#app`. One definition shared with the timer; the suite asserts the door carries no second copy of
+the path.
+
+**The slim addendum was verified present, not written.** R19's zero-tea Origins state shipped in
+v4.07's empty branch; the empty shelf and the onboarding hero already read properly, and onboarding
+keeps the **app mark, not the ensō**. Three surfaces checked; nothing authored.
+
+Three things the next round inherits. **(a)** **R111** — `landing.html` is a superseded surface on a
+live public URL, orphaned by R29, untouched under R61 and flagged to the **beta-hardening bundle**.
+**(b)** **R112** — a closure-private function cannot be sandboxed, so `landing-test.js` asserts
+source and says so; its §D is the half that genuinely renders. **(c)** **The door has never been
+seen.** The Browser pane refused localhost for two deploys running, and a door is a *look* before it
+is a function.
+
+**NEXT: nothing in R3.** What remains open at the round's close is listed in §7.
+
+**Previously: v4.08 — the Origins map, rendered to the frame ruling** (cache **v118**, no SQL, three commits).
 Niklas opened the map on a phone: two of its seven marks rendered as a single letter each. **The
 cause was upstream of the code** — the board that ruled direction 2 had never been banked (§3), so
 H2 was built to a relayed summary of it, and a session that searched the repo for the board's two
@@ -602,6 +633,26 @@ instruction: a board or hand-off line that resists the shipped engine is a findi
 licence to adapt the engine.
 
 ## 7 · Open items and unknowns
+
+> **AT THE ROUND'S CLOSE (2026-08-06, after v4.09) — everything R3 leaves open, in one list.**
+> Nothing below blocked the build; each is a decision or a data gap with a named home.
+> 1. **Three coordinate rows** — Wuyi Mountains · Lugu · Chiayi. Until they land, R55's three
+>    offerable teas stay in the country tier even after an accepted offer. Also upgrades freshness
+>    from R85's rung 3 to rung 2, so the batch pays twice.
+> 2. **Two merge-rule questions** — the tie-break when counts are equal (implemented as
+>    northernmost, asserted synthetically at `origins-test.js` B6 because no live tie exists), and
+>    whether `ORIGINS_MERGE_PX` should track pin width. The board's prose and its number disagree;
+>    the number is what shipped and what every figure was verified against.
+> 3. **R111 — `landing.html`**, a superseded surface on a live public URL. Beta-hardening bundle.
+> 4. **The tea-reference content batch** — 8 uncovered shelf teas, the swatch and script data
+>    models (R82), the 55 catalog liquor values.
+> 5. **R93 scopes R4** — the liquor swatch (with #14 and R39, both blocked on it) and a **Home
+>    revision board**: Home is the last surface the redesign never gave one.
+> 6. **The map and the door have never been looked at by this lane.** Both shipped numerically
+>    verified and visually unseen, across three deploys of a browser pane that refused localhost.
+>    Two of this round's defects were found by *using* the app and none by measuring it.
+
+
 
 - ~~**Four held rulings** (#22 · #23 · #28 · washi probation)~~ — **all ruled 2026-07-25**: R57
   defers #22 post-R3, R60 splits #23 (sort preserved as shipped, `setTeaFilter`/`focusLogSteep`

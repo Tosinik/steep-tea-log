@@ -36,6 +36,72 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.09 — R3 slice H3: #09 the door. **R3's last slice.**
+Deploy: `steep-data.js` (`renderLogin` rebuilt in place, `shell()`, new `ensoMark`),
+`styles.css` (the `.door-*` block, both themes via tokens), `steep-core.js`
+(APP_VERSION, WHATS_NEW), `service-worker.js` (**v119**), **new
+`fixtures/landing-test.js`** + its `.gitignore` exception in the same edit (R79),
+`CHANGELOG.md`, `STATE.md`, `docs/r3/R3-STATUS.md`, `docs/r3/R3-BUILD-PLAN.md`,
+`docs/r3/planning/R3-RULINGS-LEDGER.md` (**R111 · R112**). **No SQL.**
+**26 committed suites, all green.**
+
+- **`renderLogin()` stays in `steep-data.js`, and the reason is structural.** It runs
+  *before* boot: no `state`, no `render()`, and the inline-`onclick` pattern the rest of
+  the app uses does not exist yet — its handlers are wired directly because `signIn` and
+  `signInWithGoogle` are private to that closure. Extracting it is a refactor larger than
+  the board. Said in the code so the next reader doesn't "fix" it.
+- **R29's door does double duty**, so it is built as a full screen rather than a login
+  card: breathing ensō in clay → wordmark → *"a slower cup, better kept"* → the
+  what-it-is line → **Keep · Brew · Share** → email → **Send magic link** → OR →
+  **Continue with Google** → *"Invitation-only for now."* → the version stamp.
+- **R33 is satisfied by reuse, not by drawing.** The `#enso` symbol already existed in
+  `index.html`'s sprite, and — checked, not assumed — it sits **outside `#app`**, so
+  `renderLogin` overwriting `#app` cannot delete the symbol it references. One definition,
+  shared with the timer; C3 asserts the door carries no second copy of the path.
+- **The board's "Continue" was NOT taken.** Its own flag delegates the mechanism
+  ("magic-link or password — Code's call"), which makes "Continue" the label for an
+  *undecided* mechanism. The mechanism is decided, so the label names it: **Send magic
+  link**. Tapping a button called Continue and receiving an email is a small surprise, and
+  the absence of small surprises is the whole character.
+- **The autofocus is gone, and that is R29's doing.** Focusing the email field was a
+  courtesy when this was a bare login card; now the same screen is the only thing an
+  invitee ever sees, and raising the keyboard on arrival covers the half that says what
+  SlowCup is.
+- **R34 stays copy, not enforcement** — signups are toggled ON, so "Invitation-only for
+  now" states an intention and claims no lock. No redeem mechanism (B4 asserts both).
+  **R47** — Apple is not drawn because it is not configured; Google is, because it is.
+- **R94 holds on the screen most tempting to break it.** No kachi token anywhere in the
+  door's CSS, and **no hex at any render site** — tokens only, so both themes come free.
+  B6/B7 assert it; pointing `.door-enso` at `--kachi` reddens B6.
+- **The slim #09 addendum was VERIFIED PRESENT, not written.** R19's zero-tea Origins
+  state already shipped in v4.07's empty branch, the empty shelf already says what to do
+  next, and the first signed-in moment is already `onboardingHTML()`'s hero — which keeps
+  the **app mark, not the ensō** (D5 asserts that, since R33 gives the motif to the door
+  and the timer only). Three surfaces checked rather than assumed; nothing authored.
+- **Migration mapping, stated rather than left implicit:** `renderMigratePrompt` fires only
+  for localStorage-era data on that device (`hasLegacyData()`); restoring a backup from
+  here on is **Settings → Import backup**. It shares the door's brand block so the two read
+  as one family.
+- **R112 — the new suite asserts SOURCE and says so in its header.** No sandbox can call a
+  closure-private function that needs the Supabase global, so A–C prove the door's source
+  and **cannot prove it renders**; §D's three empty states are ordinary views and genuinely
+  render. B1 failed on its first run against **the suite's own comment** saying "there is
+  no Apple" — a negative check that reads prose is testing the prose — so the door's source
+  is comment-stripped before any absence check. Four negative controls bite, each on the
+  intended check.
+- **R111 — `landing.html` is a superseded surface with a live public URL.** A WS4 marketing
+  page at the repo root, referenced by nothing, precached by nothing, reachable at
+  `slowcup.app/landing.html` — and R29 made the door the landing, orphaning it. **Not
+  touched** (R61: a shipped artifact needs a ruling to remove), flagged to the
+  **beta-hardening bundle** because a public URL contradicting the door is a launch matter.
+- **The door reads its version defensively** (`try/catch`): `APP_VERSION` is a const in
+  steep-core.js, and this door is the surface you land on when something has gone wrong.
+  Before #09 it had no cross-module dependency at all; that property is kept.
+- **NOT verified visually**, for the second deploy running: the Browser pane refused
+  localhost by policy all session. A door is a *look* before it is a function, so this one
+  needs eyes more than most.
+
+---
 ## v4.08 — The Origins map, rendered to the frame ruling
 Deploy: `steep-passport.js`, `styles.css`, `steep-core.js` (APP_VERSION, WHATS_NEW),
 `service-worker.js` (**v118**), `fixtures/origins-test.js`, **new
