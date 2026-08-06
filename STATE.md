@@ -180,7 +180,27 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.03 R3 slice G: Insights + the Origins card + #11 Wrapped** (cache **v113**,
+**NOW (just shipped) — v4.04 R3 slice H1: #08 Shopping + #07's currency row + R104's scan** (cache
+**v114**, APP_VERSION v4.04, **no SQL**). **H is split three ways at the map** — H1 touches no
+geography and ships now; **H2** (Origins + the map + the Passport hub-row removal) is **gated on
+R106's outline artifact**, queued in ledger §4 as blocking; **H3** (#09 landing) stays last, because
+R19's zero-tea Origins state needs Origins to exist.
+- **R104's scan lands beside §E.** Against the v4.02 blob it flags all **seven** positions that
+  shipped symbol-less; clean on the current tree. **Its limitation is in the header**: it catches a
+  *known* money field rendered bare, never a *new* one nobody registered.
+- **`statusLine` returns `{text, tone}`, not a string** (since B3). The first shopping draft printed
+  `[object Object]` on every row — caught in the browser, because no suite renders that view.
+- **SH1's overlap now reads as a rebuy** in the shelf's own words; **R11 restock is a repeat
+  purchase** (three keys over the shipped prefill path, nothing written until the form is committed);
+  **R12's search stores nothing**.
+- **#07's currency row ships** — six options, verified live to move every cost site including the
+  medians.
+- **R107 — the completeness panel is deferred out of R3** and needs a product ruling first: R22 says
+  it *moves* and it exists nowhere, and a progress bar for filling in fields is a calm-first question.
+- **Checked and NOT changed:** SET2's false privacy line isn't in shipped code; **°F stays** (ledger
+  over board); SET5 void. **23 committed suites, all green.**
+
+**Previously — v4.03 R3 slice G: Insights + the Origins card + #11 Wrapped** (cache **v113**,
 APP_VERSION v4.03, **no SQL**). Built to R100–R103.
 - **R103 — Wrapped looks back at the last COMPLETE month.** Live: **July, 40 sittings**, not the 2
   August ones. `seasonInfo` had zero callers after and is **deleted**; the decorated "your August is

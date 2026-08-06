@@ -258,7 +258,24 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.03 LIVE — R3 slice G: Insights + the Origins card + #11 Wrapped** (cache **v113**, no SQL).
+**v4.04 LIVE — R3 slice H1: #08 Shopping + #07's currency row + R104's site scan** (cache **v114**,
+no SQL). **H is split three ways at the map**: H1 touches no geography and ships now; **H2** is
+Origins + the map + the Passport hub-row removal, **gated on R106's outline artifact** (queued in
+ledger §4 as blocking, Code generating and Design reviewing, one projection shared between outline
+and pins); **H3** is #09 landing, last, because R19's zero-tea Origins empty state cannot be written
+before Origins exists. **R107** defers the completeness panel out of R3 entirely — R22 says it
+*moves* to Settings and it exists nowhere, and a progress bar for filling in fields is a calm-first
+product question rather than a styling one.
+
+Two things a later slice inherits. **(a)** §F of `vessel-identity-test.js` is R104 made structural —
+the behavioural guard and the site scan in one place — and **its stated limitation is part of it**:
+it catches a *known* money field rendered bare, never a *new* one nobody registered. A green §F means
+"every amount we have named carries a symbol". **(b)** `statusLine` returns `{text, tone}`, not a
+string, since B3; the first shopping draft interpolated the object and printed `[object Object]` on
+every row, caught in the browser because no suite renders that view.
+**NEXT: H2**, once the outline artifact exists for Design to look at.
+
+**Previously: v4.03 — R3 slice G: Insights + the Origins card + #11 Wrapped** (cache **v113**, no SQL).
 Built to **R100–R103**, all four issued at its plan review. **R103** rewindows Wrapped onto the last
 COMPLETE month (live: July, 40 sittings — not the 2 August ones), which deleted `seasonInfo` and the
 decorated "just beginning" empty card with it. **R100**'s `argmaxTies` replaces three reducers that

@@ -220,6 +220,15 @@ function settingsModal(){
         <div><div class="set-label">Default packaging weight</div><div class="set-sub">Pre-filled tare when you weigh a tea with its packaging</div></div>
         <input type="number" min="0" max="200" step="0.5" value="${state.settings.defaultPackagingTareG??10}" style="width:70px;text-align:right;" onchange="setSetting('defaultPackagingTareG', Math.max(0,Number(this.value)||10))">
       </div>
+      <!-- #07's last owed control. The plumbing shipped in v3.95 (slice A): currencyFmt is the one
+           writer and every cost site reads it, so this row only has to set the key. It sits in
+           Inventory beside the low-stock threshold because both govern how shelf figures read. -->
+      <div class="set-row">
+        <div><div class="set-label">Currency</div><div class="set-sub">Shown on every cost — your teas, sessions and spending</div></div>
+        <select onchange="setSetting('currency', this.value)" style="width:76px;text-align:right;">
+          ${CURRENCY_OPTS.map(c=>`<option value="${escapeHtml(c)}" ${currencySymbol()===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}
+        </select>
+      </div>
 
       ${sec('Appearance')}
       <div class="set-row">

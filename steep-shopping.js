@@ -21,7 +21,6 @@ function computeRestockSuggestions(){
 }
 
 function viewShopping(){
-  const rowStyle = 'display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);';
   const items = (state.wishlist||[]).slice().sort((a,b)=>{
     if(!!a.done!==!!b.done) return a.done?1:-1;                 // open first, bought last
     return new Date(a.createdAt||0)-new Date(b.createdAt||0);
@@ -39,17 +38,26 @@ function viewShopping(){
     <button class="btn btn-primary" style="margin-top:12px;width:100%;" onclick="addWishFromInput()">＋ Add</button>
   </div>`;
 
+  /* SH2 — two sources, one screen, and they stay visibly different: running low is DERIVED from the
+     shelf through stockTier, the list is its own table. SH5's pair is whatever the threshold says
+     today, never a pinned name. Each row now offers both verbs: add it to the list (a want) or
+     restock it (a repeat purchase, R11) — plus R12's search. */
   const suggBlock = suggestions.length ? `<div class="card" style="margin-bottom:14px;">
     <div class="eyebrow">Running low</div>
-    <div style="font-size:12px;color:var(--ink-soft);margin:4px 0 6px;">From your shelf — tap to add to the list.</div>
+    <div class="shop-sub">From your shelf, by what's left — add it to the list, or log a repeat buy.</div>
     ${suggestions.slice(0,8).map(t=>{
-      const out = Number(t.amountGrams)<=0;
-      return `<div style="${rowStyle}">
+      // statusLine is the single writer for stock words (v3.86 +F); this must not invent its own.
+      // statusLine returns a STRUCTURED reading since B3 ({text, tone}), not a string — the shelf's
+      // own words come off .text. Interpolating the object printed '[object Object]' on every row.
+      const line = (typeof statusLine==='function') ? (statusLine(t).text||'') : '';
+      return `<div class="shop-row">
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;">${escapeHtml(t.name)}${t.isFavorite?' '+favLeaf(12):''}</div>
-          <div style="font-size:11px;color:var(--ink-soft);">${out?'out of stock':`${Number(t.amountGrams)}g left`}${t.source?` · ${escapeHtml(t.source)}`:''}</div>
+          <div class="shop-name">${escapeHtml(t.name)}${t.isFavorite?' '+favLeaf(12):''}</div>
+          <div class="shop-meta">${escapeHtml([line, t.source].filter(Boolean).join(' · '))}</div>
         </div>
-        <button class="lib-chip" onclick="addWishFromTea('${t.id}')">Add</button>
+        ${shopSearchLink(t.name, t.source)}
+        <button class="lib-chip" onclick="restockTea('${escapeJsArg(t.id)}')" title="Log a repeat purchase">Restock</button>
+        <button class="lib-chip" onclick="addWishFromTea('${escapeJsArg(t.id)}')">Add</button>
       </div>`;
     }).join('')}
   </div>` : '';
@@ -57,15 +65,25 @@ function viewShopping(){
   const listBlock = items.length ? `<div class="card">
     <div class="eyebrow">Your list</div>
     <div style="margin-top:2px;">
-    ${items.map(w=>`<div style="${rowStyle}">
-      <input type="checkbox" ${w.done?'checked':''} onchange="toggleWishDone('${w.id}')" aria-label="Mark bought">
+    ${items.map(w=>{
+      // SH1 — the overlap is the design. A want that names a tea already on the shelf reads as a
+      // REBUY, with the shelf's own words for how much is left (statusLine, single writer). SH4:
+      // the wishlist stores no cost, so no price is shown — inventing one is the failure this
+      // round keeps naming.
+      const onShelf = shelfTeaForWish(w);
+      const shelfWords = onShelf && typeof statusLine==='function' ? (statusLine(onShelf).text||'') : '';
+      const rebuy = onShelf ? `<span class="shop-rebuy">rebuy${shelfWords?' · '+escapeHtml(shelfWords):''}</span>` : '';
+      const meta = [w.vendor, w.note].filter(Boolean).map(escapeHtml).join(' · ');
+      return `<div class="shop-row">
+      <input type="checkbox" ${w.done?'checked':''} onchange="toggleWishDone('${escapeJsArg(w.id)}')" aria-label="Mark bought">
       <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;${w.done?'text-decoration:line-through;opacity:.55;':''}">${escapeHtml(w.name)}</div>
-        ${(w.vendor||w.note)?`<div style="font-size:11px;color:var(--ink-soft);">${[w.vendor,w.note].filter(Boolean).map(escapeHtml).join(' · ')}</div>`:''}
+        <div class="shop-name${w.done?' is-done':''}">${escapeHtml(w.name)}</div>
+        ${(meta||rebuy)?`<div class="shop-meta">${[meta, rebuy].filter(Boolean).join(' · ')}</div>`:''}
       </div>
-      ${w.done?`<button class="lib-chip" onclick="teaFromWishItem('${w.id}')">Add as tea</button>`:''}
-      <button class="icon-btn" style="font-size:14px;" onclick="removeWish('${w.id}')" title="Remove" aria-label="Remove">✕</button>
-    </div>`).join('')}
+      ${shopSearchLink(w.name, w.vendor)}
+      ${w.done?`<button class="lib-chip" onclick="teaFromWishItem('${escapeJsArg(w.id)}')">Add as tea</button>`:''}
+      <button class="icon-btn" style="font-size:14px;" onclick="removeWish('${escapeJsArg(w.id)}')" title="Remove" aria-label="Remove">✕</button>
+    </div>`;}).join('')}
     </div>
   </div>` : `<div class="card empty">Your shopping list is empty. Add something above, or pull from what's running low.</div>`;
 
@@ -114,4 +132,35 @@ function teaFromWishItem(id){
   const w = (state.wishlist||[]).find(x=>x.id===id); if(!w) return;
   state.teaPrefill = { name:w.name, source:w.vendor||'', type:w.type||'', purchaseDate: dayKey(new Date()) };
   openTeaForm(); // editingTea stays null → create path, pre-filled from teaPrefill
+}
+
+/* R11 / SH7 — restock is a REPEAT PURCHASE, not a wishlist add. The distinction is the whole point:
+   adding to the list says "I want this", restocking says "I bought it again", and the second one
+   creates a real tea row. It needs no new mechanism — `state.teaPrefill` already flows into the tea
+   form and `purchaseType` has been 'first' | 'repeat' since v3.x with an `isRepeat` checkbox reading
+   it, so this is three keys and the shipped create path. Nothing is written until the user commits
+   the form, the same contract as copy-to-new-entry and Add-to-shelf. */
+function restockTea(teaId){
+  const t = teaById(teaId); if(!t) return;
+  state.teaPrefill = { name:t.name, source:t.source||'', type:t.type||'',
+                       purchaseType:'repeat', purchaseDate: dayKey(new Date()) };
+  openTeaForm();
+}
+/* R12 / SH8 — a vendor web search, and deliberately nothing more. R12's vendor entity and stored URL
+   stay deferred, so this stores nothing and knows nothing: it composes a search from the vendor name
+   and the tea name the user already typed, and it is a PULL — the user taps it, it opens in a new
+   tab, and no request leaves the app until they do. */
+function vendorSearchUrl(name, vendor){
+  const q = [vendor, name].filter(Boolean).join(' ').trim();
+  return 'https://duckduckgo.com/?q=' + encodeURIComponent(q);
+}
+function shopSearchLink(name, vendor){
+  if(!name && !vendor) return '';
+  return `<a class="shop-find" href="${escapeHtml(vendorSearchUrl(name, vendor))}" target="_blank" rel="noopener noreferrer" title="Search the web for this">find ›</a>`;
+}
+// SH1's join, as a reading rather than a flag: the one wishlist row names a tea already on the shelf
+// at 0 g, and that overlap IS the design — a rebuy, not a duplicate. R49's normalised-name match.
+function shelfTeaForWish(w){
+  const q = (w.name||'').trim().toLowerCase(); if(!q) return null;
+  return (state.teas||[]).find(t=>(t.name||'').trim().toLowerCase()===q) || null;
 }

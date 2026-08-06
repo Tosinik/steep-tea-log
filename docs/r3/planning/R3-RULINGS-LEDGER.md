@@ -1020,6 +1020,93 @@ stdout** (R73's family — the failure mode is silence). **A tool that reports a
 writer for it** rather than carrying its own. **A tool that stamps data reads the stamp** rather than
 embedding it.
 
+**R106 — Origins renders a static simplified world outline with inline coordinate projection. No
+runtime map dependency, and R28 is preserved rather than re-ruled.** The atlas is small: eight
+verified coordinate rows (three more owed) covering 11 region-tier teas, and a country tier of
+exactly **four** countries. Fourteen marks. `origins-map-v3.html` pulls `d3@7.9.0`,
+`topojson-client@3.1.0` and `world-atlas@2.0.2` from unpkg and jsdelivr to draw them.
+
+**R28's polygon requirement dissolves on inspection.** Pole-of-inaccessibility is a *static property
+of a country's shape* — it does not change between renders. Placing four country labels needs **four
+precomputed points stored as data rows**, not runtime geometry. So the country tier keeps its meaning
+and R28 is honoured rather than amended. **The projection is arithmetic, not a library:** `fitExtent`
+over a MultiPoint is convenience, Mercator forward is a few lines, and the bounding box is knowable
+because it is the user's own shelf.
+
+Rejected: **d3 + Natural Earth** (~140 KB precached for fourteen marks, and three CDN fetches would
+be the first thing in this app to fail without network, in a PWA whose offline story is
+load-bearing); **hand-rolled with no polygons** (costs 10 of 21 teas their placement rule and
+re-rules R28); **region pins only** (a partial atlas, and #37's before/after panel would draw
+something narrower than it shows). The cost is stated: sourcing the outline is a one-time build-time
+artifact rather than a runtime capability. If a zoomable atlas is ever wanted, the dependency option
+remains open and nothing here blocks it. **The artifact is queued in §4 and blocks H2.**
+
+**R107 — The completeness panel is deferred out of R3, and needs a product ruling before it is built
+at all.** R22 says the panel *moves* from Insights to Settings. It exists **nowhere** in the code —
+not on Insights, not anywhere — so "moves" is false and building it inside a restyle is new scope:
+R81's shape, and the eighth board claim this round not to survive contact with HEAD.
+
+The deferral is not only scope. **A completeness panel is a progress bar for filling in fields**, and
+that meets the app's founding constraint head-on: no gamification, no required taps, zero-feedback
+sessions are complete and un-nagged outcomes. *"Your shelf is 68% complete"* is a nag with a number
+on it. *"3 teas have no origin recorded"* is a tool you can act on or ignore. Those are **different
+products sharing one name**, and which one it is must be ruled deliberately rather than settled by
+whoever styles the row. **R22 is amended: the panel does not move, because there is nothing to move.**
+It joins §4's deferred register, scheduled post-beta, with the calm-first tension recorded as the
+thing to resolve first.
+
+**R108 — A shared helper changing its return contract needs CONSUMER coverage, and some views have
+none.** `statusLine` returned a string until B3 made it a structured `{text, tone}` reading. H1's
+shopping rows were written against the old shape, so every row rendered `[object Object]` on first
+paint — both the running-low lines and the rebuy line. The single-writer instinct was correct; the
+contract moved underneath it **three slices earlier**, and no suite renders that view, so only
+looking found it.
+
+**This is a third distinct gap shape.** R104 was a guard whose reach stopped short of the defect —
+correct test, wrong scope. R105 was instruments exempting themselves from the rules they enforce.
+This is a **contract change with no consumer test**: nothing was wrong with the assertions on
+`statusLine` itself, and nothing ever would be. More assertions on the helper cannot close it.
+
+The mitigation is a **render smoke test per view** — assert the view renders without throwing and
+without emitting `[object Object]`, `undefined`, `NaN` or a bare `[object` in its output. That would
+have caught this **at the slice that changed the type**, not three slices later at a human's first
+glance.
+
+**The gap, enumerated 2026-08-06 (the ask was its size, not its closure):**
+
+> **14 of 15 top-level views have no suite that calls them.** `viewTeas` is the only exception
+> (`reference-test`, `shelf-order-test`). Uncovered: `viewDashboard` · `viewInsights` · `viewFriends`
+> · `viewShopping` · `viewSessions` · `viewSessionDetail` · `viewSessionEdit` · `viewSessionFlow` ·
+> `viewTeaDetail` · `viewVessels` · `viewWrapped` · `viewSpend` · `viewPassport` ·
+> `viewAchievements` (dormant).
+>
+> **Component coverage is wide and is not the same thing.** The suites exercise the builders *beneath*
+> these views — the Insights cards, the Social sections, the Focus states, quick log, the session-edit
+> body, the Wrapped cards. A component test cannot see a type change at the seam between a helper and
+> a view, which is exactly what this was.
+>
+> **All three views this round built are uncovered at the top level** — `viewFriends` (F),
+> `viewInsights`/`viewWrapped` (G), `viewShopping` (H1). H2 and H3 each add a surface, so adding them
+> blind repeats this.
+>
+> Cost estimate: one shared smoke harness plus ~14 assertions, one focused sitting. The per-view
+> state seeding is the real work, and several suites already carry most of it. **Whether that is R3
+> work or R4's is not this lane's call to make alone** — recorded so the decision is made rather than
+> defaulted.
+
+### Also recorded (not rulings) — from the slice H1 build
+
+- **Three #07 board claims, checked and NOT changed.** **SET2** needs no work: the false privacy line
+  ("your tea stays on this device") is **not in shipped code**, and the three "on this device"
+  phrases that do ship — the magic-link instruction, the diagnostics log, the theme row — are all
+  true. The correction was to the board and it landed there. **SET3 — °F stays**, per the ledger's
+  explicit confirmation, which outranks the board's "Niklas's decision to make"; `tempUnit` ships and
+  is preserved under R61. **SET5 is void** per amended R48 — there is nothing to remove.
+- **`statusLine` returns a structured reading, not a string.** Since B3 it is `{text, tone}`, and the
+  first draft of the shopping rows interpolated the object — `[object Object]` on every row and on
+  the rebuy line. Caught in the browser, not by a suite, because no suite renders that view. The
+  single-writer instinct was right; the return shape had moved under it.
+
 ### Also recorded (not rulings) — from the slice G build
 
 - **Two more expired board claims.** #08 rev 3 lists `totalGrams` + litres as a "rev 3 restoration"
@@ -1163,6 +1250,20 @@ stale. This section is the packet.
 > rows** (Wuyi Mountains · Lugu · Chiayi), and the **55 catalog liquor values** the swatch palette
 > must derive from. The first two also upgrade freshness precision from R85's **rung 3 to rung 2**, so
 > that batch now pays twice.
+>
+> **→ The Origins map artifact (R106) — OWED, BLOCKS H2.** Two pieces, in the same data file and
+> under the same verification discipline as the eight coordinate rows:
+> **(a) a simplified world outline as a static SVG path set**, derived once from Natural Earth
+> (public domain) at 110m, **projected with the same Mercator forward the pins use**. The outline and
+> the pins must share one projection or every pin lands wrong — silently, and worst at the latitudes
+> this shelf actually uses — which is why **Code generates it and Design reviews the rendered result**.
+> That is a correctness split, not a workload one. Build-time artifact, precached, no runtime
+> dependency: R106's whole point.
+> **(b) four country label points** — China · Taiwan · Thailand · Sri Lanka — precomputed
+> pole-of-inaccessibility, stored as data rows with an anchor and a checkable source. R28's country
+> tier is a mark placed inside the country's shape, and that placement is a *static* property, so it
+> needs four stored points rather than runtime geometry.
+> Recorded here because it existed only in a chat log, which is R74's shape: a task nobody inherits.
 >
 > **→ Post-beta or later** — presence (R35), the app icon, per-tea `ageing` (R86), structured
 > brew-guide pills (R65), the origin suggestion list (R56), the vendor entity and URL (R52/R12),

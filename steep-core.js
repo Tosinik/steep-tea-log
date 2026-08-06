@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.03';
+const APP_VERSION = 'v4.04';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Wrapped now looks back at the month just finished rather than the one you're in, Insights gained cost medians and an Origins reading, and where two teas or two hours tie, both are named.";
+const WHATS_NEW = "The shopping list now shows what's a rebuy and what's running low in the shelf's own words, restocking logs a repeat purchase, and you can set your currency in Settings.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -125,6 +125,10 @@ function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return
 // shelf is German/EU, so '$' was wrong for all 21 teas. Synced like the rest of settings, not
 // device-local. ONE writer: never re-hardcode a symbol at a render site or in achievement data.
 function currencySymbol(){ return (state.settings && state.settings.currency) || DEFAULT_SETTINGS.currency; }
+// The offered set for #07's row. A short list, not a picker over every ISO code: the point is that
+// the symbol is a preference, not that the app knows about money. currencyFmt only prepends, so a
+// short code ('CHF') reads as well as a glyph. Adding one is a one-line, deliberate edit.
+const CURRENCY_OPTS = ['€','$','£','¥','CHF','kr'];
 function currencyFmt(n, digits){ return currencySymbol() + Number(n||0).toFixed(digits==null ? 2 : digits); }
 
 /* R100 — the argmax that can say "tied". Every "top X" reducer in this app was written as

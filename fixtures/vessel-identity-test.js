@@ -197,6 +197,65 @@ ok(!/'\$'/.test(decomment(teasSrc)) && !/'\$'/.test(decomment(dashSrc)),
 ok(ctx.currencyFmt(null)==='€0.00', 'E6 a null cost formats rather than printing NaN');
 console.log('  E currency single writer: 6 checks');
 
+/* ---- F. R104: the SITE-level half of E ----
+ *
+ * E guards that `currencyFmt` BEHAVES. It cannot see a render site that never calls it — and six
+ * such sites (seven render positions) shipped in the spend view through four slices, printing
+ * amounts with no symbol at all, while E stayed green the whole time. A behavioural guard on a
+ * helper must be paired with a scan for the sites that should be using it.
+ *
+ * Design note, because the naive version is the tempting one: "`.toFixed(` near a cost-shaped word"
+ * gave SIX false positives and ZERO true ones on this tree — `perGramN` (a COUNT) matched `perGram`
+ * by substring, an opacity ternary matched `m.total`, a form `value=` matched `costTotal`. A scan
+ * like that gets disabled by the first person who trips over it. So the money-producing FIELDS are
+ * enumerated instead, and a site is flagged only when the field is actually EMITTED — the whole
+ * `${...}`, or `.toFixed`-formatted for output. Conditions, arguments and longer identifiers are
+ * not renders. Form `value=` is skipped deliberately: an input must hold the RAW number, because
+ * "€15" would not survive a save.
+ *
+ * ITS LIMITATION, STATED RATHER THAN DISCOVERED (R104's own shape, one level up): this catches a
+ * KNOWN money field rendered without currencyFmt. It CANNOT catch a NEW money field nobody added to
+ * MONEY_FIELDS below. The allowlist failing closed is the mitigation — adding a money field means
+ * editing this list on purpose — but it is a mitigation, not a proof. Do not read a green F as
+ * "every amount in the app carries a symbol"; read it as "every amount we have named does".
+ */
+const MONEY_FIELDS = ['costTotal','totalSpent','avgCostPerGram','costPerSession','thisMonth',
+                      'avgPerActiveMonth','totalDated','undated','perGram','perSession','m.total'];
+function moneySiteScan(src, file){
+  const hits = [];
+  src.split(/\r?\n/).forEach((line, i) => {
+    [...line.matchAll(/\$\{([^}]*)\}/g)].forEach(mm => {
+      const e = mm[1];
+      if(/value\s*=\s*["']?$/.test(line.slice(0, mm.index))) return;   // form round-trip stays raw
+      for(const f of MONEY_FIELDS){
+        const re = new RegExp('(?:^|[^A-Za-z0-9_.$])((?:[A-Za-z_$][A-Za-z0-9_$]*\\.)*' + f.replace(/\./g,'\\.') + ')(?![A-Za-z0-9_$])','g');
+        let m;
+        while((m = re.exec(e))){
+          const after = e.slice(m.index + m[0].length);
+          if(!(e.trim()===m[1] || /^\s*\.toFixed\s*\(/.test(after))) continue;
+          if(/currencyFmt\s*\(/.test(e)) continue;
+          hits.push(`${file}:${i+1} [${f}] ${e.trim().slice(0,70)}`);
+        }
+      }
+    });
+  });
+  return hits;
+}
+const RENDER_FILES = fs.readdirSync(repo).filter(f=>/^steep-.*\.js$/.test(f));
+const moneyHits = RENDER_FILES.flatMap(f => moneySiteScan(fs.readFileSync(path.join(repo,f),'utf8'), f));
+ok(moneyHits.length===0, 'F1 every named money field renders through currencyFmt — offending sites:\n      '+moneyHits.join('\n      '));
+// The scan must be able to FAIL, or it is the instrument R105 warns about. Proven against a
+// synthetic render of a real money field rather than trusted.
+ok(moneySiteScan('`<div>${ms.thisMonth.toFixed(2)}</div>`','synthetic').length===1,
+   'F2 the scan detects a bare money render — a scan that cannot fail guards nothing');
+ok(moneySiteScan('`<div>${currencyFmt(ms.thisMonth)}</div>`','synthetic').length===0,
+   'F3 …and passes the same field once it goes through the writer');
+ok(moneySiteScan('`<span>${m.perGramN} of ${teaN}</span>`','synthetic').length===0,
+   'F4 a COUNT whose name contains a money field is not a money render (the naive scan\'s false positive)');
+ok(moneySiteScan('<input value="${t.costTotal}">','synthetic').length===0,
+   'F5 a form value stays raw — "€15" would not survive a save');
+console.log('  F R104 money-site scan: 5 checks over '+RENDER_FILES.length+' files');
+
 /* ---- G. the cold-brew ENTRY path, as a state sequence ----
    C8/C10 pin what RENDERS. This pins what the lane taps DO, because the render is only half the
    question: entering cold brew leaves a stale brewStyle and a still-locked brewStyleLocked behind it.
