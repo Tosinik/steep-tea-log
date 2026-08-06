@@ -925,6 +925,35 @@ brewing habit than an arbitrary winner.
 > A figure this slice renders is a snapshot under R67, and a slice of nothing but snapshots is where
 > reading a stamp as a state does the most damage.
 
+> **Provenance flag on R101 and R102 below.** The decisions prompt carrying them did not reach the
+> Code lane; both are transcribed from the planning lane's 2026-08-06 relay of their substance, not
+> from the original text. The *substance* is the planning lane's and is recorded as ruled. **If the
+> original wording differs, overwrite these two entries with it** — a ruling's authority is its
+> committed text, and this is the one place in the ledger where the text is a reconstruction rather
+> than a transcription. Flagged rather than left silent, because failure mode 3 is self-minted
+> R-numbers and this is one step away from it.
+
+**R101 — The Origins map is one build, in slice H, and the map's dependency is its own question.**
+Slice G ships the Origins **card as an entry point** — a generated count line and a tap into Origins
+— plus R54's fence, and nothing that draws geography. The map lands once, in H, beside #37.
+Reasoning, in order: the dependency deserves its own ruling rather than arriving as a side-effect of
+scheduling — `origins-map-v3.html` renders through `d3.geoMercator()` over Natural Earth features,
+which would be the **first third-party runtime dependency since Supabase** on a no-bundler app that
+precaches every asset it ships. Hand-rolling is not the cheaper option, it is a **re-ruling**: R28
+*defines* the country tier as a polygon label, so dropping polygons costs **10 of 21 teas** their
+placement rule. And one map in one slice beats a mini-map in G that must agree with a full map in H —
+the second-writer problem, which this round has now paid for twice.
+
+**R102 — R54's fence goes in the mover, not the table. A default is not a constraint.**
+`DASH_SURFACE` sets only a *default*; `dashMoveToSurface` writes an override for **any** id, so a
+registry entry of `insights` leaves a user free to land Origins on Home — precisely what R54 exists
+to prevent. The guard asserts `dashSurface('origins')` cannot return `'home'` **after a move
+attempt**, which is a different assertion from checking the table's value.
+
+**Tie copy, ruled alongside R100:** name both, cut the flourish. A tie is the more interesting fact
+than either bucket, and "peak 08–10 with a midday second pour" asserts a hierarchy that may not
+exist. Naming both describes what is true.
+
 ### Also recorded (not rulings) — from the slice F build
 
 - **The SHARED badge does not upgrade when `to_profile` ships.** "Until `to_profile` ships the badge

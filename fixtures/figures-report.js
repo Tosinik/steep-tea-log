@@ -200,7 +200,10 @@ if (wishlist) console.log(`\nWishlist: ${wishlist.length} row(s) — ` +
   wishlist.map(w => `${w.name||'(unnamed)'} · ${w.vendor||'(no vendor)'} · done=${w.done}` +
     (teas.some(t => (t.name||'').toLowerCase() === (w.name||'').toLowerCase())
       ? ` · ALSO ON THE SHELF at ${teas.find(t => (t.name||'').toLowerCase() === (w.name||'').toLowerCase()).amountGrams} g (reads as a rebuy, not a duplicate)` : '')
-  ).join(' | ') + '. Export-verified (the table is in the relayed set as of 2026-07-26).');
+  // The stamp is READ from the file, never written here: a hardcoded date inside the tool that
+  // exists to stop hand-copied figures is the same bug one layer up. It said 2026-07-26 for two
+  // exports after that stopped being true.
+  ).join(' | ') + `. Export-verified (wishlist_rows.csv dated ${mt('wishlist_rows.csv')}).`);
 
 // ---- vendors --------------------------------------------------------------------------------------
 const vend = {}; let noVendor = 0;
