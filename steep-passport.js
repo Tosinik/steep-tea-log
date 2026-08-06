@@ -126,6 +126,34 @@ function originTier(tea){
   const parts = o.split(',').map(x=>x.trim()).filter(Boolean);
   return parts.every(p=>ORIGIN_COUNTRY_WORDS.test(p)) ? 'country' : 'region';
 }
+/* R55 — the catalog may OFFER a more specific origin, under three conditions and no others. This is
+   the only new affordance on that screen (R56 builds no suggestion list; the field stays free text).
+   The region is read from `resolveTeaType(slug).region` through the shipped matcher, never from a
+   board literal, because `region` inherits from the parent row (TT_INHERIT).
+     (a) it must name ONE place — no slash-pairs, no "&", no parenthetical lists;
+     (b) it must sit INSIDE the country already stored, or it is a CONFLICT, not an offer: no
+         default, no one-tap accept, nothing drawn;
+     (c) parentheticals are stripped ("Chiayi County, Taiwan (~1000-1500m)" → "Chiayi County, Taiwan").
+   Returns the offerable string, or null. A tea already at region tier is never offered anything —
+   the point is climbing a tier, not second-guessing what the user wrote. */
+function originOffer(tea){
+  if(typeof matchTeaType!=='function' || !tea) return null;
+  if(originTier(tea)!=='country') return null;
+  const m = matchTeaType(tea.name || '');
+  if(!m || !m.region) return null;
+  const region = String(m.region).replace(/\([^)]*\)/g,' ').replace(/\s+/g,' ')
+                                 .replace(/\s*,\s*/g,', ').replace(/(^[,\s]+|[,\s]+$)/g,'').trim();
+  if(!region) return null;
+  if(/[\/&]|\bor\b/i.test(region)) return null;                 // (a) a list or a pair, not one place
+  const parts = region.split(',').map(s=>s.trim()).filter(Boolean);
+  if(parts.length < 2) return null;                             // no more specific than the country
+  // (b) same country as what is stored — resolved through the passport's own alias table, so R16's
+  // synonyms (Ceylon → Sri Lanka) are honoured rather than re-implemented.
+  const storedCountry = passportMatchText(tea.origin || '');
+  const offerCountry  = passportMatchText(region);
+  if(!storedCountry || !offerCountry || storedCountry !== offerCountry) return null;
+  return region;
+}
 function passportGeo(country){ return PASSPORT_GEO.find(g=>g.country===country); }
 function passportSubGeo(country, name){ return (PASSPORT_SUB[country]||[]).find(s=>s.name===name); }
 

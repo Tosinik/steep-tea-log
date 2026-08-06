@@ -1052,3 +1052,6 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .shop-meta{font-size:11px;color:var(--ink-soft);margin-top:2px;}
 .shop-rebuy{color:var(--jade);}
 .shop-find{flex:none;font-family:var(--font-mono);font-size:10px;color:var(--jade-deep);text-decoration:underline;white-space:nowrap;}
+/* R55's origin offer — the one new affordance on that field (R56 builds no suggestion list). */
+.origin-offer{display:flex;align-items:center;gap:8px;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--porcelain-dim);}
+.origin-offer-txt{flex:1;font-size:12px;color:var(--ink-soft);line-height:1.4;}

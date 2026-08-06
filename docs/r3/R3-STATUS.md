@@ -258,7 +258,28 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.04 LIVE — R3 slice H1: #08 Shopping + #07's currency row + R104's site scan** (cache **v114**,
+**v4.05 LIVE — R108's render smoke harness + R55's origin offer** (cache **v115**, no SQL).
+**The map is HELD**: the planning lane measured the outline's frame at drawn size and ruled it a
+Design question — three pin collisions (Kagoshima↔Chiran at 1.6 px is two *region* pins, not a label
+artefact) and 44% of the frame empty because one tea sits 103 px from everything else. R19's adaptive
+bbox weights an outlier equally against eleven clustered marks, and that rule was inherited from
+`origins-map-v3.html`'s `fitExtent` rather than introduced. Neither the artifact nor its generator is
+committed. **R45/R66's Passport removal stays behind the map**, since Origins cannot replace it yet.
+
+Two findings from the held map to preserve verbatim when it resumes: **tolerance 1.0 is what the
+assertion permits**, not the smallest number that looked acceptable (Chiran falls in the sea at 1.5),
+and **label points are computed from the shipped geometry**, because Taiwan's inscribed radius is
+1.65 units — smaller than the tolerance was — so a source-computed label falling outside the drawn
+shape is the expected case for small countries, not an edge one.
+
+Two things a later slice inherits from what did land. **(a)** `render-smoke-test.js` is the only
+thing that fires when a shared helper changes shape under a consumer nobody re-read — and its **§D**
+is what keeps the rest honest, since every other check in it passes against an empty string. **(b)**
+The country-conflict branch of R55's offer is **unreachable on live data** and is isolated
+synthetically; the package's own example (Oriental Beauty) is rejected by the single-place rule
+first. **NEXT: the map's frame ruling, then #37's remainder and the Passport removal.**
+
+**Previously: v4.04 — R3 slice H1: #08 Shopping + #07's currency row + R104's site scan** (cache **v114**,
 no SQL). **H is split three ways at the map**: H1 touches no geography and ships now; **H2** is
 Origins + the map + the Passport hub-row removal, **gated on R106's outline artifact** (queued in
 ledger §4 as blocking, Code generating and Design reviewing, one projection shared between outline

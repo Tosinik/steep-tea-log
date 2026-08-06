@@ -56,6 +56,11 @@ fixtures/*
 # innerHTML template — so it belongs on every machine, not this one. Section A also pins the
 # migration's columns against the mapper pair, which is the drift `git add -A` cannot see either.
 !fixtures/pass-record-test.js
+# R108: the render smoke alarm. It exists because a shared helper (statusLine) changed its return
+# contract and three slices later a consumer printed [object Object] on every row — a gap no
+# assertion on the helper could ever close. 14 of 15 views had no suite calling them when it was
+# written, so it must exist on every machine, not this one.
+!fixtures/render-smoke-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

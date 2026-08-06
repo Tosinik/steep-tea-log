@@ -1094,6 +1094,37 @@ glance.
 > work or R4's is not this lane's call to make alone** — recorded so the decision is made rather than
 > defaulted.
 
+> *Code-lane note, 2026-08-06 (harness built, v4.05).* `fixtures/render-smoke-test.js`, 15 views ×
+> two passes. **Proven against the defect it was written for** — reintroducing H1's `statusLine`
+> interpolation reddens two checks on `viewShopping`. Three things worth inheriting. **(a) §D is what
+> keeps the rest honest**: every other assertion in the file passes against an **empty string**, so a
+> view that silently returned `''` would sail through the whole suite while rendering a blank screen —
+> §D requires real markup from the ten substantial surfaces. **(b) §C pins the view list against
+> `render()`'s own routing**, so a view added there cannot be silently skipped here. **(c) The empty
+> account is the pass that earns its keep**: `undefined` and `NaN` come from the no-rows branches, not
+> the populated ones.
+
+### Also recorded (not rulings) — from the H2 non-map build (v4.05)
+
+- **R55's offer is live and does exactly three things**: Gui Fei → `Lugu, Nantou, Taiwan`, Dawang Feng
+  Da Hong Pao → `Wuyi Mountains, Fujian, China` (region inherited through `TT_INHERIT`), Ali Shan Fo
+  Shou Dong Pian → `Chiayi County, Taiwan` with `(~1000-1500m)` stripped. R56 holds — no suggestion
+  list, the field stays free text.
+- **The package's country-conflict example is not the country-conflict case.** Oriental Beauty is
+  described as the conflict (catalog Taiwan, shelf China); on this data it is rejected by the
+  **single-place rule first**, because `Hsinchu / Miaoli, Taiwan` is a slash-pair. **The conflict rule
+  is unreachable on live data.** Found by negative control — softening the conflict rule left the
+  assertion green, meaning it passed for a reason it did not state. It is now isolated with a
+  synthetic pair, and the control reddens. Same family as E6's typo-against-itself, caught before it
+  was committed as evidence rather than after.
+- **The three owed coordinate rows are still absent** (Wuyi Mountains · Lugu · Chiayi), so all three
+  offerable teas stay in the country tier after an accepted offer. `tea-types-test.js` §I reports it
+  from the file itself rather than leaving it to memory.
+- **The map artifact is NOT committed.** Tolerance 1.0 and labels-from-shipped-geometry are the two
+  findings to preserve verbatim when it resumes (see the frame ruling). The generator's home is
+  proposed as `tools/`, tracked — it produces a shipped asset, so it is build infrastructure rather
+  than a fixture, and `fixtures/` is ignored-by-default (R79).
+
 ### Also recorded (not rulings) — from the slice H1 build
 
 - **Three #07 board claims, checked and NOT changed.** **SET2** needs no work: the false privacy line

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'steep-tea-log-v114';
+const CACHE_NAME = 'steep-tea-log-v115';
 const FILES_TO_CACHE = [
   './',
   './index.html',

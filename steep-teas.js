@@ -586,7 +586,7 @@ function teaFormModal(){
             <option ${t.harvestSeason==='Autumn'?'selected':''}>Autumn</option>
             <option ${t.harvestSeason==='Winter'?'selected':''}>Winter</option>
           </select></div>
-          <div class="field"><label>Origin</label><input type="text" name="origin" value="${escapeHtml(t.origin||'')}" placeholder="Fujian, China"></div>
+          <div class="field"><label>Origin</label><input type="text" name="origin" value="${escapeHtml(t.origin||'')}" placeholder="Fujian, China">${originOfferHTML(t)}</div>
           <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${escapeHtml(t.cultivar||'')}" placeholder="Qi Dan" onblur="cultivarHintCheck()"><div id="teaCultivarHint"></div></div>
           <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${escapeHtml(t.source||'')}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}</datalist></div>
           <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
@@ -883,6 +883,33 @@ function teaProvenanceHTML(t, costPerSession){
       ${t.image?`<div class="tea-label-note">The photo is the label — evidence for where it came from, never the tea's identity.</div>`:''}
     </div>`;
 }
+/* R55's offer, and the ONLY new affordance on this field — R56 rules out a suggestion list, so the
+   input stays free text with no `list=`. The rule lives in `originOffer` (steep-passport.js, the
+   Origins home per R66); this is just its card. Absent, not disabled, when there is nothing to
+   offer: uncovered teas, region-tier teas and country CONFLICTS all render nothing at all, which is
+   the point of the conflict rule — a catalog region naming a different country is not a weaker
+   offer, it is not an offer. */
+function originOfferHTML(tea){
+  if(typeof originOffer!=='function') return '';
+  const offer = originOffer(tea);
+  if(!offer) return '';
+  return `<div class="origin-offer">
+    <span class="origin-offer-txt">The catalog places this in <strong>${escapeHtml(offer)}</strong>.</span>
+    <button type="button" class="lib-chip" onclick="acceptOriginOffer(this,'${escapeJsArg(offer)}')">Use it</button>
+  </div>`;
+}
+// Fills the field the user is looking at, and nothing else — no write, no save. The tea is committed
+// by the form's own submit, so an accepted offer is still a decision the user makes.
+function acceptOriginOffer(btn, value){
+  const form = btn && btn.closest('form');
+  const input = form && form.querySelector('input[name=origin]');
+  if(!input) return;
+  input.value = value;
+  input.dispatchEvent(new Event('input', { bubbles:true }));   // marks the form dirty (WS1 guard)
+  const row = btn.closest('.origin-offer');
+  if(row) row.innerHTML = '<span class="origin-offer-txt">Origin set — save to keep it.</span>';
+}
+
 /* The ⋯ menu (#03), enumerated to what actually exists. Pass-tea LANDS HERE in v4.02, on the R25
    pass record — it was omitted rather than disabled in v3.97 because its migration hadn't shipped.
    Go Deeper still appears only when the catalog covers the tea. */

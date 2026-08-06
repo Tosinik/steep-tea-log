@@ -170,5 +170,66 @@ ok(hint('')===null && hint('   ')===null, 'H10 empty / whitespace → no hint');
 ok(hint('Gui Fei')===hint('Gui Fei'), 'H11 deterministic (same input → same result)');
 console.log('  H cultivar check: 11 checks');
 
+/* ---- I · R55's origin offer (slice H2) ----
+   The offer reads `resolveTeaType(slug).region` through the shipped matcher, so it belongs to this
+   suite rather than to a rendering one. Three conditions, and the third is the one people would
+   soften: a catalog region naming a DIFFERENT country is a conflict, not a weaker offer — nothing
+   is drawn at all. Asserted per REASON on the real shelf, because "3 offers" would stay green if
+   the right count came out of the wrong three teas. */
+const passportSrc = fs.readFileSync(path.join(repo,'steep-passport.js'),'utf8');
+vm.runInContext(passportSrc, ctx);
+const OFFER = t => vm.runInContext('originOffer', ctx)(t);
+// Section G scopes its rows locally, so load our own — and scope by user_id (R69) rather than
+// inheriting whatever G happened to leave behind.
+const _csv = path.join(__dirname,'teas_rows.csv'), _ses = path.join(__dirname,'sessions_rows.csv');
+const OWN_TEAS = (fs.existsSync(_csv) && fs.existsSync(_ses))
+  ? (() => { const owner = (parseCSV(fs.readFileSync(_ses,'utf8'))[0]||{}).user_id;
+      return parseCSV(fs.readFileSync(_csv,'utf8')).filter(r => r.user_id === owner)
+        .map(r => ({ id:r.id, name:r.name, type:r.type, origin:r.origin||'' })); })()
+  : [];
+const teaRow = name => (OWN_TEAS.find(t => t.name === name) || null);
+if(!OWN_TEAS.length){ console.log('  I R55 origin offer: SKIPPED (no export present)'); }
+else {
+  const cases = [
+    // name, expected offer or null, and WHY — the why is the assertion that matters
+    ['Honey Oolong Gui Fei',       'Lugu, Nantou, Taiwan',          'a single place inside the stored country'],
+    ['Dawang Feng Da Hong Pao',    'Wuyi Mountains, Fujian, China', 'inherited region via TT_INHERIT, single place'],
+    ['Ali Shan Fo Shou Dong Pian', 'Chiayi County, Taiwan',         'parentheticals stripped: "(~1000-1500m)" is not part of a place'],
+    // The package describes Oriental Beauty as the COUNTRY-CONFLICT case. On this data it is
+    // suppressed by rule (a) first — "Hsinchu / Miaoli, Taiwan" is a slash-pair — and the conflict
+    // rule never gets a say. Found by negative control: softening the conflict rule left this case
+    // green, which means asserting it here as "a conflict" would have been an assertion passing for
+    // a reason it does not state. The conflict rule is isolated synthetically below instead.
+    ['Oriental Beauty',            null,                            'a slash-pair ("Hsinchu / Miaoli"), so rule (a) rejects it before the country is even compared'],
+    ['Ruby Ruanzhi',               null,                            'spans two countries ("N. Thailand … & Taiwan")'],
+    ['Huang Ya Yellow Tips',       null,                            'a list, not a place ("China (Sichuan / Anhui / Hunan)")']
+  ];
+  cases.forEach(([name, want, why]) => {
+    const t = teaRow(name);
+    if(!t){ ok(false, 'I "'+name+'" is on the shelf (the export moved — re-derive the case list)'); return; }
+    ok(OFFER(t) === want, 'I ' + name + ' → ' + (want ? '"'+want+'"' : 'no offer') + ' — ' + why + ' (got ' + JSON.stringify(OFFER(t)) + ')');
+  });
+  /* The country-conflict rule, ISOLATED. No tea on the real shelf reaches it — every candidate is
+     rejected by the single-place rule first — so on live data alone this branch is untested and
+     would stay green if it were deleted. Synthetic, and labelled as such. */
+  const conflict = { id:'x', name:'Ali Shan Fo Shou Dong Pian', type:'oolong', origin:'China' };
+  ok(OFFER(conflict) === null,
+     'I SYNTHETIC: a catalog region in a DIFFERENT country than the stored origin is a conflict, not an offer (Chiayi County, Taiwan vs a shelf saying China)');
+  const sameCountry = { id:'x', name:'Ali Shan Fo Shou Dong Pian', type:'oolong', origin:'Taiwan' };
+  ok(OFFER(sameCountry) === 'Chiayi County, Taiwan',
+     'I SYNTHETIC: …and the same tea DOES offer once the stored country agrees — so the check above is the country rule, not a dead path');
+  // A region-tier tea is never offered anything: the point is climbing a tier, not second-guessing.
+  const regionTier = OWN_TEAS.filter(t => vm.runInContext('originTier', ctx)(t) === 'region');
+  ok(regionTier.length > 0, 'I the shelf has region-tier teas to check against (' + regionTier.length + ')');
+  ok(regionTier.every(t => OFFER(t) === null), 'I no region-tier tea is offered a "correction" — offers only climb a tier');
+  const offered = OWN_TEAS.filter(t => OFFER(t));
+  console.log('  I R55 origin offer: ' + (cases.length + 4) + ' checks · ' + offered.length + ' of ' + OWN_TEAS.length + ' teas offerable today');
+  // The three owed coordinate rows are NOT in DATA-region-coordinates.md, so every accepted offer
+  // still lands in the country tier on the map. Reported, not asserted — it is a content gap.
+  const coords = fs.readFileSync(path.join(repo,'docs','r3','planning','DATA-region-coordinates.md'),'utf8');
+  const owed = ['Wuyi Mountains','Lugu','Chiayi'].filter(r => !new RegExp(r,'i').test(coords));
+  if(owed.length) console.log('  note  ' + owed.length + ' offerable region(s) still have no coordinate row: ' + owed.join(', ') + ' — an accepted offer stays in the country tier until they land');
+}
+
 if(failures){ console.log('\n'+failures+' TEA-TYPES TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL TEA-TYPES TESTS PASSED  ('+passed+' passed)');

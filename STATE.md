@@ -180,7 +180,25 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.04 R3 slice H1: #08 Shopping + #07's currency row + R104's scan** (cache
+**NOW (just shipped) — v4.05: R108's render smoke harness + R55's origin offer** (cache **v115**,
+APP_VERSION v4.05, **no SQL**). **The map is HELD** — the planning lane measured the frame at drawn
+size and ruled it a Design question (three collisions, and 44% of the frame empty because of one
+outlying tea). Neither the outline artifact nor its generator is committed; both live in the
+scratchpad. **R45/R66's Passport removal stays behind the map**, as ruled.
+- **`fixtures/render-smoke-test.js` — 15 views × 2 passes** (real data, then an EMPTY account).
+  Proven against the exact H1 defect: reintroducing it reddens two checks on `viewShopping`. **§D is
+  the one that keeps the rest honest** — every other check passes against an empty string, so a view
+  silently returning `''` would sail through while rendering a blank screen.
+- **R55's offer does exactly three things** on this shelf — Gui Fei → Lugu, DHP → Wuyi Mountains,
+  Ali Shan → Chiayi County (parentheticals stripped). R56 holds: no suggestion list.
+- **A stated reason that was wrong, caught by negative control.** Oriental Beauty is suppressed by
+  the slash rule, **not** the country-conflict rule the package describes — the conflict rule is
+  unreachable on live data and is now isolated synthetically.
+- **The three owed coordinate rows are still missing** (Wuyi Mountains · Lugu · Chiayi), so every
+  accepted offer stays in the country tier. `tea-types-test.js` §I reports that itself now.
+  **24 committed suites, all green.**
+
+**Previously — v4.04 R3 slice H1: #08 Shopping + #07's currency row + R104's scan** (cache
 **v114**, APP_VERSION v4.04, **no SQL**). **H is split three ways at the map** — H1 touches no
 geography and ships now; **H2** (Origins + the map + the Passport hub-row removal) is **gated on
 R106's outline artifact**, queued in ledger §4 as blocking; **H3** (#09 landing) stays last, because
