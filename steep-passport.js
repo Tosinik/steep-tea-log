@@ -195,11 +195,30 @@ function originCoord(tea){ return ORIGIN_COORDS[originKey(tea && tea.origin)] ||
    (Hoshino↔Kagoshima) once Kagoshima and Chiran, 3.3 px apart, have merged. That distance
    between the pair that must merge and the pair that must not is what makes 14 a SAFE
    threshold rather than a tuned one.
-   UNCONFIRMED and recorded rather than assumed: whether it should TRACK PIN WIDTH instead of
-   being a constant. Pins draw at 8 px, so a fixed 14 quietly stops meaning "these overlap" if
-   pin size ever changes. Deriving it from the radius is one line when that is decided. */
+   The frame ruling board answers what v4.07 recorded as unconfirmed: 14 px is "one pin-width, not
+   a constant", right for a 4 px pin beside a 13 px label. It stays a literal until a pin size
+   actually changes, because deriving it now would encode a ratio nobody ruled. */
 const ORIGINS_MERGE_PX = 14;
 const ORIGINS_CARD_PX = 350;   // the drawn width the threshold above is calibrated against
+
+/* MARKS ARE A FIXED PIXEL SIZE; ONLY THE LAND SCALES (frame ruling, rule 3). Everything drawn on
+   top of the outline is written in PIXELS here and converted ONCE at the draw site, because the
+   viewBox is in projection units and this frame runs at 3.7 px/unit — so a number written as px
+   renders 3.7x too large in it.
+   That is not hypothetical. v4.07 drew r=4 and font-size:5px as unit-space values and shipped a
+   29.8 px pin under an 18.6 px label; `originsMerge` was the ONLY dimension that took the
+   conversion, which is exactly the shape of the bug — one conversion existed and nothing else used
+   it. Niklas found it by opening the map on a phone: the two easternmost labels ran off the card
+   and rendered as "H" and "K". Nothing numeric could see it, because no check asked where a label
+   ENDS. */
+const ORIGINS_PIN_PX = 8;      // DIAMETER — the board's `pinPx`; r = pinPx/2 = 4 px at every render size
+const ORIGINS_LBL_PX = 13;     // the label size the 14 px threshold is calibrated against
+const ORIGINS_LBL_OFF_PX = 6;  // the board's `off` — from the mark CENTRE, not from the pin's edge
+/* Advance width per em for `--font-mono`. The side-switch below asks whether a label FITS, and a
+   renderer with no layout engine can only answer that for a monospaced face. The board's rule is
+   the position proxy (outer 20% of the frame) precisely because its labels are a proportional
+   serif. If this label ever stops being mono, the fit test must fall back to that proxy. */
+const ORIGINS_LBL_ADV = 0.62;
 /* The frame is expressed as the RULED PROPERTY — marks occupy 83% of the card — rather than as a
    padding number, because the padding is a consequence and the span is the decision. A fixed pad
    would silently change the scale (and therefore what 14 px means) the moment the shelf's spread
@@ -269,13 +288,25 @@ function viewOrigins(){
     const x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad;
     const vbW = spanX + pad*2;
     const vbH = Math.max.apply(null, ys) - Math.min.apply(null, ys) + pad*2;
-    const merged = originsMerge(marks, vbW / ORIGINS_CARD_PX);
+    const upx = vbW / ORIGINS_CARD_PX;                 // units per rendered px — the one conversion
+    const merged = originsMerge(marks, upx);
     const total = marks.reduce((s,m)=>s+m.n, 0);
-    const r = 4;
+    const r = ORIGINS_PIN_PX / 2 * upx;
+    const fs = ORIGINS_LBL_PX * upx;
+    const off = ORIGINS_LBL_OFF_PX * upx;
     const dots = merged.map(m => {
       const extra = m.members.length > 1 ? ' +' + (m.members.length - 1) : '';
-      return `<g><circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="${r}" class="org-pin"></circle>`
-           + `<text x="${(m.x + r + 2.5).toFixed(1)}" y="${(m.y + r/2).toFixed(1)}" class="org-lbl">${escapeHtml(m.label + extra)}</text></g>`;
+      const txt = m.label + extra;
+      /* The side-switch, rule 5. DELIBERATE DEVIATION, stated because the board is banked: the
+         board flips a label when its pin sits past the outer 20% of the frame; this flips when the
+         label would not FIT. That is the actual invariant — the proxy under-fires for a long label
+         at 70% of the frame — and on this shelf both rules flip the same two marks, so the
+         deviation costs nothing today and holds when a longer name arrives. */
+      const wide = txt.length * ORIGINS_LBL_ADV * fs;
+      const end = m.x + off + wide > x0 + vbW;
+      return `<g><circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="${r.toFixed(2)}" class="org-pin"></circle>`
+           + `<text x="${(end ? m.x - off : m.x + off).toFixed(1)}" y="${(m.y + ORIGINS_LBL_PX * 0.34 * upx).toFixed(1)}"`
+           + ` font-size="${fs.toFixed(2)}"${end ? ' text-anchor="end"' : ''} class="org-lbl">${escapeHtml(txt)}</text></g>`;
     }).join('');
     mapHTML = `<div class="card org-card">
       <svg class="org-map" viewBox="${x0.toFixed(1)} ${y0.toFixed(1)} ${vbW.toFixed(1)} ${vbH.toFixed(1)}" role="img" aria-label="Where your teas grew">

@@ -1064,7 +1064,10 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .org-map{width:100%;height:auto;display:block;background:var(--porcelain-dim);border-radius:12px;}
 .org-land{fill:var(--line);stroke:var(--ink-soft);stroke-width:.35;stroke-opacity:.45;}
 .org-pin{fill:var(--jade);}
-.org-lbl{font-family:var(--font-mono);font-size:5px;fill:var(--ink);}
+/* No font-size here on purpose: this text lives in a viewBox scaled ~3.7x, so a px value in the
+   stylesheet is not px on screen. The size is computed in px and emitted per label, and a
+   stylesheet rule would win over that attribute. Keep it out. */
+.org-lbl{font-family:var(--font-mono);fill:var(--ink);}
 .org-cap{font-size:10px;color:var(--ink-soft);margin-top:9px;text-align:center;}
 .org-sub{font-size:12px;color:var(--ink-soft);margin:4px 0 8px;}
 .org-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid var(--line);}

@@ -124,6 +124,52 @@ ok(/passportCountryFor/.test(passSrc.split('ORIGINS (#37)')[1]||''),
    'E4 …and Origins actually uses them, so "kept" is not a euphemism for orphaned');
 console.log('  E removals: 6 checks');
 
+/* ---- F · the drawn marks: px is px, and a label ENDS somewhere ----
+ *
+ * WHY THIS SECTION EXISTS. Every check above verified geometry — where marks are, which ones merge,
+ * how wide the frame is — and all of them stayed green while two of the seven marks rendered as a
+ * single letter each. None of them asked where a label ends. Niklas found it by opening the map on
+ * a phone. This section is that question, asked of the shipped markup.
+ *
+ * ITS LIMITATION, stated: the extents are computed with the renderer's own advance-width constant,
+ * so this proves PLACEMENT, never that 0.62 em is the right number for the shipped face. A green
+ * §F means "given how wide the renderer thinks these labels are, it puts them on the card".
+ */
+const CARDH = 350;                                                 // the drawn width, as above
+const gs = html.match(/<g><circle[^>]*><\/circle><text[^>]*>[^<]*<\/text><\/g>/g) || [];
+ok(gs.length === merged.length, 'F1 every merged mark draws one pin and one label (got '+gs.length+' of '+merged.length+')');
+const drawn = gs.map(g => {
+  const c = g.match(/<circle cx="([\d.-]+)" cy="([\d.-]+)" r="([\d.]+)"/);
+  const t = g.match(/<text x="([\d.-]+)" y="([\d.-]+)" font-size="([\d.]+)"( text-anchor="end")?[^>]*>([^<]*)</);
+  const wide = t[5].length * G('ORIGINS_LBL_ADV') * Number(t[3]);
+  const s = t[4] ? Number(t[1]) - wide : Number(t[1]);
+  return { label:t[5], cx:Number(c[1]), r:Number(c[3]), fs:Number(t[3]), end:!!t[4],
+           x0px:(s - vb[0]) * scale, x1px:(s + wide - vb[0]) * scale, widePx:wide * scale };
+});
+const off = drawn.filter(d => d.x0px < 0 || d.x1px > CARDH);
+ok(!off.length, 'F2 no label runs off the card — the defect that rendered Hoshino as "H" and Kagoshima as "K" ('
+   + (off.map(d=>d.label+' '+d.x0px.toFixed(0)+'→'+d.x1px.toFixed(0)).join(', ') || 'all inside') + ')');
+/* The negative control. With the side-switch removed the invariant above is satisfied by
+   construction and F2 could not fail — an absent check is at least visible (R105). This recomputes
+   the same extents with every label forced to the right, and asserts that this shelf genuinely
+   breaks it. If this ever goes quiet, F2 has stopped proving anything. */
+const forced = drawn.filter(d => ((d.cx + G('ORIGINS_LBL_OFF_PX') * (vb[2]/CARDH) - vb[0]) * scale) + d.widePx > CARDH);
+ok(forced.length >= 2,
+   'F3 …and forcing every label to the right breaks it for '+forced.length+' marks ('+forced.map(d=>d.label).join(', ')
+   +'), so F2 is not passing by construction');
+ok(drawn.filter(d=>d.end).length === 2 && drawn.filter(d=>d.end).every(d=>/Hoshino|Kagoshima/.test(d.label)),
+   'F4 exactly the two easternmost marks flip — the same two the board\'s outer-20% proxy would flip, by a rule that also holds for a long name at 70%');
+const pinPx = drawn[0].r * 2 * scale;
+ok(Math.abs(pinPx - 8) < 0.1, 'F5 a pin draws at 8 px across — the board\'s `pinPx`, fixed at every render size (got '+pinPx.toFixed(1)+')');
+ok(drawn.every(d => Math.abs(d.fs * scale - 13) < 0.1),
+   'F6 a label draws at 13 px — the size the 14 px merge threshold is calibrated against (got '+(drawn[0].fs*scale).toFixed(1)+')');
+const passTxt = fs.readFileSync(path.join(repo,'steep-passport.js'),'utf8');
+ok(!/const r = 4;/.test(passTxt) && /ORIGINS_PIN_PX \/ 2 \* upx/.test(passTxt),
+   'F7 the pin size is converted, not written bare — the v4.07 bug was a px number living in unit space');
+ok(!/\.org-lbl\{[^}]*font-size/.test(fs.readFileSync(path.join(repo,'styles.css'),'utf8')),
+   'F8 …and no stylesheet font-size on .org-lbl, which would win over the computed attribute and put the label back in unit space');
+console.log('  F drawn marks: 8 checks · flipped ' + drawn.filter(d=>d.end).map(d=>d.label).join(' + '));
+
 console.log('');
 if(failures){ console.log('FAILED: '+failures+' of '+(passed+failures)); process.exit(1); }
 console.log('ALL ORIGINS TESTS PASSED ('+passed+' passed)');
