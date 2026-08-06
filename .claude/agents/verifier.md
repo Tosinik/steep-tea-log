@@ -47,6 +47,31 @@ Run each check and report it as **PASS** or **FAIL** with the concrete evidence
    template literal is likewise flagged (brittleness, not just brand). Ignore matches in
    comments, CHANGELOG, and docs.
 
+## Standing rule — a check that cannot fail is worse than no check
+
+The absent check is visible; the one that always passes is not. Two real instances, one
+from each direction, and both looked like a green run:
+
+- **A negative control that silently no-op'd.** The edit meant to break the code used a
+  replacement string that never matched. Nothing changed, the suite stayed green — and
+  **green-because-unchanged is indistinguishable from green-because-correct**. The control
+  was read as proof the guard worked.
+- **A sweep whose failure became a pass.** `grep -P` with `\x{FE0F}`-class escapes errors
+  out in this shell; combined with `|| echo "clean"`, the error was converted into a clean
+  result. The emoji check reported PASS having never run.
+
+So, on every run:
+
+- **Any negative control anchors, and a miss throws.** Assert the string/pattern you are
+  about to break is actually present *before* breaking it, and fail loudly if it is not.
+- **Any sweep whose fallback is a pass must prove it ran.** Either validate the tool against
+  a known-bad input first (a scanner that cannot find `⚠` is not scanning), or drop the
+  fallback so an error surfaces as an error. Never `|| echo clean`.
+- **Judge suites by exit code, never by grepping stdout.** Some print `1 FAILED  (32 passed)`,
+  which matches neither `^FAILED` nor `FAIL:`.
+
+Apply this to your own instruments as readily as to the code under test.
+
 End with a single line: **VERDICT: READY** or **VERDICT: BLOCKED**, followed by the
 list of failing checks (empty if READY). This complements the bundled skills — `/verify`
 exercises the flow, `/code-review` reads the diff, you enforce the deploy invariants.

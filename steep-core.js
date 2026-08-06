@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.06';
+const APP_VERSION = 'v4.07';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "A tea someone passes you now goes to your shopping list with their note attached, rather than onto your shelf as if you already had it.";
+const WHATS_NEW = "Origins is here: the places your teas actually grew, drawn on a map, with the ones you only know by country listed beside it.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -170,10 +170,9 @@ let state = {
   teaMenuOpen:false,              // #03: Tea detail's ⋯ sheet (shopping · Go Deeper · delete)
   refSearch:'', refOpen:null,     // R51 Go Deeper: reference search + the one expanded category
   recapPeriod: 'week',
-  passportSel: null, passportZoom: null, passportSub: null,
   social: { loaded:false, busy:false, profile:null, following:[], followers:[], feed:null, passes:null, search:null, searchOpen:false, profileEditOpen:false, draft:null, err:null, feedLoadingMore:false },
   passSheet:null,     // R25 send sheet: {teaName,teaType,teaId,sessionId,to,note,busy,err} — opened from #03 and #02b
-  hubOpen:false,      // WS6: avatar-opened hub sheet (friends/shopping/passport/achievements/settings)
+  hubOpen:false,      // WS6: avatar-opened hub sheet (friends/shopping/settings — Passport left with R45)
   navRestored:false,  // WS6: user swiped the bottom bar back up during steeping (else it recedes)
   loaded:false
 };
@@ -907,7 +906,7 @@ function render(){
   else if(state.view==='session-edit') body = viewSessionEdit();   // R58: a screen since v4.00, not an overlay
   else if(state.view==='friends') body = viewFriends();
   else if(state.view==='achievements' && ACHIEVEMENTS_ENABLED) body = viewAchievements();
-  else if(state.view==='passport') body = viewPassport();
+  else if(state.view==='origins') body = viewOrigins();
   else if(state.view==='wrapped') body = viewWrapped();
   else if(state.view==='shopping') body = viewShopping();
   else if(state.view==='spend') body = viewSpend();
@@ -967,6 +966,7 @@ function hubGo(dest){
   state.hubOpen = false;
   if(dest==='settings') return openSettings();   // each of these calls render() itself
   if(dest==='friends') return goFriends();
+  if(dest==='origins') return goOrigins();
   goView(dest);
 }
 function hubSheetHTML(){
@@ -978,7 +978,6 @@ function hubSheetHTML(){
       <div class="hub-id"><div class="hub-id-avatar">${escapeHtml(id.initial)}</div><div><div class="hub-name">${escapeHtml(id.name)}</div><div class="hub-sub">your shelf &amp; circle</div></div></div>
       ${row('friends','i-friends-hl','Friends')}
       ${row('shopping','i-shopping-hl','Shopping list')}
-      ${row('passport','i-world-hl','Passport')}
       ${ACHIEVEMENTS_ENABLED ? row('achievements','i-achievements-hl','Achievements') : ''}
       ${row('settings','i-settings-hl','Settings')}
     </div>`;
@@ -990,7 +989,6 @@ function goView(v){
   if(v!=='teas'){ state.teaSearch=''; state.refSearch=''; state.refOpen=null; }   // #19: leaving the Library clears search; same-tab round-trips (tea-detail → back = goView('teas')) keep it
   if(v==='teas') state.teaSeg='teas';                    // tapping Teas shows the teas segment (not vessels, not Go Deeper)
   state.teaOverflowOpen=false; state.teaMenuOpen=false;
-  if(v!=='passport'){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; }
   saveView(v); render();
 }
 // Deep-link target: land on the Teas tab with the Vessels segment active. Anything that used to

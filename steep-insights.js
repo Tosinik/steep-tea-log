@@ -519,10 +519,12 @@ function insOriginsHTML(){
   const sub = country
     ? `${country} name only the country — a place makes the map finer.`
     : `Every placed tea names a region.`;
-  return `<div class="section card">
+  // The tap target G deliberately left absent now has an honest destination for the first time.
+  return `<div class="section card org-entry" onclick="goOrigins()" role="button" tabindex="0">
     <div class="eyebrow" style="margin-bottom:8px;">Origins</div>
     <div class="ins-obs">${lead}</div>
     <div class="ins-cap" style="margin-top:6px;">${sub}</div>
+    <div class="org-entry-go mono">Open the atlas →</div>
   </div>`;
 }
 function dashCardsInsights(s){

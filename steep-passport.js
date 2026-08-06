@@ -157,150 +157,144 @@ function originOffer(tea){
 function passportGeo(country){ return PASSPORT_GEO.find(g=>g.country===country); }
 function passportSubGeo(country, name){ return (PASSPORT_SUB[country]||[]).find(s=>s.name===name); }
 
-// A country pin tap: select it, and if it's zoomable, dive into its sub-map.
-function passportSelect(country){
-  const same = state.passportSel===country && !state.passportSub;
-  if(same){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; }
-  else { state.passportSel=country; state.passportSub=null; state.passportZoom = PASSPORT_ZOOMABLE[country] ? country : null; }
-  render();
-}
-function passportZoomOut(){ state.passportZoom=null; state.passportSub=null; render(); }
-function passportSubSelect(country, name){
-  state.passportSel=country;
-  state.passportSub = state.passportSub===name ? null : name;
-  render();
-}
+/* ============================================================================
+   ORIGINS (#37) — direction 2. R66 keeps this file and mines the tables above; the old
+   dot-map view goes with this slice, alongside R45's hub row.
 
-function viewPassport(){
-  const byCountry = {}, bySub = {}, unmapped = [];
-  state.teas.forEach(t=>{
-    const c = passportCountryFor(t);
-    if(!c){ unmapped.push(t); return; }
-    (byCountry[c]=byCountry[c]||[]).push(t);
-    const s = passportSubFor(c, t);
-    bySub[c] = bySub[c] || { _none:[] };
-    if(s){ (bySub[c][s]=bySub[c][s]||[]).push(t); } else { bySub[c]._none.push(t); }
+   WHY R28's COST IS ACCEPTABLE, and it is not a layout argument. The country tier is OFF
+   the map and listed beside it. A country mark was never a location: R28 defines it as a
+   computed point inside the country's shape, so "China" on a map is a label pretending to
+   be a place. Listing it is the more honest rendering. Ten of twenty-one teas live in that
+   tier, so the list is a first-class half of the screen, not a footnote — and taking the
+   tier off the map also dissolves the frame problem it caused, where R19's adaptive bbox
+   weighted one outlier (Sri Lanka, 103 px from anything else) equally against eleven
+   clustered marks and left 44% of the card empty.
+   ============================================================================ */
+
+/* The eight verified rows from docs/r3/planning/DATA-region-coordinates.md, keyed on the
+   normalised `teas.origin` string — never a catalog slug. That join is exact-name and
+   hand-curated, and Origins was deliberately routed around its fragility.
+   THREE ROWS ARE STILL OWED (Wuyi Mountains · Lugu · Chiayi), which is why R55's three
+   offerable teas stay in the country tier even after an accepted offer. Drawn as such: an
+   origin with no row has no pin, and falls to the list. */
+const ORIGIN_COORDS = {
+  'kagoshima, japan':          { lat:31.60, lon:130.56, label:'Kagoshima' },
+  'chiran, kagoshima, japan':  { lat:31.38, lon:130.44, label:'Chiran' },
+  'hoshino, fukoaka, japan':   { lat:33.25, lon:130.77, label:'Hoshino' },
+  'fujian, china':             { lat:26.07, lon:119.31, label:'Fujian' },
+  'yunnan, china':             { lat:25.04, lon:102.72, label:'Yunnan' },
+  'guangdong, china':          { lat:23.12, lon:113.25, label:'Guangdong' },
+  'zhejiang, china':           { lat:30.29, lon:120.16, label:'Zhejiang' },
+  'nantou, taiwan':            { lat:23.92, lon:120.68, label:'Nantou' }
+};
+const originKey = s => String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+function originCoord(tea){ return ORIGIN_COORDS[originKey(tea && tea.origin)] || null; }
+
+/* Marks closer than this MERGE — below it they are one dot wearing two labels rather than two
+   readable marks. 14 px is judged against the tightest remaining gap of 23.0 px
+   (Hoshino↔Kagoshima) once Kagoshima and Chiran, 3.3 px apart, have merged. That distance
+   between the pair that must merge and the pair that must not is what makes 14 a SAFE
+   threshold rather than a tuned one.
+   UNCONFIRMED and recorded rather than assumed: whether it should TRACK PIN WIDTH instead of
+   being a constant. Pins draw at 8 px, so a fixed 14 quietly stops meaning "these overlap" if
+   pin size ever changes. Deriving it from the radius is one line when that is decided. */
+const ORIGINS_MERGE_PX = 14;
+const ORIGINS_CARD_PX = 350;   // the drawn width the threshold above is calibrated against
+/* The frame is expressed as the RULED PROPERTY — marks occupy 83% of the card — rather than as a
+   padding number, because the padding is a consequence and the span is the decision. A fixed pad
+   would silently change the scale (and therefore what 14 px means) the moment the shelf's spread
+   changed. Derived this way, Design's figures reproduce exactly: 3.74 px/unit, 83% span,
+   Kagoshima-Chiran 3.3 px, tightest remaining gap 23.0 px. */
+const ORIGINS_SPAN = 0.83;
+const ORIGINS_MIN_PAD = 6;     // units — so a single-mark shelf still gets a frame rather than a point
+
+/* Merge label: MOST TEAS wins, ties go NORTHERNMOST. The board stated the tie-break; what it
+   lacked was per-region counts, which the app has. On this shelf Kagoshima 3 / Chiran 1, so the
+   merged mark reads "Kagoshima +1". */
+function originsMerge(marks, unitsPerPx){
+  const tol = ORIGINS_MERGE_PX * unitsPerPx;
+  const out = [];
+  marks.forEach(m => {
+    const near = out.find(o => Math.hypot(o.x - m.x, o.y - m.y) <= tol);
+    if(!near){ out.push(Object.assign({}, m, { members:[m] })); return; }
+    near.members.push(m);
+    const lead = near.members.slice().sort((a,b)=> (b.n - a.n) || (b.lat - a.lat))[0];
+    near.x = lead.x; near.y = lead.y; near.label = lead.label; near.lat = lead.lat;
+    near.n = near.members.reduce((s,x)=>s+x.n, 0);
   });
-  const owned = Object.keys(byCountry);
-  const totalMapped = owned.reduce((n,c)=>n+byCountry[c].length,0);
-  if(state.passportSel && !byCountry[state.passportSel]){ state.passportSel=null; state.passportZoom=null; state.passportSub=null; }
-  if(state.passportZoom && !byCountry[state.passportZoom]) state.passportZoom=null;
+  return out;
+}
+// One mark per coordinate-bearing origin string, carrying its tea count.
+function originsRegionMarks(){
+  const by = {};
+  (state.teas||[]).forEach(t => {
+    const c = originCoord(t); if(!c) return;
+    const k = originKey(t.origin);
+    by[k] = by[k] || { label:c.label, lat:c.lat, lon:c.lon, n:0, teas:[] };
+    by[k].n++; by[k].teas.push(t);
+  });
+  return Object.keys(by).map(k => {
+    const m = by[k], p = originsProject(m.lon, m.lat);
+    return Object.assign({}, m, { x:p[0], y:p[1] });
+  });
+}
+/* The country tier: teas whose origin names only a country (R16 normalises "Ceylon, Sri Lanka"
+   in), PLUS any region-tier tea with no coordinate row yet — it knows its place, we simply
+   cannot draw it, and pretending otherwise would be the invention this round keeps refusing. */
+function originsCountryRows(){
+  const by = {};
+  (state.teas||[]).forEach(t => {
+    if(originCoord(t)) return;
+    const c = passportCountryFor(t); if(!c) return;
+    (by[c] = by[c] || []).push(t);
+  });
+  return Object.keys(by).map(country => ({ country, teas:by[country] }))
+    .sort((a,b) => b.teas.length - a.teas.length || a.country.localeCompare(b.country));
+}
+function goOrigins(){ state.view='origins'; state.activeTeaId=null; render(); }
 
-  const cell=9, pad=6;
-  const cx = c => pad+c*cell+cell/2, cy = r => pad+r*cell+cell/2;
-  // Gentle pin sizing (sqrt) so counts read as a soft ramp without big blobs that
-  // hide the land underneath. Labels sit just below each pin so the region is legible.
-  const rFor = n => (2.5 + Math.sqrt(Math.max(1,n))*0.95);
-  const label = (txt, c, r, off, size) => `<text x="${cx(c)}" y="${cy(r)+off}" text-anchor="middle" font-size="${size||4.4}" font-family="var(--font-mono),monospace" fill="var(--ink-soft)" style="pointer-events:none;">${txt}</text>`;
-
-  // ---- viewBox: overview crop, or a zoomed window around the selected country ----
-  let vbX, vbY, vbW, vbH, zoom = state.passportZoom;
-  if(zoom && PASSPORT_SUB[zoom]){
-    const g = passportGeo(zoom);
-    const cols=[g.col], rows=[g.row];
-    PASSPORT_SUB[zoom].forEach(s=>{ if((bySub[zoom]&&bySub[zoom][s.name])){ cols.push(s.col); rows.push(s.row); } });
-    const P=3.4;                     // more breathing room = you can see coastline/context
-    let c0=Math.min(...cols)-P, c1=Math.max(...cols)+P, r0=Math.min(...rows)-P, r1=Math.max(...rows)+P;
-    const minW=11, minH=8;           // floor the window so a tight cluster still shows the country
-    if(c1-c0<minW){ const m=(minW-(c1-c0))/2; c0-=m; c1+=m; }
-    if(r1-r0<minH){ const m=(minH-(r1-r0))/2; r0-=m; r1+=m; }
-    vbX=pad+c0*cell; vbY=pad+r0*cell; vbW=(c1-c0+1)*cell; vbH=(r1-r0+1)*cell;
-  } else {
-    // Crop to the tea-growing hemisphere — the Americas aren't used, and cropping
-    // zooms everything up so it reads well on mobile.
-    const colMin=28, colMax=59, rowMin=2, rowMax=20;
-    vbX=pad+colMin*cell; vbY=pad+rowMin*cell; vbW=(colMax-colMin+1)*cell; vbH=(rowMax-rowMin+1)*cell;
+function viewOrigins(){
+  const marks = originsRegionMarks();
+  const countries = originsCountryRows();
+  // R19's zero-tea state (#09's slim addendum): no shelf, no atlas, and no map of nowhere.
+  if(!marks.length && !countries.length){
+    return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Origins</h2></div>
+      <div class="card empty">Your atlas fills in as you add teas — each one's origin puts it on the map.</div>`;
   }
-
-  // ---- land dots (only those inside the current window) ----
-  let svg = `<svg viewBox="${vbX} ${vbY} ${vbW} ${vbH}" role="img" aria-label="Map of your tea regions" style="width:100%;height:auto;display:block;">`;
-  const inWin = (c,r)=> cx(c)>=vbX-cell && cx(c)<=vbX+vbW+cell && cy(r)>=vbY-cell && cy(r)<=vbY+vbH+cell;
-  for(const r in PASSPORT_LAND){ PASSPORT_LAND[r].forEach(seg=>{ for(let c=seg[0];c<=seg[1];c++){ if(inWin(c,+r)) svg += `<circle cx="${cx(c)}" cy="${cy(+r)}" r="2.4" fill="var(--heat-empty)"/>`; } }); }
-
-  if(zoom && PASSPORT_SUB[zoom]){
-    // ---- zoomed sub-map: sub-region pins for the selected country ----
-    const g = passportGeo(zoom);
-    const noneCount = (bySub[zoom] && bySub[zoom]._none) ? bySub[zoom]._none.length : 0;
-    // faint marker for country-level (region-unspecified) teas
-    if(noneCount){
-      const nr=rFor(noneCount).toFixed(1);
-      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${nr}" fill="var(--heat-empty)" stroke="var(--line)" stroke-width="1.1" style="cursor:pointer;" onclick="passportSubSelect('${escapeJsArg(zoom)}',null)"><title>${zoom} · region unspecified · ${noneCount}</title></circle>`;
-      svg += label(`? ${noneCount}`, g.col, g.row, +nr+4.6, 4.2);
-    }
-    PASSPORT_SUB[zoom].forEach(s=>{
-      const list = bySub[zoom] && bySub[zoom][s.name]; if(!list) return;
-      const n=list.length, rad=rFor(n).toFixed(1);
-      const on = state.passportSub===s.name;
-      const fill = on?'var(--jade)':'var(--clay)', stroke = on?'var(--amber)':'var(--white)', sw = on?2:1.2;
-      svg += `<circle cx="${cx(s.col)}" cy="${cy(s.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSubSelect('${escapeJsArg(zoom)}','${escapeJsArg(s.name)}')"><title>${s.name} · ${n} tea${n===1?'':'s'}</title></circle>`;
-      svg += label(`${s.name} ${n}`, s.col, s.row, +rad+4.6, 4.2);
-    });
-  } else {
-    // ---- overview: country pins ----
-    owned.forEach(country=>{
-      const g = passportGeo(country); if(!g) return;
-      const n = byCountry[country].length, rad=rFor(n).toFixed(1);
-      const sel = state.passportSel===country;
-      const fill = sel?'var(--jade)':'var(--clay)', stroke = sel?'var(--amber)':'var(--white)', sw = sel?2:1.2;
-      const zoomable = PASSPORT_ZOOMABLE[country];
-      svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${rad}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer;" onclick="passportSelect('${escapeJsArg(country)}')"><title>${country} · ${n} tea${n===1?'':'s'}${zoomable?' · tap to zoom':''}</title></circle>`;
-      if(zoomable){ svg += `<circle cx="${cx(g.col)}" cy="${cy(g.row)}" r="${(+rad+2.2).toFixed(1)}" fill="none" stroke="var(--amber)" stroke-width="0.7" stroke-dasharray="1.6 1.8" opacity="0.5" style="pointer-events:none;"/>`; }
-      svg += label(`${country} ${n}`, g.col, g.row, +rad+6, 6.2);
-    });
+  let mapHTML = '';
+  if(marks.length){
+    const xs = marks.map(m=>m.x), ys = marks.map(m=>m.y);
+    const spanX = Math.max.apply(null, xs) - Math.min.apply(null, xs);
+    const pad = Math.max(ORIGINS_MIN_PAD, spanX * (1/ORIGINS_SPAN - 1) / 2);
+    const x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad;
+    const vbW = spanX + pad*2;
+    const vbH = Math.max.apply(null, ys) - Math.min.apply(null, ys) + pad*2;
+    const merged = originsMerge(marks, vbW / ORIGINS_CARD_PX);
+    const total = marks.reduce((s,m)=>s+m.n, 0);
+    const r = 4;
+    const dots = merged.map(m => {
+      const extra = m.members.length > 1 ? ' +' + (m.members.length - 1) : '';
+      return `<g><circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="${r}" class="org-pin"></circle>`
+           + `<text x="${(m.x + r + 2.5).toFixed(1)}" y="${(m.y + r/2).toFixed(1)}" class="org-lbl">${escapeHtml(m.label + extra)}</text></g>`;
+    }).join('');
+    mapHTML = `<div class="card org-card">
+      <svg class="org-map" viewBox="${x0.toFixed(1)} ${y0.toFixed(1)} ${vbW.toFixed(1)} ${vbH.toFixed(1)}" role="img" aria-label="Where your teas grew">
+        <path d="${ORIGINS_OUTLINE}" class="org-land" fill-rule="evenodd"></path>${dots}
+      </svg>
+      <div class="org-cap mono">${merged.length} place${merged.length===1?'':'s'} · ${total} tea${total===1?'':'s'}</div>
+    </div>`;
   }
-  svg += `</svg>`;
-
-  // ---- detail panel ----
-  const chipCss = 'display:inline-block;background:var(--porcelain-dim);border:1px solid var(--line);border-radius:6px;padding:6px 11px;margin:0 6px 6px 0;cursor:pointer;font-size:12px;color:var(--jade-deep);';
-  let panel;
-  if(zoom && PASSPORT_SUB[zoom]){
-    const sd = bySub[zoom] || { _none:[] };
-    const named = PASSPORT_SUB[zoom].filter(s=>sd[s.name]).map(s=>s.name);
-    const title = state.passportSub ? `${state.passportSub}, ${zoom}` : zoom;
-    const list = state.passportSub ? (sd[state.passportSub]||[]) : byCountry[zoom];
-    const subChipCss = 'display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0 7px 7px 0;cursor:pointer;';
-    const subChips = named.map(nm=>`<span style="${subChipCss}${state.passportSub===nm?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSubSelect('${escapeJsArg(zoom)}','${escapeJsArg(nm)}')">${nm} <b style="color:var(--clay);">${sd[nm].length}</b></span>`).join('')
-      + (sd._none && sd._none.length ? `<span style="${subChipCss}${state.passportSub===null?'':''}" onclick="passportSubSelect('${escapeJsArg(zoom)}',null)">Region unspecified <b style="color:var(--clay);">${sd._none.length}</b></span>` : '');
-    panel = `<div style="font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);">${title}</div>
-      <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'} · tap a tea to open</div>
-      ${named.length?`<div style="display:flex;flex-wrap:wrap;margin-bottom:10px;">${subChips}</div>`:''}
-      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${escapeJsArg(t.id)}','passport')">${escapeHtml(t.name)}</span>`).join('')}</div>`;
-  } else if(state.passportSel && byCountry[state.passportSel]){
-    const list = byCountry[state.passportSel];
-    const zoomable = PASSPORT_ZOOMABLE[state.passportSel];
-    panel = `<div style="font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--ink);">${state.passportSel}</div>
-      <div style="font-size:11.5px;color:var(--ink-soft);margin:1px 0 11px;">${list.length} tea${list.length===1?'':'s'}${zoomable?' · tap the pin to zoom into sub-regions':' · tap to open'}</div>
-      <div style="display:flex;flex-wrap:wrap;">${list.map(t=>`<span style="${chipCss}" onclick="openTeaDetail('${escapeJsArg(t.id)}','passport')">${escapeHtml(t.name)}</span>`).join('')}</div>`;
-  } else {
-    panel = `<div style="color:var(--ink-soft);font-size:13px;line-height:1.5;">Tap a pin — or a region below — to see the teas you've brewed from there. China and Japan zoom into sub-regions. Tap a tea to open it.</div>`;
-  }
-
-  // ---- region chips (overview only, sorted by count) ----
-  const rchipCss = 'display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0 7px 7px 0;cursor:pointer;';
-  const chips = zoom ? '' : owned.sort((a,b)=>byCountry[b].length-byCountry[a].length)
-    .map(c=>`<span style="${rchipCss}${state.passportSel===c?'border-color:var(--jade);background:var(--porcelain-dim);color:var(--jade-deep);':''}" onclick="passportSelect('${escapeJsArg(c)}')">${c} <b style="color:var(--clay);">${byCountry[c].length}</b>${PASSPORT_ZOOMABLE[c]?' <span style="color:var(--amber);">⊕</span>':''}</span>`).join('');
-
-  const unmappedNote = (!zoom && unmapped.length)
-    ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;">${unmapped.length} tea${unmapped.length===1?'':'s'} not yet placed${unmapped.length<=6?': '+unmapped.map(t=>escapeHtml(t.name)).join(', '):''}. Add a country to the origin field to map ${unmapped.length===1?'it':'them'}.</div>`
-    : '';
-
-  const zoomBar = zoom
-    ? `<div style="display:flex;align-items:center;gap:10px;margin:2px 0 10px;">
-         <button class="btn btn-ghost" style="padding:4px 0;" onclick="passportZoomOut()">← Zoom out</button>
-         <span style="font-size:12px;color:var(--ink-soft);">Zoomed into <b style="color:var(--jade-deep);">${zoom}</b></span>
-       </div>` : '';
-
-  return `
-    <button class="detail-back" onclick="goView('dashboard')">← Back to home</button>
-    <div class="section-title" style="margin-top:6px;">
-      <h2 style="font-family:var(--font-display);font-size:20px;">Tea passport</h2>
-      <span class="mono" style="font-size:12px;color:var(--amber);">${owned.length} region${owned.length===1?'':'s'} · ${totalMapped} tea${totalMapped===1?'':'s'}</span>
-    </div>
-    ${owned.length===0 && unmapped.length===0
-      ? `<div class="card empty">Add teas with an origin (e.g. "Fujian, China") and they'll appear on the map.</div>`
-      : `${zoomBar}<div class="card" style="padding:12px;">${svg}</div>
-    <div class="card" style="margin-top:14px;min-height:60px;">${panel}</div>
-    ${chips?`<div style="display:flex;flex-wrap:wrap;margin-top:14px;">${chips}</div>`:''}
-    ${unmappedNote}`}
-  `;
+  const listHTML = countries.length ? `<div class="card">
+    <div class="eyebrow">Known by country</div>
+    <div class="org-sub">These name a country, not a place inside it — so they are listed rather than pinned.</div>
+    ${countries.map(c=>`<div class="org-row">
+      <div style="flex:1;min-width:0;">
+        <div class="org-country">${escapeHtml(c.country)}</div>
+        <div class="org-teas">${c.teas.map(t=>`<button class="btn-ghost org-tea" onclick="openTeaDetail('${escapeJsArg(t.id)}','origins')">${escapeHtml(t.name)}</button>`).join('')}</div>
+      </div>
+      <span class="org-count mono">${c.teas.length}</span>
+    </div>`).join('')}
+  </div>` : '';
+  return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Origins</h2></div>
+    ${mapHTML}${listHTML}`;
 }

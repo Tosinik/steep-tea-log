@@ -61,6 +61,10 @@ fixtures/*
 # assertion on the helper could ever close. 14 of 15 views had no suite calling them when it was
 # written, so it must exist on every machine, not this one.
 !fixtures/render-smoke-test.js
+# #37 Origins: the one surface whose design decisions are NUMBERS — a frame proportion, a merge
+# threshold in pixels, a tier split — each ruled after measurement. A number ruled after measurement
+# drifts silently when a pin radius or a coordinate row changes, so the suite ships everywhere.
+!fixtures/origins-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

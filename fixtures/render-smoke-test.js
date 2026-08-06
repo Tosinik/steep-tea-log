@@ -30,7 +30,7 @@ const repo=path.join(__dirname,'..');
 
 // Load order mirrors index.html: data+core first, features after. steep-data.js is skipped (it is an
 // IIFE around the Supabase client and needs a live SDK); SteepDB is stubbed below instead.
-const FILES=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-settings.js',
+const FILES=['steep-origins-map.js','steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-settings.js',
   'steep-dashboard.js','steep-insights.js','steep-teas.js','steep-reference.js','steep-shopping.js',
   'steep-passport.js','steep-social.js','steep-sessions.js'];
 const SRC=FILES.map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
@@ -76,7 +76,7 @@ const VIEWS=[
   ['viewTeaDetail','tea-detail'],['viewSessions','sessions'],['viewSessionDetail','session-detail'],
   ['viewSessionEdit','session-edit'],['viewSessionFlow','session'],['viewFriends','friends'],
   ['viewShopping','shopping'],['viewSpend','spend'],['viewWrapped','wrapped'],
-  ['viewVessels','vessels'],['viewPassport','passport'],['viewAchievements','achievements']
+  ['viewVessels','vessels'],['viewOrigins','origins'],['viewAchievements','achievements']
 ];
 // The output smells that mean a value reached the DOM in the wrong shape.
 const SMELLS=[['[object Object]','a value was interpolated instead of a field of it'],

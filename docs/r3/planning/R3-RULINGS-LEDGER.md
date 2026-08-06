@@ -1133,6 +1133,26 @@ export; this one could only come from the thing working and still being wrong.
 > it** — a 0 g shelf row does not read as neutral under `stockTier`, which is the actual argument and
 > the part a future "simplify to one action" would not notice.
 
+> *Code-lane note on R106, 2026-08-06 (built and shipped in v4.07).* Four things worth inheriting.
+> **(a) The tool refuses to write when a pin would land in the sea**, and that is what sets the
+> tolerance — 1.0 is what the assertion permits, not the smallest number that looked acceptable.
+> Running at 1.5 exits 1 and leaves the asset untouched, which is the negative control for the tool
+> itself. **(b) The projection ships INSIDE the asset**, beside the paths it produced, so a pin
+> cannot be projected with a different forward than the coastline was drawn with — the failure that
+> would be invisible except as pins landing slightly wrong. **(c) The frame is the ruled SPAN, not a
+> padding number.** A first build used a fixed 26-unit pad and produced 2.69 px/unit and a 60% span:
+> none of Design's figures reproduced. Padding is a consequence, the span is the decision, and a
+> fixed pad silently changes what "14 px" means the moment the shelf's spread changes. Expressed as
+> the property, every ruled figure reproduces exactly. **(d) The pole-of-inaccessibility code is
+> deliberately ABSENT**, not kept dormant: direction 2 takes the country tier off the map, so there
+> are no country marks to place. The finding that produced it survives as the reason the honest
+> rendering is a list.
+>
+> **R45/R66 are discharged in the same slice, last within it**, as required: the hub's Passport row
+> and the dot-map view are gone; `PASSPORT_GEO` / `PASSPORT_SUB` / `PASSPORT_LAND` /
+> `passportCountryFor` stay and are **used by Origins**, asserted so that "kept" cannot quietly become
+> "orphaned". R3's only shipped-control removal, and it landed after its replacement existed.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 - **Design chose direction 2**: country tier off the map, listed beside it; direction 3's 14 px merge
