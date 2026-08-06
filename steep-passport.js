@@ -219,13 +219,33 @@ const ORIGINS_LBL_OFF_PX = 6;  // the board's `off` — from the mark CENTRE, no
    the position proxy (outer 20% of the frame) precisely because its labels are a proportional
    serif. If this label ever stops being mono, the fit test must fall back to that proxy. */
 const ORIGINS_LBL_ADV = 0.62;
-/* The frame is expressed as the RULED PROPERTY — marks occupy 83% of the card — rather than as a
-   padding number, because the padding is a consequence and the span is the decision. A fixed pad
-   would silently change the scale (and therefore what 14 px means) the moment the shelf's spread
-   changed. Derived this way, Design's figures reproduce exactly: 3.74 px/unit, 83% span,
-   Kagoshima-Chiran 3.3 px, tightest remaining gap 23.0 px. */
-const ORIGINS_SPAN = 0.83;
-const ORIGINS_MIN_PAD = 6;     // units — so a single-mark shelf still gets a frame rather than a point
+/* THE FRAME, rule 2: the bounding box of the REGION PINS, plus 10% of the box's longer side,
+   EXPANDED TO THE CARD'S ASPECT. Written as the board writes it, because it is now readable.
+   The expansion is the half v4.07 missed. It drew the marks' own bbox and let the card take
+   whatever aspect that gave (350x193 instead of 350x258), so the frame ended a few pixels past the
+   easternmost pin — which is what read as "the map cuts off most of Japan". Expanding never crops:
+   it only ever shows more land, and while the box is wider than the card — as this shelf's is — it
+   leaves the x-scale alone, so every ruled figure survives it and 3.743 px/unit is nearer Design's
+   published 3.74 than the 3.727 that shipped.
+   v4.07 expressed the pad as a span proportion (0.83) instead. Same arithmetic on this shelf, since
+   1/1.2 = 83.3%, but it keyed off the X span alone where the rule says the LONGER side, and a
+   taller-than-wide shelf would have diverged silently. */
+const ORIGINS_PAD_PCT = 0.10;
+const ORIGINS_MIN_SPAN = 30;    // units (~1,200 km) — two neighbouring pins must not become a close-up
+const ORIGINS_ASPECT = 1.359;   // the card's aspect, from the board
+const ORIGINS_MIN_MARKS = 2;    // rule 6 — fewer than two pins is not a map
+function originsFrame(marks){
+  const xs = marks.map(m=>m.x), ys = marks.map(m=>m.y);
+  let x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+  let y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+  const pad = ORIGINS_PAD_PCT * Math.max(x1 - x0, y1 - y0);
+  x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+  let w = x1 - x0, h = y1 - y0;
+  if(w < ORIGINS_MIN_SPAN){ const cx = (x0 + x1) / 2; w = ORIGINS_MIN_SPAN; x0 = cx - w / 2; }
+  if(w / h > ORIGINS_ASPECT){ const cy = (y0 + y1) / 2; h = w / ORIGINS_ASPECT; y0 = cy - h / 2; }
+  else { const cx = (x0 + x1) / 2; w = h * ORIGINS_ASPECT; x0 = cx - w / 2; }
+  return { x0, y0, w, h };
+}
 
 /* Merge label: MOST TEAS wins, ties go NORTHERNMOST. The board stated the tie-break; what it
    lacked was per-region counts, which the app has. On this shelf Kagoshima 3 / Chiran 1, so the
@@ -281,13 +301,8 @@ function viewOrigins(){
       <div class="card empty">Your atlas fills in as you add teas — each one's origin puts it on the map.</div>`;
   }
   let mapHTML = '';
-  if(marks.length){
-    const xs = marks.map(m=>m.x), ys = marks.map(m=>m.y);
-    const spanX = Math.max.apply(null, xs) - Math.min.apply(null, xs);
-    const pad = Math.max(ORIGINS_MIN_PAD, spanX * (1/ORIGINS_SPAN - 1) / 2);
-    const x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad;
-    const vbW = spanX + pad*2;
-    const vbH = Math.max.apply(null, ys) - Math.min.apply(null, ys) + pad*2;
+  if(marks.length >= ORIGINS_MIN_MARKS){
+    const { x0, y0, w:vbW, h:vbH } = originsFrame(marks);
     const upx = vbW / ORIGINS_CARD_PX;                 // units per rendered px — the one conversion
     const merged = originsMerge(marks, upx);
     const total = marks.reduce((s,m)=>s+m.n, 0);
@@ -304,7 +319,14 @@ function viewOrigins(){
          deviation costs nothing today and holds when a longer name arrives. */
       const wide = txt.length * ORIGINS_LBL_ADV * fs;
       const end = m.x + off + wide > x0 + vbW;
-      return `<g><circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="${r.toFixed(2)}" class="org-pin"></circle>`
+      /* Rule 4 — a merged mark wears a ring to say it is more than one place. The "+1" says how
+         many; the ring says that the question arises at all, which is the part a glance gets.
+         stroke-width is emitted, not styled: a stylesheet rule would win over the attribute and
+         put it back in unit space, which is this whole deploy's bug. */
+      const ring = m.members.length > 1
+        ? `<circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="${((ORIGINS_PIN_PX/2 + 3) * upx).toFixed(2)}"`
+          + ` stroke-width="${upx.toFixed(2)}" class="org-ring"></circle>` : '';
+      return `<g>${ring}<circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="${r.toFixed(2)}" class="org-pin"></circle>`
            + `<text x="${(end ? m.x - off : m.x + off).toFixed(1)}" y="${(m.y + ORIGINS_LBL_PX * 0.34 * upx).toFixed(1)}"`
            + ` font-size="${fs.toFixed(2)}"${end ? ' text-anchor="end"' : ''} class="org-lbl">${escapeHtml(txt)}</text></g>`;
     }).join('');
@@ -326,6 +348,12 @@ function viewOrigins(){
       <span class="org-count mono">${c.teas.length}</span>
     </div>`).join('')}
   </div>` : '';
+  /* Rule 6 suppresses the map below two pins, and on a shelf of one pinned tea and no country-tier
+     ones that leaves the screen with nothing on it. The rule says "list only" and assumes the list
+     is there; this is the case where it isn't. A blank screen is worse than the empty state, which
+     at least says what would fill it. */
+  if(!mapHTML && !listHTML) return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Origins</h2></div>
+      <div class="card empty">Your atlas fills in as you add teas — each one's origin puts it on the map.</div>`;
   return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Origins</h2></div>
     ${mapHTML}${listHTML}`;
 }

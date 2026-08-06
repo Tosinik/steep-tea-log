@@ -1064,6 +1064,8 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .org-map{width:100%;height:auto;display:block;background:var(--porcelain-dim);border-radius:12px;}
 .org-land{fill:var(--line);stroke:var(--ink-soft);stroke-width:.35;stroke-opacity:.45;}
 .org-pin{fill:var(--jade);}
+/* No stroke-width here — see .org-lbl below; it is emitted per ring in converted units. */
+.org-ring{fill:none;stroke:var(--jade);}
 /* No font-size here on purpose: this text lives in a viewBox scaled ~3.7x, so a px value in the
    stylesheet is not px on screen. The size is computed in px and emitted per label, and a
    stylesheet rule would win over that attribute. Keep it out. */

@@ -64,7 +64,16 @@ ok(Math.abs(spanPct-0.83)<0.01, 'A1 marks occupy 83% of the card — the ruled f
 ok(Math.abs(scale-3.74)<0.05, 'A2 …which puts the scale at 3.74 px/unit (got '+scale.toFixed(2)+')');
 ok(!/const pad = 26/.test(fs.readFileSync(path.join(repo,'steep-passport.js'),'utf8')),
    'A3 the frame is derived from the ruled span, not a hardcoded padding');
-console.log('  A frame: 3 checks');
+/* Rule 2's second half, unimplemented until v4.08: the box is EXPANDED to the card's aspect. Drawn
+   as the marks' own bbox the card came out 350x193, ending a few px past the easternmost pin —
+   which is what read as the map cutting Japan off. */
+ok(Math.abs(vb[2]/vb[3] - G('ORIGINS_ASPECT')) < 0.002,
+   'A4 the frame is expanded to the card\'s aspect, not left at whatever the marks\' bbox gave (got '+(vb[2]/vb[3]).toFixed(3)+')');
+const ys=marks.map(m=>m.y);
+ok(Math.min.apply(null,ys) > vb[1] && Math.max.apply(null,ys) < vb[1]+vb[3] &&
+   Math.min.apply(null,xs) > vb[0] && Math.max.apply(null,xs) < vb[0]+vb[2],
+   'A5 …and expanding never crops — every mark still sits inside the frame');
+console.log('  A frame: 5 checks · card 350x'+(vb[3]*scale).toFixed(0)+' px');
 
 /* ---- B · the merge, and why 14 is safe rather than tuned ---- */
 const px=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)*scale;
@@ -136,10 +145,10 @@ console.log('  E removals: 6 checks');
  * §F means "given how wide the renderer thinks these labels are, it puts them on the card".
  */
 const CARDH = 350;                                                 // the drawn width, as above
-const gs = html.match(/<g><circle[^>]*><\/circle><text[^>]*>[^<]*<\/text><\/g>/g) || [];
+const gs = html.match(/<g>.*?<\/g>/g) || [];
 ok(gs.length === merged.length, 'F1 every merged mark draws one pin and one label (got '+gs.length+' of '+merged.length+')');
 const drawn = gs.map(g => {
-  const c = g.match(/<circle cx="([\d.-]+)" cy="([\d.-]+)" r="([\d.]+)"/);
+  const c = g.match(/<circle cx="([\d.-]+)" cy="([\d.-]+)" r="([\d.]+)" class="org-pin"/);
   const t = g.match(/<text x="([\d.-]+)" y="([\d.-]+)" font-size="([\d.]+)"( text-anchor="end")?[^>]*>([^<]*)</);
   const wide = t[5].length * G('ORIGINS_LBL_ADV') * Number(t[3]);
   const s = t[4] ? Number(t[1]) - wide : Number(t[1]);
@@ -166,9 +175,33 @@ ok(drawn.every(d => Math.abs(d.fs * scale - 13) < 0.1),
 const passTxt = fs.readFileSync(path.join(repo,'steep-passport.js'),'utf8');
 ok(!/const r = 4;/.test(passTxt) && /ORIGINS_PIN_PX \/ 2 \* upx/.test(passTxt),
    'F7 the pin size is converted, not written bare — the v4.07 bug was a px number living in unit space');
-ok(!/\.org-lbl\{[^}]*font-size/.test(fs.readFileSync(path.join(repo,'styles.css'),'utf8')),
+const cssTxt = fs.readFileSync(path.join(repo,'styles.css'),'utf8');
+ok(!/\.org-lbl\{[^}]*font-size/.test(cssTxt),
    'F8 …and no stylesheet font-size on .org-lbl, which would win over the computed attribute and put the label back in unit space');
-console.log('  F drawn marks: 8 checks · flipped ' + drawn.filter(d=>d.end).map(d=>d.label).join(' + '));
+// Rule 4 — the ring is what a glance reads; "+1" is what a second look reads.
+const ringed = (html.match(/class="org-ring"/g)||[]).length;
+ok(ringed === merged.filter(m=>m.members.length>1).length && ringed === 1,
+   'F9 the merged mark wears a ring, and only the merged mark (got '+ringed+')');
+const ringR = Number((html.match(/r="([\d.]+)" stroke-width="[\d.]+" class="org-ring"/)||[])[1]) * scale;
+ok(Math.abs(ringR - (8/2 + 3)) < 0.1, 'F10 …at pin radius + 3 px, converted like everything else (got '+ringR.toFixed(1)+' px)');
+ok(!/\.org-ring\{[^}]*stroke-width/.test(cssTxt),
+   'F11 …and no stylesheet stroke-width on it either — same trap, one line lower');
+/* Rule 6's two halves. Neither can be seen on this shelf — seven pins, ten country rows — so both
+   are driven synthetically, the way B6 drives the tie-break. The first is the one with teeth: the
+   rule says "no map, list only" and assumes a list exists, and a shelf of one pinned tea and no
+   country-tier ones has none, so without a fallback the screen renders a heading over nothing. */
+const REAL = G('JSON.stringify(state.teas)');
+G('state.teas=' + JSON.stringify(TEAS.filter(t => /kagoshima, japan/i.test(t.origin)).slice(0,1)) + ';');
+const one = G('viewOrigins()');
+ok(G('originsRegionMarks().length') === 1 && !/org-map/.test(one),
+   'F12 one region pin draws no map — rule 6, and one pin is not an atlas');
+ok(/card empty/.test(one),
+   'F13 …and that shelf still says something: no map AND no country list would otherwise be a bare heading over a blank screen');
+G('state.teas=' + REAL + ';');
+const tightFrame = G('originsFrame([{x:800,y:400},{x:801,y:400.5}])');
+ok(Math.abs(tightFrame.w - G('ORIGINS_MIN_SPAN')) < 0.001,
+   'F14 two neighbouring pins get the 30-unit floor, not a meaningless close-up (got '+tightFrame.w.toFixed(1)+')');
+console.log('  F drawn marks: 14 checks · flipped ' + drawn.filter(d=>d.end).map(d=>d.label).join(' + '));
 
 console.log('');
 if(failures){ console.log('FAILED: '+failures+' of '+(passed+failures)); process.exit(1); }
