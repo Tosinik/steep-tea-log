@@ -1153,6 +1153,32 @@ export; this one could only come from the thing working and still being wrong.
 > `passportCountryFor` stay and are **used by Origins**, asserted so that "kept" cannot quietly become
 > "orphaned". R3's only shipped-control removal, and it landed after its replacement existed.
 
+**R110 — Origins renders at DIRECTION 2, per the banked frame ruling board.** The country tier is
+listed rather than pinned; the map draws coordinate-backed region pins only. The frame is the marks'
+bbox, padded by 10% of the box's longer side, **then expanded to the card's aspect** — the expansion
+never crops, and it is the half missing from v4.07, which is why the eastern edge cut through Japan.
+Merged marks wear a ring; no map renders below two pins, with a 30-unit floor. `ORIGINS_MERGE_PX`
+is 14. The board is banked at `docs/r3/boards/origins-frame-ruling.dc.html`, sha256
+`441fceb3075a837b…`, arriving post-export and **banked late** — recorded in R3-STATUS §3 so the gap
+is visible rather than silent. **The board's own `R107` badge is wrong** and cites the
+completeness-panel deferral; cite **R110**.
+
+Accepting R28's cost is not a layout argument: **a country mark was never a location, only a
+computed pole of inaccessibility**, so listing is the more honest rendering. Ten of twenty-one teas
+are listed, which is why the list is a first-class half of the screen rather than a footnote.
+
+**Deviation from the board, deliberate.** The label side-switch flips when the label *wouldn't fit*,
+not when the pin passes the outer 20% of the frame. The board's proxy under-fires for a long label at
+70%. The fit test is only answerable for a monospaced face — the board's labels are a proportional
+serif, which is very likely why it used a position proxy at all. Ours is `--font-mono`, so the test
+holds; **if that face ever changes, the flip falls back to the board's rule.** In the comment, and
+correctly so.
+
+> *Code-lane note, 2026-08-06 (shipped in v4.08).* This ruling is **retroactive on a shipped
+> surface**: H2 was built, verified and released against a board that had never been banked, so the
+> number arrives after the code. That order is the finding, not an irregularity to smooth over — see
+> the v4.08 block below, and the note above the frame-ruling summary.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
@@ -1162,8 +1188,8 @@ export; this one could only come from the thing working and still being wrong.
 > label side-switch (`const inner = f.x0 + 0.8 * f.w`) and the pin size (`pinPx` = 8, so r = 4 px at
 > every render size) — were each reported as absent from the repo by a session that searched
 > honestly and found nothing, because there was nothing to find. **Its badge says `R107`, which is
-> already taken** (the completeness-panel deferral). The frame ruling has no ledger number; cite it
-> as "the frame ruling board", never as R107.
+> already taken** (the completeness-panel deferral). **The ruling it carries is R110**, issued
+> 2026-08-06 to give it the number it never had — cite that, never the badge.
 
 - **Design chose direction 2**: country tier off the map, listed beside it; direction 3's 14 px merge
   rule attached; no edge indicator. Verified independently against their own frame function — scale

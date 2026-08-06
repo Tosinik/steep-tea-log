@@ -250,10 +250,11 @@ would have to reason from a summary; this is what happens the one time that is s
 six numbered rules were unimplemented at v4.07 and are named in the v4.08 entry below.
 
 **One defect in it, recorded rather than fixed:** the board's own badge reads **`R107 · RULED`**, and
-the committed ledger's **R107 is the completeness-panel deferral** (issued at slice H1). The frame
-ruling has no ledger number — it is recorded in §1's *"Also recorded (not rulings) — the frame
-ruling"* block. **Do not cite "R107" from this board.** Self-minted R-numbers are failure mode 3,
-and this one collides with a live ruling rather than merely floating free.
+the committed ledger's **R107 is the completeness-panel deferral** (issued at slice H1). Self-minted
+R-numbers are failure mode 3, and this one collides with a live ruling rather than merely floating
+free. **The ruling the board carries is now `R110`**, issued 2026-08-06 to give it the number it
+never had — so a board that was relayed, built and shipped from finally has one. **Cite R110, never
+the badge.**
 
 **Two defects recorded, banked verbatim rather than fixed in transit.** (a) The MANIFEST claims
 "ALL BOARDS 77cf800 → 9f695e2"; `02b` and `04` still read `repo 77cf800`, and `03` plus both

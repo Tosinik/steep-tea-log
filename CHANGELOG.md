@@ -57,8 +57,9 @@ been banked.
   instead from `origins-map-v3.html`, **the pre-direction-2 map, superseded by the very
   ruling it could not read**. Banked now as `docs/r3/boards/origins-frame-ruling.dc.html`,
   sha256 `441fceb3075a837b…` on both the delivered file and the staged blob. Its badge says
-  `R107`, which is already the completeness-panel deferral: the frame ruling has **no**
-  ledger number and must not be cited as one.
+  `R107`, which is already the completeness-panel deferral — so the ruling it carries was
+  issued as **R110** with this deploy, giving a board that was relayed, built and shipped
+  from the number it never had. Cite R110, never the badge.
 - **One bug, not two.** Every dimension drawn over the outline was written as if it were
   pixels, inside a viewBox that runs at 3.727 px/unit: `r = 4` drew a **29.8 px** pin (the
   code's own comment claimed 8), `.org-lbl{font-size:5px}` drew an **18.6 px** label, and
