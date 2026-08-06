@@ -896,6 +896,35 @@ reading the **computed background in both themes**. Any new component carrying a
 either declares no competing property on its base rule, or uses a compound selector, and its guard
 reads computed style rather than asserting a rule exists.
 
+**R100 — The "top X" reducers cannot express a tie, and that is a LATENT defect, not a live one.**
+Three reducers take the **first** maximum and never revisit it: `peakBucket`
+(`steep-dashboard.js:79–80`, `if(v>peakVal)`), and `computeWrapped`'s `topTea` (`steep-insights.js:241`)
+and `topType` (`:247`), both `if(c>topTeaN)`. While one value is a strict maximum they are correct.
+The moment two are level they silently name one — no tie, no hedge, no signal that a choice was made.
+Slice G builds one shared **argmax that reports ties**, and copy generated from it names *both* when a
+tie occurs. Which is the interesting fact anyway: two equal peaks is a truer thing to say about a
+brewing habit than an arbitrary winner.
+
+> *Correction, recorded rather than smoothed (2026-08-06).* This ruling was first drafted by the Code
+> lane asserting the app **is currently printing a false peak** — that `brewingClockHTML` renders
+> `peak 8:00–10:00` over a genuine tie. That was **wrong at live data**. It was derived from the
+> 2026-07-26 stamped export (40 sessions · 133 steeps · 21 days · 162.5 g), where 08–10 and 12–14 tie
+> at 15. Live on 2026-08-06 the log reads **42 sessions · 143 infusions · 23 days · 168.5 g** — two
+> more sittings, and the tie has broken. 08–10 genuinely leads, so the shipped label is **accurate**.
+>
+> The error is **R67's own failure mode, committed inside a ruling about prose going quietly false**:
+> a stamped snapshot read as if it were the current state. The stamp was doing its job; it was read
+> past. Both lanes reached the same wrong conclusion from the same file, which is what makes it worth
+> a paragraph rather than a corrected sentence — the stamp does not protect a reader who has decided
+> what the data says.
+>
+> **Consequence for slice G, binding:** that slice is made *entirely* of snapshots — the clock, the
+> method split, the type mix, the cost figures, Wrapped's every card. **Re-derive each of them at
+> build from live-shaped data**, never from §1's stamp or from this ledger. The Main Kyusu / Mogake
+> tie at 9 may also have moved; so may the ten country-only origins and the shared-by-you fraction.
+> A figure this slice renders is a snapshot under R67, and a slice of nothing but snapshots is where
+> reading a stamp as a state does the most damage.
+
 ### Also recorded (not rulings) — from the slice F build
 
 - **The SHARED badge does not upgrade when `to_profile` ships.** "Until `to_profile` ships the badge

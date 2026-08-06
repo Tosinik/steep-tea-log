@@ -264,6 +264,16 @@ Notes that shape the order:
 - **G**: R54 is a one-line `DASH_SURFACE` entry of `insights` (`steep-dashboard.js:538`) plus a guard
   that the card is not Home-moveable via `dashSurface()`. Cost medians recomputed at build (needs A's
   currency) or rendered as nothing — never 0.17/0.86. Taste-vocabulary panel is GATED: build nothing.
+  **Three additions from the slice-G plan review (2026-08-06).** (i) **R100** — `peakBucket`, `topTea`
+  and `topType` cannot express a tie; build the shared tie-reporting argmax and let copy name both.
+  The defect is **latent**, not live: it was first drafted as live from the stamped export and that
+  was wrong, which is the correction R100 carries. (ii) **Re-derive every figure at build from
+  live-shaped data** — this slice is made entirely of snapshots, and R67 binds hardest here. (iii)
+  The **Origins card's map dependency is unruled**: `origins-map-v3.html` renders through `d3.geoMercator`
+  over Natural Earth features, and R28 *defines* the country tier as a polygon label, so there is no
+  country tier without polygons. The app has one external runtime dependency (Supabase) and precaches
+  everything. Needs a ruling before the card is built; the Code lane's recommendation is that G ships
+  the card as an entry point and the map lands once, in H, beside #37.
 - **H**: R55 reads the region from `resolveTeaType(slug).region`, never a board literal; R56 builds
   no suggestion list; the three owed coordinate rows mean an accepted offer honestly leaves the tea
   in its country tier, which is what #37's before/after panel draws.
