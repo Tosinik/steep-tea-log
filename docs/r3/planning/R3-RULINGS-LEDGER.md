@@ -1207,6 +1207,17 @@ behavioural, and the suite labels which half is which. Same family as R104's sta
 > on the intended check: re-adding Apple reddens B1 alone, paraphrasing the tagline reddens A1,
 > pointing `.door-enso` at `--kachi` reddens B6, and copying the ensō path instead of referencing the
 > symbol reddens C1 **and** C3.
+>
+> *Amended the same day, and the amendment is the lesson.* The fix above was applied to the door's
+> **source** and not to its **CSS**, so it happened again one section later: §E's `margin-top:auto`
+> check failed against the CSS comment *explaining what an auto top margin does*. **Fifth instance
+> this round**, after the typo-against-itself, the fallback-is-a-pass, the no-op negative control and
+> B1 — and the first with real cost: the red short-circuited a `&&` chain, the backup step never ran,
+> and the restore branch copied a **stale `/tmp` file from an earlier session over `styles.css`**.
+> Recovered from `git`, which is the only authoritative copy. Two rules out of it: **strip comments
+> before every absence check, in every language a suite reads**, and **run negative controls through
+> `git checkout`, never through shell backups** — a scripted restore whose source is a path that
+> might already exist is not a restore.
 
 ### Also recorded (not rulings) — the frame ruling (map still held)
 

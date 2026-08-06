@@ -198,8 +198,18 @@ APP_VERSION v4.09, **no SQL**). Slices A · B · B2 · B3 · C · D · E · F ·
 - **R111** — `landing.html` is a superseded surface on a live public URL, orphaned by R29, **not
   touched** under R61 and flagged to the beta-hardening bundle. **R112** — the new suite asserts
   **source** (a closure-private function cannot be sandboxed) and says so; §D's empty states do render.
-- **NOT verified visually, second deploy running** — the Browser pane refused localhost all session.
-  **26 committed suites, all green.**
+- **A layout defect shipped in the first cut and was caught by LOOKING** — the board is drawn at one
+  height (812) and distributes slack with an auto top margin, so on a taller screen every extra pixel
+  lands in one gap; Niklas saw ~500 px of it. Fixed as a flagged deviation: centred column, clamped
+  gap, reviewed at 667/812/932/1280. **Third defect this round found by using the app; still none
+  found by measuring.**
+- **A check read its own prose for the fifth time, and this one had teeth** — E1 failed against the
+  CSS comment explaining an auto top margin, which short-circuited a `&&` chain and let a stale
+  `/tmp` file overwrite `styles.css` (recovered from git). **Strip comments before every absence
+  check, in every language a suite reads; run negative controls through `git checkout`, never shell
+  backups.**
+- **NOT verified visually by me, second deploy running** — the Browser pane refused localhost all
+  session. **26 committed suites, all green** (`landing-test.js` 31 checks).
 
 **Previously — v4.08: the Origins map, rendered to the frame ruling** (cache **v118**,
 APP_VERSION v4.08, **no SQL**). Three commits. **Niklas opened the map on a phone and two of its

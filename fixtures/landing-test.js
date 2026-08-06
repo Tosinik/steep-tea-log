@@ -51,7 +51,12 @@ ok(/Send magic link/.test(DOOR),
    'B5 the button names its own mechanism: tapping it sends an email, and the label says so before the tap');
 /* Contract 4. The confinement assertion is the one that decays silently — nothing breaks when an
    accent spreads — and this is the screen most tempting to spend it on. */
-const doorCSS=(CSS.split('/* ---------- the door (#09')[1]||'').split('/* ---------- auth /')[0];
+/* Comment-stripped for the same reason the door's source is (see above), and it took a SECOND
+   instance to make the rule stick: E1 first failed against this block's own comment explaining
+   what an auto top margin does. An absence check must never read prose — not the code's, not
+   its own. */
+const doorCSS=((CSS.split('the door (#09')[1]||'').split('/* ---------- auth /')[0])
+  .replace(/\/\*[\s\S]*?\*\//g,' ');
 ok(doorCSS.length>200 && !/kachi/.test(doorCSS),
    'B6 R94: no kachi token anywhere in the door\'s CSS — the ring in Focus stays the only place the accent is spent');
 ok(!/#[0-9A-Fa-f]{6}/.test(doorCSS), 'B7 …and no hex at a render site; the door is tokens only, so both themes come free');
@@ -98,6 +103,25 @@ ok(!/href="#enso"/.test(home),
 [['origins',origins],['shelf',shelf],['home',home]].forEach(([n,h])=>
   ok(h && h.trim().length>60, 'D6 '+n+' returns real markup on an empty account (the check every other one here would pass without)'));
 console.log('  D empty-account hand-off: 8 checks');
+
+/* ---- E · the slack is BOUNDED (source-asserted, and it cannot see the look) ----
+ * The board draws the door in an 812 px frame and distributes with one `margin-top:auto`. That is
+ * composition at 812 and a defect at every other height: all extra viewport height lands in the
+ * single gap between the pillars and the sign-in, so the hole grows with the screen. Niklas saw
+ * ~500 px of it — the third defect this round found by looking and the third not found by measuring.
+ * WHAT THESE FOUR CHECKS ARE: a guard on the RULE that caused it, so it cannot come back unnoticed.
+ * WHAT THEY ARE NOT: a judgement of the layout. Nothing here knows what the door looks like at any
+ * height; only a browser does, and `fixtures/door-review.js` renders it at four for a human. Stated
+ * rather than papered over, per R104 and R112. */
+ok(!/margin-top:\s*auto/.test(doorCSS),
+   'E1 no `margin-top:auto` in the door — the rule that put every extra pixel of height into ONE gap');
+ok(/\.door-auth\{[^}]*margin-top:\s*clamp\(/.test(doorCSS),
+   'E2 …the gap above the sign-in is clamped, so height cannot accumulate there');
+ok(/\.door\{[^}]*justify-content:\s*center/.test(doorCSS),
+   'E3 …and the column is centred, so the excess goes ABOVE and BELOW the group rather than through it');
+ok(/\.door\{[^}]*min-height:/.test(doorCSS) && !/\.door\{[^}]*[^-]height:\s*100/.test(doorCSS),
+   'E4 min-height, not height — a short viewport grows the container instead of centring content above the scroll origin');
+console.log('  E bounded slack: 4 checks (layout itself is only judgeable by looking)');
 
 console.log('');
 if(failures){ console.log('FAILED: '+failures+' of '+(passed+failures)); process.exit(1); }

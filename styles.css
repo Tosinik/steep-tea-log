@@ -455,8 +455,15 @@ html[data-theme="dark"] .steep-pill.active{color:#15140F;}
    sign-in and the only thing a prospective invitee ever sees. It runs on clay and jade:
    KACHI-IRO IS NOT SPENT HERE (visual contract 4, R94). This is the most tempting screen in the app
    to break that on — it is the one selling the app — which is exactly why it holds. */
-.door{min-height:100vh;max-width:390px;margin:0 auto;padding:34px 26px 34px;display:flex;flex-direction:column;}
-.door-brand{display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:48px;}
+/* THE SLACK IS BOUNDED, AND THIS IS A DEVIATION FROM A BOARD DRAWN AT ONE HEIGHT. #09 draws the
+   door in an 812 px frame and distributes it with a single auto top margin, which is composition at
+   812 and a defect everywhere else: every extra pixel of viewport height lands in the ONE gap
+   between the pillars and the sign-in, so the hole grows with the screen. Niklas saw ~500 px of it.
+   So the column is CENTRED with a clamped gap: the excess goes above and below the group instead of
+   through the middle of it. `min-height` not `height`, so a short viewport grows the container
+   rather than centring content out of reach above the scroll origin. */
+.door{min-height:100vh;min-height:100dvh;max-width:390px;margin:0 auto;padding:34px 26px;display:flex;flex-direction:column;justify-content:center;}
+.door-brand{display:flex;flex-direction:column;align-items:center;text-align:center;}
 .door-enso{color:var(--clay);line-height:0;animation:sc-breathe 6s ease-in-out infinite;}
 .door-enso svg{transform:rotate(-6deg);}
 .door-name{font-family:var(--font-display);font-weight:700;font-size:40px;color:var(--ink);margin:20px 0 0;letter-spacing:.01em;}
@@ -466,7 +473,7 @@ html[data-theme="dark"] .steep-pill.active{color:#15140F;}
 .door-pillar{display:flex;flex-direction:column;align-items:center;gap:5px;width:80px;text-align:center;}
 .door-p-l{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--ink);}
 .door-p-s{font-family:var(--font-mono);font-size:8.5px;color:var(--ink-soft);line-height:1.4;}
-.door-auth{margin-top:auto;padding-top:40px;display:flex;flex-direction:column;gap:11px;}
+.door-auth{margin-top:clamp(36px,9vh,96px);display:flex;flex-direction:column;gap:11px;}
 .door-field{border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:14px;font-family:'Inter',sans-serif;background:var(--white);color:var(--ink);width:100%;}
 .door-btn{width:100%;padding:14px 0;border-radius:12px;font-size:15px;font-weight:600;}
 .door-invite{font-size:12.5px;color:var(--ink-soft);text-align:center;margin:2px 0 0;}

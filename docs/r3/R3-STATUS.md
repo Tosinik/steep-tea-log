@@ -284,6 +284,14 @@ A · B · B2 · B3 · C · D · E · F · G · H1 · H2 · H3 have all shipped.
 inline-onclick pattern — and its handlers are wired directly because the auth functions are private
 to that closure. The reason is now in the code, so the next reader does not "fix" it.
 
+**A layout defect shipped in the first cut and was caught by looking.** The board draws the door in
+an 812 px frame and distributes with a single auto top margin — composition at 812, a defect at every
+other height, because all extra viewport height lands in the one gap between the pillars and the
+sign-in. Niklas saw ~500 px of it. **Third defect this round found by using the app, and still none
+found by measuring.** Fixed as a **flagged deviation from a board drawn at one height**: the column
+is centred with a clamped gap, so the excess sits above and below the group. Reviewed at 667 / 812 /
+932 / 1280 — the board is only valid at one of them.
+
 **Two board instructions were not taken, both deliberately.** The board's **"Continue"** is the label
 for a mechanism its own flag delegates to Code ("magic-link or password"); the mechanism is decided,
 so the label names it — **Send magic link**. And the shipped **autofocus is removed**: it was a

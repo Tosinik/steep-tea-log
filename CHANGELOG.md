@@ -97,9 +97,28 @@ Deploy: `steep-data.js` (`renderLogin` rebuilt in place, `shell()`, new `ensoMar
 - **The door reads its version defensively** (`try/catch`): `APP_VERSION` is a const in
   steep-core.js, and this door is the surface you land on when something has gone wrong.
   Before #09 it had no cross-module dependency at all; that property is kept.
-- **NOT verified visually**, for the second deploy running: the Browser pane refused
-  localhost by policy all session. A door is a *look* before it is a function, so this one
-  needs eyes more than most.
+- **The board is drawn at ONE height, and the door shipped distributing slack like it.**
+  Niklas looked and found ~500 px of dead space between the pillars and the sign-in — the
+  third defect this round found by looking and the third not found by measuring.
+  `margin-top:auto` on a `100vh` column is composition at 812 px and a defect at every
+  other height, because all extra viewport height lands in that one gap. **Deviation from
+  the board, flagged like the side-switch was:** the column is centred with a
+  `clamp(36px,9vh,96px)` gap, so the excess goes above and below the group rather than
+  through it, and `min-height` (not `height`) keeps a short viewport from centring content
+  above the scroll origin. Reviewed at 667 / 812 / 932 / 1280.
+- **§E guards the rule, and says what it cannot see.** Four checks that the slack stays
+  bounded; reverting to the shipped layout reddens three of them. It does **not** judge the
+  layout — only a browser can, and `fixtures/door-review.js` renders it at four heights for
+  a human. Same stated-limitation discipline as R104 and R112.
+- **A check read its own prose for the FIFTH time this round**, and this instance had teeth:
+  E1 failed against the CSS comment *explaining* what an auto top margin does, which
+  short-circuited a `&&` chain, skipped a backup, and let a stale `/tmp` file from an
+  earlier session overwrite `styles.css`. Recovered from git — the only authoritative copy.
+  Both the door's source and its CSS block are now comment-stripped before any absence
+  check, and negative controls run through `git checkout`, never shell backups.
+- **NOT verified visually by me**, for the second deploy running: the Browser pane refused
+  localhost by policy all session. A door is a *look* before it is a function — which is
+  precisely how the layout defect was found, and not by any of the 31 checks.
 
 ---
 ## v4.08 — The Origins map, rendered to the frame ruling
