@@ -1155,6 +1155,16 @@ export; this one could only come from the thing working and still being wrong.
 
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
+> **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
+> Until then it existed only as a chat attachment, so this block was the whole of it that any lane
+> could read, and the map was built to this summary rather than to the board. **This block is no
+> longer the authority: the banked file is.** Two things it holds that no summary carried — the
+> label side-switch (`const inner = f.x0 + 0.8 * f.w`) and the pin size (`pinPx` = 8, so r = 4 px at
+> every render size) — were each reported as absent from the repo by a session that searched
+> honestly and found nothing, because there was nothing to find. **Its badge says `R107`, which is
+> already taken** (the completeness-panel deferral). The frame ruling has no ledger number; cite it
+> as "the frame ruling board", never as R107.
+
 - **Design chose direction 2**: country tier off the map, listed beside it; direction 3's 14 px merge
   rule attached; no edge indicator. Verified independently against their own frame function — scale
   **3.74 px/unit**, marks spanning **83%** of the card. Both exact.

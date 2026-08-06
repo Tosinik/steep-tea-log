@@ -233,9 +233,27 @@ preserved.** (There are 21 board files: the 20 `.dc.html` plus `origins-map-v3.h
 | **#13 Teas revision** | **rev1** | **R53 · R51 · R52 · header rework · Vessels segment; #23 shown HELD** |
 | #37 Origins refinement | rev2 | R55 drawn in full; ten-not-nine; catalog string verbatim |
 | Origins map | v3 | 8/8 coordinate rows verified |
+| **Origins frame ruling** | **—** | **BANKED LATE 2026-08-06 — arrived after the export; see below** |
 | Map 1 — surface matrix | rev2 | held-decisions group added |
 | Map 2 — navigation | rev2 | R51/R52 on Teas; Vessels corrected to a segment |
 | Bundles 1 & 2 | snapshots | round-1 **behaviour** reference only, never visual authority |
+
+**The frame ruling was banked LATE — 2026-08-06, as `origins-frame-ruling.dc.html`** (sha256
+`441fceb3075a837b…`, byte-identical to the delivered file; needs `support.js`, already present). It
+is the board that ruled **direction 2** and it arrived *after* the 25-file export was banked, so
+nobody queued it and it lived only as a chat attachment. The map was then built to a relayed summary
+of it. The cost was visible and specific: a Code session searched the repo for its two cited
+strings, found neither, correctly concluded from what it could see that they were phantom citations,
+and reasoned instead from `origins-map-v3.html` — **the pre-direction-2 map, superseded by the very
+ruling it could not read**. Every other board this round was banked and hash-verified so no lane
+would have to reason from a summary; this is what happens the one time that is skipped. Three of its
+six numbered rules were unimplemented at v4.07 and are named in the v4.08 entry below.
+
+**One defect in it, recorded rather than fixed:** the board's own badge reads **`R107 · RULED`**, and
+the committed ledger's **R107 is the completeness-panel deferral** (issued at slice H1). The frame
+ruling has no ledger number — it is recorded in §1's *"Also recorded (not rulings) — the frame
+ruling"* block. **Do not cite "R107" from this board.** Self-minted R-numbers are failure mode 3,
+and this one collides with a live ruling rather than merely floating free.
 
 **Two defects recorded, banked verbatim rather than fixed in transit.** (a) The MANIFEST claims
 "ALL BOARDS 77cf800 → 9f695e2"; `02b` and `04` still read `repo 77cf800`, and `03` plus both
