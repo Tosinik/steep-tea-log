@@ -23,7 +23,7 @@ process.env.TZ = 'Europe/Berlin';   // Niklas's local zone. Clock buckets MUST r
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const REPO = path.resolve(__dirname, '..');
 
-const SRC = ['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-dashboard.js','steep-teas.js']
+const SRC = ['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-dashboard.js','steep-teas.js','steep-passport.js']
   .map(f => fs.readFileSync(path.join(REPO, f), 'utf8')).join('\n;\n');
 const ctx = {}; ctx.window = ctx; ctx.globalThis = ctx; ctx.console = console;
 ctx.document = { documentElement:{ setAttribute(){}, getAttribute(){ return 'light'; } },
@@ -34,6 +34,7 @@ ctx.matchMedia = () => ({ matches:false }); ctx.navigator = { onLine:true };
 ctx.setTimeout = () => {}; ctx.clearTimeout = () => {};
 ctx.setInterval = () => {}; ctx.clearInterval = () => {}; ctx.addEventListener = () => {};
 vm.createContext(ctx); vm.runInContext(SRC, ctx);
+const G = name => ctx[name];   // reach a shipped function in the sandbox (originTier, v4.03)
 
 function parseCSV(t){ t = t.replace(/^﻿/, '');
   const R = []; let r = [], c = '', q = false;
@@ -214,14 +215,12 @@ console.log(`\nVendors (teas.source, ${teas.length} rows): ` +
 console.log(`  distinctVendors() returns ${ctx.distinctVendors().length} names (the empty source is correctly excluded).`);
 
 // ---- origins ----------------------------------------------------------------------------------------
-// Region-tier vs country-only: a bare country string (or a country synonym per R16) is country-tier.
-const COUNTRY = /^(china|taiwan|thailand|japan|india|sri lanka|ceylon|korea|vietnam|nepal|kenya|malawi|indonesia)$/i;
+// Region-tier vs country-only, through the SHIPPED writer (steep-passport.js `originTier`, v4.03).
+// This block used to carry its own copy of the rule, which made the tool that reports the split a
+// second definition of it — the same shape as the hardcoded date this file used to print.
 let region = 0, country = 0; const countryOnly = [];
-teas.forEach(t => { const o = (t.origin||'').trim(); if (!o) return;
-  const parts = o.split(',').map(x => x.trim()).filter(Boolean);
-  const isCountry = parts.length === 1 ? COUNTRY.test(parts[0])
-                  : parts.every(p => COUNTRY.test(p));   // "Ceylon, Sri Lanka" → country tier (R16)
-  if (isCountry){ country++; countryOnly.push(`${t.name} (${o})`); } else region++; });
+teas.forEach(t => { const tier = G('originTier')(t); if (!tier) return;
+  if (tier === 'country'){ country++; countryOnly.push(`${t.name} (${t.origin})`); } else region++; });
 console.log(`\nOrigins: ${region} region-tier · ${country} country-only.`);
 countryOnly.forEach(x => console.log(`    country-only: ${x}`));
 

@@ -189,7 +189,10 @@ minimal preview card with Add-to-shelf.
 Code owns the card sizes; Save-image may slip a build.
 
 **R38 — Wrapped's period is monthly, explicitly.** A yearly sibling comes later; v3.64's seasonal scope
-changes at the #11 build.
+changes at the #11 build. **AMENDED by R103 — read them together, never R38 alone.** R38's drawn copy
+is "your July **so far**", which was written when the log was a 16-day July and monthly and so-far
+meant the same thing. R103 rules the window the **last complete** month: Wrapped is the retrospective,
+Insights is the live view. The "so far" copy is superseded, not merely restyled.
 
 **R39 — Picker swatch long-press colour correction ratified.**
 
@@ -933,6 +936,37 @@ brewing habit than an arbitrary winner.
 > than a transcription. Flagged rather than left silent, because failure mode 3 is self-minted
 > R-numbers and this is one step away from it.
 
+**R103 — Wrapped's window is the LAST COMPLETE month, not the current one. This AMENDS R38.**
+R38 ruled the period "monthly, explicit" and drew "your July so far". That was ruled when the log was
+a 16-day July, where *monthly* and *so far* were the same thing — so nobody had to decide whether
+Wrapped was a live view or a retrospective. The log now spans two months (40 sittings in July, 2 in
+August) and the two have separated. The answer is **retrospective**: "Wrapped" denotes a closed
+period wherever the word is used, and the decisive fact is that **Insights already covers the current
+month** through its shipped All-time / Month / Week control. A thin-month Wrapped would duplicate a
+surface that already exists and do it worse — the same 2 sittings, dressed as a review.
+
+So on 6 August, Wrapped reads "Your July, wrapped": a real artifact, with **no threshold, no fallback
+rule, no thin-month state, no invented behaviour**. Wrapped is the completed retrospective; Insights
+is the live view. This removes the overlap rather than managing it.
+
+Rejected explicitly: showing the current month with a thin state (duplicates Insights); and showing
+last month while labelled "so far" (the dishonesty R68 exists to prevent — R103 shows July and says
+July). **Edge:** if the last complete month has no sittings, fall back to the most recent month that
+does, labelled by its own name; if none exists, render nothing, never an empty card. **R38 carries an
+amendment note pointing here**, the way R1 points at R50, so no lane reads its drawn "so far" copy as
+current.
+
+> *Code-lane note, 2026-08-06 (shipped in v4.03).* Three consequences. **(a)** `seasonInfo()` had
+> **zero callers** afterwards and was deleted; R38's future sibling is *yearly*, not seasonal, so
+> nothing was waiting on it. The `w.season` key kept its name — it is the shape twenty render sites
+> destructure, and renaming it would have touched all of them to say the same thing. **(b)** The
+> decorated empty state went with it: "your August is just beginning" was a live-view sentence on a
+> surface that is no longer a live view. **(c)** Two copy defects the window exposed, both caught in
+> the browser rather than by a suite: the cover read **"JUL — JUL"** once both ends fell in one month,
+> and the share button **lowercased a proper noun** ("Share your juli"). Month names render in the
+> user's locale, as every other date in this app does, so a German-locale user reads "Juli" inside
+> English copy — consistent with `fmtDate`, and flagged rather than quietly changed.
+
 **R101 — The Origins map is one build, in slice H, and the map's dependency is its own question.**
 Slice G ships the Origins **card as an entry point** — a generated count line and a tap into Origins
 — plus R54's fence, and nothing that draws geography. The map lands once, in H, beside #37.
@@ -953,6 +987,52 @@ attempt**, which is a different assertion from checking the table's value.
 **Tie copy, ruled alongside R100:** name both, cut the flourish. A tie is the more interesting fact
 than either bucket, and "peak 08–10 with a midday second pour" asserts a hierarchy that may not
 exist. Naming both describes what is true.
+
+**R104 — A guard scoped to a helper is blind to every site that never calls it.** Slice A audited six
+money sites and landed `currencyFmt`. **Six more render sites in the spend view** — the 30 px
+headline, avg-per-active-month, tracked total, the undated line, the chart bar labels, and the cost
+card's "This month" — printed amounts with **no symbol at all**, and shipped that way through four
+slices. `vessel-identity-test.js` §E guards that `currencyFmt` *behaves*; it cannot see a render site
+that never invokes it.
+
+This is a **distinct failure shape** from the vacuous assertion (E4 against the wrong renderer) and
+the tautological one (E6 matching a typo against itself): here the test is correct *and* correctly
+scoped, and its reach simply stops short of the defect. **A behavioural guard on a helper must be
+paired with a site-level scan** — find the renders that should call it and assert they do. Slice H
+closes this one for currency; the same pairing applies to `escapeHtml`, `fmtDate`, and any other
+helper whose whole value is that every relevant site uses it.
+
+**R105 — An instrument is not exempt from the failure it instruments.** Three instrument failures in
+slice G alone. `figures-report.js` carried a hardcoded `as of 2026-07-26` — a hand-written date
+inside the tool built to stop hand-copied figures, wrong for two exports. The **same reporter carried
+its own copy of the origin tier rule**, making the tool that reports the 11/10 split a second
+definition of it; `originTier` now lives in the app and the reporter calls it in its sandbox. And the
+**suite-runner matched stdout strings**, so `wrapped-cards-test.js` printing `1 FAILED  (32 passed)`
+— matching neither `^FAILED` nor `FAIL:` — reported two genuinely red suites as green, caught only
+because a specific assertion was expected to break and didn't.
+
+Precedent: the **export gate's own floor was the unscoped teas count** in slice B, so scoping the
+export would have made the gate reject correct data — F5 inside the tool written to catch F5.
+
+Every rule this project enforces applies to the thing enforcing it, and the checks that verify
+instruments are the ones nobody writes. Standing form: **suite status is read from exit codes, never
+stdout** (R73's family — the failure mode is silence). **A tool that reports a figure calls the app's
+writer for it** rather than carrying its own. **A tool that stamps data reads the stamp** rather than
+embedding it.
+
+### Also recorded (not rulings) — from the slice G build
+
+- **Two more expired board claims.** #08 rev 3 lists `totalGrams` + litres as a "rev 3 restoration"
+  when both already ship in the totals card, and **R22's completeness panel exists nowhere** — on
+  Insights or any other surface. Sixth and seventh this round, after #06's editables, #04's date,
+  #02b's nav claim, #10's BUILD-FIRST stamp and #08 Social's Rou Gui example.
+- **R100's tie behaviour has no live example** and that is the B3 0/21 shape, not a gap: on the
+  08-05 export 08–10 leads at 16, Chiran at ×5, green at 20. The fixture can see it; the export
+  cannot. Read the quiet as untested only where no fixture reaches it.
+- **R102's pin holds against real user data.** Niklas's saved `dashLayout` carries genuine surface
+  overrides (`hero` and `wrapped` moved to Home). `dashSurface('origins')` still returns `insights`
+  under that override set, and the Origins card renders on Insights and not on Home — the pin
+  verified against a real layout rather than a synthetic one.
 
 ### Also recorded (not rulings) — from the slice F build
 

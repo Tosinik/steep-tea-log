@@ -258,7 +258,27 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.02 LIVE — R3 slice F: Social + the R25 pass record** (cache **v112**, **`sql/v3_10-pass-record.sql`
+**v4.03 LIVE — R3 slice G: Insights + the Origins card + #11 Wrapped** (cache **v113**, no SQL).
+Built to **R100–R103**, all four issued at its plan review. **R103** rewindows Wrapped onto the last
+COMPLETE month (live: July, 40 sittings — not the 2 August ones), which deleted `seasonInfo` and the
+decorated "just beginning" empty card with it. **R100**'s `argmaxTies` replaces three reducers that
+took the first maximum and never revisited it; **no live tie exists on the 08-05 export**, so the
+fixture is the only thing that can see the behaviour. **R102** puts R54's fence in the mover, in
+`dashSurface` and in the rendered control — three mechanisms, and the negative control proved they
+catch different failures. **R101** keeps the Origins card an entry point with no geography.
+
+Four things a later slice inherits. **(a)** `originTier` is the single writer for the region/country
+split — `figures-report.js` had been carrying a private copy of that rule, so the tool reporting the
+number was a second definition of it. **(b)** The cost medians are **new computation**, not a
+recompute: `avgCostPerGram` is a pooled ratio. They render with generated denominators and render
+*nothing* below two data points. **(c)** Slice A's currency audit never reached the **spend view** —
+six money sites printed no symbol at all, because §E guards the writer and cannot see an uncovered
+site. **(d)** Two board claims had already expired (totalGrams + litres already shipped in the totals
+card; R22's completeness panel exists nowhere), making six and seven this round.
+**NEXT: slice H** — #37 Origins (carrying R101's map decision) · #08 Shopping · #07 Settings row ·
+#09 landing. The Passport hub row (R45/R66) comes out there, with Origins to replace it.
+
+**Previously: v4.02 — R3 slice F: Social + the R25 pass record** (cache **v112**, **`sql/v3_10-pass-record.sql`
 applied before the push** — the round's second and last migration, and the one where filename order
 genuinely differs from version order). The migration grew by two columns at review: **R96** —
 `teas` is owner-only under RLS, so a recipient handed a `tea_id` resolves nothing, and the row needs

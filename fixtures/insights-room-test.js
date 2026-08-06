@@ -15,6 +15,16 @@
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const repo=path.join(__dirname,'..');
 const src=fs.readFileSync(path.join(repo,'steep-insights.js'),'utf8');
+/* R100/R103 — argmaxTies and andList live in steep-core.js, and originTier in steep-passport.js.
+   This suite deliberately does NOT load those files (it stubs the cross-module surface instead), so
+   the two shared helpers are spliced in from their REAL source rather than stubbed: a stubbed argmax
+   would make every tie assertion below a test of this fixture's own arithmetic. The splice throws
+   loudly if it can't find them — a silent fallback to a stub is the failure it exists to prevent. */
+const coreSrc=fs.readFileSync(path.join(repo,'steep-core.js'),'utf8');
+const passSrc=fs.readFileSync(path.join(repo,'steep-passport.js'),'utf8');
+const grab=(s,name)=>{ const m=s.match(new RegExp('function '+name+'\\([\\s\\S]*?\\n}'));
+  if(!m) throw new Error('could not splice '+name+' — it moved or changed shape; fix the splice, do not stub it'); return m[0]; };
+
 
 const ctx={}; ctx.window=ctx; ctx.globalThis=ctx; ctx.console=console;
 ctx.TYPES=[{k:'green',label:'Green'},{k:'black',label:'Black'},{k:'oolong',label:'Oolong'},{k:'puerh',label:'Pu-erh'},{k:'yellow',label:'Yellow'},{k:'white',label:'White'}];
@@ -28,6 +38,7 @@ const TEAS={ 'g':{name:'Shincha Saemidori',type:'green'}, 'o':{name:'Honey Oolon
 ctx.teaById=id=>TEAS[id]||null;
 ctx.vesselById=()=>({name:'Gaiwan'});
 vm.createContext(ctx);
+vm.runInContext([grab(coreSrc,'argmaxTies'), grab(coreSrc,'andList'), grab(passSrc,'originTier')].join(';\n'), ctx);
 
 // Build ~24 morning sessions across the last 8 weeks: green-heavy, ascending steep times.
 function buildState(){

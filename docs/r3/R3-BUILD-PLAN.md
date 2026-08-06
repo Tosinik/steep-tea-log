@@ -184,7 +184,7 @@ the four-lane order went wrong the first time; this slice exists so that cannot 
 | ~~**D**~~ | ~~**#02 Sessions** + **#02b detail**, then the **edit-screen move (R58)**~~ — **SHIPPED v4.00**, two commits as planned (R90–R92) | none |
 | ~~**E**~~ | ~~**#10 Focus** — alone~~ — **SHIPPED v4.01** (R94–R95) | none |
 | ~~**F**~~ | ~~**Social + the R25 pass record**~~ — **SHIPPED v4.02** (R96–R98) | **`sql/v3_10-pass-record.sql`** — applied by hand, before the push; ~~the round's only required migration~~ one of **two**, since R84 gave B3 its own |
-| **G** | **Insights** + Origins card (R54) + **#11 Wrapped** | none |
+| ~~**G**~~ | ~~**Insights** + Origins card (R54) + **#11 Wrapped**~~ — **SHIPPED v4.03** (built to R100–R103) | none |
 | **H** | **#37 Origins** · **#08 Shopping** · **#07 Settings row** · **#09 landing** | none — `user_settings.settings` is a JSON blob |
 
 Notes that shape the order:

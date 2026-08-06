@@ -199,22 +199,19 @@ function insNotesHTML(s){
 function insWrappedTeaserHTML(){
   const w = computeWrapped(); if(w.empty) return '';
   return `<div class="ins-teaser" onclick="goView('wrapped')">
-    <div><div class="ins-teaser-k">Seasonal</div><div class="ins-teaser-title">Your ${w.season.name}, wrapped</div></div>
+    <div><div class="ins-teaser-k">Last month</div><div class="ins-teaser-title">Your ${w.season.name}, wrapped</div></div>
     <span class="ins-teaser-arrow">→</span>
   </div>`;
 }
 
 /* ================= STEEP WRAPPED =================
-   A calm, seasonal recap built entirely from existing session data. No new
-   infra. Northern-hemisphere meteorological seasons (matches Steep's users);
-   flip the month ranges for a southern-hemisphere option later. */
-function seasonInfo(date){
-  const m = date.getMonth(), y = date.getFullYear();
-  if(m===11 || m<=1){ const sy = m===11 ? y : y-1; return {name:'Winter', start:new Date(sy,11,1), end:new Date(sy+1,2,1), year:m===11?y+1:y}; }
-  if(m<=4) return {name:'Spring', start:new Date(y,2,1), end:new Date(y,5,1), year:y};
-  if(m<=7) return {name:'Summer', start:new Date(y,5,1), end:new Date(y,8,1), year:y};
-  return {name:'Autumn', start:new Date(y,8,1), end:new Date(y,11,1), year:y};
-}
+   A calm retrospective built entirely from existing session data. No new infra.
+   The window is the LAST COMPLETE MONTH (R103, amending R38's "monthly, explicit") — see
+   wrappedPeriod() below for why the amendment was needed rather than the ruling applied.
+   `seasonInfo()` was deleted here: R103 left it with zero callers, and R38's future sibling is
+   YEARLY, not seasonal, so nothing is waiting on it. The `w.season` key keeps its name — it is the
+   shape every card destructures, and renaming it would have touched twenty render sites to say the
+   same thing. Its `.name` is now a month ("July"), which is what the cards print. */
 function partWord(p){ return ({morning:'mornings', afternoon:'afternoons', evening:'evenings', night:'late nights'})[p] || p; }
 function fmtSteepDuration(sec){
   if(sec<60) return Math.round(sec)+'s';
@@ -223,10 +220,42 @@ function fmtSteepDuration(sec){
   const h = Math.floor(m/60), r = m%60;
   return r ? `${h}h ${r}m` : `${h}h`;
 }
+/* R103 — Wrapped's window is the LAST COMPLETE MONTH, not the current one. This amends R38, which
+   ruled the period "monthly, explicit" when the log was a 16-day July: monthly and so-far were the
+   same thing then, so nobody had to decide whether Wrapped was a live view or a retrospective. The
+   log now spans two months and they have separated. The answer is retrospective — "Wrapped" denotes
+   a closed period wherever the word is used, and Insights already covers the current month through
+   its shipped week/month/all control. A thin-month Wrapped would duplicate that surface and do it
+   worse: the same handful of sittings, dressed as a review.
+   No threshold, no fallback rule, no thin-month state. If the last complete month is empty, fall
+   back to the most recent month that isn't, labelled by its own name — which is not a special case
+   so much as the same rule applied honestly. If no month has sittings, render nothing. */
+/* The month name is COPY here, not a data value, and the two take different rules. `fmtDate` renders
+   dates in the user's locale and rightly stays that way — "11. Juli 2026" is a date. But
+   "Your Juli, wrapped" is an English sentence with one German word in it, and since the app carries
+   no i18n, that reads as a bug rather than as localisation. So the period name is pinned English and
+   used only in sentence positions; nothing else in the app changes. */
+const WRAP_MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function wrappedPeriod(now, sessions){
+  const monthOf = d => ({ name: WRAP_MONTHS_EN[d.getMonth()], year: d.getFullYear(),
+                          short: WRAP_MONTHS_EN[d.getMonth()].slice(0,3).toUpperCase(),
+                          start: new Date(d.getFullYear(), d.getMonth(), 1),
+                          end: new Date(d.getFullYear(), d.getMonth()+1, 1) });
+  const start = new Date(now.getFullYear(), now.getMonth()-1, 1);   // the last complete month
+  const has = d => (sessions||[]).some(s=>{ const t=new Date(s.date); return t>=d && t<new Date(d.getFullYear(), d.getMonth()+1, 1); });
+  if(has(start)) return monthOf(start);
+  // Walk back to the most recent month that actually holds sittings. Bounded by the oldest session,
+  // so an empty log terminates immediately rather than scanning history forever.
+  const dates = (sessions||[]).map(s=>new Date(s.date)).filter(d=>d<start);
+  if(!dates.length) return null;
+  const newest = new Date(Math.max(...dates));
+  return monthOf(new Date(newest.getFullYear(), newest.getMonth(), 1));
+}
 function computeWrapped(){
   const now = new Date();
-  const season = seasonInfo(now);
-  const inSeason = state.sessions.filter(s=>{ const d=new Date(s.date); return d>=season.start && d<season.end && d<=now; });
+  const season = wrappedPeriod(now, state.sessions);
+  if(!season) return { season:null, empty:true };
+  const inSeason = state.sessions.filter(s=>{ const d=new Date(s.date); return d>=season.start && d<season.end; });
   if(inSeason.length===0) return { season, empty:true };
 
   const infusions = inSeason.reduce((a,s)=>a+steepCountOf(s),0);
@@ -236,20 +265,26 @@ function computeWrapped(){
   const activeDays = new Set(inSeason.map(s=>dayKey(s.date))).size;
   const coldN = inSeason.filter(s=>s.isColdBrew).length;
 
+  // R100 — both of these took the first maximum and never revisited it. Two teas reached for
+  // equally often is a truer thing to say than an arbitrary winner, so the tie is carried through
+  // to the card rather than resolved here. topTea/topType keep the single-value shape the share
+  // text and the older callers use; the arrays are what the cards read.
   const teaCounts = {};
   inSeason.forEach(s=>{ teaCounts[s.teaId]=(teaCounts[s.teaId]||0)+1; });
-  let topTeaId=null, topTeaN=0; Object.entries(teaCounts).forEach(([id,c])=>{ if(c>topTeaN){ topTeaN=c; topTeaId=id; } });
-  const topTea = teaById(topTeaId);
+  const teaTop = argmaxTies(Object.entries(teaCounts));
+  const topTeas = teaTop.keys.map(teaById).filter(Boolean);
+  const topTea = topTeas[0] || null, topTeaN = teaTop.value;
   const distinctTeas = Object.keys(teaCounts).length;
 
   const typeCounts = {};
   inSeason.forEach(s=>{ const t=teaById(s.teaId); if(t) typeCounts[t.type]=(typeCounts[t.type]||0)+1; });
-  let topType=null, topTypeN=0; Object.entries(typeCounts).forEach(([k,c])=>{ if(c>topTypeN){ topTypeN=c; topType=k; } });
+  const typeTop = argmaxTies(Object.entries(typeCounts));
+  const topTypes = typeTop.keys, topType = topTypes[0] || null, topTypeN = typeTop.value;
 
   const parts = timeOfDayBuckets(inSeason);
   const topPart = Object.entries(parts).sort((a,b)=>b[1]-a[1])[0][0];
 
-  // "New this season" = teas whose first-ever session lands in the window.
+  // "New this month" = teas whose first-ever session lands in the window (R103: the last complete one).
   const firstSeen = {};
   state.sessions.forEach(s=>{ const t=new Date(s.date).getTime(); if(firstSeen[s.teaId]==null || t<firstSeen[s.teaId]) firstSeen[s.teaId]=t; });
   const newTeas = Object.keys(firstSeen)
@@ -260,7 +295,7 @@ function computeWrapped(){
     .sort((a,b)=> (b.rating-a.rating) || (new Date(b.date)-new Date(a.date)))[0] || null;
 
   return { season, empty:false, n:inSeason.length, infusions, grams, steepSeconds, activeDays,
-    coldN, topTea, topTeaN, distinctTeas, topType, topTypeN, topPart, parts, newTeas, standout };
+    coldN, topTea, topTeas, topTeaN, distinctTeas, topType, topTypes, topTypeN, topPart, parts, newTeas, standout };
 }
 function wrappedShareText(w){
   const lines = [`SlowCup Wrapped · ${w.season.name} ${w.season.year}`];
@@ -268,7 +303,7 @@ function wrappedShareText(w){
     `${w.distinctTeas} tea${w.distinctTeas>1?'s':''}${w.newTeas.length?` (${w.newTeas.length} new)`:''}`].join(' · '));
   if(w.topTea) lines.push(`Companion: ${w.topTea.name} ×${w.topTeaN}`);
   if(w.standout){ const sn = w.standout.teaName||(teaById(w.standout.teaId)||{}).name||'—'; lines.push(`Standout: ${sn} ★${Number(w.standout.rating)}`); }
-  lines.push(`Quietly, that's a season.`);
+  lines.push(`Quietly, that's a month.`);
   return lines.join('\n');
 }
 async function shareWrapped(){
@@ -305,14 +340,16 @@ function wrappedCardHTML(kind, i, total, w){
   const cat = (label, right) => `<div class="wrap-cat"><span>№ ${no}</span><span>${right!=null?right:label}</span></div>`;
   const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
   if(kind==='cover'){
-    const mfmt = d => d.toLocaleDateString(undefined,{month:'short'}).toUpperCase();
-    const months = `${mfmt(w.season.start)} — ${mfmt(new Date(w.season.end.getTime()-86400000))}`;
+    // The old range spanned three months of a season; a month window makes both ends the same, so
+    // it rendered "JUL — JUL". The title already names the month — this line carries the days.
+    const dayN = new Date(w.season.end.getTime()-86400000).getDate();
+    const months = `1—${dayN} ${w.season.short}`;
     return `<div class="wrap-card wf-jade">
       <svg class="wrap-enso-bg" viewBox="0 0 120 120" aria-hidden="true"><use href="#enso"/></svg>
       ${cat(null, `${w.season.name} · ${w.season.year}`)}
       <div class="wrap-body">
         <div class="wrap-display wrap-cover-title">${w.season.name}<br>${w.season.year}</div>
-        <div class="wrap-cover-sub">${months} · a quiet season of tea</div>
+        <div class="wrap-cover-sub">${months} · a month of quiet cups</div>
       </div>
       <div class="wrap-cover-foot"><svg class="wrap-leaf" aria-hidden="true"><use href="#fav-leaf"/></svg><span>swipe →</span></div>
     </div>`;
@@ -322,7 +359,7 @@ function wrappedCardHTML(kind, i, total, w){
       ${cat('Sessions')}
       <div class="wrap-body">
         <div class="wrap-bignum"><span class="wrap-big">${w.n}</span><span class="wrap-big-unit">session${w.n>1?'s':''}</span></div>
-        <div class="wrap-display wrap-lead">Quietly, that's a season.</div>
+        <div class="wrap-display wrap-lead">Quietly, that's a month.</div>
         <div class="wrap-sub">Across ${w.activeDays} day${w.activeDays>1?'s':''} you made the time — no more, no less.</div>
       </div>
       ${foot}
@@ -343,12 +380,16 @@ function wrappedCardHTML(kind, i, total, w){
     </div>`;
   }
   if(kind==='companion'){
+    // R100 — when two teas were reached for equally often, both are named and the count reads
+    // "each". "Always first" is a claim about a single tea, so it goes when there isn't one.
+    const tied = (w.topTeas||[]).length>1;
+    const names = tied ? andList(w.topTeas.map(t=>escapeHtml(t.name))) : escapeHtml(w.topTea.name);
     return `<div class="wrap-card wf-jade">
-      ${cat('Your companion')}
+      ${cat(tied?'Your companions':'Your companion')}
       <div class="wrap-body">
-        <div class="wrap-display wrap-teaname">${escapeHtml(w.topTea.name)}</div>
-        <div class="wrap-count"><span class="wrap-x">×${w.topTeaN}</span><span class="wrap-x-sub">of ${w.n}<br>sessions</span></div>
-        <div class="wrap-display wrap-lead-sm">Mostly ${partWord(w.topPart)}, always first.</div>
+        <div class="wrap-display wrap-teaname">${names}</div>
+        <div class="wrap-count"><span class="wrap-x">×${w.topTeaN}${tied?' each':''}</span><span class="wrap-x-sub">of ${w.n}<br>sessions</span></div>
+        <div class="wrap-display wrap-lead-sm">${tied?`Neither one led.`:`Mostly ${partWord(w.topPart)}, always first.`}</div>
       </div>
       <svg class="wrap-leaf wrap-leaf-foot" aria-hidden="true"><use href="#fav-leaf"/></svg>
     </div>`;
@@ -361,9 +402,11 @@ function wrappedCardHTML(kind, i, total, w){
     return `<div class="wrap-card wf-por">
       ${cat('Your rhythm')}
       <div class="wrap-body">
-        <div class="wrap-display wrap-lead" style="margin-top:0;">Mostly ${typeLabel(w.topType).toLowerCase()},<br>mostly ${partWord(w.topPart)}.</div>
+        <div class="wrap-display wrap-lead" style="margin-top:0;">${(w.topTypes||[]).length>1
+          ? `${andList(w.topTypes.map(k=>typeLabel(k).toLowerCase()))},<br>evenly.`
+          : `Mostly ${typeLabel(w.topType).toLowerCase()},<br>mostly ${partWord(w.topPart)}.`}</div>
         <div class="wrap-bars">${bars}</div>
-        <div class="wrap-sub-mono">${typeLabel(w.topType).toLowerCase()} · ${w.topTypeN} of ${w.n}</div>
+        <div class="wrap-sub-mono">${andList((w.topTypes||[]).map(k=>typeLabel(k).toLowerCase()))} · ${w.topTypeN}${(w.topTypes||[]).length>1?' each':''} of ${w.n}</div>
       </div>
       ${foot}
     </div>`;
@@ -372,7 +415,7 @@ function wrappedCardHTML(kind, i, total, w){
     const names = w.newTeas.slice(0,3).map(t=>escapeHtml(t.name)).join('<br>');
     const more = w.newTeas.length>3 ? `<span class="wrap-names-more"> · +${w.newTeas.length-3}</span>` : '';
     return `<div class="wrap-card wf-amber">
-      ${cat('New this season')}
+      ${cat('New this month')}
       <div class="wrap-body">
         <div class="wrap-bignum"><span class="wrap-big">${w.newTeas.length}</span><span class="wrap-display wrap-big-unit-lg">tea${w.newTeas.length>1?'s':''} found<br>their way in.</span></div>
         <div class="wrap-names">${names}${more}</div>
@@ -411,10 +454,10 @@ function wrappedCardHTML(kind, i, total, w){
     ${cat('Kept')}
     <div class="wrap-body">
       <div class="wrap-display wrap-keep-lines">${w.n} session${w.n>1?'s':''}.<br>${w.infusions} infusion${w.infusions>1?'s':''}.<br>${distinct}</div>
-      <div class="wrap-display wrap-keep-tag">Quietly, that's a season.</div>
+      <div class="wrap-display wrap-keep-tag">Quietly, that's a month.</div>
     </div>
     <div class="wrap-share-wrap">
-      <button class="wrap-share" onclick="shareWrapped()">Share your ${w.season.name.toLowerCase()}</button>
+      <button class="wrap-share" onclick="shareWrapped()">Share your ${w.season.name}</button>
       <div class="wrap-share-note">copies as text · no image, no account</div>
     </div>
   </div>`;
@@ -427,13 +470,14 @@ function wrapGo(i){
 }
 function viewWrapped(){
   const w = computeWrapped();
+  // R103 — no decorated empty card. Wrapped is a retrospective: with no completed month behind you
+  // there is nothing to look back on, and "your August is just beginning" was a live-view sentence
+  // on a surface that is no longer a live view. The teaser already withholds itself when empty, so
+  // this is reachable only by a stale saved view; it says the plain thing and offers the way out.
   if(w.empty){
     return `<div class="wrap">
       <div class="wrap-head"><div class="wrap-head-brand"><svg aria-hidden="true"><use href="#fav-leaf"/></svg><span class="wrap-head-lbl">SlowCup Wrapped</span></div><button class="wrap-close" onclick="goView('insights')" aria-label="Close">×</button></div>
-      <div class="section card" style="text-align:center;padding:34px 20px;">
-        <h2 style="font-family:var(--font-display);font-size:26px;margin:0 0 6px;">Your ${w.season.name} is just beginning</h2>
-        <p style="color:var(--ink-soft);font-size:14px;max-width:34ch;margin:0 auto;">No sessions logged this ${w.season.name.toLowerCase()} yet. Brew a few cups and your recap fills in here.</p>
-      </div>
+      <p style="color:var(--ink-soft);font-size:14px;max-width:34ch;margin:24px auto;text-align:center;">Wrapped looks back at a finished month. Yours arrives once one has passed.</p>
     </div>`;
   }
   const kinds = wrappedKinds(w);
@@ -452,6 +496,35 @@ function viewWrapped(){
 // card moved to Home still has its HTML there; takes the shared computeStats result. renderDashboard
 // concatenates these in order, so each carries its own styling and the run reads as one room:
 // hero (jade-pale, the ONE thing) → hairline-topped observations → deep-jade Wrapped teaser.
+/* The Origins card (R46/R54/R101) — an ENTRY POINT, and deliberately not a map.
+   R101 keeps the map as one build in slice H beside #37, because drawing geography needs d3-geo
+   and a Natural Earth topology: the first third-party runtime dependency since Supabase, on an app
+   with no bundler that precaches every asset it ships. R28 also *defines* the country tier as a
+   polygon label, so half the shelf has no placement rule without those polygons. A mini-map here
+   that a full map in H would then have to agree with is the second-writer problem this round has
+   already paid for twice.
+   So this reads the tiers and says what it knows. There is no tap target yet — the destination
+   lands in H, and a control that goes nowhere is worse than one that isn't drawn (the honest-absence
+   pattern). Both figures are counted, never written (R68), and a shelf with no origins renders
+   nothing at all rather than an empty frame. */
+function insOriginsHTML(){
+  if(typeof originTier!=='function') return '';
+  let region=0, country=0;
+  (state.teas||[]).forEach(t=>{ const tier=originTier(t); if(tier==='region') region++; else if(tier==='country') country++; });
+  const placed = region+country;
+  if(!placed) return '';
+  const lead = region
+    ? `${region} of your teas name where they grew.`
+    : `Your shelf names countries, not yet places.`;
+  const sub = country
+    ? `${country} name only the country — a place makes the map finer.`
+    : `Every placed tea names a region.`;
+  return `<div class="section card">
+    <div class="eyebrow" style="margin-bottom:8px;">Origins</div>
+    <div class="ins-obs">${lead}</div>
+    <div class="ins-cap" style="margin-top:6px;">${sub}</div>
+  </div>`;
+}
 function dashCardsInsights(s){
   return {
     hero: insHeroHTML(),
@@ -459,7 +532,8 @@ function dashCardsInsights(s){
     typemix: insTypeMixHTML(s),
     steepshape: insSteepShapeHTML(),
     notes: insNotesHTML(s),
-    wrapped: insWrappedTeaserHTML()
+    wrapped: insWrappedTeaserHTML(),
+    origins: insOriginsHTML()
   };
 }
 

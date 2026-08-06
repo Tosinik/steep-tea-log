@@ -198,5 +198,35 @@ ok(Math.abs(litersOf({id:'g6',teaId:'TA',vesselId:'v200',date:now,infusionCount:
   'G8 cold brew: liters counted from its waterMl (0.75 L), not the 200ml vessel — no cold-brew exclusion in gridStats');
 console.log('  G water override (#24): 8 checks');
 
+/* ---- H · the card registry, and R102's fence (slice G) ----
+   R54 pins Origins to Insights. A DASH_SURFACE entry only sets the DEFAULT: dashMoveToSurface
+   writes an override for any id, so the registry alone left a user free to move a map onto Home,
+   which is the surface R54 exists to keep it off. The fence therefore lives in the MOVER, and this
+   section asserts the behaviour after a move ATTEMPT — checking the table's value would pass while
+   the hole stayed open, which is precisely the distinction R102 draws. */
+const G = e => vm.runInContext(e, ctx);
+G("persistSettings=function(){};");   // saveDashLayout persists through SteepDB; this section is about the fence, not the write
+['DASH_DEFAULT_ORDER','DASH_LABELS','DASH_SURFACE'].forEach(k=>
+  ok(G(`${k}.origins!==undefined||${k}.indexOf('origins')>-1`), `H1 origins is registered in ${k}`));
+ok(G("DASH_SURFACE.origins==='insights'"), 'H2 R54: its default surface is insights');
+G("state.settings.dashLayout={order:[...DASH_DEFAULT_ORDER],hidden:[],surface:{}};");
+G("dashMoveToSurface('origins');");
+ok(G("dashSurface('origins')==='insights'"),
+   'H3 R102: a move ATTEMPT does not move it — the fence is in the mover, not the table');
+ok(G("!state.settings.dashLayout.surface.origins"),
+   'H4 R102: and it writes no override, so nothing is left behind to honour later');
+// A pin must also survive an override written BEFORE the pin existed (an older saved layout).
+G("state.settings.dashLayout.surface={origins:'home'};");
+ok(G("dashSurface('origins')==='insights'"),
+   'H5 R102: a pre-existing override is ignored — a layout saved before the pin cannot strand a map on Home');
+G("state.settings.dashLayout={order:[...DASH_DEFAULT_ORDER],hidden:[],surface:{}};");
+// The control is also not drawn — hiding it and refusing it are different failure modes (R102).
+ok(!/dashMoveToSurface\('origins'\)/.test(G("renderDashboard(dashCards(),'insights')")+''),
+   'H6 R102: the move control is not rendered for a pinned card either');
+// An unpinned card must still move, or the fence has quietly become a freeze.
+G("dashMoveToSurface('clock');");
+ok(G("dashSurface('clock')==='home'"), 'H7 an UNPINNED card still moves — the fence is not a global freeze');
+console.log('  H card registry + R102 fence: 8 checks');
+
 if(failures){ console.log('\n'+failures+' STAT-PERIOD TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL STAT-PERIOD TESTS PASSED  ('+passed+' passed)');

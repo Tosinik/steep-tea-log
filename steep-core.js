@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.02';
+const APP_VERSION = 'v4.03';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "You can pass a tea to someone in your circle now, with a line to go with it — and Social is one screen: who you write to, what you've shared, and what's arrived.";
+const WHATS_NEW = "Wrapped now looks back at the month just finished rather than the one you're in, Insights gained cost medians and an Origins reading, and where two teas or two hours tie, both are named.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -126,6 +126,23 @@ function lowStockG(){ const v = Number(state.settings.lowStockThreshold); return
 // device-local. ONE writer: never re-hardcode a symbol at a render site or in achievement data.
 function currencySymbol(){ return (state.settings && state.settings.currency) || DEFAULT_SETTINGS.currency; }
 function currencyFmt(n, digits){ return currencySymbol() + Number(n||0).toFixed(digits==null ? 2 : digits); }
+
+/* R100 — the argmax that can say "tied". Every "top X" reducer in this app was written as
+   `if(v > best)`, which takes the FIRST maximum and never revisits it: correct while one value
+   strictly leads, silently arbitrary the moment two are level. There was no signal that a choice
+   had been made. This returns every key holding the maximum, so `tied` is an answer rather than a
+   failure to pick, and the caller decides whether to name one, name both, or say nothing.
+   Callers must filter out the zeroes they don't want to win — an all-zero set legitimately ties. */
+function argmaxTies(entries){
+  let value = -Infinity, keys = [];
+  entries.forEach(([k,v])=>{ if(v>value){ value=v; keys=[k]; } else if(v===value){ keys.push(k); } });
+  return { keys, value: keys.length?value:0, tied: keys.length>1 };
+}
+// "a and b" · "a, b and c" — the shared join for every place R100's tie has to be spoken aloud.
+function andList(items){
+  if(items.length<=1) return items[0]||'';
+  return items.slice(0,-1).join(', ') + ' and ' + items[items.length-1];
+}
 
 let state = {
   teas: [], vessels: [], sessions: [], tagLibrary: [...DEFAULT_TAGS],

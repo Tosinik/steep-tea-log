@@ -110,6 +110,22 @@ function passportSubFor(country, tea){
   for(const s of subs){ for(const a of s.aliases){ if(a.length>bestLen && text.includes(a)){ best=s.name; bestLen=a.length; } } }
   return best;
 }
+/* Origins tier (v4.03) — the honesty ladder Origins is built on: a stored origin either names a
+   PLACE inside a country ("Lugu, Nantou, Taiwan") or only the country ("China"). R28 hangs two
+   different geometries off this distinction — verified point vs labelled polygon — so it needs one
+   writer, in the app, where the card and the future map both read it.
+   It is written here rather than invented: `fixtures/figures-report.js` had been carrying this rule
+   as a private regex, which made the tool that reports the split a second definition of it. The
+   reporter now calls this function in its vm sandbox, the way it already calls the rest of the
+   engine, so the split it prints cannot drift from the split the app draws.
+   R16 — "Ceylon" is a country synonym, so "Ceylon, Sri Lanka" is country tier despite the comma. */
+const ORIGIN_COUNTRY_WORDS = /^(china|taiwan|thailand|japan|india|sri lanka|ceylon|korea|vietnam|nepal|kenya|malawi|indonesia)$/i;
+function originTier(tea){
+  const o = ((tea && tea.origin) || '').trim();
+  if(!o) return null;                                  // no origin at all — not a tier, an absence
+  const parts = o.split(',').map(x=>x.trim()).filter(Boolean);
+  return parts.every(p=>ORIGIN_COUNTRY_WORDS.test(p)) ? 'country' : 'region';
+}
 function passportGeo(country){ return PASSPORT_GEO.find(g=>g.country===country); }
 function passportSubGeo(country, name){ return (PASSPORT_SUB[country]||[]).find(s=>s.name===name); }
 

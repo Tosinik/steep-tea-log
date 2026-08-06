@@ -180,7 +180,30 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.02 R3 slice F: Social + the R25 pass record** (cache **v112**, APP_VERSION
+**NOW (just shipped) — v4.03 R3 slice G: Insights + the Origins card + #11 Wrapped** (cache **v113**,
+APP_VERSION v4.03, **no SQL**). Built to R100–R103.
+- **R103 — Wrapped looks back at the last COMPLETE month.** Live: **July, 40 sittings**, not the 2
+  August ones. `seasonInfo` had zero callers after and is **deleted**; the decorated "your August is
+  just beginning" card is gone, because a retrospective with nothing behind it says so plainly.
+- **R100 — a tie is named, never resolved.** `argmaxTies` (steep-core) replaces three `if(v>best)`
+  reducers. **No live tie exists on the 08-05 export** — 08–10 leads at 16, Chiran at ×5, green at 20
+  — so the fixture is the only thing that can see it. Don't read the absence as untested.
+- **R102 — the fence is in the mover, not the table**, plus `dashSurface` and the rendered control.
+  The negative control removed only the mover's guard and **H4 reddened while H3 stayed green** —
+  the three mechanisms catch different failures and none is redundant.
+- **`originTier` is the single writer** for the region/country split; `figures-report.js` had a
+  private copy of the rule, so the tool reporting the split was a second definition of it.
+- **Cost medians are new computation** (`avgCostPerGram` is a pooled ratio): **€0.24/g** from 14 of
+  21 priced teas, **€0.95/session** from 33 of 42 costable sittings, denominators generated, and
+  nothing rendered below two data points. The board's €0.17/€0.86 do not reproduce and aren't drawn.
+- **Slice A's currency audit never reached the spend view** — six money sites printed no symbol at
+  all. §E guards the *writer*, so it could not see an uncovered *site*. All six now use `currencyFmt`.
+- **Two more expired board claims** (totalGrams + litres already shipped; R22's completeness panel
+  exists nowhere) — six and seven this round. **23 committed suites, all green.**
+  **NEXT: slice H** — #37 Origins (carrying R101's map decision) · #08 Shopping · #07 Settings row ·
+  #09 landing; the Passport hub row comes out there.
+
+**Previously — v4.02 R3 slice F: Social + the R25 pass record** (cache **v112**, APP_VERSION
 v4.02, **`sql/v3_10-pass-record.sql` applied by hand BEFORE the push**). The round's second and last
 migration, and the one where filename order genuinely differs from version order.
 - **R96 — a pass carries a snapshot, not just an id.** `teas` is owner-only under RLS, so a recipient

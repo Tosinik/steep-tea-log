@@ -139,6 +139,29 @@ const travel = V.find(v => /travel/i.test(v.name || ''));
 ok(travel && travel.type === 'Porcelain teapot',
    `Travel cuppa is typed 'Porcelain teapot' (R63: 旅 was keyed off a name, not a type) — got ${travel ? JSON.stringify(travel.type) : 'row not found'}`);
 
+/* ---- E · the pass record (v4.02) --------------------------------------------------------------
+   The whole check turns on ONE distinction: a table with zero rows is the correct steady state
+   (the two verification rows were deleted after the read policy was exercised), while a MISSING
+   file means the table was never exported and every pass-shaped assertion downstream is running
+   against nothing. If both produced a pass, the check would have degraded to silence — which is
+   the failure mode this round has now had to protect three separate instruments from.
+   So: the file's PRESENCE is asserted; its row count is only reported. */
+console.log('\nE · pass record (zero rows is fine; a missing table is not)');
+const PA = load('passes_rows.csv'), PR = load('profiles_rows.csv');
+ok(PA !== null, 'passes_rows.csv is in the export — an absent file is a missing table, not an empty one');
+ok(PR !== null, 'profiles_rows.csv is in the export — the pass referential check has nothing to resolve against without it');
+if (PA !== null && PR !== null){
+  ok(Array.isArray(PA), 'passes_rows.csv parses');
+  const profIds = new Set(PR.map(p => p.id));
+  const badFrom = PA.filter(p => p.from_profile && !profIds.has(p.from_profile));
+  const badTo   = PA.filter(p => p.to_profile   && !profIds.has(p.to_profile));
+  ok(badFrom.length === 0, `every pass's from_profile resolves in profiles_rows — ${badFrom.length} dangling`);
+  ok(badTo.length === 0,   `every named recipient resolves in profiles_rows — ${badTo.length} dangling (null = circle, correctly skipped)`);
+  const noName = PA.filter(p => !(p.tea_name && p.tea_name.trim()));
+  ok(noName.length === 0, `every pass carries its denormalised tea_name (R96) — ${noName.length} without`);
+  console.log(`  note  ${PA.length} pass row(s) — zero is the expected steady state; rows mean a live or unretracted pass`);
+}
+
 // ---- what actually loaded --------------------------------------------------------------------
 const days = new Set(S.map(s => (s.session_date || '').slice(0, 10)).filter(Boolean));
 const sorted = [...days].sort();

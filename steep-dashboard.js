@@ -76,10 +76,13 @@ function computeStats(){
   // time of day distribution (2h buckets)
   const hourBuckets = new Array(12).fill(0);
   sessions.forEach(s=>{ hourBuckets[Math.floor(new Date(s.date).getHours()/2)]++; });
-  let peakBucket = -1, peakVal = 0;
-  hourBuckets.forEach((v,i)=>{ if(v>peakVal){ peakVal=v; peakBucket=i; } });
+  // R100 — peakBuckets is the real answer and may hold more than one index; peakBucket keeps the
+  // single-index shape for callers that only need somewhere to point. Empty buckets are filtered
+  // out first: an all-zero clock has no peak, and argmaxTies would otherwise tie all twelve.
+  const peakSet = argmaxTies(hourBuckets.map((v,i)=>[i,v]).filter(([,v])=>v>0));
+  const peakBuckets = peakSet.keys, peakBucket = peakBuckets.length ? peakBuckets[0] : -1;
 
-  return {totalSessions, totalSteeps, totalGrams, totalLiters, days, uniqueTeas, typeCounts, mostBrewed, topRated, favorites, lowStock, totalSpent, avgCostPerGram, streak, coldBrewCount, nightSessionCount, typesUsedCount, vesselsUsedCount, fiveStarSessions, hourBuckets, peakBucket};
+  return {totalSessions, totalSteeps, totalGrams, totalLiters, days, uniqueTeas, typeCounts, mostBrewed, topRated, favorites, lowStock, totalSpent, avgCostPerGram, streak, coldBrewCount, nightSessionCount, typesUsedCount, vesselsUsedCount, fiveStarSessions, hourBuckets, peakBucket, peakBuckets};
 }
 
 /* ---------- monthly spend (v3.26) ----------
@@ -129,8 +132,8 @@ function viewSpend(){
     const h = Math.max(2, Math.round((m.total/max)*96));
     const isNow = m.key===nowK;
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;">
-      <div style="font-size:10px;color:var(--ink-soft);height:12px;">${m.total?m.total.toFixed(0):''}</div>
-      <div title="${monthLabel(m.key,true)}: ${m.total.toFixed(2)}" style="width:66%;max-width:24px;height:${h}px;border-radius:4px 4px 0 0;background:${isNow?'var(--amber)':'var(--jade)'};opacity:${m.total?1:.2};"></div>
+      <div style="font-size:10px;color:var(--ink-soft);height:12px;">${m.total?currencyFmt(m.total,0):''}</div>
+      <div title="${monthLabel(m.key,true)}: ${currencyFmt(m.total)}" style="width:66%;max-width:24px;height:${h}px;border-radius:4px 4px 0 0;background:${isNow?'var(--amber)':'var(--jade)'};opacity:${m.total?1:.2};"></div>
       <div style="font-size:9.5px;color:var(--ink-soft);white-space:nowrap;">${monthLabel(m.key,false)}</div>
     </div>`;
   }).join('');
@@ -151,37 +154,82 @@ function viewSpend(){
     <div class="card">
       <div class="eyebrow">${thisMonthName}</div>
       <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px;">
-        <div style="font-size:30px;font-weight:700;font-family:var(--font-display);">${ms.thisMonth.toFixed(2)}</div>
+        <div style="font-size:30px;font-weight:700;font-family:var(--font-display);">${currencyFmt(ms.thisMonth)}</div>
         <div style="font-size:12px;color:var(--ink-soft);">${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} this month</div>
       </div>
       <div style="display:flex;align-items:flex-end;gap:4px;height:130px;margin-top:16px;">${bars}</div>
       <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--ink-soft);">
-        <span>Avg / active month: <strong style="color:var(--ink);">${ms.avgPerActiveMonth.toFixed(2)}</strong></span>
-        <span>Tracked total: <strong style="color:var(--ink);">${ms.totalDated.toFixed(2)}</strong></span>
+        <span>Avg / active month: <strong style="color:var(--ink);">${currencyFmt(ms.avgPerActiveMonth)}</strong></span>
+        <span>Tracked total: <strong style="color:var(--ink);">${currencyFmt(ms.totalDated)}</strong></span>
       </div>
     </div>
     ${teaRows ? `<div class="card"><div class="eyebrow">Bought this month</div><div style="margin-top:2px;">${teaRows}</div></div>` : ''}
-    ${ms.undatedCount ? `<div class="card" style="font-size:12px;color:var(--ink-soft);"><strong style="color:var(--ink);">${ms.undated.toFixed(2)}</strong> from ${ms.undatedCount} priced tea${ms.undatedCount===1?'':'s'} without a purchase date isn't shown by month. Add a purchase date on a tea to include it.</div>` : ''}
+    ${ms.undatedCount ? `<div class="card" style="font-size:12px;color:var(--ink-soft);"><strong style="color:var(--ink);">${currencyFmt(ms.undated)}</strong> from ${ms.undatedCount} priced tea${ms.undatedCount===1?'':'s'} without a purchase date isn't shown by month. Add a purchase date on a tea to include it.</div>` : ''}
     `}
   `;
 }
 
 
+/* Cost medians (#08 rev 3). NOT a recompute of anything shipped: `avgCostPerGram` is a POOLED
+   ratio (totalSpent / gramsBought), which is a different statistic — one expensive 500 g brick
+   moves it and moves no median. Both figures are derived here at render time from the user's own
+   rows, and the board's €0.17/g · €0.86/session are not used: that method (cost_total ÷ grams) on
+   this shelf gives €0.236/g, and the board's provenance is unknown.
+   Partial by construction — cost is optional on a tea — so the card SAYS how many rows answered
+   rather than implying the whole shelf. Below two data points a median is not a median: render
+   nothing (the three-tier cascade's third rung), never a zero. */
+function costMedians(){
+  const med = a => { if(!a.length) return null; const v=[...a].sort((x,y)=>x-y), m=v.length>>1;
+    return v.length%2 ? v[m] : (v[m-1]+v[m])/2; };
+  const rate = {};                                   // teaId → cost per gram, only where both are known
+  const perGram = [];
+  (state.teas||[]).forEach(t=>{
+    const c = Number(t.costTotal)||0, g = Number(t.costOriginalGrams)||0;
+    if(c>0 && g>0){ rate[t.id] = c/g; perGram.push(c/g); }
+  });
+  const perSession = [];
+  (state.sessions||[]).forEach(s=>{
+    const r = rate[s.teaId], g = Number(s.gramsUsed)||0;
+    if(r && g>0) perSession.push(r*g);
+  });
+  return { perGram: med(perGram), perGramN: perGram.length, teaN: (state.teas||[]).length,
+           perSession: med(perSession), perSessionN: perSession.length, sessionN: (state.sessions||[]).length };
+}
+function costMediansHTML(){
+  const m = costMedians();
+  const cells = [];
+  if(m.perGramN>=2)    cells.push(`<div class="stat"><div class="num">${currencyFmt(m.perGram)}</div><div class="lbl">Median / gram</div></div>`);
+  if(m.perSessionN>=2) cells.push(`<div class="stat"><div class="num">${currencyFmt(m.perSession)}</div><div class="lbl">Median / session</div></div>`);
+  if(!cells.length) return '';
+  // R68: the denominator is generated, so the line can never claim a coverage it doesn't have.
+  const src = [];
+  if(m.perGramN>=2)    src.push(`${m.perGramN} of ${m.teaN} teas priced`);
+  if(m.perSessionN>=2) src.push(`${m.perSessionN} of ${m.sessionN} sittings costable`);
+  return `<div class="grid grid-2" style="margin-bottom:10px;">${cells.join('')}</div>
+    <div class="mono" style="font-size:10px;color:var(--ink-soft);margin-bottom:12px;">${src.join(' · ')}</div>`;
+}
+
+// The two-digit bucket name the boards use: 08–10, not 8:00–10:00.
+function bucketLabel(i){ const p=n=>String(n).padStart(2,'0'); return `${p(i*2)}–${p(i*2+2)}`; }
 function brewingClockHTML(s){
   if(s.totalSessions===0) return '';
   const max = Math.max(1, ...s.hourBuckets);
   const labels = ['0','2','4','6','8','10','12','14','16','18','20','22'];
+  const peaks = new Set(s.peakBuckets||[]);
   const bars = s.hourBuckets.map((v,i)=>{
     const h = Math.round(v/max*100);
-    const isPeak = i===s.peakBucket && v>0;
+    const isPeak = peaks.has(i);                       // R100: every tied peak is lit, not just the first
     return `<div class="clock-col">
       <div class="clock-bar-track"><div class="clock-bar" style="height:${h}%;background:${isPeak?'var(--amber)':'var(--jade)'};"></div></div>
       <div class="clock-lbl">${labels[i]}</div>
     </div>`;
   }).join('');
-  const peakLabel = s.peakBucket>=0 ? `${s.peakBucket*2}:00–${s.peakBucket*2+2}:00` : '—';
+  // R100 — a tie is named, never resolved. "peak 08–10 and 12–14" says what is true; picking one
+  // asserts a hierarchy that doesn't exist, and the old label did it silently.
+  const pk = s.peakBuckets||[];
+  const peakLabel = pk.length ? `${pk.length>1?'joint peak':'peak'} ${andList(pk.map(bucketLabel))}` : '';
   return `<div class="section card">
-    <div class="section-title"><h2>When you brew</h2><span class="mono" style="font-size:12px;color:var(--amber);">peak ${peakLabel}</span></div>
+    <div class="section-title"><h2>When you brew</h2>${peakLabel?`<span class="mono" style="font-size:12px;color:var(--amber);">${peakLabel}</span>`:''}</div>
     <div class="clock-chart">${bars}</div>
   </div>`;
 }
@@ -533,21 +581,24 @@ function viewAchievements(){
 // WS2 (v3.74): Home reduced to glance cards only — greeting · running low · favourites · one number
 // ('week'). The stat grid + brewing clock + cost + recent moved to Insights (reflection lives there
 // now). Nothing deleted — the relocated cards stay editable/hideable, so no data or view is stranded.
-const DASH_DEFAULT_ORDER = ['greeting','restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost'];
-const DASH_LABELS = { greeting:'Greeting', restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped' };
+const DASH_DEFAULT_ORDER = ['greeting','restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost','origins'];
+const DASH_LABELS = { greeting:'Greeting', restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab.
 // Migration is automatic — existing saved {order,hidden} keep their visibility and gain a surface
 // from this map (nothing a user hid can reappear); ids no longer present are filtered out.
 const DASH_SURFACE = {
   greeting:'home', restock:'home', favorites:'home', week:'home',
   recent:'insights', totals:'insights', clock:'insights', cost:'insights',
-  hero:'insights', reading:'insights', typemix:'insights', steepshape:'insights', notes:'insights', wrapped:'insights'
+  hero:'insights', reading:'insights', typemix:'insights', steepshape:'insights', notes:'insights', wrapped:'insights',
+  origins:'insights'   // R54 — and PINNED there by DASH_PINNED below; this entry is only the default
 };
 // Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
 // dashLayout.surface maps id→'home'|'insights', overriding the built-in DASH_SURFACE. Absent
 // key = use the built-in; old saved layouts (no surface key) just fall through unchanged.
 function dashSurfaceOverride(){ const L=state.settings.dashLayout; return (L&&L.surface)||{}; }
-function dashSurface(id){ return dashSurfaceOverride()[id] || DASH_SURFACE[id] || 'home'; }
+// A pinned card's surface is not negotiable — the override is ignored even if one exists in an
+// older saved layout, so a move written before the pin can't strand a map on Home (R102).
+function dashSurface(id){ return dashPinnedTo(id) || dashSurfaceOverride()[id] || DASH_SURFACE[id] || 'home'; }
 function dashLayout(){
   const L = state.settings.dashLayout || {};
   let order = Array.isArray(L.order) ? L.order.filter(id=>DASH_DEFAULT_ORDER.includes(id)) : [];
@@ -572,7 +623,15 @@ function dashShowCard(id){ const { order, hidden } = dashLayout(); hidden.delete
 // Move a card to the other tab. Stores an override (or clears it when moving back to the card's
 // built-in surface, so no-op overrides don't accumulate) and re-lands it at the bottom of the
 // destination tab. Reorder-within-tab (dashMoveCard) then works because dashSurface reflects the override.
+/* R102 — the fence lives HERE, not in DASH_SURFACE. That table sets a DEFAULT; this function
+   writes an override for any id, so a registry entry of 'insights' left a user free to move Origins
+   to Home — exactly what R54 exists to prevent (Home has no revision board; a map is not a glance
+   card). A default is not a constraint. Pinned ids keep their move control unrendered AND refuse the
+   move if one is somehow invoked, because the two are different failure modes. */
+const DASH_PINNED = { origins:'insights' };
+function dashPinnedTo(id){ return DASH_PINNED[id] || null; }
 function dashMoveToSurface(id){
+  if(dashPinnedTo(id)) return;                        // R54 via R102: refuse, don't just hide the button
   const { order, hidden } = dashLayout();
   const dest = dashSurface(id)==='home' ? 'insights' : 'home';
   const ov = {...dashSurfaceOverride()};
@@ -604,7 +663,7 @@ function renderDashboard(cards, surface){
         <span style="display:flex;gap:4px;">
           <button class="lib-chip" onclick="dashMoveCard('${id}',-1)" aria-label="Move up">↑</button>
           <button class="lib-chip" onclick="dashMoveCard('${id}',1)" aria-label="Move down">↓</button>
-          <button class="lib-chip" onclick="dashMoveToSurface('${id}')" title="Move to the other tab">${surface==='home'?'→ Insights':'→ Home'}</button>
+          ${dashPinnedTo(id) ? '' : `<button class="lib-chip" onclick="dashMoveToSurface('${id}')" title="Move to the other tab">${surface==='home'?'→ Insights':'→ Home'}</button>`}
           <button class="lib-chip" onclick="dashHideCard('${id}')">Hide</button>
         </span>
       </div>
@@ -1021,6 +1080,7 @@ function dashCardsHome(s){
     })(),
     cost: `<div class="section card">
       <div class="section-title"><h2>Cost overview</h2></div>
+      ${costMediansHTML()}
       <div class="grid grid-3">
         <div class="stat" onclick="goView('spend')" style="cursor:pointer;" title="Monthly spending"><div class="num">${currencyFmt(s.totalSpent,0)}</div><div class="lbl">Total spent ›</div></div>
         <div class="stat"><div class="num">${currencyFmt(s.avgCostPerGram)}</div><div class="lbl">Avg / gram</div></div>
@@ -1028,7 +1088,7 @@ function dashCardsHome(s){
           ? `<div class="stat" onclick="goLowStock()" style="cursor:pointer;" title="View low-stock teas"><div class="num">${s.lowStock.length}</div><div class="lbl">Low stock ›</div></div>`
           : `<div class="stat"><div class="num">0</div><div class="lbl">Low stock</div></div>`}
       </div>
-      ${(function(){ const ms=computeMonthlySpend(); return ms.thisMonth>0 ? `<div style="margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;" onclick="goView('spend')">This month: <strong style="color:var(--ink);">${ms.thisMonth.toFixed(2)}</strong> across ${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} · see monthly ›</div>` : ''; })()}
+      ${(function(){ const ms=computeMonthlySpend(); return ms.thisMonth>0 ? `<div style="margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;" onclick="goView('spend')">This month: <strong style="color:var(--ink);">${currencyFmt(ms.thisMonth)}</strong> across ${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} · see monthly ›</div>` : ''; })()}
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
     </div>`
   };

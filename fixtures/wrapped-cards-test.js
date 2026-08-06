@@ -15,6 +15,16 @@
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const repo=path.join(__dirname,'..');
 const src=fs.readFileSync(path.join(repo,'steep-insights.js'),'utf8');
+/* R100/R103 — argmaxTies and andList live in steep-core.js, and originTier in steep-passport.js.
+   This suite deliberately does NOT load those files (it stubs the cross-module surface instead), so
+   the two shared helpers are spliced in from their REAL source rather than stubbed: a stubbed argmax
+   would make every tie assertion below a test of this fixture's own arithmetic. The splice throws
+   loudly if it can't find them — a silent fallback to a stub is the failure it exists to prevent. */
+const coreSrc=fs.readFileSync(path.join(repo,'steep-core.js'),'utf8');
+const passSrc=fs.readFileSync(path.join(repo,'steep-passport.js'),'utf8');
+const grab=(s,name)=>{ const m=s.match(new RegExp('function '+name+'\\([\\s\\S]*?\\n}'));
+  if(!m) throw new Error('could not splice '+name+' — it moved or changed shape; fix the splice, do not stub it'); return m[0]; };
+
 
 // Minimal stubs for the steep-core/dashboard helpers wrappedCardHTML leans on.
 const ctx={};
@@ -28,6 +38,7 @@ ctx.renderStarsStatic=()=>'<span class="stars">★</span>';
 ctx.typeLabel=k=>({green:'Green',oolong:'Oolong',black:'Black',white:'White'}[k]||k||'');
 ctx.matchMedia=()=>({matches:false});
 vm.createContext(ctx);
+vm.runInContext([grab(coreSrc,'argmaxTies'), grab(coreSrc,'andList'), grab(passSrc,'originTier')].join(';\n'), ctx);
 
 const test=`
   let failures=0,passes=0;
@@ -95,7 +106,47 @@ const test=`
   check('share line 2 counts', t[1]==='14 sessions · 43 infusions · 12 teas (5 new)');
   check('share companion line', t[2]==='Companion: Shincha Saemidori Kagoshima ×6');
   check('share standout line', t[3]==='Standout: Ruby Ruanzhi ★4.5');
-  check('share closing tag', t[t.length-1]==="Quietly, that's a season.");
+  check('share closing tag', t[t.length-1]==="Quietly, that's a month.");
+
+  /* 8) R103 — the window is the LAST COMPLETE MONTH. Asserted on wrappedPeriod directly, with
+     dates built RELATIVE to a fixed "now", because a suite that hardcodes July passes in July and
+     lies in August — which is the exact class of bug R103 exists to close. */
+  const NOW=new Date(2026,7,6);                                   // 6 Aug 2026
+  const at=(y,m,d)=>({date:new Date(y,m,d).toISOString()});
+  // The window is asserted on its BOUNDARIES, which carry no locale at all. The NAME is pinned
+  // English on purpose: it appears mid-sentence ("Your July, wrapped") in an app with no i18n, so
+  // unlike fmtDate — which renders dates in the user's locale and stays that way — it is copy.
+  // This machine runs de-DE, so a locale-rendered name here would read "Juli" and this assertion
+  // is what stops that coming back.
+  const monthName=(y,m)=>['January','February','March','April','May','June','July','August','September','October','November','December'][m];
+  const p1=wrappedPeriod(NOW,[at(2026,6,12),at(2026,7,4)]);       // July + August rows
+  check('R103 window is the last complete month, not the current one',
+    p1 && p1.start.getTime()===new Date(2026,6,1).getTime() && p1.year===2026);
+  check('R103 window excludes the current month', p1 && p1.end.getTime()===new Date(2026,7,1).getTime());
+  check('R103 the label names that month in the user\\'s locale', p1 && p1.name===monthName(2026,6));
+  const only=wrappedPeriod(NOW,[at(2026,7,4)]);                   // August only — nothing completed
+  check('R103 with only current-month rows there is nothing to look back on', only===null);
+  const gap=wrappedPeriod(NOW,[at(2026,4,9),at(2026,7,4)]);       // May, then August
+  check('R103 empty last month falls back to the most recent month that has sittings',
+    gap && gap.start.getTime()===new Date(2026,4,1).getTime() && gap.name===monthName(2026,4));
+  check('R103 no sittings anywhere renders nothing', wrappedPeriod(NOW,[])===null);
+
+  /* 9) R100 — a tie is named, not resolved. No live export currently ties (the 08-05 set has
+     Chiran x5 clear and green x20 clear), so this is the ONLY thing that can see the behaviour. */
+  const tiedW=Object.assign({},full,{ topTeas:[{name:'Ruby Ruanzhi'},{name:'Honey Oolong'}],
+    topTea:{name:'Ruby Ruanzhi'}, topTeaN:6, topTypes:['green','oolong'], topType:'green', topTypeN:7 });
+  const comp=wrappedCardHTML('companion',3,8,tiedW);
+  check('R100 a tied companion names BOTH teas', comp.indexOf('Ruby Ruanzhi and Honey Oolong')>-1);
+  check('R100 a tied companion counts "each"', comp.indexOf('each')>-1);
+  check('R100 a tied companion drops "always first"', comp.indexOf('always first')<0);
+  const comp1=wrappedCardHTML('companion',3,8,full);
+  check('R100 an untied companion still reads exactly as before', comp1.indexOf('always first')>-1 && comp1.indexOf('each')<0);
+  const rhy=wrappedCardHTML('rhythm',4,8,tiedW);
+  check('R100 a tied rhythm names both types', rhy.indexOf('green and oolong')>-1);
+  check('R100 argmaxTies reports the tie rather than picking', (function(){
+    const r=argmaxTies([['a',3],['b',3],['c',1]]); return r.tied===true && r.keys.length===2 && r.value===3; })());
+  check('R100 a clear winner is not reported as tied', (function(){
+    const r=argmaxTies([['a',4],['b',3]]); return r.tied===false && r.keys[0]==='a'; })());
 
   console.log('\\n'+(failures===0?'ALL WRAPPED-CARDS TESTS PASSED':failures+' FAILED')+'  ('+passes+' passed)');
   if(failures) throw new Error('wrapped-cards test failed');
