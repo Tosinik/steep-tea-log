@@ -180,7 +180,24 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.05: R108's render smoke harness + R55's origin offer** (cache **v115**,
+**NOW (just shipped) — v4.06: R109, a passed tea goes to the wishlist** (cache **v116**, APP_VERSION
+v4.06, **no SQL**).
+- **R109 amends R36, and it is the first ruling this round overturned by USING the app.** Add-to-shelf
+  claimed ownership of a tea the recipient had only been told about, **and the claim propagates**:
+  0 g enters stock → `empty` under `stockTier` → Shopping's running-low list → a slot in "21 teas".
+  The wishlist was already the right shape and needs no schema; **the sender's note rides onto the
+  row with its attribution**, which the shelf had nowhere to put. Add-to-shelf stays secondary.
+- **The guard is at the writer** (`addWishFromTea`'s had to move there after `rebuyYes` inherited the
+  bug). Both halves proven by negative control; **F16 asserts the propagation rather than describing
+  it**, because that is the part a future "simplify to one action" would not notice.
+- **The map is still HELD.** Design chose direction 2 — country tier off the map, listed beside it,
+  14 px merge rule, no edge indicator. Verified: 3.74 px/unit, 83% span. **Correction carried: the
+  tightest remaining gap is 23.0 px (Hoshino↔Kagoshima), not 24.5** (that is Hoshino↔Chiran), and
+  23 px is what the 14 px threshold is judged against. **Still owed by Design:** the merged-mark
+  tie-break, and whether 14 px tracks pin width. **R45/R66's Passport removal stays behind it.**
+  **24 committed suites, all green.**
+
+**Previously — v4.05: R108's render smoke harness + R55's origin offer** (cache **v115**,
 APP_VERSION v4.05, **no SQL**). **The map is HELD** — the planning lane measured the frame at drawn
 size and ruled it a Design question (three collisions, and 44% of the frame empty because of one
 outlying tea). Neither the outline artifact nor its generator is committed; both live in the

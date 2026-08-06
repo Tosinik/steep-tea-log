@@ -258,7 +258,24 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.05 LIVE — R108's render smoke harness + R55's origin offer** (cache **v115**, no SQL).
+**v4.06 LIVE — R109: a passed tea goes to the wishlist, not the shelf** (cache **v116**, no SQL).
+R109 amends R36 and is **the first ruling this round overturned by using the app** rather than by
+reading it against the repo — the feature worked and was still wrong. Add-to-shelf claimed ownership
+of a tea the recipient had only been told about, and the claim propagates through `stockTier` into
+Shopping's running-low list and the tea count. The wishlist needed no schema, and the sender's note
+now rides onto the row with its attribution. Add-to-shelf stays as the secondary action.
+
+**The map is HELD, with the frame ruled.** Design chose direction 2: country tier off the map, listed
+beside it; the 14 px merge rule; no edge indicator. Independently verified — 3.74 px/unit, marks
+spanning 83% of the card. **One correction carried: the tightest remaining gap is 23.0 px
+(Hoshino↔Kagoshima), not 24.5** — that figure is Hoshino↔Chiran — and 23 px is what the 14 px
+threshold is actually judged against, which is what makes 14 safe rather than tuned. Two owed items
+are answered (**ten** country-only under R16's normalisation; the larger tea count leads a merged
+mark); **two are still owed by Design** — the tie-break when counts are equal, and whether 14 px
+tracks pin width or is a constant. **The map does not resume until those land, and R45/R66's Passport
+removal stays behind it.**
+
+**Previously: v4.05 — R108's render smoke harness + R55's origin offer** (cache **v115**, no SQL).
 **The map is HELD**: the planning lane measured the outline's frame at drawn size and ruled it a
 Design question — three pin collisions (Kagoshima↔Chiran at 1.6 px is two *region* pins, not a label
 artefact) and 44% of the frame empty because one tea sits 103 px from everything else. R19's adaptive

@@ -1104,6 +1104,52 @@ glance.
 > account is the pass that earns its keep**: `undefined` and `NaN` come from the no-rows branches, not
 > the populated ones.
 
+**R109 — A passed tea goes to the WISHLIST, not the shelf. Amends R36.** R36 specified Add-to-shelf
+as the only action on the minimal preview. Real use — Niklas ran the feature end to end with Ruth's
+phone as the recipient — shows that claims ownership of a tea the recipient has only been *told
+about*, and **the claim propagates**: the tea enters stock at 0 g, therefore reads `empty` under
+`stockTier`, therefore appears in Shopping's running-low list, and takes a slot in "21 teas". None of
+that is true of a recommendation.
+
+The wishlist is the surface built for exactly this — a tea you want and do not have — and a pass maps
+onto it **with no schema change**: `wishlist` already carries `name`, `tea_type`, `note` and a
+nullable `vendor` (`sql/v3_3-wishlist.sql:5–14`). The sender's note becomes the wishlist note rather
+than being discarded into a shelf row, **which is a better outcome than the original**. The onward
+path needs nothing new either: `teaFromWishItem` moves the row to the shelf when the tea is actually
+acquired, R49's normalised-name join matches it, and SH1's overlap handling already draws a wishlist
+row naming a tea now on the shelf. Add-to-shelf **stays available as a secondary action** — someone
+may be passed a tea they already own, or buy it at once — but it is no longer the only one and no
+longer the default. Applies to **both** R36 tiers. Same idempotency guard as `addWishFromTea`: a pass
+added twice must not create two rows.
+
+**Recorded as the first ruling this round overturned by USING the app rather than by reading it
+against the repo.** Every other correction this round came from checking a claim against code or
+export; this one could only come from the thing working and still being wrong.
+
+> *Code-lane note, 2026-08-06 (shipped in v4.06).* The guard is at the **writer**, not the call site —
+> `addWishFromTea`'s guard had to be moved there after `rebuyYes` inherited the bug, so this one
+> starts there. Both halves are proven by negative control: disabling the guard reddens F15, and
+> making the shelf primary again reddens F9/F10. **F16 asserts the propagation rather than describing
+> it** — a 0 g shelf row does not read as neutral under `stockTier`, which is the actual argument and
+> the part a future "simplify to one action" would not notice.
+
+### Also recorded (not rulings) — the frame ruling (map still held)
+
+- **Design chose direction 2**: country tier off the map, listed beside it; direction 3's 14 px merge
+  rule attached; no edge indicator. Verified independently against their own frame function — scale
+  **3.74 px/unit**, marks spanning **83%** of the card. Both exact.
+- **One correction carried:** the tightest remaining gap is **23.0 px (Hoshino↔Kagoshima)**, not 24.5
+  — that figure is Hoshino↔Chiran. It matters because 23 px is what the 14 px threshold is actually
+  judged against, and the jump from Kagoshima↔Chiran at 3.3 px to 23 px is what makes 14 a **safe**
+  threshold rather than a tuned one.
+- **Two of the three owed items are answered.** The country-only count is **ten**: nine bare country
+  strings (China ×5, Taiwan ×3, Thailand ×1) plus Moragella Oolong at `Ceylon, Sri Lanka`,
+  normalising in under R16 — nine is the literal-string count, ten is post-normalisation, and R16
+  governs. Which name leads a merged mark: per-region tea counts exist (Kagoshima 3, Chiran 1), so
+  the larger count leads. **Still owed by Design:** the tie-break rule when counts are equal, and
+  whether 14 px tracks pin width or is a constant.
+- **The map does not resume until those land**, and **R45/R66's Passport removal stays behind it**.
+
 ### Also recorded (not rulings) — from the H2 non-map build (v4.05)
 
 - **R55's offer is live and does exactly three things**: Gui Fei → `Lugu, Nantou, Taiwan`, Dawang Feng

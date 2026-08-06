@@ -28,7 +28,9 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const repo=path.join(__dirname,'..');
-const SRC=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-dashboard.js','steep-teas.js','steep-reference.js','steep-social.js','steep-sessions.js']
+// steep-shopping.js is loaded for R109: the wishlist is where a passed tea now goes, so its writer
+// (persistWish) and R49's join (wishHasTeaName) are part of the path under test, not a stub.
+const SRC=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-dashboard.js','steep-teas.js','steep-reference.js','steep-shopping.js','steep-social.js','steep-sessions.js']
   .map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
 const ctx={};ctx.window=ctx;ctx.globalThis=ctx;ctx.console=console;
 ctx.document={documentElement:{setAttribute(){},getAttribute(){return'light'}},
@@ -235,6 +237,44 @@ ok(/function openPassSheet\(/.test(code) && (code.match(/SteepDB\.sendPass\(/g)|
   ok(!code.includes(w), 'F2 receiving a pass never mutates your shelf directly ('+w+' absent)'));
 ok(/state\.teaPrefill/.test(code) && /openTeaForm\(\)/.test(code),
    'F3 Add to shelf opens the prefilled create FORM — nothing is written until the user commits it');
+
+/* ---- F9–F14 · R109: a pass is a RECOMMENDATION, so it goes to the wishlist ----
+   R36 made Add-to-shelf the only action. Using the app overturned it: a shelf row claims ownership
+   of a tea you have only been told about, and the claim PROPAGATES — 0 g enters stock, reads
+   `empty` under stockTier, surfaces in Shopping's running-low list, and takes a slot in the tea
+   count. The propagation is asserted below rather than described, because it is the actual argument
+   and it is the part a future "simplification" back to one action would not notice. */
+// The writer touches the persistence + toast + render surface; stub only those, so what is being
+// asserted is the writer's own logic rather than a re-implementation of it.
+let _wrote = 0;
+ctx.SteepDB = { newId: () => 'w' + (++_wrote), putWishItem: () => Promise.resolve() };
+ctx.showToast = () => {};
+vm.runInContext('render=function(){};', ctx);
+S.teas=teas; S.wishlist=[];
+const passIn = { id:'p9', fromProfile:'attacker', toProfile:OWNER, sessionId:null, teaId:null,
+                 teaName:'Rou Gui', teaType:'oolong', note:'the second steep is where it opens',
+                 createdAt:'2026-07-12T09:00:00Z' };
+S.social.passes = { sent:[], received:[passIn], profiles:{} };
+S.social.profiles = { ...profMap, attacker:{id:'attacker',username:'ruth',displayName:'Ruth',avatarUrl:null} };
+const rowR109 = G('passRowHTML(state.social.passes.received[0], state.social.profiles.attacker)');
+ok(/addPassToWishlist\(/.test(rowR109), 'F9 R109 the PRIMARY action is Add to wishlist');
+ok(/Add to wishlist/.test(rowR109), 'F10 …and it says so in words, not just in the handler');
+ok(/addPassToShelf\(/.test(rowR109), 'F11 R109 Add-to-shelf survives as the secondary action — someone may already own it');
+ok(rowR109.indexOf('addPassToWishlist') < rowR109.indexOf('addPassToShelf'),
+   'F12 …and the wishlist comes FIRST in the markup, so it is the default rather than a peer');
+// The writer, and its guard. addWishFromTea's guard had to move to the writer once rebuyYes
+// inherited the bug; this one starts there.
+G("addPassToWishlist('p9');");
+ok(S.wishlist.length===1 && S.wishlist[0].name==='Rou Gui', 'F13 the pass lands on the wishlist as a want');
+ok(/second steep/.test(S.wishlist[0].note||'') && /Ruth/.test(S.wishlist[0].note||''),
+   'F14 the sender\'s note is CARRIED with its attribution — the shelf had nowhere to put it');
+G("addPassToWishlist('p9');");
+ok(S.wishlist.length===1, 'F15 adding the same pass twice creates ONE row — the guard is at the writer');
+// The propagation R109 exists to prevent: had it gone to the shelf, this tea would be stock at 0 g.
+const wouldBeShelfRow = { id:'x', name:'Rou Gui', type:'oolong', amountGrams:0 };
+ok(G('stockTier')(wouldBeShelfRow)!=='plenty',
+   'F16 a 0 g shelf row is NOT neutral — it reads as a stock tier, which is why a recommendation must not become one');
+S.wishlist=[];
 ok(/function circleFeedHTML\(/.test(code) && /feedHTML\(\)/.test(code),
    'F4 R61: the feed keeps its home on the new screen — the board absorbed two tabs and orphaned this one');
 ok(/loadMoreFeed/.test(code), 'F5 feed paging (v3.66) survives the rebuild');

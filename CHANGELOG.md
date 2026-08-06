@@ -36,6 +36,18 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.06 — R109: a passed tea goes to the wishlist, not the shelf
+Deploy: `steep-social.js` (`addPassToWishlist`; `passRowHTML`'s two actions), `styles.css` (`.pass-actions`/`.pass-own`), `fixtures/pass-record-test.js` (§F9–F16, and it now loads `steep-shopping.js`), `steep-core.js` (APP_VERSION, WHATS_NEW), `service-worker.js` (**v116**), `CHANGELOG.md`, `STATE.md`, `docs/r3/R3-STATUS.md`, `docs/r3/planning/R3-RULINGS-LEDGER.md`. **No SQL** — the wishlist already carries `name`, `tea_type`, `note` and a nullable `vendor`. **24 committed suites, all green.**
+
+- **R109 amends R36, and it is the first ruling this round overturned by USING the app** rather than by reading it against the repo. Niklas ran the pass end to end with Ruth's phone as the recipient. Add-to-shelf claimed ownership of a tea he had only been *told about*, **and the claim propagates**: 0 g enters stock → reads `empty` under `stockTier` → surfaces in Shopping's running-low list → takes a slot in "21 teas". None of that is true of a recommendation.
+- **The wishlist was already the right shape** — a tea you want and do not have — so this needs no schema. **The sender's note is carried onto the row with its attribution**, which is a better outcome than the shelf gave it: a shelf row has nowhere to put "the second steep is where it opens".
+- **The onward path already existed:** `teaFromWishItem` moves the row to the shelf when the tea is actually acquired, R49's join matches it, and SH1's overlap handling already draws a wishlist row naming a tea now on the shelf. Add-to-shelf survives as the quiet second action, for someone who already owns it or buys it at once.
+- **The guard is at the writer, not the call site** — `addWishFromTea`'s had to move there after `rebuyYes` inherited the bug, so this one starts there.
+- **Both halves proven by negative control:** disabling the guard reddens F15; making the shelf primary again reddens F9/F10. **F16 asserts the propagation rather than describing it** — a 0 g shelf row does not read as neutral under `stockTier`, which is the actual argument, and the part a future "simplify to one action" would not notice.
+- **The first negative control silently no-op'd** (its replacement string never matched) and reported nothing. Redone with a verified anchor that throws when it misses — an unproven guard is not a guard.
+- **The frame ruling is recorded, the map is still held.** Direction 2, verified independently: scale 3.74 px/unit, marks spanning 83% of the card. One correction carried — the tightest remaining gap is **23.0 px (Hoshino↔Kagoshima)**, not 24.5, which is Hoshino↔Chiran; 23 px is what the 14 px threshold is judged against. Two owed items answered (ten country-only under R16; larger tea count leads a merged mark), two still owed by Design (the tie-break, and whether 14 px tracks pin width). **R45/R66's Passport removal stays behind the map.**
+
+---
 ## v4.05 — R108's render smoke harness + R55's origin offer (H2's non-map half)
 Deploy: **new `fixtures/render-smoke-test.js`** + its `.gitignore` exception (R79), `steep-passport.js` (`originOffer`), `steep-teas.js` (`originOfferHTML`/`acceptOriginOffer`, the offer on the Origin field), `styles.css` (`.origin-offer*`), `fixtures/tea-types-test.js` (**new §I**), `steep-core.js` (APP_VERSION, WHATS_NEW), `service-worker.js` (**v115**), `CHANGELOG.md`, `STATE.md`, `docs/r3/R3-STATUS.md`, `docs/r3/planning/R3-RULINGS-LEDGER.md`. **No SQL.** **24 committed suites, all green** by exit code.
 

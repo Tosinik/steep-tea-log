@@ -244,10 +244,23 @@ function passRowHTML(p, prof){
   const line = `${who} passed ${p.toProfile ? 'you a cup' : 'this to the circle'} · ${fmtDate(p.createdAt)}`;
   const cat = passCategoryFor(p.teaName);
   const deeper = cat ? `<button class="btn-ghost pass-deeper" onclick="goDeeperCat('${escapeJsArg(cat)}')">open reference · ${escapeHtml(refCategoryLabel(cat))} ›</button>` : '';
+  /* R109 — the primary action is the WISHLIST, not the shelf. R36 made Add-to-shelf the only action,
+     and using it showed why that is wrong: a shelf row claims you OWN a tea you have merely been
+     told about, and the claim propagates — it enters stock at 0 g, therefore reads `empty` under
+     stockTier, therefore turns up in Shopping's running-low list, and takes a slot in "21 teas".
+     None of that is true of a recommendation. The wishlist is the surface built for exactly this
+     shape (a tea you want and do not have) and it needs no schema: name, tea_type, note and a
+     nullable vendor are already there. Add-to-shelf stays as the quiet second action, because
+     someone may already own the tea or buy it at once — it is just no longer the default.
+     Applies to BOTH R36 tiers; this row is the only place either draws an action. */
   const onShelf = (state.teas||[]).some(t=>(t.name||'').trim().toLowerCase()===(p.teaName||'').trim().toLowerCase());
-  const add = onShelf
-    ? `<span class="pass-on-shelf mono">on your shelf ✓</span>`
-    : `<button class="btn pass-add" onclick="addPassToShelf('${escapeJsArg(p.id)}')">Add to shelf</button>`;
+  const onList = (typeof wishHasTeaName==='function') && wishHasTeaName(p.teaName);
+  const add = onShelf ? `<span class="pass-on-shelf mono">on your shelf ✓</span>`
+    : onList ? `<span class="pass-on-shelf mono">on your list ✓</span>`
+    : `<span class="pass-actions">
+        <button class="btn pass-add" onclick="addPassToWishlist('${escapeJsArg(p.id)}')">Add to wishlist</button>
+        <button class="btn-ghost pass-own" onclick="addPassToShelf('${escapeJsArg(p.id)}')">I have it ›</button>
+      </span>`;
   return `<div class="pass-card">
     <div class="social-row" style="border:0;padding:0;">
       ${socialTileHTML(p.teaType, p.teaName)}
@@ -265,8 +278,31 @@ function refCategoryLabel(slug){
   if(typeof resolveTeaType!=='function') return slug;
   const r=resolveTeaType(slug); return r ? r.display_name : slug;
 }
-// Add to shelf opens the create form PREFILLED — the same gesture teaFromWishItem uses. Nothing is
-// written until the user commits it themselves; a pass never silently grows your shelf.
+/* R109's primary path. A pass becomes a WANT, with the sender's note carried onto the wishlist row
+   rather than discarded — which is a better outcome than the shelf gave it, since a shelf row has
+   nowhere to put "the second steep is where it opens". The onward path already exists and needs
+   nothing new: teaFromWishItem moves the row to the shelf when the tea is actually acquired, R49's
+   normalised-name join matches it, and SH1's overlap handling already draws a wishlist row that
+   names a tea now on the shelf.
+   The idempotency guard is at the WRITER, not the call site — the same lesson as addWishFromTea,
+   whose guard had to move here after `rebuyYes` inherited the bug. */
+function addPassToWishlist(passId){
+  const so = state.social, p = ((so.passes && so.passes.received)||[]).find(x=>x.id===passId); if(!p) return;
+  if(typeof wishHasTeaName==='function' && wishHasTeaName(p.teaName)){
+    showToast(`"${p.teaName}" is already on your list`); render(); return;
+  }
+  const prof = (so.profiles||{})[p.fromProfile];
+  const who = prof ? (prof.displayName || prof.username) : 'someone in your circle';
+  const note = (p.note||'').trim();
+  const w = { id:uid(), name:p.teaName, vendor:'', type:p.teaType||'',
+              note: note ? `${note} — ${who}` : `passed on by ${who}`,
+              done:false, createdAt:new Date().toISOString() };
+  state.wishlist = state.wishlist||[]; state.wishlist.push(w);
+  persistWish(w); showToast(`Added "${p.teaName}" to your list`); render();
+}
+// The secondary path, kept for someone who already owns the passed tea or buys it at once. Opens the
+// create form PREFILLED — the same gesture teaFromWishItem uses. Nothing is written until the user
+// commits it themselves; a pass never silently grows your shelf.
 function addPassToShelf(passId){
   const so=state.social, p=((so.passes&&so.passes.received)||[]).find(x=>x.id===passId); if(!p) return;
   state.teaPrefill = { name:p.teaName, type:p.teaType||'' };
