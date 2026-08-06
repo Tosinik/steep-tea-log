@@ -36,6 +36,72 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.08 — The Origins map, rendered to the frame ruling
+Deploy: `steep-passport.js`, `styles.css`, `steep-core.js` (APP_VERSION, WHATS_NEW),
+`service-worker.js` (**v118**), `fixtures/origins-test.js`, **new
+`docs/r3/boards/origins-frame-ruling.dc.html`** (a board, banked late — no `.gitignore`
+edit needed, `!docs/r3/boards/*.dc.html` already covers it), `CHANGELOG.md`, `STATE.md`,
+`docs/r3/R3-STATUS.md`, `docs/r3/planning/R3-RULINGS-LEDGER.md`. **No SQL.**
+**25 committed suites, all green** (`origins-test.js` 25 → 40 checks). Three commits.
+
+**Niklas opened the map on a phone.** Two of its seven marks rendered as a single letter
+each — "H" and "K", Hoshino and Kagoshima +1, the two most-brewed origins on the shelf.
+This is the second time this round that *using* the app found what reading it could not
+(R109 was the first), and the first time the cause was that a design authority had never
+been banked.
+
+- **The board that ruled direction 2 existed only as a chat attachment.** It arrived after
+  the 25-file export was banked and nobody queued it, so the map was built to a relayed
+  summary. A session then searched the repo for its two cited strings, found neither, and
+  correctly concluded from what it could see that they were phantom citations — reasoning
+  instead from `origins-map-v3.html`, **the pre-direction-2 map, superseded by the very
+  ruling it could not read**. Banked now as `docs/r3/boards/origins-frame-ruling.dc.html`,
+  sha256 `441fceb3075a837b…` on both the delivered file and the staged blob. Its badge says
+  `R107`, which is already the completeness-panel deferral: the frame ruling has **no**
+  ledger number and must not be cited as one.
+- **One bug, not two.** Every dimension drawn over the outline was written as if it were
+  pixels, inside a viewBox that runs at 3.727 px/unit: `r = 4` drew a **29.8 px** pin (the
+  code's own comment claimed 8), `.org-lbl{font-size:5px}` drew an **18.6 px** label, and
+  the label gap sat **24.2 px** from the pin centre. `originsMerge` was the **only**
+  dimension that took the conversion — one conversion existed and nothing else used it.
+  There is now one `upx` at the draw site and every drawn value is written in px.
+- **Sizes are the board's**, readable at last: `pinPx` **8** (r = 4 px at every render
+  size, rule 3), label **13 px** — the size the 14 px merge threshold is calibrated
+  against — and its 6 px offset from the mark centre. Measured at 350 px: all seven labels
+  fit, no collisions.
+- **Deliberate deviation, rule 5, stated because the board is banked.** The board flips a
+  label when its pin passes the outer 20% of the frame (`const inner = f.x0 + 0.8 * f.w`);
+  this flips when the label would not **fit**. The proxy under-fires for a long name at 70%
+  of the frame. Both rules flip the same two marks on this shelf. The fit test is only
+  answerable for a monospaced face — which is why the board, whose labels are a
+  proportional serif, used a proxy. Noted in the code.
+- **Rule 2's second half was missing, and it is what read as "cramped".** The frame is
+  expanded to the **card's aspect**; v4.07 drew the marks' own bbox and let the card take
+  350×193 instead of 350×258, ending a few pixels past the easternmost pin. **That is what
+  cut Japan off — a deviation from the ruling, not a consequence of it.** Expanding never
+  crops, and it leaves the x-scale alone while the box is wider than the card: the span
+  stays 83% and the scale moves 3.727 → **3.743**, nearer Design's published 3.74 than what
+  shipped. The pad now keys off the box's **longer** side as ruled.
+- **Rule 6 and rule 4 landed with it.** No map below two pins, plus a 30-unit frame floor —
+  neither reachable on this shelf, so both are driven synthetically. Rule 6 has a hole worth
+  naming: "no map, list only" assumes a list exists, and a shelf of one pinned tea with no
+  country-tier ones has none, so it would render a heading over a blank screen; the empty
+  state covers it. A merged mark now wears a **ring** — the "+1" says how many, the ring
+  says the question arises at all.
+- **§F is the check that would have caught it**, and its negative controls bite: removing
+  the side-switch reddens F2/F4 with the off-card extents named; putting the pin back in
+  unit space reddens F5 with **"got 29.8"**; breaking the aspect branch reddens seven checks
+  across A, B and F. **F3 forces every label right and asserts this shelf breaks**, so F2
+  cannot pass by construction (R105). Its limitation is in the header: extents use the
+  renderer's own advance-width constant, so it proves placement, never that 0.62 em is right
+  for the shipped face.
+- **NOT verified visually.** The Browser pane refused localhost by policy for this whole
+  session and `file://` pages would not composite, so the map is again numerically verified
+  and unseen. The before/after render was handed to Niklas as a file instead. **Verified
+  correct and left alone:** Japan's absence from the country list (every Japanese tea names
+  a region; no tea records a bare "Japan"; 11 + 10 = 21), and country marks as a list.
+
+---
 ## v4.07 — R3 slice H2: #37 Origins, and the Passport removal
 Deploy: **new `tools/gen-origins-outline.js`** (tracked build infrastructure), **new generated `steep-origins-map.js`** (added to `index.html` **and** `FILES_TO_CACHE`), `steep-passport.js` (the dot-map view **deleted**; `ORIGIN_COORDS`, `originsMerge`, `originsRegionMarks`, `originsCountryRows`, `viewOrigins`), `steep-core.js` (router `passport`→`origins`, **the Passport hub row removed**, dead dot-map state dropped, APP_VERSION, WHATS_NEW), `steep-insights.js` (the Origins card gains its tap target), `styles.css`, `service-worker.js` (**v117**), **new `fixtures/origins-test.js`** + its `.gitignore` exception (R79), `fixtures/render-smoke-test.js`, `.claude/agents/verifier.md`, `CHANGELOG.md`, `STATE.md`, `docs/r3/R3-STATUS.md`, `docs/r3/R3-BUILD-PLAN.md`, `docs/r3/planning/R3-RULINGS-LEDGER.md`. **No SQL.** **25 committed suites, all green.**
 

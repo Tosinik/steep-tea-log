@@ -1180,6 +1180,38 @@ export; this one could only come from the thing working and still being wrong.
   whether 14 px tracks pin width or is a constant.
 - **The map does not resume until those land**, and **R45/R66's Passport removal stays behind it**.
 
+### Also recorded (not rulings) — from the map fix (v4.08)
+
+- **An unbanked authority is the round's most expensive failure so far, and it is a NEW shape.** The
+  frame ruling board was never banked (see the note above the frame-ruling block), so H2 was built to
+  a summary of it. The summary was accurate about what it carried; it simply could not carry a
+  `const`. Three of the board's six numbered rules went unimplemented, and a later session searching
+  for its two cited strings **correctly** reported them absent and reasoned from the superseded
+  pre-direction-2 map instead. Failure modes 3 and 9 both describe *checking the wrong
+  representation*; this is checking the right representation of a **document that was never
+  admitted**. Counter: a board is not an authority until `git ls-files` says so.
+- **The map's marks were drawn 3.7× oversized, and the cause is one line's worth of thinking.** Every
+  dimension drawn over the outline was written as pixels inside a viewBox that runs at 3.727
+  px/unit: a 29.8 px pin under an 18.6 px label, 24.2 px from its mark. **`originsMerge` was the only
+  dimension that took the conversion** — one conversion existed and nothing else used it. Nothing
+  numeric could see it, because every check asked where marks *are* and none asked where a label
+  *ends*. Niklas found it by opening the map on a phone; R109 was the first of these, this is the
+  second.
+- **Japan's cut edge was a deviation, not a consequence — this lane recorded the opposite at v4.06.**
+  The board's rule 2 expands the frame to the card's aspect; v4.07 drew the marks' own bbox and got
+  350×193 instead of 350×258. The correction moves the scale to **3.743 px/unit**, nearer Design's
+  published 3.74 than the 3.727 that shipped, and the 83% span is unchanged. The v4.06 entry above
+  says the frame "follows from R19's bbox rule as ruled"; **it did not**, and that sentence should be
+  read with this one.
+- **Rule 6 has a hole, recorded rather than papered over.** "Fewer than two region pins: no map, list
+  only" assumes the list exists. A shelf of one pinned tea and no country-tier ones has neither, so
+  the screen would render a heading over nothing. Built with the empty state as the fallback; if
+  Design wants something else there, it is one branch.
+- **Deliberate deviation from rule 5, flagged because the board is now readable.** The side-switch
+  flips when a label would not **fit**, not when its pin passes the outer 20% of the frame. Both
+  rules flip the same two marks on this shelf. The fit test is only answerable for a monospaced face
+  — which is presumably why a board with proportional serif labels used a position proxy.
+
 ### Also recorded (not rulings) — from the H2 non-map build (v4.05)
 
 - **R55's offer is live and does exactly three things**: Gui Fei → `Lugu, Nantou, Taiwan`, Dawang Feng
@@ -1380,6 +1412,18 @@ stale. This section is the packet.
 > is **untrue until it ships**, and the beta welcome note must not promise deletion before then. It
 > belongs with the **beta-hardening bundle** — it gates the public launch the way F1 and F2 do.
 
+- **Country marks are not tappable and do not zoom** — **R4 candidate, recorded 2026-08-06.**
+  Direction 2 made the country tier a list and specified no interaction beyond that, so this is not
+  an omission. But it was never ruled *out* either, and the frame ruling board explicitly keeps the
+  `? N` tap target's meaning ("those N teas, never all teas from the country") while moving it off
+  the map — so the behaviour has a spec and no surface. Written down so it is a deferred decision
+  rather than an unstated gap. Note the shipped list already opens each tea by name, which may be
+  all the affordance the tier needs.
+- **The merge rule's two open items stay open** — the tie-break when counts are equal (implemented
+  as northernmost and asserted synthetically at `origins-test.js` B6, since no live tie exists), and
+  whether `ORIGINS_MERGE_PX` should track pin width. The frame ruling board answers the second in
+  prose — "it is one pin-width, not a constant" — but 14 px is not one width of an 8 px pin, so the
+  sentence and the number disagree and the number is what shipped. Non-blocking.
 - **App icon + splash** — parked after 3 rounds/12 concepts; two rulings stand (icon outside the
   contracts but honours Kachi-iro scarcity; ensō belongs to the timer exclusively).
 - **Per-tea elevation** — R3 pin, drawn on Add/Edit (`610 m · NEW`), schema question flagged.
