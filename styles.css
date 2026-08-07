@@ -25,6 +25,25 @@
   --font-display:'Shippori Mincho',serif;
   --enso:#E3A15C; /* WS3: steep-timer ring — amber-bright on the light-theme jade-deep box */
   --nav-active:#3F5E42; --nav-inactive:#a29a86; /* WS6 bottom bar: active tab / avatar initial | muted inactive tab */
+  /* THE LIQUOR RAMP (v4.11) — contract 1, the last of the five visual contracts to be built.
+     Ten stops, pale → dark, from SPEC-liquor-swatch-model.md §7. A BOUNDED ORDERED RAMP, never a
+     free picker: `teas.liquor` will store the KEY, so these hexes can be retuned without rewriting
+     a single row of user data. Never write a liquor hex at a render site — the currency lesson
+     (v3.95, six sites, three wrong) and the kachi lesson (R94, a contract that shipped
+     unimplemented because nothing named its token) were both learned the hard way.
+     ALL TEN ARE OCCUPIED. There is no headroom stop: `amber` holds gui-fei-oolong (spec A1). If a
+     future style needs a colour between two of these, that is a deliberate ramp EXTENSION — more
+     stops on the same ramp, per §2 and R121 — never an empty slot waiting to be filled. */
+  --liquor-jade-pale:#A9C46E;   /* Japanese green — sencha, gyokuro, matcha */
+  --liquor-straw:#D8D48A;       /* Chinese green — unroasted, pale yellow-green */
+  --liquor-gold-pale:#E8D9A0;   /* white tea, silver needle, light-oxidation oolong */
+  --liquor-gold:#DCB863;        /* light gaoshan oolong */
+  --liquor-amber:#C99447;       /* Gui Fei / bug-bitten honey oolong */
+  --liquor-amber-deep:#B87A38;  /* Wuyi yancha, roasted rock oolong */
+  --liquor-copper:#A15E2E;      /* high-oxidation oolong, roasted green */
+  --liquor-mahogany:#7E3B26;    /* hong cha — the whole red-tea family */
+  --liquor-sepia:#5A3122;       /* hei cha */
+  --liquor-near-black:#2E1C14;  /* shou pu-erh */
   /* --greeting-eye / --greeting-body DELETED in v4.10: both were tuned as green-ink FOR the
      jade-pale greeting card, and R114 put the masthead on bare ground. A token kept after its
      ground is gone is a colour waiting to be reused for the wrong reason. */
@@ -50,6 +69,22 @@ html[data-theme="dark"]{
   --amber-pale:#3A2C1A;
   --xanthous-wash:rgba(229,174,43,.12);
   --kachi:#7FA6C4; --kachi-ink:#14130E; --kachi-soft:rgba(127,166,196,.12); --kachi-line:rgba(127,166,196,.30);
+  /* THE LIQUOR RAMP, dark — LIFTED, NOT INVERTED, and that distinction is the whole rule.
+     A swatch is the colour of tea in a cup. Inverting the ramp would make a pu-erh render PALE,
+     which is the one thing this contract must never do: the swatch identifies the tea, and a pale
+     pu-erh identifies a different tea. Each stop keeps its hue and raises lightness just enough to
+     stay legible on the dark ground, so the ramp's ORDER survives the theme — pale stays palest,
+     near-black stays darkest, in both. Same ten keys, same order, spec §7. */
+  --liquor-jade-pale:#B8D07E;
+  --liquor-straw:#DFD996;
+  --liquor-gold-pale:#EADFAF;
+  --liquor-gold:#E2C275;
+  --liquor-amber:#D2A05A;
+  --liquor-amber-deep:#C4884A;
+  --liquor-copper:#B26F3D;
+  --liquor-mahogany:#96503A;
+  --liquor-sepia:#7A4A36;
+  --liquor-near-black:#4A3125;
   --clay:#C99872;
   --line:#332F24;
   --white:#1C1A14;
