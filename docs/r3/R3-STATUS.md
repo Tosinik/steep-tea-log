@@ -658,8 +658,11 @@ licence to adapt the engine.
 >    whether `ORIGINS_MERGE_PX` should track pin width. The board's prose and its number disagree;
 >    the number is what shipped and what every figure was verified against.
 > 3. **R111 — `landing.html`**, a superseded surface on a live public URL. Beta-hardening bundle.
-> 4. **The tea-reference content batch** — 8 uncovered shelf teas, the swatch and script data
->    models (R82), the 55 catalog liquor values.
+> 4. **The tea-reference content batch** — 8 uncovered shelf teas, ~~the swatch and script data
+>    models (R82), the 55 catalog liquor values~~. **The SWATCH model is WRITTEN (v4.11):**
+>    `docs/r4/planning/SPEC-liquor-swatch-model.md`, with the ramp and all 55 catalog values landed.
+>    **Still owed: the per-origin SCRIPT model** — R82's other never-written pin — plus the 8
+>    uncovered shelf teas.
 > 5. **R93 scopes R4** — the liquor swatch (with #14 and R39, both blocked on it) and a **Home
 >    revision board**: Home is the last surface the redesign never gave one.
 > 6. **The map and the door have never been looked at by this lane.** Both shipped numerically

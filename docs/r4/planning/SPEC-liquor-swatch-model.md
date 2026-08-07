@@ -1,5 +1,37 @@
 # SPEC — the liquor swatch data model
 
+> **AMENDED 2026-08-07, at the build.** Banked verbatim in `94edced`
+> (sha256 `f3c564e585cc40b5…`); the text below is amended in place, with every change logged here.
+> This is a living spec, not an archival board — for the delivered bytes, read it at that commit.
+>
+> **A1 · §8's table covered 54 of the catalog's 55 rows.** `gui-fei-oolong` was missing, and it is on
+> the shelf (`covers: ["Honey Oolong Gui Fei"]`). **Ruled `amber`** — the planning lane's own
+> generation run had printed `amber 1 gui-fei-oolong`, and the table was then hand-written as
+> `amber | 0 | — headroom`, transcribed from memory rather than from the output it had just
+> produced. **Seventh instance of the wrong-representation family this round, and the first authored
+> inside the document whose §9 exists to prevent it.** The anchor holds: wuyi-yancha at ox-mid 55
+> shifted one darker gives `amber-deep`, so mid 55's *base* is `amber`, and Gui Fei's 45 sits far
+> nearer that than `gold`'s 22.5. *Never adjust data to preserve a claim about the data.*
+> **Consequences, all landed below:** §7 loses the headroom annotation, §9 loses two now-false
+> statements, and §10's expected outcome becomes **six** distinct swatches, not five.
+>
+> **A2 · `dong-ding` is not a slug**; the catalog row is `dong-ding-oolong`. Left as written, the
+> assignment would have silently no-opped and the null assertion would have checked a slug that does
+> not exist — a check that cannot fail. Corrected in §8, and `liquor-test.js` now asserts every
+> null-list slug resolves to a real row, which closes the whole class.
+>
+> **A3 · §8's rule 2 must run on RESOLVED rows, not raw ones.** Seven Dancong members and
+> `huang-jin-gui` carry no own `roast` or `family` — they inherit through `TT_INHERIT`. On raw rows
+> only **three** rows read `roast: variable`; on resolved rows all **ten** do. The null list was
+> right, but only under resolution, and an assertion written against raw rows would have passed for
+> the wrong reason.
+>
+> **A4 · `liquor` is NOT added to `TT_INHERIT`** (§3 left it open "for when the values are
+> authored", which is now). §8 authors every member explicitly, so inheritance is unused today and
+> would change no current row; its only future effect is a new member silently inheriting a colour
+> nobody authored — R121's failure exactly. Null-by-absence is also what keeps the eleven deliberate
+> nulls legible as decisions rather than omissions.
+
 **Planning lane, R4.** This is one of the two "hand-off pins" R82 found had never been written. The
 swatch is **contract #1** of the visual contracts — *identifies a tea, identity only, never
 decoration* — and it has shipped unimplemented for the whole of R3. What renders today is a **type
@@ -110,8 +142,12 @@ in the first place.
 
 ## 7 · The ramp
 
-**Ten stops.** Sized from evidence, not from the board's fourteen: the catalog uses **nine**, and
-Niklas's 21-tea shelf needs **five**. The tenth (`amber`) sits in the widest gap as headroom.
+**Ten stops.** Sized from evidence, not from the board's fourteen. ~~the catalog uses **nine**, and
+Niklas's 21-tea shelf needs **five**. The tenth (`amber`) sits in the widest gap as headroom.~~
+**Amended (A1): the catalog uses all TEN and Niklas's shelf needs SIX.** `amber` is occupied by
+`gui-fei-oolong`, so **the ramp has no headroom stop.** If a future style needs a stop between two
+existing ones, that is a deliberate ramp extension — §2's "more swatches on the same ramp — 18, 24 —
+never a free picker", and R121's same rule — **not an empty slot waiting to be filled.**
 
 Ordered pale → dark. Keys are stable; hex values are retunable without touching user data, which is
 why `teas.liquor` stores the key.
@@ -122,7 +158,7 @@ why `teas.liquor` stores the key.
 | `straw` | `#D8D48A` | `#DFD996` | Chinese green — unroasted, pale yellow-green |
 | `gold-pale` | `#E8D9A0` | `#EADFAF` | white tea, silver needle, light-oxidation oolong |
 | `gold` | `#DCB863` | `#E2C275` | light gaoshan oolong |
-| `amber` | `#C99447` | `#D2A05A` | *headroom — no catalog row lands here yet* |
+| `amber` | `#C99447` | `#D2A05A` | Gui Fei / bug-bitten honey oolong *(A1 — not headroom)* |
 | `amber-deep` | `#B87A38` | `#C4884A` | Wuyi yancha, roasted rock oolong |
 | `copper` | `#A15E2E` | `#B26F3D` | high-oxidation oolong, roasted green |
 | `mahogany` | `#7E3B26` | `#96503A` | hong cha — the whole red-tea family |
@@ -156,13 +192,13 @@ liquor. The rule, in order:
 | `straw` | 1 | anji-bai-cha |
 | `gold-pale` | 10 | ruan-zhi-oolong · fujian-white · bai-hao-yin-zhen · bai-mu-dan · gong-mei · shou-mei · ya-bao-yunnan · huang-ya · yue-guang-bai · baozhong |
 | `gold` | 2 | alishan-gaoshan · jin-xuan-milky |
-| `amber` | 0 | — headroom |
+| `amber` | **1** | **gui-fei-oolong** *(A1 — was written as 0/headroom)* |
 | `amber-deep` | 9 | wuyi-yancha · dhp · rou-gui · shui-xian-wuyi · tie-luo-han · shui-jin-gui · bei-dou · qi-lan · huang-mei-gui |
 | `copper` | 2 | oriental-beauty · hojicha |
 | `mahogany` | 8 | hong-cha · dian-hong · keemun · lapsang-souchong · jin-jun-mei · ying-hong · lichuan-hong · jin-mu-dan-black |
 | `sepia` | 1 | hei-cha |
 | `near-black` | 1 | shou-puerh |
-| **none** | 11 | dong-ding · phoenix-dancong · mi-lan-xiang · ya-shi-xiang · huang-zhi-xiang · zhi-lan-xiang · xing-ren-xiang · phoenix-shui-xian · anxi-tie-guan-yin · huang-jin-gui · sheng-puerh |
+| **none** | 11 | dong-ding-oolong *(A2 — was `dong-ding`, not a slug)* · phoenix-dancong · mi-lan-xiang · ya-shi-xiang · huang-zhi-xiang · zhi-lan-xiang · xing-ren-xiang · phoenix-shui-xian · anxi-tie-guan-yin · huang-jin-gui · sheng-puerh |
 
 **Eleven rows carry no liquor and that is the correct answer**, not a gap: ten are `roast: variable`
 (all seven Dancong, both Anxi TGY, dong ding) and sheng pu-erh varies by age more than any of them.
@@ -187,8 +223,11 @@ Per R116 and R121, the pattern to copy is contract 1's: **its absence caused no 
 written down in two files and asserted in two suites.** So:
 
 - **No per-tea value exists yet.** `teas.liquor` is unmigrated; every tea resolves at tier 2 or 3.
-- **`amber` has no catalog row.** It is deliberate headroom, not an oversight — assert that it is
-  reachable only by a user correction.
+- ~~**`amber` has no catalog row.** It is deliberate headroom, not an oversight — assert that it is
+  reachable only by a user correction.~~ **STRUCK (A1): both statements are false.** `amber` holds
+  `gui-fei-oolong`, it is reachable at tier 2, and **the ramp has no headroom stop at all**. What is
+  asserted instead is that all ten stops are occupied — so a future gap is filled by extending the
+  ramp deliberately, never by discovering an empty slot.
 - **Eleven catalog rows are deliberately null.** A suite must assert they stay null, or a later pass
   will "complete" the table and assert a colour for a style that varies.
 - **The small geometry is derived, not locked** (R121).
@@ -206,6 +245,6 @@ Steps 1 and 2 of §6 are now done — the ramp exists and all 55 rows are assign
 3. **The migration** — `alter table teas add column if not exists liquor text;`
 4. **The cascade** at read time, then the picker (R39), which unblocks #14 (R89).
 
-Niklas's shelf will then show five distinct swatches across 12 teas; nine teas stay on the type tint
-— one indeterminate (Yashi Xiang) and eight with no catalog match at all, which is the same content
-gap that costs them Go Deeper and freshness rung 2.
+Niklas's shelf will then show **six** distinct swatches across 12 teas (~~five~~ — A1: Gui Fei brings
+`amber`); nine teas stay on the type tint — one indeterminate (Yashi Xiang) and eight with no catalog
+match at all, which is the same content gap that costs them Go Deeper and freshness rung 2.

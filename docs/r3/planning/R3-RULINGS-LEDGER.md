@@ -825,6 +825,14 @@ source #06's "14-colour palette derived from the catalog liquors" was to derive 
 whose primary affordance is the long-press colour correction (R39). Scope it as a slice comparable
 to B3.
 
+> **PARTLY DISCHARGED in v4.11.** ~~the swatch data model R82 found was never written~~ — **it is
+> written**: `docs/r4/planning/SPEC-liquor-swatch-model.md`, banked verbatim in `94edced` and amended
+> at the build (A1–A4 in its header). Of the three things this ruling says are needed, **two have
+> landed**: the ten-stop ramp as tokens in both themes, and a `liquor` value on all 55 `TEA_TYPES`
+> rows (**eleven deliberately null**, asserted). **Still owed: the per-tea column** (`teas.liquor`)
+> and the read-time cascade, which carry the migration — and then the picker, which is what actually
+> unblocks #14.
+
 **(b) Home.** R53 accepted Bundle 1 for Home and the non-Focus steeping states, so Home receives the
 §0 primitives and nothing else — no revision board, none scheduled. That was **correct for R3**: Home
 carried no new R3 affordances. But it is the **first surface opened on every launch and the last
@@ -1633,9 +1641,16 @@ stale. This section is the packet.
 > local decisions rather than any ruling.
 >
 > **→ The tea-reference content batch** — the **8 uncovered shelf teas**, the **3 owed coordinate
-> rows** (Wuyi Mountains · Lugu · Chiayi), and the **55 catalog liquor values** the swatch palette
-> must derive from. The first two also upgrade freshness precision from R85's **rung 3 to rung 2**, so
-> that batch now pays twice.
+> rows** (Wuyi Mountains · Lugu · Chiayi), ~~and the **55 catalog liquor values** the swatch palette
+> must derive from~~ — **the liquor values LANDED in v4.11**, all 55 rows assigned from
+> `docs/r4/planning/SPEC-liquor-swatch-model.md` §8, eleven of them deliberately null. The first two
+> also upgrade freshness precision from R85's **rung 3 to rung 2**, so that batch still pays twice —
+> and the 8 uncovered teas now cost a **third** thing, the swatch, since a tea with no catalog match
+> resolves at tier 3 and shows its type tint.
+>
+> **→ R82's OTHER never-written pin is still owed: the per-origin SCRIPT data model.** The swatch
+> model is written; this one is not. Recorded separately so "R82's pins" cannot be ticked off as a
+> pair when only one of them exists.
 >
 > **→ The Origins map artifact (R106) — OWED, BLOCKS H2.** Two pieces, in the same data file and
 > under the same verification discipline as the eight coordinate rows:
