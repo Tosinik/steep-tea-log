@@ -1,5 +1,11 @@
 # R3-STATUS — the running state of the R3 round
 
+> **R3 IS CLOSED (v4.09, 2026-08-06). THIS DOCUMENT IS HISTORICAL — do not read it as current.**
+> R4 opened at v4.10 and keeps **no separate status doc**: its state is `STATE.md` plus the ledger,
+> which is still `docs/r3/planning/R3-RULINGS-LEDGER.md` and **still the one ledger** — numbering ran
+> continuously into R4 at **R113**. §7's close-out list below is the accurate record of what R3 left
+> open; everything else here describes a round that has finished.
+
 **Updated: 2026-08-05 (slice F shipped as v4.02; R96–R98 issued at its plan review) · §5 by the Code lane.**
 This is the single source of truth for where R3
 stands. Any fresh chat, fresh Design session, or Code session reads this FIRST. It is updated at

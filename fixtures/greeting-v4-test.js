@@ -36,7 +36,10 @@ const sess=(teaId,y,m,d,h)=>({ id:'s'+(++TID), teaId, date:isoAt(y,m,d,h), steep
 function setState(teas, sessions){
   vm.runInContext('state.teas='+JSON.stringify(teas)+'; state.sessions='+JSON.stringify(sessions)+';', ctx);
 }
-function greet(){ return vm.runInContext('greetingCardHTML()', ctx); }
+// v4.10: `greetingCardHTML` became `greetingMastheadHTML` when R115 made the greeting the masthead.
+// The ENGINE below is untouched — bucket copy, pick scoring, recency, the one-voice-per-day hash —
+// so this suite is renamed at its entry point and nothing else. A rename is not a rewrite.
+function greet(){ return vm.runInContext('greetingMastheadHTML()', ctx); }
 const call=(expr)=>vm.runInContext(expr, ctx);
 
 let passed=0; const fail=(m)=>{ console.error('FAIL: '+m); process.exit(1); };
@@ -182,7 +185,7 @@ const sub=(html)=>{ const m=html.match(/class="greeting-body">([\s\S]*?)<\/div>/
   for(const [d,h] of [[10,8],[10,14],[10,20],[10,2]]){
     setNow(localMs(2026,7,d,h));
     let html; try { html=greet(); } catch(e){ fail('D real-data render threw at hour '+h+': '+e.message); }
-    ok(/<div class="greeting-card"/.test(html) && /<h2/.test(html), 'D render is a well-formed card at hour '+h);
+    ok(/<div class="home-masthead"/.test(html) && /<h2/.test(html), 'D render is a well-formed masthead at hour '+h);
     ok(html===greet(), 'D render is deterministic at hour '+h);
     if(hasTap(html)) ok(/openTeaDetail\('[^']+'\)/.test(html), 'D any suggested tea has a real tap-target at hour '+h);
     n++;

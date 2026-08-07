@@ -180,7 +180,28 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.09 R3 slice H3: #09 the door. THE R3 BUILD IS COMPLETE** (cache **v119**,
+**NOW (just shipped) — v4.10: R4 opens with the Home revision** (cache **v120**, APP_VERSION v4.10,
+**no SQL**). **R3's build is closed; R4 is scoped by R93 as the Home revision (this) + the liquor
+swatch (next).** R4 keeps no separate status doc: **this file plus the ledger is R4's state.**
+- **The board is banked at `docs/r4/boards/`** — a new round folder needs **both** repo rules or it
+  silently doesn't ship (`.gitignore` negation is path-scoped to r3; `.gitattributes -text`).
+  **The ledger keeps its `R3-` name on purpose**: six docs cite it and one is CHANGELOG, which is
+  never rewritten. Numbering is continuous — R113–R116 are R4's.
+- **The greeting is the masthead, not a card.** Migration is free: `dashLayout()` already filtered
+  both `order` and `hidden` against `DASH_DEFAULT_ORDER`. **It overrides a deliberate hide**, by ruling.
+- **Clay exists for the first time** (`.btn-clay`, spine only, at most one per surface). Both masthead
+  actions guard the dirty draft — this button is the first thing on the first screen.
+- **R116: three of the five visual contracts shipped unimplemented.** Clay and washi were never built,
+  so **R59 deferred a probation on a phantom and R113 accepted a cost that didn't exist**. Audit:
+  liquor unbuilt-but-declared · clay built now · **xanthous built and confined** · kachi built v4.01 ·
+  washi never built. **A locked contract is not implemented until something asserts it** — `home-test.js`
+  §D is that assertion.
+- **A negative control destroyed the build.** `git checkout -- <file>` restores from the **index**, so
+  yesterday's rule is amended: **stage before you break anything.** Rebuilt, controls re-run staged.
+- **Sixth instance of a check reading its own prose.** Every source `home-test.js` reads is
+  comment-stripped. **27 committed suites, all green. NOT verified visually** (third deploy running).
+
+**Previously — v4.09 R3 slice H3: #09 the door. THE R3 BUILD IS COMPLETE** (cache **v119**,
 APP_VERSION v4.09, **no SQL**). Slices A · B · B2 · B3 · C · D · E · F · G · H1 · H2 · H3 all shipped.
 - **`renderLogin()` stayed in `steep-data.js`**, as instructed and for a structural reason: it runs
   before boot, so there is no `state`, no `render()` and no inline-onclick pattern, and its handlers

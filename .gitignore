@@ -70,6 +70,11 @@ fixtures/*
 # provider, no kachi on the screen most tempting to spend it on — plus the three empty states the
 # door opens onto, which do render. Ships because those are brand rules, not local expectations.
 !fixtures/landing-test.js
+# R4's Home: every one of its rulings is an invariant about what must NOT appear on a surface the
+# user composes — the greeting is not a card, a card carries no clay, a card with nothing to say is
+# absent. Absences decay silently. §D also carries the guards R116 ordered for the visual contracts,
+# after three of the five turned out to have shipped unimplemented.
+!fixtures/home-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

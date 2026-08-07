@@ -96,10 +96,14 @@ ok(/Your atlas fills in as you add teas/.test(origins),
    'D1 R19: zero teas gives Origins its empty state — the addendum #09 could not be written until Origins existed');
 ok(!/org-map/.test(origins), 'D2 …and draws no map of nowhere');
 ok(/No teas yet/.test(shelf), 'D3 the empty shelf says what to do next');
-ok(/Welcome to SlowCup/.test(home) && /Add your first tea/.test(home),
-   'D4 …and the first signed-in moment is the onboarding hero, not a blank Home');
+/* D4 CHANGED IN v4.10, and the change was flagged before it happened. R115 replaced the three-step
+   onboarding checklist with the greeting and one door, gated on the SHELF rather than the session
+   count — so "Welcome to SlowCup" is gone and this asserts what actually greets a new account now.
+   The door still opens onto something that speaks; only the words behind it moved. */
+ok(/Nothing on the shelf yet/.test(home) && /Add your first tea/.test(home),
+   'D4 …and the first signed-in moment is day one\'s masthead and its one door, not a blank Home');
 ok(!/href="#enso"/.test(home),
-   'D5 onboarding keeps the app mark, NOT the ensō — R33 gives the motif to the door and the timer only');
+   'D5 day one keeps the app\'s own voice, NOT the ensō — R33 gives the motif to the door and the timer only');
 [['origins',origins],['shelf',shelf],['home',home]].forEach(([n,h])=>
   ok(h && h.trim().length>60, 'D6 '+n+' returns real markup on an empty account (the check every other one here would pass without)'));
 console.log('  D empty-account hand-off: 8 checks');

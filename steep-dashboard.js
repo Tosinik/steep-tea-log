@@ -524,31 +524,27 @@ function forecastLine(tea){
              : (f.method==='ledger' ? ' · from your purchase date' : '');
   return `<div class="forecast-line">At your pace (~${wk}g/week), about <b>${fmtDaysLeft(f.daysLeft)}</b> left${tail}.</div>`;
 }
-function onboardingHTML(){
-  const hasTea = state.teas.length>0;
-  const hasVessel = state.vessels.length>0;
-  const ready = hasTea && hasVessel;
-  const step = (done, n, title, sub, btn) => `
-    <div class="ob-step ${done?'done':''}">
-      <div class="ob-check">${done?'✓':n}</div>
-      <div class="ob-step-body">
-        <div class="ob-step-title">${title}</div>
-        <div class="ob-step-sub">${sub}</div>
-      </div>
-      ${done?'<span class="ob-done-tag">done</span>':(btn||'')}
+/* DAY ONE (R115) — the greeting and ONE door. It replaces the three-step onboarding checklist, which
+   was gated on `sessions.length===0` and therefore also met a user who had a shelf but had not
+   brewed yet; board 4d draws exactly that user (one tea, two cups) getting an ordinary Home. The
+   gate is now the shelf, which is what the copy is about.
+   The checklist went for two reasons beyond the board: its step 2 ("add a vessel") is obsolete under
+   R43, which made the vessel optional and never blocking; and a to-do list is a nag on the one
+   surface whose whole argument is that it has nothing to nag with.
+   ONE DOOR, NOT TWO. Board 4c also draws "or log a cup you've already had" — that link cannot work
+   here: quick log requires a tea (`quickLogSession` toasts "Add a tea first." on an empty shelf, and
+   R88 makes a tea mandatory for the record), so on a shelf of nothing it is a door to a toast.
+   Ruling 5's own words are "the greeting and one door"; the text is buildable and the drawing is not,
+   so the text wins. Flagged rather than quietly dropped. */
+function dayOneHTML(){
+  const now = new Date();
+  const eyebrow = `${now.toLocaleDateString('en-US',{weekday:'long'})} ${d_hourBucket(now.getHours())}`;
+  return `<div class="home-masthead">
+      <div class="greeting-eyebrow">${escapeHtml(eyebrow)}</div>
+      <h2 class="greeting-head">Nothing on the shelf yet.</h2>
+      <div class="greeting-body">Add a tea and this becomes the page that tells you what&rsquo;s ready and what&rsquo;s running out.</div>
+      <div class="mast-act"><button class="btn-clay" onclick="goView('teas')">Add your first tea</button></div>
     </div>`;
-  return `
-    <div class="ob-hero">
-      <div style="display:flex;justify-content:center;margin-bottom:14px;">${steepLogoSVG(52)}</div>
-      <h1>Welcome to SlowCup</h1>
-      <p class="ob-lede">A calm home for your tea. Log a few sessions and this space fills with your rhythms — what you brew, your brewing days, your favourites. No rush.</p>
-    </div>
-    <div class="card ob-steps">
-      ${step(hasTea, 1, 'Add your first tea', 'Name and type are enough; add a photo and notes if you like.', `<button class="btn btn-primary ob-btn" onclick="goView('teas')">Add tea</button>`)}
-      ${step(hasVessel, 2, 'Add a vessel', 'A gaiwan, teapot, or mug — whatever you brew in.', `<button class="btn btn-primary ob-btn" onclick="goView('vessels')">Add vessel</button>`)}
-      ${step(false, 3, 'Log your first session', ready?"Everything's ready — go brew something.":'Add a tea and a vessel first.', ready?`<button class="btn btn-primary ob-btn" onclick="quickLogSession(this)">Log session</button>`:'')}
-    </div>
-  `;
 }
 function viewAchievements(){
   const s = computeStats();
@@ -581,13 +577,27 @@ function viewAchievements(){
 // WS2 (v3.74): Home reduced to glance cards only — greeting · running low · favourites · one number
 // ('week'). The stat grid + brewing clock + cost + recent moved to Insights (reflection lives there
 // now). Nothing deleted — the relocated cards stay editable/hideable, so no data or view is stranded.
-const DASH_DEFAULT_ORDER = ['greeting','restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost','origins'];
-const DASH_LABELS = { greeting:'Greeting', restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
+/* R115 — THE GREETING IS NOT A CARD. It is the masthead: fixed, unmovable, unhideable, the app's
+   voice and the one thing every Home has in common. Removing its id from this array is the whole
+   migration, and it is free by construction: `dashLayout()` filters BOTH `order` and `hidden`
+   against DASH_DEFAULT_ORDER, so a saved layout that hid the greeting simply stops mentioning a card
+   that no longer exists — no write, no phantom row in edit mode, nothing else disturbed.
+   Stated plainly because it OVERRIDES A DELIBERATE HIDE: a user who hid their greeting now sees it
+   again. The alternative was a Home with no voice and no control left to bring it back, since the
+   thing that would have unhidden it is a card list the greeting has just left. */
+const DASH_DEFAULT_ORDER = ['restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost','origins'];
+const DASH_LABELS = { restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab.
 // Migration is automatic — existing saved {order,hidden} keep their visibility and gain a surface
 // from this map (nothing a user hid can reappear); ids no longer present are filtered out.
+/* R115's default-set rule, applied: a card defaults to Home if removing it would leave you unable to
+   answer WHAT NOW without navigating. `restock` passes (what is running out) and `favorites` passes
+   (what you reach for). **`week` fails** — it counts what already happened, which is Sessions' job
+   and Insights' tense — so it defaults to Insights, the only other surface. Anyone who has moved it
+   keeps it: the rule governs the DEFAULT SET, and a user's override still wins in `dashSurface()`. */
 const DASH_SURFACE = {
-  greeting:'home', restock:'home', favorites:'home', week:'home',
+  restock:'home', favorites:'home',
+  week:'insights',
   recent:'insights', totals:'insights', clock:'insights', cost:'insights',
   hero:'insights', reading:'insights', typemix:'insights', steepshape:'insights', notes:'insights', wrapped:'insights',
   origins:'insights'   // R54 — and PINNED there by DASH_PINNED below; this entry is only the default
@@ -776,7 +786,16 @@ function d_rediscoveryPick(todayKey, excludeIds, excludeType){
   const top=cands[0]; const weeks=(top.id in lastBrew)?Math.floor((now-lastBrew[top.id])/(7*24*3600*1000)):null;
   return { t:top, weeks };
 }
-function greetingCardHTML(){
+/* THE MASTHEAD (R115), and the app's only clay action (R113).
+   Renamed from `greetingCardHTML` because it is no longer a card: `viewDashboard` draws it above the
+   stack, it cannot be hidden, moved or reordered, and R114 puts it on bare ground rather than the
+   jade-pale panel it used to sit in.
+   CLAY IS THE SECOND ARGUMENT, and only the branch that suggests a tea for NOW passes one. Contract
+   2 is at most one committing action per surface, not exactly one: an evening Home that reports the
+   day rather than proposing a cup correctly carries none, and a redirected suggestion ("save the X
+   for tomorrow") must not offer to brew it now — the button would contradict the sentence above it.
+   The copy in `greet`/`sub` is untouched; this is a container change plus one action. */
+function greetingMastheadHTML(){
   const now = new Date();
   const bucket = d_hourBucket(now.getHours());
   const greet = GREETING_LINE[bucket];
@@ -786,10 +805,14 @@ function greetingCardHTML(){
   // Force English for this UI chrome (bucket words are English too) — a locale-mixed "Freitag evening"
   // reads broken. User INPUT (notes/tags) stays whatever the user types; this is chrome only.
   const eyebrow = `${now.toLocaleDateString('en-US',{weekday:'long'})} ${bucket}`;
-  const card = sub => `<div class="greeting-card">
+  const card = (sub, commitTea) => `<div class="home-masthead">
       <div class="greeting-eyebrow">${escapeHtml(eyebrow)}</div>
       <h2 class="greeting-head">${greet}.</h2>
       ${sub ? `<div class="greeting-body">${sub}</div>` : ''}
+      ${commitTea ? `<div class="mast-act">
+        <button class="btn-clay" onclick="homeStartSteeping(this,'${escapeJsArg(commitTea.id)}')">Start steeping</button>
+        <button class="btn-ghost mast-quiet" onclick="homeLogCup(this,'${escapeJsArg(commitTea.id)}')">Log a cup &rarr;</button>
+      </div>` : ''}
     </div>`;
   const todayKey = dayKey(now);
   if(!sessions.length) return card(d_copyPick([
@@ -1001,7 +1024,32 @@ function greetingCardHTML(){
           `Perhaps the ${name} to ease into ${bw}.`,
         ], todayKey);
   }
-  return card(sub);
+  // The ONLY clay on Home. `redirected` means the sentence proposes a later window ("save the X for
+  // tomorrow"), so a Start-steeping button beside it would argue with its own caption.
+  return card(sub, redirected ? null : pick.t);
+}
+
+/* The masthead's two actions. Both mirror `quickLogSession`'s dirty-draft guard rather than calling
+   `startSessionFor` bare, because this button is the first thing on the first screen and it would
+   otherwise DISCARD A RUNNING STEEP in silence. Tea detail's two entries (`steep-teas.js`) still call
+   it bare — shipped behaviour, preserved under R61 and named here rather than left as a surprise.
+   `homeLogCup` is the retrospective sibling: same tea, recorded rather than brewed. It re-checks the
+   draft because `startSessionFor` early-returns when there is no vessel, and `beginQuickLog` would
+   then run against a draft that return never created. */
+function homeStartSteeping(btn, teaId){
+  if(sessionDraftDirty(state.sessionDraft)){
+    if(btn){ armConfirm(btn, 'Discard the session in progress?', ()=>startSessionFor(teaId)); return; }
+    state.view='session'; render(); return;
+  }
+  startSessionFor(teaId);
+}
+function homeLogCup(btn, teaId){
+  const go = ()=>{ startSessionFor(teaId); if(state.sessionDraft) beginQuickLog(); };
+  if(sessionDraftDirty(state.sessionDraft)){
+    if(btn){ armConfirm(btn, 'Discard the session in progress?', go); return; }
+    state.view='session'; render(); return;
+  }
+  go();
 }
 
 function dashCardsHome(s){
@@ -1042,7 +1090,6 @@ function dashCardsHome(s){
     </div>` : '';
 
   return {
-    greeting: greetingCardHTML(),
     restock: restockHTML,
     recent: recentHTML,
     // #16 (v3.82): a period lens on the RAW numbers only — scoped reinstatement; v3.65's
@@ -1066,17 +1113,24 @@ function dashCardsHome(s){
       </div></div>`;
     })(),
     clock: brewingClockHTML(s),
-    favorites: `<div class="section card">
+    /* R115 — a card is ABSENT until it has something to say. Four empty cards would be four
+       apologies, and on day two that is most of the screen. The empty branches are dropped rather
+       than reworded: "No favourites marked yet" is a card explaining why it is a card.
+       `renderDashboard`'s edit-mode shell still names an empty card, and must — you cannot reorder
+       or unhide what you cannot see (R61). */
+    favorites: s.favorites.length ? `<div class="section card">
       <div class="eyebrow" style="margin-bottom:12px;">Favourites</div>
-      ${s.favorites.length
-        ? s.favorites.slice(0,6).map(t=>`<div class="fav-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')">${favLeaf(15)}<span>${escapeHtml(t.name)}</span></div>`).join('')
-        : '<div class="empty">No favourites marked yet.</div>'}
-    </div>`,
+      ${s.favorites.slice(0,6).map(t=>`<div class="fav-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')">${favLeaf(15)}<span>${escapeHtml(t.name)}</span></div>`).join('')}
+    </div>` : '',
     // WS2 (v3.74) — the one number that earns Home: sessions since the start of this week (Mon-anchored).
     week: (function(){
       const ws = new Date(); ws.setHours(0,0,0,0); ws.setDate(ws.getDate() - ((ws.getDay()+6)%7));
       const n = state.sessions.filter(se=> new Date(se.date) >= ws).length;
-      return `<div class="section card week-card"><div class="week-num">${n}</div><div class="week-cap">sessions<br>this week</div></div>`;
+      // Absent at zero (R115): "0 sessions this week" is a scoreboard reading, and a calm-first app
+      // does not open by telling you that you have not brewed. The week is Monday-anchored, as it
+      // has been since WS2 — Design drew no weekly figure because it could not verify a boundary
+      // from the export; this one is derived here, from `sessions` and that anchor.
+      return n ? `<div class="section card week-card"><div class="week-num">${n}</div><div class="week-cap">sessions<br>this week</div></div>` : '';
     })(),
     cost: `<div class="section card">
       <div class="section-title"><h2>Cost overview</h2></div>
@@ -1094,11 +1148,12 @@ function dashCardsHome(s){
   };
 }
 
+/* Home = the masthead (spine) + the stack. The spine is drawn HERE rather than by
+   `renderDashboard`, because renderDashboard renders one surface's cards and the masthead is not a
+   card and belongs to one surface only. Insights keeps its own head. */
 function viewDashboard(){
-  if(state.sessions.length===0){
-    return onboardingHTML();
-  }
-  return renderDashboard(dashCards(), 'home');
+  if(!state.teas.length) return dayOneHTML();
+  return `${greetingMastheadHTML()}${renderDashboard(dashCards(), 'home')}`;
 }
 
 /* ================= TEAS ================= */

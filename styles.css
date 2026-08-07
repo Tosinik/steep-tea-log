@@ -25,7 +25,9 @@
   --font-display:'Shippori Mincho',serif;
   --enso:#E3A15C; /* WS3: steep-timer ring — amber-bright on the light-theme jade-deep box */
   --nav-active:#3F5E42; --nav-inactive:#a29a86; /* WS6 bottom bar: active tab / avatar initial | muted inactive tab */
-  --greeting-eye:#5c7a5e; --greeting-body:#47533f; /* WS2 greeting hero: eyebrow (muted jade) | body (green-ink on jade-pale) */
+  /* --greeting-eye / --greeting-body DELETED in v4.10: both were tuned as green-ink FOR the
+     jade-pale greeting card, and R114 put the masthead on bare ground. A token kept after its
+     ground is gone is a colour waiting to be reused for the wrong reason. */
   --enso-track:rgba(255,255,255,.15); --timer-sub:#a9b8a2; --timer-soft:rgba(255,255,255,.14); /* WS3 timer box (foreground over the dark-green box) */
   /* WS1 Wrapped — seasonal-wash story-card fields (deeper than the app tokens on purpose) */
   --wc-jade:#2A4130; --wc-jade-fg:#F6F2E9; --wc-jade-soft:#CDE0C4;
@@ -57,7 +59,6 @@ html[data-theme="dark"]{
   --heat-fill:#E3A15C;
   --enso:#2A4130; /* WS3: dark-jade ring on the dark-theme light-green timer box */
   --nav-active:#8FBE83; --nav-inactive:#8f866f; /* WS6 bottom bar (dark) */
-  --greeting-eye:#7f9a78; --greeting-body:#c3cdb9; /* WS2 greeting hero (dark) */
   --enso-track:rgba(42,65,48,.26); --timer-sub:#2A4130; --timer-soft:rgba(21,20,15,.14); /* WS3 timer box (foreground over the light-green box) */
   /* WS1 Wrapped — dark fields never go full-bright */
   --wc-jade:#1E2C1E; --wc-jade-fg:#EDE6D6; --wc-jade-soft:#9DB79A;
@@ -134,11 +135,24 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
 .hub-row{display:flex;align-items:center;gap:12px;width:100%;padding:11px 2px;border:none;border-top:1px solid var(--line);background:none;color:var(--ink);font-size:15px;text-align:left;}
 .hub-row .hl{color:var(--ink-soft);flex:0 0 auto;}
 
-/* WS2 Home — greeting hero + glance cards (greeting/running low/favourites/one number) */
-.greeting-card{background:var(--jade-pale);border:1px solid var(--line);border-radius:20px;padding:24px 22px;}
-.greeting-eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--greeting-eye);}
+/* WS2 Home — greeting hero + glance cards (running low / favourites / one number)
+   R114/R115 (v4.10): the greeting is the MASTHEAD, so it sits on bare ground. The old jade-pale
+   panel, its border and its 20px radius are gone — the one place a masthead floated on a card was
+   the masthead, and a masthead is the top of a page rather than an element on one. The body colour
+   moves to `--ink-soft`; the two tokens it used were tuned as green-ink for a fill that is gone. */
+.home-masthead{padding:6px 2px 18px;}
+.greeting-eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);}
 .greeting-head{font-family:var(--font-display);font-weight:700;font-size:32px;line-height:1.15;color:var(--ink);margin:8px 0 12px;}
-.greeting-body{font-size:16px;line-height:1.55;color:var(--greeting-body);}
+.greeting-body{font-size:16px;line-height:1.55;color:var(--ink-soft);}
+/* CLAY — contract 2, implemented for the FIRST time in v4.10 (R113/R116). One committing action per
+   surface, and only ever in that surface's SPINE: a card may not carry it, because a card moves
+   between surfaces and would either bring a second clay onto a screen that has one or change
+   appearance on arrival. The torn-paper radius is the mark; it is not a generic button shape.
+   Do not put `.btn-clay` on a card, and do not reach for `--clay` for a second action on any screen.
+   `home-test.js` §D enumerates every use and asserts exactly one of them is an action. */
+.btn-clay{background:var(--clay);color:var(--porcelain);border:none;font-weight:600;font-size:14.5px;padding:12px 19px;border-radius:15px 5px 13px 5px;}
+.mast-act{display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-top:15px;}
+.mast-quiet{font-size:14.5px;color:var(--jade-deep);font-weight:500;padding:0;}
 .greeting-body span[onclick]{color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;}
 .fav-row{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--ink);padding:6px 0;cursor:pointer;}
 .week-card{display:flex;align-items:center;gap:16px;}
@@ -587,22 +601,9 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .session-photo{width:100%;max-height:280px;object-fit:cover;border-radius:12px;margin-top:10px;display:block;}
 .session-thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;flex:0 0 auto;}
 
-/* v3 — onboarding + achievements page */
-.ob-hero{text-align:center;padding:34px 16px 10px;}
-.ob-hero .brand-mark{margin:0 auto 14px;width:46px;height:46px;}
-.ob-hero h1{font-family:var(--font-display);font-size:30px;margin:0 0 10px;color:var(--ink);}
-.ob-lede{max-width:440px;margin:0 auto;color:var(--ink-soft);font-size:14px;line-height:1.6;}
-.ob-steps{margin-top:18px;display:flex;flex-direction:column;gap:2px;}
-.ob-step{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--line);}
-.ob-step:last-child{border-bottom:none;}
-.ob-check{flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:14px;font-weight:600;background:var(--jade-pale,#e7ede6);color:var(--jade);border:1px solid var(--line);}
-.ob-step.done .ob-check{background:var(--jade);color:var(--white);border-color:var(--jade);}
-.ob-step-body{flex:1;min-width:0;}
-.ob-step-title{font-weight:600;font-size:14.5px;color:var(--ink);}
-.ob-step-sub{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
-.ob-step.done .ob-step-title{color:var(--ink-soft);}
-.ob-btn{flex:0 0 auto;}
-.ob-done-tag{flex:0 0 auto;font-family:var(--font-mono);font-size:11px;color:var(--jade);text-transform:uppercase;letter-spacing:.08em;}
+/* v3 — achievements page. The `.ob-*` onboarding block was DELETED in v4.10 along with the
+   three-step checklist it styled (R115's day one is the greeting and one door); after that deletion
+   no JS referenced any of it. */
 .btn.active-ghost{border-color:var(--jade);color:var(--jade);}
 
 /* v3 — recap card */

@@ -36,6 +36,71 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.10 — R4 opens: the Home revision (R113 · R114 · R115 · R116)
+Deploy: `steep-dashboard.js`, `styles.css`, `steep-core.js` (APP_VERSION, WHATS_NEW),
+`service-worker.js` (**v120**), **new `fixtures/home-test.js`** + its `.gitignore`
+exception in the same edit (R79), `fixtures/landing-test.js`, `fixtures/greeting-v4-test.js`,
+**new `docs/r4/boards/`** (the banked board + `support.js`) with **both** repo rules
+(`.gitignore` negation, `.gitattributes -text`), `CHANGELOG.md`, `STATE.md`,
+`docs/r3/R3-STATUS.md`, `docs/r3/planning/R3-RULINGS-LEDGER.md`. **No SQL.**
+**27 committed suites, all green.** Two commits.
+
+**Home is the only present-tense surface in the app** — what is ready, what is running
+out, what you were in the middle of — and that makes the default set testable rather
+than a matter of taste.
+
+- **The greeting is the masthead, not a card.** Out of all three registries, drawn above
+  the stack, unhideable. **The migration is free by construction:** `dashLayout()` already
+  filtered `order` and `hidden` against `DASH_DEFAULT_ORDER`, so removing the id prunes it
+  on read — no write, no phantom row in edit mode. **It does override a deliberate hide**,
+  and that is the ruled trade: the control that would have unhidden it is a card list the
+  greeting has just left.
+- **Clay is implemented for the first time** (R113) — `.btn-clay` on the spine, `Start
+  steeping` with `Log a cup →` beside it. **At most one, not exactly one:** an evening
+  Home that reports the day carries none, and a *redirected* suggestion ("save it for
+  tomorrow") carries none either, because the button would argue with its own caption.
+- **Both masthead actions guard the draft** the way `quickLogSession` does. This button is
+  the first thing on the first screen; calling `startSessionFor` bare would discard a
+  running steep in silence. Tea detail's two entries still call it bare — shipped
+  behaviour, kept under R61 and **named** rather than left as a surprise.
+- **`week` leaves Home's defaults** for Insights, the only other surface. Anyone who moved
+  it keeps it. Where it sits *within* Insights is left open, as ruled.
+- **A card is absent until it has something to say** — `favorites` and `week` return
+  nothing when empty. **Edit mode still names them**: you cannot reorder or unhide what you
+  cannot see (R61).
+- **Day one is the greeting and one door**, gated on the **shelf** rather than the session
+  count — the old gate also met a user with a shelf and no sessions, which board 4d draws
+  getting an ordinary Home. **The board's second link is not built:** quick log requires a
+  tea (R88), so on an empty shelf "or log a cup you've already had" is a door to a toast.
+  Ruling 5's own words are "the greeting and one door"; the text is buildable and the
+  drawing is not. The three-step checklist is deleted with its styles — step 2 was obsolete
+  under R43, and a to-do list nags on the one surface whose argument is that it doesn't.
+- **R116 — three of the five visual contracts shipped unimplemented.** Clay had never been
+  an action colour (all seven `--clay` uses decorative or textual; `.ins-teaser` is
+  jade-deep, not clay), and `washi` has **zero occurrences** outside the boards. So **R59
+  deferred a probation on something never built** and **R113 accepted a cost that did not
+  exist**. The audit, reported whether or not each turned out fine: **liquor swatch** unbuilt
+  but *declared* in code and asserted in two suites — the shape the others should have had;
+  **clay** built here; **xanthous built and confined** to two `.active` selectors;
+  **kachi** built v4.01; **washi** never built, probation closed on paper.
+- **A check read its own prose for the SIXTH time** — A2 failed against this deploy's own
+  CSS comment about `.greeting-card`. Yesterday's rule was applied to one language and not
+  the others; every source `home-test.js` reads is now comment-stripped, with the one check
+  that *wants* comments reading raw source deliberately and saying why.
+- **A negative control destroyed the build, and the lesson is an amendment to yesterday's.**
+  "Restore through `git checkout`, never shell backups" is only safe **when the work is
+  staged** — `git checkout -- <file>` restores from the index, and unstaged work means the
+  index holds HEAD. The Home build was rebuilt from scratch and the controls re-run against
+  a staged index. **Stage before you break anything.**
+- **Four negative controls bite**, each on the intended check: clay on a redirected
+  suggestion reddens B7 (a check that exists *because* the first run of that control found
+  nothing to fail), `week` back on Home reddens C2, `--clay`→`--kachi` reddens B4 **and**
+  D2, an empty favourites card reddens C6.
+- **NOT verified visually by me**, third deploy running — the Browser pane refuses
+  localhost. `fixtures/home-review.js` renders all four states in both themes from real
+  `viewDashboard()` output for a human.
+
+---
 ## v4.09 — R3 slice H3: #09 the door. **R3's last slice.**
 Deploy: `steep-data.js` (`renderLogin` rebuilt in place, `shell()`, new `ensoMark`),
 `styles.css` (the `.door-*` block, both themes via tokens), `steep-core.js`
