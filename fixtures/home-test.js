@@ -52,8 +52,13 @@ const OWNER=rows('sessions_rows.csv')[0].user_id;                  // R69: deriv
 const TEAS=rows('teas_rows.csv').filter(t=>t.user_id===OWNER)
   .map(t=>({id:t.id,name:t.name,type:t.type,origin:t.origin||'',amountGrams:Number(t.amount_grams||0),
             isFavorite:t.is_favorite==='true'||t.is_favorite==='t'}));
+// Steeps come from the real export: `brewCountLabel` reads `steeps.length`, so a session seeded
+// without them renders a diary line with an empty count. Seeding the shape the app actually stores.
+const STEEPS_BY_SESSION=rows('steeps_rows.csv').filter(s=>s.user_id===OWNER)
+  .reduce((m,s)=>{ (m[s.session_id]=m[s.session_id]||[]).push({}); return m; }, {});
 const SESSIONS=rows('sessions_rows.csv').filter(s=>s.user_id===OWNER)
-  .map(s=>({id:s.id,teaId:s.tea_id,vesselId:s.vessel_id,date:s.session_date,teaName:s.tea_name}));
+  .map(s=>({id:s.id,teaId:s.tea_id,vesselId:s.vessel_id,date:s.session_date,teaName:s.tea_name,
+            teaType:s.tea_type,steeps:STEEPS_BY_SESSION[s.id]||[]}));
 const seed=()=>G('state.teas='+JSON.stringify(TEAS)+';state.sessions='+JSON.stringify(SESSIONS)
   +';state.vessels=[{id:"v1",name:"Dragon Gaiwan",capacityMl:110}];state.settings.dashLayout=undefined;state.dashEdit=false;');
 seed();
@@ -147,6 +152,50 @@ ok(/Favourites/.test(edit) && /nothing to show right now/.test(edit),
    'C7 …but EDIT MODE still names it: you cannot reorder or unhide what you cannot see (R61)');
 G('state.dashEdit=false;'); seed();
 console.log('  C present tense: 7 checks');
+
+/* ---- E · Earlier today (R117) and the glance destination (R118) ---- */
+// Two of today's own sittings, stamped onto real exported rows rather than invented ones.
+const noonToday=new Date(); noonToday.setHours(11,0,0,0);
+const todays=SESSIONS.slice(0,2).map((s,i)=>Object.assign({},s,{date:new Date(noonToday.getTime()+i*3600e3).toISOString()}));
+G('state.sessions='+JSON.stringify(todays.concat(SESSIONS))+';');
+const withToday=G('viewDashboard()');
+ok(/Earlier today/.test(withToday), 'E1 the card appears once a cup is logged today');
+ok(G('dashSurface("today")')==='home' && G('dashSurface("recent")')==='insights',
+   'E2 …on Home, while `recent` stays on Insights — two cards over one table, not one card meaning different things by surface (R113)');
+ok(G('DASH_DEFAULT_ORDER.indexOf("today")')===0 && G('DASH_DEFAULT_ORDER.indexOf("today") < DASH_DEFAULT_ORDER.indexOf("restock")'),
+   'E3 …and it LEADS the stack: today outranks supply, so the first card changes through the day');
+/* The boundary check is the one that matters, because its failure is absurd rather than subtle: the
+   masthead announcing a second pour over a card showing one row. Both must read the same filter. */
+/* Anchored on the CALL SITE, not the name. The first version tested for `sessionsToday(now)`, which
+   is a substring of the function's own declaration `function sessionsToday(now){` — so it matched
+   itself and passed with the masthead re-deriving its boundary. Caught by a negative control that
+   refused to bite. Assert the consumer, never the definition. */
+ok(G('sessionsToday().length')===2 && /todaySessions = sessionsToday\(/.test(dashSrc)
+   && !/todaySessions = sessions\.filter/.test(dashSrc),
+   'E4 the card and the masthead share ONE day boundary — the greeting READS `sessionsToday` rather than re-deriving it');
+ok(!/renderStarsStatic/.test((withToday.split('Earlier today')[1]||'').split('</div></div>')[0]),
+   'E5 no stars on a diary line — R2 moved ratings to detail, and time · tea · steeps · ★★★★½ is a scorecard');
+/* Asserted on the CONTENT of the two spans, not their presence. The review harness rendered a diary
+   line with an empty steeps span for exactly this reason — it seeded sessions with no `steeps`, and
+   `brewCountLabel` returns '' for those. A class-exists check passes against an empty element. */
+const dayRow=(withToday.match(/<div class="today-row"[\s\S]*?<\/div>\s*<\/div>/)||[''])[0];
+ok(/today-time mono">\d\d:\d\d</.test(dayRow),
+   'E6 a diary line carries a real clock time, derived from the session date (R27 — the board\'s times are illustrative)');
+ok(/today-steeps mono">\d+ (steep|infusion)/.test(dayRow),
+   'E7 …and a real steep count, not an empty span where one belongs');
+G('state.sessions='+JSON.stringify(SESSIONS.map(s=>Object.assign({},s,{date:"2020-01-02T09:00:00Z"})))+';');
+ok(!/Earlier today/.test(G('viewDashboard()')),
+   'E8 and it is ABSENT on a day with no cup — blank until written on, not an empty card apologising');
+G('state.sessions='+JSON.stringify(todays.concat(SESSIONS))+';');
+const cards=G('dashCards()');
+ok(/openSessionDetail/.test(cards.today) && !/openSessionEdit/.test(cards.today),
+   'E9 R118: a diary row opens DETAIL, not the edit form — tapping a line to look at it must not land in a form');
+ok(/openSessionDetail/.test(cards.recent) && !/openSessionEdit/.test(cards.recent),
+   'E10 …and `recent` is fixed with it, on Insights — the same wrong destination, so the same fix');
+ok(/\$\{body\}\$\{editBar\}/.test(dashSrc) && /\.dash-edit-bar\{[^}]*justify-content:\s*center/.test(cssSrc),
+   'E11 Edit layout sits BELOW the stack, centred, on both surfaces — above it, it read as a third action in the masthead\'s row');
+seed();
+console.log('  E earlier today: 11 checks');
 
 /* ---- D · the contract guards R116 ordered ---- */
 const claySel=(cssSrc.match(/^[^\n{]*\{[^}]*var\(--clay\)[^}]*\}/gm)||[]).map(s=>s.split('{')[0].trim());

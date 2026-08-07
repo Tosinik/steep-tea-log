@@ -1274,6 +1274,35 @@ above it rather than the code. **A locked contract is not implemented until some
 > **4 · Kachi-iro — built v4.01, guarded** (`focus-test.js` §B, proven by leaking it onto `.pour-saved`).
 > **5 · Washi — never built.** Probation closed on paper by R115; zero code.
 
+**R117 — "Earlier today" is its OWN card, not `recent` rescoped.** Two cards over one table,
+justified by different query, different job, different name: `recent` is the last four sittings, any
+date, a **log**, on Insights; **Earlier today** is this calendar day, a **diary page**, on Home.
+Rescoping one card to mean different things on different surfaces is exactly the fault R113 rejected
+when it refused "the surface that owns the card" — a card must render the same everywhere.
+
+**Its day boundary must be the greeting's**, or the masthead says "second pour today" over a card
+showing one row. Use the greeting's own boundary; do not re-derive one. **No stars** — R2's Library
+rule already moved ratings to detail, and `time · tea · steeps · ★★★★½` is a scorecard where a diary
+line was asked for. **It leads the stack, above Running low**: today outranks supply, so the first
+card changes through the day. **Absence is correct, not flicker** — a diary page is blank until
+written on; the card arrives at the first cup and stays until midnight, the same mechanism as Running
+low. **Stated cost: at midnight a full tea day vanishes from Home.** Correct for a present-tense
+surface, and Sessions takes over.
+
+> *Code-lane note, 2026-08-07 (built in v4.10).* The boundary is a shared `sessionsToday()` that the
+> masthead reads too, so the two cannot disagree by drifting apart — one writer, not two correct
+> calls to `dayKey`. **Its guard was vacuous on the first write**: the check tested for
+> `sessionsToday(now)`, which is a substring of the function's own declaration
+> `function sessionsToday(now){`, so it matched itself and passed while the masthead re-derived its
+> boundary. Found by a negative control that refused to bite. **Anchor on the call site, never the
+> definition** — the same family as a check reading its own prose, one layer up.
+
+**R118 — a glance row opens session DETAIL, not the edit screen.** `openSessionEdit` assumes you
+came to change something; tapping a diary line to look at it and landing in a form is a wrong-verb
+error. Since **R58** gave editing its own screen, detail is the container that offers it. **Not
+scoped to the new card:** `recent`'s rows carry the same wrong destination on Insights today, so it
+is one fix in both places.
+
 **R111 — `landing.html` is a SUPERSEDED SURFACE with a live public URL.** It ships at the repo root:
 a self-contained WS4 marketing page with its own tokens, referenced by nothing in `index.html` or
 `service-worker.js`, deliberately outside the precache, and reachable at `slowcup.app/landing.html`.
@@ -1578,6 +1607,13 @@ stale. This section is the packet.
 > is **untrue until it ships**, and the beta welcome note must not promise deletion before then. It
 > belongs with the **beta-hardening bundle** — it gates the public launch the way F1 and F2 do.
 
+- **Resuming an in-progress sitting cannot be a Home card** — **recorded 2026-08-07, answering the
+  item the Home board left unproposed.** `state.sessionDraft` is **in-memory only**: nothing persists
+  it, and `steep-core.js`'s `refreshData()` bails out early *because* it is volatile ("never refetch
+  over unsaved work"). So the card has no state to read — if a draft exists you are already on that
+  screen, and if you left the app it no longer exists. **Persisting a draft is a schema question, not
+  a card**, and it would need its own ruling about what a half-finished sitting means when it comes
+  back on another device. Filed here so it is a decision rather than a standing board note.
 - **Country marks are not tappable and do not zoom** — **R4 candidate, recorded 2026-08-06.**
   Direction 2 made the country tier a list and specified no interaction beyond that, so this is not
   an omission. But it was never ruled *out* either, and the frame ruling board explicitly keeps the

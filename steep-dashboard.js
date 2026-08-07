@@ -585,8 +585,9 @@ function viewAchievements(){
    Stated plainly because it OVERRIDES A DELIBERATE HIDE: a user who hid their greeting now sees it
    again. The alternative was a Home with no voice and no control left to bring it back, since the
    thing that would have unhidden it is a card list the greeting has just left. */
-const DASH_DEFAULT_ORDER = ['restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost','origins'];
-const DASH_LABELS = { restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
+// R117 — `today` LEADS the stack: today outranks supply, so the first card changes through the day.
+const DASH_DEFAULT_ORDER = ['today','restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost','origins'];
+const DASH_LABELS = { today:'Earlier today', restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab.
 // Migration is automatic — existing saved {order,hidden} keep their visibility and gain a surface
 // from this map (nothing a user hid can reappear); ids no longer present are filtered out.
@@ -596,6 +597,7 @@ const DASH_LABELS = { restock:'Running low', favorites:'Favourites', week:'Sessi
    and Insights' tense — so it defaults to Insights, the only other surface. Anyone who has moved it
    keeps it: the rule governs the DEFAULT SET, and a user's override still wins in `dashSurface()`. */
 const DASH_SURFACE = {
+  today:'home',                  // R117 — this calendar day is present tense; `recent` stays Insights
   restock:'home', favorites:'home',
   week:'insights',
   recent:'insights', totals:'insights', clock:'insights', cost:'insights',
@@ -658,7 +660,13 @@ function renderDashboard(cards, surface){
   const { order, hidden } = dashLayout();
   const editing = !!state.dashEdit;
   const onSurface = id => dashSurface(id)===surface && cards[id]!=null; // only this tab's cards
-  const editBar = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+  /* The edit affordance sits BELOW the stack, centred (board 4a/5a). It used to lead, which was
+     right while the greeting was the stack's first card — the bar read as the stack's own control.
+     Making the greeting a masthead moved the stack's top edge out from under it and left the bar
+     stranded between the spine and the first card, directly beneath "Log a cup →", where it read as
+     a third action in the masthead's row. Below both tabs' stacks, not Home's only: one control with
+     two positions is the two-container-models trap R114 names. */
+  const editBar = `<div class="dash-edit-bar">
     <button class="lib-chip ${editing?'active':''}" onclick="dashToggleEdit()">${editing?'✓ Done':`${icon('i-edit-hl',13)} Edit layout`}</button>
   </div>`;
   const visible = order.filter(id=>onSurface(id) && !hidden.has(id));
@@ -686,7 +694,7 @@ function renderDashboard(cards, surface){
     ${hiddenIds.length ? hiddenIds.map(id=>`<div class="rank-row"><span class="rname">${DASH_LABELS[id]}</span><button class="lib-chip" onclick="dashShowCard('${id}')">Show</button></div>`).join('') : '<div class="empty">Nothing hidden — every card is on your dashboard.</div>'}
     <div style="margin-top:14px;"><button class="btn" onclick="dashResetLayout()">Reset to default order</button></div>
   </div>` : '';
-  return `${editBar}${body}${hiddenPanel}`;
+  return `${body}${editBar}${hiddenPanel}`;
 }
 
 // Every dashboard card, keyed by id, built once so either tab can render any of them — cross-tab
@@ -822,7 +830,7 @@ function greetingMastheadHTML(){
     `Whenever you&rsquo;re ready, the first steep is waiting.`,
   ], todayKey));
   const teaLink = t => `<span onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="color:var(--jade-deep);font-weight:600;cursor:pointer;text-decoration:underline;">${escapeHtml(t.name)}</span>`;
-  const todaySessions = sessions.filter(se=>dayKey(se.date)===todayKey);
+  const todaySessions = sessionsToday(now);   // R117: the ONE boundary, shared with Earlier today
   const brewedToday = new Set(todaySessions.map(se=>se.teaId));
   // v3.70 (issue #4) — a "more than usual" day: today's session count beats the user's typical per-day
   // (5-day signal, today excluded from the baseline). Celebratory, count-aware; surfaced in the ack below.
@@ -1034,6 +1042,17 @@ function greetingMastheadHTML(){
   return card(sub, redirected ? null : pick.t);
 }
 
+/* R117 — ONE day boundary, used by the masthead and by Earlier today. The ruling is explicit that
+   they must agree ("use the greeting's own boundary, don't re-derive one"), because the failure is
+   silent and absurd in the same glance: the masthead saying "second pour today" over a card showing
+   one row. So the filter lives here and both callers read it, rather than each calling `dayKey`
+   correctly and hoping they keep agreeing. Sorted ascending — a diary page reads down the day. */
+function sessionsToday(now){
+  const k = dayKey(now || new Date());
+  return (state.sessions||[]).filter(se=>dayKey(se.date)===k)
+    .sort((a,b)=> new Date(a.date) - new Date(b.date));
+}
+
 /* The masthead's two actions. Both mirror `quickLogSession`'s dirty-draft guard rather than calling
    `startSessionFor` bare, because this button is the first thing on the first screen and it would
    otherwise DISCARD A RUNNING STEEP in silence. Tea detail's two entries (`steep-teas.js`) still call
@@ -1068,7 +1087,10 @@ function dashCardsHome(s){
       <div class="section-title"><h2>Recent sessions</h2></div>
       ${recent.map(se=>{
         const tea = teaById(se.teaId);
-        return `<div class="rank-row" onclick="openSessionEdit('${escapeJsArg(se.id)}')" style="cursor:pointer;">
+        // R118 — a glance row opens DETAIL, which contains edit. Landing in a form because you
+        // tapped a line to look at it is a wrong-verb error, and R58 is what makes detail the
+        // container that offers editing. Same fix as Earlier today's rows; this one is on Insights.
+        return `<div class="rank-row" onclick="openSessionDetail('${escapeJsArg(se.id)}')" style="cursor:pointer;">
           <span class="rname">${escapeHtml(se.teaName || (tea?tea.name:'—'))}${se.rating?' '+renderStarsStatic(se.rating,false):''}</span>
           <span class="rval" style="color:var(--ink-soft);font-size:12px;">${brewCountLabel(se)} · ${new Date(se.date).toLocaleDateString()}</span>
         </div>`;
@@ -1094,7 +1116,33 @@ function dashCardsHome(s){
       }).join('')}
     </div>` : '';
 
+  /* R117 — EARLIER TODAY: a diary page, not a log. Deliberately a second card over the same table
+     rather than `recent` rescoped, because a card that means "today" on Home and "the last four"
+     on Insights is the fault R113 rejected when it refused "the surface that owns the card" — cards
+     must render the same everywhere. Different query, different job, different name.
+     Its boundary is `sessionsToday`, shared with the masthead. NO STARS: R2's Library rule moved
+     ratings to detail, and time · tea · steeps · ★★★★½ is a scorecard where a diary line was asked
+     for. Absent until the first cup and gone at midnight — a blank page is what a diary looks like
+     before you write on it, and the vanishing is the stated cost of a present-tense surface. */
+  const today = sessionsToday();
+  const todayHTML = today.length ? `
+    <div class="section card">
+      <div class="section-title"><h2>Earlier today</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${today.length} sitting${today.length===1?'':'s'}</span></div>
+      ${today.map(se=>{
+        const tea = teaById(se.teaId);
+        const type = (se.teaType || (tea && tea.type) || '').toLowerCase();
+        const when = new Date(se.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
+        return `<div class="today-row" onclick="openSessionDetail('${escapeJsArg(se.id)}')">
+          <span class="today-time mono">${escapeHtml(when)}</span>
+          <span class="today-tint t-${escapeHtml(type||'green')}"></span>
+          <span class="today-name">${escapeHtml(se.teaName || (tea?tea.name:'—'))}</span>
+          <span class="today-steeps mono">${escapeHtml(brewCountLabel(se))}</span>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
   return {
+    today: todayHTML,
     restock: restockHTML,
     recent: recentHTML,
     // #16 (v3.82): a period lens on the RAW numbers only — scoped reinstatement; v3.65's
