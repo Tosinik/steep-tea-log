@@ -1289,6 +1289,46 @@ above it rather than the code. **A locked contract is not implemented until some
 > **4 · Kachi-iro — built v4.01, guarded** (`focus-test.js` §B, proven by leaking it onto `.pour-saved`).
 > **5 · Washi — never built.** Probation closed on paper by R115; zero code.
 
+**R122 — The looking is not automatable, and the harnesses that support it are repo files.** Four
+defects this round were found by a human looking at a rendered surface and **none by a check**: the
+map's labels running off the card, the door's ~500 px of slack, clay reaching one branch of two, and
+a preview that showed the content region for an entire slice while looking complete.
+
+**No review subagent.** The verifier works because it is a gate with a fixed checklist and a binary
+output. A review agent would have to make design judgements, and the entire value of these harnesses
+is that a *person* forms the judgement — automating the looking would rebuild the blind spot it
+exists to cover. This is not a resourcing decision to revisit when agents get better; it is what the
+four defects have in common.
+
+**The harnesses are therefore tracked** (v4.15, with their `.gitignore` exceptions). Two reasons, and
+the second was learned the hard way: they encode rules relearned four times over — *iframes because
+`position:fixed`/`sticky` and `100dvh` need a real viewport · drive `render()` rather than
+approximate the shell · assert the chrome is present and **throw** rather than write a page · count
+the markup, not the file that inlines its own stylesheet · both themes, with per-state numbers the
+tool prints itself* — and **a harness that is not in the repo cannot be reviewed**. The planning lane
+had to take its output on trust, which is exactly how the narrowed preview survived a full slice.
+`git checkout` cannot even restore one: an untracked file has no index entry.
+
+> *Code-lane note, 2026-08-07.* Counted at the moment of tracking rather than from the report: there
+> were **three** harnesses in `fixtures/`, not four. The Origins one had never been a repo file — it
+> drew the map for the whole H2 slice from a session scratchpad, with an absolute path hardcoded in
+> it, one `/clear` from gone. That near-miss is the argument.
+
+**Queued for R4's close, in this order:** reconcile `slowcup-deploy` (step 8 stops at commit, step 9
+is the UNPUSHED pause — the rhythm exists because the planning lane cannot review what it cannot
+clone; and step 7's "three suites at minimum" becomes all suites from `git ls-files`) · update
+`vm-fixture` with the full delta **and fold the review-harness contract into it as a section**, since
+both are "sandbox the app, look at what comes out" and two documents would drift · run the audit with
+**six** lenses · point `issue-triage` at the queue (**#28** is arguably closed by v4.10 and **#25** by
+the masthead) · extract `fixtures/_sandbox.js`, which touches every suite and must not land mid-slice.
+
+**R121b — the sixth lens: "asserted but never built."** Approved 2026-08-07. Lens 4 catches doc claims
+that went **stale** — true once, false now. R81, R95 and R116 are claims that were **never true**:
+nothing decayed, and three of them lived in **boards**, which lens 4 does not scope. The sixth lens
+inverts the method: for each locked contract or ruling, demand the **artifact** that proves it exists
+in code — a token, a selector, a function — and treat **absence of a pointer** as the finding.
+Counter-rule already earned: **a locked contract is not implemented until something asserts it.**
+
 **R119 — A CUP IS A STEEP. Ruled by Niklas.** A steep is poured into a cup and drunk, so five steeps
 is five cups. The planning lane argued a cup is a *sitting* and was wrong: that reasons about the
 sitting, not the cup.

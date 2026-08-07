@@ -80,6 +80,27 @@ fixtures/*
 # "completes" the table and asserts a colour for a style that genuinely varies. It also carries the
 # fence: no teas.liquor column yet, liquor not inherited, nothing rendering a swatch.
 !fixtures/liquor-test.js
+# THE REVIEW HARNESSES. Not tests — they render a surface for a HUMAN to look at, which is how
+# every defect this round was actually found: the map's unreadable labels, the door's 500px slack,
+# clay reaching one branch of two, and a preview that showed the content region for a whole slice
+# while looking complete. None was found by a check.
+#
+# Tracked for two reasons. They encode rules that were relearned four times over (iframes because
+# position:fixed/sticky and 100dvh need a real viewport · drive render() rather than approximate the
+# shell · assert the chrome is present and THROW rather than write a page · count the markup, not the
+# file that inlines its own stylesheet · both themes, with per-state numbers the tool prints itself).
+# And a harness only in a working tree cannot be REVIEWED — the planning lane had to take its output
+# on trust, which is exactly how the narrowed preview survived. `git checkout` cannot even restore
+# one: an untracked file has no index entry, so a negative control that breaks it destroys it.
+# Their generated *.html output stays ignored — that is the artifact, regenerated per run.
+# Counted from `ls`, not from memory: the report that prompted this said FOUR harnesses and only
+# THREE were in fixtures/. The Origins one had never been a repo file at all — it drew the map for
+# the whole H2 slice from a session scratchpad, unreviewable and one `/clear` from gone. Promoted
+# here with its hardcoded absolute path removed. That near-miss is the argument, not the tidiness.
+!fixtures/door-review.js
+!fixtures/origins-review.js
+!fixtures/home-review.js
+!fixtures/liquor-review.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.
