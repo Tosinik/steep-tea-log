@@ -180,7 +180,24 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.12: A5, the ramp goes to twelve stops** (cache **v122**, APP_VERSION v4.12,
+**NOW (just shipped) — v4.13: the dark pale end collapsed, and A3 was asserting a proxy** (cache
+**v123**, APP_VERSION v4.13, **no SQL**). v4.12 shipped a collision the suite reported green on.
+- **1.9 luminance between `yellow-pale` and `gold-pale` in DARK** — one fifth of their 9.2 light
+  spacing — so Huang Ya and Fujian White would have been the same swatch on a dark card. Cause: A5's
+  stops move down in dark while `gold-pale` was lifted up, closing the gap from both sides. **Each
+  change was individually defensible**, which is why nothing caught it.
+- **A3 was a PROXY that permitted the property to fail.** "Every dark stop is lifted" was protecting
+  *adjacent stops stay tellable apart in every theme* — now asserted directly: **≥9 luminance between
+  every adjacent pair, in both blocks**, the threshold taken from the light column's own tightest gap
+  (9.2). **Where a proxy and the property disagree, assert the property.** No exemption list to
+  maintain.
+- **A3b, the ground check that was also missing:** every stop **≥18 from the card it sits on**. Same
+  class — "can a human tell these apart" — separation from the surface rather than the neighbour. It
+  is a **collapse detector and says so**; `ivory` at 19.2 in light is the tightest and unseen.
+- Dark pale end retuned (`yellow-pale`, `gold-pale`); **light column verified unmoved by diff**.
+  **28 suites, all green.**
+
+**Previously — v4.12: A5, the ramp goes to twelve stops** (cache **v122**, APP_VERSION v4.12,
 **no SQL**). Niklas tasted the four `gold-pale` teas; `ivory` (bud-only whites) and `yellow-pale`
 (the one yellow row) came out of it. **Shelf now shows EIGHT distinct swatches across 12 teas.**
 - **Both new stops are per-slug exceptions for the same reason: the separating fact is not a field.**

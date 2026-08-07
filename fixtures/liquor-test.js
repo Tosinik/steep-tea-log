@@ -41,10 +41,15 @@ const cssSrc=strip(fs.readFileSync(path.join(repo,'styles.css'),'utf8'));
    in lightness, below it in the ramp's reading order — so the brown arm gains two members and the
    green arm (jade-pale, straw) is unchanged. */
 const RAMP=['jade-pale','straw','ivory','yellow-pale','gold-pale','gold','amber','amber-deep','copper','mahogany','sepia','near-black'];
-/* The ramp's ONLY un-lifted stops, enumerated rather than described. A3 exempts exactly these two
-   and no others, so a third cannot join them without reddening — which is the difference between an
-   exception and an erosion. Deltas measured at the build: ivory 234.8→230.9, yellow-pale 225.3→223.7. */
-const UNLIFTED=['ivory','yellow-pale'];
+/* TWO SEPARATION FLOORS, and they are the whole of what this ramp has to guarantee.
+   `SEP_MIN` — every adjacent pair, in EVERY theme. Taken from the light column's own spacing, whose
+   tightest gap is 9.2 (yellow-pale ↔ gold-pale); 9 is that floor, not a number chosen to pass.
+   `GROUND_MIN` — every stop against the card it sits on. This one is a COLLAPSE detector and says
+   so: it catches a swatch becoming invisible against its surface, and it does not prove any pair is
+   comfortable. The tightest real value is `ivory` at 19.2 from `--white` in the light theme, and
+   nobody has looked at it rendered — flagged rather than certified. */
+const SEP_MIN=9;
+const GROUND_MIN=18;
 const NULLS=['dong-ding-oolong','phoenix-dancong','mi-lan-xiang','ya-shi-xiang','huang-zhi-xiang',
   'zhi-lan-xiang','xing-ren-xiang','phoenix-shui-xian','anxi-tie-guan-yin','huang-jin-gui','sheng-puerh'];
 
@@ -60,16 +65,33 @@ ok(RAMP.every(k=>hexOf(dark,k)), 'A2 …and all ten in the dark theme, so no sto
 /* Lifted, NOT inverted — the rule the whole ramp turns on. A swatch is the colour of tea in a cup,
    so an inverted ramp renders pu-erh pale, and a pale pu-erh identifies a different tea. */
 const lum=h=>{const n=parseInt(h.slice(1),16);return 0.2126*((n>>16)&255)+0.7152*((n>>8)&255)+0.0722*(n&255);};
-/* A3 asserts the exemption SET, not merely "no failures". The rule was reasoned from the dark end —
-   a pale pu-erh identifies a different tea — and at the pale end there is nothing left to lift
-   toward. So the two palest stops are exempt BY NAME, and the check fails if the set changes in
-   either direction: a third un-lifted stop is an erosion, and a lifted `ivory` means the delivered
-   value moved without anyone saying so. */
-const notLifted=RAMP.filter(k=>lum(hexOf(dark,k))<=lum(hexOf(light,k))).sort();
-ok(notLifted.length===UNLIFTED.length && UNLIFTED.slice().sort().every((k,i)=>notLifted[i]===k),
-   'A3 exactly two stops are un-lifted — `ivory` and `yellow-pale`, the palest, where lifting would glare rather than read as tea (got: '+(notLifted.join(', ')||'none')+')');
-ok(RAMP.filter(k=>!UNLIFTED.includes(k)).every(k=>lum(hexOf(dark,k))>lum(hexOf(light,k))),
-   'A3b …and every other stop IS lifted, which is what stops a pu-erh rendering pale on a dark ground');
+/* A3 ASSERTS THE PROPERTY, NOT THE PROXY, and the difference was found the hard way.
+   The rule was written as "every dark stop is lifted", reasoned from the dark end: a pale pu-erh
+   identifies a different tea. Then A5's two stops moved DOWN in dark while `gold-pale` was lifted UP
+   — each defensible alone — and closed the gap between them to 1.9 luminance, one fifth of their
+   light spacing. On a dark card Niklas's Huang Ya and his Fujian White would have been the same
+   swatch: the exact collision A5 was written to remove, reintroduced by the theme, while a
+   named-exemption check reported green.
+   What lifting was protecting is that ADJACENT STOPS STAY TELLABLE APART IN EVERY THEME. That is
+   assertable directly, so it is. A stop that does not lift now passes as long as it stays separated;
+   one that lifts too far reddens for the right reason; and there is no exemption list to maintain. */
+[['light',light],['dark',dark]].forEach(([name,blk])=>{
+  const tight=[];
+  for(let i=1;i<RAMP.length;i++){
+    const d=Math.abs(lum(hexOf(blk,RAMP[i]))-lum(hexOf(blk,RAMP[i-1])));
+    if(d<SEP_MIN) tight.push(RAMP[i-1]+'↔'+RAMP[i]+' '+d.toFixed(1));
+  }
+  ok(!tight.length, 'A3 every adjacent pair stays ≥'+SEP_MIN+' luminance apart in '+name
+     +' — two swatches a human cannot tell apart are one swatch ('+(tight.join(', ')||'all clear')+')');
+});
+/* The other half of "can a human tell these apart": separation from the SURFACE, not the neighbour.
+   Same class of failure, and it was equally unasserted — found by measuring `ivory` against the card
+   it will sit on once the cascade lands, rather than by discovering it then. */
+[['light',light,'#FFFEFB'],['dark',dark,'#1C1A14']].forEach(([name,blk,card])=>{
+  const faint=RAMP.filter(k=>Math.abs(lum(hexOf(blk,k))-lum(card))<GROUND_MIN);
+  ok(!faint.length, 'A3b every stop stays ≥'+GROUND_MIN+' from the card it sits on in '+name
+     +' — a swatch that vanishes into its surface identifies nothing ('+(faint.join(', ')||'all clear')+')');
+});
 /* Asserted on the BROWN ARM only, and deliberately so: §2 gives the ramp a green arm (jade-pale,
    straw) beside the brown one, so a monotonicity check over all ten fails for the right reason.
    Testing the wrong property would have made this check either wrong or vacuous. */

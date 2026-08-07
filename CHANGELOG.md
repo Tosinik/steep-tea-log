@@ -36,6 +36,42 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.13 — the dark pale end collapsed, and A3 was asserting a proxy
+Deploy: `styles.css` (two dark values retuned; the light column untouched),
+`fixtures/liquor-test.js`, `steep-core.js`, `service-worker.js` (**v123**),
+`CHANGELOG.md`, `STATE.md`. **No SQL.** **28 committed suites, all green.**
+
+**v4.12 shipped a collision in the dark theme and the suite reported green.** Measured
+per theme block: `yellow-pale` and `gold-pale` sat **1.9 luminance apart** in dark —
+one fifth of their 9.2 light spacing — so on a dark card Niklas's Huang Ya and his
+Fujian White would have rendered as **the same swatch**. That is exactly the collision
+A5 was written to remove, reintroduced by the theme.
+
+- **The cause was A5's exemption cutting both ways.** The two new stops move *down* in
+  dark while `gold-pale` was lifted *up*, closing the gap from both sides. **Each change
+  is individually defensible**, which is why nothing caught it.
+- **A3 was a PROXY, and it permitted the property to fail.** "Every dark stop is lifted"
+  was reasoned from the dark end — a pale pu-erh identifies a different tea — but what
+  lifting protects is that **adjacent stops stay tellable apart in every theme**. That is
+  directly assertable, so it now is: **every adjacent pair ≥ 9 luminance, in both
+  blocks.** The threshold is the light column's own tightest gap (9.2), not a number
+  picked to pass. **Where a proxy and the property disagree, assert the property** — and
+  the exemption list stops needing maintenance: a stop that doesn't lift is fine as long
+  as it stays separated, and one that lifts too far reddens for the right reason.
+- **The dark pale end is retuned to satisfy it** — `yellow-pale` `#EBE0BC`→`#E8DDB6`,
+  `gold-pale` `#EADFAF`→`#DED2A0`. Gaps now 10.4 / 11.6 / 13.7. **The light column did
+  not move**, verified by diff: exactly two token values changed, both in the dark block.
+- **The ground check that was also missing now exists.** Separation from the *surface* is
+  the same class of failure as separation from the *neighbour* — "can a human tell these
+  apart" — and neither had a check. **A3b: every stop ≥ 18 from the card it sits on**, in
+  both themes. **Its limitation is in the code:** it is a *collapse* detector, catching a
+  swatch that vanishes into its surface, and it proves nothing about comfort. The tightest
+  real value is `ivory` at **19.2** from `--white` in light, and nobody has looked at it
+  rendered.
+- **Both controls bite:** restoring v4.12's dark `gold-pale` reddens A3 (and A4);
+  lightening `ivory` until it vanishes into the light card reddens A3b.
+
+---
 ## v4.12 — A5: the ramp goes to twelve stops; A6 held
 Deploy: `styles.css` (two new stops in **both** theme blocks), `steep-tea-types.js`
 (three rows reassigned), `fixtures/liquor-test.js`, **new

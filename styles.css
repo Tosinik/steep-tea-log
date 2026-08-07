@@ -31,7 +31,8 @@
      a single row of user data. Never write a liquor hex at a render site — the currency lesson
      (v3.95, six sites, three wrong) and the kachi lesson (R94, a contract that shipped
      unimplemented because nothing named its token) were both learned the hard way.
-     ALL TEN ARE OCCUPIED. There is no headroom stop: `amber` holds gui-fei-oolong (spec A1). If a
+     ALL TWELVE ARE OCCUPIED (ten at v4.11; A5 added two, both filled). No headroom stop: `amber`
+     holds gui-fei-oolong (spec A1). If a
      future style needs a colour between two of these, that is a deliberate ramp EXTENSION — more
      stops on the same ramp, per §2 and R121 — never an empty slot waiting to be filled. */
   --liquor-jade-pale:#A9C46E;   /* Japanese green — sencha, gyokuro, matcha */
@@ -87,19 +88,23 @@ html[data-theme="dark"]{
      near-black stays darkest, in both. Same ten keys, same order, spec §7. */
   --liquor-jade-pale:#B8D07E;
   --liquor-straw:#DFD996;
-  /* THESE TWO ARE THE RAMP'S ONLY UN-LIFTED STOPS, and the exception is measured, not assumed:
-     ivory 234.8 → 230.9 and yellow-pale 225.3 → 223.7, so both dark twins are very slightly DARKER
-     than their light ones. Every other stop lifts.
-     The "lifted, not inverted" rule was reasoned from the DARK end — a lifted pu-erh must not render
-     pale, because a pale pu-erh identifies a different tea. At the pale end there is nothing left to
-     lift toward: ivory is already at 92% of white, and raising it further on a dark ground makes a
-     swatch that glares rather than one that reads as tea. What the rule actually protects is ORDER,
-     and the order holds in both themes.
-     `liquor-test.js` A3 enumerates exactly these two as exemptions, so a third cannot join them
-     quietly. Delivered by the spec; the deltas above were measured at the build, not taken on trust. */
+  /* THE PALE END IS TUNED FOR SEPARATION, NOT FOR LIFT, and that is a correction to how this ramp
+     was first reasoned about. "Lifted, not inverted" was a PROXY: what it was protecting is that
+     adjacent stops stay tellable apart in every theme, so a pale pu-erh never identifies a different
+     tea. The proxy permitted the property to fail. A5's stops move DOWN in dark while gold-pale was
+     lifted UP, closing the gap from both sides — 1.9 luminance between yellow-pale and gold-pale,
+     one fifth of their light spacing, which would have put Niklas's Huang Ya and his Fujian White
+     on the same swatch on a dark card. Exactly the collision A5 was written to remove, reintroduced
+     by the theme.
+     So the dark pale end is retuned to hold the light column's own spacing (its tightest adjacent
+     gap is 9.2): ivory 230.9 · yellow-pale 220.5 · gold-pale 208.9, gaps 10.4 / 11.6 / 13.7.
+     THE LIGHT COLUMN IS UNCHANGED — it was already correct.
+     `liquor-test.js` A3 now asserts the PROPERTY across every adjacent pair in both blocks, so a
+     stop that does not lift is fine as long as it stays separated, and one that lifts too far
+     reddens for the right reason. There is no exemption list to maintain. */
   --liquor-ivory:#EFE7CE;
-  --liquor-yellow-pale:#EBE0BC;
-  --liquor-gold-pale:#EADFAF;
+  --liquor-yellow-pale:#E8DDB6;
+  --liquor-gold-pale:#DED2A0;
   --liquor-gold:#E2C275;
   --liquor-amber:#D2A05A;
   --liquor-amber-deep:#C4884A;
