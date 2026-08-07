@@ -269,6 +269,27 @@ written down in two files and asserted in two suites.** So:
 - **Eleven catalog rows are deliberately null.** A suite must assert they stay null, or a later pass
   will "complete" the table and assert a colour for a style that varies.
 - **The small geometry is derived, not locked** (R121).
+- **OPEN QUESTION, recorded before the cascade rather than rediscovered after it: the ramp is TWO
+  ARMS, and the adjacent-pair invariant is blind across them.** Luminance ascends
+  `jade-pale` 184.1 → `straw` 207.5 → `ivory` 234.8, then descends to `near-black`. A3 asserts
+  separation between *adjacent* stops, so two stops at opposite ends of the ramp can converge freely
+  and nothing notices. Measured across every non-adjacent pair, in both themes:
+
+  | pair | Δlum light | Δlum dark | Δhue |
+  |---|---|---|---|
+  | `jade-pale` ↔ `gold` | 1.5 | 1.7 | **37°** |
+  | `straw` ↔ `gold-pale` | 8.6 | **4.5** | **9° / 7°** |
+  | `straw` ↔ `yellow-pale` | — | 7.1 | **8°** |
+
+  **The question is whether hue separation is sufficient across arms, or whether the ramp needs a
+  non-adjacent minimum.** For `jade-pale` ↔ `gold` the answer is plainly yes — 37° of hue is a green
+  against a gold, and a luminance-only check would be the wrong instrument. **`straw` ↔ `gold-pale`
+  is the case that does not resolve so easily**: it is close in *both*, and in dark it is 4.5
+  luminance at 7° of hue, which is inside the range this ramp elsewhere treats as one swatch.
+  **No live collision on this shelf** — `straw` holds only `anji-bai-cha`, and Niklas's Spring White
+  Anji has no catalog match, so it resolves at tier 3. But a user with an Anji Bai Cha beside any
+  white tea would meet it. **Not acted on: this is a judgement about perception, not a measurement,
+  and it wants a decision rather than a default.**
 - **These hex values are a first pass by a lane that has not drunk these teas.** Two groupings in
   particular are plausible-on-paper and want a human check: `gold-pale` holds a Fujian white, a Thai
   Ruby Ruanzhi, a yellow tea and a Yunnan silver bud; and `copper` puts Oriental Beauty beside

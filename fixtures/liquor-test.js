@@ -84,6 +84,14 @@ const lum=h=>{const n=parseInt(h.slice(1),16);return 0.2126*((n>>16)&255)+0.7152
   ok(!tight.length, 'A3 every adjacent pair stays ≥'+SEP_MIN+' luminance apart in '+name
      +' — two swatches a human cannot tell apart are one swatch ('+(tight.join(', ')||'all clear')+')');
 });
+/* WHAT A3 CANNOT SEE, stated because an invariant's blind spot is not obvious from reading it: the
+   ramp is TWO ARMS, ascending to `ivory` then descending, so adjacent-pair separation says nothing
+   about two stops at opposite ends. `jade-pale` and `gold` sit 1.5 luminance apart and are told
+   apart by 37° of hue alone; `straw` and `gold-pale` are 4.5 apart in dark at 7° of hue, which is
+   the case that does not obviously resolve. No live collision on this shelf — `straw` holds only
+   anji-bai-cha, which matches nothing Niklas owns. Recorded as an open question in the spec with the
+   full pairwise table; a luminance-only non-adjacent check would be the wrong instrument, and
+   choosing the right one is a decision nobody has made. */
 /* The other half of "can a human tell these apart": separation from the SURFACE, not the neighbour.
    Same class of failure, and it was equally unasserted — found by measuring `ivory` against the card
    it will sit on once the cascade lands, rather than by discovering it then. */
