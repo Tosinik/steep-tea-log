@@ -14,3 +14,4 @@
 # code line endings, which is a separate decision with its own churn and no bearing on
 # archiving a design export.
 docs/r3/boards/** -text
+docs/r4/boards/** -text

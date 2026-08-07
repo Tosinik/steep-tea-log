@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#C8C2B2}
+  a{color:#3F5E42}
+  a:hover{color:#2A4130}
+</style>
+</helmet>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>
+<symbol id="i-home-hl" viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-cup-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v3.5a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/><path d="M8 4v2M11 4v2"/></g></symbol>
+<symbol id="i-calendar-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8 3.5v4M16 3.5v4"/></g></symbol>
+<symbol id="i-chart-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V12M10 20V7M15 20v-5M20 20v-9"/></g></symbol>
+<symbol id="i-plus-hl" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-edit-hl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.1-4.1L16.4 4.6a2 2 0 0 1 2.8 2.8L7.9 18.7 4 20z"/><path d="M14.6 6.4l3 3"/></g></symbol>
+<symbol id="fav-leaf" viewBox="0 0 24 24"><path d="M13.5 3.2 C7 7.5 6.5 15 11.5 20.5 C16.5 15.5 19 8 13.5 3.2 Z" fill="currentColor"/><path d="M12 6.5 C11 11 11.4 15.5 12.6 18.8" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="1.1" stroke-linecap="round"/><path d="M11.5 20.5 C10.8 21.6 10.2 22.2 9.4 22.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</defs></svg>
+
+<section style="display:block;padding:56px 60px 24px;font-family:'Inter',sans-serif">
+  <div style="max-width:880px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.1em;background:#2A4130;color:#F6F2E9;padding:5px 10px;border-radius:6px">R4 · HOME</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:#6b6350">EXPORT 2026-08-05 · 42 SESSIONS · 140 STEEPS · 21 TEAS · 5 VESSELS · 23 DAYS</span>
+    </div>
+    <h1 style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:38px;line-height:1.14;color:#2B2320;margin:16px 0 12px">Home is the present tense</h1>
+    <p style="font-size:16px;line-height:1.62;color:#5C5148;margin:0 0 14px;max-width:740px;text-wrap:pretty">Home keeps the card stack, sheds the washi band, and gets a job it can be held to. The board draws the fixed spine and four states; the stack below the spine stays the user's. Reference ids — <a href="#4a">4a</a> Niklas's Home · <a href="#4b">4b</a> the same at night · <a href="#4c">4c</a> day one · <a href="#4d">4d</a> thin.</p>
+    <p style="font-size:14.5px;line-height:1.6;color:#5C5148;margin:0;max-width:740px;padding-left:16px;border-left:2px solid #8A2B1C;text-wrap:pretty"><b style="color:#2B2320">This is a revision against a lock, not a first draft.</b> Home was boarded in R2 WS2, deep-dived, locked at 2a, and shipped in v3.65 — <code style="font-family:'IBM Plex Mono',monospace;font-size:13px">DESIGN.md:6</code> records it. R61 protects that lock, so what follows revises where the world around Home has moved since: a fifth tab, Origins pinned to Insights, the four-lane method control, the freshness model, and a liquor swatch about to acquire a real data model. Nothing here re-opens 2a itself.</p>
+  </div>
+</section>
+
+<section style="display:block;padding:0 60px 34px;font-family:'Inter',sans-serif">
+  <div style="max-width:880px;border-top:1px solid #B9B2A0;border-bottom:1px solid #B9B2A0;padding:22px 0">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#8A2B1C;margin-bottom:14px">FINDINGS — WHERE THE BRIEF DISAGREES WITH THE FILES</div>
+    <div style="display:grid;gap:16px">
+      <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8A2B1C;line-height:1.5">HOME HAS<br>TWO BOARDS</span>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#3d352e;max-width:640px;text-wrap:pretty">Home is not unboarded. <b>R2 WS2</b> gave it a three-direction board (2a greeting-led · 2b today &amp; shelf · 2c bare glance), a deep-dive with morning, dark and evening-rested states, and <b>Niklas locked 2a</b> — greeting as Shippori hero, stat grid shed to Insights and Wrapped. Bundle 1 then drew it as a canonical screen. What Home lacks is an <i>R4 revision</i> board, which is a smaller and more answerable claim. Two of the four questions below were already ruled in R2; this board carries those forward rather than re-opening them.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8A2B1C;line-height:1.5">Q1 IS<br>ALREADY SHUT</span>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#3d352e;max-width:640px;text-wrap:pretty">"Is Home a card stack at all?" was answered in R2's own framing — <i>"Home stays a user-editable card layout — so these are cards, not a fixed page"</i> — locked with 2a and protected since by R61. Re-asking it in R4 would reverse a lock on no new evidence. The live question is the one underneath it: <b>what does a board draw when the user composes the surface?</b> Answer below.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8A2B1C;line-height:1.5">A CONTRACT<br>BREAKS</span>
+        <p style="margin:0;font-size:14.5px;line-height:1.6;color:#3d352e;max-width:640px;text-wrap:pretty">Clay is <i>one committing action per screen</i>. Cards move between screens. So a card cannot carry clay: the Wrapped teaser is clay on Insights, and the moment Niklas drags it to Home it either brings a second clay onto a surface that has one, or changes appearance on arrival. <b>Clay belongs to surfaces, not to cards.</b> This is not a Home problem — it is a movable-card problem the contract never met, and it is load-bearing for R4's swatch work too.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="display:block;padding:0 60px 40px;font-family:'Inter',sans-serif">
+  <div style="max-width:880px">
+    <h2 style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:25px;color:#2B2320;margin:0 0 6px">The ruling</h2>
+    <div style="display:grid;gap:15px;margin-top:18px">
+
+      <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#3F5E42;padding-top:3px">1</span>
+        <div style="max-width:700px">
+          <p style="margin:0 0 5px;font-size:15.5px;line-height:1.55;color:#2B2320"><b>Home's job: what now.</b></p>
+          <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">Sessions is the diary, Insights is the reflection, Wrapped is the season, Teas is the shelf as objects. All of those are past tense or object tense. <b>Home is the only present-tense surface in the app</b> — what is ready, what is running out, what you were in the middle of. That is a job a lobby doesn't have, and it is testable.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#3F5E42;padding-top:3px">2</span>
+        <div style="max-width:700px">
+          <p style="margin:0 0 5px;font-size:15.5px;line-height:1.55;color:#2B2320"><b>The default-set rule, and its limit.</b></p>
+          <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">A card defaults to Home if removing it would leave you unable to answer <i>what now</i> without navigating. Running low passes. Favourites passes — it is what you reach for. <b>Sessions this week fails</b>: it is a count of what already happened, and it is the fourth default today. The rule governs the <b>default set only</b>; a user's move always wins and is never second-guessed by the design. Niklas has <i>This week, mostly</i> and <i>Wrapped</i> on his Home, and both are drawn here as first-class.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#3F5E42;padding-top:3px">3</span>
+        <div style="max-width:700px">
+          <p style="margin:0 0 5px;font-size:15.5px;line-height:1.55;color:#2B2320"><b>Spine and stack — what a board can draw.</b></p>
+          <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">The greeting is <b>not a card</b>. It is the masthead — fixed, unmovable, unhideable, the app's voice and the one thing every Home has in common. Everything below it is stack, and the board draws it as <i>one configuration, labelled as one</i>. That is the answer to "no board can draw a user-composed surface": draw the spine as specification, draw the stack as an example.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#8A2B1C;padding-top:3px">4</span>
+        <div style="max-width:700px">
+          <p style="margin:0 0 5px;font-size:15.5px;line-height:1.55;color:#2B2320"><b>The washi band: dropped.</b></p>
+          <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">The probation contract was "if it ever fights the masthead, drop it without ceremony." Ruling 3 makes the greeting the masthead, so the band is now a second masthead gesture stacked on the first — that is the fight, arriving on schedule. Two further reasons: D's material moments survived because they carry information (liquor = identity, clay = commit) and this one was flagged from the start as carrying none; and a texture that appears on exactly one surface can never teach what it means. Home loses nothing structural. <b>Toggle it back on in Tweaks to see what is being given up.</b></p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#3F5E42;padding-top:3px">5</span>
+        <div style="max-width:700px">
+          <p style="margin:0 0 5px;font-size:15.5px;line-height:1.55;color:#2B2320"><b>Empty is not a stack of empty cards.</b></p>
+          <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">Day one, every default card has nothing in it. Four empty cards would be four apologies. <b>A card is absent until it has something to say</b> — so day one is the greeting and one door, and cards arrive as they earn a line. R2's dashed "add a card" slots stay, but they belong to a furnished Home in edit mode, not to a bare one: an invitee should not be asked to arrange a room before they have furniture.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#8A2B1C;padding-top:3px">6</span>
+        <div style="max-width:700px">
+          <p style="margin:0 0 5px;font-size:15.5px;line-height:1.55;color:#2B2320"><b>Clay lives in the spine. Cards never carry it. <span style="color:#8A2B1C">Revised</span></b></p>
+          <p style="margin:0 0 9px;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">The earlier ruling gave Home no committing action. That was a consequence of the broken contract, not a decision, and it cost the thing the R1 mock got right — <b>Start steeping</b> as the screen's one commit. Corrected: each surface's <b>spine</b> may carry at most one clay action; a card carries none, on any surface. Home's is the greeting's suggestion, made committing. The raised Log stays jade — it is chrome, shared by every tab, and reads as a different register from content.</p>
+          <p style="margin:0 0 9px;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty"><b>Why not "the surface that owns the card".</b> That version is close and keeps Insights shipping unchanged, but it demotes a card at the moment the user promotes it: drag Wrapped onto Home — the first surface you see — and it renders quieter than it did on Insights. The user's own act of promotion makes the thing dimmer. Spine-only also removes the surprise entirely, since no card changes appearance when moved.</p>
+          <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty"><b>What it costs, and why the cost is right.</b> Insights loses its clay: the Wrapped teaser becomes a quiet card. Clay was defined as <i>one committing action, never selection</i> — and a link to a reflective view commits nothing. That teaser was clay as emphasis, which is the misuse the contract existed to prevent. Insights then carries no clay at all, correctly: the reflective room has nothing to commit. <b>Owed back:</b> the teaser is Insights' warmest element and losing clay should not make it cold — that treatment is an Insights decision, not one to settle on the Home board.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#8A2B1C;padding-top:3px">7</span>
+        <div style="max-width:700px">
+          <p style="margin:0 0 5px;font-size:15.5px;line-height:1.55;color:#2B2320"><b>Content bleeds to the edges. Every tab, not just Home. <span style="color:#8A2B1C">New</span></b></p>
+          <p style="margin:0 0 9px;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">Porcelain paints edge to edge with no page container. The decisive reason is nesting: the stack below the greeting is already made of cards, and a card stack inside a card is a page inside a page. The masthead settles it too — a masthead is the top of a page, not an element floating on one.</p>
+          <p style="margin:0 0 9px;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty">Figure and ground still resolve, without a page edge: <b>porcelain <code style="font-family:'IBM Plex Mono',monospace;font-size:13px">#F6F2E9</code> is the ground, surface <code style="font-family:'IBM Plex Mono',monospace;font-size:13px">#FFFEFB</code> cards are the figure</b>, and the masthead is ink on bare ground. That one-step token pair is what it was for. The "whiter" reading is a board artifact — the phone frames float on a dark surround so they read as objects, which the app never does.</p>
+          <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5C5148;text-wrap:pretty"><b>This binds every tab.</b> Home-only would give the app two container models, and the second one gets "fixed" later by someone who does not know it was chosen.</p>
+        </div>
+      </div>
+
+    </div>
+    <div style="max-width:700px;margin:26px 0 0 40px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      <div style="width:150px">
+        <div style="height:96px;border-radius:10px;background:#F6F2E9;border:1px solid #D8CFB9;padding:9px;display:flex;flex-direction:column;gap:7px">
+          <div style="height:13px;width:74%;border-radius:2px;background:#D6CDB6"></div>
+          <div style="flex:1;border-radius:6px;background:#FFFEFB;border:1px solid #E4DBC6"></div>
+          <div style="flex:1;border-radius:6px;background:#FFFEFB;border:1px solid #E4DBC6"></div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#3F5E42;margin-top:7px">RULED · BLEED</div>
+      </div>
+      <div style="width:150px">
+        <div style="height:96px;border-radius:10px;background:#E2DBC8;border:1px solid #D8CFB9;padding:9px;display:flex">
+          <div style="flex:1;border-radius:7px;background:#F6F2E9;border:1px solid #D8CFB9;padding:7px;display:flex;flex-direction:column;gap:6px">
+            <div style="height:11px;width:74%;border-radius:2px;background:#D6CDB6"></div>
+            <div style="flex:1;border-radius:5px;background:#FFFEFB;border:1px solid #E4DBC6"></div>
+            <div style="flex:1;border-radius:5px;background:#FFFEFB;border:1px solid #E4DBC6"></div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#8b8371;margin-top:7px">REJECTED · PAGE ON A DESK</div>
+      </div>
+      <p style="flex:1;min-width:250px;margin:0;font-size:13.5px;line-height:1.6;color:#5C5148;text-wrap:pretty">Three container levels on the right, two on the left. The rejected model is also the one the board's own phone frames accidentally imply — which is how the question arrived.</p>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-wrap:wrap;gap:40px;padding:0 60px 90px;align-items:flex-start;font-family:'Inter',sans-serif">
+
+  <div id="4a" style="width:390px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;background:#2A4130;color:#F6F2E9;padding:4px 11px;border-radius:7px">4a</span>
+      <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#2B2320">Niklas's Home</span>
+    </div>
+    <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;border:1px solid #D8CFB9;background:#F6F2E9;position:relative;box-shadow:0 22px 50px -30px rgba(60,50,30,.4)">
+      <div style="height:36px;background:#F6F2E9;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:#2B2320;font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600"><span>9:41</span><span style="letter-spacing:.15em;font-size:10px">● ● ●</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 4px">
+        <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#2B2320">SlowCup</span>
+        <span style="width:30px;height:30px;border-radius:50%;background:#8B5E4A;color:#F6F2E9;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-size:14px">N</span>
+      </div>
+      <div style="height:16px;margin:6px 20px 0;border-radius:3px;background:repeating-linear-gradient(90deg,#E7DFCC,#E7DFCC 3px,#EFE8D8 3px,#EFE8D8 7px);display:{{ washiDisplay }}"></div>
+      <div style="padding:16px 20px 6px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#8b8371">FRIDAY MORNING</div>
+        <div style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:33px;line-height:1.16;color:#2B2320;margin:9px 0 10px">Good morning.</div>
+        <div style="font-size:15.5px;line-height:1.55;color:#5C5148;text-wrap:pretty">Maybe the <span style="color:#3F5E42;font-weight:600;border-bottom:1px solid #B7C6B2">Shincha Saemidori Kagoshima</span> — it's been your morning pour.</div>
+        <div style="display:{{ clayDisplay }};margin-top:15px;align-items:center;gap:15px"><span style="display:inline-block;background:#8B5E4A;color:#F6F2E9;font-weight:600;font-size:14.5px;padding:12px 19px;border-radius:15px 5px 13px 5px">Start steeping</span><span style="font-size:14.5px;color:#3F5E42;font-weight:500">Log a cup →</span></div>
+        <div style="display:{{ quietDisplay }};margin-top:13px;font-size:14.5px;color:#3F5E42;font-weight:600">Brew it →</div>
+      </div>
+      <div style="padding:14px 20px 0;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+
+        <div style="border:1px solid #D8CFB9;background:#FFFEFB;border-radius:16px;padding:14px 15px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px"><span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:16.5px;color:#2B2320">Running low</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#a29a86">2 TEAS</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#2B2320;min-width:0"><span style="width:13px;height:13px;border-radius:3px;background:#9DB86A;flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shincha Saemidori</span></span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#8B5E4A;flex:none">2.0g · ~1 day</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#2B2320;min-width:0"><span style="width:13px;height:13px;border-radius:3px;background:#C79A52;flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Honey Oolong Gui Fei</span></span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#8B5E4A;flex:none">7.0g · ~4 days</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="border:1px solid #D8CFB9;background:#FFFEFB;border-radius:16px;padding:14px 15px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8b8371;margin-bottom:11px">FAVOURITES</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#2B2320"><span style="width:13px;height:13px;border-radius:3px;background:#B4623F;flex:none"></span>Ruby Ruanzhi<svg viewBox="0 0 24 24" style="width:13px;height:13px;color:#3F5E42;margin-left:auto"><use href="#fav-leaf"></use></svg></span>
+            <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#2B2320"><span style="width:13px;height:13px;border-radius:3px;background:#E0D4A8;flex:none"></span>Moonlight White<svg viewBox="0 0 24 24" style="width:13px;height:13px;color:#3F5E42;margin-left:auto"><use href="#fav-leaf"></use></svg></span>
+            <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#2B2320"><span style="width:13px;height:13px;border-radius:3px;background:#8B5E3C;flex:none"></span>Da Hong Pao<svg viewBox="0 0 24 24" style="width:13px;height:13px;color:#3F5E42;margin-left:auto"><use href="#fav-leaf"></use></svg></span>
+          </div>
+        </div>
+
+        <div style="border:1px solid #D8CFB9;background:#FFFEFB;border-radius:16px;padding:14px 15px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:16.5px;color:#2B2320">This week, mostly</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#a29a86">MOVED HERE</span></div>
+          <div style="font-size:14.5px;line-height:1.5;color:#5C5148;margin-top:7px">Sencha, and mostly before ten.</div>
+        </div>
+
+        <div style="border:1px solid #D8CFB9;background:#F1EADB;border-radius:16px;padding:14px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div><div style="font-family:'Shippori Mincho',serif;font-weight:600;font-size:16px;color:#2B2320">Your summer, wrapped</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#a29a86;margin-top:3px">A CARD · NEVER CLAY</div></div>
+          <span style="color:#3F5E42;font-size:18px">→</span>
+        </div>
+
+        <div style="display:flex;justify-content:center;padding:2px 0 4px"><span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#8b8371;border:1px solid #E0D7C2;border-radius:999px;padding:6px 13px"><svg viewBox="0 0 24 24" style="width:13px;height:13px"><use href="#i-edit-hl"></use></svg>Edit layout</span></div>
+      </div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:72px;background:#F6F2E9;border-top:1px solid #E7DFCC;display:flex;align-items:center;justify-content:space-around;padding:0 14px 12px">
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#2B2320"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-home-hl"></use></svg><span style="font-size:10px">Home</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-cup-hl"></use></svg><span style="font-size:10px">Teas</span></span>
+        <span style="width:52px;height:52px;border-radius:50%;background:#3F5E42;color:#F6F2E9;display:flex;align-items:center;justify-content:center;margin-top:-18px;box-shadow:0 6px 14px -6px rgba(42,65,48,.7)"><svg viewBox="0 0 24 24" style="width:24px;height:24px"><use href="#i-plus-hl"></use></svg></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-calendar-hl"></use></svg><span style="font-size:10px">Sessions</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-chart-hl"></use></svg><span style="font-size:10px">Insights</span></span>
+      </div>
+    </div>
+    <p style="font-size:13px;line-height:1.6;color:#463d35;margin:12px 0 0;max-width:390px;text-wrap:pretty">Spine: wordmark, avatar, greeting, <b>and the one clay commit</b> — the suggestion made actionable, with "Log a cup" as its quiet sibling. Stack: two defaults plus the two cards Niklas moved, <b>one configuration of many</b>. No washi. Content bleeds; only the cards are bounded. The four tinted squares are <b>type tint, not liquor swatch</b> — the real per-tea colour lands in exactly those slots when R93/R82 gives it a data model.</p>
+  </div>
+
+  <div id="4b" style="width:390px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;background:#2A4130;color:#F6F2E9;padding:4px 11px;border-radius:7px">4b</span>
+      <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#2B2320">The same, at night</span>
+    </div>
+    <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;border:1px solid #332F24;background:#15140F;position:relative;box-shadow:0 22px 50px -28px rgba(0,0,0,.7)">
+      <div style="height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:#EDE6D6;font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600"><span>21:12</span><span style="letter-spacing:.15em;font-size:10px">● ● ●</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 4px">
+        <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#EDE6D6">SlowCup</span>
+        <span style="width:30px;height:30px;border-radius:50%;background:#C99872;color:#15140F;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-size:14px">N</span>
+      </div>
+      <div style="padding:16px 20px 6px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#8f866f">FRIDAY EVENING</div>
+        <div style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:33px;line-height:1.16;color:#EDE6D6;margin:9px 0 10px">That's two cups<br>logged today.</div>
+        <div style="font-size:15.5px;line-height:1.55;color:#A79C87;text-wrap:pretty">The kettle's patient whenever you are.</div>
+      </div>
+      <div style="padding:14px 20px 0;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+        <div style="border:1px solid #332F24;background:#1C1A14;border-radius:16px;padding:14px 15px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px"><span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:16.5px;color:#EDE6D6">Running low</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#7c745f">2 TEAS</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#EDE6D6;min-width:0"><span style="width:13px;height:13px;border-radius:3px;background:#9DB86A;flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shincha Saemidori</span></span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#C99872;flex:none">2.0g · ~1 day</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#EDE6D6;min-width:0"><span style="width:13px;height:13px;border-radius:3px;background:#C79A52;flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Honey Oolong Gui Fei</span></span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#C99872;flex:none">7.0g · ~4 days</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid #332F24;background:#1C1A14;border-radius:16px;padding:14px 15px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8f866f;margin-bottom:11px">FAVOURITES</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#EDE6D6"><span style="width:13px;height:13px;border-radius:3px;background:#B4623F;flex:none"></span>Ruby Ruanzhi<svg viewBox="0 0 24 24" style="width:13px;height:13px;color:#6F9A66;margin-left:auto"><use href="#fav-leaf"></use></svg></span>
+            <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#EDE6D6"><span style="width:13px;height:13px;border-radius:3px;background:#E0D4A8;flex:none"></span>Moonlight White<svg viewBox="0 0 24 24" style="width:13px;height:13px;color:#6F9A66;margin-left:auto"><use href="#fav-leaf"></use></svg></span>
+            <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#EDE6D6"><span style="width:13px;height:13px;border-radius:3px;background:#8B5E3C;flex:none"></span>Da Hong Pao<svg viewBox="0 0 24 24" style="width:13px;height:13px;color:#6F9A66;margin-left:auto"><use href="#fav-leaf"></use></svg></span>
+          </div>
+        </div>
+        <div style="border:1px solid #332F24;background:#1C1A14;border-radius:16px;padding:14px 15px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:16.5px;color:#EDE6D6">This week, mostly</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#7c745f">MOVED HERE</span></div>
+          <div style="font-size:14.5px;line-height:1.5;color:#A79C87;margin-top:7px">Sencha, and mostly before ten.</div>
+        </div>
+        <div style="border:1px solid #332F24;background:#221F17;border-radius:16px;padding:14px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div><div style="font-family:'Shippori Mincho',serif;font-weight:600;font-size:16px;color:#EDE6D6">Your summer, wrapped</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#7c745f;margin-top:3px">A CARD · NEVER CLAY</div></div>
+          <span style="color:#8FBE83;font-size:18px">→</span>
+        </div>
+        <div style="display:flex;justify-content:center;padding:2px 0 4px"><span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#8f866f;border:1px solid #332F24;border-radius:999px;padding:6px 13px"><svg viewBox="0 0 24 24" style="width:13px;height:13px"><use href="#i-edit-hl"></use></svg>Edit layout</span></div>
+      </div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:72px;background:#15140F;border-top:1px solid #262319;display:flex;align-items:center;justify-content:space-around;padding:0 14px 12px">
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#EDE6D6"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-home-hl"></use></svg><span style="font-size:10px">Home</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8f866f"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-cup-hl"></use></svg><span style="font-size:10px">Teas</span></span>
+        <span style="width:52px;height:52px;border-radius:50%;background:#6F9A66;color:#15140F;display:flex;align-items:center;justify-content:center;margin-top:-18px;box-shadow:0 6px 14px -6px rgba(0,0,0,.8)"><svg viewBox="0 0 24 24" style="width:24px;height:24px"><use href="#i-plus-hl"></use></svg></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8f866f"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-calendar-hl"></use></svg><span style="font-size:10px">Sessions</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8f866f"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-chart-hl"></use></svg><span style="font-size:10px">Insights</span></span>
+      </div>
+    </div>
+    <p style="font-size:13px;line-height:1.6;color:#463d35;margin:12px 0 0;max-width:390px;text-wrap:pretty">Same spine, evening voice. The greeting <b>rests when the day is already logged</b> — it reports rather than suggests, which is R2's evening state carried forward. With nothing to suggest there is nothing to commit, so this Home carries <b>no clay at all</b> — the spine rule is <i>at most one</i>, not <i>exactly one</i>. Nothing on Home nudges.</p>
+  </div>
+
+  <div id="4c" style="width:390px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;background:#8A2B1C;color:#F6F2E9;padding:4px 11px;border-radius:7px">4c</span>
+      <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#2B2320">Day one · never drawn</span>
+    </div>
+    <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;border:1px solid #D8CFB9;background:#F6F2E9;position:relative;box-shadow:0 22px 50px -30px rgba(60,50,30,.4)">
+      <div style="height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:#2B2320;font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600"><span>9:41</span><span style="letter-spacing:.15em;font-size:10px">● ● ●</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 4px">
+        <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#2B2320">SlowCup</span>
+        <span style="width:30px;height:30px;border-radius:50%;border:1px solid #D8CFB9;background:#F1EADB;color:#8b8371;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-size:14px">·</span>
+      </div>
+      <div style="padding:38px 20px 0">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#8b8371">WEDNESDAY MORNING</div>
+        <div style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:34px;line-height:1.16;color:#2B2320;margin:10px 0 14px">Nothing on the<br>shelf yet.</div>
+        <div style="font-size:15.5px;line-height:1.6;color:#5C5148;max-width:300px;text-wrap:pretty">Add a tea and this becomes the page that tells you what's ready and what's running out.</div>
+        <div style="margin-top:26px"><span style="display:inline-block;background:#8B5E4A;color:#F6F2E9;font-weight:600;font-size:15px;padding:13px 20px;border-radius:16px 6px 14px 6px">Add your first tea</span></div>
+        <div style="margin-top:18px;font-size:14.5px;color:#3F5E42;border-bottom:1px solid #B7C6B2;display:inline-block">or log a cup you've already had</div>
+      </div>
+      <div style="position:absolute;left:20px;right:20px;bottom:104px;padding-top:16px;border-top:1px solid #E2D9C4">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#a29a86;line-height:1.7">NO EMPTY CARDS. NO DASHED SLOTS.<br>CARDS ARRIVE AS THEY EARN A LINE.</div>
+      </div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:72px;background:#F6F2E9;border-top:1px solid #E7DFCC;display:flex;align-items:center;justify-content:space-around;padding:0 14px 12px">
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#2B2320"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-home-hl"></use></svg><span style="font-size:10px">Home</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-cup-hl"></use></svg><span style="font-size:10px">Teas</span></span>
+        <span style="width:52px;height:52px;border-radius:50%;background:#3F5E42;color:#F6F2E9;display:flex;align-items:center;justify-content:center;margin-top:-18px;box-shadow:0 6px 14px -6px rgba(42,65,48,.7)"><svg viewBox="0 0 24 24" style="width:24px;height:24px"><use href="#i-plus-hl"></use></svg></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-calendar-hl"></use></svg><span style="font-size:10px">Sessions</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-chart-hl"></use></svg><span style="font-size:10px">Insights</span></span>
+      </div>
+    </div>
+    <p style="font-size:13px;line-height:1.6;color:#463d35;margin:12px 0 0;max-width:390px;text-wrap:pretty">The second screen after the door. The greeting still speaks, because the voice is the spine — but it names the state instead of suggesting a tea it cannot know. <b>The single clay commit is legitimate here</b> and nowhere else on Home. The avatar is present but unearned, drawn hollow.</p>
+  </div>
+
+  <div id="4d" style="width:390px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;background:#8A2B1C;color:#F6F2E9;padding:4px 11px;border-radius:7px">4d</span>
+      <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#2B2320">Thin · one tea, two cups</span>
+    </div>
+    <div style="width:390px;height:844px;border-radius:36px;overflow:hidden;border:1px solid #D8CFB9;background:#F6F2E9;position:relative;box-shadow:0 22px 50px -30px rgba(60,50,30,.4)">
+      <div style="height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:#2B2320;font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600"><span>8:04</span><span style="letter-spacing:.15em;font-size:10px">● ● ●</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 4px">
+        <span style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:20px;color:#2B2320">SlowCup</span>
+        <span style="width:30px;height:30px;border-radius:50%;background:#8B5E4A;color:#F6F2E9;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-size:14px">N</span>
+      </div>
+      <div style="padding:22px 20px 0">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#8b8371">SATURDAY MORNING</div>
+        <div style="font-family:'Shippori Mincho',serif;font-weight:700;font-size:33px;line-height:1.16;color:#2B2320;margin:9px 0 10px">Good morning.</div>
+        <div style="font-size:15.5px;line-height:1.55;color:#5C5148;text-wrap:pretty">The <span style="color:#3F5E42;font-weight:600;border-bottom:1px solid #B7C6B2">Shincha Saemidori</span> again? It's the only one on the shelf so far.</div>
+      </div>
+      <div style="padding:20px 20px 0;display:flex;flex-direction:column;gap:12px">
+        <div style="border:1px solid #D8CFB9;background:#FFFEFB;border-radius:16px;padding:14px 15px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8b8371;margin-bottom:11px">YOUR SHELF</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <span style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#2B2320"><span style="width:13px;height:13px;border-radius:3px;background:#9DB86A;flex:none"></span>Shincha Saemidori</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5C5148">48g · fresh</span>
+          </div>
+        </div>
+        <div style="border:1px dashed #D8CFB9;border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:7px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#a29a86">NOT YET SHOWN</div>
+          <div style="font-size:13.5px;line-height:1.55;color:#8b8371;text-wrap:pretty">Running low waits until something is. Favourites waits until you mark one. This week waits until there's a week.</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:72px;background:#F6F2E9;border-top:1px solid #E7DFCC;display:flex;align-items:center;justify-content:space-around;padding:0 14px 12px">
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#2B2320"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-home-hl"></use></svg><span style="font-size:10px">Home</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-cup-hl"></use></svg><span style="font-size:10px">Teas</span></span>
+        <span style="width:52px;height:52px;border-radius:50%;background:#3F5E42;color:#F6F2E9;display:flex;align-items:center;justify-content:center;margin-top:-18px;box-shadow:0 6px 14px -6px rgba(42,65,48,.7)"><svg viewBox="0 0 24 24" style="width:24px;height:24px"><use href="#i-plus-hl"></use></svg></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-calendar-hl"></use></svg><span style="font-size:10px">Sessions</span></span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8b8371"><svg viewBox="0 0 24 24" style="width:21px;height:21px"><use href="#i-chart-hl"></use></svg><span style="font-size:10px">Insights</span></span>
+      </div>
+    </div>
+    <p style="font-size:13px;line-height:1.6;color:#463d35;margin:12px 0 0;max-width:390px;text-wrap:pretty">The dashed panel is <b>a board annotation, not a shipped element</b> — it names the three absent cards so the rule is visible. In the app that space is simply empty. Drawn to make ruling 5 checkable, and it should be deleted at hand-off.</p>
+  </div>
+
+</section>
+
+<section style="display:block;padding:0 60px 90px;font-family:'Inter',sans-serif">
+  <div style="max-width:880px;border-top:1px solid #B9B2A0;padding-top:22px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#6b6350;margin-bottom:14px">LEFT OPEN, DELIBERATELY</div>
+    <div style="display:grid;gap:13px;max-width:700px">
+      <p style="margin:0;font-size:14.5px;line-height:1.6;color:#3d352e"><b>Where "Sessions this week" goes.</b> Ruling 2 removes it from the Home default set. It should default to Insights, but Insights already carries eleven cards and that is a composition question for the Insights half of R4, not this board.</p>
+      <p style="margin:0;font-size:14.5px;line-height:1.6;color:#3d352e"><b>Whether the greeting can be hidden.</b> Ruling 3 makes it unhideable, which is a new constraint on shipped reorder/hide machinery. If a user has already hidden their greeting card, migration needs an answer. Flagged for Code before this ships.</p>
+      <p style="margin:0;font-size:14.5px;line-height:1.6;color:#3d352e"><b>Insights' Wrapped teaser, after clay.</b> Ruling 6 takes clay off it. It is the warmest element on that surface and it should not go cold — but the replacement treatment is an Insights composition question, and settling it here would be the Home board ruling on a surface it has not drawn.</p>
+      <p style="margin:0;font-size:14.5px;line-height:1.6;color:#3d352e"><b>No weekly count is drawn.</b> The export gives 42 sessions across 23 distinct days but no week boundary I can verify, so no "N this week" figure appears anywhere on this board rather than an invented one. Grams, day estimates and tea names are from the shipped library; the four square tints are placeholders, not data.</p>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;washiBand&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Ruling 4 — dropped band&quot;},&quot;suggestionAction&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clay Start steeping&quot;,&quot;quiet link&quot;],&quot;default&quot;:&quot;clay Start steeping&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Ruling 6 — ruled vs superseded&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const washi = this.props.washiBand ?? false;
+    const action = this.props.suggestionAction ?? 'clay Start steeping';
+    const clay = action === 'clay Start steeping';
+    return {
+      washiDisplay: washi ? 'block' : 'none',
+      quietDisplay: clay ? 'none' : 'block',
+      clayDisplay: clay ? 'flex' : 'none'
+    };
+  }
+}
+</script>
+</body>
+</html>

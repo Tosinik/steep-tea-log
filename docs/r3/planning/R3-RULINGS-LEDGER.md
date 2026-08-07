@@ -1,5 +1,16 @@
 # R3 — Rulings ledger & round-2 record
 
+> **THIS IS THE PROJECT LEDGER, NOT R3's — numbering is continuous and R4 continues in it.**
+> R110–R112 closed R3; **R113 onward are R4**. There is exactly one ledger and there must stay
+> exactly one: two would mean two authorities, and a ruling that is not in *this* file is not real.
+>
+> **Why the name and path still say `r3`, deliberately.** Six committed documents cite
+> `docs/r3/planning/R3-RULINGS-LEDGER.md`, and **one of them is `CHANGELOG.md`**, whose entries are
+> never rewritten. Renaming would either falsify past `Deploy:` lines or leave them pointing at a
+> path that no longer exists — and the CHANGELOG's whole value is that it is not edited after the
+> fact. A slightly wrong filename is cheaper than a history that lies. The `r3` records where this
+> file was born, not what it governs.
+
 2026-07-19 · Planning lane. The binding reference for the #09b sweep and the Code hand-off.
 Commit to `docs/r3/planning/`. Everything below is verified against the live repo at `77cf800`
 and the **2026-07-19 exports** (22 teas · 31 sessions · 103 steeps · 5 vessels · 3 profiles ·
@@ -819,6 +830,16 @@ to B3.
 carried no new R3 affordances. But it is the **first surface opened on every launch and the last
 untouched by the redesign**. R4 commissions a Home revision board.
 
+> **AMENDED 2026-08-07, at R4's opening.** This clause was relayed to Design as *"Home has never had
+> a board"*, and **that is false.** **R2 WS2 boarded Home** in three directions (2a greeting-led ·
+> 2b today & shelf · 2c bare glance), deep-dived it with morning, dark and evening-rested states, and
+> **Niklas locked 2a** — greeting as Shippori hero, the stat grid shed to Insights and Wrapped;
+> `DESIGN.md:6` records WS2 shipping in **v3.65**, and Bundle 1 then drew Home as a canonical screen.
+> What Home lacked was an **R4 revision** board, which is a smaller and far more answerable claim.
+> The correction matters because it changes the board's standing: R4's Home board is a **revision
+> against a lock**, so R61 protects 2a and Design's refusal to re-open "is Home a card stack at all"
+> is right — re-asking it would reverse a lock on no new evidence.
+
 **§4 is a queue, not a graveyard.** Everything in it is scheduled to one of three places, and §4 now
 says which. Nothing in this ruling changes slices E–H; it exists so the next round's scope lives in
 the repo rather than in a chat log.
@@ -1178,6 +1199,80 @@ correctly so.
 > surface**: H2 was built, verified and released against a board that had never been banked, so the
 > number arrives after the code. That order is the finding, not an irregularity to smooth over — see
 > the v4.08 block below, and the note above the frame-ruling summary.
+
+## R4 rulings begin here (R113 onward) — same ledger, continuous numbering
+
+**R113 — Clay lives in a surface's SPINE; a card never carries it.** Contract 2 is *one committing
+action per screen, never selection*. A movable card cannot satisfy it: a card carrying clay either
+brings a second clay onto a surface that already has one, or changes appearance on arrival — and
+giving clay to "the surface that owns the card" **demotes a card exactly when the user promotes it**
+(drag Wrapped to Home and it renders quieter than it did on Insights). So clay belongs to the fixed,
+unmovable frame. Home's is the greeting's suggestion made committing — **Start steeping**, with
+"Log a cup →" as its quiet sibling. **At most one per surface, not exactly one:** an evening Home
+with nothing to suggest correctly carries none. The raised Log stays **jade** — it is chrome shared
+by every tab, a different register from content.
+
+> **AMENDED at the build, 2026-08-07, and the amendment removes a phantom.** This ruling was written
+> as a *correction* — "Insights loses its clay, the Wrapped teaser becomes a quiet card" — and
+> accepted a cost it named as deliberate. **That cost does not exist.** `.ins-teaser` is `#2A4130`,
+> jade-deep, with an amber arrow; `var(--clay)` appears seven times in `styles.css` and **every one is
+> decorative or textual** (the brand mark's gradient, the mood sub-line, the door's ensō, a passport
+> mark, a chip figure, the Wrapped eyebrow). **No clay action has ever existed in this app.** So
+> R113 is not a correction of a misuse — it is **clay's first implementation**, and Insights loses
+> nothing. The owed-back question about the teaser going cold dissolves with it. See R116.
+
+**R114 — Content bleeds to the edges, on every tab, with no page-in-a-page.** The stack is already
+made of cards, so a card stack inside a card is a page inside a page, and a masthead is the top of a
+page rather than an element floating on one. Figure and ground resolve on the existing token pair:
+`--porcelain` `#F6F2E9` is ground, `#FFFEFB` cards are figure, the masthead is ink on bare ground.
+One rule for every tab, so nobody later "fixes" one surface to match another.
+
+> *Code-lane note, 2026-08-07.* **The app-level half is already true and always was.**
+> `html,body{background:var(--porcelain)}` and `#app{max-width:920px;margin:0 auto;padding:0 16px
+> 92px}` — no background, no border, no container. The 920 px cap is a desktop reading width with no
+> visual boundary; the board's rejected "page on a desk" is not what ships. **The masthead clause is
+> the real work**, and it is exactly one rule: `.greeting-card` was `background:var(--jade-pale)`
+> with a border and a 20 px radius, so the one place the masthead floated on a card was the masthead.
+
+**R115 — Home's job is the present tense, and that makes the default set testable.** Home answers
+**what now** — what is ready, what is running out, what you were mid-way through. Sessions and
+Insights are past tense; Teas is object tense. **A card defaults to Home if removing it would leave
+you unable to answer "what now" without navigating.** Running low passes; Favourites passes (it is
+what you reach for); **Sessions this week fails** — it counts what already happened. **The rule
+governs the DEFAULT SET only; a user's move always wins and is never second-guessed.**
+
+The **greeting is not a card**: it is the masthead — fixed, unmovable, unhideable, the app's voice
+and the one thing every Home has in common. Everything below it is one configuration of many.
+**A card is absent until it has something to say** — day one is the greeting and one door, and cards
+arrive as they earn a line. R2's dashed slots belong to edit mode on a *furnished* Home; an invitee
+should not be asked to arrange a room before they have furniture. **The washi band is dropped** — its
+probation clause was "if it fights the masthead, drop it", and making the greeting the masthead makes
+washi a second masthead gesture on the first. R59 deferred this once; it is decided now.
+
+**R116 — THREE OF THE FIVE VISUAL CONTRACTS SHIPPED UNIMPLEMENTED, and two lanes ruled on them
+anyway.** Contract 2 (clay = one committing action), contract 4 (kachi-iro = the Focus ring and
+nowhere else) and contract 5 (washi = the Home masthead) were locked, cited across boards and
+rulings, and **never built**. Kachi was found at slice E and implemented in v4.01 (R94). Clay and
+washi are found now: clay has never been an action colour, and `washi` has **zero occurrences**
+outside `docs/r3/boards/`.
+
+**The consequences compounded, which is the part worth keeping.** R59 deferred a *probation* on
+something that was never built. R113 accepted a *cost* that did not exist. Both were reasoned from
+boards describing a state the code never reached — by three lanes in turn, each checking the tier
+above it rather than the code. **A locked contract is not implemented until something asserts it.**
+
+> *The audit R116 ordered, run 2026-08-07. All five, stated whether or not they turned out fine.*
+> **1 · Liquor swatch — NOT built, and honestly so.** The tile is a type tint keyed on `teas.type`.
+> Its absence is **declared in code** (`steep-social.js:174`, `styles.css:1051`) and **asserted in
+> two committed suites** (`pass-record-test.js` D6, `quick-log-test.js` C4). Deferred to R4 with the
+> data model R82 found was never written. This is the shape the other four should have had: unbuilt
+> is fine, unbuilt-and-believed-built is not.
+> **2 · Clay — never built.** Seven decorative/textual uses, no action. Built in v4.10, spine-only.
+> **3 · Xanthous (state only) — BUILT AND CONFINED.** `--xanthous-wash` is declared in both theme
+> blocks and used at exactly two selectors, `.tea-mode.active` and `.tea-seg.active` — both selected
+> state, neither identity nor action. The contract holds; it now gets a guard so it keeps holding.
+> **4 · Kachi-iro — built v4.01, guarded** (`focus-test.js` §B, proven by leaking it onto `.pour-saved`).
+> **5 · Washi — never built.** Probation closed on paper by R115; zero code.
 
 **R111 — `landing.html` is a SUPERSEDED SURFACE with a live public URL.** It ships at the repo root:
 a self-contained WS4 marketing page with its own tokens, referenced by nothing in `index.html` or
