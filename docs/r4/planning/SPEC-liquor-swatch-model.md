@@ -163,10 +163,15 @@ rows, and R82's other never-written pin, the per-origin script model.
 
 ## 6 · Order of work
 
-1. **Author the ramp** — the ordered key set, light and dark.
-2. **Author the 55 catalog liquor values** against it.
-3. **Measure the real shelf** and size the ramp from evidence (§2).
-4. **Then** the migration, the cascade, the picker.
+> **SUPERSEDED BY §10, which is the live plan.** Steps 1–3 are done and step 4 is two-thirds done;
+> §10 below tracks it. Kept because the *ordering argument* is the point and still holds: content
+> first, then the number, then the build.
+
+1. ~~**Author the ramp**~~ — **done (v4.11, twelve stops after A5).**
+2. ~~**Author the 55 catalog liquor values**~~ — **done (v4.11; 44 assigned, 11 deliberately null).**
+3. ~~**Measure the real shelf**~~ — **done: eight distinct swatches over twelve teas.**
+4. **Then** the migration, the cascade, the picker — **migration + cascade shipped v4.14, three
+   render slots v4.15; the PICKER is what remains.**
 
 Steps 1–3 are content and produce the number that step 4 builds against. Building the picker before
 the ramp is sized would pin a size that has no evidence behind it — which is how fourteen got drawn
@@ -260,7 +265,17 @@ varies — this is the same judgement.
 Per R116 and R121, the pattern to copy is contract 1's: **its absence caused no damage because it was
 written down in two files and asserted in two suites.** So:
 
-- **No per-tea value exists yet.** `teas.liquor` is unmigrated; every tea resolves at tier 2 or 3.
+> **TWO OF THESE FENCES HAVE BEEN CROSSED, and are rewritten to where the wall now is rather than
+> deleted** — the pattern D1 established: a fence that has been crossed becomes the fence that still
+> stands, because deleting it loses the record of what was deliberately not built.
+
+- ~~**No per-tea value exists yet.** `teas.liquor` is unmigrated~~ — **CROSSED (v4.14).** The column
+  exists and both mappers carry it. **The fence that still stands: no PICKER**, so tier 1 is
+  reachable today only by import or hand-edit, and every tea on a real shelf resolves at tier 2 or 3.
+- ~~Nothing renders a swatch.~~ **CROSSED (v4.15):** three slots do — `.ref-swatch`, `.social-tile`,
+  `.today-tint`. **The fence that still stands: the SHELF renders none.** `shelfPhoto` holds that
+  position on evidence (21 of 21 teas carry photos; R78 made the tint the fallback only when no photo
+  exists), so a swatch beside the photo is an addition nobody has drawn — Design's call (R81).
 - ~~**`amber` has no catalog row.** It is deliberate headroom, not an oversight — assert that it is
   reachable only by a user correction.~~ **STRUCK (A1): both statements are false.** `amber` holds
   `gui-fei-oolong`, it is reachable at tier 2, and **the ramp has no headroom stop at all**. What is

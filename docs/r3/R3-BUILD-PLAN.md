@@ -4,6 +4,13 @@
 against HEAD.** Plan-mode review held in the planning lane the same day; R63–R66 issued in response
 and land alongside this document.
 
+> **CLOSED — every slice here shipped, ending at v4.09. R4 IS NOT IN THIS FILE, deliberately.**
+> This document is R3's sequence and its record; adding R4's slices would make it two rounds' plan
+> under one round's name, which is the stale-name trap the ledger already declined. **R4's sequence
+> lives in `ROADMAP-v4.md` + the ledger**, which between them carry the scope (R93), the rulings
+> (R113–R122) and the queue (§4) — enough for a round of two items, and one fewer document to drift.
+> **Do not start a third.** If R5 ever needs a slice table of its own, write `docs/r5/`'s, not this.
+
 **Authority position.** This is a *plan*, the lowest tier in the round's order: live repo →
 the current export, stamped (R67) → `planning/R3-RULINGS-LEDGER.md` → `R3-STATUS.md` → the boards → this. It
 sequences work; it rules nothing. Where it disagrees with any of those, they win and this gets

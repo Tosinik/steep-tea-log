@@ -283,7 +283,11 @@ reconciliation. No further Design work is queued for R3.
 
 ## 5 · Code state
 
-**v4.09 LIVE — R3 slice H3: #09 the door. THE R3 BUILD IS COMPLETE** (cache **v119**, no SQL).
+> **NOT THE LIVE VERSION.** v4.09 was **R3's last deploy**, not the current one — R4 has shipped
+> v4.10 through v4.15 since. For what is live, read `STATE.md`'s NOW block; this section is R3's
+> closing state and stops here on purpose.
+
+**v4.09 — R3's FINAL DEPLOY: slice H3, #09 the door. THE R3 BUILD IS COMPLETE** (cache **v119**, no SQL).
 A · B · B2 · B3 · C · D · E · F · G · H1 · H2 · H3 have all shipped.
 
 **`renderLogin()` stayed in `steep-data.js`.** It runs before boot — no `state`, no `render()`, no

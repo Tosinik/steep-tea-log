@@ -96,7 +96,11 @@ applied *after* `v3_11`. Both happen to be order-independent; the list above is 
 
 ## Deploy ritual
 Produce updated files → push to GitHub Pages → **bump `CACHE_NAME` in service-worker.js** (and add any
-NEW module to its `FILES_TO_CACHE` list) → hard reload. Current cache: **v92**. Keep CHANGELOG.md updated.
+NEW module to its `FILES_TO_CACHE` list) → hard reload. Keep CHANGELOG.md updated.
+**Read the current cache number from `service-worker.js`, never from here.** This line said
+`v92` until 2026-08-07, thirty-three deploys after it was true — a stated number in a document
+nobody bumps is a number that decays silently (R71). The ritual and the deploy skill both read
+`CACHE_NAME` at the source.
 Since v3.27 the app shows a "new version — Refresh" banner when a new SW installs, so testers no
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 

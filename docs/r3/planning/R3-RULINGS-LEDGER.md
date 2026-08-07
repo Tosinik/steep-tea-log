@@ -666,6 +666,11 @@ unscoped item is built only after it has a ruling and, where needed, a migration
 is visible rather than rediscovered: that §2 entry was written from the boards' *behaviour* without
 auditing their *data demands* — a planning-lane omission, not a Design error.
 
+> **ONE OF THE TWO IS NOW WRITTEN (v4.11).** The **swatch** data model is
+> `docs/r4/planning/SPEC-liquor-swatch-model.md` (+ its A5 amendment), banked verbatim and amended in
+> its own header. **The per-origin SCRIPT model is still owed** — recorded separately in §4 so
+> "R82's pins" cannot be ticked off as a pair when only one exists.
+
 **R82 — Two of the three declared "hand-off pins" were never written.** `SPEC-freshness-model.md`'s
 header names itself alongside a **swatch data model** and a **per-origin script data model**.
 `R3-BUNDLE1-RECONCILIATION.md:106` says all three "are what get pinned at that build hand-off" —
@@ -767,6 +772,16 @@ searchable scoped listbox with swatch-led rows for teas and a photo/kanji twin f
 half-closes #14 while omitting the board's own primary affordance. The `<select>` + `<optgroup>`
 controls stay. **#14 reopens when the swatch data model lands.**
 
+> **THE CONDITION IS MET — #14 IS REOPENED (v4.14/v4.15).** Both blockers this ruling names are gone:
+> ~~there is no per-tea colour column (R78)~~ — `teas.liquor` exists (`sql/v3_12-liquor.sql`, applied
+> 2026-08-07) — and ~~the palette's data model was never written (R82)~~ — it is
+> `docs/r4/planning/SPEC-liquor-swatch-model.md`, with a twelve-stop ramp and all 55 rows assigned.
+> **R39's long-press correction can now ship**, and it is the remaining third of the swatch work
+> (slice 3: the form control first, long-press optional). Struck rather than deleted because the
+> *reasoning* stands and is why the listbox waited — but left as written this paragraph is an
+> instruction not to build something whose preconditions have since been met, which is R71's trap in
+> its commanding form.
+
 > *Code-lane note, 2026-07-26 (shipped in v3.99).* Two things worth the record. **(a) #04's half of the
 > date inversion needed no work at all** — `sessionDate` has shipped inside *More details* since it
 > landed, so "folded away on #04" was already true and the entire inversion is #12's. A board
@@ -827,11 +842,15 @@ to B3.
 
 > **PARTLY DISCHARGED in v4.11.** ~~the swatch data model R82 found was never written~~ — **it is
 > written**: `docs/r4/planning/SPEC-liquor-swatch-model.md`, banked verbatim in `94edced` and amended
-> at the build (A1–A4 in its header). Of the three things this ruling says are needed, **two have
-> landed**: the ten-stop ramp as tokens in both themes, and a `liquor` value on all 55 `TEA_TYPES`
-> rows (**eleven deliberately null**, asserted). **Still owed: the per-tea column** (`teas.liquor`)
-> and the read-time cascade, which carry the migration — and then the picker, which is what actually
-> unblocks #14.
+> at the build (A1–A5 in its header). **Updated 2026-08-07 — this note had itself gone stale within
+> four deploys**, which is the trap it exists to guard: it said "ten-stop ramp" (A5 made it twelve)
+> and listed the column and cascade as owed after both had shipped.
+> **All three things this ruling names have landed:** the **twelve-stop ramp** as tokens in both
+> themes (v4.11, A5); a `liquor` on **44 of 55** `TEA_TYPES` rows, eleven deliberately null and
+> asserted (v4.11); and the **per-tea column** with the read-time cascade (v4.14,
+> `sql/v3_12-liquor.sql`). **Three slots render it** (v4.15).
+> **Still owed: the PICKER** (R39) — form control first, long-press optional — which is what actually
+> unblocks #14, whose R89 condition is now met.
 
 **(b) Home.** R53 accepted Bundle 1 for Home and the non-Focus steeping states, so Home receives the
 §0 primitives and nothing else — no revision board, none scheduled. That was **correct for R3**: Home

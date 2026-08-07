@@ -70,14 +70,23 @@ cards · menu decision boards. Each workstream returns as its own versioned depl
 The binding text is `docs/r3/planning/R3-RULINGS-LEDGER.md` **R93**; this is the pointer, not the
 authority. **Two items**, both of which drifted out of R3 through individually-correct local
 decisions rather than any single ruling:
-- **The liquor swatch** — visual contract #1 (*identity only, never decoration*) and #06's declared
-  primary path, **shipping unimplemented**. Today's swatch is a **type tint**, six colours keyed on
-  `teas.type`, so every green tea is the same colour; a liquor swatch is per-tea. Needs a per-tea
-  colour **column**, a **liquor value on each of the 55 `TEA_TYPES` rows**, and the swatch data model
-  **R82** found was never written. Unblocks **#14** (R89) and **R39**. Size it like slice B3.
-- **Home** — R53 gave it the §0 primitives and no revision board, correct for R3 since it carried no
-  new R3 affordances. It is also the first surface opened on every launch and the last untouched by
-  the redesign. R4 commissions its board.
+- ~~**The liquor swatch** — visual contract #1 … **shipping unimplemented**.~~ **TWO-THIRDS SHIPPED
+  (v4.11–v4.15).** All three things this bullet said it needed are done: the data model **R82** found
+  was never written is `docs/r4/planning/SPEC-liquor-swatch-model.md`; the **twelve-stop ramp** is
+  tokens in both themes; **44 of 55 `TEA_TYPES` rows** carry a `liquor` (eleven deliberately null);
+  the **per-tea column** is `teas.liquor` (`sql/v3_12-liquor.sql`, applied); the read-time **cascade**
+  resolves tier 1 → 2 → 3; and **three slots render** it (`.ref-swatch`, `.social-tile`,
+  `.today-tint`). **Remaining: slice 3, the picker (R39)** — form control first, long-press optional
+  — which is what finally **unblocks #14** (R89's condition is now met). The shelf swatch is
+  **deferred to a board**: `shelfPhoto` holds that position on evidence (21/21 teas carry photos), so
+  a swatch beside the photo is an addition nobody has drawn (R81).
+- ~~**Home** — R53 gave it the §0 primitives and no revision board … R4 commissions its board.~~
+  **SHIPPED v4.10.** The board was commissioned, delivered (rev 1 + rev 2 with 5a) and banked at
+  `docs/r4/boards/`. Built to **R113–R118**: the greeting became the masthead, **clay was implemented
+  for the first time in the app's life**, the default set became testable ("what now"), **Earlier
+  today** arrived as its own card, glance rows open detail, and Edit layout moved below the stack.
+  **R93's claim that "Home has never had a board" was false** and is amended in the ledger — R2 WS2
+  boarded it and Niklas locked 2a in v3.65, so R4's was a *revision against a lock*.
 
 **The register is scheduled, not parked** (ledger §4): R4 · the tea-reference content batch (8
 uncovered teas, 3 coordinate rows, 55 liquor values — the first two also lift freshness from R85's
@@ -234,8 +243,10 @@ Six locked design workstreams from `SlowCup R2 bundle handoff/` (master plan + W
   making it an R3 surface rather than a phase-2 one; Phase C's styling landed with it. **v3.97 adds the
   contextual half** — Go Deeper from Tea detail, and *Borrow from Go Deeper* writing the catalog's
   temp/ratio into the free-text `brew_guide` through the shipped `scheduleToGuideText`. **Still owed to
-  the tea-reference lane, batched:** the 8 shelf teas the catalog does not cover, the swatch/script data
-  models that were never written (R82), and the 3 coordinate rows.
+  the tea-reference lane, batched:** the 8 shelf teas the catalog does not cover, ~~the swatch/script data
+  models that were never written (R82)~~ — **the SWATCH model is written (v4.11) and its 55 values are
+  authored; only the per-origin SCRIPT model is still owed** — and the 3 coordinate rows. Note the 8
+  uncovered teas now cost a **third** thing: with no catalog match they resolve at the swatch's tier 3.
 - [x] **greeting pass — #25 + #17 + ack** (v3.88) — `d_scorePick` soft recency penalty (2 prior days,
   tunable; today excluded, deterministic) stops re-suggesting a just-had tea; new `isTeaUnopened` gates the
   rediscovery copy so an opened tea is never called "unopened"; ack pool rewritten retrospective. Hygiene
