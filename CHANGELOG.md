@@ -96,9 +96,26 @@ than a matter of taste.
   suggestion reddens B7 (a check that exists *because* the first run of that control found
   nothing to fail), `week` back on Home reddens C2, `--clay`→`--kachi` reddens B4 **and**
   D2, an empty favourites card reddens C6.
+- **CLAY REACHED ONE OF ITS TWO BRANCHES, and Niklas found it by looking.** The masthead
+  has **six** return paths; the first build wired clay into the bucket suggestion only, so
+  a furnished Home whose greeting took the **rediscovery** branch — *"the X has been waiting
+  4 weeks — today?"* — carried **no committing action at all**. Every line in that branch
+  proposes the tea for today, so it commits too. The other four are correct without it: two
+  name no tea, one names a tea for a **later** window (the same reason a redirected
+  suggestion carries none), one has nothing to say.
+- **The check could not see it, and the report repeated the error.** §B asserted "at most
+  one clay" — which **passes at zero**. And the ship report claimed "3 clay buttons across
+  4 states" from a `grep -o` over the finished review page, which contains the inlined
+  `.btn-clay{…}` rule and a comment naming it; the true markup count was **1**. Counting the
+  file instead of the thing it renders, one deploy after the same mistake was written into
+  the ledger. **B8/B9 now enumerate the six return paths and assert exactly two commit** —
+  unwiring the rediscovery branch reddens B9 — and `home-review.js` prints the per-state
+  count itself, from the markup, before any stylesheet is glued on.
 - **NOT verified visually by me**, third deploy running — the Browser pane refuses
   localhost. `fixtures/home-review.js` renders all four states in both themes from real
-  `viewDashboard()` output for a human.
+  `viewDashboard()` output for a human. **4d was seeded wrong on the first pass** (zero
+  sessions instead of the board's "one tea, two cups"), so it reviewed a state the board
+  never drew; corrected.
 
 ---
 ## v4.09 — R3 slice H3: #09 the door. **R3's last slice.**

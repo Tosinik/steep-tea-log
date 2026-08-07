@@ -935,6 +935,11 @@ function greetingMastheadHTML(){
     const redis = d_rediscoveryPick(todayKey, brewedToday, null);
     if(redis){
       const rname = teaLink(redis.t);
+      // CLAY BELONGS HERE TOO, and its absence is why the first build of this slice shipped a
+      // furnished Home with no committing action at all: every line in this branch proposes the tea
+      // for TODAY ("remember it?", "shall we?", "maybe today"), which is the same present-tense
+      // offer the bucket branch makes. Found by rendering Home and looking at it, not by any check —
+      // §B counted "at most one" and passed happily at zero.
       return card(redis.weeks!=null
         ? d_copyPick([
             `The ${rname} has been waiting ${redis.weeks} weeks — remember it?`,
@@ -955,7 +960,7 @@ function greetingMastheadHTML(){
                 `The ${rname} has waited patiently on the shelf — today?`,
                 `The ${rname}&rsquo;s been open a while without a steep; maybe today.`,
                 `Time to return to the ${rname}? It&rsquo;s been waiting.`,
-              ], todayKey, 'shelf')));
+              ], todayKey, 'shelf')), redis.t);
     }
   }
 

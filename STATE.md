@@ -199,7 +199,14 @@ swatch (next).** R4 keeps no separate status doc: **this file plus the ledger is
 - **A negative control destroyed the build.** `git checkout -- <file>` restores from the **index**, so
   yesterday's rule is amended: **stage before you break anything.** Rebuilt, controls re-run staged.
 - **Sixth instance of a check reading its own prose.** Every source `home-test.js` reads is
-  comment-stripped. **27 committed suites, all green. NOT verified visually** (third deploy running).
+  comment-stripped.
+- **Clay reached one of its two branches, and LOOKING found it.** The masthead has six return paths;
+  the first build wired only the bucket suggestion, so a furnished Home on the **rediscovery** branch
+  ("waiting 4 weeks — today?") had no committing action. §B's "at most one clay" **passes at zero**;
+  B8/B9 now enumerate the six paths and assert exactly two commit. The ship report also miscounted
+  from a `grep -o` over the review page — which inlines the stylesheet — one deploy after that exact
+  lesson went into the ledger. **Count what renders, not the file it lives in.**
+  **27 committed suites, all green. NOT verified visually by me** (third deploy running).
 
 **Previously — v4.09 R3 slice H3: #09 the door. THE R3 BUILD IS COMPLETE** (cache **v119**,
 APP_VERSION v4.09, **no SQL**). Slices A · B · B2 · B3 · C · D · E · F · G · H1 · H2 · H3 all shipped.

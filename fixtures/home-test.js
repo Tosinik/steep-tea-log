@@ -105,7 +105,24 @@ ok(/bn-log-circle\{[^}]*var\(--jade\)/.test(cssSrc),
    cannot reach it without owning the clock. What can be pinned is the gate itself. */
 ok(/return card\(sub, redirected \? null : pick\.t\);/.test(dashSrc),
    'B7 a REDIRECTED suggestion carries no clay — "save the X for tomorrow" beside a Start-steeping button would argue with its own caption');
-console.log('  B clay: 7 checks (B7 source-asserted — the redirect branch needs the wall clock)');
+/* B8 IS THE CHECK B1 SHOULD HAVE BEEN. "At most one clay" passes happily at ZERO, and the first
+   build of this slice shipped exactly that: clay was wired into the bucket branch only, so a
+   furnished Home whose greeting took the REDISCOVERY branch ("the X has been waiting 4 weeks —
+   today?") carried no committing action at all. Niklas found it by looking at the rendered page;
+   nothing here could, because branch selection turns on the wall clock and a date hash.
+   So the masthead's return paths are enumerated instead. Two of the six propose a tea for NOW and
+   pass one; the other four name no tea, or name one for a LATER window. If a seventh appears, this
+   reddens and someone has to decide which kind it is — which is the whole point. */
+const mast=(dashSrc.split('function greetingMastheadHTML')[1]||'').split('\nfunction ')[0];
+const returns=(mast.match(/return card\(/g)||[]).length;
+// Counted at the ARGUMENT, not by trying to span a whole nested `card(...)` call: the rediscovery
+// return is a multi-line ternary of copy pools, and a regex that has to walk it is a regex that will
+// silently stop matching the day someone reflows the copy.
+const withTea=(mast.match(/,\s*redis\.t\)/g)||[]).length
+            + (mast.match(/,\s*redirected \? null : pick\.t\)/g)||[]).length;
+ok(returns===6, 'B8 the masthead has six return paths (got '+returns+') — a new one must be classified, not defaulted');
+ok(withTea===2, 'B9 …and exactly TWO of them commit: the rediscovery pick and the bucket pick, the only two that propose a tea for NOW (got '+withTea+')');
+console.log('  B clay: 9 checks (B7–B9 source-asserted — branch selection needs the wall clock)');
 
 /* ---- C · the present tense: default set, and cards that say nothing ---- */
 ok(G('dashSurface("restock")')==='home' && G('dashSurface("favorites")')==='home',
