@@ -1289,7 +1289,9 @@ sitting, not the cup.
 greeting says *"Second pour today"* — under this ruling that is the **eighth** pour. A pour is one
 steep poured, not one time you sat down. So the greeting's counted language is the defect: it means
 *sitting* and should say so. **Not changed in this slice** — it is shipped greeting-engine copy under
-R61, and it gets its own change with the whole copy set in view. Design's derived arc (40 → 42 → 42
+R61, and it gets its own change with the whole copy set in view. **Filed in §4 as a COUNTED-UNIT
+item, not a copy item**, with its five lines and single call site named: the fix is deciding which
+count feeds each sentence, since relabelling alone would rename the same wrong number. Design's derived arc (40 → 42 → 42
 across Friday, 4d at 2) is **sittings**, correctly labelled, and is untouched by this.
 
 > *Code-lane audit, 2026-08-07, ordered with the ruling — and it corrects two of its premises.*
@@ -1662,6 +1664,25 @@ stale. This section is the packet.
 > is **untrue until it ships**, and the beta welcome note must not promise deletion before then. It
 > belongs with the **beta-hardening bundle** — it gates the public launch the way F1 and F2 do.
 
+- **The greeting's COUNTED UNIT (R119) — a counted-unit item, not a copy item.** Recorded 2026-08-07;
+  deliberately left out of v4.10 under R61, to be done once with the whole pool in view.
+  **The defect is not word choice.** `steep-dashboard.js:900` — `const ord = d_cap(d_ordinal(todaySessions.length))`
+  — is the app's **only** ordinal call site, and it counts **sittings**. Both labels attached to it
+  name something else: under R119 a pour is one steep poured, and a steep is a steep. **Relabelling
+  without fixing what is counted would just rename the same wrong number.** So the follow-up decides,
+  per line, *which unit the sentence means* and *which count feeds it* — and the answers may differ:
+  "a proper tea day" is plausibly about sittings, "steep in" is plainly about steeps.
+  **The five lines, one call site:**
+  | line | text | counted by :900? |
+  |---|---|---|
+  | `:902` | `${ord} pour today — a proper tea day.` | **yes** |
+  | `:905` | `${ord} steep in — the leaves are well looked-after today.` | **yes** |
+  | `:889` | `The <tea> instead — a lovely, unexpected pour.` | no — descriptive |
+  | `:895` | `A good pour already behind you.` | no — descriptive |
+  | `:908` | `A day of many pours; the kettle's glad of it.` | no — plural, uncounted |
+  The two counted lines are the decision; the three uncounted ones are word choice and may well be
+  fine as they stand. **A "pour" grep finds four of the five and misses `:905`**, which is the sharper
+  contradiction — that is why this is filed by the number, not by the word.
 - **Resuming an in-progress sitting cannot be a Home card** — **recorded 2026-08-07, answering the
   item the Home board left unproposed.** `state.sessionDraft` is **in-memory only**: nothing persists
   it, and `steep-core.js`'s `refreshData()` bails out early *because* it is volatile ("never refetch

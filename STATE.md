@@ -206,7 +206,9 @@ swatch (next).** R4 keeps no separate status doc: **this file plus the ledger is
 - **The R119 audit corrected two of its own premises:** `"Your 140th cup."` **exists nowhere** (one
   ordinal call site in the app, `steep-dashboard.js:900`), and grepping "pour" **under-counts** — the
   same pool attaches the same sitting ordinal to the word **"steep"**, which is the sharper
-  contradiction. One call site, two mislabelled units.
+  contradiction. One call site, two mislabelled units. **Filed in ledger §4 as a COUNTED-UNIT item,
+  not a copy item**: `:900` counts sittings, so relabelling alone would rename the same wrong number.
+  The follow-up decides per line which unit the sentence means and which count feeds it.
 - **Sixth instance of a check reading its own prose.** Every source `home-test.js` reads is
   comment-stripped. **Seventh: E4 matched the function's own declaration** — anchor on the call site,
   never the definition.
