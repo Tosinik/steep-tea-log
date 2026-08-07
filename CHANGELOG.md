@@ -36,6 +36,56 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.12 — A5: the ramp goes to twelve stops; A6 held
+Deploy: `styles.css` (two new stops in **both** theme blocks), `steep-tea-types.js`
+(three rows reassigned), `fixtures/liquor-test.js`, **new
+`docs/r4/planning/SPEC-A5-ivory-stop.md`** (banked verbatim, sha256 `ba8c24903da10758…`),
+`docs/r4/planning/SPEC-liquor-swatch-model.md` (A5/A6 logged in its header, §7 and §8
+updated), `steep-core.js`, `service-worker.js` (**v122**), `CHANGELOG.md`, `STATE.md`.
+**No SQL.** **28 committed suites, all green.**
+
+**Niklas tasted the four `gold-pale` teas**, and the ramp gained two stops from it —
+`ivory` for bud-only whites and `yellow-pale` for the catalog's single yellow row.
+
+- **Both are per-slug exceptions for the same underlying reason: the fact that separates
+  them is not a field.** Bud-only versus buds-and-leaf is recorded nowhere — all seven
+  white rows carry `ox 0–15` and one inherited signature — and `men huang` is a process
+  step the catalog does not hold, which is why `huang-ya` reads `ox 0-0, roast: none`,
+  numerically identical to an unroasted green. **Third instance of this pattern**, after
+  hojicha's roast and pu-erh's family.
+- **The placement was set by taste, against the rule.** The men-huang reasoning predicted
+  yellow would sit *deeper* than white; Niklas reports the opposite. So `yellow-pale`
+  sits **above** `gold-pale` and its name changed with it. **C9 asserts that ordering
+  specifically**, because the rule and the placement now disagree and a later reader would
+  otherwise "correct" it back — the control proves it: restoring the reasoning's order
+  reddens C9, A3 and A4.
+- **`bai-hao-yin-zhen` is inferred, not observed.** It is not on the shelf; Ya Bao is what
+  was tasted, and Silver Needle joins on the same bud-only rule. Marked as such.
+- **The two new stops are the ramp's ONLY un-lifted ones**, and that was found by
+  measuring rather than taken on trust: `ivory` 234.8 → 230.9 and `yellow-pale`
+  225.3 → 223.7, so both dark twins are slightly *darker*. The lift rule was reasoned from
+  the dark end — a pale pu-erh identifies a different tea — and at the pale end there is
+  nothing left to lift toward. **A3 now asserts the exemption SET by name**, so a third
+  un-lifted stop reddens it; the control confirms that.
+- **A6 — Ruby Ruanzhi has NOT moved**, and C10 pins it. Two possibilities with
+  incompatible fixes: his jar is a variant, which is what tier 1 is for; or Ruan Zhi
+  generally pours darker than the row says, in which case **`oxidation` is wrong at source**
+  and liquor should follow from that correction. Darkening the stop now would make every
+  pale Ruan Zhi wrong to fix one jar. The check is the vendor's own description.
+  **The shape is worth keeping: a tea that disagrees with its style is tier 1; a style
+  that disagrees with itself is a catalog defect.**
+- **Also open, recorded not resolved:** the 2021 Fujian White is five years old and white
+  darkens with age, so the comparison may be aged white against fresh yellow. If a fresh
+  Fujian white later reads paler than Huang Ya, the fix is a tier-1 correction on that jar,
+  not a ramp change.
+- **Revised outcome: Niklas's shelf shows EIGHT distinct swatches across 12 teas** (was
+  six) — Ya Bao alone on `ivory`, Huang Ya alone on `yellow-pale`. Nine teas still resolve
+  at tier 3. Eight over twelve is a high ratio and the right one: the four that share a
+  stop are four Japanese greens, which do pour alike.
+- **Fences unchanged:** no `teas.liquor`, no cascade, no migration, nothing renders a
+  swatch. Total assigned stays 44; deliberate nulls stay 11.
+
+---
 ## v4.11 — R4's second half: the liquor swatch, ramp and catalog values
 Deploy: `steep-tea-types.js` (a `liquor` key on 44 of 55 rows), `styles.css` (the ten-stop
 ramp in **both** theme blocks), `steep-core.js` (APP_VERSION, WHATS_NEW),

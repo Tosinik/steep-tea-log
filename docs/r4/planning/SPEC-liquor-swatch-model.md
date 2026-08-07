@@ -26,6 +26,40 @@
 > right, but only under resolution, and an assertion written against raw rows would have passed for
 > the wrong reason.
 >
+> **A5 · The ramp goes to TWELVE stops — `ivory` and `yellow-pale`.** Delivered as its own document,
+> banked verbatim at `docs/r4/planning/SPEC-A5-ivory-stop.md` (sha256 `ba8c24903da10758…`); the ramp
+> table in §7 and the assignments in §8 below are updated to match, so this file stays the one
+> authority. Niklas tasted the four `gold-pale` teas: **Ya Bao is palest**, Huang Ya and Fujian White
+> are both darker than it, and **Fujian White is darker than Huang Ya**.
+> **Both new stops are per-slug exceptions, and for the same underlying reason — the fact that
+> separates them is not a field in the catalog.** `ivory` holds the **bud-only** whites, and
+> buds-versus-buds-and-leaf is recorded nowhere: all seven white rows carry `ox 0–15` and the same
+> inherited signature. `yellow-pale` holds `huang-ya` alone, which reads `ox 0-0, roast: none` —
+> numerically identical to an unroasted green — because its colour comes from **men huang**, a process
+> step the catalog does not record. **Third instance of this pattern**, after hojicha's roast and
+> pu-erh's family.
+> **The direction was set by OBSERVATION AGAINST THE RULE, and that must not be "corrected" later:**
+> the men-huang reasoning predicted yellow would sit *deeper* than white; Niklas reports the opposite,
+> so the stop sits **below** `gold-pale` and its name changed with it (`yellow-pale`, not
+> `yellow-gold`). The rule and the placement now disagree, and the observation wins.
+> **`bai-hao-yin-zhen` is INFERRED, not observed** — it is not on the shelf; Niklas verified Ya Bao
+> only, and Silver Needle is included by the same bud-only reasoning.
+> **Open, not blocking:** his Fujian White is a **2021**, five years old, and white tea darkens with
+> age — the catalog's white rows note ageing in their own signature. The comparison may be *aged white
+> versus fresh yellow*. **If a fresh Fujian white later reads paler than Huang Ya, the fix is a tier-1
+> correction on that jar, not a ramp change.**
+>
+> **A6 · Ruby Ruanzhi does NOT move — held, deliberately.** The catalog has `ruan-zhi-oolong` at
+> `ox 10–25, roast none-light`; Niklas reports his pours way darker. Two possibilities with
+> **incompatible** fixes: his jar is a variant of the style, in which case this is exactly what tier 1
+> exists for and darkening the catalog stop would make every pale Ruan Zhi wrong to fix one tea; or
+> Ruan Zhi generally pours darker than the row says, in which case **`oxidation` is wrong at source**
+> and the liquor should follow from that correction rather than be patched alone. **Nothing changes
+> until it is settled**; the check is MainTee Würzburg's own description. Recorded because it is the
+> first case where a per-tea and a catalog correction are genuinely confusable, and the shape is worth
+> keeping: **a tea that disagrees with its style is tier 1; a style that disagrees with itself is a
+> catalog defect.**
+>
 > **A4 · `liquor` is NOT added to `TT_INHERIT`** (§3 left it open "for when the values are
 > authored", which is now). §8 authors every member explicitly, so inheritance is unused today and
 > would change no current row; its only future effect is a new member silently inheriting a colour
@@ -142,7 +176,7 @@ in the first place.
 
 ## 7 · The ramp
 
-**Ten stops.** Sized from evidence, not from the board's fourteen. ~~the catalog uses **nine**, and
+**TWELVE stops (A5)** — ~~Ten stops.~~ Sized from evidence, not from the board's fourteen. ~~the catalog uses **nine**, and
 Niklas's 21-tea shelf needs **five**. The tenth (`amber`) sits in the widest gap as headroom.~~
 **Amended (A1): the catalog uses all TEN and Niklas's shelf needs SIX.** `amber` is occupied by
 `gui-fei-oolong`, so **the ramp has no headroom stop.** If a future style needs a stop between two
@@ -156,7 +190,9 @@ why `teas.liquor` stores the key.
 |---|---|---|---|
 | `jade-pale` | `#A9C46E` | `#B8D07E` | Japanese green — sencha, gyokuro, matcha |
 | `straw` | `#D8D48A` | `#DFD996` | Chinese green — unroasted, pale yellow-green |
-| `gold-pale` | `#E8D9A0` | `#EADFAF` | white tea, silver needle, light-oxidation oolong |
+| `ivory` | `#F2EBD4` | `#EFE7CE` | **bud-only whites — barely-tinted, faint gold** *(A5)* |
+| `yellow-pale` | `#EDE2B8` | `#EBE0BC` | **yellow tea — a clear, light gold** *(A5)* |
+| `gold-pale` | `#E8D9A0` | `#EADFAF` | white tea, light-oxidation oolong *(A5: no longer silver needle)* |
 | `gold` | `#DCB863` | `#E2C275` | light gaoshan oolong |
 | `amber` | `#C99447` | `#D2A05A` | Gui Fei / bug-bitten honey oolong *(A1 — not headroom)* |
 | `amber-deep` | `#B87A38` | `#C4884A` | Wuyi yancha, roasted rock oolong |
@@ -190,7 +226,9 @@ liquor. The rule, in order:
 |---|---|---|
 | `jade-pale` | 9 | sencha · shincha · kabusecha · gyokuro · matcha · genmaicha · bancha · kukicha · kamairicha |
 | `straw` | 1 | anji-bai-cha |
-| `gold-pale` | 10 | ruan-zhi-oolong · fujian-white · bai-hao-yin-zhen · bai-mu-dan · gong-mei · shou-mei · ya-bao-yunnan · huang-ya · yue-guang-bai · baozhong |
+| `ivory` | **2** | **ya-bao-yunnan · bai-hao-yin-zhen** *(A5 — bud-only; Silver Needle is INFERRED, not tasted)* |
+| `yellow-pale` | **1** | **huang-ya** *(A5 — men huang, a step the catalog does not record)* |
+| `gold-pale` | ~~10~~ **7** | ruan-zhi-oolong *(A6: held, may be tier 1)* · fujian-white · bai-mu-dan · gong-mei · shou-mei · yue-guang-bai · baozhong |
 | `gold` | 2 | alishan-gaoshan · jin-xuan-milky |
 | `amber` | **1** | **gui-fei-oolong** *(A1 — was written as 0/headroom)* |
 | `amber-deep` | 9 | wuyi-yancha · dhp · rou-gui · shui-xian-wuyi · tie-luo-han · shui-jin-gui · bei-dou · qi-lan · huang-mei-gui |
@@ -245,6 +283,7 @@ Steps 1 and 2 of §6 are now done — the ramp exists and all 55 rows are assign
 3. **The migration** — `alter table teas add column if not exists liquor text;`
 4. **The cascade** at read time, then the picker (R39), which unblocks #14 (R89).
 
-Niklas's shelf will then show **six** distinct swatches across 12 teas (~~five~~ — A1: Gui Fei brings
-`amber`); nine teas stay on the type tint — one indeterminate (Yashi Xiang) and eight with no catalog
+Niklas's shelf will then show **eight** distinct swatches across 12 teas (~~five~~ ~~six~~ — A1: Gui
+Fei brings `amber`; **A5: Ya Bao brings `ivory` and Huang Ya brings `yellow-pale`**); nine teas stay
+on the type tint — one indeterminate (Yashi Xiang) and eight with no catalog
 match at all, which is the same content gap that costs them Go Deeper and freshness rung 2.

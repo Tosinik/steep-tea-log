@@ -37,7 +37,14 @@ const ok=(c,m)=>{ if(c){passed++;} else {failures++; console.log('  FAIL: '+m);}
 // generalise. An absence check must never read prose, not the code's and not its own.
 const strip=s=>s.replace(/\/\*[\s\S]*?\*\//g,' ');
 const cssSrc=strip(fs.readFileSync(path.join(repo,'styles.css'),'utf8'));
-const RAMP=['jade-pale','straw','gold-pale','gold','amber','amber-deep','copper','mahogany','sepia','near-black'];
+/* Twelve stops since A5. `ivory` and `yellow-pale` are inserted at the PALE end — above `gold-pale`
+   in lightness, below it in the ramp's reading order — so the brown arm gains two members and the
+   green arm (jade-pale, straw) is unchanged. */
+const RAMP=['jade-pale','straw','ivory','yellow-pale','gold-pale','gold','amber','amber-deep','copper','mahogany','sepia','near-black'];
+/* The ramp's ONLY un-lifted stops, enumerated rather than described. A3 exempts exactly these two
+   and no others, so a third cannot join them without reddening — which is the difference between an
+   exception and an erosion. Deltas measured at the build: ivory 234.8→230.9, yellow-pale 225.3→223.7. */
+const UNLIFTED=['ivory','yellow-pale'];
 const NULLS=['dong-ding-oolong','phoenix-dancong','mi-lan-xiang','ya-shi-xiang','huang-zhi-xiang',
   'zhi-lan-xiang','xing-ren-xiang','phoenix-shui-xian','anxi-tie-guan-yin','huang-jin-gui','sheng-puerh'];
 
@@ -53,8 +60,16 @@ ok(RAMP.every(k=>hexOf(dark,k)), 'A2 …and all ten in the dark theme, so no sto
 /* Lifted, NOT inverted — the rule the whole ramp turns on. A swatch is the colour of tea in a cup,
    so an inverted ramp renders pu-erh pale, and a pale pu-erh identifies a different tea. */
 const lum=h=>{const n=parseInt(h.slice(1),16);return 0.2126*((n>>16)&255)+0.7152*((n>>8)&255)+0.0722*(n&255);};
-const notLifted=RAMP.filter(k=>lum(hexOf(dark,k))<=lum(hexOf(light,k)));
-ok(!notLifted.length, 'A3 every dark stop is LIFTED, not inverted ('+(notLifted.join(', ')||'all ten')+')');
+/* A3 asserts the exemption SET, not merely "no failures". The rule was reasoned from the dark end —
+   a pale pu-erh identifies a different tea — and at the pale end there is nothing left to lift
+   toward. So the two palest stops are exempt BY NAME, and the check fails if the set changes in
+   either direction: a third un-lifted stop is an erosion, and a lifted `ivory` means the delivered
+   value moved without anyone saying so. */
+const notLifted=RAMP.filter(k=>lum(hexOf(dark,k))<=lum(hexOf(light,k))).sort();
+ok(notLifted.length===UNLIFTED.length && UNLIFTED.slice().sort().every((k,i)=>notLifted[i]===k),
+   'A3 exactly two stops are un-lifted — `ivory` and `yellow-pale`, the palest, where lifting would glare rather than read as tea (got: '+(notLifted.join(', ')||'none')+')');
+ok(RAMP.filter(k=>!UNLIFTED.includes(k)).every(k=>lum(hexOf(dark,k))>lum(hexOf(light,k))),
+   'A3b …and every other stop IS lifted, which is what stops a pu-erh rendering pale on a dark ground');
 /* Asserted on the BROWN ARM only, and deliberately so: §2 gives the ramp a green arm (jade-pale,
    straw) beside the brown one, so a monotonicity check over all ten fails for the right reason.
    Testing the wrong property would have made this check either wrong or vacuous. */
@@ -93,15 +108,28 @@ ok(assigned.length===44, 'C1 forty-four rows carry a liquor (got '+assigned.leng
 const bad=assigned.filter(r=>!RAMP.includes(r.liquor));
 ok(!bad.length, 'C2 every assigned value is a ramp KEY, never a hex — so the ramp can be retuned without rewriting user data ('+(bad.map(r=>r.slug+'='+r.liquor).join(', ')||'all valid')+')');
 const occupied=RAMP.filter(k=>assigned.some(r=>r.liquor===k));
-ok(occupied.length===10,
-   'C3 ALL TEN stops are occupied — there is no headroom stop (spec A1: `amber` holds gui-fei-oolong). A future gap is a deliberate ramp EXTENSION, never an empty slot waiting');
+ok(occupied.length===RAMP.length,
+   'C3 every stop on the ramp is occupied — there is no headroom stop (A1: `amber` holds gui-fei-oolong; A5 added two more, both occupied). A future gap is a deliberate ramp EXTENSION, never an empty slot waiting (got '+occupied.length+' of '+RAMP.length+')');
 ok(rows.find(r=>r.slug==='gui-fei-oolong').liquor==='amber',
    'C4 gui-fei-oolong is `amber` — the row §8 omitted, on Niklas\'s shelf, ruled from the anchor rather than left to preserve a headroom claim');
 ok(rows.find(r=>r.slug==='hojicha').liquor==='copper',
    'C5 hojicha is `copper`, not jade — a roasted green pours reddish-brown, and the family override fires before roast can correct it');
 ok(rows.find(r=>r.slug==='lapsang-souchong').liquor==='mahogany',
    'C6 lapsang-souchong needs no smoke exception — the catalog distinguishes modern unsmoked Zheng Shan Xiao Zhong, so mahogany with keemun is right');
-console.log('  C the assignments: 6 checks');
+/* A5's two per-slug exceptions. Both exist because the fact that separates them is NOT A FIELD:
+   bud-only vs buds-and-leaf is recorded nowhere (all seven whites read ox 0-15 with one inherited
+   signature), and men huang is a process step the catalog does not carry — which is why huang-ya
+   reads ox 0-0, roast:none, numerically identical to an unroasted green. Third instance of the
+   pattern after hojicha's roast and pu-erh's family. */
+ok(['ya-bao-yunnan','bai-hao-yin-zhen'].every(s=>rows.find(r=>r.slug===s).liquor==='ivory'),
+   'C7 the two bud-only whites are `ivory` — a per-slug exception, because buds-vs-buds-and-leaf is not a catalog field');
+ok(rows.find(r=>r.slug==='huang-ya').liquor==='yellow-pale',
+   'C8 the catalog\'s one yellow row is `yellow-pale` — men huang is not a field either');
+ok(lum(hexOf(light,'yellow-pale'))>lum(hexOf(light,'gold-pale')),
+   'C9 yellow-pale sits ABOVE gold-pale, which is OBSERVATION AGAINST THE RULE: men huang predicted deeper, Niklas tasted paler, and the taste wins — do not "correct" this back to the reasoning');
+ok(rows.find(r=>r.slug==='ruan-zhi-oolong').liquor==='gold-pale',
+   'C10 A6: Ruby Ruanzhi has NOT moved. A tea that disagrees with its style is tier 1; a style that disagrees with itself is a catalog defect — and darkening the row would make every pale Ruan Zhi wrong to fix one jar');
+console.log('  C the assignments: 10 checks');
 
 /* ---- D · the fence: what this slice deliberately does NOT do (R116's pattern) ---- */
 const dataSrc=fs.readFileSync(path.join(repo,'steep-data.js'),'utf8');

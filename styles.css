@@ -36,7 +36,17 @@
      stops on the same ramp, per §2 and R121 — never an empty slot waiting to be filled. */
   --liquor-jade-pale:#A9C46E;   /* Japanese green — sencha, gyokuro, matcha */
   --liquor-straw:#D8D48A;       /* Chinese green — unroasted, pale yellow-green */
-  --liquor-gold-pale:#E8D9A0;   /* white tea, silver needle, light-oxidation oolong */
+  /* A5's two stops. Both are PER-SLUG exceptions for the same reason: the fact that separates them
+     is not a field in the catalog. `ivory` is bud-only whites (buds vs buds-and-leaf is recorded
+     nowhere — all seven white rows read ox 0-15 with the same inherited signature); `yellow-pale` is
+     men huang, a process step the catalog does not record, which is why huang-ya reads ox 0-0 and
+     roast:none, numerically identical to an unroasted green.
+     THE ORDER HERE WAS SET BY TASTE, AGAINST THE RULE. The men-huang reasoning predicted yellow
+     would sit DEEPER than white; Niklas reports the opposite, so yellow-pale sits above gold-pale
+     and its name changed with it. Do not "correct" this back to match the reasoning. */
+  --liquor-ivory:#F2EBD4;       /* bud-only whites — barely-tinted, faint gold */
+  --liquor-yellow-pale:#EDE2B8; /* yellow tea — a clear, light gold */
+  --liquor-gold-pale:#E8D9A0;   /* white tea, light-oxidation oolong */
   --liquor-gold:#DCB863;        /* light gaoshan oolong */
   --liquor-amber:#C99447;       /* Gui Fei / bug-bitten honey oolong */
   --liquor-amber-deep:#B87A38;  /* Wuyi yancha, roasted rock oolong */
@@ -77,6 +87,18 @@ html[data-theme="dark"]{
      near-black stays darkest, in both. Same ten keys, same order, spec §7. */
   --liquor-jade-pale:#B8D07E;
   --liquor-straw:#DFD996;
+  /* THESE TWO ARE THE RAMP'S ONLY UN-LIFTED STOPS, and the exception is measured, not assumed:
+     ivory 234.8 → 230.9 and yellow-pale 225.3 → 223.7, so both dark twins are very slightly DARKER
+     than their light ones. Every other stop lifts.
+     The "lifted, not inverted" rule was reasoned from the DARK end — a lifted pu-erh must not render
+     pale, because a pale pu-erh identifies a different tea. At the pale end there is nothing left to
+     lift toward: ivory is already at 92% of white, and raising it further on a dark ground makes a
+     swatch that glares rather than one that reads as tea. What the rule actually protects is ORDER,
+     and the order holds in both themes.
+     `liquor-test.js` A3 enumerates exactly these two as exemptions, so a third cannot join them
+     quietly. Delivered by the spec; the deltas above were measured at the build, not taken on trust. */
+  --liquor-ivory:#EFE7CE;
+  --liquor-yellow-pale:#EBE0BC;
   --liquor-gold-pale:#EADFAF;
   --liquor-gold:#E2C275;
   --liquor-amber:#D2A05A;

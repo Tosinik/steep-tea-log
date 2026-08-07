@@ -180,7 +180,26 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.11: R4's second half, the liquor swatch model** (cache **v121**,
+**NOW (just shipped) — v4.12: A5, the ramp goes to twelve stops** (cache **v122**, APP_VERSION v4.12,
+**no SQL**). Niklas tasted the four `gold-pale` teas; `ivory` (bud-only whites) and `yellow-pale`
+(the one yellow row) came out of it. **Shelf now shows EIGHT distinct swatches across 12 teas.**
+- **Both new stops are per-slug exceptions for the same reason: the separating fact is not a field.**
+  Bud-only vs buds-and-leaf is recorded nowhere; `men huang` is a process step the catalog doesn't
+  hold (which is why `huang-ya` reads `ox 0-0, roast:none`). **Third instance** after hojicha's roast
+  and pu-erh's family.
+- **Placement was set by TASTE, against the rule** — men huang predicted yellow *deeper*, Niklas
+  reports paler, so `yellow-pale` sits **above** `gold-pale`. **C9 guards that specific ordering**, so
+  a later reader can't "correct" it back to the reasoning. `bai-hao-yin-zhen` is **inferred, not
+  tasted**.
+- **These two are the ramp's only UN-LIFTED stops** (ivory 234.8→230.9, yellow-pale 225.3→223.7) —
+  measured at the build, not taken on trust. A3 asserts the exemption **set by name**, so a third
+  reddens it.
+- **A6: Ruby Ruanzhi has NOT moved** (C10). A tea that disagrees with its style is tier 1; a style
+  that disagrees with itself is a catalog defect — and the fixes are incompatible. Check is MainTee
+  Würzburg's own description. **Also open:** the 2021 Fujian White may be aged-white-vs-fresh-yellow.
+- Fences unchanged: no `teas.liquor`, no cascade, nothing renders a swatch. **28 suites, all green.**
+
+**Previously — v4.11: R4's second half, the liquor swatch model** (cache **v121**,
 APP_VERSION v4.11, **no SQL**). **Contract 1 was the last of the five visual contracts unbuilt;**
 the model R82 found had never been written is now `docs/r4/planning/SPEC-liquor-swatch-model.md`.
 - **Ten-stop ramp as `--liquor-<key>` tokens, both themes; `liquor` on 44 of 55 catalog rows.**
