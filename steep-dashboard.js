@@ -1083,7 +1083,7 @@ function dashCardsHome(s){
     .sort((a,b)=>Number(a.amountGrams)-Number(b.amountGrams));
   const restockHTML = restock.length ? `
     <div class="section card">
-      <div class="section-title"><h2>Running low</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">favourites & rebuys</span></div>
+      <div class="section-title"><h2>Running low</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">favourites &amp; rebuys</span></div>
       ${restock.map(t=>{
         const g=Number(t.amountGrams);
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
