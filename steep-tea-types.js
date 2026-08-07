@@ -108,6 +108,32 @@ function matchTeaType(name){
   return resolveTeaType(hits[0].slug);
 }
 
+/* THE LIQUOR CASCADE (contract 1, v4.14) — tier 1 → tier 2, resolved at READ TIME AND NEVER STORED.
+   Returns a palette key, or null when neither tier answers. Null is tier 3's cue: the render site
+   falls back to the shipped type tint, which is an honest answer and not a failure state — 9 of
+   Niklas's 21 teas land there, one deliberately null in the catalog and eight matching no row at all.
+
+   WHY THIS NEVER WRITES, and it is the trap R97 already caught once with `catalog_slug`: resolving
+   at read time means authoring a catalog liquor LATER upgrades every tea that matches it, including
+   teas already on the shelf. A stored resolution would freeze each tea at the catalog's answer on
+   the day it was first drawn, and every later improvement would reach only teas nobody had looked at.
+
+   CLEARING IS THEREFORE FREE. `teas.liquor = null` returns the tea to tier 2 by construction, not to
+   tier 3 and not to a stale copy of tier 2 — because tier 2 was never copied anywhere.
+
+   An UNKNOWN key degrades rather than breaks: `LIQUOR_KEYS` is the palette's membership set, so a
+   value from a future ramp, a typo, or a hand-edited row falls through to the catalog answer instead
+   of rendering `var(--liquor-nonsense)` as nothing. That is why the column stores a key and not a hex. */
+var LIQUOR_KEYS = ['jade-pale','straw','ivory','yellow-pale','gold-pale','gold','amber',
+                   'amber-deep','copper','mahogany','sepia','near-black'];
+function isLiquorKey(k){ return LIQUOR_KEYS.indexOf(k) !== -1; }
+function liquorFor(tea){
+  if(!tea) return null;
+  if(isLiquorKey(tea.liquor)) return tea.liquor;                 // tier 1 — the user's own correction
+  var m = (typeof matchTeaType === 'function') ? matchTeaType(tea.name || '') : null;
+  return (m && isLiquorKey(m.liquor)) ? m.liquor : null;         // tier 2, else null → tier 3
+}
+
 // Browse index: every parent/standalone as a category with its members grouped under it.
 // Browsability is INDEPENDENT of `covers` — a parent whose covers were moved to its members
 // (Wuyi Yancha, Phoenix Dan Cong) is still a first-class browse destination.

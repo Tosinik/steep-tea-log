@@ -59,6 +59,11 @@
     // v3.98: the freshness clock's rung 1. NOT the same join as purchase_date — purchase says when
     // the tea reached you, opened says when the seal broke, and only the second starts the real clock.
     openedDate: r.opened_date || null,
+    // v4.14: TIER 1 of the liquor cascade, and the only tier that is stored. A palette KEY, never a
+    // hex — the ramp retunes without touching user data, and an unknown key degrades to tier 2
+    // rather than rendering a broken colour. Null means "no correction", which is not the same as
+    // "no colour": tiers 2 and 3 answer at read time.
+    liquor: r.liquor || null,
     leafForm: r.leaf_form || null,
     dateAdded: r.created_at
   });
@@ -74,6 +79,7 @@
       purchase_type: t.purchaseType || 'first', image_data: t.image || null,
       purchase_date: t.purchaseDate || null,
       opened_date: t.openedDate || null,   // v3.98 — requires sql/v3_11-opened-date.sql to be applied FIRST
+      liquor: t.liquor || null,            // v4.14 — requires sql/v3_12-liquor.sql to be applied FIRST
       leaf_form: t.leafForm || null
     };
     // Preserve the original creation date across import/restore. dateAdded mirrors the DB

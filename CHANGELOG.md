@@ -36,6 +36,43 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.14 — the liquor cascade: migration, mappers, resolver
+Deploy: **`sql/v3_12-liquor.sql` — APPLIED BY HAND BEFORE THE PUSH**, `steep-data.js`
+(both mappers), `steep-tea-types.js` (`liquorFor`, `LIQUOR_KEYS`, `isLiquorKey`),
+`fixtures/liquor-test.js`, `steep-core.js`, `service-worker.js` (**v124**),
+`CHANGELOG.md`, `STATE.md`. **28 committed suites, all green** (`liquor-test.js` 40 → 50).
+**Nothing renders a swatch yet** — that is slice 2.
+
+- **`alter table teas add column if not exists liquor text;`** Nullable, holding a palette
+  **key** and never a hex: the ramp retunes without rewriting user data, and an invalid
+  value is *detectable* rather than merely ugly. **Applied before the push** — from this
+  version `teaToDb` sends `liquor` on every tea save and PostgREST rejects an unknown
+  column outright, which would break every write to `teas` until the SQL lands. Adding a
+  nullable column is backward-compatible with v4.13; the reverse is not (B3's precedent).
+- **`v3_12`, continuing the series — not `v4_1`.** The `v3_` prefix is a series number,
+  not the app version: `v3_10-pass-record.sql` was applied at app **v4.02**. Starting a
+  `v4_` prefix would imply a correspondence that file already disproves.
+- **The cascade resolves at read time and never writes**, which is R97's `catalog_slug`
+  reasoning applied to colour: a stored resolution would freeze each tea at the catalog's
+  answer on the day it was first drawn, and every later improvement would reach only teas
+  nobody had looked at. **Clearing is therefore free** — `liquor = null` returns the tea to
+  tier 2 by construction, because tier 2 was never copied anywhere. **E4 asserts exactly
+  that**, since it is the part most likely to be got wrong.
+- **An unknown key degrades to tier 2** rather than rendering `var(--liquor-nonsense)` as
+  nothing — `LIQUOR_KEYS` is the membership set, and this is the whole reason the column
+  stores a key instead of a hex. E6/E7 pin both fall-throughs.
+- **Tier 3 is not a failure state.** Nine of Niklas's 21 teas land there — Yashi Xiang,
+  deliberately null in the catalog, and eight matching no row at all. Same content gap that
+  costs them Go Deeper and freshness rung 2; the B3 `0/21` shape.
+- **D1 was rewritten, not deleted.** It asserted "no `teas.liquor` column yet", which this
+  slice discharges. **A fence that has been crossed becomes the fence that still stands:**
+  no picker exists, so tier 1 is currently reachable only by import or hand-edit.
+- **Two negative controls no-opped on the first run** — the working copy is CRLF and the
+  patterns used `\n`, so E5, E8 and E9 were briefly unproven. Re-run with anchors that
+  **throw when they fail to match**; all four now bite. A control that does not fire is
+  indistinguishable from a check that cannot fail.
+
+---
 ## v4.13 — the dark pale end collapsed, and A3 was asserting a proxy
 Deploy: `styles.css` (two dark values retuned; the light column untouched),
 `fixtures/liquor-test.js`, `steep-core.js`, `service-worker.js` (**v123**),

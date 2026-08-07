@@ -163,8 +163,13 @@ console.log('  C the assignments: 10 checks');
 
 /* ---- D · the fence: what this slice deliberately does NOT do (R116's pattern) ---- */
 const dataSrc=fs.readFileSync(path.join(repo,'steep-data.js'),'utf8');
-ok(!/liquor/.test(dataSrc),
-   'D1 no `teas.liquor` column yet — the migration and the read-time cascade are the NEXT slice, so every tea resolves at tier 2 or tier 3');
+/* D1 CHANGED IN v4.14 — it used to assert "no teas.liquor column yet", which was the v4.11/v4.12
+   fence and is now discharged. A fence that has been crossed is rewritten to the one that still
+   stands, never deleted: the column exists and is mapped (E8/E9), and what is NOT built is the
+   PICKER — so today `teas.liquor` can only be non-null by a hand-edit or an import, and every tea
+   on a real shelf resolves at tier 2 or tier 3. */
+ok(!/liquorPicker|setTeaLiquor|liquorGrid/.test(dataSrc+strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'))),
+   'D1 no picker yet (R39, slice 3) — nothing in the app can WRITE a correction, so tier 1 is currently reachable only by import or hand-edit');
 ok(G('TT_INHERIT').indexOf('liquor')===-1,
    'D2 `liquor` is NOT inherited: §8 authors every member explicitly, so inheritance is unused today and its only future effect is a new member silently inheriting a colour nobody authored (R121)');
 ok(!/var\(--liquor-/.test(strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'))+strip(fs.readFileSync(path.join(repo,'steep-dashboard.js'),'utf8'))),
@@ -174,6 +179,41 @@ ok(/These hex values are a first pass by a lane that has not drunk these teas/.t
    'D4 the spec still says the hexes are unverified by anyone who has tasted these teas — two groupings want a human check');
 ok(/derived, not locked/.test(spec), 'D5 …and that the small 15x20 geometry is derived, not locked (R121)');
 console.log('  D the fence: 5 checks');
+
+/* ---- E · the cascade (v4.14) — read time, never stored ---- */
+const gf={id:'t1', name:'Honey Oolong Gui Fei', type:'oolong'};          // matches gui-fei-oolong → amber
+const dancong={id:'t2', name:'Yashi Xiang Dancong Guangdong', type:'oolong'};  // matches, deliberately null
+const nomatch={id:'t3', name:'Pipachá', type:'green'};                   // matches nothing
+ok(G('liquorFor')(gf)==='amber', 'E1 tier 2 — a tea matching a catalog row resolves to that row\'s liquor');
+ok(G('liquorFor')(Object.assign({},gf,{liquor:'sepia'}))==='sepia',
+   'E2 tier 1 — the user\'s own correction wins over the catalog');
+ok(G('liquorFor')(dancong)===null && G('liquorFor')(nomatch)===null,
+   'E3 tier 3 — a deliberately-null style and an unmatched tea both resolve to NOTHING, which the render site draws as the type tint: an honest answer, not a failure state');
+/* E4 IS THE ONE MOST LIKELY TO BE GOT WRONG, and it is why the cascade must never write. Clearing a
+   correction has to return the tea to TIER 2 — not to tier 3, and not to a stored copy of tier 2's
+   value. A stored copy means a catalog improvement can never again reach a tea whose owner once
+   looked at it. Here it is free by construction: tier 2 was never copied anywhere. */
+const corrected=Object.assign({},gf,{liquor:'sepia'});
+const cleared=Object.assign({},corrected,{liquor:null});
+ok(G('liquorFor')(cleared)==='amber',
+   'E4 CLEARING returns the tea to tier 2, not to tier 3 and not to a frozen copy — otherwise a catalog improvement could never reach a tea anyone had corrected');
+/* Read time, never stored: the resolver must not mutate what it is handed. A cascade that quietly
+   wrote its answer back would pass every check above and fail the ruling. */
+const probe={id:'t4', name:'Honey Oolong Gui Fei', type:'oolong'};
+const before=JSON.stringify(probe); G('liquorFor')(probe);
+ok(JSON.stringify(probe)===before, 'E5 resolving writes nothing — the tea object is unchanged after a call (R97\'s reasoning, applied to colour)');
+ok(G('liquorFor')(Object.assign({},gf,{liquor:'chartreuse'}))==='amber',
+   'E6 an UNKNOWN key degrades to tier 2 rather than rendering a broken colour — which is why the column stores a key and not a hex');
+ok(G('liquorFor')(Object.assign({},nomatch,{liquor:'chartreuse'}))===null,
+   'E7 …and falls all the way to tier 3 when the catalog has nothing either');
+/* The mappers, both directions. Adding a persisted field means updating BOTH or the round trip
+   silently drops it — the house rule, and the thing a one-way check would miss. */
+const dataSrc2=fs.readFileSync(path.join(repo,'steep-data.js'),'utf8');
+ok(/liquor: r\.liquor \|\| null/.test(dataSrc2), 'E8 teaFromDb reads `liquor`');
+ok(/liquor: t\.liquor \|\| null/.test(dataSrc2), 'E9 …and teaToDb writes it — both mappers, or the round trip drops it silently');
+ok(fs.existsSync(path.join(repo,'sql/v3_12-liquor.sql')),
+   'E10 the migration is committed as `v3_12`, continuing the series — the `v3_` prefix is a series number, not the app version (v3_10 was applied at app v4.02)');
+console.log('  E the cascade: 10 checks');
 
 console.log('');
 if(failures){ console.log('FAILED: '+failures+' of '+(passed+failures)); process.exit(1); }

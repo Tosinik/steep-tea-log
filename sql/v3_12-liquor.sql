@@ -1,0 +1,23 @@
+-- v3_12 — the liquor swatch's per-tea tier (contract 1, R4).
+-- Apply in the Supabase SQL editor BEFORE pushing the code that writes it: from v4.14 onward
+-- `teaToDb` sends `liquor` on every tea save, and PostgREST rejects an unknown column outright,
+-- which would break every write to `teas` until this lands. Adding a nullable column is
+-- backward-compatible with the running build, so this direction is safe; the reverse is not.
+--
+-- NULLABLE, AND IT HOLDS A PALETTE KEY, NOT A HEX. Two reasons, both load-bearing:
+--   * the ramp can be retuned without rewriting a single row of user data, which is why
+--     `styles.css` owns the colours and this column owns only the choice;
+--   * an invalid value is DETECTABLE rather than merely ugly — a key with no palette entry falls
+--     through to tier 2 and then tier 3, so a bad write degrades to the catalog answer instead of
+--     rendering a broken colour.
+--
+-- This is TIER 1 of three, and the only tier that is stored. Tier 2 (the catalog's value for the
+-- matched style) and tier 3 (the type tint) are resolved at READ time and never written — so
+-- authoring a catalog liquor later upgrades every tea that matches it, including teas already on
+-- the shelf. Same reasoning as R97's decision not to store `catalog_slug`.
+--
+-- Clearing a correction means setting this back to NULL, which must return the tea to tier 2 —
+-- never to tier 3, and never to a stored copy of tier 2's value. A stored copy would mean a
+-- catalog improvement could never again reach a tea whose owner once looked at it.
+
+alter table teas add column if not exists liquor text;

@@ -74,9 +74,12 @@ steep-teas → steep-shopping → steep-passport → steep-social → steep-sess
 schema.sql · v2_1-migration · v2_2-photos-storage · v3_0-social · v3_1-quick-log ·
 v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date · v3_6-leaf-form ·
 v3_7-mood · v3_8-water-ml · v3_9-steep-feedback · **v3_10-pass-record (v4.02)** ·
-**v3_11-opened-date (v3.98)**.
+**v3_11-opened-date (v3.98)** · **v3_12-liquor (v4.14)**.
 **Read the version, not the sort.** `v3_10` sorts between `v3_1` and `v3_2` as a string, and it was
 applied *after* `v3_11`. Both happen to be order-independent; the list above is by version.
+**The `v3_` prefix is a SERIES number, not the app version** — `v3_10-pass-record` was applied at app
+**v4.02**, which already disproves any correspondence. R4's first migration continues the series as
+`v3_12`; starting a `v4_` prefix would imply a rule that file breaks.
 
 ## Conventions / principles
 - Calm-first; achievements/XP dormant app-wide (`ACHIEVEMENTS_ENABLED=false`, v3.72 — the old
@@ -180,7 +183,29 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.13: the dark pale end collapsed, and A3 was asserting a proxy** (cache
+**NOW (just shipped) — v4.14: the liquor cascade — migration, mappers, resolver** (cache **v124**,
+APP_VERSION v4.14, **`sql/v3_12-liquor.sql` applied BY HAND BEFORE THE PUSH**). Slice 1 of 3;
+**nothing renders a swatch yet.**
+- **Read time, never stored** (R97's `catalog_slug` reasoning applied to colour) — so authoring a
+  catalog liquor later upgrades teas already on the shelf, and **clearing a correction returns the
+  tea to tier 2 by construction**, because tier 2 was never copied anywhere. E4 asserts it.
+- **An unknown key degrades to tier 2**; `LIQUOR_KEYS` is the membership set. That is why the column
+  stores a key, not a hex.
+- **Tier 3 is not a failure state** — nine of 21 teas land there (one deliberately null, eight with
+  no catalog match).
+- **The site scan is slice 2's deliverable and pointed the other way from the currency scan:** of 12
+  type-tint uses, only **3 are true swatch slots** (`.ref-swatch`, `.social-tile`, `.today-tint` —
+  two already carry the hairline border, and giving the third the same **resolves the `ivory`-at-19.2
+  item**). **3 are photo placeholders**, **4 are type LABELS** (pills reading "Oolong" — liquor-ising
+  one would be an active regression), **2 are a categorical chart**. A mechanical swap would be wrong
+  at six of twelve.
+- **Shelf swatch DEFERRED to a board** — `shelfPhoto` holds that position with evidence behind it
+  (21/21 teas have photos), so a swatch there is an addition nobody has drawn (R81).
+- **28 suites green. NEXT: slice 2** (the three slots + the classification scan), then **slice 3**
+  (the picker — form control first, long-press optional; there is **no long-press machinery** in the
+  app, only six touch handlers and none of them a long-press).
+
+**Previously — v4.13: the dark pale end collapsed, and A3 was asserting a proxy** (cache
 **v123**, APP_VERSION v4.13, **no SQL**). v4.12 shipped a collision the suite reported green on.
 - **1.9 luminance between `yellow-pale` and `gold-pale` in DARK** — one fifth of their 9.2 light
   spacing — so Huang Ya and Fujian White would have been the same swatch on a dark card. Cause: A5's
