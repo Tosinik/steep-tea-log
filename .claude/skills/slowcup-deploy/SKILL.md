@@ -13,6 +13,16 @@ STOP. Change nothing.** This is the low-risk test mode — first invocations sho
 
 The ritual, in order. Do not skip, reorder, or batch steps silently:
 
+0. **If the deploy carries a migration, PUSH THE SQL FILE ALONE, FIRST.** Commit
+   `sql/vN_M-*.sql` on its own and push it before the code commit exists, the way `v3_10` went out.
+   Two reasons, and the second is the one that was learned late: the migration must be applied
+   before code that writes the new column reaches users (PostgREST rejects an unknown column, so
+   every write to that table fails in the window) — **and the reviewer cannot read a file that is
+   only in your working tree.** At `v3_12` the planning lane was asked to approve a statement it
+   could not see at origin, and had to take it on report. That was acceptable for one nullable
+   column whose risk lives in comments; it would not have been for `v3_10`'s RLS policies, where
+   the policies *were* the risk. **Push the SQL, let it be read, then apply it, then push the code.**
+
 1. **Version bumps** (all three, same commit):
    - `service-worker.js`: `CACHE_NAME` `steep-tea-log-vNN` → `vNN+1`. Never rename the prefix.
    - `steep-core.js`: `APP_VERSION` → the new `vX.YY`.

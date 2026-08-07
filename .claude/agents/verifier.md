@@ -64,6 +64,18 @@ So, on every run:
 
 - **Any negative control anchors, and a miss throws.** Assert the string/pattern you are
   about to break is actually present *before* breaking it, and fail loudly if it is not.
+- **Before trusting a control, confirm it FIRED.** This is the rule above made the default
+  rather than the retry, and it is what the two instances below have in common: the anchor
+  rule is only worth having if it runs the first time. A control that produces no failure is
+  reporting one of two things — the guard works, or the control did nothing — and those are
+  not distinguishable from the outside. **Assume the second until the edit is shown to have
+  landed.** Cheapest form: have the breaking edit throw when its pattern does not match, and
+  print that it applied.
+  *Eighth instance of this family, twice in one file: patterns written with `\n` against a
+  **CRLF** working copy matched nothing, and three cascade checks were briefly unproven.
+  R73 named the line-ending case and R105 named the general one — so the gap was in applying
+  the standing method, not in knowing it. Prefer line-ending-agnostic anchors (`/^.*x.*$/m`)
+  over literal multi-line strings.*
 - **Any sweep whose fallback is a pass must prove it ran.** Either validate the tool against
   a known-bad input first (a scanner that cannot find `⚠` is not scanning), or drop the
   fallback so an error surfaces as an error. Never `|| echo clean`.
