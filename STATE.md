@@ -187,7 +187,45 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.15: the swatch becomes visible** (cache **v125**, APP_VERSION v4.15,
+**NOW (just shipped) — v4.16: R123, the greeting looks at the day** (cache **v126**, APP_VERSION
+v4.16, **no SQL**). **Niklas found it by using v4.15** — *Earlier today* listed his two sittings
+while the masthead told him to go and have a tea. Fifth defect this round found by looking.
+- **R117's one boundary HELD.** Both readers call `sessionsToday()`. The divergence was one layer up,
+  in the **branch predicate**: the v3.67 ack gates on `bucketSessions` (today narrowed to the current
+  hour bucket), so a morning brew read at 14:00 skipped every ack and fell through to rediscovery —
+  present tense, with clay. The greeting already held **both** readings (the zero-session evening
+  branch gates on the DAY), and that inconsistency inside one function is the whole defect.
+- **R123 adds a day-level branch**, past-tense ack + the existing forward tail, **countless by rule**
+  (R119: a numbered line here ships the filed COUNTED-UNIT item). Clay suppressed **by construction**
+  — `card(ack+tail)` with no `commitTea`, exactly as the bucket branch does; R120 reaches it by its
+  own terms. `home-test.js` **B8 reddened at "six return paths (got 7)"** and the seventh is
+  classified: **7 paths, still exactly 2 committing.**
+- **`bigDay` is NOT dead code** — the planning note's premise was wrong. It renders today whenever a
+  sitting is in the current window (a two-sitting morning at 10:00 says *"Second pour today"*). What
+  it could never reach is **precisely the case R123 creates**, and the likeliest one: a big day is
+  read *after* the brewing. It renders in the new branch from its pool's four **countless** lines;
+  the bucket branch's seven are untouched (two carry the ordinal — R119's item, not this deploy's).
+- **One tail writer** (`dayTail`), because duplicating it would recreate the two-readers fault one
+  level down. **Proven inert:** greetings dumped over the real export, 7 hours × 2 scenarios, are
+  byte-identical on every bucket-branch row.
+- **`d_rediscoveryPick` takes `d_scorePick`'s calendar anchor.** On the wall clock the sentence moved
+  inside one day — **"4 weeks" at 14:30, "5 weeks" at 19:30**. The pick was stable; the number wasn't.
+- **A second v4.15 defect closed in passing:** a shelf entirely brewed today rendered `card('')` — a
+  greeting with **no line at all**. Found while building a negative control.
+- **THREE new checks were wrong first, each caught by RUNNING the control.** J4 tested "names any
+  tea" (the tail names one either way); **J1 passed twice with the branch disabled** (v3.55 redirect
+  already suppressed clay for a morning-only drinker; then a two-tea shelf gave an empty body);
+  **K3 passed on the reverted anchor** until the fixture brewed 49 days back at midday so the week
+  boundary falls inside the day (control now reddens `6/7/7`). `J3b` deleted — it read `|| true`.
+- **The planning lane's proposed check would have passed on v4.15**; the suite asserts the
+  **property** instead. Section counts are **derived from `passed`**, not written.
+- **NEXT: v4.17 — slice 3, the picker (R39).** Does **not** start until the S3 ruling lands (F2's
+  name-vs-type mechanism and the tier-3 default cell both sit inside it). Carried into it: F1's
+  containment guard, F4's stale §7 hexes, F5's self-falsifying header, F6's secondary-path statement,
+  and three accepted deviations. **Do not touch `liquor-test.js` or `swatchAttr` before S3.**
+  **28 suites green** (greeting-v4 62 → 72).
+
+**Previously — v4.15: the swatch becomes visible** (cache **v125**, APP_VERSION v4.15,
 **no SQL** — `v3_12` shipped with v4.14). Slice 2 of 3. **The first time a liquor renders anywhere**,
 four rounds after contract 1 was locked.
 - **Three slots, one writer** (`swatchAttr`, steep-teas.js): `.ref-swatch` · `.social-tile` ·

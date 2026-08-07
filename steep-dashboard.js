@@ -780,10 +780,18 @@ function d_typicalPerDay(todayKey){
 // Most-neglected in-stock tea: never brewed OR last brew ≥ REDISCOVERY_WEEKS ago. Oldest-waiting first,
 // date-seeded hash tie-break. Honours the same exclusions as d_scorePick. Returns {t,weeks|null} or null.
 function d_rediscoveryPick(todayKey, excludeIds, excludeType){
-  const sessions = state.sessions||[]; const now=Date.now();
+  /* CALENDAR-DAY ANCHOR (v4.16) — the same one `d_scorePick` takes, and for the same reason: both
+     sides are day keys parsed as UTC midnight, so the difference is an exact day count. Read from
+     `Date.now()` this sentence moved under the user inside one day — "4 weeks" at 14:30 and
+     "5 weeks" at 19:30, same day, same tea, same pick — while the branch's own comment promised the
+     choice was stable across the day. The CHOICE was; the NUMBER IN THE SENTENCE was not, and the
+     number is part of the one-voice-per-day contract. Two consequences, named rather than found
+     later: the cutoff is now whole-day, and two teas last brewed on the same day tie — resolved by
+     the date-seeded hash already in the sort below. */
+  const sessions = state.sessions||[]; const now=Date.parse(todayKey);
   const cutoff = REDISCOVERY_WEEKS*7*24*3600*1000;
   const lastBrew = {};
-  sessions.forEach(se=>{ const t=+new Date(se.date); if(!(se.teaId in lastBrew)||t>lastBrew[se.teaId]) lastBrew[se.teaId]=t; });
+  sessions.forEach(se=>{ const t=Date.parse(dayKey(se.date)); if(!(se.teaId in lastBrew)||t>lastBrew[se.teaId]) lastBrew[se.teaId]=t; });
   const cands = (state.teas||[]).filter(t=> !isTeaFinished(t)
     && !(excludeIds && excludeIds.has(t.id))
     && !(excludeType && t.type===excludeType)
@@ -863,6 +871,37 @@ function greetingMastheadHTML(){
     ], todayKey, 'off'));
   }
 
+  /* THE ONE TAIL WRITER, shared by both acknowledgement branches (R123, v4.16). It was inline in the
+     bucket branch; R123 adds a second branch that needs the same sentence, and duplicating it would
+     recreate one level down exactly the two-readers fault this deploy exists to fix. Behaviour is
+     unchanged for the bucket branch — same inputs, same pools, same 'tail' salt. */
+  const dayTail = (loggedTea) => {
+    // A later ACTIVE window today that has no session yet? (needs signal to call a window "active".)
+    let laterWindow = null;
+    if(enoughSignal){
+      const idx = BUCKET_CYCLE.indexOf(bucket);
+      for(let i=idx+1;i<BUCKET_CYCLE.length;i++){ const b=BUCKET_CYCLE[i];
+        if(isActive(b) && !todaySessions.some(se=>d_hourBucket(new Date(se.date).getHours())===b)){ laterWindow=b; break; } }
+    }
+    // Forward pick for that window, minus brewed-today and (variety guard) the just-logged type.
+    let fwd = null;
+    if(laterWindow){
+      const excludeType = (VARIETY_GUARD_SAME_DAY && loggedTea) ? loggedTea.type : null;
+      fwd = d_scorePick(laterWindow, todayKey, brewedToday, excludeType);
+    }
+    return fwd
+      ? d_copyPick([ `Maybe the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?`,
+                     `The ${teaLink(fwd.t)} could round out ${BUCKET_WHEN[laterWindow]}.`,
+                     `How about the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?`,
+                     `Perhaps the ${teaLink(fwd.t)} to come ${BUCKET_WHEN[laterWindow]}.`,
+                     `The ${teaLink(fwd.t)} would sit well ${BUCKET_WHEN[laterWindow]}.` ], todayKey, 'tail')
+      : d_copyPick([ `That&rsquo;s the day&rsquo;s brewing — the kettle can rest.`,
+                     `Well steeped today; the shelf can rest now.`,
+                     `The kettle&rsquo;s earned its quiet.`,
+                     `A good day&rsquo;s steeping. Let it settle.`,
+                     `The leaves have done their part today.` ], todayKey, 'tail');
+  };
+
   // v3.67 — SESSION-AWARE (issue #2): a session already logged in the CURRENT bucket today. Don't
   // nudge another same-bucket brew. Acknowledge the ritual (referencing the day's deterministic
   // prediction — predicted-vs-actual), then either suggest FORWARD for a later active window (with
@@ -908,37 +947,57 @@ function greetingMastheadHTML(){
         `A day of many pours; the kettle&rsquo;s glad of it.`,
       ], todayKey, 'ack');
     }
-    // A later ACTIVE window today that has no session yet? (needs signal to call a window "active".)
-    let laterWindow = null;
-    if(enoughSignal){
-      const idx = BUCKET_CYCLE.indexOf(bucket);
-      for(let i=idx+1;i<BUCKET_CYCLE.length;i++){ const b=BUCKET_CYCLE[i];
-        if(isActive(b) && !todaySessions.some(se=>d_hourBucket(new Date(se.date).getHours())===b)){ laterWindow=b; break; } }
-    }
-    // Forward pick for that window, minus brewed-today and (variety guard) the just-logged type.
-    let fwd = null;
-    if(laterWindow){
-      const excludeType = (VARIETY_GUARD_SAME_DAY && loggedTea) ? loggedTea.type : null;
-      fwd = d_scorePick(laterWindow, todayKey, brewedToday, excludeType);
-    }
-    const tail = fwd
-      ? d_copyPick([ `Maybe the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?`,
-                     `The ${teaLink(fwd.t)} could round out ${BUCKET_WHEN[laterWindow]}.`,
-                     `How about the ${teaLink(fwd.t)} ${BUCKET_WHEN[laterWindow]}?`,
-                     `Perhaps the ${teaLink(fwd.t)} to come ${BUCKET_WHEN[laterWindow]}.`,
-                     `The ${teaLink(fwd.t)} would sit well ${BUCKET_WHEN[laterWindow]}.` ], todayKey, 'tail')
-      : d_copyPick([ `That&rsquo;s the day&rsquo;s brewing — the kettle can rest.`,
-                     `Well steeped today; the shelf can rest now.`,
-                     `The kettle&rsquo;s earned its quiet.`,
-                     `A good day&rsquo;s steeping. Let it settle.`,
-                     `The leaves have done their part today.` ], todayKey, 'tail');
-    return card(ack + ' ' + tail);
+    return card(ack + ' ' + dayTail(loggedTea));
+  }
+
+  /* R123 (v4.16) — SITTINGS TODAY, NONE IN THIS WINDOW. Niklas found this by using v4.15: `Earlier
+     today` renders his two morning sittings while the masthead offers him a tea for now.
+     R117's ONE BOUNDARY HELD — both readers call `sessionsToday()`, there is no second `dayKey` and
+     no timezone split. The divergence was one layer up, in the predicate above: the bucket branch
+     requires a sitting in the CURRENT window, so a morning brew read at 14:00 skipped every
+     acknowledgement and fell through to rediscovery, which speaks in the present tense and carries
+     clay. The greeting already held both readings — the zero-session evening branch gates on the
+     DAY (`!todaySessions.length`) while this one gated on the WINDOW — and that inconsistency inside
+     one function is the whole defect; neither branch was wrong alone.
+     PAST TENSE AND COUNTLESS. `todaySessions.length` counts SITTINGS and R119 rules a cup a steep,
+     so a numbered line here would ship the COUNTED-UNIT item §4 has already filed. Countless copy
+     leaves that item intact and filed.
+     CLAY IS SUPPRESSED THE WAY THE BUCKET BRANCH SUPPRESSES IT — by passing no `commitTea`, not by a
+     new rule. R120 reaches this branch by its own terms: the tail is the same forward suggestion, and
+     a Start-steeping button beside it would argue with its own caption. */
+  if(todaySessions.length){
+    const lastToday = todaySessions[todaySessions.length-1];   // sessionsToday() sorts ascending
+    const lastTea = teaById(lastToday.teaId);
+    // bigDay is COMPUTED ABOVE AND WAS UNREACHABLE HERE, which is the branch it was written for: a
+    // more-than-usual day is most likely to be READ after the brewing, not during it. The bucket
+    // branch's pool is left exactly as it ships — two of its seven lines carry the ordinal and those
+    // are R119's filed item, not this deploy's. These four are that pool's countless lines.
+    const ack = bigDay
+      ? d_copyPick([
+          `The kettle&rsquo;s earning its keep today.`,
+          `A generous tea day; the shelf approves.`,
+          `Big tea day — the kettle&rsquo;s humming.`,
+          `More tea than usual today. Lovely.`,
+        ], todayKey, 'day')
+      : d_copyPick([
+          `The kettle&rsquo;s been on already today.`,
+          `The leaves have had their turn today.`,
+          `Tea&rsquo;s been made today — the shelf&rsquo;s been busy.`,
+          `Already steeped today; the kettle&rsquo;s still warm.`,
+          `The day&rsquo;s had its tea already.`,
+        ], todayKey, 'day');
+    // The variety guard reads the day's LAST sitting rather than nothing — you don't want the same
+    // type suggested back at you an hour after you drank it.
+    return card(ack + ' ' + dayTail(lastTea));
   }
 
   // v3.70 (issue #5) — rediscovery: on a deterministic ~1-in-N days, the day's pick becomes the most-
   // neglected in-stock tea (never brewed, or quiet ≥ REDISCOVERY_WEEKS) instead of the habitual one, in
   // its own "remember this?" register. Needs shelf signal; excludes brewed-today; the seed is date-only
   // so the choice is stable across the day and independent of the copy pick.
+  // Since R123 both remaining branches are reached only when the day is EMPTY, so `brewedToday` is
+  // now always an empty set here and at the fall-through. Kept, not deleted: it is what makes the
+  // exclusion correct by construction rather than by branch order.
   if(enoughSignal && d_hash(todayKey+'|shelf') % REDISCOVERY_ODDS === 0){
     const redis = d_rediscoveryPick(todayKey, brewedToday, null);
     if(redis){

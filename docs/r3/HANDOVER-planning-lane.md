@@ -219,6 +219,23 @@ Real fill rates (14 teas / 12–24 sessions / 3 vessels — CSVs in the project 
    these lessons; sweep it before hand-off with four questions per screen: does it carry all
    stored data for its entity? are its connection-map links drawn? does it handle its variants
    (cold brew, steepless/matcha, empty)? are invented features flagged?
+6. **A proposed CHECK can be written against the wrong representation too, and it will pass on the
+   broken build.** Recorded 2026-08-07, ordered by the planning lane itself. Same family as R81/R95's
+   board claims, one level further out — the wrong representation is no longer a document *about* the
+   code but an *assertion about the code*. This lane specified the R123 guard as *"pin that the
+   greeting and the card resolve from the same function and cannot disagree"*. They already did
+   resolve from the same function (`sessionsToday`, R117) and disagreed anyway, because the
+   divergence was in the branch predicate that consumed the answer. **A check written to that
+   description is green on v4.15.** Code caught it before it was written and asserted the **property**
+   instead — *on a day with sittings the masthead makes no present-tense offer to brew* — which
+   reddens. Siblings already on the record: A3-was-a-proxy (v4.13), and the `sessionsToday(now)` guard
+   that matched its own declaration (v4.10). **Counter-rule: state the check as the property a user
+   would notice, never as the mechanism you believe implements it** — and prove it by running the
+   negative control, because three of v4.16's own new checks passed on the broken build until the
+   control was actually run.
+
+*(Numbering note: items 1–5 are cited by number elsewhere in the record, so nothing above is ever
+renumbered — a new mode is appended, never inserted.)*
 
 ---
 

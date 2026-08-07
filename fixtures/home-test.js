@@ -115,9 +115,15 @@ ok(/return card\(sub, redirected \? null : pick\.t\);/.test(dashSrc),
    furnished Home whose greeting took the REDISCOVERY branch ("the X has been waiting 4 weeks —
    today?") carried no committing action at all. Niklas found it by looking at the rendered page;
    nothing here could, because branch selection turns on the wall clock and a date hash.
-   So the masthead's return paths are enumerated instead. Two of the six propose a tea for NOW and
-   pass one; the other four name no tea, or name one for a LATER window. If a seventh appears, this
-   reddens and someone has to decide which kind it is — which is the whole point. */
+   So the masthead's return paths are enumerated instead. Two propose a tea for NOW and pass one; the
+   rest name no tea, or name one for a LATER window. If a new one appears, this reddens and someone
+   has to decide which kind it is — which is the whole point.
+
+   IT DID EXACTLY THAT AT v4.16, and the classification is recorded rather than absorbed: R123 adds a
+   SEVENTH path — sittings today, none in this window — and it commits NOTHING. Its tail is the same
+   forward suggestion the bucket branch builds, so R120 reaches it by its own terms and clay stays
+   suppressed the same way that branch suppresses it: by passing no tea, not by a new rule. Six → 7
+   paths, still exactly 2 committing. */
 const mast=(dashSrc.split('function greetingMastheadHTML')[1]||'').split('\nfunction ')[0];
 const returns=(mast.match(/return card\(/g)||[]).length;
 // Counted at the ARGUMENT, not by trying to span a whole nested `card(...)` call: the rediscovery
@@ -125,8 +131,8 @@ const returns=(mast.match(/return card\(/g)||[]).length;
 // silently stop matching the day someone reflows the copy.
 const withTea=(mast.match(/,\s*redis\.t\)/g)||[]).length
             + (mast.match(/,\s*redirected \? null : pick\.t\)/g)||[]).length;
-ok(returns===6, 'B8 the masthead has six return paths (got '+returns+') — a new one must be classified, not defaulted');
-ok(withTea===2, 'B9 …and exactly TWO of them commit: the rediscovery pick and the bucket pick, the only two that propose a tea for NOW (got '+withTea+')');
+ok(returns===7, 'B8 the masthead has seven return paths (got '+returns+') — a new one must be classified, not defaulted (six until v4.16; R123 added the sittings-today branch)');
+ok(withTea===2, 'B9 …and STILL exactly TWO of them commit: the rediscovery pick and the bucket pick, the only two that propose a tea for NOW (got '+withTea+') — R123 added a path and no clay');
 console.log('  B clay: 9 checks (B7–B9 source-asserted — branch selection needs the wall clock)');
 
 /* ---- C · the present tense: default set, and cards that say nothing ---- */

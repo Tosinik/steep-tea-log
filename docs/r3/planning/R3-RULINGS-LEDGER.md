@@ -1348,6 +1348,49 @@ inverts the method: for each locked contract or ruling, demand the **artifact** 
 in code — a token, a selector, a function — and treat **absence of a pointer** as the finding.
 Counter-rule already earned: **a locked contract is not implemented until something asserts it.**
 
+**R123 — The greeting reads the DAY, not just the current window.** Ruled 2026-08-07 after Niklas
+found it in use: on one Home screen *Earlier today* listed two sittings while the masthead told him
+to go and have a tea. A new day-level branch — `todaySessions.length && !bucketSessions.length` —
+gives a **past-tense acknowledgement plus the existing forward tail**. The shipped registers are not
+stretched: the just-now pool ("in the pot already", "a lovely start") is not applied to a six-hour-old
+sitting. **The copy carries no count** — `todaySessions.length` counts *sittings* and R119 makes a cup
+a *steep*, so a numbered line would ship the COUNTED-UNIT item §4 has already filed. Countless copy
+leaves that item intact and filed.
+
+> *Code-lane note, 2026-08-07 (built in v4.16), and it corrects the diagnosis this ruling was issued
+> against.* **None of the three proposed causes was the cause.** R117 shipped as code, not as a
+> claim: both readers call `sessionsToday()` (`steep-dashboard.js:833`), there is no second `dayKey`
+> and no timezone split. **The divergence was one layer up, in the branch predicate** — the v3.67 ack
+> gates on `bucketSessions`, today's sittings narrowed to the current hour bucket, so a morning brew
+> read at 14:00 skipped every acknowledgement and fell through to rediscovery, which speaks in the
+> present tense and carries clay. The greeting already contained **both** readings: the zero-session
+> evening branch gates on the day, this one gated on the window, and **that inconsistency inside one
+> function is the whole defect** — neither branch was wrong alone.
+>
+> **`bigDay` is not dead code, and the clause ordering its removal rested on a false premise.** It
+> renders today whenever a sitting sits in the current window — a two-sitting morning read at 10:00
+> says *"Second pour today — a proper tea day."* What it could never reach is **exactly the case R123
+> creates**, which is also the likelier one: a big day is usually read *after* the brewing. So it
+> renders in the new branch, from its own pool's four countless lines. The bucket branch's seven are
+> untouched — two carry the ordinal and those are R119's filed item.
+>
+> **Clay is suppressed by construction, not by a fourth rule**: the branch returns
+> `card(ack + ' ' + tail)` with no `commitTea`, exactly as the bucket branch does. R120's letter
+> reaches it. `home-test.js` **B8 did the job it was written for** — it reddened at "six return paths
+> (got 7)" and the seventh is classified rather than defaulted: **7 paths, still exactly 2
+> committing.**
+>
+> **A second, narrower v4.15 defect closed in passing:** a user who had brewed everything on their
+> shelf today got `card('')` — a masthead with a greeting and **no line at all**, because
+> `d_scorePick` excluded the whole shelf via `brewedToday`. Found while building a negative control.
+>
+> **`d_rediscoveryPick` now takes the calendar anchor `d_scorePick` already had.** On the wall clock
+> the sentence moved under the user inside one day — "4 weeks" at 14:30, "5 weeks" at 19:30, same
+> day, same tea, same pick — while the branch's own comment promised the choice was stable across the
+> day. The choice was; **the number in the sentence was not**, and the number is part of the
+> one-voice-per-day contract. Two consequences named rather than found later: the cutoff is now
+> whole-day, and same-day ties resolve through the date-seeded hash already in the sort.
+
 **R119 — A CUP IS A STEEP. Ruled by Niklas.** A steep is poured into a cup and drunk, so five steeps
 is five cups. The planning lane argued a cup is a *sitting* and was wrong: that reasons about the
 sitting, not the cup.

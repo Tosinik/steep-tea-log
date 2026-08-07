@@ -36,6 +36,77 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.16 — R123: the greeting looks at the day, not just the window
+Deploy: `steep-dashboard.js`, `steep-core.js` (APP_VERSION + WHATS_NEW),
+`service-worker.js` (cache **v126**), `fixtures/greeting-v4-test.js`,
+`fixtures/home-test.js`, `CHANGELOG.md`, `STATE.md`, `ROADMAP-v4.md`,
+`docs/r3/planning/R3-RULINGS-LEDGER.md`, `docs/r3/HANDOVER-planning-lane.md`. **No SQL.**
+
+**Niklas found it by using v4.15**: on one Home screen, *Earlier today* listed his two
+sittings while the masthead told him to go and have a tea. Fifth defect this round found
+by looking at a rendered surface, none by a check.
+
+- **R117's one boundary HELD, and the diagnosis matters more than the fix.** Both readers
+  call `sessionsToday()`; there is no second `dayKey` and no timezone split. The
+  divergence was one layer up, in the **branch predicate**: the v3.67 acknowledgement
+  gates on `bucketSessions` — today's sittings narrowed to the CURRENT hour bucket — so a
+  morning brew read at 14:00 skipped every ack and fell through to rediscovery, which
+  speaks in the present tense and carries clay. The greeting already held both readings:
+  the zero-session evening branch gates on the **day**, this one on the **window**. That
+  inconsistency inside one function is the whole defect; neither branch was wrong alone.
+- **R123 — a new day-level branch.** `todaySessions.length && !bucketSessions.length` →
+  a past-tense acknowledgement plus the existing forward tail. **Countless by rule:**
+  `todaySessions.length` counts *sittings* and R119 makes a cup a *steep*, so a numbered
+  line here would have shipped the COUNTED-UNIT item ledger §4 has already filed.
+- **`bigDay` was computed and discarded, and the planning note's premise was wrong.** It
+  is not dead code — it renders today whenever a sitting sits in the current window
+  (proven: a two-sitting morning read at 10:00 says *"Second pour today"*). What it could
+  never reach was **exactly the case R123 creates**, which is also the likeliest one: a
+  big day is usually read *after* the brewing. So it renders in the new branch, from its
+  own pool's four countless lines. The bucket branch's seven are untouched — two carry the
+  ordinal and those are R119's filed item, not this deploy's.
+- **One tail writer.** The forward/rest tail moved into a `dayTail` closure both branches
+  call. Duplicating it would have recreated one level down the exact two-readers fault
+  this deploy exists to fix. Proven inert: greetings dumped over the real export at seven
+  hours × two scenarios are **byte-identical** on every bucket-branch row.
+- **Clay stays suppressed by construction, not by a new rule** — the branch returns
+  `card(ack + ' ' + tail)` with no `commitTea`, the same way the bucket branch does. R120
+  reaches it by its own terms. `home-test.js` **B8 did its job**: it reddened at "six
+  return paths (got 7)" and the seventh is classified rather than defaulted — 7 paths,
+  still exactly 2 committing.
+- **`d_rediscoveryPick` now takes the calendar anchor** `d_scorePick` already had, with
+  its comment carried over. On the wall clock the sentence moved under the user inside one
+  day — **"4 weeks" at 14:30 and "5 weeks" at 19:30**, same day, same tea, same pick —
+  while the branch's own comment promised stability across the day. The *choice* was
+  stable; the *number* was not. Two consequences named rather than found later: the cutoff
+  is whole-day, and same-day ties resolve through the date-seeded hash already in the sort.
+- **A second, narrower v4.15 defect closed in passing:** a user who had brewed everything
+  on their shelf today got `card('')` — a masthead with a greeting and **no line at all**,
+  because `d_scorePick` excluded the entire shelf via `brewedToday`. Found while building
+  a negative control, not by design.
+- **THREE OF THE NEW CHECKS WERE WRONG FIRST, and each was caught by running the control
+  rather than reading it.** J4 tested "names any tea", which both branches satisfy —
+  the *tail* names a forward tea either way; only the *ack* differs, so the probe is now
+  the tea just drunk. **J1 passed twice with the branch disabled**: first because a
+  morning-only drinker already got no clay (v3.55 redirects when the current bucket is
+  inactive), then because a two-tea shelf rendered an empty body instead. **K3 passed on
+  the reverted anchor** because that brew date did not straddle a week boundary; the
+  fixture now brews exactly 49 days back at midday so it does, and the control reddens
+  with `got 6/7/7`. A behavioural check riding on a source check is not a behavioural
+  check. `J3b` was also deleted outright — it read `|| true` (R105).
+- **The check the planning lane proposed would have passed on v4.15.** "Pin that the
+  greeting and the card resolve from the same function" — they already did, and disagreed
+  anyway. The suite asserts the **property**: on a day with sittings, the masthead makes
+  no present-tense offer to brew, with `btn-clay` as the structural signal.
+- **Three pre-existing rediscovery scenarios needed repair, and it is a real precondition,
+  not bookkeeping** — C5, I4 and K1 searched for a firing day from the 1st while their
+  synthetic history occupied days 1–6. Since R123, rediscovery is reachable only on a day
+  with **no** sittings, so a firing day inside that window now takes the ack branch and
+  those checks were asserting a fall-through a different branch was answering.
+- Section counts in J and K are **derived from `passed`**, not written — the same trap
+  `liquor-review.js` fell into. **28 suites green; greeting-v4 62 → 72 checks.**
+
+---
 ## v4.15 — the swatch becomes visible: three slots, and the scan that says which
 Deploy: `steep-teas.js` (`swatchAttr`, the single writer), `steep-dashboard.js`,
 `steep-social.js`, `steep-reference.js` (one call site each), `styles.css`

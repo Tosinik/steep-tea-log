@@ -78,8 +78,15 @@ decisions rather than any single ruling:
   resolves tier 1 → 2 → 3; and **three slots render** it (`.ref-swatch`, `.social-tile`,
   `.today-tint`). **Remaining: slice 3, the picker (R39)** — form control first, long-press optional
   — which is what finally **unblocks #14** (R89's condition is now met). The shelf swatch is
-  **deferred to a board**: `shelfPhoto` holds that position on evidence (21/21 teas carry photos), so
-  a swatch beside the photo is an addition nobody has drawn (R81).
+  **deferred to a board** — and the shipped justification for that deferral is **superseded**: it
+  reads "an addition nobody has drawn", but **#13 rev 1 draws swatch-led shelf rows**. The planning
+  lane is returning it as a *correction* (premature, not wrong: with no liquor data the swatch would
+  have been a six-colour type tint, which is why R78 ruled type-tint-for-now — that premise expired
+  when the data landed) inside a forthcoming **S3 ruling**, which also rules tier 3 an unfilled plate
+  holding the tea's script rather than a type tint. **`liquor-test.js` D3/F5 and `swatchAttr` are not
+  to be touched until S3 lands**, so the correction arrives with its ruling.
+- **Slice 3 (the picker) is v4.17 and is GATED ON S3** — F2's name-vs-type mechanism and the tier-3
+  default cell both sit inside that ruling.
 - ~~**Home** — R53 gave it the §0 primitives and no revision board … R4 commissions its board.~~
   **SHIPPED v4.10.** The board was commissioned, delivered (rev 1 + rev 2 with 5a) and banked at
   `docs/r4/boards/`. Built to **R113–R118**: the greeting became the masthead, **clay was implemented

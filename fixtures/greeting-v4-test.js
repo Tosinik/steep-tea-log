@@ -139,8 +139,12 @@ const sub=(html)=>{ const m=html.match(/class="greeting-body">([\s\S]*?)<\/div>/
   ok(call('d_hash("2026-07-10|shelf")')===call('d_hash("2026-07-10|shelf")'), 'C4 shelf roll hash is stable');
 
   // Find dates where the 1-in-4 roll fires / doesn't (so the integration test is deterministic).
+  // FROM DAY 8, not day 1, and that is a real precondition rather than test bookkeeping: since R123
+  // rediscovery is reached only on a day with NO sittings, and this scenario's history occupies
+  // 08-01..06. A firing day inside that window would take the acknowledgement branch, and C6 would
+  // have been asserting the fall-through while a different branch answered.
   let firesKey=null, skipsKey=null;
-  for(let d=1; d<=31 && (!firesKey||!skipsKey); d++){
+  for(let d=8; d<=31 && (!firesKey||!skipsKey); d++){
     const k='2026-08-'+String(d).padStart(2,'0');
     const r=call('d_hash("'+k+'|shelf") % REDISCOVERY_ODDS');
     if(r===0 && !firesKey) firesKey={d};
@@ -313,7 +317,7 @@ const idsIn = html => (html.match(/openTeaDetail\('([^']+)'\)/g)||[]).map(m=>/\(
   ok(call('isTeaUnopened({costOriginalGrams:0,amountGrams:18})')===true,   'I3 no purchase data → treated as unopened');
   // integration on a firing rediscovery day: opened-but-unsessioned → neglected register, never "unopened".
   let firesKey=null;
-  for(let d=1; d<=31 && !firesKey; d++){ const k='2026-09-'+String(d).padStart(2,'0');
+  for(let d=8; d<=31 && !firesKey; d++){ const k='2026-09-'+String(d).padStart(2,'0');   // from 8: see C5
     if(call('d_hash("'+k+'|shelf") % REDISCOVERY_ODDS')===0) firesKey={d}; }
   ok(firesKey, 'I4 found a firing rediscovery day');
   const drinker={id:'dr',name:'Habit',type:'green',amountGrams:40};
@@ -329,6 +333,129 @@ const idsIn = html => (html.match(/openTeaDetail\('([^']+)'\)/g)||[]).map(m=>/\(
   ok(/unopened|never been steeped|not brewed the/i.test(s), 'I6 a genuinely-untouched tea still reads "unopened"');
   clearNow();
   console.log('  I #17 unopened-copy gate: 6 checks');
+})();
+
+/* ===== J. R123 — sittings today, none in THIS window (v4.16) =====
+ *
+ * THE CHECK PLANNING ASKED FOR WOULD HAVE PASSED ON v4.15, and that is why this one is written
+ * differently. The proposal was "pin that the greeting and the card resolve from the same function
+ * and cannot disagree" — but they already DID resolve from the same function (`sessionsToday`), and
+ * they disagreed anyway, because the divergence was in what each did with the answer. A check
+ * written to the mechanism is green on the broken build. Same family as A3-was-a-proxy and the
+ * `sessionsToday(now)` guard that matched its own declaration.
+ *
+ * So J1 asserts the PROPERTY: on a day with sittings, the masthead makes no present-tense offer to
+ * brew. `btn-clay` is the exact structural signal — `card(sub, commitTea)` renders it only for a
+ * branch that passes a tea, and only the present-tense branches do (R113/R120: clay IS the
+ * committing action for the suggestion on screen). It reddens on v4.15 at five of seven hours.
+ */
+(function(){
+  const at0=passed;   // DERIVED count, not a written one — a hand-typed total is the stale-number trap
+  // A morning drinker with real signal, then TWO sittings today — Niklas's shape exactly.
+  /* THE SCENARIO IS THE HALF THAT HAD TO BE GOT RIGHT, and the first draft got it wrong: a
+     MORNING-ONLY drinker read at 14:00 already got no clay on v4.15, because the v3.55 redirect rule
+     suppresses it when the current bucket is inactive ("save it for the morning"). J1 therefore
+     passed with the R123 branch disabled — a check that cannot fail, which R105 rules worse than no
+     check, found by running the control rather than by reading it. The drinker must be ACTIVE in the
+     window being read, which is also Niklas's real pattern: he brews across the day. */
+  const t=tea({name:'Morning tea'}), o=tea({name:'Other tea',type:'oolong'}), u=tea({name:'Third tea',type:'white'});
+  const hist=[]; for(let d=1;d<=6;d++){ hist.push(sess(t.id,2026,7,d,8)); hist.push(sess(t.id,2026,7,d,14)); hist.push(sess(t.id,2026,7,d,20)); }
+  const today=[sess(t.id,2026,7,10,8), sess(o.id,2026,7,10,9)];
+  /* THREE teas, not two, and the third is what makes J1 bite. With only the two that were brewed
+     today, `d_scorePick` excludes the whole shelf via `brewedToday`, returns null, and v4.15 renders
+     `card('')` — an empty body and no clay, so J1 passed for the wrong reason a second time. Worth
+     recording as its own small v4.15 defect that R123 also closes: a user who has brewed everything
+     on their shelf today got a masthead with a greeting and NO LINE AT ALL. */
+  setState([t,o,u], hist.concat(today));
+
+  // Afternoon and evening are both ACTIVE, so on v4.15 each of these hours reaches the fall-through
+  // un-redirected and commits clay. 02:00 is left out deliberately: at 2am the day's 8am sittings are
+  // same-key but in the FUTURE — a calendar-day quirk R117 already accepted, shared with the card.
+  [14,20].forEach(h=>{
+    setNow(localMs(2026,7,10,h));
+    const html=greet();
+    ok(!/btn-clay/.test(html),
+       'J1 no present-tense offer to brew at hour '+h+' on a day that already has sittings — the property, not the mechanism (proven to redden with the branch disabled)');
+    ok(sub(html).length>0, 'J2 …and the masthead still says something at hour '+h+' — acknowledgement, not silence');
+  });
+
+  // COUNTLESS (R119). Read at 23:00: night is the one inactive window, so there is no later active
+  // one, the tail is the rest pool, and the whole body is this branch's own copy with no tea name.
+  const hist2=hist;
+  setNow(localMs(2026,7,10,23));
+  const body=sub(greet()).replace(/<[^>]+>/g,'');
+  ok(!/\d/.test(body),
+     'J3 the branch\'s copy carries NO count — `todaySessions.length` is sittings and R119 rules a cup a steep, so a numbered line here would ship the COUNTED-UNIT item §4 has filed');
+
+  /* THE BRANCH DISCRIMINATOR, and it took two attempts to make it discriminate. Draft one asserted
+     "names any tea", which both branches can satisfy — the TAIL names a forward tea on either path.
+     What separates them is WHICH tea: the v3.67 branch acknowledges the tea you just drank by name;
+     R123's never does. So the probe is the LOGGED tea specifically, and the forward pick cannot
+     impersonate it (it is excluded by `brewedToday` and by the same-day variety guard).
+     ONE sitting, so bigDay is false and the named ack is the one in play. Same shelf, two hours. */
+  const oneToday=[sess(o.id,2026,7,20,8)];
+  setState([t,o,u], hist2.concat(oneToday));
+  setNow(localMs(2026,7,20,9));                       // 09:00 — the sitting is in THIS window
+  ok(/Other tea/.test(sub(greet())),
+     'J4 a sitting in the current window still reaches the v3.67 acknowledgement, which names THE TEA JUST DRUNK — the `dayTail` extraction changed no behaviour there');
+  setNow(localMs(2026,7,20,14));                      // 14:00 — same sitting, a later window
+  const later=greet();
+  ok(!/Other tea/.test(sub(later)) && !/btn-clay/.test(later),
+     'J4b …and the same sitting read in a later window reaches R123 instead: acknowledged without naming it, and no clay');
+
+  // And a day with NO sittings still reaches the suggestion branches, clay included. The new branch
+  // must not swallow the ordinary case.
+  setState([t,o,u], hist2);
+  setNow(localMs(2026,7,20,14));
+  ok(/btn-clay/.test(greet()), 'J5 a day with no sittings still gets a suggestion and its clay — R123 narrows nothing else');
+
+  // ONE tail writer. Duplicating it would recreate one level down the two-readers fault this deploy
+  // fixes, so the pool literal must appear exactly once in the source.
+  const dashSrc=fs.readFileSync(path.join(REPO,'steep-dashboard.js'),'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g,' ').replace(/^\s*\/\/.*$/gm,' ');
+  const tails=(dashSrc.match(/That&rsquo;s the day&rsquo;s brewing/g)||[]).length;
+  ok(tails===1, 'J6 the forward/rest tail has exactly ONE writer, shared by both acknowledgement branches (got '+tails+')');
+  clearNow();
+  console.log('  J R123 sittings-today branch: '+(passed-at0)+' checks');
+})();
+
+/* ===== K. The rediscovery week count is day-stable (v4.16) =====
+ * "4 weeks" at 14:30 and "5 weeks" at 19:30 — one day, one tea, one pick. The branch's own comment
+ * promised the choice was stable across the day; the choice was, the NUMBER was not, and the number
+ * is part of the one-voice-per-day contract. `d_scorePick` had the right anchor all along.
+ */
+(function(){
+  const at0=passed;
+  let fires=null;
+  for(let d=8; d<=28 && !fires; d++){ const k='2026-09-'+String(d).padStart(2,'0');   // from 8: see C5
+    if(call('d_hash("'+k+'|shelf") % REDISCOVERY_ODDS')===0) fires=d; }
+  ok(fires, 'K1 found a firing rediscovery day');
+  // A habit tea brewed right up to yesterday (never a candidate), and one neglected long enough to be.
+  const hab={id:'hab',name:'Habit',type:'green',amountGrams:40};
+  const old={id:'old',name:'Neglected',type:'oolong',amountGrams:30};
+  const hist=[]; for(let d=1;d<=6;d++) hist.push({id:'h'+d,teaId:'hab',date:isoAt(2026,9,d,8),steeps:[]});
+  /* THE BREW INSTANT IS CHOSEN TO STRADDLE A WEEK BOUNDARY, and it has to be. Set at an arbitrary
+     date the wall-clock reading happens to give the same answer at 00:00 and 23:00, so K3 passed on
+     the broken build and only K4 caught the revert — a behavioural check riding on a source check is
+     not a behavioural check. Exactly 49 days back AT MIDDAY means the 7-week boundary falls inside
+     the target day: `Date.now()` reads 6 weeks in the morning and 7 by night, while the calendar
+     anchor reads 7 all day. Now the control bites the check that describes the property. */
+  hist.push({id:'oldbrew',teaId:'old',date:isoAt(2026,9,fires-49,13),steeps:[]});
+  setState([hab,old], hist);
+  const weeksAt=(h)=>{ setNow(localMs(2026,9,fires,h)); const m=sub(greet()).replace(/<[^>]+>/g,'').match(/(\d+)\s*weeks/); return m?m[1]:null; };
+  const a=weeksAt(0), b=weeksAt(13), c=weeksAt(23);
+  ok(a!==null, 'K2 the rediscovery line renders its week count');
+  ok(a===b && b===c,
+     'K3 the week count is IDENTICAL at 00:00, 13:00 and 23:00 of the same day — the calendar anchor, not the wall clock (got '+a+'/'+b+'/'+c+')');
+  // Assert the anchor at source too, comment-stripped — this suite's own explanation names `Date.now()`,
+  // and an absence check that reads prose is testing the prose (the fifth-instance lesson).
+  const dashSrc=fs.readFileSync(path.join(REPO,'steep-dashboard.js'),'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g,' ').replace(/^\s*\/\/.*$/gm,' ');
+  const body=(dashSrc.match(/function d_rediscoveryPick\([\s\S]*?\n\}/)||[''])[0];
+  ok(/Date\.parse\(todayKey\)/.test(body) && !/Date\.now\(\)/.test(body),
+     'K4 d_rediscoveryPick anchors on the calendar day, never the wall clock — the same anchor d_scorePick takes and says why');
+  clearNow();
+  console.log('  K rediscovery day-stability: '+(passed-at0)+' checks');
 })();
 
 console.log('\nALL GREETING-V4 TESTS PASSED  ('+passed+' passed)');
