@@ -18,7 +18,12 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const repo=path.join(__dirname,'..');
-const FILES=['steep-knowledge.js','steep-tea-types.js','steep-core.js'];
+/* §F renders three real slots, so the sandbox loads the modules that own them — `swatchAttr` lives
+   in steep-teas.js and `socialTileHTML` in steep-social.js. A source-only check would have proved
+   the call sites exist and nothing about what they emit. */
+const FILES=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-settings.js',
+  'steep-dashboard.js','steep-insights.js','steep-teas.js','steep-reference.js',
+  'steep-shopping.js','steep-passport.js','steep-social.js','steep-sessions.js'];
 const SRC=FILES.map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
 const ctx={};ctx.window=ctx;ctx.globalThis=ctx;ctx.console=console;
 ctx.document={documentElement:{setAttribute(){},getAttribute(){return'light'}},
@@ -172,8 +177,13 @@ ok(!/liquorPicker|setTeaLiquor|liquorGrid/.test(dataSrc+strip(fs.readFileSync(pa
    'D1 no picker yet (R39, slice 3) — nothing in the app can WRITE a correction, so tier 1 is currently reachable only by import or hand-edit');
 ok(G('TT_INHERIT').indexOf('liquor')===-1,
    'D2 `liquor` is NOT inherited: §8 authors every member explicitly, so inheritance is unused today and its only future effect is a new member silently inheriting a colour nobody authored (R121)');
-ok(!/var\(--liquor-/.test(strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'))+strip(fs.readFileSync(path.join(repo,'steep-dashboard.js'),'utf8'))),
-   'D3 nothing RENDERS a liquor yet — the shelf still draws the type tint, which is tier 3 and an honest answer, not a gap');
+/* D3 CHANGED IN v4.15 — it asserted "nothing renders a liquor yet", the v4.11–v4.14 fence, and this
+   slice crosses it. Rewritten to the fence that still stands, the way D1 was: the SHELF does not
+   render one. `shelfPhoto` holds that position on evidence — 21 of 21 teas carry photos, and R78
+   made the tint the colour source only when no photo exists — so a swatch there is an ADDITION
+   alongside the photo that no board has drawn, and re-deciding it is Design's call (R81). */
+ok(!/swatchAttr\('shelf-/.test(strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'))),
+   'D3 the SHELF still draws no swatch — deferred to a board, because shelfPhoto holds that position with evidence behind it and an addition beside it is undrawn (R81)');
 const spec=fs.readFileSync(path.join(repo,'docs/r4/planning/SPEC-liquor-swatch-model.md'),'utf8');
 ok(/These hex values are a first pass by a lane that has not drunk these teas/.test(spec),
    'D4 the spec still says the hexes are unverified by anyone who has tasted these teas — two groupings want a human check');
@@ -214,6 +224,61 @@ ok(/liquor: t\.liquor \|\| null/.test(dataSrc2), 'E9 …and teaToDb writes it �
 ok(fs.existsSync(path.join(repo,'sql/v3_12-liquor.sql')),
    'E10 the migration is committed as `v3_12`, continuing the series — the `v3_` prefix is a series number, not the app version (v3_10 was applied at app v4.02)');
 console.log('  E the cascade: 10 checks');
+
+/* ---- F · THE SITE SCAN, and it points the OPPOSITE way from the currency scan ----
+ *
+ * R104's scan caught money fields rendered bare — sites that should have called the helper and did
+ * not. This one has to catch the reverse: a colour applied where it does not belong. Twelve places
+ * write a `t-<type>` class, and they are four different kinds of thing:
+ *
+ *   3 SWATCH SLOTS      already Bundle-1 geometry wearing a type tint — these get the liquor
+ *   3 PHOTO PLACEHOLDERS  40-100px image substitutes; a design question nobody has drawn
+ *   4 TYPE LABELS       pills that literally read "Oolong" — liquor-ising one is an ACTIVE REGRESSION
+ *   2 CHART SEGMENTS    a categorical bar of types, not of teas
+ *
+ * A mechanical "replace the type tint" would have been wrong at six of twelve, and nothing else in
+ * the app would have noticed. So the classification itself is asserted: a new tinted site has to be
+ * classified rather than defaulted, and a label that quietly acquires a liquor reddens.
+ */
+const FILES_SCANNED=['steep-teas.js','steep-sessions.js','steep-social.js','steep-dashboard.js','steep-reference.js','steep-insights.js'];
+const SWATCHES=['today-tint','social-tile','ref-swatch'];
+const LABELS=['shelf-pill','pill t-'];
+/* THE WRITER'S OWN BODY IS EXCLUDED BEFORE COUNTING, and that is not bookkeeping. `swatchAttr`
+   contains a `t-${...}` fallback and the token `swatchAttr(` in its own declaration, so counting the
+   file raw reports ten tints and four call sites — the helper counted as a user of itself. Ninth
+   instance of this family, and the second in three slices after `sessionsToday(now)` matched
+   `function sessionsToday(now){`. Count the SITES; the definition is not one. */
+let tinted=0, painted=0;
+FILES_SCANNED.forEach(f=>{
+  const src=strip(fs.readFileSync(path.join(repo,f),'utf8'))
+    .replace(/function swatchAttr\(base, key, type\)\{[\s\S]*?\n\}/,'');
+  tinted += (src.match(/t-\$\{|dot-\$\{/g)||[]).length;
+  painted += (src.match(/swatchAttr\(/g)||[]).length;
+});
+ok(tinted===9, 'F1 nine type-tint writes remain across the five files — three became swatches, and the rest are labels, placeholders and chart segments (got '+tinted+')');
+ok(painted===3, 'F2 …and exactly THREE call sites paint a liquor, one per real swatch slot (got '+painted+')');
+/* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
+   colouring it by what the tea pours is a category error, and it would look deliberate. */
+const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));
+const socialSrc=strip(fs.readFileSync(path.join(repo,'steep-social.js'),'utf8'));
+ok(/shelf-pill t-\$\{/.test(teasSrc) && !/swatchAttr\('shelf-pill/.test(teasSrc),
+   'F3 the shelf type PILL keeps its type tint and takes no liquor — a label reading "Oolong" coloured by liquor is a category error');
+ok(/class="pill t-\$\{/.test(socialSrc) && /class="pill t-\$\{/.test(teasSrc),
+   'F4 …and so do the two other type pills, on Social and Tea detail');
+ok(/shelf-ph t-\$\{/.test(teasSrc) && !/swatchAttr\('shelf-/.test(teasSrc),
+   'F5 the shelf PHOTO placeholder is untouched — R81: a swatch beside the photo is an addition nobody has drawn, and shelfPhoto holds that position on evidence (21/21 teas carry photos)');
+ok(/dot-\$\{/.test(strip(fs.readFileSync(path.join(repo,'steep-insights.js'),'utf8'))),
+   'F6 the type-mix chart still keys on type — it counts categories, not teas, so a per-tea colour would make its legend meaningless');
+/* The three slots actually resolve. Rendered, not merely present in source. */
+G('state.teas='+JSON.stringify([{id:'x',name:'Honey Oolong Gui Fei',type:'oolong'}])+';');
+ok(/background:var\(--liquor-amber\)/.test(G('socialTileHTML("oolong","Honey Oolong Gui Fei")')),
+   'F7 the social tile paints the catalog liquor for a passed tea — tier 2 by construction, since a passed tea has no row of yours to correct');
+ok(/background:var\(--liquor-/.test(G('swatchAttr("ref-swatch","amber-deep","oolong")'))
+   && /class="ref-swatch t-oolong"/.test(G('swatchAttr("ref-swatch",null,"oolong")')),
+   'F8 the writer paints when there is a key and falls back to the type tint when there is not — tier 3 lives at the render site, not in the resolver');
+ok(/\.today-tint\{[^}]*border:1px solid var\(--line\)/.test(cssSrc),
+   'F9 the third slot gains the hairline the other two already had — which is what makes `ivory` (19.2 from --white) exist on a near-white card, and closes that open item');
+console.log('  F the site scan: 9 checks · '+tinted+' tints kept · '+painted+' liquor sites');
 
 console.log('');
 if(failures){ console.log('FAILED: '+failures+' of '+(passed+failures)); process.exit(1); }

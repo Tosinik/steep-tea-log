@@ -1134,7 +1134,7 @@ function dashCardsHome(s){
         const when = new Date(se.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
         return `<div class="today-row" onclick="openSessionDetail('${escapeJsArg(se.id)}')">
           <span class="today-time mono">${escapeHtml(when)}</span>
-          <span class="today-tint t-${escapeHtml(type||'green')}"></span>
+          <span ${swatchAttr('today-tint', liquorFor(tea || {name:se.teaName, type:se.teaType}), type)}></span>
           <span class="today-name">${escapeHtml(se.teaName || (tea?tea.name:'—'))}</span>
           <span class="today-steeps mono">${escapeHtml(brewCountLabel(se))}</span>
         </div>`;

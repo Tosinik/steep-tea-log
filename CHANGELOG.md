@@ -36,6 +36,58 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.15 — the swatch becomes visible: three slots, and the scan that says which
+Deploy: `steep-teas.js` (`swatchAttr`, the single writer), `steep-dashboard.js`,
+`steep-social.js`, `steep-reference.js` (one call site each), `styles.css`
+(`.today-tint` hairline), `fixtures/liquor-test.js`, `fixtures/pass-record-test.js`,
+`fixtures/stat-period-test.js`, `steep-core.js`, `service-worker.js` (**v125**),
+`CHANGELOG.md`, `STATE.md`. **No SQL** — `v3_12` shipped with v4.14.
+**28 committed suites, all green** (`liquor-test.js` 50 → 59). Slice 2 of 3.
+
+**The first time a liquor swatch renders anywhere in the app**, four rounds after
+contract 1 was locked.
+
+- **THE SCAN IS THE DELIVERABLE, and it points the opposite way from R104's.** The
+  currency scan caught money fields rendered **bare** — sites that should have called the
+  helper and didn't. This one has to catch **over-reach**. Twelve places write a
+  `t-<type>` class and they are four different kinds: **3 swatch slots** already at
+  Bundle-1 geometry (`.ref-swatch`, `.social-tile`, `.today-tint`), **3 photo
+  placeholders**, **4 type LABELS** — pills that literally read "Oolong" — and **2
+  categorical chart segments**. A mechanical "replace the type tint" would have been
+  **wrong at six of twelve**, and nothing else in the app would have noticed. §F asserts
+  the classification, so a new tinted site must be classified rather than defaulted.
+  Liquor-ising the shelf pill reddens **five** checks.
+- **One writer, `swatchAttr`**, and **tier 3 lives at the render site**, not in
+  `liquorFor` — tier 3 is a CSS class, and the resolver has no business knowing about
+  stylesheets.
+- **The social tile is tier 2 by construction.** A passed tea is not on your shelf, so
+  there is no row to carry a correction; the pass record's denormalised name and type
+  (R96) are exactly what the matcher needs. A sender's own correction is deliberately not
+  carried — it is their judgement of their jar.
+- **`.today-tint` gains the hairline the other two slots already had**, which is what
+  makes `ivory` (19.2 luminance from `--white`) exist on a near-white card. **That closes
+  the open item** rather than leaving it to the cascade.
+- **THREE FENCES CROSSED, ALL REWRITTEN RATHER THAN DELETED** — and two of them lived in
+  *other suites*, which is why they only surfaced when the full set ran. `liquor-test`
+  D3 ("nothing renders a liquor") becomes "the **shelf** still draws no swatch", deferred
+  to a board because `shelfPhoto` holds that position on evidence — 21 of 21 teas carry
+  photos, R78 made the tint the colour source only when none exists, so a swatch beside
+  the photo is an addition nobody has drawn (R81). `pass-record` D6 ("no liquor swatch is
+  invented here", R93's fence) becomes "no invented **colour**" — the tile now paints a
+  real one through the shared writer.
+- **`stat-period-test.js` broke on load order, not on logic** — its sandbox omitted
+  `steep-tea-types.js` while the dashboard now calls `liquorFor`. `index.html` has always
+  loaded it first; the fixture caught up with the app rather than the reverse.
+- **A count that included its own definition, for the ninth time.** §F first reported ten
+  tints and four call sites, because `swatchAttr`'s body contains a `t-${...}` fallback
+  and its own declaration contains `swatchAttr(`. The helper counted as a user of itself —
+  the same shape as `sessionsToday(now)` matching `function sessionsToday(now){` three
+  slices ago. The writer's body is now excluded before counting.
+- **Rendered and verified, not just asserted:** 6 painted swatches and 2 tier-3 fallbacks
+  in the review page, Yashi Xiang correctly falling back to `t-oolong`; Home's diary line
+  paints `gold-pale` for the 2021 Fujian White.
+
+---
 ## v4.14 — the liquor cascade: migration, mappers, resolver
 Deploy: **`sql/v3_12-liquor.sql` — APPLIED BY HAND BEFORE THE PUSH**, `steep-data.js`
 (both mappers), `steep-tea-types.js` (`liquorFor`, `LIQUOR_KEYS`, `isLiquorKey`),

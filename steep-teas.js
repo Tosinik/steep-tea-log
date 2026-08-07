@@ -161,6 +161,26 @@ function shelfPhoto(tea, kind){
 }
 function shelfPill(tea){ return `<span class="shelf-pill t-${escapeHtml(tea.type||'')}">${escapeHtml(typeLabel(tea.type))}</span>`; }
 
+/* THE ONE WRITER that paints a swatch (contract 1, v4.15). Takes a resolved liquor key — or null —
+   and the tea's type, and returns the element's attributes: the liquor when there is one, the
+   shipped type tint when there is not. Tier 3 lives HERE rather than in `liquorFor`, because tier 3
+   is a CSS class and the resolver has no business knowing about stylesheets.
+
+   THREE CALL SITES, AND ONLY THREE. The site scan (`liquor-test.js` §F) enumerates all twelve places
+   a `t-<type>` class is written and classifies each, because the danger in this slice is the
+   OPPOSITE of the currency sweep's: not a money field left bare, but a colour applied where it does
+   not belong. Four of the twelve are type LABELS — pills that literally read "Oolong" — and painting
+   one with a liquor would be an active regression that nothing else would notice. Three more are
+   photo placeholders, standing in for an image at 40-100px, which is a design question nobody has
+   drawn. Two are a categorical chart of types, not of teas.
+
+   The key is validated by `isLiquorKey` before it reaches here, so it cannot inject; the type is
+   escaped anyway, because it is user-adjacent data and the rule is escape the data, never the markup. */
+function swatchAttr(base, key, type){
+  return key ? `class="${base}" style="background:var(--liquor-${escapeHtml(key)});"`
+             : `class="${base} t-${escapeHtml((type||'unknown').toLowerCase())}"`;
+}
+
 // Vessel identity ladder (R63): photo → kanji plate → type-tinted stripe. NOT an extension of
 // shelfPhoto — that one is the TEA tile and its kanji key on tea.type (白 white, 餅 puerh), so 蓋碗
 // there would mean a tea of type gaiwan. Vessels have no liquor swatch; photo/kanji IS their identity.

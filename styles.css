@@ -222,7 +222,12 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
    the slots the per-tea colour lands in when R82/R93 gives it a data model. */
 .today-row{display:flex;align-items:center;gap:11px;padding:6px 0;cursor:pointer;}
 .today-time{font-size:12.5px;color:var(--ink-soft);flex:none;width:38px;}
-.today-tint{width:13px;height:13px;border-radius:3px;flex:none;}
+/* The hairline is what makes a bud-only white exist on a near-white card. `ivory` sits 19.2
+   luminance from `--white` in the light theme — it passes A3b, which only claims it has not
+   collapsed into the surface, and says nothing about comfort. `.ref-swatch` and `.social-tile`
+   already carried this border, so giving the third slot the same one bounds the pale end
+   everywhere it appears and closes that open item rather than leaving it to the cascade. */
+.today-tint{width:13px;height:13px;border-radius:3px;flex:none;border:1px solid var(--line);}
 .today-name{font-size:14.5px;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .today-steeps{font-size:12.5px;color:var(--ink-soft);flex:none;}
 .dash-edit-bar{display:flex;justify-content:center;margin:14px 0 4px;}

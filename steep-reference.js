@@ -107,6 +107,9 @@ function refEntryHTML(t, owned, inherited){
   </div>`;
 }
 
+/* The catalog row IS tier 2, so the swatch here needs no tea and no matcher — the row carries the
+   value. Eleven rows are deliberately null and fall to the family tint, the same honest answer the
+   shelf gives: never guess a colour for a style that varies by maker. */
 function refRowHTML(cat, owned){
   const t = cat.type;
   const names = refOwnedNames(cat, owned);
@@ -114,7 +117,7 @@ function refRowHTML(cat, owned){
   const script = refScript(t);
   return `<div class="ref-row${names.length?'':' is-unowned'}${open?' is-open':''}">
     <div class="ref-rowhead" onclick="toggleRefEntry('${escapeJsArg(t.slug)}')">
-      <span class="ref-swatch t-${escapeHtml(refFamilyClass(t.family))}"></span>
+      <span ${swatchAttr('ref-swatch', t.liquor, refFamilyClass(t.family))}></span>
       <div class="ref-rowmid">
         <div class="ref-rowname"><span class="shelf-name">${escapeHtml(t.display_name)}</span>${script?`<span class="ref-script">${escapeHtml(script)}</span>`:''}</div>
         <span class="ref-meta mono">${escapeHtml(refMetaLine(cat))}</span>

@@ -179,7 +179,12 @@ function circleHTML(){
    case — the script can never render, and the tile carries the tint alone. */
 function socialTileHTML(type, name){
   const t=(type||'').toLowerCase();
-  return `<span class="social-tile t-${escapeHtml(t||'unknown')}">${escapeHtml(passScriptFor(name))}</span>`;
+  /* TIER 2 ONLY, and by construction. A passed tea is not on your shelf, so there is no `teas` row
+     to carry a tier-1 correction — the pass record holds a denormalised name and type (R96), which
+     is exactly what `liquorFor` needs to reach the catalog. A sender's own correction is deliberately
+     NOT carried: it is their judgement of their jar, and R97's reasoning applies here too — the
+     recipient reads the catalog live, so a later authoring reaches this tile as well. */
+  return `<span ${swatchAttr('social-tile', liquorFor({name:name, type:t}), t)}>${escapeHtml(passScriptFor(name))}</span>`;
 }
 function passScriptFor(name){
   if(typeof matchTeaType!=='function' || typeof refScript!=='function') return '';

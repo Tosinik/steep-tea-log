@@ -18,7 +18,10 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const REPO=path.resolve(__dirname,'..');
-const SRC=['steep-knowledge.js','steep-core.js','steep-dashboard.js','steep-insights.js','steep-teas.js']
+// steep-tea-types.js joins the list at v4.15: the dashboard's diary line now resolves a liquor
+// through `liquorFor`, which lives there. index.html has always loaded it before these four, so this
+// is the fixture catching up with the app's own order rather than a change in it.
+const SRC=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-dashboard.js','steep-insights.js','steep-teas.js']
   .map(f=>fs.readFileSync(path.join(REPO,f),'utf8')).join('\n;\n');
 const LS={};   // mutable localStorage backing store so gridPeriod()/setGridPeriod() are observable
 const ctx={}; ctx.window=ctx; ctx.globalThis=ctx; ctx.console=console;

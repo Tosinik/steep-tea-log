@@ -179,8 +179,16 @@ names.filter(n=>!G('passCategoryFor('+JSON.stringify(n)+')')).forEach(n=>
 const covName = names.find(n=>G('passCategoryFor('+JSON.stringify(n)+')'));
 ok(covName && /social-tile/.test(G('socialTileHTML("green",'+JSON.stringify(covName)+')')),
    'D5 the tile renders for a covered tea');
-ok(!/liquor|swatchColor|--liquor/.test(socialCode),
-   'D6 R93: no liquor swatch is invented here — the tile is the shipped type tint');
+/* D6 CHANGED IN v4.15, and it is the third crossed fence of this slice. It asserted "no liquor
+   swatch is invented here" — R93's fence, correct while the swatch had no data model and slice F
+   might have invented one. v4.11-v4.15 built the model, so the tile now resolves a REAL liquor
+   through the shared writer instead of inventing a colour. The fence moves to what still holds:
+   the tile takes TIER 2 only, because a passed tea is not on your shelf and has no row to carry a
+   correction, and it must still fall back to the type tint when the catalog has nothing. */
+ok(/swatchAttr\('social-tile'/.test(socialCode) && !/#[0-9A-Fa-f]{6}/.test(socialCode.split('function socialTileHTML')[1].split('}')[0]),
+   'D6 the tile paints through the shared writer, never a hex of its own — R93\'s "no invented swatch" survives as "no invented COLOUR"');
+ok(/class="social-tile t-/.test(G('socialTileHTML("oolong","Yashi Xiang Dancong Guangdong")')),
+   'D7a …and falls back to the type tint for a deliberately-null style — tier 3 reaches the pass tile like anywhere else');
 /* D7 is slice B's cascade bug, guarded at the only place it is visible. `.social-tile` and `.t-green`
    are both (0,1,0), and this block is appended BELOW the .t-* palette, so a `background` on the base
    rule wins on source order and flattens every type tint to one colour. It shipped that way in this

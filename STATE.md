@@ -183,7 +183,25 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.14: the liquor cascade — migration, mappers, resolver** (cache **v124**,
+**NOW (just shipped) — v4.15: the swatch becomes visible** (cache **v125**, APP_VERSION v4.15,
+**no SQL** — `v3_12` shipped with v4.14). Slice 2 of 3. **The first time a liquor renders anywhere**,
+four rounds after contract 1 was locked.
+- **Three slots, one writer** (`swatchAttr`, steep-teas.js): `.ref-swatch` · `.social-tile` ·
+  `.today-tint`. **Tier 3 lives at the render site**, not in `liquorFor` — tier 3 is a CSS class.
+- **The scan is the deliverable and it points the OPPOSITE way from R104's.** Twelve `t-<type>`
+  writes: 3 swatch slots · 3 photo placeholders · **4 type LABELS** (pills reading "Oolong" —
+  painting one would be an active regression) · 2 chart segments. **A mechanical swap would be wrong
+  at six of twelve.** §F asserts the classification; liquor-ising the shelf pill reddens five checks.
+- **Three fences crossed, all REWRITTEN not deleted, and two lived in other suites** — `liquor-test`
+  D3 → "the **shelf** draws no swatch" (deferred to a board; `shelfPhoto` holds that position on
+  evidence, R81); `pass-record` D6 → "no invented **colour**". `stat-period` broke on a fixture load
+  order the app never had.
+- **`.today-tint` gains the hairline**, closing the `ivory`-at-19.2 item.
+- **NEXT: slice 3, the picker** — form control first (keyboard-reachable, testable), long-press
+  optional. **Clearing must return to tier 2**, already asserted at E4. Unblocks #14 (R89).
+  **28 suites green.**
+
+**Previously — v4.14: the liquor cascade — migration, mappers, resolver** (cache **v124**,
 APP_VERSION v4.14, **`sql/v3_12-liquor.sql` applied BY HAND BEFORE THE PUSH**). Slice 1 of 3;
 **nothing renders a swatch yet.**
 - **Read time, never stored** (R97's `catalog_slug` reasoning applied to colour) — so authoring a
