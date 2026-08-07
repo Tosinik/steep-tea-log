@@ -75,6 +75,11 @@ fixtures/*
 # absent. Absences decay silently. §D also carries the guards R116 ordered for the visual contracts,
 # after three of the five turned out to have shipped unimplemented.
 !fixtures/home-test.js
+# Contract 1's data model. Its most important assertion is that ELEVEN catalog rows stay NULL —
+# ten resolve to `roast: variable` and sheng pu-erh varies by age — because without it a later pass
+# "completes" the table and asserts a colour for a style that genuinely varies. It also carries the
+# fence: no teas.liquor column yet, liquor not inherited, nothing rendering a swatch.
+!fixtures/liquor-test.js
 # Local Claude Code state (launch.json, settings.local.json, etc.) stays ignored, but
 # committed project skills under .claude/skills/ and subagent definitions under
 # .claude/agents/ are tracked so they ship with the repo.

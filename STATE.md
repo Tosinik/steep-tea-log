@@ -180,7 +180,28 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.10: R4 opens with the Home revision** (cache **v120**, APP_VERSION v4.10,
+**NOW (just shipped) — v4.11: R4's second half, the liquor swatch model** (cache **v121**,
+APP_VERSION v4.11, **no SQL**). **Contract 1 was the last of the five visual contracts unbuilt;**
+the model R82 found had never been written is now `docs/r4/planning/SPEC-liquor-swatch-model.md`.
+- **Ten-stop ramp as `--liquor-<key>` tokens, both themes; `liquor` on 44 of 55 catalog rows.**
+  **Nothing renders a swatch yet** — no `teas.liquor` column, no cascade. That is the fence (R116),
+  not an omission, and `liquor-test.js` §D asserts it.
+- **Dark is LIFTED, not inverted** — inverting would render pu-erh pale, and a pale pu-erh identifies
+  a different tea. The order-guard is written against the **brown arm** only, because §2 gives the
+  ramp a green arm too.
+- **Eleven rows are deliberately null** (ten resolve to `roast: variable`, plus sheng pu-erh) — §B is
+  the assertion this slice exists for, and it must be read on **resolved** rows: raw rows find three,
+  resolved find ten.
+- **§8 covered 54 of 55 rows.** `gui-fei-oolong` was missing and is on the shelf → ruled **`amber`**,
+  so **the ramp has no headroom stop**. The spec's own generation run had printed it; the table was
+  hand-written from memory. Seventh wrong-representation instance this round.
+- **`liquor` is NOT in `TT_INHERIT`** — every member is authored explicitly, so inheritance would
+  only ever let a future member inherit a colour nobody authored.
+- **Expected quiet:** six distinct swatches over 12 teas; **nine stay on the type tint** (one
+  deliberately null, eight with no catalog match). Correct by construction. **28 suites, all green.**
+- **NEXT: the migration + the read-time cascade**, then the picker (R39), which unblocks #14 (R89).
+
+**Previously — v4.10: R4 opens with the Home revision** (cache **v120**, APP_VERSION v4.10,
 **no SQL**). **R3's build is closed; R4 is scoped by R93 as the Home revision (this) + the liquor
 swatch (next).** R4 keeps no separate status doc: **this file plus the ledger is R4's state.**
 - **The board is banked at `docs/r4/boards/`** — a new round folder needs **both** repo rules or it

@@ -36,6 +36,67 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.11 — R4's second half: the liquor swatch, ramp and catalog values
+Deploy: `steep-tea-types.js` (a `liquor` key on 44 of 55 rows), `styles.css` (the ten-stop
+ramp in **both** theme blocks), `steep-core.js` (APP_VERSION, WHATS_NEW),
+`service-worker.js` (**v121**), **new `fixtures/liquor-test.js`** + its `.gitignore`
+exception in the same edit (R79), **new `docs/r4/planning/SPEC-liquor-swatch-model.md`**,
+`CHANGELOG.md`, `STATE.md`, `docs/r3/R3-STATUS.md`,
+`docs/r3/planning/R3-RULINGS-LEDGER.md`. **No SQL** — the migration rides the cascade,
+next slice. **28 committed suites, all green.** Four commits.
+
+**Contract 1 was the last of the five visual contracts still unbuilt**, and the model
+R82 found had never been written now exists in the repo. **Nothing renders a swatch
+yet** — that is the fence, not an omission.
+
+- **The spec landed verbatim first** (`94edced`, sha256 `f3c564e585cc40b5…`) and is
+  amended in place with its four amendments logged in its own header — the
+  R3-IMPLEMENTATION-HANDOFF pattern, so both the delivered and corrected states are
+  readable. A spec that lives only as an attachment is what cost this project two wrong
+  decisions on the frame ruling.
+- **§8's table covered 54 of 55 rows.** `gui-fei-oolong` was missing — **and it is on the
+  shelf**. Ruled **`amber`**: wuyi-yancha at ox-mid 55 shifted one darker gives
+  `amber-deep`, so mid 55's *base* is `amber`, and Gui Fei's 45 sits far nearer that than
+  `gold`'s 22.5. The provenance is the finding — the planning lane's own generation run
+  printed `amber 1 gui-fei-oolong` and the table was then hand-written as
+  `amber | 0 | headroom` from memory, **inside the document whose §9 exists to prevent
+  exactly that**. Seventh instance of the wrong-representation family this round.
+  *Never adjust data to preserve a claim about the data.*
+- **So the ramp has no headroom stop.** All ten are occupied. A future gap is a
+  deliberate ramp **extension** — more stops on the same ramp (§2, R121) — never an empty
+  slot waiting.
+- **`dong-ding` is not a slug**; the row is `dong-ding-oolong`. As written the assignment
+  would have no-opped **and the null assertion would have guarded a slug that does not
+  exist** — a check that cannot fail. B2 now asserts every null-list slug resolves to a
+  real row, which closes the class.
+- **Rule 2 must run on RESOLVED rows.** Seven Dancong members and `huang-jin-gui` carry
+  no own `roast`; raw rows find **three** `roast: variable`, resolved rows find **ten**.
+  An assertion against raw rows would have passed for the wrong reason.
+- **Dark is lifted, not inverted**, and the comment says why: a swatch is the colour of
+  tea in a cup, so inverting renders pu-erh **pale**, and a pale pu-erh identifies a
+  different tea. Verified — all ten dark stops lighter than their light twins, and the
+  **brown arm** darkens strictly in both themes so the ramp's order survives the theme.
+  The guard is written against the brown arm because §2 gives the ramp a **green arm**
+  too; a monotonicity check over all ten fails for the right reason.
+- **`liquor` is NOT added to `TT_INHERIT`** (§3 left it open for now). §8 authors every
+  member explicitly, so inheritance is unused today; its only future effect is a new
+  member silently inheriting a colour nobody authored — R121's failure exactly.
+- **§B is the assertion this slice exists for:** eleven rows carry no liquor **on
+  purpose**, and a negative control proves it bites — giving `sheng-puerh` a colour
+  reddens B3, B6 and C1. Emptying `amber` again reddens four checks.
+- **Expected quiet, stated before it is measured:** Niklas's shelf resolves to **six**
+  distinct swatches across **12** teas; **nine stay on the type tint** — one indeterminate
+  (Yashi Xiang, deliberately null) and eight with no catalog match at all. That is the
+  same content gap that already costs them Go Deeper and freshness rung 2, and it is
+  correct by construction — the B3 `0/21` shape.
+- **The review artifact is the ramp, not the shelf.** Nothing renders a liquor yet, so a
+  shelf render would show a human nothing and imply everything. `liquor-review.js` draws
+  the ten stops at Bundle 1's geometry and every shelf tea under the stop it resolves to,
+  which is what §9 asks a human to check — **`gold-pale` holds a Fujian white, a Thai
+  Ruby Ruanzhi, a yellow tea and a Yunnan silver bud**, and the hexes are a first pass by
+  a lane that has not drunk these teas.
+
+---
 ## v4.10 — R4 opens: the Home revision (R113 · R114 · R115 · R116)
 Deploy: `steep-dashboard.js`, `styles.css`, `steep-core.js` (APP_VERSION, WHATS_NEW),
 `service-worker.js` (**v120**), **new `fixtures/home-test.js`** + its `.gitignore`

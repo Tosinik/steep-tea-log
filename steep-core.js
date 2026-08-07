@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.10';
+const APP_VERSION = 'v4.11';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Home answers what now: the greeting is the page's own voice with one action beside it, and cards only appear once they have something to say.";
+const WHATS_NEW = "Groundwork only this time — the colours your teas actually brew are now recorded per style, ready for the shelf to start using them.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
