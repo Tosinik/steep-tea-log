@@ -725,3 +725,35 @@ licence to adapt the engine.
    working copy smudged, check green against the wrong representation. Counter: **run the check on
    the thing that travels** — hash the delivered file, not the one you edited; hash the checkout,
    not the blob. (Generalisation owed to the Code lane.)
+10. **A proposed CHECK can be written against the wrong representation, and it passes on the broken
+    build.** Mode 9 is about verifying the wrong *artifact*; this is asserting the wrong
+    *proposition*, one layer further out — the thing being mis-represented is no longer a file but
+    the claim itself. The planning lane specified R123's guard as *"pin that the greeting and the
+    card resolve from the same function and cannot disagree."* They already did resolve from the
+    same function (`sessionsToday`, R117) and disagreed anyway, because the divergence lived in the
+    branch predicate that consumed the answer — so **that check is green on v4.15**, the build it
+    was commissioned to catch. Code caught it before it was written and asserted the property
+    instead: *on a day with sittings the masthead makes no present-tense offer to brew*. Siblings on
+    the record: A3-was-a-proxy (v4.13) and the `sessionsToday(now)` guard that matched its own
+    declaration (v4.10). Counter: **state a check as the property a user would notice, never as the
+    mechanism you believe implements it** — then prove it by *running* the negative control. Three
+    of v4.16's own new checks passed on the broken build until the control was actually run, and one
+    shipped for a while reading `|| true`.
+
+    > **This entry was first filed in the wrong document, and the mistake is worth more than the
+    > entry.** The Code lane searched `R3-RULINGS-LEDGER.md` for the "§8" it had been given, found
+    > the ledger stops at §6, and **took absence from one file as proof the register did not exist**
+    > — then filed the note into `HANDOVER-planning-lane.md` §7, a different lane's earlier list of
+    > five. That is **mode 9 committed while filing an instance of mode 9**, and **mode 5**
+    > (completeness blindness — checking what was in front of it, not the set: one grep of one file,
+    > no sweep for the register). It is also the **second** occurrence of mode 3's exact shape, which
+    > already records *"the hand-off's own citation to a '§6' that does not exist."* Counter, and it
+    > is cheap: **before concluding a cited section is missing, grep the section title across
+    > `docs/`, not the section number inside one file.**
+11. **A section number with no document is not a citation** — and in blame order this comes before
+    10. Recorded by the planning lane about itself: it wrote "§8" six times across two hand-offs and
+    never once named the file, so the Code lane went looking in the document it *was* holding. The
+    looking was correct; the pointer was under-specified. This is mode 3 (phantom references) turned
+    around — not a citation to something that does not exist, but a citation too thin to resolve to
+    the thing that does. Counter: **every cross-reference names its file**, and a reference to
+    another lane's document says which lane owns it.

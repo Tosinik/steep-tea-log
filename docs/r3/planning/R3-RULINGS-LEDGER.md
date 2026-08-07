@@ -1341,6 +1341,18 @@ both are "sandbox the app, look at what comes out" and two documents would drift
 **six** lenses · point `issue-triage` at the queue (**#28** is arguably closed by v4.10 and **#25** by
 the masthead) · extract `fixtures/_sandbox.js`, which touches every suite and must not land mid-slice.
 
+> **Added to that queue 2026-08-07 — the stale service worker, and it explains three unlooked-at
+> deploys.** v4.09, v4.10 and v4.15 each reported "the Browser pane refused localhost". It did not.
+> A service worker registered at **cache v114** was serving **v4.04** — a five-version-old app —
+> from disk, so every local check was looking at a build nobody was shipping. **That is failure mode
+> 9 in the verification step itself**: green against the wrong representation, and the reason R122's
+> four looking-found defects had no fifth. It belongs in `slowcup-deploy`'s verification step as a
+> precondition, not a tip: **unregister every service worker and delete every cache before the first
+> look, then assert the rendered `APP_VERSION` equals the one just bumped** — an assertion, because
+> "the page loaded" is exactly the check that passed for six weeks. The second cause was
+> `.claude/launch.json` pointing at a dead session's scratchpad path; the config needs repointing
+> per session, or the server needs a home that outlives one.
+
 **R121b — the sixth lens: "asserted but never built."** Approved 2026-08-07. Lens 4 catches doc claims
 that went **stale** — true once, false now. R81, R95 and R116 are claims that were **never true**:
 nothing decayed, and three of them lived in **boards**, which lens 4 does not scope. The sixth lens
@@ -1356,6 +1368,20 @@ stretched: the just-now pool ("in the pot already", "a lovely start") is not app
 sitting. **The copy carries no count** — `todaySessions.length` counts *sittings* and R119 makes a cup
 a *steep*, so a numbered line would ship the COUNTED-UNIT item §4 has already filed. Countless copy
 leaves that item intact and filed.
+
+> **AMENDED at the build, 2026-08-07, and the amendment strikes a premise rather than a clause.**
+> This ruling was issued with the instruction *"either `bigDay` renders in the new branch or it
+> goes — a value that can only display inside the branch that excludes its own condition is dead
+> code wearing a feature's name."* **The second half is false, and the "or it goes" it justified
+> would have deleted working shipped copy.** The bucket branch does *not* exclude `bigDay`'s
+> condition: `bigDay` needs ≥2 sittings today, the bucket branch needs ≥1 in the current window, and
+> both hold at once — a two-sitting morning read at 10:00 renders *"Second pour today — a proper tea
+> day."* on v4.15 and still does. What `bigDay` could never reach is **precisely the case R123
+> creates**, which is also the likelier one to be read: a big day is usually seen *after* the
+> brewing, not during it. **It renders in the new branch**, from its own pool's four countless lines;
+> the bucket branch's seven are untouched, two of them carrying the ordinal that is R119's filed
+> item. Struck rather than left standing, per R71: a false premise on the record is what a later
+> round reasons from.
 
 > *Code-lane note, 2026-08-07 (built in v4.16), and it corrects the diagnosis this ruling was issued
 > against.* **None of the three proposed causes was the cause.** R117 shipped as code, not as a
