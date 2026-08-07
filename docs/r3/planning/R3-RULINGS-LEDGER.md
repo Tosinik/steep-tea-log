@@ -1220,6 +1220,13 @@ by every tab, a different register from content.
 > mark, a chip figure, the Wrapped eyebrow). **No clay action has ever existed in this app.** So
 > R113 is not a correction of a misuse — it is **clay's first implementation**, and Insights loses
 > nothing. The owed-back question about the teaser going cold dissolves with it. See R116.
+>
+> **Amended again 2026-08-07, by Niklas: the Wrapped teaser stays exactly as it is.** It was never
+> clay (`#2A4130` jade-deep with an amber arrow), so R113 takes nothing from it, and its warmth is
+> the point on a surface that has none otherwise. **The "cost, accepted deliberately" in this
+> ruling's original text was phantom throughout** — no clay was removed from Insights, because there
+> was none to remove. Struck rather than left standing: a cost on the record that was never paid is
+> the kind of line a later round budgets against.
 
 **R114 — Content bleeds to the edges, on every tab, with no page-in-a-page.** The stack is already
 made of cards, so a card stack inside a card is a page inside a page, and a masthead is the top of a
@@ -1273,6 +1280,54 @@ above it rather than the code. **A locked contract is not implemented until some
 > state, neither identity nor action. The contract holds; it now gets a guard so it keeps holding.
 > **4 · Kachi-iro — built v4.01, guarded** (`focus-test.js` §B, proven by leaking it onto `.pour-saved`).
 > **5 · Washi — never built.** Probation closed on paper by R115; zero code.
+
+**R119 — A CUP IS A STEEP. Ruled by Niklas.** A steep is poured into a cup and drunk, so five steeps
+is five cups. The planning lane argued a cup is a *sitting* and was wrong: that reasons about the
+sitting, not the cup.
+
+**The consequence is a unit collision.** 5a shows two sittings totalling eight steeps while the
+greeting says *"Second pour today"* — under this ruling that is the **eighth** pour. A pour is one
+steep poured, not one time you sat down. So the greeting's counted language is the defect: it means
+*sitting* and should say so. **Not changed in this slice** — it is shipped greeting-engine copy under
+R61, and it gets its own change with the whole copy set in view. Design's derived arc (40 → 42 → 42
+across Friday, 4d at 2) is **sittings**, correctly labelled, and is untouched by this.
+
+> *Code-lane audit, 2026-08-07, ordered with the ruling — and it corrects two of its premises.*
+>
+> **(a) "Your 140th cup." does not exist.** Not in any `.js`, not in the boards. The app has exactly
+> **one** ordinal call site — `d_ordinal(todaySessions.length)`, `steep-dashboard.js:900` — and
+> `d_ordinal` has no other caller anywhere. So the sentence cited as "literally correct" is a phantom,
+> the same shape as R113's phantom cost and R116's phantom contracts. **The ruling stands as a
+> decision; the line justifying it is not in the product.**
+>
+> **(b) Grepping "pour" UNDER-COUNTS the defect.** "pour" appears in **four** copy lines across
+> **two** branches: the already-brewed ack (`…a lovely, unexpected pour.` · `A good pour already
+> behind you.`) and the big-day ack (`${ord} pour today — a proper tea day.` · `A day of many pours…`).
+> Only **one of the four attaches a number**. But the *same pool* also contains
+> **`${ord} steep in — the leaves are well looked-after today.`**, which attaches the **same sitting
+> ordinal to the word "steep"** — under R119 that is the more explicit contradiction, and a "pour"
+> audit would have shipped it. **One ordinal, two mislabelled units, one call site to fix.**
+>
+> **(c) The board makes the same slip.** Rev 2's 5a caption reads *"Mid-afternoon, two cups in."* —
+> two **sittings**, eight steeps. Under R119 that is "eight cups in". Recorded, not edited: banked
+> boards are archival.
+
+**R120 — Clay is suppressed beside a forward suggestion; the tail wins.** Board 5a draws clay on the
+already-brewed-today state. The shipped greeting appends a forward suggestion to the acknowledgement
+("…a proper tea day. Maybe the Dawang Feng this afternoon?"), and R113's redirect rule forbids clay
+beside a later-window suggestion. **Keep what shipped:** a Start-steeping button under that caption
+argues with it — the caption says *later*, the button says *now*. **Dropping the tail to justify a
+button would lose information to gain an affordance**: the tail names which tea and when, the button
+only says that brewing exists. The board is not wrong — it drew a greeting without a tail, and its
+clay is consistent there. The difference is recorded rather than reconciled.
+
+**R121 — Only ONE liquor-swatch geometry is locked.** Bundle 1 defines exactly one: **24×32, radius
+`9px 4px 8px 5px`**. The session state's "3 sizes" is not in that file, and the other two were either
+never drawn or live somewhere nobody has found. Design's derived **15×20 at `6px 3px 5px 3px`** —
+same 3:4 aspect, same asymmetric radius, scaled — is the right derivation and is marked **derived,
+not locked**. This is R116's "described but never built" pattern found in the **design record**
+rather than the code, and the counter is identical: **a lock is not a lock until something points at
+the artifact that holds it.**
 
 **R117 — "Earlier today" is its OWN card, not `recent` rescoped.** Two cards over one table,
 justified by different query, different job, different name: `recent` is the last four sittings, any

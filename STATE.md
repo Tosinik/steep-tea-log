@@ -198,8 +198,18 @@ swatch (next).** R4 keeps no separate status doc: **this file plus the ledger is
   §D is that assertion.
 - **A negative control destroyed the build.** `git checkout -- <file>` restores from the **index**, so
   yesterday's rule is amended: **stage before you break anything.** Rebuilt, controls re-run staged.
+- **R117 Earlier today** (its own card, not `recent` rescoped; boundary shared with the masthead via
+  `sessionsToday()`; leads the stack; no stars; absent until the first cup) · **R118** glance rows open
+  **detail**, fixed on the new card *and* `recent` · **R119** a cup is a steep — the greeting's counted
+  "pour"/"steep" language is a defect **left for its own change** (R61) · **R120** clay stays suppressed
+  beside a forward suggestion · **R121** only one swatch geometry is locked.
+- **The R119 audit corrected two of its own premises:** `"Your 140th cup."` **exists nowhere** (one
+  ordinal call site in the app, `steep-dashboard.js:900`), and grepping "pour" **under-counts** — the
+  same pool attaches the same sitting ordinal to the word **"steep"**, which is the sharper
+  contradiction. One call site, two mislabelled units.
 - **Sixth instance of a check reading its own prose.** Every source `home-test.js` reads is
-  comment-stripped.
+  comment-stripped. **Seventh: E4 matched the function's own declaration** — anchor on the call site,
+  never the definition.
 - **Clay reached one of its two branches, and LOOKING found it.** The masthead has six return paths;
   the first build wired only the bucket suggestion, so a furnished Home on the **rediscovery** branch
   ("waiting 4 weeks — today?") had no committing action. §B's "at most one clay" **passes at zero**;
