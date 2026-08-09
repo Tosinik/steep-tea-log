@@ -1713,6 +1713,47 @@ wrong ledger line.
 > "misinforms but a stale backlog item **commands**" falls (the sentence begins on 126);
 > `STATE.md:138` is the authority-order line.
 
+**R132 — A check that COUNTS is a proxy. State the property.** Minted by the planning lane. Seven
+instances this round: **A3** as a proxy for legibility · **"resolve from the same function"** as a
+proxy for agreement · **a hit count** as a proxy for consistency · **J4's "names any tea"** · **J1
+green with the branch disabled** · **K3 on the reverted anchor** · **J3b as `|| true`**.
+
+The generative claim, which is the part worth having: **these are not produced by carelessness but by
+reaching for rigour.** A proxy is the checkable thing adjacent to the uncheckable one, so it is what
+the hand closes on when the hand is trying hardest. That is why every instance was authored by
+someone who had just learned the lesson.
+
+**FENCE, and it is why R132 is not itself a check.** The property this ruling arrives at — *every
+statement of the authority chain places `CLAUDE.md` between the export tier and the ledger tier* —
+**cannot become a suite assertion.** Satisfying it requires separating statements from prose
+mentions, and `grep` cannot see that difference; enumerating the set mechanically **reinstates the
+count**. It is a **review property under R122**, verified by the looking. Recorded so a future
+session reads the prohibition rather than rediscovering it by writing the fixture.
+
+> *Code-lane note, 2026-08-07 — the baseline is confirmed, and the seven are not one family.*
+>
+> **Confirmed from `1498829`:** `live repo →` returned **four**, one each in `STATE.md`,
+> `R3-STATUS.md`, `R3-IMPLEMENTATION-HANDOFF.md` and `R3-BUILD-PLAN.md`, zero in this ledger, and no
+> prose mentions anywhere. "Confirm five hits" correctly anticipated R131's own statement as the
+> fifth. **It was true when written and false when obeyed** — mode 2 with a one-action fuse.
+>
+> **Three sub-families, and they take different counters — merging them would let "state the
+> property" be read as the fix for all seven, which it is not.**
+> **(a) PROXY** — asserts a correlate of the property: A3, "resolve from the same function", the hit
+> count. Counter: *state the property.* This is R132 proper.
+> **(b) VACUOUS** — cannot fail at all: `J3b` as `|| true`, and v4.10's `sessionsToday(now)` guard
+> matching its own declaration. The assertion has no failing input, so no scenario reaches it.
+> Counter: *prove it can fail* — a check that has never been seen red is not yet a check.
+> **(c) UNEXERCISED** — the property is stated **correctly** and the fixture never reaches the
+> failing condition: **J1** (a morning-only drinker already got no clay, so the scenario never
+> exercised the branch), **K3** (that brew date did not straddle a week boundary), and **J4** (both
+> branches satisfied "names any tea", so the probe did not discriminate). Counter: *run the negative
+> control* — and note that **stating the property does not help here**, because the property was
+> already stated right. J1's counter was a third tea; K3's was a brew instant 49 days back at midday.
+>
+> The generative claim survives the split and arguably sharpens: (a) and (b) come from reaching for
+> rigour, while (c) comes from **stopping at green** — which is the same reach one step short.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

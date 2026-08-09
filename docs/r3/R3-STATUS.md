@@ -806,11 +806,16 @@ licence to adapt the engine.
     **Planning lane.** R131 was issued as "amend `STATE:138`" after grepping three files rather than
     the set, so the pointer named a line number drawn from a subset. That is the **same
     under-specification as "§8"** two turns earlier — a section number with no document, then a line
-    number with no set. **Two instances, both caught by the Code lane, and the pattern is the
-    finding, not either instance:** this lane states a location at the precision it happened to look
-    at, and precision is read as completeness. Counter: **a pointer to a rule states how the set was
-    determined, or it states nothing** — "amend `STATE:138`" and "amend every statement of the
-    authority order" are different instructions, and only the second is checkable.
+    number with no set. **Three instances now**, the third being R132's own: **a COUNT specified as
+    the verification of a fix for under-specification** — "grep `live repo →` and confirm five hits",
+    issued in the instruction correcting an under-specified pointer, and falsified by the act of
+    writing the correction down. Confirmed from `1498829`: the string returned **four** at that
+    commit, all statements, no prose mentions, so the instruction was true when written and false
+    when obeyed. **All three caught by the Code lane, and the pattern is the finding, not any
+    instance:** this lane states a location at the precision it happened to look at, and precision is
+    read as completeness. Counter: **a pointer to a rule states how the set was determined, or it
+    states nothing** — "amend `STATE:138`" and "amend every statement of the authority order" are
+    different instructions, and only the second is checkable.
 
     **Code lane.** The counter written to catch it — *"grep the rule's own text across `docs/`"* —
     **caught three of four**. It missed `R3-BUILD-PLAN.md:14`, whose paragraph is headed "Authority
@@ -834,4 +839,11 @@ licence to adapt the engine.
     a sixth added later either satisfies it or does not, with no number to keep current. This is the
     round's own spine reaching its documentation — **assert the property, not the proxy.** A3 was a
     proxy for legibility, "resolve from the same function" was a proxy for agreement, and a hit count
-    is a proxy for consistency; all three pass while the thing they stand for fails.
+    is a proxy for consistency; all three pass while the thing they stand for fails. Ruled as
+    **R132**, with the fence that the property itself **cannot become a suite assertion** — telling a
+    statement from a prose mention is not something `grep` can do, and enumerating the set
+    mechanically reinstates the count. It is a review property under R122.
+
+    **The prose mentions were deliberately left unreworded**, and that belongs here rather than in a
+    report: rewording them to make the grep return five would **fit the artifact to the instrument**
+    — the same error one layer down, and the one that would have looked most like diligence.
