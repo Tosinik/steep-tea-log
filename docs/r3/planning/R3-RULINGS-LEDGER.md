@@ -1353,6 +1353,17 @@ the masthead) · extract `fixtures/_sandbox.js`, which touches every suite and m
 > `.claude/launch.json` pointing at a dead session's scratchpad path; the config needs repointing
 > per session, or the server needs a home that outlives one.
 
+> **Also added to that queue 2026-08-07 — the RED GATE, and it is the first thing this round that is
+> both mechanical and currently unenforced.** R132's amendment splits check failures into three
+> families and shows two of them fall to one test: **invert the thing under test, require red.**
+> `J3b` stayed green with the code inverted; `J1` stayed green with the branch disabled. Nothing in
+> the ritual requires that test today — negative controls have been run by habit, well, and only
+> because a build lane chose to. **Whether it becomes a `verifier` check or stays a build-time
+> habit is a decision for the reconciliation, and should be made there rather than drifting in.**
+> Two things to weigh when it is: the gate is cheap and catches (b) and (c) outright, but it
+> **cannot** reach (a) — a proxy passes it convincingly (see R132) — so adopting it must not be
+> recorded as closing the class. **Not acted on now.**
+
 **R121b — the sixth lens: "asserted but never built."** Approved 2026-08-07. Lens 4 catches doc claims
 that went **stale** — true once, false now. R81, R95 and R116 are claims that were **never true**:
 nothing decayed, and three of them lived in **boards**, which lens 4 does not scope. The sixth lens
@@ -1723,6 +1734,45 @@ reaching for rigour.** A proxy is the checkable thing adjacent to the uncheckabl
 the hand closes on when the hand is trying hardest. That is why every instance was authored by
 someone who had just learned the lesson.
 
+> **AMENDED at the build, 2026-08-07 — the split is the Code lane's and belongs IN the ruling, not
+> beneath it.** Left as a note, this ruling reads "state the property" as a universal remedy, and the
+> third family below proves it is not: **J1 and K3 asserted exactly the right property and were
+> repaired by changing the FIXTURE, never the assertion.**
+>
+> **Three families, and the split does not fall where the repair does.**
+>
+> | family | diagnostic | repair site |
+> |---|---|---|
+> | **vacuous** — cannot fail at all | never seen red | the **assertion** |
+> | **unexercised** — right property, fixture never reaches the failing condition | never seen red | the **fixture** |
+> | **proxy** — measures a correlate | **goes red correctly and is still wrong** | the **assertion** |
+>
+> **Vacuous and unexercised share one gate: invert the thing under test, require red.** `J3b` stayed
+> green with the code inverted; **J1** stayed green with the branch disabled — the same observation
+> twice. Only the repair differs afterwards: `J3b` needed deleting (`|| true`), **J1** needed a third
+> tea and **K3** a brew instant 49 days back at midday, both fixture work against a correct assertion.
+>
+> **A proxy survives that gate.** Break what A3 *measures* and A3 reddens obediently; it is still the
+> wrong measurement. Disable the shared writer and "resolve from the same function" reddens
+> correctly, while a greeting and a card that both call it can still disagree. **The negative control
+> is the instrument a proxy defeats, because a proxy is a real check of a real thing.**
+>
+> *Code lane's addition, and it explains recurrence better than "no gate holds it":* a proxy does not
+> merely survive the red gate — **it passes convincingly, so it accumulates confidence rather than
+> suspicion.** The gate requires the tester to choose what to invert, and a proxy makes that choice
+> look obvious: at v4.12 anyone negative-controlling A3 would have un-lifted a dark stop, the thing
+> A3 names, and seen red. The inversion that would have exposed it — moving two stops *together*
+> while keeping both lifted — is only visible to someone who already knows the property. **The gate
+> certifies the proxy.**
+>
+> **So R132 lands on the division the round already has.** The red gate is **mechanical** and belongs
+> to the verifier; the proxy question is **judgement** and belongs to the looking, per R122. That is
+> why (a) recurred seven times while (b) and (c) are closable — **no gate can hold (a)**, which is the
+> same reason R122 refused a review subagent.
+>
+> Both halves of the generative claim stand: **proxy and vacuous come from reaching for rigour;
+> unexercised comes from stopping at green — the same reach, one step short.**
+
 **FENCE, and it is why R132 is not itself a check.** The property this ruling arrives at — *every
 statement of the authority chain places `CLAUDE.md` between the export tier and the ledger tier* —
 **cannot become a suite assertion.** Satisfying it requires separating statements from prose
@@ -1730,29 +1780,18 @@ mentions, and `grep` cannot see that difference; enumerating the set mechanicall
 count**. It is a **review property under R122**, verified by the looking. Recorded so a future
 session reads the prohibition rather than rediscovering it by writing the fixture.
 
-> *Code-lane note, 2026-08-07 — the baseline is confirmed, and the seven are not one family.*
+> *Code-lane note, 2026-08-07 — the baseline, confirmed.* At `1498829` the string `live repo →`
+> returned **four**, one each in `STATE.md`, `R3-STATUS.md`, `R3-IMPLEMENTATION-HANDOFF.md` and
+> `R3-BUILD-PLAN.md`, zero in this ledger, and **no prose mentions anywhere**. "Confirm five hits"
+> correctly anticipated R131's own statement as the fifth. **It was true when written and false when
+> obeyed** — mode 2 with a one-action fuse. The family membership of the seven instances is in the
+> amendment above, where it binds.
 >
-> **Confirmed from `1498829`:** `live repo →` returned **four**, one each in `STATE.md`,
-> `R3-STATUS.md`, `R3-IMPLEMENTATION-HANDOFF.md` and `R3-BUILD-PLAN.md`, zero in this ledger, and no
-> prose mentions anywhere. "Confirm five hits" correctly anticipated R131's own statement as the
-> fifth. **It was true when written and false when obeyed** — mode 2 with a one-action fuse.
->
-> **Three sub-families, and they take different counters — merging them would let "state the
-> property" be read as the fix for all seven, which it is not.**
-> **(a) PROXY** — asserts a correlate of the property: A3, "resolve from the same function", the hit
-> count. Counter: *state the property.* This is R132 proper.
-> **(b) VACUOUS** — cannot fail at all: `J3b` as `|| true`, and v4.10's `sessionsToday(now)` guard
-> matching its own declaration. The assertion has no failing input, so no scenario reaches it.
-> Counter: *prove it can fail* — a check that has never been seen red is not yet a check.
-> **(c) UNEXERCISED** — the property is stated **correctly** and the fixture never reaches the
-> failing condition: **J1** (a morning-only drinker already got no clay, so the scenario never
-> exercised the branch), **K3** (that brew date did not straddle a week boundary), and **J4** (both
-> branches satisfied "names any tea", so the probe did not discriminate). Counter: *run the negative
-> control* — and note that **stating the property does not help here**, because the property was
-> already stated right. J1's counter was a third tea; K3's was a brew instant 49 days back at midday.
->
-> The generative claim survives the split and arguably sharpens: (a) and (b) come from reaching for
-> rigour, while (c) comes from **stopping at green** — which is the same reach one step short.
+> Where each of the seven falls, for the record: **proxy** — A3, "resolve from the same function",
+> the hit count. **Vacuous** — `J3b` as `|| true`, and v4.10's `sessionsToday(now)` guard matching
+> its own declaration. **Unexercised** — `J1` (a morning-only drinker already got no clay, so the
+> scenario never reached the branch), `K3` (that brew date did not straddle a week boundary), `J4`
+> (both branches satisfied "names any tea", so the probe did not discriminate).
 
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
