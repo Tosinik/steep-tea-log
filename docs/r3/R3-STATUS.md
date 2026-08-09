@@ -847,3 +847,19 @@ licence to adapt the engine.
     **The prose mentions were deliberately left unreworded**, and that belongs here rather than in a
     report: rewording them to make the grep return five would **fit the artifact to the instrument**
     — the same error one layer down, and the one that would have looked most like diligence.
+15. **A deploy entry documents its FIRST commit, and the house pattern is one deploy / TWO.** v4.10
+    shipped as two commits — `751fabd` (masthead, clay, the present tense) and `430083b` (R117/R118:
+    Earlier today as its own card, glance rows opening detail, **and the Edit-layout bar moving below
+    the stack**). Both carry `CACHE_NAME steep-tea-log-v120`, so both are v4.10. **v4.10's CHANGELOG
+    entry never mentions the edit-bar move** — which is the fix closing GitHub issue #28, pinned by
+    `home-test.js` E11, a check written for exactly that complaint.
+
+    **The cost was paid this turn.** Triaging #28, an agent reading commit *position* rather than
+    `CACHE_NAME` concluded the fix "shipped inside v4.11's cache bump" as a separate
+    "CHANGELOG-underdocumented commit", and reported #28 as **not** closed by v4.10 — contradicting a
+    correct planning-lane hypothesis. The version was recoverable in one command
+    (`git show 430083b:service-worker.js` → v120); the reason it was reachable *only* by that command
+    is the entry under-documenting its own deploy. Counter: **the write-up covers the whole deploy,
+    not the commit being written up.** CLAUDE.md step 2 already says this for the `Deploy:` file list
+    (build it from `git diff --name-only <remote>..HEAD`); the bullets need the same rule, because a
+    second commit is where the second half of a version's behaviour lives.
