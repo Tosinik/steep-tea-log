@@ -11,10 +11,12 @@ and land alongside this document.
 > (R113–R122) and the queue (§4) — enough for a round of two items, and one fewer document to drift.
 > **Do not start a third.** If R5 ever needs a slice table of its own, write `docs/r5/`'s, not this.
 
-**Authority position.** This is a *plan*, the lowest tier in the round's order: live repo →
-the current export, stamped (R67) → `planning/R3-RULINGS-LEDGER.md` → `R3-STATUS.md` → the boards → this. It
-sequences work; it rules nothing. Where it disagrees with any of those, they win and this gets
-corrected.
+**Authority position — amended by R131.** This is a *plan*, the lowest tier in the round's order:
+live repo → the current export, stamped (R67) → **`CLAUDE.md` standing rules** →
+`planning/R3-RULINGS-LEDGER.md` → `R3-STATUS.md` → the boards → this. It sequences work; it rules
+nothing. Where it disagrees with any of those, they win and this gets corrected. **`CLAUDE.md` sits
+above the ledger because it holds standing rules a ruling must *satisfy*, not rulings themselves —
+R125 contradicted `CLAUDE.md:129` while that file was in no tier at all.**
 
 **Why it is in the repo.** The hand-off drifted twice as a chat attachment. A plan relayed as a
 completion summary would drift the same way — and §1's findings are the reasoning behind the

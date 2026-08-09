@@ -1673,13 +1673,42 @@ wrong ledger line.
 
 > *Code-lane note, 2026-08-07 — the amendment was under-specified in the same shape as the "§8"
 > citation, and both were caught the same way.* R131 says "amend `STATE:138`". **The authority order
-> is stated in three places, not one**: `STATE.md:138`, `docs/r3/R3-STATUS.md:18` (marked "binding"),
-> and `docs/r3/R3-IMPLEMENTATION-HANDOFF.md:36` (also "binding", and the only copy that names each
-> document by path). Amending one would have left two copies of the superseded order in documents
-> that call themselves binding — mode 2 with a three-day fuse instead of an instant one. **All three
-> are amended identically.** Counter, generalising item 11's: **before amending a rule stated in a
-> document, grep the rule's own text across `docs/` — a rule worth ranking is usually written down
-> more than once.** The three citations this ruling rests on were each verified against `1498829`
+> is stated in ~~three places~~ FOUR, not one**: `STATE.md:138`, `docs/r3/R3-STATUS.md:18` (marked
+> "binding"), `docs/r3/R3-IMPLEMENTATION-HANDOFF.md:36` (also "binding", and the only copy that names
+> each document by path), and **`docs/r3/R3-BUILD-PLAN.md:14`**, which heads its paragraph
+> "Authority **position**" and ends its chain "→ this" rather than "nobody's memory". Amending one
+> would have left three copies of the superseded order, two in documents that call themselves
+> binding — mode 2 with a three-day fuse instead of an instant one. **All four are amended
+> identically**, and with this ruling's own statement that is **five** occurrences of `live repo →`.
+>
+> **The counter is amended, and the amendment is the better entry.** It first read *"grep the rule's
+> own text across `docs/`"* — which **caught three and lost one**, because the grep went after what
+> the rule is *called*. Every label varies: "Authority order (binding)", "Authority order, binding",
+> "Authority position". So does the tail: three chains end "nobody's memory", the fourth ends "this",
+> and `nobody's memory` was the string actually grepped. **Only `live repo →` is invariant.**
+> **Corrected counter: grep the CONTENT, not the label** — the invariant substring of the thing
+> itself, never the heading that introduces it or the tail that closes it. **This is mode 9 nested
+> inside the fix for mode 5, in the same commit**: a sweep checked against the wrong representation
+> of the very rule it was sweeping for. Same family as the `\n`-versus-CRLF hash mismatch and the
+> `grep -o` over a page that inlines its own stylesheet.
+>
+> **The verification instruction broke itself, twice, and that is the finding — not the count.** It
+> was issued as "grep `live repo →` and confirm five hits". After this commit that string returns
+> **nine**: five statements plus four prose mentions written by the entries recording the rule.
+> Re-keyed to the longer `live repo → the current export`, it returned **seven** — because these
+> entries then quoted *that*. **Documenting an invariant destroys its uniqueness, and each attempt to
+> fix the count by lengthening the string is invalidated by writing the fix down.**
+>
+> **So the check is not a count.** The property is: **every statement of the authority chain places
+> `CLAUDE.md` between the export tier and the ledger tier.** Verified that way — five statements,
+> five satisfying it, in `STATE.md`, `R3-STATUS.md`, `R3-IMPLEMENTATION-HANDOFF.md`,
+> `R3-BUILD-PLAN.md` and this ledger — and a sixth statement added later either satisfies it or does
+> not, with no number to keep current. This is the session's own spine arriving at its documentation:
+> **assert the property, not the proxy.** A3 was a proxy for legibility; "resolve from the same
+> function" was a proxy for agreement; a hit count is a proxy for consistency, and all three pass
+> while the thing they stand for fails.
+>
+> The three citations this ruling rests on were each verified against `1498829`
 > first: `CLAUDE.md:129` is "one coherent change per version" exactly; `CLAUDE.md:127` is where
 > "misinforms but a stale backlog item **commands**" falls (the sentence begins on 126);
 > `STATE.md:138` is the authority-order line.

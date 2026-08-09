@@ -799,3 +799,39 @@ licence to adapt the engine.
     walked straight through it. Second counter, from R131's limit: **where the higher tier is silent,
     the lower tier is the record, not the error** — mode 8's "correct downward" would here have
     rewritten STATE and the roadmap to match a wrong ledger line.
+14. **A pointer given from a subset, twice — and the sweep that fixed it swept for the wrong
+    string.** Two lanes, one shape, and the planning lane's share comes first because it originates
+    each instance.
+
+    **Planning lane.** R131 was issued as "amend `STATE:138`" after grepping three files rather than
+    the set, so the pointer named a line number drawn from a subset. That is the **same
+    under-specification as "§8"** two turns earlier — a section number with no document, then a line
+    number with no set. **Two instances, both caught by the Code lane, and the pattern is the
+    finding, not either instance:** this lane states a location at the precision it happened to look
+    at, and precision is read as completeness. Counter: **a pointer to a rule states how the set was
+    determined, or it states nothing** — "amend `STATE:138`" and "amend every statement of the
+    authority order" are different instructions, and only the second is checkable.
+
+    **Code lane.** The counter written to catch it — *"grep the rule's own text across `docs/`"* —
+    **caught three of four**. It missed `R3-BUILD-PLAN.md:14`, whose paragraph is headed "Authority
+    **position**" and whose chain closes "→ this" instead of "nobody's memory", which was the string
+    actually grepped. Every label varies and so does every tail; **only `live repo →` is invariant**.
+    **Mode 9 nested inside the fix for mode 5, in the same commit** — a sweep run against the wrong
+    representation of the rule it was sweeping for. Same family as the `\n`-versus-CRLF hash
+    mismatch and the `grep -o` over a page that inlines its own stylesheet. Corrected counter:
+    **grep the CONTENT, not the label** — the invariant substring of the thing itself, never the
+    heading that introduces it nor the tail that closes it.
+
+    **Third layer, and it is the one to keep: the verification instruction broke itself, twice.** It
+    was issued as "grep `live repo →` and confirm five hits". After this commit that string returns
+    **nine** — five statements plus four prose mentions written by these very entries. Re-keyed to
+    the longer `live repo → the current export`, it returned **seven**, because the entries then
+    quoted that. **Documenting an invariant destroys its uniqueness, and every attempt to repair the
+    count by lengthening the string is invalidated by writing the repair down.**
+
+    **So the check is not a count.** The property is: **every statement of the authority chain places
+    `CLAUDE.md` between the export tier and the ledger tier.** Five statements, five satisfying it;
+    a sixth added later either satisfies it or does not, with no number to keep current. This is the
+    round's own spine reaching its documentation — **assert the property, not the proxy.** A3 was a
+    proxy for legibility, "resolve from the same function" was a proxy for agreement, and a hit count
+    is a proxy for consistency; all three pass while the thing they stand for fails.
