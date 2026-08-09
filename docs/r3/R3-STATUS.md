@@ -757,3 +757,14 @@ licence to adapt the engine.
     around — not a citation to something that does not exist, but a citation too thin to resolve to
     the thing that does. Counter: **every cross-reference names its file**, and a reference to
     another lane's document says which lane owns it.
+12. **A count written into the same edit that changes it** — mode 2 (honest-and-stale) at its
+    shortest possible range, and it happened *on a line about failure modes*. Filing items 10 and 11
+    above, the Code lane wrote a pointer in `HANDOVER-planning-lane.md` saying the register "holds
+    ten" while the edit adding **two** items was still in flight. Stale on save, not by send time —
+    mode 2 normally needs days and a re-send; this needed neither. Same edit as item 10's mis-filing,
+    a second and different mode from one action, which is the part worth keeping: **one careless step
+    does not produce one failure.** Counter, and it is why the pointer now states no count at all:
+    **a document that is not the register does not restate the register's size** — cross-references
+    carry a name and a path, never a tally. Where a count must be printed, derive it (`greeting-v4`'s
+    section labels now compute from `passed` for exactly this reason, after the same trap caught
+    `liquor-review.js` and this suite's own hand-typed totals).

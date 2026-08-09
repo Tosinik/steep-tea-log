@@ -1536,6 +1536,103 @@ behavioural, and the suite labels which half is which. Same family as R104's sta
 > `git checkout`, never through shell backups** — a scripted restore whose source is a path that
 > might already exist is not a restore.
 
+**R124 — Tier 3 is decided by a predicate, not by a site.** `swatchAttr` gains one argument answering
+one question: **is a type label rendered in this row?** Where the answer is yes, tier 3 renders the
+unfilled plate; where no, it keeps the type tint. This does not break the single writer. `swatchAttr`
+already takes a per-site first argument (`base`) and has never been parameterless — "one writer"
+means one function owns the write path, not that the function is constant. There is no site
+whitelist to maintain and no exemption list, because the rule is evaluated per call from a fact about
+the row.
+
+The reasoning is Design's and survives restatement: a tint at tier 3 is honest — it asserts a family,
+and the app knows the family. What it cannot be, beside a pill that already reads "Oolong", is
+non-redundant. **The objection is redundancy in the identity slot, not dishonesty.**
+
+**R125 — The predicate reaches three of four call sites; only the shelf ships in v4.17.** Verified
+against `c799aa3`: `refMetaLine` is `[t.family, t.roast, …]` and renders "oolong · medium · 4 entries"
+directly under `.ref-swatch`; the social row's meta is `[fmtDate, typeLabel(s.teaType), …]` and
+renders "5 Aug · Oolong · gongfu" beside `.social-tile`. Both are adjacent type labels and both are
+therefore redundant under R124. `.today-tint`'s row is time · swatch · name · steep count and carries
+**no type label** — it keeps the tint permanently, by the rule rather than by exemption.
+
+`.ref-swatch` and `.social-tile` are filed with R124 attached and land on their own version once
+someone has looked at them rendered. **A rule discovered mid-slice does not reshape two live surfaces
+in the same deploy.** One tension recorded for that work: `.social-tile` already renders script inside
+the swatch span, so suppressing its tint turns it into a plate holding a glyph — the shape R129
+removes from the shelf. That is a question, not a decision.
+
+**R126 — The tier distinction is carried by border STYLE, not by fill.** Measured swatches take a
+**solid** hairline; plates take a **dashed** one. Dashed reads as incomplete without a legend and
+survives a fill nobody can see.
+
+Why it is structural rather than a retune: `liquor-test.js` A3b sets `GROUND_MIN` at 18 and `ivory`
+sits at **19.2** from `--white` in light, in the suite's own lum units — a margin of **1.2**. A3b's
+own comment says it is a collapse detector that "does not prove any pair is comfortable" and that
+`ivory` was "flagged rather than certified" because nobody had looked at it rendered. Design looked,
+and a filled Ya Bao against an empty plate was one object. **A distinction resting on 1.2 was resting
+on nothing.** Border style removes fill from the load path entirely. Watch it hardest in dark, where
+fill separation was already tightest.
+
+Correction attached, because the finding arrived with a wrong number: Design measured against
+`#F5F0E3`, which is **not** the ground. The card is `.shelf-card{background:var(--white)}` =
+`#FFFEFB`. The finding stands; the measurement was replaced from source.
+
+**R127 — Board grounds are repo tokens. `#F5F0E3` is retired.** It appears on **21 of 23** `.dc.html`
+boards and **zero** times in `styles.css`, `index.html`, or any `steep-*.js`. It sits roughly **14
+units below** `#FFFEFB`, so every by-eye light-mode contrast judgement made on any R3 board was made
+against a ground **darker than ships** — systematically flattering the pale end, which is where the
+ramp's tightest stops live. Carrying it is a review finding on any board from here. **This is not a
+retouch order: superseded boards stay as record.**
+
+**R128 — Look at renders to FIND things; read `styles.css` to MEASURE them.** Design's own
+formulation, adopted verbatim. It is the working division under R122: the looking is not automatable
+and finds what checks decline to certify, but **a value that enters a ruling comes from the file,
+never from a render.**
+
+Its second half, filed by Design as **F17** and binding on every lane: **don't add a value you
+haven't read; don't delete one you haven't checked.** Deletion is an assertion about the source in
+the opposite direction, and **it wears caution as a disguise**, which is why it survives review where
+an addition would not. The instance: 芽苞 and 白茶 were withdrawn as invented and both are in the
+catalog's `aka`.
+
+**R129 — No per-tea script on the shelf row.** New this turn; **minted by the planning lane, not by
+Code**, and flagged as such. The reference room and the social tile keep theirs. The shelf row drops
+it.
+
+`refScript` returns whichever CJK name sits **first in a row's `aka` array**. Gui Fei carries both
+蜜香烏龍 and 貴妃烏龍; what renders is array position, not a fact. Across the 13 scripted rows only 6
+are character-set-distinguishable and those 6 split **3 traditional** (蜜香烏龍 · 東方美人 · 軟枝) ·
+**3 simplified** (大红袍 · 黄芽 · 鸭屎香), with **7 neutral** — so the mixing is not a gap better data
+would close. The shelf shows 21 teas being **scanned**; the reference room and the social tile show
+one tea being **looked at**, where a name in its own script is the subject. **Reversible on Niklas's
+word** — he reads the script and it is his shelf.
+
+> *Code-lane verification note, 2026-08-07. Every checkable claim in R124–R129 was run against
+> `c799aa3` before this commit, because a wrong number entering the binding reference is what R126's
+> own attached correction is about. All verified; two readings pinned so a later session doesn't
+> re-derive them wrongly.*
+>
+> **R125 — exact.** `refMetaLine` (`steep-reference.js:53`) is
+> `[t.family, t.roast, members||leaf_shape]`, rendered at `:123` as `.ref-meta` under `.ref-swatch`.
+> The social meta (`steep-social.js:211`) is
+> `[fmtDate(s.date), typeLabel(s.teaType), sessionMethodLabel(s), vessel]`. `.today-tint`'s row
+> (`steep-dashboard.js:1137`) is `today-time · swatch · today-name · today-steeps` — no type label.
+> **R127 — exact.** 23 `.dc.html` boards are tracked and **21** contain `#F5F0E3`; it appears **zero**
+> times across `styles.css`, `index.html` and every `steep-*.js`. `.shelf-card` (`styles.css:286`) is
+> `background:var(--white)`, and `--white` is `#FFFEFB` (`:19`). In the suite's lum units `#F5F0E3`
+> measures **13.9 below** `#FFFEFB` — the ruling's "roughly 14".
+> **R126 — exact.** `GROUND_MIN` is 18; `ivory` `#F2EBD4` measures **19.17** from `#FFFEFB`, a margin
+> of **1.17**.
+> **R128 — exact.** `芽苞` is `ya-bao-yunnan.aka[0]`; `白茶` is `fujian-white.aka[1]`. Both shipped.
+> **R129 — exact, on the reading that "13 scripted rows" means the covered SHELF rows.** Pinned
+> because the catalog reading gives a different number and someone will grep it: **all 55 catalog
+> rows carry a CJK `aka`**, so `refScript` returns a script for every row. Scoped to Niklas's shelf,
+> **13 of 21 teas** resolve through `matchTeaType` to a scripted row, and those 13 are exactly the
+> ruling's set — the three traditional and three simplified examples are all among them, and the
+> remaining **7** rows are neutral (`煎茶` twice, `白茶`, `新茶`, `冠茶`, `阿里山高山茶`, `芽苞`).
+> Gui Fei's two candidates confirmed: `refScript` (`steep-reference.js:18`) returns the first `aka`
+> entry matching its CJK/kana range, so `蜜香烏龍` wins on position alone.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
