@@ -219,11 +219,29 @@ while the masthead told him to go and have a tea. Fifth defect this round found 
   boundary falls inside the day (control now reddens `6/7/7`). `J3b` deleted — it read `|| true`.
 - **The planning lane's proposed check would have passed on v4.15**; the suite asserts the
   **property** instead. Section counts are **derived from `passed`**, not written.
-- **NEXT: v4.17 — slice 3, the picker (R39).** Does **not** start until the S3 ruling lands (F2's
-  name-vs-type mechanism and the tier-3 default cell both sit inside it). Carried into it: F1's
-  containment guard, F4's stale §7 hexes, F5's self-falsifying header, F6's secondary-path statement,
-  and three accepted deviations. **Do not touch `liquor-test.js` or `swatchAttr` before S3.**
-  **28 suites green** (greeting-v4 62 → 72).
+- **PUSHED.** `origin/main` is `2eaba73`; slowcup.app serves `APP_VERSION v4.16` / `CACHE_NAME v126`,
+  verified at the origin rather than from the tracking ref.
+- **NEXT: v4.17 — slice 3, the picker (R39). THE GATE IS OPEN.** ~~Does not start until the S3 ruling
+  lands~~ — **S3 landed as R124–R129** (2026-08-07), so `swatchAttr` and `liquor-test.js` are in
+  scope again. **R124** puts tier 3 behind a *predicate* (is a type label in this row?), not a site
+  list; **R125** reaches three of four call sites but **only the shelf**, and the shelf is **v4.18**,
+  after slice 3 *and* Design's dark redraw — amended from a delivered "v4.17", which would have put
+  two R4 items in one version. `.ref-swatch` and `.social-tile` are filed behind it; `.today-tint`
+  keeps its tint permanently, by the rule not by exemption. **R129 drops per-tea script from the
+  shelf row** (`refScript` returns array position, not a fact). **R126** carries the tier distinction
+  in border *style* — solid hairline for measured, dashed for plates — because `ivory`'s 1.17 margin
+  over `GROUND_MIN` was never load-bearing. **R127 retires `#F5F0E3`**: 21 of 23 boards use it, zero
+  app files do, and it sits 13.9 below the real ground, so every by-eye pale-end judgement on an R3
+  board was flattered. **R128** — look at renders to find, read `styles.css` to measure.
+- **`/slowcup-deploy dry` RUNS FIRST, before any file is touched.** It was owed at v4.16 and missed;
+  slice 3 edits `swatchAttr`, which is the whole reason for the step 0/1 ordering constraint.
+- **Stale-SW precondition before any visual check** (R122's queue): unregister every worker, delete
+  every cache, then **assert** the rendered `APP_VERSION` equals the bump. Three deploys reported
+  "the Browser pane refused localhost" while a worker at cache v114 served v4.04 from disk.
+- Carried into slice 3: F1's containment guard (`submitTeaForm` silently drops `liquor`), F2's
+  name-vs-type mechanism, F4's stale §7 dark hexes, F5's self-falsifying `liquor-review.js` header,
+  F6's stated-not-discovered secondary path, three accepted deviations, and **R121's scale-the-lock
+  method for any new geometry**. **28 suites green** (greeting-v4 62 → 72).
 
 **Previously — v4.15: the swatch becomes visible** (cache **v125**, APP_VERSION v4.15,
 **no SQL** — `v3_12` shipped with v4.14). Slice 2 of 3. **The first time a liquor renders anywhere**,

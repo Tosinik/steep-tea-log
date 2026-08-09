@@ -1548,7 +1548,17 @@ The reasoning is Design's and survives restatement: a tint at tier 3 is honest �
 and the app knows the family. What it cannot be, beside a pill that already reads "Oolong", is
 non-redundant. **The objection is redundancy in the identity slot, not dishonesty.**
 
-**R125 — The predicate reaches three of four call sites; only the shelf ships in v4.17.** Verified
+**R125 — The predicate reaches three of four call sites; only the shelf ships in ~~v4.17~~ v4.18.**
+
+> **AMENDED by the planning lane, 2026-08-07, struck per R71 rather than rewritten — and the error is
+> a sequencing ruling that broke sequencing.** The original text said the shelf ships in **v4.17**.
+> **v4.17 is slice 3, the picker** — the Q5 sequencing this lane itself ruled — so as written this
+> ruling put two R4 items in one version, against the rule it has spent the round enforcing.
+> **The shelf lands on its own version, v4.18, after slice 3 and after Design's dark redraw.** Ref and
+> social stay filed behind it. **The predicate reaching three sites is unaffected — only the version
+> was wrong.**
+
+Verified
 against `c799aa3`: `refMetaLine` is `[t.family, t.roast, …]` and renders "oolong · medium · 4 entries"
 directly under `.ref-swatch`; the social row's meta is `[fmtDate, typeLabel(s.teaType), …]` and
 renders "5 Aug · Oolong · gongfu" beside `.social-tile`. Both are adjacent type labels and both are
