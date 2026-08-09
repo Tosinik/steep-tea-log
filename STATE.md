@@ -135,8 +135,12 @@ parked → R3; the held #15 vocab expansion stays out until phase-2. New bugs/id
 
 **R3 status (building — slice B shipped v3.96):** **read `docs/r3/R3-STATUS.md` FIRST.** It is the round's
 durable state document and outranks this paragraph on
-every R3 detail (authority order: live repo → the current export, stamped → rulings ledger → R3-STATUS → boards →
-nobody's memory). It records the commit hashes itself.
+every R3 detail (authority order, **amended by R131**: live repo → the current export, stamped →
+**`CLAUDE.md` standing rules** → rulings ledger → R3-STATUS → boards → nobody's memory). `CLAUDE.md`
+joins above the ledger because it holds standing rules a ruling must *satisfy*, not rulings — R125
+contradicted `CLAUDE.md:129` and no ordering check could fire, because the rule sat outside the
+order. **The order settles which document is authoritative, not which is right:** where the higher
+tier is *silent*, the lower tier is the record, not the error. It records the commit hashes itself.
 The **binding reference** for the #09b sweep + Code hand-off is
 **`docs/r3/planning/R3-RULINGS-LEDGER.md`**, **contiguous and verified unbroken from a fresh clone**,
 with `DATA-region-coordinates.md` the Origins coordinate source (8/8, CLOSED). The build order is

@@ -14,9 +14,14 @@ natural milestone via Code. If this document and anyone's memory disagree, this 
 and if this document and the live repo/export disagree, the repo/export win and this document
 gets corrected.
 
-**Authority order (binding):** live repo → the current export, stamped → rulings ledger →
-this status doc → boards (visual reference) → nobody's memory. *(R67 — the tier names no date: one
-that does becomes wrong the next time a cup is brewed, and did.)*
+**Authority order (binding), amended by R131:** live repo → the current export, stamped →
+**`CLAUDE.md` standing rules** → rulings ledger → this status doc → boards (visual reference) →
+nobody's memory. *(R67 — the tier names no date: one that does becomes wrong the next time a cup is
+brewed, and did.)* **R131 — `CLAUDE.md` sits above the ledger because it holds standing rules a
+ruling must *satisfy*, not rulings; R125 contradicted `CLAUDE.md:129` ("one coherent change per
+version") and no ordering check could fire, because the rule was outside the order. The order settles
+which document is AUTHORITATIVE, not which is RIGHT — where the higher tier is silent, the lower tier
+is the record, not the error.**
 
 ---
 
@@ -768,27 +773,29 @@ licence to adapt the engine.
     carry a name and a path, never a tally. Where a count must be printed, derive it (`greeting-v4`'s
     section labels now compute from `passed` for exactly this reason, after the same trap caught
     `liquor-review.js` and this suite's own hand-typed totals).
-13. **A ruling that mandated sequencing broke the sequencing decision** — planning lane, about
-    itself. R125 as delivered said the shelf swatch ships in **v4.17**. v4.17 is **slice 3, the
-    picker** (the Q5 sequencing this lane ruled), so the ruling put two R4 items in one version
-    against the one-coherent-change-per-version rule it had spent the round enforcing. Amended in
-    place to **v4.18**, struck per R71. Mode 5 — checking the ruling in front of me, not the set.
+13. **A ruling contradicted a standing rule in a document the authority order does not rank** —
+    planning lane, about itself. R125 as delivered shipped the shelf swatch in **v4.17**, which is
+    slice 3, the picker: two R4 items in one version, against **`CLAUDE.md:129`** — *"one coherent
+    change per version"* — the rule this lane had spent the round enforcing. Amended to **v4.18**,
+    struck per R71; the sequencing is now **R130** and the order itself **R131**.
 
-    > **Two corrections from the Code lane, made before this entry was written, and the second is
-    > the structural half.** The instruction to file this cited *"the sequencing ruling three numbers
-    > earlier in the same file"*. **It does not resolve.** R122 is the review-harness ruling, and
-    > `v4.17` appears exactly once in the whole ledger — inside R125 itself. **The sequencing decision
-    > has no ledger number at all**; it lives only at `STATE.md:222` and `ROADMAP-v4.md:88`. Writing
-    > the citation as given would have been mode 3 inside an entry about mode 5.
-    >
-    > **And that absence is the likelier cause than inattention.** A ruling written straight into the
-    > ledger had **nothing at its own tier to check itself against** — the decision it contradicted
-    > sat two tiers down, in documents the ledger outranks. **This is mode 8's inverse and the limit
-    > of its counter:** "when two tiers disagree, the higher tier wins and the lower gets corrected"
-    > would here have propagated the error *downward*, rewriting STATE and the roadmap to match a
-    > wrong ledger line. **The tier rule settles which document is authoritative, not which one is
-    > right**, and it has nothing to say when the higher tier never recorded the decision. Counter:
-    > **a decision that constrains later rulings gets a ledger number when it is made**, not a line
-    > in the hand-off — otherwise it is unciteable at the only tier that binds. The Q5 sequencing is
-    > owed one; the Code lane has not minted it (R129's precedent: the planning lane mints, and says
-    > when it does).
+    **Not inattention.** Nothing at the ledger's own tier existed to check the ruling against — the
+    version assignment lived at `STATE.md:222` and `ROADMAP-v4.md:88`, two tiers *below* the ledger
+    — and **the rule it actually broke sat outside the ordering altogether**, since `CLAUDE.md` was
+    in no tier of the authority order despite being the first thing a fresh session reads. A rule
+    with no tier cannot be checked by an ordering rule. R131 puts `CLAUDE.md` above the ledger for
+    exactly this, and `CLAUDE.md:127` — *a stale figure misinforms, a stale backlog item commands* —
+    is the second reason it belongs there.
+
+    **Filed with the phantom citation this lane then used to explain it.** The instruction to write
+    this entry cited *"the sequencing ruling three numbers earlier in the same file"*. It does not
+    resolve: R122 is the review-harness ruling, and `v4.17` occurred exactly once in the ledger —
+    inside R125 itself. **Mode 3 inside an entry about mode 5**, caught by the Code lane pre-commit.
+    The error and the explanation of the error failed the same way, one turn apart, which is the
+    part worth keeping.
+
+    Counter, from the Code lane and adopted: **a decision that constrains later rulings gets a ledger
+    number when it is made.** Q5's sequencing went unnumbered for four turns and a later ruling
+    walked straight through it. Second counter, from R131's limit: **where the higher tier is silent,
+    the lower tier is the record, not the error** — mode 8's "correct downward" would here have
+    rewritten STATE and the roadmap to match a wrong ledger line.

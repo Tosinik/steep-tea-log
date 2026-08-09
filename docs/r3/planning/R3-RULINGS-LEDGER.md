@@ -1643,6 +1643,47 @@ word** — he reads the script and it is his shelf.
 > Gui Fei's two candidates confirmed: `refScript` (`steep-reference.js:18`) returns the first `aka`
 > entry matching its CJK/kana range, so `蜜香烏龍` wins on position alone.
 
+**R130 — The version sequencing of R4's remaining work is a RULING.** Minted by the planning lane,
+not by Code, and said so. **v4.16** the greeting (shipped) · **v4.17** slice 3, the picker (R39) ·
+**v4.18** the shelf — R124's predicate at the shelf call site, R126's hairlines, R129's script
+removal · **ref and social are filed behind v4.18, unversioned** until someone has looked at them
+rendered. **One coherent change per version, per `CLAUDE.md:129`.** R125's amended heading is correct
+as struck.
+
+Recorded with it, as the Code lane's counter: **a decision that constrains later rulings gets a
+ledger number when it is made.** Q5's sequencing went unnumbered for four turns and a later ruling
+walked straight through it.
+
+**R131 — The authority order settles which document is AUTHORITATIVE, not which one is RIGHT.** It is
+silent in two cases, and **both produced R125**: when the higher tier never recorded the decision at
+all, and when the rule lives outside the order entirely.
+
+**`CLAUDE.md` joins the order, above the ledger.** It holds **standing rules that rulings must
+satisfy**, not rulings themselves — which is why a ruling could contradict one and no ordering check
+could fire. The amended order:
+
+> live repo → the current export, stamped → **`CLAUDE.md` standing rules** → rulings ledger →
+> `R3-STATUS` → boards → nobody's memory
+
+**The limit stated plainly, because it is the part that would have caused damage:** when a lower tier
+disagrees with a higher one, **correcting downward is right only if the higher tier's claim was
+checked.** Where the higher tier is **silent**, the lower tier is the **record**, not the error.
+Applied naively here, mode 8's counter would have rewritten `STATE.md` and the roadmap to match a
+wrong ledger line.
+
+> *Code-lane note, 2026-08-07 — the amendment was under-specified in the same shape as the "§8"
+> citation, and both were caught the same way.* R131 says "amend `STATE:138`". **The authority order
+> is stated in three places, not one**: `STATE.md:138`, `docs/r3/R3-STATUS.md:18` (marked "binding"),
+> and `docs/r3/R3-IMPLEMENTATION-HANDOFF.md:36` (also "binding", and the only copy that names each
+> document by path). Amending one would have left two copies of the superseded order in documents
+> that call themselves binding — mode 2 with a three-day fuse instead of an instant one. **All three
+> are amended identically.** Counter, generalising item 11's: **before amending a rule stated in a
+> document, grep the rule's own text across `docs/` — a rule worth ranking is usually written down
+> more than once.** The three citations this ruling rests on were each verified against `1498829`
+> first: `CLAUDE.md:129` is "one coherent change per version" exactly; `CLAUDE.md:127` is where
+> "misinforms but a stale backlog item **commands**" falls (the sentence begins on 126);
+> `STATE.md:138` is the authority-order line.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

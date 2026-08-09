@@ -32,10 +32,15 @@ an archival record like `docs/r3/boards/`.
   lights what `commitSession` will store); **R73** requires `/\r?\n/` for line-based source scanning.
   Live state and the two contracts a later slice must not break: `R3-STATUS.md` §5.
 
-**Authority order, binding:** live repo → the current export, stamped (R67) → `docs/r3/planning/R3-RULINGS-LEDGER.md`
-→ `docs/r3/R3-STATUS.md` → the boards → nobody's memory. Boards are visual authority, the engine is
-behavioural authority, the ledger is rulings authority. **A conflict between them is a finding, not
-a thing to resolve quietly.**
+**Authority order, binding — amended by R131:** live repo → the current export, stamped (R67) →
+**`CLAUDE.md` standing rules** → `docs/r3/planning/R3-RULINGS-LEDGER.md` → `docs/r3/R3-STATUS.md` →
+the boards → nobody's memory. Boards are visual authority, the engine is behavioural authority, the
+ledger is rulings authority, and **`CLAUDE.md` is standing-rule authority — rules a ruling must
+satisfy, not rulings themselves.** It sits above the ledger because R125 contradicted
+`CLAUDE.md:129` and no ordering check could fire while the rule was outside the order. **A conflict
+between them is a finding, not a thing to resolve quietly** — and the order settles which document
+is AUTHORITATIVE, not which is RIGHT: where the higher tier is *silent*, the lower tier is the
+record, not the error.
 
 **Standing instruction: challenge, don't absorb.** Every catch this round has been worth making, on
 all three lanes including the planning lane. Judgment-calls section in every ship report. Flag
