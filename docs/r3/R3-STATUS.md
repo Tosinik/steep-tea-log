@@ -863,8 +863,7 @@ licence to adapt the engine.
     not the commit being written up.** CLAUDE.md step 2 already says this for the `Deploy:` file list
     (build it from `git diff --name-only <remote>..HEAD`); the bullets need the same rule, because a
     second commit is where the second half of a version's behaviour lives.
-16. **A gap asserted from a truncated view** — planning lane, about itself, and the third instance of
-    this lane's under-specification family. The audit brief named "#07's Account / Appearance / Theme
+16. **A conclusion drawn from a truncated view.** The audit brief named "#07's Account / Appearance / Theme
     / Accent block" as a silently-unbuilt candidate. Verified in `steep-settings.js`: **Theme
     (`:235`), Currency (`:223–229`), Sign out (`:12`), Export backup (`:9`), Import (`:10`) and
     Diagnostics (`:44`) all ship.** Wrong on four of five — **only the Accent row is absent.** The
@@ -875,9 +874,23 @@ licence to adapt the engine.
     > **The Code lane reproduced it one turn later, verifying it, with a different instrument.** The
     > first check for those rows was `grep … steep-settings.js | head -12` — which returned twelve
     > lines and stopped at `:136`, so `:223` and `:235` never appeared and the correction briefly
-    > looked wrong. **A truncated screenshot and a truncated pipe are the same failure.** Counter:
-    > **when a check's output could have been cut, prove it wasn't** — the file is 262 lines and the
-    > `head` was 12; either drop the limit or state the coverage.
+    > looked wrong. **A truncated screenshot and a truncated pipe are the same failure.**
+
+    **The counter is not "don't truncate"** — truncation is how anything readable gets read. It is:
+    **a count or an absence is never taken from a truncated view. Presence survives truncation;
+    absence and totals do not.** Seeing a row proves it exists; not seeing one proves nothing until
+    the view is known to be whole.
+
+    > *Third instance moved out, and the mechanism is why.* This entry was to gain R134's wrong
+    > "four call sites" as a third instrument (`head -10` on a seven-site grep). **It does not
+    > reproduce:** `grep -rn "syncAchievements(" steep-*.js` yields **8** lines (7 calls + the
+    > declaration), and no `head` limit of 10 truncates 8. What yields **exactly four** is the
+    > narrower pattern **`syncAchievements(true)`** — `steep-sessions.js:216`, `:328`, `:1627`,
+    > `steep-teas.js:708`. That is a *label* variant, not a truncation, so it belongs to item 17 and
+    > is filed there. Recorded rather than silently re-filed: **filing it here would have taught the
+    > wrong counter** — "don't take a count from a truncated view" would not have prevented it, and
+    > "grep the content, not the label" would. If the planning lane did in fact truncate, move it
+    > back; the evidence only shows which command reproduces the number.
 17. **Grepping the LABEL, case-sensitively — and nearly filing "the register does not exist."** Code
     lane. Lens 5 requires checking DESIGN.md's accepted-nuances register; the sweep grepped
     `accepted nuance`, matched nothing, and came within one keystroke of reporting a phantom finding
@@ -890,3 +903,15 @@ licence to adapt the engine.
     grep** (item 14), its **retired function names**, and the **"Authority position"** heading that
     hid the fourth copy of the authority order. Four instruments — a subset, a name, a heading, a
     letter case — and one failure: **matching how a thing is written rather than what it says.**
+
+    **Fifth instrument, added 2026-08-07 and the most instructive: an argument value.** R134 was
+    issued saying `syncAchievements` "fires from four call sites". It fires from **seven**.
+    `syncAchievements(` returns 8 lines (7 calls + the declaration); **`syncAchievements(true)`
+    returns exactly four** — `steep-sessions.js:216`, `:328`, `:1627`, `steep-teas.js:708`. The
+    narrower pattern matched the *animate-true* variant, and the four it found were a **coherent,
+    plausible set** — three session paths and the tea form — which is why the count read as
+    complete rather than partial. **That is R132's proxy shape inside a grep**: the wrong pattern
+    did not fail, it succeeded on something adjacent and returned a believable answer. It landed
+    **inside the ruling batch that also commissioned item 16**, one turn after item 14. Counter,
+    unchanged and now five times earned: **match what the thing says, not how it is written** — and
+    when a count is load-bearing, run the widest pattern that can be wrong.

@@ -1800,13 +1800,44 @@ session reads the prohibition rather than rediscovering it by writing the fixtur
 > scenario never reached the branch), `K3` (that brew date did not straddle a week boundary), `J4`
 > (both branches satisfied "names any tea", so the probe did not discriminate).
 
-> **R133 — NOT ISSUED. Recorded so the gap is a fact rather than a hunt.** The rulings issued
-> 2026-08-07 ran R132 then R134; no R133 exists in this file or anywhere in `docs/`. Flagged by the
-> Code lane because **`STATE.md:145` asserts this ledger is "contiguous and verified unbroken from a
-> fresh clone"** — a claim a numbering gap falsifies, and the next session to check it would go
-> looking for a lost ruling. **The number is left unclaimed for the planning lane** to either mint or
-> confirm as skipped (R129's precedent: the planning lane mints, and says when it does). Not minted
-> here.
+**R133 — The Insights Wrapped teaser is warmth by GROUND, not by SLAB.** Design's ruling 5b,
+ratified. The teaser becomes the warmest card on Insights via a **flat honeyed paper with a warm
+border**, a **link-arrow rather than a slab button**, and the season mark **夏** for an identity no
+stat card carries.
+
+The reasoning is the shelf's argument reused correctly: **clay is not a hue under quarantine, it is
+a treatment** — fill *plus* the pressed-slab inset shadow. So warmth is available to a card that must
+not read as committing. **Insights holds no committing action at all**, and reflection is not a thing
+one commits to; the teaser must read as **a door, not a button**. 5a (the clay slab, #08 as drawn) is
+the alternative that made Ruling 6 necessary. 5c (typographic, one warm rule) was rejected as too
+quiet — it reads as another divider, and **Wrapped's whole job is to not**.
+
+> *Recovered, not minted — Code-lane note, 2026-08-07.* This ruling was issued two turns before it
+> reached the file; the triage and audit work overtook the prompt carrying it. The Code lane flagged
+> the resulting **R132 → R134 gap** because `STATE.md:145` asserts this ledger is "contiguous and
+> verified unbroken from a fresh clone", left the number **unclaimed rather than minting it**
+> (R129's precedent), and the planning lane then supplied the missing text. **Contiguity restored:
+> R132 → R133 → R134.** Worth keeping as the case where a checked property caught a *lost* ruling
+> rather than a wrong one — the same check would have read a genuine skip identically, which is why
+> the number was not filled in locally.
+
+> **Attached as RECORDED, not as rulings — both verified at HEAD before filing.**
+>
+> **F23's stated defect is not in shipped code.** The brewing-clock paints
+> `isPeak ? 'var(--amber)' : 'var(--jade)'` — **`steep-dashboard.js:221–223`**, not
+> `steep-insights.js`, because the shared card registry builds both surfaces from `dashCards()`; grep
+> the dashboard file, not the room the card renders in. **Clay never touches an Insights chart and
+> there is none to remove.** One `clay` token does live in `steep-insights.js`, at `:441` —
+> `.wrap-eyebrow-clay`, a Wrapped eyebrow, which is one of the seven decorative uses R116's audit
+> already enumerated, not a chart. **The live question is whether `--amber` as chart ink borrows the
+> state colour, and that is Design's.**
+>
+> **F24 has one writer.** `steep-insights.js:202` renders `Your ${w.season.name}, wrapped`, and
+> `w.season.name` is `WRAP_MONTHS_EN[d.getMonth()]` (`:238`, set in `monthOf` at `:240`) — a **month**,
+> under R103's last-complete-month window. Both surfaces render the same card. The disagreement is
+> **a variable named `season` holding a month**: naming residue, to clear when Wrapped is next
+> touched. Same disposition as `streakCardHTML` (audit A6) — renamed when the file is open, never on
+> its own.
 
 **R134 — Achievements are DELETED, not dormant.** `ACHIEVEMENTS_ENABLED = false`
 (`steep-core.js:120`) has held the scrapped v3.72 system in place while `DEFAULT_SETTINGS` still

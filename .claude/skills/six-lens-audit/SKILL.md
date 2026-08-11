@@ -10,6 +10,13 @@ disable-model-invocation: true
 > five-lens file kept saying five, and the R121b audit had to run six by following the ruling instead
 > of the instrument. **A stale instrument decides what gets looked at before anything is read** —
 > the same fault that had `issue-triage` bucketing a `swatchAttr` change as copy-only.
+>
+> **If `/six-lens-audit` does not resolve, the session predates the rename — restart, don't
+> re-create.** A `.claude/skills/` change is picked up at session start, so in the session that made
+> it neither name is invocable: `/five-lens-audit` is gone and `/six-lens-audit` is not yet loaded.
+> The file on disk is correct. Written here because that absence is exactly §8 item 16's shape — **a
+> conclusion drawn from a view that cannot show presence yet** — and the wrong conclusion ("the skill
+> is missing") costs a rebuild of something that already exists.
 
 This is the audit that ran before v3.83 and produced the four audit riders (v3.83), the
 capability-regression bundle (issue #23), and the docs reconciliation commit. Run it after
