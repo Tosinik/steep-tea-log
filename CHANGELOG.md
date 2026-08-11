@@ -5,7 +5,7 @@
 
 Newest first. "Deploy" = files to push to GitHub Pages. SQL = run once in the Supabase SQL editor.
 
-## Module map (current — refreshed at the v3.83 docs pass)
+## Module map (current — refreshed at the v4.16 audit; previously v3.83)
 Plain scripts sharing one global scope (not ES modules), loaded in this order by
 `index.html` (the `<script>` list there is authoritative). The v3 split was originally a
 mechanical cut of `app.js`; it has drifted far since — the old "concatenating reproduces
@@ -15,6 +15,9 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 2. `steep-data.js` — Supabase client, `loadKey`/`saveKey`, mappers, per-row CRUD, offline
    write queue (`window.SteepDB`).
 3. `steep-knowledge.js` — curated tea KB (`kbResolve`, `KB_STYLES`, flavour vocab/families).
+3b. `steep-tea-types.js` — the 55-row reference catalog (v3.87) + `matchTeaType`/`resolveTeaType`/
+   `TT_INHERIT`, and the liquor cascade `LIQUOR_KEYS`/`isLiquorKey`/`liquorFor` (v4.14). Data +
+   resolvers only; no rendering. *(Absent from this map until the v4.16 audit — finding A3.)*
 4. `steep-core.js` — constants, `state`, settings/persist helpers, small utils, image
    upload, the pixel logo, `render()`, WS6 shell (bottom bar + avatar hub), `goView`,
    `bindDynamic`, brew-guide parser + leaf-form logic, achievements engine (dormant).
@@ -29,7 +32,11 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 8b. `steep-reference.js` — Go Deeper (v3.96): the browsable catalog surface over
    `steep-tea-types.js`. Read-only by contract — it never writes.
 9. `steep-shopping.js` — shopping list + suggestions.
-10. `steep-passport.js` — origin→country matching + passport view (rendering PARKED).
+9b. `steep-origins-map.js` — the generated Origins map asset (v4.07/v4.08): country outlines +
+   projected region pins, drawn to the frame ruling (R110). Loads before `steep-passport.js`, which
+   renders it. *(Absent from this map until the v4.16 audit — finding A3.)*
+10. `steep-passport.js` — origin→country matching + the Origins view (`viewOrigins`; the old
+   dot-map `viewPassport` was deleted in v4.07).
 11. `steep-social.js` — friends/feed/profile/follow.
 12. `steep-sessions.js` — sessions calendar, vessels, session-edit modal, session flow
     (setup/steeping/finish/quick), timer + WS4 capture, tags, `commitSession`.

@@ -61,6 +61,13 @@ placeholder, never written as a value. Every consumer already falls back to capa
 (`navigator.wakeLock.request('screen')`, PWA-compatible, iOS ≥16.4). Hold the lock **only while
 a steep timer runs**; re-acquire on `visibilitychange`; fail silent. Design invention, ratified.
 
+> **~~ratified~~ RATIFIED-BUT-UNBUILT, marked 2026-08-07 by the R121b audit (finding A1), struck per
+> R71 rather than rewritten.** `wakeLock` has **zero occurrences in any `.js`**. This ruling has read
+> as shipped for the whole of R3 and R4, and the cost is visible: the **#07 Settings board draws
+> "Keep screen awake while steeping · only while a steep timer runs (R7)" as a live toggle beside
+> rows marked `shipped ✓`** — the board was not inventing, it was reading this ledger. GitHub
+> **issue #33** is the user asking for the capability the ledger says exists. See **R138**.
+
 **R8 — "N following" on Settings deep-links to the Friends view** (`friends` is a persisted
 view) and renders only when Social exists.
 
@@ -1792,6 +1799,66 @@ session reads the prohibition rather than rediscovering it by writing the fixtur
 > its own declaration. **Unexercised** — `J1` (a morning-only drinker already got no clay, so the
 > scenario never reached the branch), `K3` (that brew date did not straddle a week boundary), `J4`
 > (both branches satisfied "names any tea", so the probe did not discriminate).
+
+> **R133 — NOT ISSUED. Recorded so the gap is a fact rather than a hunt.** The rulings issued
+> 2026-08-07 ran R132 then R134; no R133 exists in this file or anywhere in `docs/`. Flagged by the
+> Code lane because **`STATE.md:145` asserts this ledger is "contiguous and verified unbroken from a
+> fresh clone"** — a claim a numbering gap falsifies, and the next session to check it would go
+> looking for a lost ruling. **The number is left unclaimed for the planning lane** to either mint or
+> confirm as skipped (R129's precedent: the planning lane mints, and says when it does). Not minted
+> here.
+
+**R134 — Achievements are DELETED, not dormant.** `ACHIEVEMENTS_ENABLED = false`
+(`steep-core.js:120`) has held the scrapped v3.72 system in place while `DEFAULT_SETTINGS` still
+carries `showAchievements` and `quietMode` (`:121`) and `syncAchievements` still fires on every
+session commit. **Report the removal cost before doing it** — whether the two settings keys drop
+cleanly or whether stored `user_settings` rows make it a migration. **#8 is then: delete the
+achievements state · add the Accent row · decide section order. Not an overhaul.**
+
+> *Code-lane note — one figure corrected before this was filed.* The ruling was issued saying
+> `syncAchievements` "fires from four call sites on every session commit". It is **seven**, and only
+> one of them is a session commit: `steep-core.js:202` and `:237` (boot/refresh),
+> `steep-sessions.js:216`, `:328` and `:1627` (only `:1627` is `commitSession`),
+> `steep-settings.js:158`, `steep-teas.js:708`. The declaration is `steep-dashboard.js:310`. The
+> removal cost is therefore ~2× the ruling's estimate in call sites and touches four modules, not
+> one — which is precisely why R134 asks for the cost before the deletion.
+
+**R135 — Matcha is a tea, not a method; it gets a steepless path.** The data already knows
+(`steep-tea-types.js:44`; `steep-knowledge.js:32` carries `first: 0` and `note: 'whisked, not
+steeped'` — both verified at HEAD); the session flow does not. **Matcha latte is explicitly OUT of
+this ruling** and goes back to Niklas as a product question — it is a recipe, not a preparation of
+leaf.
+
+**R136 — #32 splits into two.** **Vacation mode** narrows to suppressing "running low" on Home;
+**freshness keeps running, because tea ages regardless.** **Guest tea** — logging a cup you don't
+own, at a tea house or someone's table — is a schema question on `tea_id` and its own issue. Open
+them separately; **the second one is the substantial one.**
+
+**R137 — #34 and #35 are ONE SLICE, and it goes ahead of slice 3.** There is no `pushState`,
+`popstate` or `history.` anywhere in the app — verified at HEAD, the only two `history.` matches are
+prose comments ending in the word — so the back gesture exits because nothing ever pushed a state.
+And `state.sessionDraft` is memory-only. **Together: swipe back mid-session, the app exits, the
+sitting is gone.** Neither is gated on v4.17 or v4.18, and **it is the only thing in the queue that
+loses work permanently.**
+
+**Sequencing, ruled 2026-08-07: #34/#35 first, then #30/#33, both ahead of slice 3.** The audit's A1
+is right that the wake-lock bundle is cleaner and readier; it still goes second, because #34/#35
+loses work permanently and R7's absence loses nobody anything — the screen dims. **Cleanliness orders
+equals; consequence orders these.**
+
+**R138 — A ruling can assert a state the repo does not have, and the REPO WINS.** Issued from the
+R121b audit's finding A1. R7 is fully specified, ratified, and `wakeLock` has zero occurrences in any
+`.js`. The #07 Settings board then drew it as a live toggle beside rows marked `shipped ✓` — **the
+board was not inventing, it was reading the ledger.**
+
+**A ruling claiming a shipped state is worse than a board drawing one, because boards are checked
+against code and rulings are not.** R116 found three visual contracts believed-built; this is the
+same failure one tier up, in the document that outranks the boards. R7 is amended in place above.
+
+> **SEVENTH LENS, recorded as a CANDIDATE and deliberately not run yet:** sweep every ruling that
+> asserts a shipped capability and demand its artifact — the inverse of R121b's lens 6, which demands
+> an artifact for a *contract*. R7 is unlikely to be alone. Not run now; queued so it is scoped
+> rather than improvised mid-audit.
 
 ### Also recorded (not rulings) — the frame ruling (map still held)
 

@@ -863,3 +863,30 @@ licence to adapt the engine.
     not the commit being written up.** CLAUDE.md step 2 already says this for the `Deploy:` file list
     (build it from `git diff --name-only <remote>..HEAD`); the bullets need the same rule, because a
     second commit is where the second half of a version's behaviour lives.
+16. **A gap asserted from a truncated view** — planning lane, about itself, and the third instance of
+    this lane's under-specification family. The audit brief named "#07's Account / Appearance / Theme
+    / Accent block" as a silently-unbuilt candidate. Verified in `steep-settings.js`: **Theme
+    (`:235`), Currency (`:223–229`), Sign out (`:12`), Export backup (`:9`), Import (`:10`) and
+    Diagnostics (`:44`) all ship.** Wrong on four of five — **only the Accent row is absent.** The
+    claim was built from Niklas's screenshot, which was cut off mid-screen, and the GitHub issue's
+    screenshot shows the same screen scrolled further. Same shape as the subset grep (item 14) and
+    the retired function names: **a view that ends is read as a set that ends.**
+
+    > **The Code lane reproduced it one turn later, verifying it, with a different instrument.** The
+    > first check for those rows was `grep … steep-settings.js | head -12` — which returned twelve
+    > lines and stopped at `:136`, so `:223` and `:235` never appeared and the correction briefly
+    > looked wrong. **A truncated screenshot and a truncated pipe are the same failure.** Counter:
+    > **when a check's output could have been cut, prove it wasn't** — the file is 262 lines and the
+    > `head` was 12; either drop the limit or state the coverage.
+17. **Grepping the LABEL, case-sensitively — and nearly filing "the register does not exist."** Code
+    lane. Lens 5 requires checking DESIGN.md's accepted-nuances register; the sweep grepped
+    `accepted nuance`, matched nothing, and came within one keystroke of reporting a phantom finding
+    **inside the lens that exists to catch phantoms**. The register is at `DESIGN.md:86`, headed
+    *"Accepted nuances"* — capital A.
+
+    **This is R128's counter one step further down, and it is the third instance of one lesson.**
+    R128 says grep the content, not the label; case is itself a label variant. Named alongside its
+    siblings, because the pattern is worth more than any instance: the planning lane's **subset
+    grep** (item 14), its **retired function names**, and the **"Authority position"** heading that
+    hid the fourth copy of the authority order. Four instruments — a subset, a name, a heading, a
+    letter case — and one failure: **matching how a thing is written rather than what it says.**
