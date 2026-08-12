@@ -887,10 +887,12 @@ licence to adapt the engine.
     > declaration), and no `head` limit of 10 truncates 8. What yields **exactly four** is the
     > narrower pattern **`syncAchievements(true)`** — `steep-sessions.js:216`, `:328`, `:1627`,
     > `steep-teas.js:708`. That is a *label* variant, not a truncation, so it belongs to item 17 and
-    > is filed there. Recorded rather than silently re-filed: **filing it here would have taught the
-    > wrong counter** — "don't take a count from a truncated view" would not have prevented it, and
-    > "grep the content, not the label" would. If the planning lane did in fact truncate, move it
-    > back; the evidence only shows which command reproduces the number.
+    > **is permanently filed there** — confirmed 2026-08-07 by the planning lane: *"head -10 on eight
+    > lines truncates nothing; `syncAchievements(true)` returns exactly four, and that is what my
+    > sentence counted."* Filing it here would have taught the wrong counter — "don't take a count
+    > from a truncated view" would not have prevented it, and "grep the content, not the label"
+    > would. **This entry has two instruments, not three.** How the third came to be attributed here
+    > at all is its own entry, item 18.
 17. **Grepping the LABEL, case-sensitively — and nearly filing "the register does not exist."** Code
     lane. Lens 5 requires checking DESIGN.md's accepted-nuances register; the sweep grepped
     `accepted nuance`, matched nothing, and came within one keystroke of reporting a phantom finding
@@ -904,6 +906,31 @@ licence to adapt the engine.
     hid the fourth copy of the authority order. Four instruments — a subset, a name, a heading, a
     letter case — and one failure: **matching how a thing is written rather than what it says.**
 
+18. **A correction accepted without rechecking, then a cause invented to explain an error that had
+    not occurred.** Planning lane, about itself, and **the first entry in this register pointing
+    inward.** Sequence: R134 was issued saying `syncAchievements` fires from "four call sites on
+    every session commit". The Code lane reported **seven**. The correction was accepted — correctly
+    — but **the original was never re-run**, and a plausible mechanism was then invented for the
+    error: *"`head -10` on a seven-site grep."* That mechanism is impossible; `head -10` truncates
+    neither seven lines nor eight. **No truncation had occurred.** The real cause was a narrower
+    pattern, `syncAchievements(true)`, which returns exactly four — the celebratory variant, and
+    exactly what the sentence had counted. **Four was right for what was grepped; seven is the
+    removal cost.**
+
+    The invented cause was then **filed as a lesson** (as item 16's third instrument) and
+    **propagated into a ruling's supporting text**, where it would have taught a counter that could
+    not have prevented anything. Caught by the Code lane on the re-file, not by the lane that wrote
+    it.
+
+    **This is mode 1 — confident invention — turned inward**: invention about one's own reasoning
+    rather than about the world, which is the harder direction to catch because the subject cannot
+    be re-read, only re-run. **The mechanism worth recording is why the correction went in
+    unchecked: it was offered confidently by a lane with a good record.** A correct correction is not
+    evidence that the account of the original error is also correct — they are two claims, and only
+    one of them was verified. Counter: **when accepting a correction, re-run the original.** The
+    corrected value and the story of how it went wrong are separate findings; accepting the first
+    does not license the second.
+
     **Fifth instrument, added 2026-08-07 and the most instructive: an argument value.** R134 was
     issued saying `syncAchievements` "fires from four call sites". It fires from **seven**.
     `syncAchievements(` returns 8 lines (7 calls + the declaration); **`syncAchievements(true)`
@@ -915,3 +942,14 @@ licence to adapt the engine.
     **inside the ruling batch that also commissioned item 16**, one turn after item 14. Counter,
     unchanged and now five times earned: **match what the thing says, not how it is written** — and
     when a count is load-bearing, run the widest pattern that can be wrong.
+
+    **Sixth instrument, and the best in the set: a LINE BREAK.** Verifying that this register's own
+    skill-header note existed, the Code lane grepped `restart, don't re-create` and got **zero** —
+    then nearly reported the note missing. It is there; `don't` ends one line and `re-create` begins
+    the next, so no single-line pattern can match it. `re-create` alone returns 1. **A formatting
+    variant**, after a subset, a name, a heading, a letter case and an argument value — and it
+    arrived **inside the verification of the entry cataloguing exactly that**. It is the best
+    instance because nothing about the target changed: same file, same words, same session, same
+    lane, and the pattern still failed on how the text happened to wrap. Counter, sharpened by it:
+    **a multi-word pattern assumes a line break that may not be there** — grep the shortest
+    distinctive token, or read the region.

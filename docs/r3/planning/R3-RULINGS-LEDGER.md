@@ -1841,18 +1841,25 @@ quiet — it reads as another divider, and **Wrapped's whole job is to not**.
 
 **R134 — Achievements are DELETED, not dormant.** `ACHIEVEMENTS_ENABLED = false`
 (`steep-core.js:120`) has held the scrapped v3.72 system in place while `DEFAULT_SETTINGS` still
-carries `showAchievements` and `quietMode` (`:121`) and `syncAchievements` still fires on every
-session commit. **Report the removal cost before doing it** — whether the two settings keys drop
+carries `showAchievements` and `quietMode` (`:121`) and `syncAchievements` still fires from ~~four
+places on every session commit~~ **seven call sites across four modules — only one of which is a
+session commit** (corrected 2026-08-07; see the code-lane note below and §8 item 18). **Report the removal cost before doing it** — whether the two settings keys drop
 cleanly or whether stored `user_settings` rows make it a migration. **#8 is then: delete the
 achievements state · add the Accent row · decide section order. Not an overhaul.**
 
-> *Code-lane note — one figure corrected before this was filed.* The ruling was issued saying
-> `syncAchievements` "fires from four call sites on every session commit". It is **seven**, and only
-> one of them is a session commit: `steep-core.js:202` and `:237` (boot/refresh),
-> `steep-sessions.js:216`, `:328` and `:1627` (only `:1627` is `commitSession`),
-> `steep-settings.js:158`, `steep-teas.js:708`. The declaration is `steep-dashboard.js:310`. The
-> removal cost is therefore ~2× the ruling's estimate in call sites and touches four modules, not
-> one — which is precisely why R134 asks for the cost before the deletion.
+> *Code-lane note — the figure corrected, and then the correction's own account corrected.*
+> **Seven call sites, four modules, one session commit:** `steep-core.js:202` and `:237`
+> (boot/refresh), `steep-sessions.js:216`, `:328`, `:1627` (**only `:1627` is `commitSession`**),
+> `steep-settings.js:158` (Settings), `steep-teas.js:708` (**the tea form**). Declaration at
+> `steep-dashboard.js:310`. **So the dormant system reaches two modules with nothing to do with
+> sessions at all**, and the removal cost is ~2× the ruling's estimate — which is why R134 asks for
+> the cost before the deletion. The estimate stands corrected; the ruling stands.
+>
+> **Four was not a miscount — it was a different question.** `syncAchievements(true)` returns exactly
+> four (`sessions:216`, `:328`, `:1627`, `teas:708`): the celebratory variant. The wrong pattern did
+> not fail, it answered something adjacent and plausibly. **The account of how that happened was
+> itself invented afterwards and is filed as §8 item 18** — the register's first entry about
+> reasoning turned inward rather than about the world.
 
 **R135 — Matcha is a tea, not a method; it gets a steepless path.** The data already knows
 (`steep-tea-types.js:44`; `steep-knowledge.js:32` carries `first: 0` and `note: 'whisked, not
