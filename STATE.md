@@ -225,18 +225,26 @@ while the masthead told him to go and have a tea. Fifth defect this round found 
   **property** instead. Section counts are **derived from `passed`**, not written.
 - **PUSHED.** `origin/main` is `2eaba73`; slowcup.app serves `APP_VERSION v4.16` / `CACHE_NAME v126`,
   verified at the origin rather than from the tracking ref.
-- **NEXT: v4.17 — slice 3, the picker (R39). THE GATE IS OPEN.** ~~Does not start until the S3 ruling
-  lands~~ — **S3 landed as R124–R129** (2026-08-07), so `swatchAttr` and `liquor-test.js` are in
-  scope again. **R124** puts tier 3 behind a *predicate* (is a type label in this row?), not a site
-  list; **R125** reaches three of four call sites but **only the shelf**, and the shelf is **v4.18**,
-  after slice 3 *and* Design's dark redraw — amended from a delivered "v4.17", which would have put
-  two R4 items in one version. `.ref-swatch` and `.social-tile` are filed behind it; `.today-tint`
-  keeps its tint permanently, by the rule not by exemption. **R129 drops per-tea script from the
-  shelf row** (`refScript` returns array position, not a fact). **R126** carries the tier distinction
-  in border *style* — solid hairline for measured, dashed for plates — because `ivory`'s 1.17 margin
-  over `GROUND_MIN` was never load-bearing. **R127 retires `#F5F0E3`**: 21 of 23 boards use it, zero
-  app files do, and it sits 13.9 below the real ground, so every by-eye pale-end judgement on an R3
-  board was flattered. **R128** — look at renders to find, read `styles.css` to measure.
+- **NEXT: v4.17 — #34/#35, the draft-loss slice (R137). THE GATE IS OPEN.** ~~v4.17 — slice 3, the
+  picker~~ — **renumbered by R141**: the picker is now **v4.19**. The R4 ladder is **v4.17** #34/#35
+  (back-gesture exits the app + session draft is memory-only → swipe back mid-sitting loses the cup;
+  **the only queue item that loses a user's work permanently**) · **v4.18** #30/#33 (wake-lock
+  bundle, R7) · **v4.19** slice 3 the picker (R39) · **v4.20** the shelf. `/slowcup-deploy dry` runs
+  first, before any file. **v4.17 mechanics, ruled:** draft persists via `saveDraft`/`loadDraft`/
+  `clearDraft` in `steep-data.js` beside `saveQueue` (R139); the inline photo is stripped on persist
+  and the app says so once, at restore (R139); restore is silent (R140); history rides `saveView`
+  not `goView` — `goVessels`/`goFriends` bypass `goView` (R140); `popstate` plan comes back for
+  review before it is built.
+- **SLICE 3 (picker) is now v4.19, and its S3 rulings still stand** — `swatchAttr` and
+  `liquor-test.js` stay untouched until it opens. **R124** puts tier 3 behind a *predicate* (is a type
+  label in this row?), not a site list; **R125** reaches three of four call sites but **only the
+  shelf**, which is **v4.20** (renumbered twice — R125's heading records both), after slice 3 *and*
+  Design's dark redraw. `.ref-swatch`/`.social-tile` filed behind v4.20; `.today-tint` keeps its tint
+  permanently, by the rule not by exemption. **R129** drops per-tea script from the shelf row
+  (`refScript` returns array position, not a fact). **R126** carries the tier distinction in border
+  *style* — solid hairline for measured, dashed for plates — because `ivory`'s 1.17 margin over
+  `GROUND_MIN` was never load-bearing. **R127 retires `#F5F0E3`**: 21 of 23 boards use it, zero app
+  files do, 13.9 below the real ground. **R128** — look at renders to find, read `styles.css` to measure.
 - **`/slowcup-deploy dry` RUNS FIRST, before any file is touched.** It was owed at v4.16 and missed;
   slice 3 edits `swatchAttr`, which is the whole reason for the step 0/1 ordering constraint.
 - **Stale-SW precondition before any visual check** (R122's queue): unregister every worker, delete

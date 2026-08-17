@@ -83,12 +83,15 @@ decisions rather than any single ruling:
   a correction inside a forthcoming S3 ruling~~ — **S3 LANDED 2026-08-07 as R124–R129.** The
   deferral was premature, not wrong: with no liquor data the swatch would have been a six-colour type
   tint (R78's type-tint-for-now), and that premise expired when the data landed.
-- **Slice 3 (the picker) is v4.17 and is UNBLOCKED** — the S3 gate was R124/R125 and both are in the
-  ledger. `/slowcup-deploy dry` runs first, before any file is touched.
-- **The shelf swatch is v4.18**, on its own version, after slice 3 **and** after Design's dark
-  redraw — R125 as delivered said v4.17 and was amended, struck per R71, because that would have put
-  two R4 items in one version. `.ref-swatch` and `.social-tile` are filed behind it; `.today-tint`
-  keeps its tint permanently, by R124's predicate rather than by exemption.
+- **R141 ladder (renumbered from R130):** ~~slice 3 = v4.17~~ · **v4.17** #34/#35 (draft-loss slice,
+  R137) · **v4.18** #30/#33 (wake-lock, R7) · **v4.19** slice 3 the picker (R39) · **v4.20** the
+  shelf. #34/#35 goes first because it is the only queue item that loses a user's work permanently;
+  cleanliness orders equals, consequence orders these. `/slowcup-deploy dry` runs first, before any
+  file is touched.
+- **Slice 3 (the picker) is now v4.19 and UNBLOCKED** — the S3 gate was R124/R125, both in the ledger.
+- **The shelf swatch is v4.20** (renumbered twice — R125's heading records both), on its own version,
+  after slice 3 **and** after Design's dark redraw. `.ref-swatch`/`.social-tile` are filed behind it;
+  `.today-tint` keeps its tint permanently, by R124's predicate rather than by exemption.
 - ~~**Home** — R53 gave it the §0 primitives and no revision board … R4 commissions its board.~~
   **SHIPPED v4.10.** The board was commissioned, delivered (rev 1 + rev 2 with 5a) and banked at
   `docs/r4/boards/`. Built to **R113–R118**: the greeting became the masthead, **clay was implemented

@@ -1566,15 +1566,15 @@ The reasoning is Design's and survives restatement: a tint at tier 3 is honest �
 and the app knows the family. What it cannot be, beside a pill that already reads "Oolong", is
 non-redundant. **The objection is redundancy in the identity slot, not dishonesty.**
 
-**R125 — The predicate reaches three of four call sites; only the shelf ships in ~~v4.17~~ v4.18.**
+**R125 — The predicate reaches three of four call sites; only the shelf ships in ~~v4.17~~ ~~v4.18~~ v4.20.** *(shelf renumbered again by R141; the point is unchanged — it is one version, whatever its number)*
 
 > **AMENDED by the planning lane, 2026-08-07, struck per R71 rather than rewritten — and the error is
 > a sequencing ruling that broke sequencing.** The original text said the shelf ships in **v4.17**.
 > **v4.17 is slice 3, the picker** — the Q5 sequencing this lane itself ruled — so as written this
 > ruling put two R4 items in one version, against the rule it has spent the round enforcing.
-> **The shelf lands on its own version, v4.18, after slice 3 and after Design's dark redraw.** Ref and
-> social stay filed behind it. **The predicate reaching three sites is unaffected — only the version
-> was wrong.**
+> **The shelf lands on its own version, ~~v4.18~~ v4.20 (renumbered by R141), after slice 3 and
+> after Design's dark redraw.** Ref and social stay filed behind it. **The predicate reaching three
+> sites is unaffected — only the version was wrong** (and wrong twice: R141 records the recurrence).
 
 Verified
 against `c799aa3`: `refMetaLine` is `[t.family, t.roast, …]` and renders "oolong · medium · 4 entries"
@@ -1662,11 +1662,28 @@ word** — he reads the script and it is his shelf.
 > entry matching its CJK/kana range, so `蜜香烏龍` wins on position alone.
 
 **R130 — The version sequencing of R4's remaining work is a RULING.** Minted by the planning lane,
-not by Code, and said so. **v4.16** the greeting (shipped) · **v4.17** slice 3, the picker (R39) ·
-**v4.18** the shelf — R124's predicate at the shelf call site, R126's hairlines, R129's script
-removal · **ref and social are filed behind v4.18, unversioned** until someone has looked at them
-rendered. **One coherent change per version, per `CLAUDE.md:129`.** R125's amended heading is correct
-as struck.
+not by Code, and said so. **v4.16** the greeting (shipped) · ~~**v4.17** slice 3, the picker (R39) ·
+**v4.18** the shelf~~ · **ref and social are filed behind ~~v4.18~~ v4.20, unversioned** until
+someone has looked at them rendered. **One coherent change per version, per `CLAUDE.md:129`.**
+
+> **AMENDED by R141, 2026-08-17 — and it is R125's exact shape a SECOND time, not a fresh error.**
+> R130 numbered slice 3 as v4.17 and the shelf as v4.18. But R137 then ruled #34/#35 and #30/#33
+> *ahead of* slice 3, and neither had a number — so the ladder was again a sequencing ruling
+> numbered ahead of its own work, the precise fault R125 already recorded. **The amended ladder:**
+> **v4.17** #34/#35 (draft persistence + back-gesture) · **v4.18** #30/#33 (wake-lock bundle) ·
+> **v4.19** slice 3, the picker (R39) · **v4.20** the shelf (R124's predicate at the shelf call
+> site, R126's hairlines, R129's script removal). `.ref-swatch`/`.social-tile` filed behind v4.20.
+> **The recurrence is filed as §8 item 19.**
+>
+> **The structural fix is named and NOT adopted here, because adopting it is Niklas's call.** Both
+> instances share one cause: a version is assigned *when the ruling is written* rather than *when the
+> work is built*, so any later reordering strands the numbers. **Version-at-build-time** — assign
+> `vX.YY` only at `/slowcup-deploy` step 1, and let rulings reference work by name — would close the
+> class. It touches R130's whole method, so it waits for a decision rather than being taken in passing.
+
+Recorded with it, as the Code lane's counter: **a decision that constrains later rulings gets a
+ledger number when it is made.** Q5's sequencing went unnumbered for four turns and a later ruling
+walked straight through it.
 
 Recorded with it, as the Code lane's counter: **a decision that constrains later rulings gets a
 ledger number when it is made.** Q5's sequencing went unnumbered for four turns and a later ruling

@@ -953,3 +953,26 @@ licence to adapt the engine.
     lane, and the pattern still failed on how the text happened to wrap. Counter, sharpened by it:
     **a multi-word pattern assumes a line break that may not be there** — grep the shortest
     distinctive token, or read the region.
+19. **A sequencing ruling numbered ahead of its work — the SECOND time, R125's exact shape.**
+    Planning lane, about itself. R130 assigned slice 3 to v4.17 and the shelf to v4.18. R137 then
+    ruled #34/#35 and #30/#33 *ahead of* slice 3 and gave neither a number, so the ladder once again
+    numbered later work below earlier work — the identical fault §8 item 13 records for R125.
+    Amended by **R141** to v4.17 #34/#35 · v4.18 #30/#33 · v4.19 picker · v4.20 shelf. **This is not
+    a new lesson; it is the same lesson recurring, which is itself the finding** — one instance is an
+    error, two is a method fault. The method fault: **a version is assigned when a ruling is written,
+    not when its work is built**, so any reorder strands the numbers. The structural counter —
+    **version-at-build-time**, assign `vX.YY` only at `/slowcup-deploy` step 1 — is recorded in R141
+    and deliberately **not adopted**, because it rewrites R130's whole method and that is Niklas's
+    call, not a thing to take in passing. Filed so that if it recurs a third time, the record already
+    says the fix was known and deferred, not undiscovered.
+20. **The dry run paid for itself on its first real use, and that is worth recording as a
+    positive.** `/slowcup-deploy dry` was queued for the reconciliation and had never been run in
+    anger. Its first invocation (2026-08-17, before v4.17) caught **two** blockers, neither visible
+    from the diff: the version conflict of item 19 (R130 vs R137), surfaced at step 1's version bump;
+    and a **twelve-day-stale fixture export** (42 sessions on disk vs 48 in the app's own
+    screenshots), surfaced at step 7's currency precondition. **Both are exactly what running step
+    0/1 first exists to surface** — a version with no agreed number and a green suite testing against
+    dead data. A clean instrument finding real faults on first use is the evidence that the
+    reconciliation's instinct to run it early was right; recorded because §8 otherwise reads as a
+    catalogue of only what went wrong, and a register that never books a win loses calibration (the
+    A5-clean-result argument from the audit, applied to process).
