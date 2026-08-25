@@ -717,7 +717,7 @@ function deleteTea(id){
 }
 
 function openTeaDetail(id, from){ state.activeTeaId=id; state.teaDetailFrom = from||'teas'; state.view='tea-detail'; state.flavorView='bars'; state.teaMenuOpen=false; // WS4: bars is the default view on every visit — the toggle is deliberately NOT persisted (radar must never become sticky)
-  try{ localStorage.setItem('tealog_view','tea-detail'); localStorage.setItem('tealog_activeTea', id); }catch(e){}
+  saveView('tea-detail');   // v4.17: saveView is the ONE writer of view history + the tea-detail deep-link (was a hand-write here — the F24 two-writers trap)
   render(); }
 
 // v3.62 freshness cue — one soft, observational line on tea detail (never on Home/the picker, never

@@ -245,6 +245,23 @@
   function saveQueue(q) { try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); } catch (e) { console.warn('[Steep] write-queue persist failed (storage full?):', e && e.message); } }
   function queueLength() { return loadQueue().length; }
 
+  /* -------- in-progress session draft (v4.17, #35) --------
+     state.sessionDraft is memory-only, so an OS eviction during a long backgrounded sitting loses it
+     (issue #35). Persist it local-first, beside the write queue, and restore on boot. The persist-safe
+     shape (photo stripped, timer paused) is draftForPersist() in steep-sessions.js — see there for
+     why. A failed write (quota / serialise) is dropped silently: never break the app or the queue to
+     save a draft. */
+  const DRAFT_KEY = 'tealog_sessionDraft';
+  function saveDraft(draft, draftImage) {
+    try {
+      const payload = (typeof draftForPersist === 'function') ? draftForPersist(draft, draftImage) : null;
+      if (!payload) { localStorage.removeItem(DRAFT_KEY); return; }
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+    } catch (e) { /* drop the persist; the sitting stays in memory, and the queue is untouched */ }
+  }
+  function loadDraft() { try { const raw = localStorage.getItem(DRAFT_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; } }
+  function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+
   // data: URL images can't be uploaded offline and must never reach Postgres —
   // drop the inline image; the user re-adds it once online. (Belt to
   // commitSession's suspenders, and it covers the tea/vessel forms too.)
@@ -809,6 +826,7 @@
     getMyProfile, saveProfile, searchProfiles, getProfilesByIds, follow, unfollow, getFollowing, getFollowers, getFeed,
     sendPass, getPasses,
     getUser: () => currentUser,
-    flushQueue, pendingWrites: queueLength
+    flushQueue, pendingWrites: queueLength,
+    saveDraft, loadDraft, clearDraft   // v4.17 (#35): crash-recovery for an in-progress sitting
   };
 })();

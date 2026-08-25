@@ -80,6 +80,7 @@ fixtures/*
 # "completes" the table and asserts a colour for a style that genuinely varies. It also carries the
 # fence: no teas.liquor column yet, liquor not inherited, nothing rendering a swatch.
 !fixtures/liquor-test.js
+!fixtures/session-draft-test.js
 # THE REVIEW HARNESSES. Not tests — they render a surface for a HUMAN to look at, which is how
 # every defect this round was actually found: the map's unreadable labels, the door's 500px slack,
 # clay reaching one branch of two, and a preview that showed the content region for a whole slice

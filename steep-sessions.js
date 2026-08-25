@@ -535,6 +535,25 @@ function viewSessionEdit(){
 function draftFingerprint(d){
   return [d.teaId,d.vesselId,d.sessionDate,d.isColdBrew,d.waterType,d.waterTDS,d.gramsUsed,d.brewStyle,d.waterMl,d.mood].join('|');
 }
+/* v4.17 (#35): the persist-safe shape of a session draft, so an OS eviction mid-sitting doesn't lose
+   it. TWO things are stripped and both matter:
+     · the inline photo (state._draftImage) — a data: URL is potentially megabytes, and a
+       QuotaExceededError writing it beside the offline queue would break the queue, a worse loss
+       than the one being fixed (R139). The user re-adds it, same rule as the offline queue.
+     · the timer — intervalId is a live setInterval handle, meaningless once the JS context restarts;
+       nulled and paused, so a restored steep comes back stopped at its saved elapsed rather than
+       pretending to have counted while the app was gone (wall-clock resume is #30's deferred rework).
+   PURE on purpose: saveDraft (steep-data.js) calls it, and a fixture asserts the invariant here
+   without the DB layer. Returns null for a null/absent draft, which clears the persisted copy. */
+function draftForPersist(draft, draftImage){
+  if(!draft) return null;
+  const d = JSON.parse(JSON.stringify(draft));                 // structural clone; drops nothing persistable
+  if(d.timer){ d.timer.intervalId = null; d.timer.running = false; }
+  const hadInline = (typeof draftImage==='string' && draftImage.startsWith('data:'));
+  // photoDropped lets restore say so ONCE (R139) — without it, a null image at restore is
+  // ambiguous between "stripped" and "never had one", so the notice couldn't be honest.
+  return { draft:d, draftImage: hadInline ? null : (draftImage || null), photoDropped: hadInline };
+}
 function sessionDraftDirty(d){
   if(!d) return false;
   if(d.stage!=='setup') return true;                     // steeping/finish/quick carry logged work
@@ -596,7 +615,9 @@ function startSessionFor(teaId, pre){
 }
 function cancelSession(){
   clearTimerInterval();
-  state.sessionDraft=null; state._draftImage=null; state.view='teas'; render();
+  state.sessionDraft=null; state._draftImage=null;
+  if(window.SteepDB && SteepDB.clearDraft) SteepDB.clearDraft();   // v4.17 (#35): drop the persisted copy too
+  state.view='teas'; render();
 }
 function clearTimerInterval(){
   const tm = state.sessionDraft?.timer;
@@ -1622,6 +1643,7 @@ async function commitSession(){
     persistSession(session);
     state.sessionDraft=null;
     state._draftImage=null;
+    if(window.SteepDB && SteepDB.clearDraft) SteepDB.clearDraft();   // v4.17 (#35): the sitting is committed — clear the crash-recovery copy
     state.activeTeaId = d.teaId;
     state.view='tea-detail';
     syncAchievements(true);

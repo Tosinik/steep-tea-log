@@ -43,6 +43,55 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.17 — a sitting survives the app closing, and Back steps back (R137/R139/R140)
+Deploy: `steep-data.js` (`saveDraft`/`loadDraft`/`clearDraft`), `steep-sessions.js`
+(`draftForPersist` + two `clearDraft` sites), `steep-core.js` (`saveView` history +
+boot restore + APP_VERSION/WHATS_NEW), `steep-teas.js` (`openTeaDetail` → one writer),
+`steep-boot.js` (persist hook + `popstate`), `service-worker.js` (cache **v127**),
+**new `fixtures/session-draft-test.js`** + its `.gitignore` exception, `CHANGELOG.md`,
+`STATE.md`. **No SQL.**
+
+R137's one slice, two issues — the only queue item that loses a user's work permanently:
+swipe back mid-sitting, the app exits, the draft is gone. #35 is the loss; #34 is the exit.
+
+- **#35 — the in-progress sitting persists (R139).** `state.sessionDraft` was memory-only,
+  so an OS eviction during a long backgrounded steep silently dropped it.
+  `saveDraft`/`loadDraft`/`clearDraft` live in `steep-data.js` beside the write queue; the
+  **persist-safe shape is a pure `draftForPersist`** in `steep-sessions.js` so a fixture
+  guards it without the DB layer. **Two things are stripped, both load-bearing:** the inline
+  `data:` photo (R139 — a multi-MB data URL beside the queue risks a `QuotaExceededError`
+  that breaks the *queue*, a worse loss; the user re-adds it, same rule as the offline queue),
+  and the live `timer.intervalId` (a dead handle across reload — a restored steep resumes
+  **paused** at its saved elapsed, never pretending to have counted while gone; wall-clock
+  resume is #30's deferred rework).
+- **Only a DIRTY draft is persisted**, on `pagehide` + `visibilitychange:hidden` (the
+  backgrounding that precedes eviction) — a single hook, not the ~45 draft mutators. A
+  pristine setup screen clears the key. Restore is **silent (R140)** — no prompt; boot lands
+  on the session view, and the existing `sessionDraftDirty` guard governs abandonment.
+- **The photo-drop is announced once, at restore, past-tense, no imperative (R139).** If the
+  line can't lose the "re-add it" instruction it is dropped and the empty slot speaks — the
+  fence Niklas set.
+- **#34 — the OS back gesture steps back a screen instead of exiting the PWA.** The app had
+  no browser history, so Back had nothing to pop. `history.pushState` now rides **`saveView`,
+  the single writer** — `openTeaDetail`'s hand-write to `tealog_view` folded in, closing the
+  F24 two-writers-for-one-fact drift. `HISTORY_VIEWS` is the read surfaces; the **live session
+  flow (session/steeping/finish/quick) is deliberately absent**, because `popstate` is not
+  cancellable — Back from a running steep pops to the last tab and the draft is persisted, so
+  nothing is lost. The handler sets `state.view` directly, never via `goView` (which would
+  `saveView` → push again → Back-loop).
+- **v1 scope, flagged:** views reached by a direct `state.view=` (session-detail, origins) do
+  not push; Back from them pops to the last tab, which is the right target anyway. Modals
+  ("Back closes the sheet", 11 overlay booleans) are a separate axis, not built.
+- **Tea-detail Back follows `state.teaDetailFrom`** (the existing tracker), not a parallel
+  answer — two writers for one fact is the F24 shape and it drifts.
+- **NON-AUTOMATABLE GATE:** no vm suite reaches `pushState`/`popstate`; **#34's back gesture
+  is verified by Niklas on device before ship** (this deploy's step 7). `session-draft-test.js`
+  guards what *can* be checked — the R139 strip, the history fence, the single writer, the two
+  clear sites — 34 checks, four negative controls proven to bite (image kept → A1, session view
+  in the list → D1, hand-write restored → E1, popstate calls goView → F2). 29 committed suites
+  green against the fresh (2026-08-17) export.
+
+---
 ## v4.16 — R123: the greeting looks at the day, not just the window
 Deploy: `steep-dashboard.js`, `steep-core.js` (APP_VERSION + WHATS_NEW),
 `service-worker.js` (cache **v126**), `fixtures/greeting-v4-test.js`,

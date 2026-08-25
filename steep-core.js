@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.16';
+const APP_VERSION = 'v4.17';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "The greeting now notices tea you brewed earlier in the day, instead of suggesting a cup as though the kettle had been cold since morning.";
+const WHATS_NEW = "An in-progress brew is no longer lost if the app closes, and the back gesture now steps back a screen instead of leaving SlowCup.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -196,8 +196,26 @@ async function init(){
     else state.view='teas';
   } else if(savedView==='vessels'){ state.view='teas'; state.teaSeg='vessels'; } // pre-v3.46 persisted 'vessels' → Teas tab, vessels segment
   else if(savedView && PERSISTED_VIEWS.includes(savedView)) state.view = savedView;
+  // v4.17 (#35): restore an in-progress sitting an eviction would otherwise have lost. SILENT (R140) —
+  // no prompt; the existing sessionDraftDirty guard governs abandonment. Only a DIRTY draft is ever
+  // persisted (steep-boot's hook), so any draft found here is worth landing back on — there is no
+  // "resume" card to reach it from otherwise. The timer comes back paused (draftForPersist nulled it).
+  let _restoredPhotoDropped = null;
+  try {
+    const saved = window.SteepDB.loadDraft && window.SteepDB.loadDraft();
+    if(saved && saved.draft){
+      state.sessionDraft = saved.draft;
+      state._draftImage = saved.draftImage || null;
+      if(state.sessionDraft.timer){ state.sessionDraft.timer.intervalId = null; state.sessionDraft.timer.running = false; }
+      state.view = 'session';
+      // R139: the inline photo could not be persisted (quota) — say so ONCE, past-tense, no ask.
+      // If it had a photo dropped, name the sitting; the empty slot in the session carries the rest.
+      if(saved.photoDropped){ const t=teaById(state.sessionDraft.teaId); _restoredPhotoDropped = t ? t.name : ''; }
+    }
+  } catch(e){}
   state.loaded = true;
   render();
+  if(_restoredPhotoDropped!=null){ try{ showToast('Picked up your '+(_restoredPhotoDropped||'')+' sitting — its photo wasn’t kept.'); }catch(e){} }
   if(state.view==='friends') loadSocial();
   syncAchievements(false); // reconcile seen list on load, no celebration
   installResumeSync();
@@ -997,7 +1015,25 @@ function goVessels(){
   state.teaSeg='vessels'; state.view='teas'; state.activeTeaId=null; state.dashEdit=false;
   saveView('teas'); render();
 }
-function saveView(v){ try{ if(PERSISTED_VIEWS.includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); } }catch(e){} }
+// v4.17 (#34): the app is one state machine with no browser history, so the OS back gesture had
+// nothing to pop and exited the PWA. saveView is the single place a navigable view is recorded, so
+// history rides HERE — one writer, no parallel truth (the F24 drift the tea-detail hand-write used
+// to be). HISTORY_VIEWS is every surface you can stand on and want Back to leave; the transient
+// session flow (session/steeping/finish/quick) is deliberately ABSENT, so Back can never resurrect a
+// live steep — popstate is not cancellable, so that fence is v1's safety (steep-boot's handler).
+// Views reached by a direct state.view= (session-detail, origins) don't push in v1; Back from them
+// pops to the last tab, which is the right target anyway. The localStorage relaunch memory keeps its
+// own smaller gate (PERSISTED_VIEWS, tab-level), plus the tea-detail deep-link.
+const HISTORY_VIEWS = ['dashboard','insights','teas','sessions','friends','tea-detail','session-detail','shopping','spend','origins','wrapped'];
+function saveView(v){
+  try{
+    if(typeof history!=='undefined' && history.pushState && HISTORY_VIEWS.includes(v)){
+      history.pushState({ view:v, activeTeaId:(v==='tea-detail' ? (state.activeTeaId||null) : null) }, '');
+    }
+    if(PERSISTED_VIEWS.includes(v)){ localStorage.setItem('tealog_view', v); localStorage.removeItem('tealog_activeTea'); }
+    else if(v==='tea-detail' && state.activeTeaId){ localStorage.setItem('tealog_view','tea-detail'); localStorage.setItem('tealog_activeTea', state.activeTeaId); }
+  }catch(e){}
+}
 
 // Inline two-step confirm — the calm replacement for blocking confirm() on destructive buttons.
 // Hides the clicked button in place and shows "<message>  Yes / Cancel" right after it, without a

@@ -1,6 +1,38 @@
 /* ---------- boot ---------- */
 window.SteepDB.boot(init);
 
+/* v4.17 (#35): persist an in-progress sitting when the page is hidden, so an OS eviction during a
+   long backgrounded steep doesn't lose it. `pagehide` covers navigation/close; `visibilitychange`
+   covers the phone being backgrounded — the actual eviction trigger. Only a DIRTY draft is written
+   (a pristine setup draft clears the key), so a restore always lands on real work. Cheap, idempotent,
+   fail-silent. */
+function _persistSessionDraft(){
+  try {
+    if(window.SteepDB && SteepDB.saveDraft){
+      const d = state && state.sessionDraft;
+      SteepDB.saveDraft(sessionDraftDirty(d) ? d : null, state && state._draftImage);
+    }
+  } catch(e){}
+}
+window.addEventListener('pagehide', _persistSessionDraft);
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') _persistSessionDraft(); });
+
+/* v4.17 (#34): the OS back gesture pops the app's own history instead of exiting the PWA. saveView
+   pushes a state entry per navigable view; here we honour the pop by setting the view DIRECTLY —
+   never via goView, which would call saveView and push again, turning Back into a loop. popstate is
+   not cancellable, so the live session flow deliberately pushes nothing (saveView's HISTORY_VIEWS):
+   Back from a running steep pops to the last tab, and the draft is persisted above, so nothing is
+   lost. NON-AUTOMATABLE: no vm suite reaches pushState/popstate — the back gesture is verified on
+   device (this slice's step 7, like landing-test's source-only limit). */
+window.addEventListener('popstate', (e)=>{
+  const st = e.state;
+  if(!st || !st.view){ return; }                       // the initial page entry — let Back exit from home
+  state.view = st.view;
+  state.activeTeaId = st.activeTeaId || null;
+  if(st.view==='tea-detail' && !(state.activeTeaId && (state.teas||[]).some(t=>t.id===state.activeTeaId))) state.view='teas'; // tea gone → its tab
+  render();
+});
+
 /* Service worker + "new version available" prompt.
    The SW now waits (no auto-skipWaiting) so an in-progress session is never
    interrupted; when an update is installed we show a small banner, and only on

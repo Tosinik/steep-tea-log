@@ -191,7 +191,29 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (just shipped) — v4.16: R123, the greeting looks at the day** (cache **v126**, APP_VERSION
+**NOW (BUILT, awaiting the on-device gate + push) — v4.17: #34/#35, work no longer lost** (cache
+**v127**, APP_VERSION v4.17, **no SQL**). R137's one slice, two issues — the only queue item that
+loses a user's work permanently.
+- **#35 (R139):** `state.sessionDraft` was memory-only → an eviction mid-sitting lost it.
+  `saveDraft`/`loadDraft`/`clearDraft` in `steep-data.js` beside the queue; pure `draftForPersist`
+  in `steep-sessions.js` strips the inline `data:` photo (quota — a `QuotaExceededError` would break
+  the *queue*) and pauses the timer. Persist on `pagehide`/`visibilitychange:hidden`, dirty drafts
+  only; restore **silent** (R140), lands on the session. Photo-drop announced once at restore,
+  past-tense, or dropped if it can't lose the imperative.
+- **#34:** `history.pushState` rides `saveView` (the single writer; `openTeaDetail`'s hand-write
+  folded in — F24 closed). `HISTORY_VIEWS` = read surfaces; session flow **absent** (popstate not
+  cancellable → Back can't resurrect a live steep; it pops to the last tab, draft safe). Handler sets
+  `state.view` directly, never `goView`.
+- **NON-AUTOMATABLE GATE, standing:** no vm suite reaches pushState/popstate — **Niklas verifies the
+  back gesture on device before push** (this deploy's step 7). `session-draft-test.js` (34 checks, 4
+  negative controls bite) guards the R139 strip + history fence + single writer + clear sites. **29
+  committed suites green** on the fresh 2026-08-17 export.
+- **v1 scope flagged:** session-detail/origins don't push (pop to last tab); modals a separate axis,
+  not built.
+- **NEXT: v4.18 — #30/#33** (wake-lock bundle, R7 ratified-unbuilt), then **v4.19** slice 3 picker,
+  **v4.20** shelf (R141 ladder). `/slowcup-deploy dry` first, before any file.
+
+**Previously — v4.16: R123, the greeting looks at the day** (cache **v126**, APP_VERSION
 v4.16, **no SQL**). **Niklas found it by using v4.15** — *Earlier today* listed his two sittings
 while the masthead told him to go and have a tea. Fifth defect this round found by looking.
 - **R117's one boundary HELD.** Both readers call `sessionsToday()`. The divergence was one layer up,
