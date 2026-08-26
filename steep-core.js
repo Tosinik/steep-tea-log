@@ -110,7 +110,7 @@ function groupTeasByType(teas){
 }
 // Flat version of the same ordering — the Teas-tab default sort.
 function sortTeasByTypeThenName(teas){ return groupTeasByType(teas).flatMap(g=>g.teas); }
-const VESSEL_TYPES = ['Gaiwan','Kyusu','Shiboridashi','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
+const VESSEL_TYPES = ['Gaiwan','Kyusu','Shiboridashi','Matcha bowl','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other'];
 // Top-level views whose selection is remembered across reloads (init restore + saveView).
 const PERSISTED_VIEWS = ['dashboard','insights','teas','sessions','friends'];
 // v3.72 (issue #6) — achievements/confetti are dormant app-wide: the 8-bit system was scrapped and a

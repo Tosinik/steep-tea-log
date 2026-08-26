@@ -63,12 +63,16 @@ ok(/is-ph/.test(none) && /v-unknown/.test(none), 'A9 a vessel with no type still
 const teasSrc = fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8');
 ok(!Object.values(G('VESSEL_KANJI')).includes('旅'), 'A10 旅 is not a mapped glyph');
 ok(!G('VESSEL_TYPES').some(t=>/travel/i.test(t)), 'A10b VESSEL_TYPES still has no traveller entry');
-ok(!/旅/.test(['Gaiwan','Kyusu','Shiboridashi','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other','']
+ok(!/旅/.test(['Gaiwan','Kyusu','Shiboridashi','Matcha bowl','Yixing teapot','Porcelain teapot','Glass teapot','Mug','Cold brew jar','Other','']
      .map(t=>ctx.vesselPhoto({name:'Travel cuppa',type:t},'thumb')).join('')),
    'A10c 旅 never renders — not even for a vessel NAMED "Travel cuppa"');
 ok(Object.keys(G('VESSEL_KANJI')).length===3, 'A11 VESSEL_KANJI holds exactly the three drawn types (got '+Object.keys(G('VESSEL_KANJI')).length+')');
 ok(Object.keys(G('VESSEL_KANJI')).every(t=>G('VESSEL_TYPES').includes(t)),
    'A12 every kanji key is a real VESSEL_TYPES entry — no glyph keyed to a non-type');
+// #31 (v4.18): Matcha bowl joins VESSEL_TYPES. VESSEL_KANJI stays 3 (A11) — a chawan has no kanji
+// plate, and A12 counts kanji keys not types, which is why one entry + this line is the whole diff.
+ok(G('VESSEL_TYPES').includes('Matcha bowl'), 'A13 VESSEL_TYPES includes "Matcha bowl" (#31)');
+ok(!('Matcha bowl' in G('VESSEL_KANJI')), 'A13b …and it has no kanji plate — it falls to the type-tinted stripe, by design');
 // The tea tile must stay untouched: its kanji are TEA types, and mixing the two was the original bug.
 ok(/白/.test(teasSrc) && /餅/.test(teasSrc), 'A13 shelfPhoto still carries its own 白/餅 tea kanji');
 ok(!/VESSEL_KANJI\[[^\]]*tea/.test(teasSrc), 'A14 the vessel map is never keyed by a tea');
