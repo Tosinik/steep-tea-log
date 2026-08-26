@@ -152,6 +152,86 @@ tea whose user once looked at it.
 This unblocks **#14** (R89), whose listbox was deferred precisely because its primary affordance was
 this correction.
 
+### 4.1 · The slice-3 build, as approved for v4.19 (R141 ladder)
+
+> **This subsection is the build authority for the picker — approved in the planning↔code exchange
+> that scoped slice 3, and written here because it existed only in that chat until 2026-08-26.** It
+> supersedes §4's "long-press" framing: **long-press is optional and NOT the primary mechanism**
+> (there is no long-press machinery in the app — six touch handlers, none of them one — so a fiddly
+> gesture must not block the feature). The form control below is the build.
+
+**F2 — the mechanism is NAME, not TYPE. Build to this, not to board #06 rev 4.** The board (AT1, the
+Add caption) says the Tier-2 default appears "live only after you pick a **TYPE**". **That is wrong.**
+Tier 2 resolves from **`matchTeaType(tea.name)`** — an exact normalised match against `covers`
+(`steep-tea-types.js:130`). Picking a type changes the swatch **nothing**; the default follows the
+**name** field. A session that builds to the board alone will wire the preview to the type control and
+it will never update. Same R81 family as the other stale-board claims this round.
+
+**The COLOUR row (the control).** A row in the tea form, placed **after Type, above the Specifics
+fold** (deviation 1 below — the board put it above Name):
+- **preview swatch + source note + a link-styled action** — *"correct the colour ›"* (edit) /
+  *"set a colour ›"* (add) — that opens an **inline grid in place**.
+- **source note reads the tier honestly:** "your correction" (tier 1) · "catalog default · Da Hong
+  Pao" (tier 2, name the matched row) · "no colour yet — shows its type tint" (tier 3).
+- **the grid is 13 cells:** a **default cell first**, painted with `liquorFor({…tea, liquor:null})`
+  (i.e. what tier 2/3 resolves to with no correction), then the **twelve ramp stops** in order.
+- **every cell a real `<button type="button">`** with an `aria-label` and `aria-pressed` — natively
+  focusable, Enter/Space, testable **without synthesised pointer events**. `type="button"` so a cell
+  is never an accidental form submit.
+- **selection writes a hidden `<input name="liquor">`** and **dispatches an `input` event** to trip
+  the WS1 dirty guard (`_teaFormTouched`), exactly as `acceptOriginOffer` does — else a backdrop tap
+  discards the choice silently.
+- **the form's own Save commits** — R55's offer model, **not Borrow's**. Inside a form, a second
+  self-committing control would make colour the only field in the app that saves itself. (Board 03's
+  *"Set this colour commits"* belongs to the tea-detail in-place picker, which has no form Save to
+  ride — and tea detail renders no swatch today, so that primary path is not this slice; #06's form
+  is the boarded **secondary** path, and that is what ships.)
+- **open/close and selection are DOM-only — NEVER `render()`.** The form reads its fields on submit,
+  so a re-render mid-edit wipes unsaved values (the constraint `toggleSpecifics` already documents).
+- **`submitTeaForm` must add `liquor`**, gated through `isLiquorKey` (a tampered DOM can't persist
+  junk); anything else → `null`.
+- **Clearing selects the default cell → writes `''` → `null`.** Returns the tea to tier 2 by
+  construction (§4 above; asserted at `liquor-test.js` **E4**), never a stored copy.
+
+**F1 — the containment guard (v4.19's central bug the hour the picker ships).** `submitTeaForm`
+already **silently drops `liquor`** today: it rebuilds the tea from scratch and writes every mapped
+field except that one (`steep-teas.js` ~`:672`; latent only because nothing can set tier 1 yet). The
+guard to write is **not** `/liquor/` — it is the general form: **the set of keys `submitTeaForm`
+writes ⊇ the set of keys `teaFromDb` produces.** That catches the `liquor` drop **and the next dropped
+field**, which a string match would miss. Put it in the picker's suite section (§G of `liquor-test.js`,
+per the plan).
+
+**R121 geometry — scale the lock, don't adopt a new aspect.**
+- **preview swatch: 26×34, radius `8px 4px 7px 4px`** — the shipped `.social-tile`/`.ref-swatch`
+  family (also what #03 draws for the picker's current swatch).
+- **grid cells: 22×22, radius `6px 3px 5px 3px`** — board #03's picker cells.
+- **#06's 40×50 (radius `10px 5px 9px 6px`) is NOT adopted** — it is a **4:5** aspect where the one
+  locked geometry (Bundle 1) is **3:4**; R121's method for a new size is to *scale the lock*, not
+  adopt an aspect drawn nowhere else.
+
+**The three accepted deviations (planning-lane approved).**
+1. **COLOUR row after Type, not above Name** — the board's placement rested on F2's (wrong) mechanism;
+   under the real one, WS1's "photo · name · type up front" survives and the row sits after the field
+   that drives it.
+2. **No new geometry** — preview and cells reuse shipped/boarded sizes (above); 40×50 not taken.
+3. **No long-press** — no machinery exists, it isn't keyboard-reachable, and the surfaces it would
+   live on (shelf, tea detail) draw no swatch to press. **Fenced, not skipped.**
+
+**Also carried into v4.19 (found in the R121b audit, dispositions recorded):** **F4** — SPEC §7's
+ramp table has two **stale dark hexes** (`yellow-pale` `#EBE0BC`→shipped `#E8DDB6`, `gold-pale`
+`#EADFAF`→`#DED2A0`; code is right, §7 gets corrected when this file is touched). **F5** —
+`liquor-review.js`'s header says "Nothing renders a liquor yet" and calls itself untracked; both false
+since v4.15/`a82bda9`. **F6** — board 03's ✎-badge "primary path" has nothing to attach to (tea detail
+renders no swatch); this slice ships the **secondary** (#06 form) path, stated not discovered.
+
+**A2 (v4.20 fence pair) — the timing, so it is not discovered mid-slice.** R124–R129's fences fold
+into **§9 here** and **`liquor-test.js` §D** **as part of v4.19's touch of that suite** — because §9's
+current standing fences (**D1 "no PICKER"**, **D3 "SHELF renders none"**, lines ~272/275) predate
+R124–R129 and describe a *different wall*. When the picker ships, D1 is crossed (rewrite it to the
+fence that still stands, per §9's own D1 pattern), and R124/R125's shelf-and-predicate fences are what
+D3 becomes at **v4.20** (the shelf). **Do not touch `liquor-test.js` or `swatchAttr` before v4.19
+opens.**
+
 ## 5 · What is authoring work, not code
 
 - **55 catalog liquor values.** Content, judged per style, sourced the way every other catalog field

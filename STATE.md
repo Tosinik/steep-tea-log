@@ -205,9 +205,19 @@ low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unseq
 - **`fixtures/wake-timer-test.js`** (15, 2 controls bite) guards the running-scoped lock + pause
   logic; **30 committed suites green**. **NON-AUTOMATABLE GATE (smoke.md):** wakeLock has no vm reach
   — screen-stays-lit + lock-follows-running verified on device before push.
-- **NEXT: v4.19 — slice 3, the picker (R39).** Reads the shelf, so **refresh the export first** (the
-  2026-08-17 pull is fine for v4.18 but the picker wants current). `swatchAttr`/`liquor-test.js`
-  in scope again (S3 = R124–R129). Then **v4.20** the shelf (R141 ladder). `/slowcup-deploy dry` first.
+- **NEXT: v4.19 — slice 3, the picker (R39 / R89).** **BUILD AUTHORITY = `SPEC-liquor-swatch-model.md`
+  §4.1** — the full approved control spec (COLOUR row after Type, 13-cell grid with `<button>`+
+  `aria-pressed`, DOM-only never `render()`, hidden field + `input` dispatch, form-Save commits,
+  clear→default→tier 2), **F2** (the default follows the NAME via `matchTeaType`, not the TYPE — build
+  to §4.1, not board #06 rev 4), **F1** (the containment guard: `submitTeaForm` writes ⊇ `teaFromDb`
+  produces — it silently drops `liquor` today), **R121 geometry** (preview 26×34 `.ref-swatch` family,
+  cells 22×22, #06's 40×50 NOT adopted), the **three accepted deviations**, and the **A2 fence timing**
+  (R124–R129's fences fold into SPEC §9 + `liquor-test.js` §D as part of v4.19's touch of that suite —
+  D1/D3 predate those rulings). All six were chat-only until the 2026-08-26 handoff; now in §4.1.
+- **Refresh the export FIRST** (step-zero precondition, not a step-7 surprise) — the picker reads the
+  shelf; the 2026-08-17 pull is fine for v4.18 but stale for the picker. `swatchAttr`/`liquor-test.js`
+  in scope again (S3 = R124–R129) — untouched until v4.19 opens. Then **v4.20** the shelf (R141
+  ladder). **`/slowcup-deploy dry` before any file is touched.**
 
 **Previously — v4.17: #34/#35, work no longer lost** (cache
 **v127**, APP_VERSION v4.17, **no SQL**). R137's one slice, two issues — the only queue item that

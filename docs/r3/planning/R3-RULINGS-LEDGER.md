@@ -788,6 +788,12 @@ controls stay. **#14 reopens when the swatch data model lands.**
 > *reasoning* stands and is why the listbox waited — but left as written this paragraph is an
 > instruction not to build something whose preconditions have since been met, which is R71's trap in
 > its commanding form.
+>
+> **BUILD AUTHORITY for slice 3 (v4.19 per R141) is `docs/r4/planning/SPEC-liquor-swatch-model.md`
+> §4.1** — added 2026-08-26 at the session handoff, because the full approved control spec (the COLOUR
+> row, F2's name-not-type mechanism, F1's containment guard, R121 geometry, the three accepted
+> deviations, and the A2 fence timing) existed only in the planning↔code chat that scoped it and would
+> have died with that session. §4.1 supersedes §4's long-press framing.
 
 > *Code-lane note, 2026-07-26 (shipped in v3.99).* Two things worth the record. **(a) #04's half of the
 > date inversion needed no work at all** — `sessionDate` has shipped inside *More details* since it
