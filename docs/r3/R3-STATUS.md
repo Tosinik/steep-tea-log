@@ -976,3 +976,13 @@ licence to adapt the engine.
     reconciliation's instinct to run it early was right; recorded because §8 otherwise reads as a
     catalogue of only what went wrong, and a register that never books a win loses calibration (the
     A5-clean-result argument from the audit, applied to process).
+21. **The non-automatable gate certified a slice the suites could not — as designed, on first use.**
+    Second positive instance. v4.17 (#34 back gesture) shipped a DOM History-API surface no `vm` suite
+    can reach: `session-draft-test.js` pins the source facts (session flow absent from `HISTORY_VIEWS`,
+    `popstate` never calls `goView`, one writer) and **names its own blind spot** — the swipe itself.
+    The slice held for an **on-device check by Niklas** before push; he confirmed close-and-reopen
+    survives and swipe-back steps back instead of exiting. **The person did the certifying the check
+    declined to do, and the deploy did not push until they had** — which is R122's look-to-find/
+    read-to-measure division applied to runtime, and the thing `smoke.md` + the CLAUDE.md rule now make
+    standing rather than ad-hoc. Booked as a win for the same reason as item 20: a register that only
+    catalogues faults forgets that the gates also work.

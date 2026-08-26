@@ -100,6 +100,19 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
   export is not user-scoped (one `teas` row belongs to another account), and an unscoped read
   silently reports two vendorless teas where there is one.
 
+**Non-automatable surfaces ship a gate, not just a suite.** Some behaviour has no `vm` reach at all —
+the DOM **History API** (`pushState`/`popstate`, the back gesture), the **Screen Wake Lock API**, the
+service-worker update flow, real **touch gestures**, actual storage **eviction**. A suite can assert
+the *source facts* around them (the fence is present, the single writer is the writer, the handler
+never loops) but cannot exercise the behaviour, so a green suite is **not** a pass. **A slice that
+ships one of these surfaces ships two things with it: an entry in `smoke.md`, and a phone check by
+Niklas before the push** — the non-automatable check does the certifying, and the deploy's step 7
+says so explicitly. Record the pass in `smoke.md`. Worked example: **#34's back gesture (v4.17)** —
+`session-draft-test.js` pins that the session flow is absent from `HISTORY_VIEWS` and that `popstate`
+never calls `goView`, but only a swipe on a real phone proves Back steps back instead of exiting; that
+was verified on device before v4.17 pushed. Same family as `landing-test.js` asserting the door's
+*source* because `renderLogin` can't be sandboxed.
+
 ## Deploy ritual (do this every deploy)
 
 "Deploy" = push the changed static files to GitHub Pages. There is no CI. Every deploy:
@@ -128,6 +141,15 @@ not a `file://` URL, for the service worker and Supabase auth redirect to work.
    documents, each an instruction to rebuild work already done.
 5. **Keep deploys small and explicit** — one coherent change per version, listing the
    precise files. Don't bundle unrelated edits.
+
+**Split-push: docs push on write; code holds for its gate.** The pause-before-push rhythm exists
+because *the planning lane cannot review what it cannot clone* — so a **docs-only** change (ledger,
+STATE, ROADMAP, CHANGELOG-only, `smoke.md`, this file) is **pushed the moment it is written**, because
+pushing is what makes it cloneable and reviewable; holding it back serves the opposite of the rule's
+purpose. A change that **touches an app file** (a real deploy) still **pauses UNPUSHED** for review and
+for any `smoke.md` on-device gate the slice requires; Niklas pushes it. When a deploy carries both —
+docs *and* code — keep them as **separate commits** (the docs push on write; the code commit waits),
+so the reviewable record isn't held hostage to the code gate. One rule, two speeds, same reason.
 
 The service worker deliberately does **not** auto-`skipWaiting()`. On a new SW install
 `steep-boot.js` shows a "new version — Refresh" banner and only swaps in the new worker
