@@ -92,6 +92,13 @@ decisions rather than any single ruling:
 - **The shelf swatch is v4.20** (renumbered twice — R125's heading records both), on its own version,
   after slice 3 **and** after Design's dark redraw. `.ref-swatch`/`.social-tile` are filed behind it;
   `.today-tint` keeps its tint permanently, by R124's predicate rather than by exemption.
+- **Security & legal hardening pass — sequenced after v4.20, before any public beta.** Findings
+  captured and verified against the live project in **`SECURITY.md`**: `profiles` readable by all
+  authenticated users with no allowlist (HIGH) · `tea-photos` bucket public + unscoped read (HIGH) ·
+  shared sessions/steeps expose the full row incl. `mood`/notes to followers (MEDIUM) · auth
+  redirect-allowlist dashboard confirm (LOW) · advisor's leaked-password WARN. Findings 1–2 **gate the
+  Datenschutzerklärung** (must not publish while profiles/photos are world-readable); the Impressum
+  needs a ladungsfähige Anschrift. Neither legal doc is in the repo yet.
 - ~~**Home** — R53 gave it the §0 primitives and no revision board … R4 commissions its board.~~
   **SHIPPED v4.10.** The board was commissioned, delivered (rev 1 + rev 2 with 5a) and banked at
   `docs/r4/boards/`. Built to **R113–R118**: the greeting became the masthead, **clay was implemented
