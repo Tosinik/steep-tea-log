@@ -16,7 +16,7 @@ function _persistSessionDraft(){
 }
 window.addEventListener('pagehide', _persistSessionDraft);
 document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState==='hidden'){ _persistSessionDraft(); }
+  if(document.visibilityState==='hidden'){ if(typeof onAppHidden==='function') onAppHidden(); _persistSessionDraft(); } // v4.18 (#30-B): freeze a running steep BEFORE persisting it
   else if(document.visibilityState==='visible'){ if(typeof onAppVisible==='function') onAppVisible(); } // v4.18 (#33/R142): re-acquire the lock only while running
 });
 

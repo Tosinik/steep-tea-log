@@ -642,6 +642,17 @@ function onAppVisible(){
   if(timerRunning()) acquireWakeLock();
   if(state.sessionDraft && state.view==='session' && state.loaded) render();
 }
+/* v4.18 (#30-B, R142): FREEZE a running steep when the app is backgrounded — it holds at the last
+   value the app actually observed, never a wall-clock guess. The steep is leaf in water the app
+   cannot see, so a clock that "caught up to real elapsed" would assert progress it never measured;
+   honesty-over-invention, at the timer. Reuses the pause path, no new timestamp state, and matches
+   #35's restore-paused so draft and timer behave identically: you stepped away, it holds, you
+   resume. Returns whether it paused, so a suite can assert the running/paused split without the DOM. */
+function onAppHidden(){
+  const tm = state.sessionDraft && state.sessionDraft.timer;
+  if(tm && tm.running){ clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false; releaseWakeLock(); return true; }
+  return false;
+}
 function clearTimerInterval(){
   const tm = state.sessionDraft?.timer;
   if(tm?.intervalId){ clearInterval(tm.intervalId); tm.intervalId=null; }
