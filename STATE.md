@@ -191,7 +191,25 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (BUILT, awaiting the on-device gate + push) — v4.17: #34/#35, work no longer lost** (cache
+**NOW (BUILT, awaiting the on-device gate + push) — v4.18: #33/#30/#31, wake-lock bundle** (cache
+**v128**, APP_VERSION v4.18, **no SQL**). Three feature commits + a release note.
+- **#33 (R7):** screen stays awake while a steep timer runs, **and only then** — the lock follows the
+  timer's `running` state (R142), not the session's existence. Acquire on start; release on
+  pause/complete/`clearTimerInterval`; `onAppVisible` re-acquires on return **guarded by
+  `timerRunning()`** so a paused steep is never held awake. Fail-silent.
+- **#30-B (R142):** a timer left mid-steep **holds where you left it** — `onAppHidden` freezes a
+  running steep on hide, before the draft persists. **No wall-clock** (rework A rejected): the app
+  can't see the pot, so a "caught-up" clock would assert progress it never measured. Matches #35's
+  restore-paused.
+- **#31:** `VESSEL_TYPES` += `'Matcha bowl'` (separate commit; `VESSEL_KANJI` stays 3).
+- **`fixtures/wake-timer-test.js`** (15, 2 controls bite) guards the running-scoped lock + pause
+  logic; **30 committed suites green**. **NON-AUTOMATABLE GATE (smoke.md):** wakeLock has no vm reach
+  — screen-stays-lit + lock-follows-running verified on device before push.
+- **NEXT: v4.19 — slice 3, the picker (R39).** Reads the shelf, so **refresh the export first** (the
+  2026-08-17 pull is fine for v4.18 but the picker wants current). `swatchAttr`/`liquor-test.js`
+  in scope again (S3 = R124–R129). Then **v4.20** the shelf (R141 ladder). `/slowcup-deploy dry` first.
+
+**Previously — v4.17: #34/#35, work no longer lost** (cache
 **v127**, APP_VERSION v4.17, **no SQL**). R137's one slice, two issues — the only queue item that
 loses a user's work permanently.
 - **#35 (R139):** `state.sessionDraft` was memory-only → an eviction mid-sitting lost it.

@@ -43,6 +43,46 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.18 — the screen stays awake while a steep runs, and a timer you leave holds (R7/R142)
+Deploy: `steep-sessions.js` (wake-lock helpers, `onAppHidden`/`onAppVisible`, timer
+acquire/release), `steep-boot.js` (visibilitychange wiring), `steep-core.js`
+(APP_VERSION/WHATS_NEW + `VESSEL_TYPES`), `service-worker.js` (cache **v128**),
+**new `fixtures/wake-timer-test.js`** + its `.gitignore` exception,
+`fixtures/vessel-identity-test.js`, `smoke.md`, `CHANGELOG.md`, `STATE.md`. **No SQL.**
+Three feature commits (`#33` wake-lock · `#30-B` pause-on-hide · `#31` Matcha bowl,
+kept separate) + this release note.
+
+- **#33 (R7) — the screen stays awake while a steep timer runs, and only then.** Wake
+  Lock API, **steep-scoped and running-scoped**: the lock follows the timer's `running`
+  state, not the mere existence of a session (R142). Acquire on `timerStartPause`→running;
+  release on pause, on auto-complete, and in `clearTimerInterval` (cancel/reset/replace).
+  A wake lock is auto-released by the browser on hide, so `onAppVisible` re-acquires on
+  return — **guarded by `timerRunning()`**, so a timer paused-on-hide re-acquires only when
+  the user resumes. Holding the screen awake over a **frozen** clock is the inverted
+  calm-first waste R7 exists to prevent (R142's named condition). Fail-silent: an
+  unsupported browser or denied request just lets the screen dim.
+- **#30-B (R142) — a timer you leave mid-steep holds where you left it, resolving #30 as
+  shipped, not deferred.** `onAppHidden` freezes a running steep on `visibilitychange→hidden`,
+  before the draft persists, so the saved draft reflects the pause. **No wall-clock
+  timestamp** (the rejected rework A): the steep is leaf in water the app cannot see, so a
+  clock that "caught up to real elapsed" would assert progress it never measured —
+  honesty-over-invention, at the timer. Reuses the pause path, no new state, and **matches
+  #35's restore-paused** so draft and timer behave identically: you stepped away, it holds,
+  you resume.
+- **#31 — `VESSEL_TYPES` gains `'Matcha bowl'`.** Unrelated to the wake-lock, kept a separate
+  commit. `VESSEL_KANJI` stays 3 (a chawan has no kanji plate; it falls to the type-tinted
+  stripe) — one array entry + two assertions is the whole diff.
+- **`fixtures/wake-timer-test.js` (15 checks)** guards the invariant: `onAppHidden`'s pause
+  logic runs live (running→paused, elapsed frozen, paused-untouched, no-draft no-op) and the
+  lock wiring is source-asserted (acquire only where the timer starts; release on every stop;
+  the R142 running-guard on `onAppVisible`). Two negative controls proven to bite. 30 committed
+  suites green.
+- **NON-AUTOMATABLE GATE (`smoke.md`, v4.18):** `navigator.wakeLock` has no `vm` reach — the
+  screen actually staying lit and the lock following running-state are verified by Niklas on
+  device before push: screen doesn't dim during a steep; background+return while running →
+  lock comes back on resume; background+return while paused → it does not.
+
+---
 ## v4.17 — a sitting survives the app closing, and Back steps back (R137/R139/R140)
 Deploy: `steep-data.js` (`saveDraft`/`loadDraft`/`clearDraft`), `steep-sessions.js`
 (`draftForPersist` + two `clearDraft` sites), `steep-core.js` (`saveView` history +
