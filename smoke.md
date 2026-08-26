@@ -28,3 +28,19 @@ runtime behaviour: a check certifies what it can reach, and names what it cannot
    **not** exit SlowCup.
 4. **Swipe-back from a running steep** → leaves to the Teas tab; the draft is safe (reopen shows it).
    Back must **never** resurrect or drop into a live steep. *(Niklas confirmed on v4.17 live.)*
+
+---
+
+## v4.18 · #33 wake-lock + #30-B pause-on-hide  *(the lock follows the timer's running state)*
+
+The Screen Wake Lock API and the lock/timer interaction have no `vm` reach — the suite pins the
+source facts (acquire tied to `running`, release on stop, re-acquire guarded on running) but only a
+phone shows the screen actually staying lit and the lock following the timer. Three checks:
+
+1. **Screen stays awake while a steep runs.** Start a steep, don't touch the phone → the screen does
+   **not** dim/lock while the timer counts. Pause the timer → the screen may dim as normal (the lock
+   is released; the phone's own timeout takes over).
+2. **Background and return while RUNNING** → the timer paused itself on the way out (holds where you
+   left it, no drift), and on return the lock comes back **when you resume**, not before.
+3. **Background and return while PAUSED** → the lock does **not** re-acquire on return; the screen is
+   not held awake to show a frozen clock. It re-acquires only when you tap resume.

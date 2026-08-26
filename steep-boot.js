@@ -15,7 +15,10 @@ function _persistSessionDraft(){
   } catch(e){}
 }
 window.addEventListener('pagehide', _persistSessionDraft);
-document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') _persistSessionDraft(); });
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='hidden'){ _persistSessionDraft(); }
+  else if(document.visibilityState==='visible'){ if(typeof onAppVisible==='function') onAppVisible(); } // v4.18 (#33/R142): re-acquire the lock only while running
+});
 
 /* v4.17 (#34): the OS back gesture pops the app's own history instead of exiting the PWA. saveView
    pushes a state entry per navigable view; here we honour the pop by setting the view DIRECTLY —

@@ -619,9 +619,33 @@ function cancelSession(){
   if(window.SteepDB && SteepDB.clearDraft) SteepDB.clearDraft();   // v4.17 (#35): drop the persisted copy too
   state.view='teas'; render();
 }
+/* v4.18 (#33 / R7) — keep the SCREEN awake while a steep timer runs, and ONLY then. Steep-scoped:
+   the lock follows the timer's RUNNING state, never the mere existence of a session (R142). A wake
+   lock is auto-released by the browser whenever the page hides, so it must be re-acquired on return —
+   but ONLY if the timer is still running. Under #30-B a hidden timer PAUSES, so a resumed-from-
+   background timer re-acquires its lock when the user taps resume, not before: holding the screen
+   awake to show a FROZEN clock is the exact calm-first waste R7 exists to prevent, inverted.
+   Fail-silent — an unsupported browser or a denied request just lets the screen dim, no error. */
+let _wakeLock = null;
+async function acquireWakeLock(){
+  try {
+    if(typeof navigator==='undefined' || !('wakeLock' in navigator) || _wakeLock) return;
+    _wakeLock = await navigator.wakeLock.request('screen');
+    _wakeLock.addEventListener('release', ()=>{ _wakeLock = null; });   // the system drops it on hide
+  } catch(e){ _wakeLock = null; }
+}
+function releaseWakeLock(){ try{ if(_wakeLock){ _wakeLock.release(); _wakeLock = null; } }catch(e){ _wakeLock = null; } }
+function timerRunning(){ return !!(state.sessionDraft && state.sessionDraft.timer && state.sessionDraft.timer.running); }
+// v4.18 (R142): re-acquire on return to the app ONLY while the timer runs; a paused steep stays dark.
+// Also re-renders a live session so a pause that happened while hidden (#30-B) shows on return.
+function onAppVisible(){
+  if(timerRunning()) acquireWakeLock();
+  if(state.sessionDraft && state.view==='session' && state.loaded) render();
+}
 function clearTimerInterval(){
   const tm = state.sessionDraft?.timer;
   if(tm?.intervalId){ clearInterval(tm.intervalId); tm.intervalId=null; }
+  releaseWakeLock();   // v4.18: the timer stopped (cancel/reset/replace) — the screen no longer needs holding
 }
 
 function viewSessionFlow(){
@@ -1374,14 +1398,17 @@ function timerStartPause(){
   const tm = state.sessionDraft.timer;
   if(tm.running){
     clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false;
+    releaseWakeLock();                                    // v4.18 (#33): paused → let the screen dim
   } else {
     if(!_audioCtx){ try{ _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
     state.sessionDraft.timeEditing=false; // starting closes any open target edit
     tm.running=true;
+    acquireWakeLock();                                    // v4.18 (#33 / R7): running → hold the screen awake
     tm.intervalId = setInterval(()=>{
       tm.elapsed += 1;
       if(tm.mode==='timer' && tm.elapsed>=tm.target){
         clearInterval(tm.intervalId); tm.intervalId=null; tm.running=false;
+        releaseWakeLock();                                // v4.18: the steep is done — release
         playTimerDone();
       }
       updateTimerDisplayOnly();
