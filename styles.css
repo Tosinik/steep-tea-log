@@ -296,8 +296,13 @@ html[data-theme="dark"] .shelf-kanji.t-puerh{background:#2a241c;} html[data-them
 /* rows density */
 .shelf-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;}
 .shelf-row:last-child{border-bottom:none;}
-.shelf-thumb{width:50px;height:50px;border-radius:11px;flex:0 0 auto;}
-.shelf-kanji.shelf-thumb span{font-size:22px;}
+/* v4.20 — the shelf row leads with the liquor swatch (24×32 SVG, stroke/fill from tokens on the path
+   itself), and the photo trails as a small SQUARE thumb: 26×26, 5px radius, a hairline — deliberately
+   NOT the swatch's 9/4/8/5 tin radius, so photo and swatch read as different objects (R144's concern,
+   one level up). Kanji glyph shrinks with the box. .shelf-thumb is shelfRowHTML-only (verified). */
+.shelf-swatch{width:24px;height:32px;flex:0 0 auto;}
+.shelf-thumb{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);flex:0 0 auto;}
+.shelf-kanji.shelf-thumb span{font-size:13px;}
 .shelf-row-mid{flex:1;min-width:0;}
 .shelf-row .shelf-name{font-size:15.5px;line-height:1.2;}
 .shelf-row-meta{display:flex;align-items:center;gap:7px;margin-top:5px;}

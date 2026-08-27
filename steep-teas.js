@@ -162,21 +162,32 @@ function shelfPhoto(tea, kind){
 function shelfPill(tea){ return `<span class="shelf-pill t-${escapeHtml(tea.type||'')}">${escapeHtml(typeLabel(tea.type))}</span>`; }
 
 /* THE ONE WRITER that paints a swatch (contract 1, v4.15). Takes a resolved liquor key — or null —
-   and the tea's type, and returns the element's attributes: the liquor when there is one, the
-   shipped type tint when there is not. Tier 3 lives HERE rather than in `liquorFor`, because tier 3
-   is a CSS class and the resolver has no business knowing about stylesheets.
+   the tea's type, and (v4.20) `hasLabel`, R124's predicate: does the row that holds this swatch also
+   render a type label? Return is POLYMORPHIC BY SITE, and single-writer is one function owning the
+   write path, not one output format (R124):
+     · hasLabel FALSE (ref-swatch/social-tile/today-tint) → CSS attributes, UNCHANGED — the liquor as a
+       background when there is a key, the shipped type tint when there is not. Tier 3 lives here, not
+       in `liquorFor`, because a tint is a CSS class and the resolver has no business with stylesheets.
+     · hasLabel TRUE (the shelf row, v4.20) → an inline SVG `<path>` at BOTH tiers (R145), because
+       R144's dashed plate can't be a CSS border (dash length isn't settable there): filled 1px for a
+       measured swatch, a dashed 1.5px PLATE for tier 3 — one object with its outline broken, so a
+       filled block and an empty plate read as different things at the near-black end.
+   The predicate reaches three of four sites (R125); only the shelf passes it now. When a later version
+   enables it on ref-swatch/social-tile they flip CSS→SVG too — R145's "both tiers an SVG path" landing
+   as R125 staged.
 
-   THREE CALL SITES, AND ONLY THREE. The site scan (`liquor-test.js` §F) enumerates all twelve places
-   a `t-<type>` class is written and classifies each, because the danger in this slice is the
-   OPPOSITE of the currency sweep's: not a money field left bare, but a colour applied where it does
-   not belong. Four of the twelve are type LABELS — pills that literally read "Oolong" — and painting
-   one with a liquor would be an active regression that nothing else would notice. Three more are
-   photo placeholders, standing in for an image at 40-100px, which is a design question nobody has
-   drawn. Two are a categorical chart of types, not of teas.
-
-   The key is validated by `isLiquorKey` before it reaches here, so it cannot inject; the type is
-   escaped anyway, because it is user-adjacent data and the rule is escape the data, never the markup. */
-function swatchAttr(base, key, type){
+   `key` is validated by `isLiquorKey` upstream so it cannot inject; `type` is escaped anyway. The
+   plate `d` is lifted VERBATIM from Design's board (shelf-swatch-ruling.dc.html:776) — R128, do not
+   re-derive. style="…var(--line)…" not stroke="…" so the token resolves on the SVG stroke and themes;
+   the board bakes #332F24 because it is a dark mockup, shipped code must not. */
+const SHELF_SWATCH_PATH = "M9.75 0.75 H19.25 A4 4 0 0 1 23.25 4.75 V23.25 A8 8 0 0 1 15.25 31.25 H5.75 A5 5 0 0 1 0.75 26.25 V9.75 A9 9 0 0 1 9.75 0.75 Z";
+function swatchAttr(base, key, type, hasLabel){
+  if(hasLabel){
+    const stroke = key
+      ? `fill:var(--liquor-${escapeHtml(key)});stroke:var(--line);stroke-width:1;`
+      : `fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:13 6;`;
+    return `<svg class="${base}" viewBox="0 0 24 32"><path d="${SHELF_SWATCH_PATH}" style="${stroke}"/></svg>`;
+  }
   return key ? `class="${base}" style="background:var(--liquor-${escapeHtml(key)});"`
              : `class="${base} t-${escapeHtml((type||'unknown').toLowerCase())}"`;
 }
@@ -226,14 +237,19 @@ function teaCardHTML(t){
   </div>`;
 }
 // Row (density = rows) — thumbnail + name + [type pill · status] + caret.
+// v4.20: the SWATCH leads (identity), the PHOTO trails as a small square thumb before the caret
+// (evidence) — board S1/S2, photo kept not dropped (F4/TD1). The row renders shelfPill (a type label),
+// so hasLabel is true: tier 1/2 draws a filled swatch, tier 3 a dashed plate (R124/R144/R145).
 function shelfRowHTML(t){
   const fin = isTeaFinished(t);
+  const key = liquorFor(t);
   return `<div class="shelf-row${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
-    ${shelfPhoto(t,'thumb')}
+    ${swatchAttr('shelf-swatch', key, t.type, true)}
     <div class="shelf-row-mid">
       <div class="shelf-name">${escapeHtml(t.name)}</div>
       <div class="shelf-row-meta">${shelfPill(t)}${statusLineHTML(t)}</div>
     </div>
+    ${shelfPhoto(t,'thumb')}
     <span class="shelf-caret">${icon('i-caret-hl',20)}</span>
   </div>`;
 }

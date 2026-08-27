@@ -187,22 +187,32 @@ ok(!/long-?press|onlongpress/i.test(teasFenceSrc),
    'D1b …and long-press is NOT built (deviation 3) — no machinery, not keyboard-reachable, nothing on shelf/detail to press');
 ok(G('TT_INHERIT').indexOf('liquor')===-1,
    'D2 `liquor` is NOT inherited: §8 authors every member explicitly, so inheritance is unused today and its only future effect is a new member silently inheriting a colour nobody authored (R121)');
-/* D3 UNCHANGED at v4.19 — the picker lives in the FORM, so the shelf still renders no swatch. This is
-   the fence that becomes R124/R125's shelf-and-predicate fence at v4.20 (the shelf), when swatchAttr
-   gains its tier-3 predicate argument. THE A2 FOLD: R124–R129 are recorded here and in SPEC §9 as the
-   v4.20 fences so they are not discovered mid-slice — D6 pins that swatchAttr's signature is unchanged
-   until then, and SPEC §9's shelf/predicate/border-style fences (R124 predicate · R125 ref+social
-   filed behind v4.20 · R126 dashed-border tier mark · R129 no per-tea script) are the wall that stands
-   after this one. */
-ok(!/swatchAttr\('shelf-/.test(teasFenceSrc),
-   'D3 the SHELF still draws no swatch — shelfPhoto holds that position on evidence (R81); this becomes R124/R125\'s predicate fence at v4.20, not now');
+/* D3 FLIPS AT v4.20 (the shelf) — the picker lived in the form, but shelfRowHTML now LEADS with the
+   swatch, so the shelf draws one via R124's predicate. The "shelf renders none" fence is CROSSED;
+   what it becomes is the assertion that the shelf swatch is an SVG <path> (R145), tier-3 a dashed
+   PLATE (R144), never a border style. R126's border STYLE is superseded here by R145: the tier is now
+   carried by stroke weight + interruption on one path, not solid-vs-dashed borders. The fence that
+   still stands after this: ref-swatch/social-tile do not yet pass the predicate — filed behind a later
+   version (after v4.20, not yet sequenced), R125 — so they keep the CSS output (D3e). */
+ok(/swatchAttr\('shelf-swatch'/.test(teasSrc0),
+   'D3 the shelf row now DRAWS a swatch via the predicate — shelfRowHTML leads with swatchAttr(\'shelf-swatch\', …, true) (R124/R125, board S1)');
+{ const plate=G("swatchAttr('shelf-swatch', null, 'green', true)");
+  ok(/<path\b/.test(plate) && /stroke-dasharray:13 6/.test(plate) && /stroke-width:1\.5/.test(plate) && /fill:none/.test(plate),
+     'D3b tier 3 on a labelled row is a dashed SVG PLATE — <path>, dasharray "13 6", 1.5px, fill none (R144/R145), NOT a CSS border'); }
+{ const filled=G("swatchAttr('shelf-swatch', 'amber-deep', 'oolong', true)");
+  ok(/<path\b/.test(filled) && /fill:var\(--liquor-amber-deep\)/.test(filled) && /stroke-width:1;/.test(filled) && !/dasharray/.test(filled),
+     'D3c a measured swatch is the SAME <path>, filled with the liquor, solid 1px, no dash — one object with its outline broken (R145)'); }
+ok(/class="today-tint t-green"/.test(G("swatchAttr('today-tint', null, 'green', false)")),
+   'D3d hasLabel FALSE keeps the CSS type tint (today-tint has no label) — the predicate reaches 3/4 sites and this is the one it does not (R125)');
+ok(/background:var\(--liquor-amber\)/.test(G("swatchAttr('ref-swatch', 'amber', 'oolong')")),
+   'D3e the three filed-behind sites are UNCHANGED — a 3-arg call (no hasLabel) still returns CSS attributes; ref/social/today untouched (R125)');
 const spec=fs.readFileSync(path.join(repo,'docs/r4/planning/SPEC-liquor-swatch-model.md'),'utf8');
 ok(/These hex values are a first pass by a lane that has not drunk these teas/.test(spec),
    'D4 the spec still says the hexes are unverified by anyone who has tasted these teas — two groupings want a human check');
 ok(/derived, not locked/.test(spec), 'D5 …and that the small 15x20 geometry is derived, not locked (R121)');
-ok(/function swatchAttr\(base, key, type\)/.test(teasSrc0),
-   'D6 swatchAttr\'s signature is UNCHANGED — R124\'s tier-3 predicate argument is v4.20 work (the shelf), not this slice; recorded so the A2 fold is not discovered mid-slice');
-console.log('  D the fence: 7 checks');
+ok(/function swatchAttr\(base, key, type, hasLabel\)/.test(teasSrc0),
+   'D6 swatchAttr\'s signature GAINED R124\'s predicate (base, key, type, hasLabel) and its label branch emits an SVG <path>, not a border (R145) — the A2 fold, landed at the shelf');
+console.log('  D the fence: 11 checks');
 
 /* ---- E · the cascade (v4.14) — read time, never stored ---- */
 const gf={id:'t1', name:'Honey Oolong Gui Fei', type:'oolong'};          // matches gui-fei-oolong → amber
@@ -245,7 +255,9 @@ console.log('  E the cascade: 10 checks');
  * not. This one has to catch the reverse: a colour applied where it does not belong. FOURTEEN places
  * write a `t-<type>` class (twelve before v4.19; the picker added two), and they are five kinds:
  *
- *   3 SWATCH SLOTS      already Bundle-1 geometry wearing a type tint — these get the liquor
+ *   4 SWATCH SLOTS      the liquor's home — three CSS (ref/social/today) + the shelf row (v4.20). The
+ *                       shelf is an SVG <path>, so it lifts `painted` to FOUR but adds no t- tint: its
+ *                       tier-3 is a dashed PLATE, not a class, so `tinted` stays 11 (R145).
  *   3 PHOTO PLACEHOLDERS  40-100px image substitutes; a design question nobody has drawn
  *   4 TYPE LABELS       pills that literally read "Oolong" — liquor-ising one is an ACTIVE REGRESSION
  *   2 CHART SEGMENTS    a categorical bar of types, not of teas
@@ -258,7 +270,7 @@ console.log('  E the cascade: 10 checks');
  * classified rather than defaulted, and a label that quietly acquires a liquor reddens.
  */
 const FILES_SCANNED=['steep-teas.js','steep-sessions.js','steep-social.js','steep-dashboard.js','steep-reference.js','steep-insights.js'];
-const SWATCHES=['today-tint','social-tile','ref-swatch'];
+const SWATCHES=['today-tint','social-tile','ref-swatch','shelf-swatch'];
 const LABELS=['shelf-pill','pill t-'];
 /* THE WRITER'S OWN BODY IS EXCLUDED BEFORE COUNTING, and that is not bookkeeping. `swatchAttr`
    contains a `t-${...}` fallback and the token `swatchAttr(` in its own declaration, so counting the
@@ -268,12 +280,12 @@ const LABELS=['shelf-pill','pill t-'];
 let tinted=0, painted=0;
 FILES_SCANNED.forEach(f=>{
   const src=strip(fs.readFileSync(path.join(repo,f),'utf8'))
-    .replace(/function swatchAttr\(base, key, type\)\{[\s\S]*?\n\}/,'');
+    .replace(/function swatchAttr\(base, key, type, hasLabel\)\{[\s\S]*?\n\}/,'');
   tinted += (src.match(/t-\$\{|dot-\$\{/g)||[]).length;
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
 ok(tinted===11, 'F1 ELEVEN type-tint writes remain across the six files — the v4.19 picker added two (its tier-3 fallback: COLOUR-row preview + default cell), on top of the nine that stayed labels/placeholders/chart after three became swatches (got '+tinted+')');
-ok(painted===3, 'F2 …and exactly THREE call sites paint a liquor, one per real swatch slot (got '+painted+')');
+ok(painted===4, 'F2 …and exactly FOUR call sites paint a liquor now — the three earlier slots plus the shelf row (v4.20), one per real swatch slot (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
 const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));
@@ -282,8 +294,16 @@ ok(/shelf-pill t-\$\{/.test(teasSrc) && !/swatchAttr\('shelf-pill/.test(teasSrc)
    'F3 the shelf type PILL keeps its type tint and takes no liquor — a label reading "Oolong" coloured by liquor is a category error');
 ok(/class="pill t-\$\{/.test(socialSrc) && /class="pill t-\$\{/.test(teasSrc),
    'F4 …and so do the two other type pills, on Social and Tea detail');
-ok(/shelf-ph t-\$\{/.test(teasSrc) && !/swatchAttr\('shelf-/.test(teasSrc),
-   'F5 the shelf PHOTO placeholder is untouched — R81: a swatch beside the photo is an addition nobody has drawn, and shelfPhoto holds that position on evidence (21/21 teas carry photos)');
+/* F5 SPLITS AT v4.20 — the "no shelf swatch" negation is CROSSED (D3/F5b assert presence now). Two
+   distinct guards: (a) the photo placeholder tint is not liquor-ised — the site-scan's real job; and
+   (b) the photo-trails DECISION, pinned on shelfRowHTML's OWN body, not the whole file, so it reddens
+   if the photo is dropped or the swatch/photo order flips (board S1/S2 · F4/TD1 · R81 for the grid). */
+ok(/shelf-ph t-\$\{/.test(teasSrc),
+   'F5a the shelf photo PLACEHOLDER keeps its type tint and takes no liquor — a tint stays a tint');
+{ const rowBody=teasSrc.match(/function shelfRowHTML\([\s\S]*?\n\}/)[0];
+  const swAt=rowBody.indexOf("swatchAttr('shelf-swatch'"), phAt=rowBody.indexOf("shelfPhoto(t,'thumb')");
+  ok(swAt!==-1 && phAt!==-1 && swAt<phAt,
+     'F5b the row draws the swatch AND keeps the photo — swatch leading, photo trailing (board S1/S2, F4/TD1); reddens if the photo is dropped or the order flips'); }
 ok(/dot-\$\{/.test(strip(fs.readFileSync(path.join(repo,'steep-insights.js'),'utf8'))),
    'F6 the type-mix chart still keys on type — it counts categories, not teas, so a per-tea colour would make its legend meaningless');
 /* The three slots actually resolve. Rendered, not merely present in source. */
@@ -295,7 +315,7 @@ ok(/background:var\(--liquor-/.test(G('swatchAttr("ref-swatch","amber-deep","ool
    'F8 the writer paints when there is a key and falls back to the type tint when there is not — tier 3 lives at the render site, not in the resolver');
 ok(/\.today-tint\{[^}]*border:1px solid var\(--line\)/.test(cssSrc),
    'F9 the third slot gains the hairline the other two already had — which is what makes `ivory` (19.2 from --white) exist on a near-white card, and closes that open item');
-console.log('  F the site scan: 9 checks · '+tinted+' tints kept · '+painted+' liquor sites');
+console.log('  F the site scan: 10 checks · '+tinted+' tints kept · '+painted+' liquor sites');
 
 /* ---- G · the picker (v4.19, R39) — the WRITE path, and F1's containment guard ----
  *

@@ -18,7 +18,10 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const repo=path.join(__dirname,'..');
-const src=['steep-knowledge.js','steep-core.js','steep-teas.js'].map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
+// steep-tea-types.js added v4.20: shelfRowHTML now calls liquorFor (the shelf swatch), which lives
+// there — in production it loads before steep-teas.js (index.html + FILES_TO_CACHE), so the sandbox
+// must provide it too. Not a guard at the call site: the picker already calls liquorFor unguarded.
+const src=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-teas.js'].map(f=>fs.readFileSync(path.join(repo,f),'utf8')).join('\n;\n');
 const ctx={}; ctx.window=ctx; ctx.globalThis=ctx; ctx.console=console;
 ctx.document={documentElement:{setAttribute(){},getAttribute(){return 'light';}},getElementById(){return null;},querySelector(){return null;},querySelectorAll(){return[];},createElement(){return{style:{},setAttribute(){},appendChild(){},classList:{add(){}}};}};
 let store={}; // switchable localStorage so the density pass can flip tealog_teaDensity
