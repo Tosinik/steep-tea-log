@@ -191,7 +191,32 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (SHIPPED — v4.19 LIVE) — the liquor picker (R39/R89)** (cache **v129**, APP_VERSION v4.19,
+**NOW (BUILT — awaiting review, the F29 on-device gate, and Niklas's push) — v4.20: the shelf leads with
+the swatch** (cache **v130**, APP_VERSION v4.20, **no SQL**). The library ROWS lead with the liquor swatch
+and the photo trails as a 26×26 square thumb (board S1/S2, photo KEPT — F4/TD1). `swatchAttr` gained
+R124's predicate `hasLabel` and is now **polymorphic by site** — CSS attributes for `.ref-swatch`/
+`.social-tile`/`.today-tint` (unchanged), an SVG `<path>` for the shelf (R145): filled 1px at tier 1/2, a
+dashed 1.5px plate (`dasharray "13 6"`, R144) at tier 3. `swatchAttr` stays the single writer (R124); a
+standalone renderer §F can't see would pass `painted===3` vacuously (R132). Path `d` lifted verbatim from
+the board (`shelf-swatch-ruling.dc.html:776`, R128); stroke/fill via `var(--line)`/`var(--liquor-*)`.
+- **CARRYOVER (the later lane that enables the predicate on ref/social):** `.ref-swatch`/`.social-tile` are
+  filed behind a later version — **after v4.20, sequence not yet ruled** (the security/legal pass is next),
+  R125. Enabling `hasLabel` at those two sites flips them **CSS→SVG**, which is R145's "at both tiers an SVG
+  path" landing as R125 staged. `.today-tint` keeps its tint permanently by the predicate, not exemption.
+- **Tests:** `liquor-test.js` §D (11) + §F (10, `painted 3→4`, `tinted` stays 11); F5→F5a/F5b (photo-trails
+  pinned on `shelfRowHTML`'s body); self-exclusion regex updated + **negative control proven** (stale regex
+  → 12/5). `shelf-order-test.js` gained `steep-tea-types.js` — the sweep caught `shelfRowHTML`'s new
+  `liquorFor` crashing its under-provisioned sandbox. **37 suites green.**
+- **NON-AUTOMATABLE GATE (smoke.md F29):** the ~1.3:1 plate legibility on a dimmed dark screen and CSS-var
+  resolution on an SVG stroke are not vm-reachable — Niklas confirms on device before push. Live shelf:
+  **12 filled / 9 plates** (matches the board's split).
+- **Split-push:** docs (CHANGELOG, STATE, ROADMAP, smoke.md, SPEC §9/§10) **pushed on write**; the code
+  commit (`steep-teas.js`, `styles.css`, `service-worker.js`, `steep-core.js`, `fixtures/liquor-test.js`,
+  `fixtures/shelf-order-test.js`) **pauses UNPUSHED for review + the F29 phone check** — Niklas pushes.
+- **NEXT: the security/legal hardening pass** (`SECURITY.md`'s two HIGH findings — the beta blocker; its
+  own turn, not squeezed behind more build).
+
+**Previously — v4.19: the liquor picker (R39/R89)** (cache **v129**, APP_VERSION v4.19,
 **no SQL** — `v3_12` shipped v4.14). Slice 3 of 3 of the liquor swatch model; **unblocks #14 (R89)**.
 **PUSHED: origin/main = `1ee6aaf`**, docs (`e6e5075` v4.19 + R143) below it; verified at origin — cache
 v129, APP_VERSION v4.19. Code commit = `steep-teas.js`, `styles.css`, `service-worker.js`, `steep-core.js`,

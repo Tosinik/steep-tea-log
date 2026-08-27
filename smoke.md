@@ -44,3 +44,21 @@ phone shows the screen actually staying lit and the lock following the timer. Th
    left it, no drift), and on return the lock comes back **when you resume**, not before.
 3. **Background and return while PAUSED** → the lock does **not** re-acquire on return; the screen is
    not held awake to show a frozen clock. It re-acquires only when you tap resume.
+
+---
+
+## v4.20 · #shelf swatch — F29 the dashed plate on a dimmed screen  *(the visual half R144 can't automate)*
+
+The suite asserts the SVG `<path>` is present with `stroke:var(--line)` / `stroke-dasharray:13 6` — but a
+vm has no renderer, so two things only a phone shows: whether a **CSS variable resolves on an SVG stroke**
+(the `style="…stroke:var(--line)…"` form is used precisely because presentation-attribute vars don't
+always resolve), and whether the **~1.3:1 plate edge** reads at all in the worst case. One check:
+
+1. **DARK mode, screen dimmed to LOW brightness** — open the library in ROWS density. A tier-3 **dashed
+   plate** reads as a **different object** from a filled swatch on an adjacent row: the interrupted
+   outline vs. the continuous block is legible, not a faint scratch. The trailing photo thumb (small
+   square) reads as a separate thing from the leading swatch (tin shape), not a second swatch.
+   - **Note, not a fail:** the tightest pair — a filled **near-black** beside a plate — may be absent
+     from the live shelf (board F21: Fei Bing is tier 3, so near-black never appears). If it's not there,
+     that's an observation; the plate-vs-fill legibility still holds on the pairs that are present
+     (12 filled / 9 plates on the current shelf).

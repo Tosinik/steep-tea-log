@@ -371,9 +371,13 @@ written down in two files and asserted in two suites.** So:
   bullet (D3); R124–R129 are the v4.20 fences, folded into `liquor-test.js` §D + D6 so they are not
   discovered mid-slice.
 - ~~Nothing renders a swatch.~~ **CROSSED (v4.15):** three slots do — `.ref-swatch`, `.social-tile`,
-  `.today-tint`. **The fence that still stands: the SHELF renders none.** `shelfPhoto` holds that
-  position on evidence (21 of 21 teas carry photos; R78 made the tint the fallback only when no photo
-  exists), so a swatch beside the photo is an addition nobody has drawn — Design's call (R81).
+  `.today-tint`. ~~**The fence that still stands: the SHELF renders none.**~~ **CROSSED (v4.20):** the
+  library ROWS now LEAD with the swatch and the photo trails (board S1/S2, R81 kept for the grid). The
+  fence that still stands after this: **`.ref-swatch`/`.social-tile` do not yet pass the predicate** —
+  filed behind a later version (after v4.20, not yet sequenced; the security/legal pass is next), R125 —
+  so they keep the CSS output; enabling `hasLabel` there flips them CSS→SVG, R145's "both tiers an SVG
+  path" landing as R125 staged. `swatchAttr` carries R124's predicate and, for a label-bearing row, emits
+  an SVG `<path>` (R145) — filled at tier 1/2, a dashed 1.5px plate at tier 3 (R144).
 - ~~**`amber` has no catalog row.** It is deliberate headroom, not an oversight — assert that it is
   reachable only by a user correction.~~ **STRUCK (A1): both statements are false.** `amber` holds
   `gui-fei-oolong`, it is reachable at tier 2, and **the ramp has no headroom stop at all**. What is
@@ -410,14 +414,16 @@ written down in two files and asserted in two suites.** So:
 
 ## 10 · Order of work, revised
 
-Steps 1 and 2 of §6 are now done — the ramp exists and all 55 rows are assigned. What remains:
+> **ALL SHIPPED (v4.11–v4.20).** The steps below are struck as done; the outcome is now present tense.
 
-1. **Land the ramp as tokens** in `styles.css`, both themes.
-2. **Land `liquor` on the 55 catalog rows** from §8's table.
-3. **The migration** — `alter table teas add column if not exists liquor text;`
-4. **The cascade** at read time, then the picker (R39), which unblocks #14 (R89).
+1. ~~**Land the ramp as tokens** in `styles.css`, both themes.~~ **done v4.11.**
+2. ~~**Land `liquor` on the 55 catalog rows** from §8's table.~~ **done v4.11.**
+3. ~~**The migration**~~ **done v4.14 (`v3_12`).**
+4. ~~**The cascade** at read time, then the picker (R39), which unblocks #14 (R89).~~ **cascade v4.14,
+   three render slots v4.15, the picker v4.19, and the SHELF swatch-led rows v4.20.**
 
-Niklas's shelf will then show **eight** distinct swatches across 12 teas (~~five~~ ~~six~~ — A1: Gui
-Fei brings `amber`; **A5: Ya Bao brings `ivory` and Huang Ya brings `yellow-pale`**); nine teas stay
-on the type tint — one indeterminate (Yashi Xiang) and eight with no catalog
-match at all, which is the same content gap that costs them Go Deeper and freshness rung 2.
+Niklas's shelf ~~will then show~~ **shows eight** distinct swatches across 12 teas (~~five~~ ~~six~~ — A1:
+Gui Fei brings `amber`; **A5: Ya Bao brings `ivory` and Huang Ya brings `yellow-pale`**); nine teas stay
+on the type tint — now drawn as a dashed **plate** on the shelf row (R144/R145), not a filled swatch —
+one indeterminate (Yashi Xiang) and eight with no catalog match at all, which is the same content gap
+that costs them Go Deeper and freshness rung 2. **Verified on the 08-26 export: 12 filled / 9 plates.**

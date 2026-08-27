@@ -43,6 +43,37 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.20 — the shelf leads with the swatch (R124 / R144 / R145)
+Deploy: steep-teas.js, styles.css, service-worker.js (v130), steep-core.js, fixtures/liquor-test.js,
+fixtures/shelf-order-test.js, smoke.md, docs/r4/planning/SPEC-liquor-swatch-model.md, CHANGELOG.md,
+STATE.md, ROADMAP-v4.md. No SQL.
+
+- **Library ROWS lead with the liquor swatch; the photo trails as a 26×26 square thumb** (board S1/S2:
+  leading = identity, trailing = evidence — the photo is KEPT, not dropped, F4/TD1). The trailing thumb
+  takes a 5px radius + a hairline, deliberately NOT the swatch's 9/4/8/5 tin radius, so the two read as
+  different objects. Grid cards stay photo-forward (R81). `.ref-swatch`/`.social-tile` are untouched.
+- **`swatchAttr` gains R124's predicate `hasLabel`**: a row that renders a type label draws the swatch,
+  and its tier-3 becomes a dashed PLATE, not the type tint; `.today-tint` (no label) keeps its tint
+  permanently (R125). The return is **polymorphic by site** — CSS attributes for the three filed-behind
+  sites, an SVG `<path>` for the shelf — so `swatchAttr` stays the single writer (R124) and a standalone
+  renderer the §F scan can't see can't pass `painted===3` vacuously (R132).
+- **R145: the shelf swatch is an inline SVG `<path>` at BOTH tiers** (R144's dash length isn't settable
+  in a CSS border): filled 1px for tier 1/2, dashed 1.5px `dasharray "13 6"` for tier 3 — one object with
+  its outline broken, so a fill and a plate read apart at the near-black end. The path `d` is lifted
+  verbatim from Design's board (`shelf-swatch-ruling.dc.html:776`, R128); stroke/fill use
+  `var(--line)`/`var(--liquor-*)` via `style=` so it themes (the board bakes `#332F24` as a dark mockup).
+- **Tests:** `liquor-test.js` §D flips (D3 presence-of-path + D3b–e tier×predicate; D6 pins the new
+  signature + `<path>`); §F `painted 3→4`, `tinted` stays 11 (the swatch is a path), F5 splits into F5a
+  (placeholder tint kept) + F5b (photo-trails ordering pinned on `shelfRowHTML`'s body), and the
+  self-exclusion regex is updated to the new signature — **proven load-bearing by a negative control**
+  (stale regex → both counters inflate to 12/5). The **sweep caught a real bug**: `shelfRowHTML`'s new
+  `liquorFor` call crashed `shelf-order-test.js`, whose sandbox didn't load `steep-tea-types.js`; fixed by
+  provisioning it (production loads it before `steep-teas.js`; the picker already calls `liquorFor`
+  unguarded). 37 suites green.
+- **On-device gate (smoke.md F29):** the ~1.3:1 plate legibility on a dimmed dark screen and whether a
+  CSS var resolves on an SVG stroke are browser/perceptual facts no vm suite reaches — Niklas confirms on
+  device before push. Live shelf: **12 filled / 9 plates** (verified, matches the board's split).
+
 ## v4.19 — the liquor picker: a tea's colour becomes correctable (R39 / R89)
 Deploy: `steep-teas.js` (the COLOUR row + picker functions + F1 fix), `styles.css`
 (`.liquor-*` geometry), `steep-core.js` (APP_VERSION/WHATS_NEW), `service-worker.js`

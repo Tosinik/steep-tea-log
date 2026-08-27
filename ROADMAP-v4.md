@@ -90,14 +90,14 @@ decisions rather than any single ruling:
   file is touched.
 - ~~**Slice 3 (the picker) is now v4.19 and UNBLOCKED**~~ — **SHIPPED v4.19** (cache v129): the COLOUR row
   in the tea form (F2 name-not-type, DOM-only grid, F1 containment guard), **unblocking #14 (R89)**. The
-  S3 gate was R124/R125; those + R126–R129 are now the **v4.20** shelf fences, recorded in `liquor-test.js`
-  §D. Next is v4.20 (the shelf) — **Design's dark redraw LANDED + reconciled (R144/R145; board banked at
-  `docs/r4/boards/shelf-swatch-ruling.dc.html`), so v4.20 is UNBLOCKED** — then the `SECURITY.md`
-  hardening pass.
-- **The shelf swatch is v4.20** (renumbered twice — R125's heading records both), on its own version,
-  after slice 3 (**shipped v4.19**) **and** after Design's dark redraw (**landed this session — R144/R145,
-  dark plates are a dashed 1.5px SVG path, not a CSS border**). `.ref-swatch`/`.social-tile` are filed
-  behind it; `.today-tint` keeps its tint permanently, by R124's predicate rather than by exemption.
+  S3 gate was R124/R125; those + R126–R129 were the v4.20 shelf fences — **all struck as SHIPPED v4.20**.
+- ~~**The shelf swatch is v4.20**~~ — **SHIPPED v4.20** (cache v130): the library ROWS lead with the
+  liquor swatch, the photo trails as a 26×26 square thumb (board S1/S2). `swatchAttr` gained R124's
+  predicate and, for a label-bearing row, emits an SVG `<path>` (R145) — filled at tier 1/2, a dashed
+  1.5px plate at tier 3 (R144); `.today-tint` keeps its tint by the predicate (R125). Grid cards stay
+  photo-forward (R81). **`.ref-swatch`/`.social-tile` are filed behind a later version** — after v4.20,
+  **not yet sequenced** (the security/legal pass is next), R125; enabling the predicate there flips them
+  CSS→SVG. **F29 is the on-device gate** (dashed-plate legibility on a dimmed dark screen).
 - **Security & legal hardening pass — sequenced after v4.20, before any public beta.** Findings
   captured and verified against the live project in **`SECURITY.md`**: `profiles` readable by all
   authenticated users with no allowlist (HIGH) · `tea-photos` bucket public + unscoped read (HIGH) ·
