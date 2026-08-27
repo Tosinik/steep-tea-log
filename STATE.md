@@ -191,7 +191,37 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (BUILT, awaiting the on-device gate + push) — v4.18: #33/#30/#31, wake-lock bundle** (cache
+**NOW (BUILT — docs pushed; code commit awaiting review + push) — v4.19: the liquor picker (R39/R89)**
+(cache **v129**, APP_VERSION v4.19, **no SQL** — `v3_12` shipped v4.14). Slice 3 of 3 of the liquor
+swatch model; **unblocks #14 (R89)**. Split-push: CHANGELOG/STATE/ROADMAP/SPEC pushed on write; the code
+commit (`steep-teas.js`, `styles.css`, `service-worker.js`, `steep-core.js`, `fixtures/liquor-test.js`,
+`fixtures/liquor-review.js`, `fixtures/xss-render-test.js`) **pauses UNPUSHED for review** — Niklas pushes.
+- **The COLOUR row** (tea form, after Type, above the Specifics fold): preview swatch + tier-honest source
+  note + inline **13-cell `<button>` grid** (default cell + 12 ramp stops), `aria-pressed`/`aria-label`.
+  DOM-only, never `render()`; selection writes a hidden input + dispatches `input` (WS1 dirty guard,
+  `acceptOriginOffer`'s pattern); clearing → default cell → `''` → `null` → tier 2 (E4).
+- **F1 fixed** — `submitTeaForm` silently dropped `liquor` (wrote 22 of `teaFromDb`'s 23 keys); now gated
+  through `isLiquorKey`, and `liquor-test.js` **§G** asserts the **general** containment (`submitTeaForm`
+  keys ⊇ `teaFromDb` keys), so the NEXT dropped field reddens too.
+- **F2** — the default follows the NAME via `matchTeaType`, not the type (built to §4.1, not board #06 rev
+  4). **Geometry R121** — preview 26×34, cells 22×22 (#06's 40×50 not adopted).
+- **A2 fold** — `liquor-test.js` **D1 crossed** (picker exists → form-control fence; tea detail no in-place
+  picker F6, no long-press dev.3); **D3 unchanged** (shelf renders none); **R124–R129 recorded as the
+  v4.20 fences** (D6 pins `swatchAttr`'s signature). Site scan 9→11 tints (the +2 = picker tier-3 fallback,
+  classified). **F4/F5 housekeeping** done in SPEC §7 / `liquor-review.js`.
+- **No on-device gate** (smoke.md — DOM form state, vm-reachable). **30 committed suites green** (+ 7
+  local; a local `xss-render-test.js` gained `steep-tea-types.js` in its sandbox) on the fresh
+  **2026-08-26 export** (swapped this session; the Aug-17 set → `fixtures/archive/2026-08-26-pre-v4.19/`);
+  `liquor-test.js` 59→**72**.
+- **TWO JUDGMENT CALLS surfaced for a look at the pause** (both §4.1-approved): the COLOUR row above the
+  fold on **Add** (the one spot that brushes WS1's "name and type are all you need"), and the tier-3
+  preview re-tinting on **type** change (correct: the tier-3 fallback is type-derived; the liquor still
+  follows name only).
+- **NEXT: v4.20 — the shelf** (R141 ladder; the R124–R129 fences), **gated on Design's dark redraw** —
+  check if it's landed. Then the **security/legal hardening pass** (documented in `SECURITY.md`, after
+  v4.20), then the beta is reachable.
+
+**Previously — v4.18: #33/#30/#31, wake-lock bundle** (cache
 **v128**, APP_VERSION v4.18, **no SQL**). Three feature commits + a release note.
 - **#33 (R7):** screen stays awake while a steep timer runs, **and only then** — the lock follows the
   timer's `running` state (R142), not the session's existence. Acquire on start; release on
@@ -205,7 +235,7 @@ low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unseq
 - **`fixtures/wake-timer-test.js`** (15, 2 controls bite) guards the running-scoped lock + pause
   logic; **30 committed suites green**. **NON-AUTOMATABLE GATE (smoke.md):** wakeLock has no vm reach
   — screen-stays-lit + lock-follows-running verified on device before push.
-- **NEXT: v4.19 — slice 3, the picker (R39 / R89).** **BUILD AUTHORITY = `SPEC-liquor-swatch-model.md`
+- ~~**NEXT: v4.19 — slice 3, the picker (R39 / R89).**~~ **SHIPPED v4.19 (see NOW block above).** **BUILD AUTHORITY = `SPEC-liquor-swatch-model.md`
   §4.1** — the full approved control spec (COLOUR row after Type, 13-cell grid with `<button>`+
   `aria-pressed`, DOM-only never `render()`, hidden field + `input` dispatch, form-Save commits,
   clear→default→tier 2), **F2** (the default follows the NAME via `matchTeaType`, not the TYPE — build
@@ -214,10 +244,10 @@ low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unseq
   cells 22×22, #06's 40×50 NOT adopted), the **three accepted deviations**, and the **A2 fence timing**
   (R124–R129's fences fold into SPEC §9 + `liquor-test.js` §D as part of v4.19's touch of that suite —
   D1/D3 predate those rulings). All six were chat-only until the 2026-08-26 handoff; now in §4.1.
-- **Refresh the export FIRST** (step-zero precondition, not a step-7 surprise) — the picker reads the
-  shelf; the 2026-08-17 pull is fine for v4.18 but stale for the picker. `swatchAttr`/`liquor-test.js`
-  in scope again (S3 = R124–R129) — untouched until v4.19 opens. Then **v4.20** the shelf (R141
-  ladder). **`/slowcup-deploy dry` before any file is touched.**
+- ~~**Refresh the export FIRST**~~ **DONE v4.19** — export swapped to the **2026-08-26** set (Aug-17 →
+  `fixtures/archive/2026-08-26-pre-v4.19/`); `/slowcup-deploy dry` ran clean before any file was touched.
+  `swatchAttr`/`liquor-test.js` were in scope (S3 = R124–R129); **the shelf's R124–R129 fences remain
+  v4.20** — recorded in `liquor-test.js` §D/D6, not built this slice.
 
 **Previously — v4.17: #34/#35, work no longer lost** (cache
 **v127**, APP_VERSION v4.17, **no SQL**). R137's one slice, two issues — the only queue item that

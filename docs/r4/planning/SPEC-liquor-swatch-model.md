@@ -159,6 +159,12 @@ this correction.
 > supersedes §4's "long-press" framing: **long-press is optional and NOT the primary mechanism**
 > (there is no long-press machinery in the app — six touch handlers, none of them one — so a fiddly
 > gesture must not block the feature). The form control below is the build.
+>
+> **SHIPPED v4.19 (cache v129).** F1 (containment guard), F2 (name-not-type), the COLOUR-row control,
+> R121 geometry, the three deviations, and the A2 fence fold all built as written; F4/F5/F6 discharged
+> (below). The build is `steep-teas.js` (picker + F1) · `styles.css` (`.liquor-*`) · `liquor-test.js`
+> §D/§G (72 green) · `liquor-review.js` (F5). This subsection stays as the authority-of-record; the
+> code is the artifact.
 
 **F2 — the mechanism is NAME, not TYPE. Build to this, not to board #06 rev 4.** The board (AT1, the
 Add caption) says the Tier-2 default appears "live only after you pick a **TYPE**". **That is wrong.**
@@ -223,6 +229,8 @@ ramp table has two **stale dark hexes** (`yellow-pale` `#EBE0BC`→shipped `#E8D
 `liquor-review.js`'s header says "Nothing renders a liquor yet" and calls itself untracked; both false
 since v4.15/`a82bda9`. **F6** — board 03's ✎-badge "primary path" has nothing to attach to (tea detail
 renders no swatch); this slice ships the **secondary** (#06 form) path, stated not discovered.
+**ALL THREE DISCHARGED v4.19:** F4 corrected in §7's table above; F5's header rewritten; F6 recorded in
+the CHANGELOG and pinned by `liquor-test.js` D1 (the picker is the form/secondary path).
 
 **A2 (v4.20 fence pair) — the timing, so it is not discovered mid-slice.** R124–R129's fences fold
 into **§9 here** and **`liquor-test.js` §D** **as part of v4.19's touch of that suite** — because §9's
@@ -276,8 +284,8 @@ why `teas.liquor` stores the key.
 | `jade-pale` | `#A9C46E` | `#B8D07E` | Japanese green — sencha, gyokuro, matcha |
 | `straw` | `#D8D48A` | `#DFD996` | Chinese green — unroasted, pale yellow-green |
 | `ivory` | `#F2EBD4` | `#EFE7CE` | **bud-only whites — barely-tinted, faint gold** *(A5)* |
-| `yellow-pale` | `#EDE2B8` | `#EBE0BC` | **yellow tea — a clear, light gold** *(A5)* |
-| `gold-pale` | `#E8D9A0` | `#EADFAF` | white tea, light-oxidation oolong *(A5: no longer silver needle)* |
+| `yellow-pale` | `#EDE2B8` | `#E8DDB6` | **yellow tea — a clear, light gold** *(A5; F4: dark hex corrected v4.19 from the stale `#EBE0BC` to the shipped value)* |
+| `gold-pale` | `#E8D9A0` | `#DED2A0` | white tea, light-oxidation oolong *(A5; F4: dark hex corrected v4.19 from the stale `#EADFAF` to the shipped value)* |
 | `gold` | `#DCB863` | `#E2C275` | light gaoshan oolong |
 | `amber` | `#C99447` | `#D2A05A` | Gui Fei / bug-bitten honey oolong *(A1 — not headroom)* |
 | `amber-deep` | `#B87A38` | `#C4884A` | Wuyi yancha, roasted rock oolong |
@@ -350,8 +358,13 @@ written down in two files and asserted in two suites.** So:
 > stands, because deleting it loses the record of what was deliberately not built.
 
 - ~~**No per-tea value exists yet.** `teas.liquor` is unmigrated~~ — **CROSSED (v4.14).** The column
-  exists and both mappers carry it. **The fence that still stands: no PICKER**, so tier 1 is
-  reachable today only by import or hand-edit, and every tea on a real shelf resolves at tier 2 or 3.
+  exists and both mappers carry it. ~~**The fence that still stands: no PICKER**~~ — **CROSSED
+  (v4.19):** the picker ships as the tea-FORM control (R39, #06's boarded SECONDARY path); tier 1 is
+  now set from the app. **The fence that still stands: tea detail renders no in-place picker** (board
+  03's PRIMARY path, F6 — it draws no swatch to attach one to) and **there is no long-press**
+  (deviation 3: no machinery, not keyboard-reachable, nothing to press). The SHELF fence is the next
+  bullet (D3); R124–R129 are the v4.20 fences, folded into `liquor-test.js` §D + D6 so they are not
+  discovered mid-slice.
 - ~~Nothing renders a swatch.~~ **CROSSED (v4.15):** three slots do — `.ref-swatch`, `.social-tile`,
   `.today-tint`. **The fence that still stands: the SHELF renders none.** `shelfPhoto` holds that
   position on evidence (21 of 21 teas carry photos; R78 made the tint the fallback only when no photo

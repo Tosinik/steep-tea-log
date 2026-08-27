@@ -88,7 +88,10 @@ decisions rather than any single ruling:
   shelf. #34/#35 goes first because it is the only queue item that loses a user's work permanently;
   cleanliness orders equals, consequence orders these. `/slowcup-deploy dry` runs first, before any
   file is touched.
-- **Slice 3 (the picker) is now v4.19 and UNBLOCKED** — the S3 gate was R124/R125, both in the ledger.
+- ~~**Slice 3 (the picker) is now v4.19 and UNBLOCKED**~~ — **SHIPPED v4.19** (cache v129): the COLOUR row
+  in the tea form (F2 name-not-type, DOM-only grid, F1 containment guard), **unblocking #14 (R89)**. The
+  S3 gate was R124/R125; those + R126–R129 are now the **v4.20** shelf fences, recorded in `liquor-test.js`
+  §D. Next is v4.20 (the shelf), gated on Design's dark redraw, then the `SECURITY.md` hardening pass.
 - **The shelf swatch is v4.20** (renumbered twice — R125's heading records both), on its own version,
   after slice 3 **and** after Design's dark redraw. `.ref-swatch`/`.social-tile` are filed behind it;
   `.today-tint` keeps its tint permanently, by R124's predicate rather than by exemption.

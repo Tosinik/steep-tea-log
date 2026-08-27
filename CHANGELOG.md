@@ -43,6 +43,62 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.19 — the liquor picker: a tea's colour becomes correctable (R39 / R89)
+Deploy: `steep-teas.js` (the COLOUR row + picker functions + F1 fix), `styles.css`
+(`.liquor-*` geometry), `steep-core.js` (APP_VERSION/WHATS_NEW), `service-worker.js`
+(cache **v129**), `fixtures/liquor-test.js` (D1 rewrite + §G, 72 green),
+`fixtures/liquor-review.js` (F5 header), `docs/r4/planning/SPEC-liquor-swatch-model.md`
+(F4 §7 hexes + §9 fence cross + §4.1 shipped banner), `CHANGELOG.md`, `STATE.md`,
+`ROADMAP-v4.md`. (A local, gitignored `fixtures/xss-render-test.js` also gained
+`steep-tea-types.js` in its sandbox load list — teaFormModal now calls `liquorFor` — but it
+does not travel and is not a deploy file.) **No SQL**
+(`v3_12` shipped v4.14). Slice 3 of 3 of the liquor swatch model; unblocks **#14** (R89).
+
+- **The COLOUR row** — a new field in the tea form, **after Type, above the Specifics fold**
+  (deviation 1): a preview swatch, a tier-honest source note ("your correction" / "catalog
+  default · Da Hong Pao" / "no colour yet — shows its type tint"), and a link-styled action
+  that opens an **inline 13-cell grid in place** (a default cell first, then the twelve ramp
+  stops). Every cell is a real `<button type="button">` with `aria-label` + `aria-pressed` —
+  keyboard-reachable and testable without synthesised pointer events.
+- **F2 — the default follows the NAME, not the type** (`matchTeaType(tea.name)`), against
+  board #06 rev 4's caption. Picking a type changes the resolved liquor nothing; the type
+  only re-tints the tier-3 fallback. Built to SPEC §4.1, not the board.
+- **DOM-only, never `render()`** — selection writes a hidden `<input name="liquor">` and
+  dispatches an `input` event to trip the WS1 dirty guard, **exactly `acceptOriginOffer`'s
+  pattern**, so a backdrop tap can't discard the choice. Open/close and repaint mutate the
+  DOM directly (the form reads its fields on submit; a re-render mid-edit would wipe them —
+  the constraint `toggleSpecifics` documents). **Clearing** selects the default cell → `''`
+  → `null` → **tier 2 by construction** (never a stored copy; `liquor-test.js` E4).
+- **F1 — the containment guard, the central bug of the slice.** `submitTeaForm` rebuilt the
+  tea from scratch and **silently dropped `liquor`** (it wrote 22 of `teaFromDb`'s 23 keys;
+  latent only because nothing could set tier 1 yet). Fixed by adding `liquor`, gated through
+  `isLiquorKey` so a tampered DOM can't persist junk. The guard written is the **general
+  form** — `§G` asserts the set of keys `submitTeaForm` writes **⊇** the set `teaFromDb`
+  produces, so it catches the *next* dropped field, which a `/liquor/` string match would miss.
+- **Geometry is R121 (scale the lock):** preview **26×34** (the shipped `.social-tile`/
+  `.ref-swatch` family), cells **22×22** (board #03). #06's 40×50 (a 4:5 aspect drawn nowhere
+  else) is **not** adopted. Colours come from the theme-aware `--liquor-*` tokens; the tier-3
+  fallback and default cell reuse the shipped `.t-<type>` tints, so no colour is hardcoded.
+- **The A2 fence fold.** `liquor-test.js` **D1** is crossed (the picker exists) and rewritten
+  to the fence that still stands — the picker is the **form** control; tea detail (board 03's
+  primary path, **F6**) renders no in-place picker, and there is **no long-press** (deviation
+  3). **D3** (the shelf renders no swatch) is unchanged this slice; **R124–R129** are recorded
+  as the **v4.20** fences (D6 pins that `swatchAttr`'s signature is unchanged until then) so
+  they aren't discovered mid-slice. The site scan (**§F**) rises 9→11 tints, the two new ones
+  **classified** as the picker's tier-3 fallback, not defaulted.
+- **Housekeeping:** **F4** — SPEC §7's two stale dark hexes corrected (`yellow-pale`
+  `#EBE0BC`→`#E8DDB6`, `gold-pale` `#EADFAF`→`#DED2A0`; the shipped code was right). **F5** —
+  `liquor-review.js`'s header (it claimed "nothing renders a liquor yet" and called itself
+  untracked, both false since v4.15) rewritten.
+- **No on-device gate** (smoke.md): the picker is DOM form state — no History/WakeLock/SW/
+  touch/eviction surface — so the unit suites certify it. **30 committed suites green** (+ 7
+  local) on the fresh 2026-08-26 export; `liquor-test.js` 59→**72**.
+- **Two judgment calls surfaced for a look at the pause** (both §4.1-approved): the COLOUR row
+  sitting above the fold on the **Add** form (the one spot §4.1 brushes WS1's "name and type
+  are all you need"), and the tier-3 preview re-tinting on **type** change (correct — the
+  tier-3 fallback *is* type-derived; the resolved liquor still follows only the name).
+
+---
 ## v4.18 — the screen stays awake while a steep runs, and a timer you leave holds (R7/R142)
 Deploy: `steep-sessions.js` (wake-lock helpers, `onAppHidden`/`onAppVisible`, timer
 acquire/release), `steep-boot.js` (visibilitychange wiring), `steep-core.js`
