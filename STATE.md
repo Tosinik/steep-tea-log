@@ -221,9 +221,15 @@ updated — it does not travel).
   the liquor still follows name only). **Both filed R143** (ledger). *(Filing R143 surfaced that
   **R139–R142 were absent from the ledger** despite being referenced here + in CHANGELOG/smoke — now
   **backfilled verbatim** (ledger R138→R143 contiguous); the contiguity failure is **§8 item 23**.)*
-- **NEXT: v4.20 — the shelf** (R141 ladder; the R124–R129 fences), **gated on Design's dark redraw** —
-  check if it's landed. Then the **security/legal hardening pass** (documented in `SECURITY.md`, after
-  v4.20), then the beta is reachable.
+- **NEXT: v4.20 — the shelf, UNBLOCKED** (R141 ladder). Swatch-led rows per **R124–R129 + R144/R145**
+  (dark plates = dashed 1.5px `--line` **SVG path**, not a CSS border — R145; `liquor-test.js` §D's D3/D6
+  assert against a path when built). **Design's dark redraw LANDED + reconciled this session** — F20/F21/F30
+  closed on the board, banked at `docs/r4/boards/shelf-swatch-ruling.dc.html`; **F29 (dashed plate on a
+  dimmed screen) is the on-device item.** **Refresh the export first** — the shelf reads composition
+  (R124–R129's fill/plate/scripted split was last confirmed at 58 sessions). Then the **security/legal
+  hardening pass** — `SECURITY.md`'s two HIGH findings are the **beta blocker**, and it must be a turn
+  *about* security, not squeezed behind shelf-shaped work (§8 item 23's neighbourhood). Then the beta is
+  reachable.
 
 **Previously — v4.18: #33/#30/#31, wake-lock bundle** (cache
 **v128**, APP_VERSION v4.18, **no SQL**). Three feature commits + a release note.

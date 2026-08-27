@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DDD6C6;font-family:Inter,sans-serif;}
+  a{color:#3F5E42;} a:hover{color:#2A4130;}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F5F0E3"></rect><rect x="22" y="30" width="18" height="24" rx="4" fill="#843A1E"></rect><rect x="48" y="30" width="50" height="8" rx="4" fill="#C9BC9E"></rect><rect x="48" y="44" width="30" height="6" rx="3" fill="#DDD6C6"></rect><rect x="22" y="66" width="18" height="24" rx="4" fill="none" stroke="#8C7F6C" stroke-width="2"></rect><rect x="48" y="66" width="50" height="8" rx="4" fill="#C9BC9E"></rect><rect x="48" y="80" width="30" height="6" rx="3" fill="#DDD6C6"></rect></svg></template>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#12100C;">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#EDE6D6; color:#1C1A14; padding:4px 10px; border-radius:4px;">TURN 5 · R144</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#6F9A66; color:#12100C; padding:4px 9px; border-radius:4px;">ALL FOUR TOKENS READ · styles.css:105–121</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#E5AE2B; border:1px solid rgba(229,174,43,0.45); padding:3px 8px; border-radius:4px;">F20 CLOSED · 4a/4b RE-INKED</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#EDE6D6; margin:0;">The lever is weight</h1>
+    </div>
+    <p style="font-size:14px; color:#C9BFAC; max-width:1060px; margin:0; line-height:1.65;">Dash-first, as asked, and it works — but not on the reason R144 was written on. Longer dashes at <code style="color:#E5AE2B;">--line</code>'s real weight still read as five faint scratches at 1px, because the problem was never how the ink is distributed; it is how little there is. <strong>1.31:1 is 1.31:1 whether you spend it in twenty-four dashes or five.</strong> What makes the plate legible is contiguous mass per dash — 1.5px reads as an intended outline where 1px reads as noise, and 2px reads as more important than the measured edge, which breaks R126 from the other side. The ladder is below so the judgement is visible rather than asserted. The third lever is drawn too, in <a href="#5c" style="color:#E5AE2B;">5c</a>, and it fails on contrast before it reaches your objection to it.</p>
+  </div>
+
+  <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="5a" style="display:flex; flex-direction:column; gap:9px; width:412px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#6F9A66; color:#12100C; padding:3px 8px; border-radius:4px;">5a · RATIFIED</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#A79C87;">THE DASH LADDER, AT --line</span>
+      </div>
+      <div style="border-radius:20px; border:1px solid #332F24; background:#1C1A14; padding:20px 22px; box-sizing:border-box; display:flex; flex-direction:column; gap:14px;">
+        <sc-for list="{{ ladder }}" as="l" hint-placeholder-count="5">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <svg viewBox="0 0 24 32" style="width:24px; height:32px; flex:none; overflow:visible;"><path d="{{ PLATE }}" fill="none" stroke="#332F24" stroke-width="{{ l.w }}" stroke-dasharray="{{ l.dash }}"></path></svg>
+            <div style="display:flex; flex-direction:column; gap:3px; flex:1; min-width:0;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#EDE6D6;">{{ l.label }}</span>
+              <span style="font-size:11px; color:#A79C87; line-height:1.5;">{{ l.note }}</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#E5AE2B; border:1px solid rgba(229,174,43,0.35); border-radius:3px; padding:2px 6px; flex:none;">{{ l.verdict }}</span>
+          </div>
+        </sc-for>
+        <div style="height:1px; background:#332F24;"></div>
+        <span style="font-size:11.5px; color:#C9BFAC; line-height:1.6;">Every stroke on this card is the same colour. The only variables are width and dash length, which is the honest form of the test — if the ladder separates, it separates on geometry alone.</span>
+      </div>
+    </div>
+
+    <div id="5b" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:4px; border:1px solid #332F24;">5b</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#A79C87;">THE FEI BING CASE</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid #332F24; background:#1C1A14; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:22px 22px 18px; display:flex; flex-direction:column; gap:12px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#A79C87;">THE HARDEST THREE ROWS THE SHELF CAN PRODUCE</span>
+          <div style="display:flex; flex-direction:column;">
+            <sc-for list="{{ feiRows }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid #332F24;">
+                <svg viewBox="0 0 24 32" style="width:24px; height:32px; flex:none; overflow:visible;"><path d="{{ PLATE }}" fill="{{ r.fill }}" stroke="#332F24" stroke-width="{{ r.sw }}" stroke-dasharray="{{ r.dash }}"></path></svg>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#EDE6D6; line-height:1.25;">{{ r.name }}</span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#A79C87; border:1px solid #332F24; border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#A79C87;">{{ r.note }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#A79C87; line-height:1.5;">row 2 is a stand-in, not a catalog tea — the real shelf has no tier-1 Dark (F21)</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#A79C87; line-height:1.55; max-width:390px;">Rows 2 and 3 are the pair R144 has to survive: a near-black fill and a plate, adjacent, on the ground they ship on. They separate — as a filled block against an outline, at the same contrast. Row 1 is there for the rhythm check, because ivory at 14.2:1 sets the eye's expectation for what a swatch looks like and both rows below it fall far short of that.</span>
+    </div>
+
+    <div id="5c" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:4px;">5c · NOT ADOPTED</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#A79C87;">THE THIRD LEVER</span>
+      </div>
+      <div style="border-radius:20px; border:1px solid #332F24; background:#1C1A14; padding:20px 22px; box-sizing:border-box; display:flex; flex-direction:column; gap:15px;">
+        <div style="display:flex; gap:20px; align-items:center;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+            <svg viewBox="0 0 24 32" style="width:24px; height:32px; overflow:visible;"><path d="{{ PLATE }}" fill="#15140F" stroke="#332F24" stroke-width="1"></path></svg>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#A79C87;">--porcelain</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+            <svg viewBox="0 0 24 32" style="width:24px; height:32px; overflow:visible;"><path d="{{ PLATE }}" fill="none" stroke="#332F24" stroke-width="1.5" stroke-dasharray="13 6"></path></svg>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#A79C87;">R144</span>
+          </div>
+          <span style="font-size:11.5px; color:#C9BFAC; line-height:1.6; flex:1;">A plate-ground tint at <code style="color:#E5AE2B;">--porcelain #15140F</code> is <strong>darker than the card</strong> — 1.07:1, below the hairline itself. It does not read as a tint; it barely reads at all.</span>
+        </div>
+        <div style="height:1px; background:#332F24;"></div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#A79C87;">MEASURED AGAINST --white #1C1A14</span>
+          <sc-for list="{{ ratios }}" as="c" hint-placeholder-count="4">
+            <div style="display:flex; align-items:baseline; gap:10px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#EDE6D6; width:150px; flex:none;">{{ c.k }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#E5AE2B; width:52px; flex:none;">{{ c.v }}</span>
+              <span style="font-size:10.5px; color:#A79C87; flex:1;">{{ c.note }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <span style="font-size:11px; color:#A79C87; line-height:1.55;">So the objection you raised about a tint never gets tested. It fails one step earlier, on the tokens as they ship — which is a better reason to refuse it, and the reason to stop looking for a third lever in this palette.</span>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:412px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#A79C87;">⚑ FINDINGS · TURN 5</span>
+      <div style="background:#1C1A14; border:1px solid #332F24; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:11px;">
+        <sc-for list="{{ findings5 }}" as="f" hint-placeholder-count="5">
+          <span style="font-size:12px; color:#C9BFAC; line-height:1.65;"><strong style="color:#E5AE2B;">{{ f.k }}</strong> {{ f.d }}</span>
+        </sc-for>
+      </div>
+      <div style="background:#1C1A14; border:1px solid #332F24; border-radius:14px; padding:16px 20px; display:flex; flex-direction:column; gap:7px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#6F9A66;">R144 · R145 — RATIFIED, FOR THE FENCE</span>
+        <span style="font-size:11.5px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">R144.</strong> Measured: solid, 1px, <code style="color:#E5AE2B;">--line</code>. Plate: dashed, <strong>1.5px</strong>, <code style="color:#E5AE2B;">--line</code>, dasharray <strong>13 6</strong> — five dashes on the 24×32 perimeter. Same ink both sides; the tier is carried by weight and interruption. Radius unchanged, 9px 4px 8px 5px, so the plate is the same object with its outline broken.</span>
+        <span style="font-size:11.5px; color:#C9BFAC; line-height:1.6;"><strong style="color:#E5AE2B;">R145.</strong> R144 is not expressible as a CSS border, because dash length is not settable there. The plate branch of <code style="color:#E5AE2B;">swatchAttr</code> emits an <strong>SVG path</strong>, not a border style, at both tiers — as 4a and 5b are now drawn. R124's per-site argument still governs which branch runs; only the branch output changes. Build note for Code before v4.20: the <code style="color:#E5AE2B;">liquor-test.js §D</code> fences assume a border-style plate and now assert against a path.</span>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#25211A; border-top:1px solid #332F24;">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#EFE7D6; color:#1C1A14; padding:4px 10px; border-radius:4px;">TURN 4 · DARK</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#6F9A66; color:#12100C; padding:4px 9px; border-radius:4px;">ALL 12 STOPS FROM styles.css:105–117</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#E5AE2B; border:1px solid rgba(229,174,43,0.45); padding:3px 8px; border-radius:4px;">GROUND --white #1C1A14 · NONE FROM §7</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#EFE7D6; margin:0;">The other end goes tight</h1>
+    </div>
+    <p style="font-size:14px; color:#C9BFAC; max-width:1060px; margin:0; line-height:1.65;">Drawn at the 3b ruling, so no script, and on the ground that ships. The thing to look at is not ivory — in dark it is the loudest mark on the shelf. <strong>The risk moves to near-black</strong>, where a filled swatch and an empty plate are nearly the same object against <code style="color:#E5AE2B;">#1C1A14</code>. That is the light-mode ivory problem reappearing at the opposite stop, which means R126 is not a light patch that dark inherits — it is load-bearing in both themes for opposite reasons, and a fill-based rule would have failed somewhere in each. It also means the dashed edge is under more strain here than a dash pattern alone can settle: see F20, closed by turn 5 above — the edge inks that were a guess here are now <code style="color:#E5AE2B;">--line</code>, and the plate carries R144.</p>
+  </div>
+
+  <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="4a" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#6F9A66; color:#12100C; padding:3px 8px; border-radius:4px;">4a · RE-INKED</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#9E9078;">3b IN DARK</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid #332F24; background:#1C1A14; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; flex-direction:column; gap:1px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#EDE6D6;">Teas</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#A79C87;">21 ON THE SHELF · 2 RUNNING LOW</span>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ dark4 }}" as="r" hint-placeholder-count="7">
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #332F24;">
+                <svg viewBox="0 0 24 32" style="width:24px; height:32px; flex:none; overflow:visible;"><path d="{{ PLATE }}" fill="{{ r.fill }}" stroke="#332F24" stroke-width="{{ r.sw }}" stroke-dasharray="{{ r.dash }}"></path></svg>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#EDE6D6; line-height:1.25;">{{ r.name }}</span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#A79C87; border:1px solid #332F24; border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <div style="width:26px; height:26px; flex:none; border-radius:5px; background:#15140F; border:1px solid #332F24; display:flex; align-items:center; justify-content:center; color:#5F564A;">
+                  <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                </div>
+                <span style="font-size:13px; color:#A79C87; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#A79C87; line-height:1.5; margin-top:9px;">card = --white #1C1A14 · stops, --line, --ink, --ink-soft, --porcelain all from source · plate edge = R144</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#9E9078; line-height:1.55; max-width:390px;">Ya Bao's ivory now leads the column instead of vanishing into it, and the two plates that sit between filled rows read cleanly. What this sample cannot show is the pair that matters: its one Dark tea, Fei Bing, is tier 3, so near-black never appears on the shelf (F21).</span>
+    </div>
+
+    <div id="4b" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:4px; border:1px solid rgba(239,231,214,0.28);">4b</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#9E9078;">THE PAIR THE SHELF CANNOT SHOW</span>
+      </div>
+      <div style="width:390px; border-radius:20px; border:1px solid #332F24; background:#1C1A14; padding:20px 22px; box-sizing:border-box; display:flex; flex-direction:column; gap:16px;">
+        <div style="display:flex; gap:5px; align-items:flex-end;">
+          <sc-for list="{{ stopsDark }}" as="s" hint-placeholder-count="12">
+            <div style="flex:1; height:40px; border-radius:6px 3px 5px 3px; background:{{ s.hex }}; border:1px solid #332F24;"></div>
+          </sc-for>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#A79C87; line-height:1.7;">jade-pale #B8D07E · straw #DFD996 · ivory #EFE7CE · yellow-pale #E8DDB6 · gold-pale #DED2A0 · gold #D6B267 · amber #C79A52 · amber-deep #BC8446 · copper #AC6E3E · mahogany #8E4F35 · sepia #6B4230 · near-black #3A2820</span>
+        <div style="height:1px; background:#332F24;"></div>
+        <div style="display:flex; gap:22px; align-items:center;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+            <svg viewBox="0 0 24 32" style="width:24px; height:32px; overflow:visible;"><path d="{{ PLATE }}" fill="#3A2820" stroke="#332F24" stroke-width="1"></path></svg>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#A79C87;">MEASURED</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+            <svg viewBox="0 0 24 32" style="width:24px; height:32px; overflow:visible;"><path d="{{ PLATE }}" fill="none" stroke="#332F24" stroke-width="1.5" stroke-dasharray="13 6"></path></svg>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#A79C87;">PLATE · R144</span>
+          </div>
+          <span style="font-size:11.5px; color:#C9BFAC; line-height:1.6; flex:1;">Twelfth stop against the ground it sits on, both edges now at <code style="color:#E5AE2B;">--line</code>. The near-black fill is 1.456:1 and the hairline 1.303:1, close enough that ink cannot reliably tell them apart — what does is that one is a soft block of 768px² and the other ~95px of interrupted stroke. Block against outline. That is the whole distinction in dark, and it is why R144 raises weight rather than brightness.</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#A79C87; line-height:1.55; max-width:390px;">Drawn side by side because on a shelf they would be twelve rows apart, which is how a near-miss survives review.</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:412px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#9E9078;">⚑ FINDINGS · TURN 4</span>
+      <div style="background:#12100C; border:1px solid rgba(239,231,214,0.16); border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:11px;">
+        <sc-for list="{{ findings4 }}" as="f" hint-placeholder-count="4">
+          <span style="font-size:12px; color:#C9BFAC; line-height:1.65;"><strong style="color:#E5AE2B;">{{ f.k }}</strong> {{ f.d }}</span>
+        </sc-for>
+      </div>
+      <div style="background:#12100C; border:1px solid rgba(239,231,214,0.16); border-radius:14px; padding:16px 20px; display:flex; flex-direction:column; gap:7px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#6F9A66;">CLOSED · WAS “STILL UNREAD IN THIS LANE”</span>
+        <span style="font-size:11.5px; color:#C9BFAC; line-height:1.6;">This block asked for four tokens — hairline, ink, muted-ink, thumb-ground — and named every ink on the dark board a board token, with F12 as the reason not to trust one. All four arrived and 4a/4b are redrawn on them. The guess was wrong by 4–5× in the direction that flattered the rule, which is F25. Light-mode boards below still carry board inks and are still marked.</span>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#DDD6C6; border-top:1px solid rgba(42,31,20,0.2);">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">TURN 3 · RULED</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">3b RULED · SEE TURN 4 ABOVE FOR DARK</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">R124 · R125 · R126</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">GROUND var(--white) #FFFEFB · SHIPPED aka ONLY</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">Undecorated</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1060px; margin:0; line-height:1.65;">Drawn on the ground that ships, with the stops that ship, and with every CJK string read from the catalog — including the two I wrongly withdrew, restored (F15, R128). The eight uncovered teas carry name · type pill · status and nothing else, which is barer than turn 2 and better for the argument: <strong>every remaining mark on the row is data, so absence reads as data too.</strong> <a href="#3b">3b</a> is the ruling and it goes one step further: <strong>no per-tea script on the shelf row either.</strong> Not because the strings are wrong but because they are arbitrary — <code>refScript</code> takes whichever CJK name sits first in a list of alternates, so the column shows one of several names chosen by array position, on 13 of 21 rows, in two character sets. <a href="#3a">3a</a> keeps it, so the case can be read rather than described.</p>
+  </div>
+
+  <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="3a" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:4px;">3a</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SCRIPT KEPT · THE CASE AGAINST, DRAWN</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(42,31,20,0.28); background:#FFFEFB; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; flex-direction:column; gap:1px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Teas</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ real3 }}" as="r" hint-placeholder-count="7">
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(42,31,20,0.13);">
+                <div style="width:24px; height:32px; box-sizing:border-box; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.fill }}; border:1px {{ r.edgeStyle }} {{ r.edge }};"></div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2A1F14; line-height:1.25;">{{ r.name }} <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:11.5px; color:#8C7F6C;">{{ r.script }}</span></span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid rgba(42,31,20,0.22); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <div style="width:26px; height:26px; flex:none; border-radius:5px; background:#F2EDE0; border:1px solid rgba(42,31,20,0.13); display:flex; align-items:center; justify-content:center; color:#A99B84;">
+                  <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                </div>
+                <span style="font-size:13px; color:#8C7F6C; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5; margin-top:9px;">card = var(--white) #FFFEFB · hairlines, ink and thumb ground are still board tokens, unread</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">The plates are rows two, four and six, and with F15 withdrawn the shelf holds three combinations, not four: filled and scripted (1, 3, 5, 7), plate and scripted (4 — Yashi Xiang matches a row and is tier 3 only by <code>roast: variable</code>), plate and bare (2, 6 — no catalog match, so nothing to show). Filled-with-no-script does not occur here; that pairing existed only while two scripts were wrongly withdrawn. This is the column 3b argues against: 大红袍 at row one and 蜜香烏龍 at row three, two rows apart, and the second of those is one of two names in the same aka list.</span>
+    </div>
+
+    <div id="3b" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:4px;">3b · RULED</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">NO SCRIPT ON THE ROW</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(42,31,20,0.28); background:#FFFEFB; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; flex-direction:column; gap:1px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Teas</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ real3Bare }}" as="r" hint-placeholder-count="7">
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(42,31,20,0.13);">
+                <div style="width:24px; height:32px; box-sizing:border-box; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.fill }}; border:1px {{ r.edgeStyle }} {{ r.edge }};"></div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2A1F14; line-height:1.25;">{{ r.name }}</span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid rgba(42,31,20,0.22); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <div style="width:26px; height:26px; flex:none; border-radius:5px; background:#F2EDE0; border:1px solid rgba(42,31,20,0.13); display:flex; align-items:center; justify-content:center; color:#A99B84;">
+                  <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                </div>
+                <span style="font-size:13px; color:#8C7F6C; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5; margin-top:9px;">script moves to detail, where it has room to be one thing consistently</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">Every row has the same shape whether the catalog knows the tea or not, and the difference between them is carried entirely by the swatch — which is what contract 1 asks the swatch to do. The cost I held this back for was not there: per-tea script renders in two shipped places, the reference room and the social tile, and neither is touched. The Sessions plate is a hardcoded type glyph standing in for a photo, not refScript. So this is shelf-local, and it rules on the row's own terms.</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:412px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">WHAT refScript ACTUALLY RETURNS · 7 SAMPLE ROWS</span>
+      <div style="border-radius:20px; border:1px solid rgba(42,31,20,0.28); background:#FFFEFB; padding:18px 20px; display:flex; flex-direction:column; gap:9px;">
+        <sc-for list="{{ scriptRows }}" as="s" hint-placeholder-count="7">
+          <div style="display:flex; align-items:baseline; gap:10px;">
+            <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:14px; color:#2A1F14; width:62px; flex:none;">{{ s.s }}</span>
+            <div style="display:flex; flex-direction:column; gap:1px; flex:1; min-width:0;">
+              <span style="font-size:11.5px; color:#2A1F14; line-height:1.35;">{{ s.n }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.05em; color:{{ s.fg }};">{{ s.note }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="height:1px; background:rgba(42,31,20,0.13);"></div>
+        <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">Five resolve, two are empty for want of a catalog match. Of the five: 2 simplified, 1 traditional, and 2 that are the same in both — 芽苞 and 白茶 are character-set-neutral. Across all 13 scripted rows it is 3 traditional · 3 simplified · 7 neutral, so only six are distinguishable at all and they split evenly (F22). Gui Fei's is also one of two names in its own aka; 貴妃烏龍 is in there too. Nothing here would be tidied by better data.</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:9px;">
+        <sc-for list="{{ status3 }}" as="s" hint-placeholder-count="4">
+          <div style="background:#FFFEFB; border:1px solid rgba(42,31,20,0.28); border-radius:12px; padding:12px 15px; display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:{{ s.fg }};">{{ s.k }}</span>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2A1F14;">{{ s.t }}</span>
+            <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">{{ s.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="max-width:1240px; background:#2B2320; border-radius:14px; padding:18px 22px; display:flex; flex-direction:column; gap:11px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ FINDINGS · TURN 3</span>
+    <sc-for list="{{ findings3 }}" as="f" hint-placeholder-count="5">
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.65;"><strong style="color:#E5AE2B;">{{ f.k }}</strong> {{ f.d }}</span>
+    </sc-for>
+  </div>
+
+</section>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#DDD6C6; border-top:1px solid rgba(42,31,20,0.2);">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">TURN 2 · RESTATED</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">SHIPPED RAMP · c799aa3</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-08-05 · 12 FILLED · 9 PLATES · 8 OF 9 EMPTY</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">The blank column, drawn honestly</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1060px; margin:0; line-height:1.65;">The sample inverted the ratio and the ruling was resting on the one plate that fills. Redrawn at the real one: four filled, three empty, and the empty ones carry nothing. <strong>S3 no longer argues that a tint is dishonest</strong> — §1 is right that it is honest, because it asserts a family and the app does know the family. The narrower argument is that <strong>on this row the family is already written in words</strong>: the type pill two lines below the swatch reads “Oolong”. So the tint is the one thing a swatch must never be here — a restatement of adjacent text, occupying the slot reserved for identity. The three slots §1 was written for carry no type label, and the tint stays correct in all of them. <strong>Superseded by <a href="#3a">3a</a>:</strong> that last sentence is wrong on two of the three (F16), and this card is drawn on a hex the repo does not contain (F12). Three of its scripts are wrong, though not the two F15 originally named — 芽苞 and 白茶 are the catalog's and stand (F15, withdrawn). Chiran's 煎茶 and Fei Bing's 餅茶 resolve to nothing, since neither tea matches a catalog row; Da Hong Pao ships simplified 大红袍, not 大紅袍; and Gui Fei's 貴妃 is a truncation of 貴妃烏龍, where 蜜香烏龍 is what actually renders.</p>
+  </div>
+
+  <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="2a" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:4px;">2a · RULED</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">PLATES, AT THE REAL RATIO</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; flex-direction:column; gap:1px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Teas</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ real2 }}" as="r" hint-placeholder-count="7">
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(42,31,20,0.13);">
+                <div style="width:24px; height:32px; box-sizing:border-box; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.fill }}; border:1px {{ r.edgeStyle }} {{ r.edge }};"></div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2A1F14; line-height:1.25;">{{ r.name }} <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:11.5px; color:#8C7F6C;">{{ r.script }}</span></span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid rgba(42,31,20,0.22); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <div style="width:26px; height:26px; flex:none; border-radius:5px; background:#E7DFCC; border:1px solid rgba(42,31,20,0.13); display:flex; align-items:center; justify-content:center; color:#A99B84;">
+                  <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                </div>
+                <span style="font-size:13px; color:#8C7F6C; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5; margin-top:9px;">solid hairline = a colour this tea is known to brew · dashed = no style match (F9)</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">Three of seven blank, and across the whole shelf nine of 21 — it does look unfinished. It <em>is</em> unfinished: those same eight teas are the ones with no Go Deeper entry and no freshness rung 2. The blank column is that content gap in the one place he scrolls every day, and it reads as a list of eight teas to identify rather than eight failures to render.</span>
+    </div>
+
+    <div id="2b" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:4px;">2b</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">THE TINT, AS §1 DEFENDS IT</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; flex-direction:column; gap:1px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Teas</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ real2Tint }}" as="r" hint-placeholder-count="7">
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(42,31,20,0.13);">
+                <div style="width:24px; height:32px; box-sizing:border-box; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.fill }}; border:1px solid rgba(42,31,20,0.34);"></div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2A1F14; line-height:1.25;">{{ r.name }} <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:11.5px; color:#8C7F6C;">{{ r.script }}</span></span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid rgba(42,31,20,0.22); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <div style="width:26px; height:26px; flex:none; border-radius:5px; background:#E7DFCC; border:1px solid rgba(42,31,20,0.13); display:flex; align-items:center; justify-content:center; color:#A99B84;">
+                  <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                </div>
+                <span style="font-size:13px; color:#8C7F6C; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5; margin-top:9px;">tint hexes not read — family stops stood in, so treat these three as placement only</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">A complete column, and every colour on it true to a family. Read row by row against the pill beside it: Green · green, Dark · dark, Oolong · gold. The colour and the label say one thing twice, and a reader cannot tell which four of these seven were measured. That is the whole of the objection — not honesty, redundancy.</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:412px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">THE TWELVE STOPS · LIGHT COLUMN, SHIPPED</span>
+      <div style="border-radius:20px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; padding:20px 22px; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; gap:6px; align-items:flex-end;">
+          <sc-for list="{{ stops }}" as="s" hint-placeholder-count="12">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px; flex:1;">
+              <div style="width:100%; height:38px; border-radius:6px 3px 5px 3px; background:{{ s.hex }}; border:1px solid rgba(42,31,20,0.2);"></div>
+            </div>
+          </sc-for>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.7;">jade-pale #A9C46E · straw #D8D48A · ivory #F2EBD4 · yellow-pale #EDE2B8 · gold-pale #E8D9A0 · gold #DCB863 · amber #C99447 · amber-deep #B87A38 · copper #A15E2E · mahogany #7E3B26 · sepia #5A3122 · near-black #2E1C14</span>
+        <div style="height:1px; background:rgba(42,31,20,0.13);"></div>
+        <p style="margin:0; font-size:12px; color:#4A4038; line-height:1.65;">Third stop from the left is <strong>ivory</strong>, and on this card it is very nearly the card. That is F9, and it is why the plate distinction is carried by a dashed edge rather than by fill alone — a rule that depends on seeing a fill fails at the exact stop the ramp added last.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:9px;">
+        <sc-for list="{{ status2 }}" as="s" hint-placeholder-count="4">
+          <div style="background:#F5F0E3; border:1px solid rgba(42,31,20,0.28); border-radius:12px; padding:12px 15px; display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:{{ s.fg }};">{{ s.k }}</span>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2A1F14;">{{ s.t }}</span>
+            <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">{{ s.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="max-width:1240px; background:#2B2320; border-radius:14px; padding:18px 22px; display:flex; flex-direction:column; gap:11px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ FINDINGS · TURN 2</span>
+    <sc-for list="{{ findings2 }}" as="f" hint-placeholder-count="4">
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.65;"><strong style="color:#E5AE2B;">{{ f.k }}</strong> {{ f.d }}</span>
+    </sc-for>
+  </div>
+
+</section>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#DDD6C6; border-top:1px solid rgba(42,31,20,0.2);">
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:4px;">TURN 1 · RULING · #13 + #03</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; background:#3F5E42; color:#F6F2E9; padding:4px 9px; border-radius:4px;">SHELF SWATCH · R4</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:4px;">EXPORT 2026-08-05 · 42 sessions · 140 steeps · 21 teas · 5 vessels</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; color:#2B2320; margin:0;">The swatch and the photo</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1060px; margin:0; line-height:1.65;">The two do not share one slot — they hold different jobs, and the row has room for both if position carries the difference. <strong>Leading = identity. Trailing = evidence.</strong> That is the same separation #03 already ships, where the swatch is in the header and the label photo sits under WHERE THIS CAME FROM. The shelf inherits that answer rather than inventing a second one. Three treatments below; <a href="#1b">1b</a> is the ruling. <strong>Superseded in two places by <a href="#2a">2a</a></strong>, and left standing as the record: its sample inverted the real 12/9 ratio, and its tier-3 plate holds a glyph that eight of nine plates cannot resolve. Hexes on this turn are the #13 board's R3-era values, not the shipped ramp.</p>
+  </div>
+
+  <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="1a" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:4px;">1a</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SWATCH ONLY · #13 AS DRAWN</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Teas</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid rgba(42,31,20,0.13);">
+                <div style="width:24px; height:32px; box-sizing:border-box; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.fill }}; border:1px solid {{ r.edge }}; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                  <span style="font-family:'Noto Serif SC',serif; font-size:9px; line-height:1; color:#8C7F6C; writing-mode:vertical-rl;">{{ r.plateScript }}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2A1F14; line-height:1.25;">{{ r.name }} <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:11.5px; color:#8C7F6C;">{{ r.inlineScript }}</span></span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid rgba(42,31,20,0.22); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <span style="font-size:13px; color:#8C7F6C; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">Contract-pure and already drawn. Its cost is not small: all 21 of his teas carry a label photo, so this deletes photography from the list surface entirely and leaves it reachable only one tap deeper. Rejected for that, not for the reasoning.</span>
+    </div>
+
+    <div id="1b" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:4px;">1b · RULED</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SWATCH LEADS · PHOTO TRAILS</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Teas</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(42,31,20,0.13);">
+                <div style="width:24px; height:32px; box-sizing:border-box; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.fill }}; border:1px solid {{ r.edge }}; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                  <span style="font-family:'Noto Serif SC',serif; font-size:9px; line-height:1; color:#8C7F6C; writing-mode:vertical-rl;">{{ r.plateScript }}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2A1F14; line-height:1.25;">{{ r.name }} <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:11.5px; color:#8C7F6C;">{{ r.inlineScript }}</span></span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid rgba(42,31,20,0.22); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <div style="width:26px; height:26px; flex:none; border-radius:5px; background:#E7DFCC; border:1px solid rgba(42,31,20,0.13); display:flex; align-items:center; justify-content:center; color:#A99B84;">
+                  <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                </div>
+                <span style="font-size:13px; color:#8C7F6C; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8C7F6C; line-height:1.5; margin-top:9px;">square 26×26 thumb, hairline, no radius family in common with the swatch — two objects, never a second swatch</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">Both survive and the row says which is which. The swatch holds the leading slot #13 gives it at Bundle 1 geometry; the label photo becomes a small square tin thumb before the caret — subordinate by size, position and shape, so it cannot be mistaken for identity. Nothing nests inside the swatch.</span>
+    </div>
+
+    <div id="1c" style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:4px;">1c</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SWATCH AS THE PHOTO'S SPINE</span>
+      </div>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#2A1F14;">Teas</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid rgba(42,31,20,0.13);">
+                <div style="display:flex; align-items:stretch; flex:none; height:34px; border:1px solid rgba(42,31,20,0.13); border-radius:5px; overflow:hidden;">
+                  <div style="width:5px; background:{{ r.fill }};"></div>
+                  <div style="width:28px; background:#E7DFCC; display:flex; align-items:center; justify-content:center; color:#A99B84;">
+                    <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2A1F14; line-height:1.25;">{{ r.name }} <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:11.5px; color:#8C7F6C;">{{ r.script }}</span></span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid rgba(42,31,20,0.22); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <span style="font-size:13px; color:#8C7F6C; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">One object instead of two, and the tightest row of the three. Rejected: identity shrinks to a 5px sliver, which is the exact reading of the swatch as decoration the contract forbids, and Bundle 1's geometry is lost. It also has no honest tier-3 state — a sliver cannot hold script.</span>
+    </div>
+
+  </div>
+
+  <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">THE 12 / 9 SPLIT, HONEST BY CONSTRUCTION</span>
+      <div style="width:390px; border-radius:20px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; padding:20px 22px; box-sizing:border-box; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#8C7F6C;">TIER 1 · 2 — A COLOUR THIS TEA ACTUALLY BREWS · 12 TEAS</span>
+          <div style="display:flex; gap:8px;">
+            <sc-for list="{{ filled }}" as="f" hint-placeholder-count="8">
+              <div style="width:24px; height:32px; box-sizing:border-box; border-radius:9px 4px 8px 5px; background:{{ f.fill }}; border:1px solid rgba(0,0,0,0.08);"></div>
+            </sc-for>
+          </div>
+          <span style="font-size:11px; color:#75695C; line-height:1.55;">Eight distinct swatches across those 12. Filled, edge-to-edge, no glyph.</span>
+        </div>
+        <div style="height:1px; background:rgba(42,31,20,0.13);"></div>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#8C7F6C;">TIER 3 · NO COLOUR ASSERTED · 9 TEAS</span>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="width:24px; height:32px; box-sizing:border-box; border-radius:9px 4px 8px 5px; border:1px solid rgba(42,31,20,0.34); display:flex; align-items:center; justify-content:center;">
+              <span style="font-family:'Noto Serif SC',serif; font-size:9px; color:#8C7F6C; writing-mode:vertical-rl;">鴨屎香</span>
+            </div>
+            <div style="width:24px; height:32px; box-sizing:border-box; border-radius:9px 4px 8px 5px; border:1px solid rgba(42,31,20,0.34);"></div>
+            <span style="font-size:11px; color:#75695C; line-height:1.55; flex:1;">The plate: same shape, unfilled, holding the tea's own script — or empty when it has none. Never a six-colour type tint.</span>
+          </div>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">This is #03's TD3 applied to the shelf, and it does the honesty job the brief asks for without a legend: filled means the app knows what this tea brews, unfilled means it does not. A type tint fails that test — it looks exactly as certain as real liquor data while carrying none.</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:390px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">1b · DARK — R3 HEXES, NOT THE RAMP (F10)</span>
+      <div style="width:390px; border-radius:30px; border:1px solid rgba(239,231,214,0.24); background:#1C1610; overflow:hidden; box-sizing:border-box;">
+        <div style="padding:24px 22px 18px; display:flex; flex-direction:column;">
+          <div style="display:flex; flex-direction:column; gap:1px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; color:#EFE7D6;">Teas</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#9E9078;">21 ON THE SHELF · 2 RUNNING LOW</span>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:14px;">
+            <sc-for list="{{ rowsDark }}" as="r" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(239,231,214,0.12);">
+                <div style="width:24px; height:32px; box-sizing:border-box; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.fill }}; border:1px solid {{ r.edge }}; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                  <span style="font-family:'Noto Serif SC',serif; font-size:9px; line-height:1; color:#9E9078; writing-mode:vertical-rl;">{{ r.plateScript }}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#EFE7D6; line-height:1.25;">{{ r.name }} <span style="font-family:'Noto Serif SC',serif; font-weight:500; font-size:11.5px; color:#9E9078;">{{ r.inlineScript }}</span></span>
+                  <div style="display:flex; align-items:center; gap:7px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:#9E9078; border:1px solid rgba(239,231,214,0.2); border-radius:3px; padding:1px 5px;">{{ r.type }}</span>
+                    <span style="font-size:11px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                  </div>
+                </div>
+                <div style="width:26px; height:26px; flex:none; border-radius:5px; background:#2A2119; border:1px solid rgba(239,231,214,0.12); display:flex; align-items:center; justify-content:center; color:#7C7060;">
+                  <svg viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M4 8h3l1.6-2h6.8L20 8" fill="none" stroke="currentColor" stroke-width="1.5"></path><path d="M4 8h16v11H4Z" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+                </div>
+                <span style="font-size:13px; color:#9E9078; flex:none;">›</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#75695C; line-height:1.55; max-width:390px;">At night the filled swatches still carry the shelf and the tin thumbs recede — which is the correct order. The plate's hairline is the one thing to watch at low contrast; it takes the same border weight as a row rule, not less.</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:412px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">#03 TEA DETAIL · NO NEW RULING NEEDED</span>
+      <div style="border-radius:20px; border:1px solid rgba(42,31,20,0.28); background:#F5F0E3; padding:20px 22px; display:flex; flex-direction:column; gap:12px;">
+        <p style="margin:0; font-size:12.5px; color:#4A4038; line-height:1.65;">Detail already separates the two, and not by sharing a slot: the swatch is in the identity block at the top of the screen at 46×60 with its ✎ entry, and the label photo sits further down under <strong>WHERE THIS CAME FROM</strong> beside vendor · cost · purchase — evidence for provenance, tapped for full size. TD1 and TD2 rule it; nothing about liquor data arriving changes either.</p>
+        <p style="margin:0; font-size:12.5px; color:#4A4038; line-height:1.65;">So detail does not want a <em>different</em> answer. It wants the same one, and it is the surface that proves the answer works: the further apart the two sit, the less either has to explain itself. The shelf row is the compressed version of that same order — identity first, evidence last.</p>
+        <div style="height:1px; background:rgba(42,31,20,0.13);"></div>
+        <sc-for list="{{ standing }}" as="s" hint-placeholder-count="3">
+          <div style="display:flex; gap:10px; align-items:flex-start;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#3F5E42; flex:none; padding-top:2px;">{{ s.k }}</span>
+            <span style="font-size:12px; color:#4A4038; line-height:1.6;">{{ s.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="max-width:1240px; display:flex; flex-direction:column; gap:10px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; color:#5C5148;">THE RULING, IN FOUR LINES</span>
+    <div style="display:flex; gap:14px; flex-wrap:wrap;">
+      <sc-for list="{{ rulings }}" as="r" hint-placeholder-count="4">
+        <div style="width:290px; background:#F5F0E3; border:1px solid rgba(42,31,20,0.28); border-left:none; border-radius:14px; padding:15px 17px; display:flex; flex-direction:column; gap:6px; box-sizing:border-box;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">{{ r.k }}</span>
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15px; color:#2A1F14; line-height:1.35;">{{ r.t }}</span>
+          <span style="font-size:12px; color:#4A4038; line-height:1.6;">{{ r.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="max-width:1240px; background:#2B2320; border-radius:14px; padding:18px 22px; display:flex; flex-direction:column; gap:11px;">
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#E5AE2B;">⚑ FINDINGS — WHERE THE BRIEF AND THE REPO DISAGREE</span>
+    <sc-for list="{{ findings }}" as="f" hint-placeholder-count="5">
+      <span style="font-size:12px; color:#C9BFAC; line-height:1.65;"><strong style="color:#E5AE2B;">{{ f.k }}</strong> {{ f.d }}</span>
+    </sc-for>
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    // Names + hexes are the repo's own (#13 board, R3-era illustrative values per R27).
+    // Tier-3 rows carry no fill: the plate holds the tea's script instead.
+    const base = [
+      { fill: "#843A1E", name: "Dawang Feng Da Hong Pao", script: "大紅袍", type: "Oolong", status: "20 g · plenty", tone: "plain" },
+      { fill: "#8FA83E", name: "Chiran Sencha Okumidori", script: "煎茶", type: "Green", status: "opened 3 wks ago · drink soon", tone: "fresh" },
+      { fill: "#CBA347", name: "Honey Oolong Gui Fei", script: "貴妃", type: "Oolong", status: "7 g · running low", tone: "low" },
+      { fill: null, name: "Yashi Xiang Dancong", script: "鴨屎香", type: "Oolong", status: "34 g · plenty", tone: "plain" },
+      { fill: "#4B3621", name: "Fei Bing Beeng Cha", script: "餅茶", type: "Dark", status: "96 g · ages well", tone: "plain" },
+      { fill: "#D8C98F", name: "2021 Fujian White Tea", script: "白茶", type: "White", status: "quantity not tracked", tone: "muted" }
+    ];
+    const dress = (t) => base.map(r => ({
+      ...r,
+      fill: r.fill || "transparent",
+      edge: r.fill ? "rgba(0,0,0,0.08)" : t.plateEdge,
+      plateScript: r.fill ? "" : r.script,
+      inlineScript: r.fill ? r.script : "",
+      statusFg: r.tone === "low" ? t.low : (r.tone === "fresh" ? t.jade : t.muted)
+    }));
+
+    // TURN 4 — dark, from styles.css:105-117 this session. Ground --white:#1C1A14.
+    // Rows follow the 3b ruling: no per-tea script.
+    const dark4 = [
+      { fill: "#BC8446", name: "Dawang Feng Da Hong Pao", type: "Oolong", status: "20 g · plenty", tone: "plain" },
+      { fill: null, name: "Chiran Sencha Okumidori", type: "Green", status: "opened 3 wks ago · drink soon", tone: "fresh" },
+      { fill: "#C79A52", name: "Honey Oolong Gui Fei", type: "Oolong", status: "7 g · running low", tone: "low" },
+      { fill: null, name: "Yashi Xiang Dancong", type: "Oolong", status: "34 g · plenty", tone: "plain" },
+      { fill: "#EFE7CE", name: "Yunnan Silver Bud Ya Bao", type: "White", status: "12 g · plenty", tone: "plain" },
+      { fill: null, name: "Fei Bing Beeng Cha", type: "Dark", status: "96 g · ages well", tone: "plain" },
+      { fill: "#DED2A0", name: "2021 Fujian White Tea", type: "White", status: "quantity not tracked", tone: "muted" }
+    ];
+
+    // TURN 3 — shipped ground (var(--white) #FFFEFB), shipped stops, and only the CJK
+    // strings verified to ship. Unread aka draws empty; nothing is guessed.
+    const real3 = [
+      { fill: "#B87A38", name: "Dawang Feng Da Hong Pao", script: "大红袍", type: "Oolong", status: "20 g · plenty", tone: "plain" },
+      { fill: null, name: "Chiran Sencha Okumidori", script: "", type: "Green", status: "opened 3 wks ago · drink soon", tone: "fresh" },
+      { fill: "#C99447", name: "Honey Oolong Gui Fei", script: "蜜香烏龍", type: "Oolong", status: "7 g · running low", tone: "low" },
+      { fill: null, name: "Yashi Xiang Dancong", script: "鸭屎香", type: "Oolong", status: "34 g · plenty", tone: "plain" },
+      { fill: "#F2EBD4", name: "Yunnan Silver Bud Ya Bao", script: "芽苞", type: "White", status: "12 g · plenty", tone: "plain" },
+      { fill: null, name: "Fei Bing Beeng Cha", script: "", type: "Dark", status: "96 g · ages well", tone: "plain" },
+      { fill: "#E8D9A0", name: "2021 Fujian White Tea", script: "白茶", type: "White", status: "quantity not tracked", tone: "muted" }
+    ];
+    const dress3 = (withScript) => real3.map(r => ({
+      ...r,
+      script: withScript ? r.script : "",
+      fill: r.fill || "transparent",
+      edgeStyle: r.fill ? "solid" : "dashed",
+      edge: r.fill ? "rgba(42,31,20,0.34)" : "rgba(42,31,20,0.42)",
+      statusFg: r.tone === "low" ? "#B07C3E" : (r.tone === "fresh" ? "#3F5E42" : "#8C7F6C")
+    }));
+
+    // TURN 2 — the real shelf, at the ratio the sandbox verified: 12 filled · 9 plates,
+    // 8 of those 9 with no catalog match at all. Stops are the shipped twelve (light).
+    const real = [
+      { stop: "amber-deep", fill: "#B87A38", name: "Dawang Feng Da Hong Pao", script: "大紅袍", type: "Oolong", status: "20 g · plenty", tone: "plain" },
+      { stop: null, name: "Chiran Sencha Okumidori", script: "煎茶", type: "Green", status: "opened 3 wks ago · drink soon", tone: "fresh" },
+      { stop: "amber", fill: "#C99447", name: "Honey Oolong Gui Fei", script: "貴妃", type: "Oolong", status: "7 g · running low", tone: "low" },
+      { stop: null, name: "Yashi Xiang Dancong", script: "鸭屎香", type: "Oolong", status: "34 g · plenty", tone: "plain" },
+      { stop: "ivory", fill: "#F2EBD4", name: "Yunnan Silver Bud Ya Bao", script: "芽苞", type: "White", status: "12 g · plenty", tone: "plain" },
+      { stop: null, name: "Fei Bing Beeng Cha", script: "餅茶", type: "Dark", status: "96 g · ages well", tone: "plain" },
+      { stop: "gold-pale", fill: "#E8D9A0", name: "2021 Fujian White Tea", script: "白茶", type: "White", status: "quantity not tracked", tone: "muted" }
+    ];
+    // Stand-ins ONLY: the six type-tint hexes live in styles.css, which this lane has not read.
+    const tintStandIn = { Green: "#A9C46E", Dark: "#5A3122", Oolong: "#DCB863", White: "#E8D9A0", Black: "#7E3B26", Yellow: "#EDE2B8" };
+    const dressReal = (mode) => real.map(r => ({
+      ...r,
+      fill: r.stop ? r.fill : (mode === "tint" ? tintStandIn[r.type] : "transparent"),
+      edgeStyle: r.stop || mode === "tint" ? "solid" : "dashed",
+      edge: r.stop || mode === "tint" ? "rgba(42,31,20,0.34)" : "rgba(42,31,20,0.42)",
+      statusFg: r.tone === "low" ? "#B07C3E" : (r.tone === "fresh" ? "#3F5E42" : "#8C7F6C")
+    }));
+
+    // TURN 5 — real dark tokens, read this session from styles.css:105–121.
+    // --line #332F24 · --ink #EDE6D6 · --ink-soft #A79C87 · --porcelain #15140F · --white #1C1A14
+    const PLATE = "M9.75 0.75 H19.25 A4 4 0 0 1 23.25 4.75 V23.25 A8 8 0 0 1 15.25 31.25 H5.75 A5 5 0 0 1 0.75 26.25 V9.75 A9 9 0 0 1 9.75 0.75 Z";
+
+    return {
+      PLATE,
+      dark4: dark4.map(r => ({
+        ...r,
+        fill: r.fill || "transparent",
+        sw: r.fill ? 1 : 1.5,
+        dash: r.fill ? "" : "13 6",
+        statusFg: r.tone === "low" ? "#D79A5A" : (r.tone === "fresh" ? "#6F9A66" : "#A79C87")
+      })),
+      ladder: [
+        { w: 1, dash: "", label: "1px SOLID", note: "--line as it ships. This is the measured edge.", verdict: "reference" },
+        { w: 1, dash: "2 2", label: "1px DASHED · BROWSER", note: "≈24 dashes, half the perimeter in gaps. Reads as grain, not as an outline.", verdict: "fails" },
+        { w: 1, dash: "13 6", label: "1px · 13/6", note: "5 dashes. Shape returns, but each stroke is still 1px of a 1.31:1 ink.", verdict: "thin" },
+        { w: 1.5, dash: "13 6", label: "1.5px · 13/6", note: "Each dash reads as a deliberate mark. The gaps become the signal.", verdict: "holds" },
+        { w: 2, dash: "13 6", label: "2px · 13/6", note: "Holds, and starts to out-weigh the solid measured edge — wrong hierarchy.", verdict: "over" }
+      ],
+      ratios: [
+        { k: "ivory fill #EFE7CE", v: "14.2 : 1", note: "loudest mark on the dark shelf" },
+        { k: "near-black fill #3A2820", v: "1.456 : 1", note: "corrected up from 1.25 — F30" },
+        { k: "--line #332F24", v: "1.303 : 1", note: "every hairline, both edge styles" },
+        { k: "--porcelain #15140F", v: "1.06 : 1", note: "third lever, below the hairline — dead" }
+      ],
+      findings5: [
+        { k: "F25 · the invented alphas were 4–5× the real hairline, and the flag was the only thing holding the board up.", d: "Board guess: 0.46 dashed, 0.28 solid. Real: --line #332F24 against --white #1C1A14 is ≈0.099 alpha-equivalent of --ink, 1.31:1. So both drawn edges were far brighter than anything that ships, and R126's dark case was passing a test it had been handed the answers to. It read as holding because the compensation was invented to make it hold. 4a and 4b are re-inked to --line above." },
+        { k: "F26 · R144 adopted, but the lever is weight, not dash length.", d: "Dash geometry alone does not do it: at 1px, 13/6 has the right rhythm and still reads as five faint scratches, because the problem is not how the ink is distributed but how little of it there is. What separates a plate from a filled swatch at the near-black end is mass — 1.5px of contiguous stroke per dash reads as an intended outline where 1px reads as noise. 2px holds too and breaks hierarchy: the plate then out-weighs the measured edge, which inverts R126 the other way. Ruled at 1.5px, dasharray 13/6, five dashes." },
+        { k: "F27 · at the near-black stop the real distinction is area against outline, not ink against ink.", d: "AMENDED by F30 — the numbers moved, the conclusion did not. The fill is 1.456:1 and the hairline 1.303:1, close enough that no ink-based rule separates them reliably, which is the arithmetic behind R144. What does separate them: the fill covers ~768px² as a soft continuous block, the plate ~95px of interrupted stroke. A block and an outline at near-equal contrast are still two different objects." },
+        { k: "F30 · my near-black fill number was pessimistic, and the correction makes R144 safer rather than tighter.", d: "Verified against the tokens: near-black #3A2820 on --white #1C1A14 is 1.456:1, not the 1.25:1 this board drew. Hairline 1.303 and porcelain 1.06 land as measured. So the filled swatch is meaningfully more separated from the ground than I credited, the gap between fill and hairline is wider than F27 first claimed, and block-vs-outline has more margin than the argument that won it. Corrected on the board so a later remeasure reads the ruling as sound rather than broken — the failure mode F13 was written about, arriving from the cautious side this time." },
+        { k: "F28 · the third lever is worse than the problem, on the real tokens.", d: "--porcelain #15140F is DARKER than --white #1C1A14: 1.07:1, less than a tenth of the ivory reading and below the hairline. A porcelain plate ground is very nearly invisible in dark, so the tint lever fails on contrast before it ever reaches the objection you raised about it looking measured. Drawn in 5c so nobody reaches for it later. It also means the dark thumb ground recedes below the card — the tin thumbs read as recesses rather than chips, which is the correct order and worth stating." },
+        { k: "F29 · with the real hairline, almost nothing on the dark shelf is drawn by line.", d: "Card edge, row rules, pill outline and thumb outline are all --line at 1.31:1. Re-inked, the dark card's structure is carried by type and fill, and the lines are barely present. That is a coherent look and it is not what any R3-era board showed, because those inks were board tokens too. The residual risk on R144 is the same fact from the other side: a 1.31:1 plate sits close to the visibility floor on a dimmed screen, and if it drops out the row reads as no swatch at all. Honest — nothing measured, nothing shown — but ragged in the left column. Flagged, not fixed; the alternatives are all worse than the flag." }
+      ],
+      feiRows: [
+        { fill: "#EFE7CE", name: "Yunnan Silver Bud Ya Bao", type: "White", note: "tier 1 · ivory · 14.2:1", sw: 1, dash: "" },
+        { fill: "#3A2820", name: "Wuyi Rou Gui, dark roast", type: "Oolong", note: "tier 1 · near-black · 1.456:1", sw: 1, dash: "" },
+        { fill: "transparent", name: "Fei Bing Beeng Cha", type: "Dark", note: "tier 3 · plate · R144", sw: 1.5, dash: "13 6" }
+      ],
+      stopsDark: [
+        { k: "jade-pale", hex: "#B8D07E" }, { k: "straw", hex: "#DFD996" }, { k: "ivory", hex: "#EFE7CE" },
+        { k: "yellow-pale", hex: "#E8DDB6" }, { k: "gold-pale", hex: "#DED2A0" }, { k: "gold", hex: "#D6B267" },
+        { k: "amber", hex: "#C79A52" }, { k: "amber-deep", hex: "#BC8446" }, { k: "copper", hex: "#AC6E3E" },
+        { k: "mahogany", hex: "#8E4F35" }, { k: "sepia", hex: "#6B4230" }, { k: "near-black", hex: "#3A2820" }
+      ],
+      findings4: [
+        { k: "F19 · the stop at risk swaps ends between the themes, and R126 is what makes that survivable.", d: "In light, ivory sits 19.2 off the card and the pale end is where fill separation nearly fails. In dark the pale end is the loudest thing on the row — ivory against #1C1A14 is the widest pair on the shelf — and the risk moves to the other end: near-black #3A2820 on #1C1A14. A filled near-black swatch and an empty plate are close to the same object, which is the light-mode ivory problem reappearing at the opposite stop. So the border-style rule is not a light-mode patch that dark inherits; it is load-bearing in both themes, for opposite reasons, and a fill-based rule would have had to fail somewhere in each. Not measured here — read as a render, per R122." },
+        { k: "F20 · the dashed edge is doing more work in dark than the drawing can justify.", d: "At 24×32 a dashed hairline is roughly nine dashes and about half its own perimeter, so it carries less ink than the solid one at the same colour — in light that is a helpful reinforcement, since dashed also happens to be the lower-contrast case. In dark it runs the wrong way at the near-black end: the plate must read as MORE present than a near-black fill, while its edge is drawn with less ink. The drawing above compensates by giving the dashed edge a stronger ink than the solid (0.46 against 0.28), which is a guess. What is needed is the hairline token from styles.css and a check of both edge styles against the ground and against near-black; if the compensation has to be large, the honest fix is a dash pattern with a longer stroke rather than a brighter one." },
+        { k: "F21 · Fei Bing is the row this shelf cannot show.", d: "It is the one Dark tea in the sample and it is tier 3, so it draws as a plate — meaning the near-black end of the ramp appears nowhere in these seven rows, and the pair F19 identifies as the dark risk cannot be seen in the shelf drawing at all. It is visible in the strip beside it, twelfth stop, against the same ground. Worth stating rather than quietly drawing an eighth tea: the composition that would test the rule hardest is one the real shelf does not currently produce." },
+        { k: "F22 · the mixing is the source, not a gap in it.", d: "Corrected from the caption drawn under turn 3: 芽苞 and 白茶 are identical in both character sets, so the five resolving rows are 2 simplified · 1 traditional · 2 neutral, and across all 13 scripted rows it is 3 traditional · 3 simplified · 7 neutral. Only six of thirteen are distinguishable and those six split evenly. That kills the reading that better data would tidy the column — there is nothing to tidy toward. It also sharpens 3b: the argument was never that the column is messy, it is that the string is arbitrary, and a 3/3 split with seven abstentions is what arbitrary looks like when you count it." }
+      ],
+      real3: dress3(true),
+      real3Bare: dress3(false),
+      scriptRows: [
+        { n: "Dawang Feng Da Hong Pao", s: "大红袍", note: "ships simplified", fg: "#3F5E42" },
+        { n: "Honey Oolong Gui Fei", s: "蜜香烏龍", note: "ships traditional — not 貴妃", fg: "#3F5E42" },
+        { n: "Yashi Xiang Dancong", s: "鸭屎香", note: "ships simplified · tier 3 by roast: variable", fg: "#3F5E42" },
+        { n: "Yunnan Silver Bud Ya Bao", s: "芽苞", note: "first CJK in aka · restored, F15 was a false withdrawal", fg: "#3F5E42" },
+        { n: "2021 Fujian White Tea", s: "白茶", note: "second in aka, first CJK · restored", fg: "#3F5E42" },
+        { n: "Chiran Sencha Okumidori", s: "—", note: "no catalog match · resolves empty", fg: "#69160F" },
+        { n: "Fei Bing Beeng Cha", s: "—", note: "no catalog match · resolves empty", fg: "#69160F" }
+      ],
+      status3: [
+        { k: "S1 · UNBLOCKED", fg: "#3F5E42", t: "The leading slot moves", d: "R124 removes the cost: swatchAttr has always taken a per-site first argument, so the plate needs one more argument and no whitelist. shelfPhoto leaves the leading slot; the swatch takes it at 24×32, radius 9px 4px 8px 5px." },
+        { k: "S2 · CARRIES", fg: "#3F5E42", t: "The photo trails as a tin thumb", d: "Unchanged through three turns. 26×26 square, 5px radius, hairline, before the caret." },
+        { k: "S3 · APPROVED", fg: "#3F5E42", t: "Plate on the shelf; tint where no type label sits", d: "R125 scopes it to the predicate, and R126 approves solid-vs-dashed for a better reason than the one I gave. Only .today-tint satisfies “no adjacent type label”, so it keeps the tint by the rule. Ref and social are filed, not drawn." },
+        { k: "S4 · RULED 3b", fg: "#3F5E42", t: "No per-tea script on the shelf row", d: "With the cost gone (the Sessions plate is not refScript and #13 is a board, so this is shelf-local) it rules on the row's own terms — F18. Script keeps both shipped sites and detail; the shelf row is the one surface where 21 teas are scanned rather than one read. Reversible on Niklas's word: he reads the script, and it is his shelf." }
+      ],
+      findings3: [
+        { k: "F12 · #F5F0E3 is a board invention, and it is on every R3 board.", d: "The shipped light card is background:var(--white) = #FFFEFB. Turn 3 draws that ground; turns 1 and 2 keep the board hex and are marked. The consequence runs past this board: any contrast anyone has judged by eye off an R3 board was judged against a card that does not ship, and the boards are where this lane looks when it wants to know what light mode looks like." },
+        { k: "F13 · F9's number was estimated from a render, which is the wrong instrument.", d: "Corrected: ivory sits 19.2 from the card in the suite's own units, against A3b's floor of 18 — liquor-test.js:54 already carried the figure. The finding survives and its reason improves: a distinction resting on fill was resting on 1.2, so border style makes it structural rather than marginal. Taking R122's division as the working rule — look at renders to find things, read styles.css to measure them." },
+        { k: "F14 · S4 relocated the character-set question; it did not retire it.", d: "Thirteen rows now carry inline script and the column mixes character sets by construction — 大红袍 simplified directly above 蜜香烏龍 traditional, same face, same size, because refScript takes whichever CJK entry sits first in aka. The plate at least confined that to one glyph. So the question S4 was supposed to close is open on a wider front, and it is worth asking whether the shelf row needs script at all: the name already identifies the tea, the pill carries the family, and script on 13 of 21 rows in two character sets is closer to decoration than to identity. Detail is where script has room to be consistent. 3b draws the alternative." },
+        { k: "F15 · WITHDRAWN R128 — two of turn 2's scripts were invented.", d: "They were not invented. Ya Bao's aka carries 芽苞 and Fujian White's carries 白茶, both verified at c799aa3, so refScript returns exactly what turn 2 drew and both are restored in turn 3. The withdrawal was itself the error: faced with a value I could not confirm I deleted it, which asserts the catalog holds nothing there — a claim about the source made without reading the source, in the opposite direction. Gui Fei is the same shape from the other side: 貴妃烏龍 is in aka, so turn 2's 貴妃 was truncated rather than invented, and 蜜香烏龍 ships only because it sits first. Kept as the record of the mistake, because the reflex that produced it — erase what you cannot verify — looks like discipline." },
+        { k: "F16 · my site list was wrong on two of three, and the predicate is what survives.", d: "refMetaLine renders family and roast under .ref-swatch, and the social row renders typeLabel beside .social-tile — both adjacent type labels, so both would take the plate under my own rule, not the tint. Only .today-tint has no type label anywhere in the row. The argument was right and the enumeration was wrong, which is the case R124 is built for: a predicate evaluates correctly at sites nobody remembered to list." },
+        { k: "F17 · R128, in the terms this board will be read in.", d: "Don't add a value you haven't read; don't delete one you haven't checked. Erasure is an assertion about the source, so an empty slot needs the same evidence a filled one does. The practical form for a board: a value you cannot confirm is drawn and marked unverified, never dropped — F13's rule for measurements and this one are the same rule, and the second half is the half that reads as caution." },
+        { k: "F18 · why 3b rules: the string is arbitrary, not just mixed.", d: "refScript takes the FIRST CJK entry in aka, and aka is a list of alternate names in no meaningful order. Gui Fei carries both 貴妃烏龍 and 蜜香烏龍; which one a row shows is array position, not meaning. So the shelf column is not merely two character sets at 11.5px in a face built for one of them — it is one name chosen arbitrarily from several, repeated down 13 of 21 rows, adding no fact the name and pill do not already carry. That is decoration by the contract's own definition. It does not indict the two shipped sites: the reference room and the social tile show one tea being looked at, where a name in its own script is the subject; the shelf row is 21 teas being scanned, and density rules differ. Same shape as the type-pill argument that carried S3." }
+      ],
+      real2: dressReal("plate"),
+      real2Tint: dressReal("tint"),
+      stops: [
+        { k: "jade-pale", hex: "#A9C46E" }, { k: "straw", hex: "#D8D48A" }, { k: "ivory", hex: "#F2EBD4" },
+        { k: "yellow-pale", hex: "#EDE2B8" }, { k: "gold-pale", hex: "#E8D9A0" }, { k: "gold", hex: "#DCB863" },
+        { k: "amber", hex: "#C99447" }, { k: "amber-deep", hex: "#B87A38" }, { k: "copper", hex: "#A15E2E" },
+        { k: "mahogany", hex: "#7E3B26" }, { k: "sepia", hex: "#5A3122" }, { k: "near-black", hex: "#2E1C14" }
+      ],
+      status2: [
+        { k: "S1 · HELD", fg: "#8A6A2E", t: "The leading slot does not move yet", d: "Right on the reasoning, but it cannot land ahead of the tier-3 ruling: swatchAttr is the single writer across three shipped slots and its tier 3 is the tint by documented decision. Held at this lane's request, not withdrawn." },
+        { k: "S2 · CARRIES", fg: "#3F5E42", t: "The photo trails as a tin thumb", d: "Unaffected by the tier question. 26×26 square, 5px radius, hairline, before the caret — no radius family in common with the swatch." },
+        { k: "S3 · RESTATED", fg: "#69160F", t: "Empty plate on the shelf row only", d: "Conceded down from “never a tint” to a single surface, on a different argument — see below. §1's defence of the tint stands everywhere it was written for." },
+        { k: "S4 · SIMPLER", fg: "#3F5E42", t: "Script is inline, every tier", d: "Was two branches (inline for 1–2, in-plate for 3). Now one rule: script always follows the name. The plate never holds a glyph, so nothing has to choose a character set." }
+      ],
+      findings2: [
+        { k: "F8 · the glyph rule is deleted, not corrected.", d: "One of nine plates resolves a script, because refScript needs a catalog match and eight of the nine have none. A state that occurs once in 21 teas does not earn a rendering rule, and drawing it made the other eight look like failures of the same rule. So the plate is uniformly empty and the script moves inline (S4) — which also retires the character-set question: the board no longer draws 鸭屎香 or 鴨屎香 in a plate at all. Inline, it is whatever aka the row ships." },
+        { k: "F9 · RESOLVED R126 / F13 — ivory disappears against the light card.", d: "Two things in the body below are false as written and kept for the record: the card is not #F5F0E3 (that hex is in no repo file — F12) and the figure was estimated off a render rather than read, where the suite's own is 19.2 against A3b's floor of 18, liquor-test.js:54. The finding itself was right and R126 approves the fix for a stronger reason than this one gives — the margin over the floor is 1.2, so fill was never carrying the distinction. Read F13 for the corrected statement. As written: #F2EBD4 on #F5F0E3 is three or four points of luminance — Ya Bao's filled swatch and an empty plate are the same object to the eye, which breaks the one distinction S3 rests on. Fixed structurally rather than by retuning the stop: measured swatches take a SOLID hairline, plates a DASHED one. Dashed reads as incomplete without a legend and survives a fill nobody can see. §9's convergence table checks stops against each other but never against the ground the swatch sits on — that is a missing check, not a missing stop." },
+        { k: "F10 · the two dark corrections are taken, and the rest of the dark column is unread.", d: "yellow-pale #E8DDB6 and gold-pale #DED2A0 noted from styles.css over §7's stale #EBE0BC / #EADFAF. The strip above is the LIGHT column only: the remaining dark values sit at styles.css:106+, which this lane still has no copy of. No dark restatement of the shelf is drawn this turn for that reason — 1b's dark panel in turn 1 keeps the R3 hexes and is marked accordingly." },
+        { k: "F11 · RESOLVED R124 — S3 asks the single writer to take a parameter, and that is a real cost.", d: "The cost was not real and the dilemma below is not live: swatchAttr has always taken a per-site first argument, so “one writer must mean one behaviour” was never Code's position. R124 resolves tier 3 from a predicate — is a type label rendered in this row? — evaluated per call, so there is no site list to whitelist and nothing to trade away. The enumeration inside the claim was also wrong on two of three (F16). Kept because the shape of the worry is worth keeping: a ruling that needs a shipped writer to behave differently per site does owe that cost, and this one turned out already paid. As written: swatchAttr would need per-site tier-3 behaviour: tint in .ref-swatch / .social-tile / .today-tint, plate on the shelf row. If Code holds that one writer must mean one behaviour, then the tint wins and the shelf shows nine tints — and what is lost is the ability to tell a measured colour from an inferred one at a glance, which the brief asked to keep honest. Worth saying plainly rather than arguing only the side I prefer." }
+      ],
+      rows: dress({ plateEdge: "rgba(42,31,20,0.34)", low: "#B07C3E", jade: "#3F5E42", muted: "#8C7F6C" }),
+      rowsDark: dress({ plateEdge: "rgba(239,231,214,0.3)", low: "#D79A5A", jade: "#6F9A66", muted: "#9E9078" }),
+      filled: ["#8FA83E", "#D8C98F", "#E6D89B", "#CBA347", "#B5632E", "#843A1E", "#6E8A3C", "#4B3621"].map(fill => ({ fill })),
+      standing: [
+        { k: "TD1", d: "Identity is always the swatch — a hero photo would compete for the one job the swatch exists to do, so the photo never leads." },
+        { k: "TD2", d: "The label photo is provenance evidence: Niklas photographs packaging, not liquor. It documents where a tea came from." },
+        { k: "TD3", d: "The kanji plate is the swatch's third tier — the shape renders the tea's own script when no colour is asserted." },
+        { k: "MAP", d: "The ✎ swatch-edit badge stays detail-only. It does not come to the shelf row; identity there is read-only." }
+      ],
+      rulings: [
+        { k: "S1 · SLOT", t: "The swatch takes the leading slot", d: "At Bundle 1 geometry: 24×32, radius 9px 4px 8px 5px. #13 draws it there and the contract says why. The build's shelfPhoto moves out of that position." },
+        { k: "S2 · PHOTO", t: "The photo trails as a tin thumb", d: "26×26, square, 5px radius, hairline, before the caret. Subordinate by size, position and shape — it shares no radius family with the swatch, so it can never read as a second one." },
+        { k: "S3 · TIER 3", t: "Unfilled plate, never a type tint", d: "Nine teas get the same shape with no fill, holding their own script (empty when they have none). Filled means the app knows what this tea brews; unfilled means it does not." },
+        { k: "S4 · SCRIPT", t: "Script appears once per row", d: "Inside the plate for tier 3, inline after the name for tiers 1–2. The type pill stays a type label and is never liquor-tinted, on any row." }
+      ],
+      findings: [
+        { k: "F1 · RESOLVED c799aa3 — the ramp is not in this project.", d: "As written: both specs were absent, so the twelve stops could not be read, every hex on this turn is the #13 board's own R3-era value, and the ruling was made on position and fill state alone — which the ramp does not touch. Both specs have since arrived and turn 2 restates the LIGHT column against the shipped twelve. Kept rather than deleted because the ruling was made under the absence and stands independent of the hexes; the dark column is still unread, which is F10 and genuinely open." },
+        { k: "F2 · two incompatible tier-3s.", d: "The brief calls tier 3 a six-colour type tint; #03's TD3 rules it the kanji plate — same shape, no colour. Both cannot ship. Ruled for the plate, because the brief's own honesty requirement ('that difference should be honest rather than hidden') is exactly what a tint defeats: it looks as certain as measured liquor while carrying none." },
+        { k: "F3 · #03 does not need a second answer.", d: "It already separates identity from evidence by putting them in different sections. The question the brief raises for detail was settled at TD1/TD2; the shelf inherits it rather than diverging." },
+        { k: "F4 · #13 never drew a photo in the row.", d: "Its rows are swatch · name/script · status. So the slot was not taken from the swatch by a decision in #13 — the photo entered at build in shelfRowHTML. Also, #13's drawn swatch is 23×30 at radius 8px 4px 7px 4px; Bundle 1's 24×32 governs and #13's geometry is stale." },
+        { k: "F5 · the drawn picker counts 14, the ramp counts 12.", d: "#03's picker block is labelled “Bundle 1's 14-swatch palette”. When the ramp lands as twelve stops that label and the drawn grid both need restating — a small correction, but it is in a shipped board." },
+        { k: "F6 · R121 closes the open “3 sizes” item.", d: "One locked geometry (24×32) plus one derived (15×20 for small rows). The shelf row is a primary row and takes the locked size; the derived size stays for sittings lists. There is no third size to design." },
+        { k: "F7 · a status line was drawn in clay, and is corrected.", d: "The first draft of this board invented its own status colours and one of them — #9C5B33 on “running low” — is the theme's clay, the direction's one-committing-action colour. Now taking #13's own tokens: lowFg #B07C3E light / #D79A5A dark, jade #3F5E42 / #6F9A66. Worth recording because it is the failure mode D was called fragile for: nothing structural stops clay leaking onto a state line, only the habit of reading the tokens." }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

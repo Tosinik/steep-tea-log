@@ -91,10 +91,13 @@ decisions rather than any single ruling:
 - ~~**Slice 3 (the picker) is now v4.19 and UNBLOCKED**~~ — **SHIPPED v4.19** (cache v129): the COLOUR row
   in the tea form (F2 name-not-type, DOM-only grid, F1 containment guard), **unblocking #14 (R89)**. The
   S3 gate was R124/R125; those + R126–R129 are now the **v4.20** shelf fences, recorded in `liquor-test.js`
-  §D. Next is v4.20 (the shelf), gated on Design's dark redraw, then the `SECURITY.md` hardening pass.
+  §D. Next is v4.20 (the shelf) — **Design's dark redraw LANDED + reconciled (R144/R145; board banked at
+  `docs/r4/boards/shelf-swatch-ruling.dc.html`), so v4.20 is UNBLOCKED** — then the `SECURITY.md`
+  hardening pass.
 - **The shelf swatch is v4.20** (renumbered twice — R125's heading records both), on its own version,
-  after slice 3 **and** after Design's dark redraw. `.ref-swatch`/`.social-tile` are filed behind it;
-  `.today-tint` keeps its tint permanently, by R124's predicate rather than by exemption.
+  after slice 3 (**shipped v4.19**) **and** after Design's dark redraw (**landed this session — R144/R145,
+  dark plates are a dashed 1.5px SVG path, not a CSS border**). `.ref-swatch`/`.social-tile` are filed
+  behind it; `.today-tint` keeps its tint permanently, by R124's predicate rather than by exemption.
 - **Security & legal hardening pass — sequenced after v4.20, before any public beta.** Findings
   captured and verified against the live project in **`SECURITY.md`**: `profiles` readable by all
   authenticated users with no allowlist (HIGH) · `tea-photos` bucket public + unscoped read (HIGH) ·

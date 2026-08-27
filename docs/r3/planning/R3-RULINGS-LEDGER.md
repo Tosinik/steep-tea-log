@@ -1979,6 +1979,29 @@ oversized map marks v4.08, the door's slack margin v4.09, the layout stretch). H
 what looking *catches* would miss that it also *ratifies*. §8 items 20/21 book the process-side of the
 same point.
 
+> **R144–R145 BACKFILLED 2026-08-27 (Code lane, on the planning lane's dictation) — same shape as
+> R139–R142: ruled in the retiring planning chat, referenced, never committed (§8 item 23's
+> neighbourhood).** Design's board is banked with them at **`docs/r4/boards/shelf-swatch-ruling.dc.html`**
+> (turn 5/6, the visual authority for R144/R145 and findings F20/F21/F29/F30), so these rulings do not
+> rest on a chat attachment. Both are **v4.20 build notes** — the shelf is where they take effect.
+
+**R144 — In dark, R126's tier distinction is carried by dash WEIGHT, not ink.** At `--line #332F24`'s
+real weight (1.303:1 against `--white #1C1A14`, verified), a plate edge cannot separate from a filled
+swatch on ink — both sit inside noise of the ground at the near-black end. The separator is
+block-vs-outline: ~768px² continuous fill against ~95px interrupted stroke, at equal contrast. Plate =
+dashed, 1.5px, `--line`, dasharray 13 6, five dashes. 1px reads as faint scratches; 2px out-weighs the
+solid measured edge and breaks R126 from the far side. Measured swatch keeps its solid hairline unchanged.
+The third lever (a plate-ground tint) is dead on the tokens — `--porcelain #15140F` is 1.06:1 against
+ground, below the hairline — and was drawn dead in 5c so nobody reaches for it. **Verified: Design turn
+5/6, tokens read this session.** *(The board rounds these to 1.31:1 and 1.07:1 — the same measurements,
+not a discrepancy.)*
+
+**R145 — The plate branch of `swatchAttr` emits an SVG path, not a CSS border.** R144's dash length
+isn't settable in a CSS border, so at both tiers the swatch is an SVG path. R124's per-site argument
+still selects the branch; the branch output changes from a border style to a path. `liquor-test.js` §D's
+shelf fences assert against a path now, not a border style — **this is a v4.20 build note, and D3/D6 need
+updating when the shelf is built.**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
