@@ -1026,3 +1026,24 @@ licence to adapt the engine.
     > `R3-STATUS.md` §8. Resolved by the **item-10 counter**: grep the section title across `docs/`, not
     > the section number inside one file — which is the same counter that kept item 10 itself from being
     > mis-filed into `HANDOVER-planning-lane.md` §7.
+23. **Four rulings referenced across three deploys while uncommitted to the ledger — item 13's
+    recurrence, now four-wide.** Planning lane, about itself. The lane asserts the ledger's contiguity
+    every turn ("contiguous and verified unbroken from a fresh clone") and yet let **R139, R140, R141,
+    R142** go uncommitted across v4.17, v4.18 and v4.19 while referencing them in `STATE.md`,
+    `CHANGELOG.md` and `smoke.md` — including **R141, which renumbered R125 inside the ledger while its
+    own entry was never written.** This is **item 13's exact shape** (R133 minted then left uncommitted,
+    a decision that constrains later rulings going unnumbered) — no longer one instance but **four at
+    once**, which makes it a method fault, not a slip. The counter already exists and was not applied:
+    **a ruling is not issued until it is in the ledger; a reference to an uncommitted ruling is a
+    reference to nothing.** The R141 case is the sharpest — a ledger amendment (R125's renumber) that
+    depends on a ruling absent from the same file.
+
+    **The Code lane's interim was correct and is worth keeping as the pattern.** Finding the R138→R143
+    gap while filing R143, it neither silently bridged it nor invented the four rulings' text (the
+    planning lane's to author); it left a **"backfill owed" note at the gap** that made the hole visible
+    and pointed to where the four were recorded. **Making a hole visible is the honest move when the fix
+    is not the noting lane's to author** — the counterpart to declining the false skip (item 22): there,
+    refusing to write another lane's *claim*; here, refusing to write another lane's *rulings*, while
+    refusing to hide that they are missing. The four were backfilled verbatim on the lane's dictation
+    once v4.19 was pushed, with a provenance note **stronger than R133's** — they describe live,
+    on-device-confirmed deploys reconstructed from shipping code, not a plan that never ran.

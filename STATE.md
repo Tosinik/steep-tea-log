@@ -191,11 +191,12 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (BUILT — docs pushed; code commit awaiting review + push) — v4.19: the liquor picker (R39/R89)**
-(cache **v129**, APP_VERSION v4.19, **no SQL** — `v3_12` shipped v4.14). Slice 3 of 3 of the liquor
-swatch model; **unblocks #14 (R89)**. Split-push: CHANGELOG/STATE/ROADMAP/SPEC pushed on write; the code
-commit (`steep-teas.js`, `styles.css`, `service-worker.js`, `steep-core.js`, `fixtures/liquor-test.js`,
-`fixtures/liquor-review.js`, `fixtures/xss-render-test.js`) **pauses UNPUSHED for review** — Niklas pushes.
+**NOW (SHIPPED — v4.19 LIVE) — the liquor picker (R39/R89)** (cache **v129**, APP_VERSION v4.19,
+**no SQL** — `v3_12` shipped v4.14). Slice 3 of 3 of the liquor swatch model; **unblocks #14 (R89)**.
+**PUSHED: origin/main = `1ee6aaf`**, docs (`e6e5075` v4.19 + R143) below it; verified at origin — cache
+v129, APP_VERSION v4.19. Code commit = `steep-teas.js`, `styles.css`, `service-worker.js`, `steep-core.js`,
+`fixtures/liquor-test.js`, `fixtures/liquor-review.js` (a local, gitignored `xss-render-test.js` also
+updated — it does not travel).
 - **The COLOUR row** (tea form, after Type, above the Specifics fold): preview swatch + tier-honest source
   note + inline **13-cell `<button>` grid** (default cell + 12 ramp stops), `aria-pressed`/`aria-label`.
   DOM-only, never `render()`; selection writes a hidden input + dispatches `input` (WS1 dirty guard,
@@ -217,9 +218,9 @@ commit (`steep-teas.js`, `styles.css`, `service-worker.js`, `steep-core.js`, `fi
   spot that brushes WS1's "name and type are all you need") — **Niklas looked at the rendered Add form
   and ruled it reads calm** (R143); no Add/Edit split, the tension is closed, v4.20+ don't reopen it.
   JC2: the tier-3 preview re-tinting on **type** change — correct (the tier-3 fallback is type-derived;
-  the liquor still follows name only). **Both filed R143** (ledger). *(While filing R143 the Code lane
-  found **R139–R142 are referenced here + in CHANGELOG but absent from the ledger** — the numbered
-  sequence jumps R138→R143; backfill owed, flagged in the ledger.)*
+  the liquor still follows name only). **Both filed R143** (ledger). *(Filing R143 surfaced that
+  **R139–R142 were absent from the ledger** despite being referenced here + in CHANGELOG/smoke — now
+  **backfilled verbatim** (ledger R138→R143 contiguous); the contiguity failure is **§8 item 23**.)*
 - **NEXT: v4.20 — the shelf** (R141 ladder; the R124–R129 fences), **gated on Design's dark redraw** —
   check if it's landed. Then the **security/legal hardening pass** (documented in `SECURITY.md`, after
   v4.20), then the beta is reachable.

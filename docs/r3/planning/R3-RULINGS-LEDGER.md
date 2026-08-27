@@ -1921,18 +1921,48 @@ same failure one tier up, in the document that outranks the boards. R7 is amende
 > an artifact for a *contract*. R7 is unlikely to be alone. Not run now; queued so it is scoped
 > rather than improvised mid-audit.
 
-**R139–R142 are recorded in `STATE.md` / `CHANGELOG.md`, NOT yet transcribed here — a backfill owed,
-flagged by the Code lane at v4.19 so the gap is visible rather than silently bridged.** The v4.17 and
-v4.18 deploys made and referenced four rulings that never reached this ledger, so the numbered sequence
-jumps **R138 → R143**: **R139** (the session draft persists via `saveDraft`/`loadDraft`/`clearDraft`, the
-inline photo is stripped on persist, the drop announced once past-tense), **R140** (restore is silent;
-`goVessels`/`goFriends` bypass `goView`), **R141** (the R4 ladder renumber — v4.17 #34/#35 · v4.18
-#30/#33 · v4.19 picker · v4.20 shelf; R125/R130's sequencing shape a third time, §8 item 19), and
-**R142** (the wake lock follows the timer's `running` state, not the session's existence). These are
-load-bearing — **R141 renumbered R125 inside this very file** while its own entry is missing — so the
-ledger is not contiguous. Their full text is the planning lane's to author; this note only points to
-where they are recorded. Same family as §8's "ledger fell behind" concern, one deploy's discipline
-slipping across two.
+> **R139–R142 BACKFILLED 2026-08-27 (Code lane, on the planning lane's dictation), restoring
+> R138 → R139 → R140 → R141 → R142 → R143.** They were referenced across `STATE.md`, `CHANGELOG.md` and
+> `smoke.md` for three deploys but never transcribed here — the contiguity failure is filed as **§8 item
+> 23**. Their provenance is **stronger than R133's**: unlike R133 (minted then left uncommitted,
+> describing a plan that never ran), each of these describes a deploy that is **live and on-device-
+> confirmed**, so its text is reconstructed from the shipping code and the deploy records, not from an
+> unrun plan.
+
+**R139 — The session draft persists locally; the inline photo does not, and the app says so once.**
+Applied to `state.sessionDraft`: persisted to `localStorage` on `pagehide`/`visibilitychange:hidden`,
+dirty drafts only, restored silently on boot. The `data:` image is stripped before persist — CLAUDE.md
+already rules inline `data:` images never reach storage (quota: a multi-MB URL beside the offline queue
+risks `QuotaExceededError`, breaking the queue — a worse failure than the one fixed). Not a new product
+call; the offline-queue decision applied to a second queue. The restore line states the fact and asks
+nothing, attached to the restored sitting, once — dropped to the empty slot if it reads as an
+instruction. `timer.intervalId` is dropped on save and re-derived from elapsed + running. **Verified
+shipped: v4.17, on device.**
+
+**R140 — Restore is silent.** A recovered draft reappears without a prompt. A launch-time question would
+be a nudge, and it would fire on the launch after a lost sitting — when the app should be least demanding.
+This is the only option consistent with zero-feedback sessions being complete outcomes: an unfinished
+sitting is not an error state the user owes an answer to. The existing `sessionDraftDirty` guard governs
+abandonment unchanged. **Verified shipped: v4.17.**
+
+**R141 — R130's version assignments shift up by the two slices sequenced ahead of the picker.** v4.17
+#34/#35 · v4.18 #30/#33 · v4.19 slice 3 picker · v4.20 shelf. `.ref-swatch`/`.social-tile` filed behind
+v4.20. This is R125's shape a second time — a sequencing ruling numbered before its work was done, stale
+by the time the work arrived — and is filed as such in §8, with the structural note (version-at-build-
+time, not version-at-ruling-time) recorded but not adopted. The ladder was amended in all four places it
+was stated (R130, R125's heading and amendment, STATE, ROADMAP) per the authority-order lesson.
+**Verified shipped: the ladder held clean through v4.17, v4.18, v4.19.**
+
+**R142 — Timer lifecycle resolves as pause-on-hide (B), not wall-clock catch-up (A).** On
+`visibilitychange:hidden` while running, the existing pause path fires (`clearInterval`, `running=false`);
+the timer freezes at its last observed value and the user resumes with a tap. Two reasons: it matches
+R139's restore-paused so draft and timer behave identically, and — the load-bearing one — A shows a
+measured number for something it never measured. "Catch up to real elapsed" asserts the steep progressed
+while backgrounded, but the steep is leaf in water and the app can't see the pot; a resumed-accurate clock
+claims progress it didn't observe. B freezes at the honest value. Named condition, built as its own guard
+(`steep-sessions.js`, `timerRunning()`): the wake lock re-acquires on return only when the timer is
+running — a paused timer re-acquires on resume, never holds the screen awake over a frozen clock.
+**Verified shipped: v4.18, on device.**
 
 **R143 — the COLOUR row above the fold is confirmed by eye; the WS1 tension is CLOSED.** The picker's
 COLOUR row sits above the Specifics fold on **both Add and Edit** (SPEC §4.1, deviation 1). §4.1 could
