@@ -1136,6 +1136,18 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
    compound rule instead, so every tile is coloured by a .t-* class and none by the base. */
 .social-tile{flex:none;display:flex;align-items:center;justify-content:center;width:26px;height:34px;border-radius:8px 4px 7px 4px;border:1px solid var(--line);font-family:var(--font-display);font-size:10px;line-height:1;text-align:center;overflow:hidden;}
 .social-tile.t-unknown{background:var(--porcelain-dim);color:var(--ink-soft);}
+/* v4.19 — the liquor picker (contract 1, R39). Colours come from the theme-aware --liquor-* tokens
+   (both blocks), so these rules carry geometry only. Preview reuses the .social-tile 26x34 family;
+   cells are board #03's 22x22 — both R121 (scale the lock, no new aspect). The default cell and any
+   tier-3 preview borrow the shipped .t-<type> tints, so no colour is hardcoded here. */
+.liquor-field .liquor-row{display:flex;align-items:center;gap:10px;}
+.liquor-preview{display:inline-block;width:26px;height:34px;flex:none;border-radius:8px 4px 7px 4px;border:1px solid var(--line);background:var(--porcelain-dim);}
+.liquor-row-txt{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.liquor-source{font-size:12px;color:var(--ink-soft);}
+.liquor-open{align-self:flex-start;background:none;border:none;padding:0;font-family:inherit;font-size:12px;color:var(--jade-deep);cursor:pointer;}
+.liquor-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.liquor-cell{width:22px;height:22px;padding:0;flex:none;border-radius:6px 3px 5px 3px;border:1px solid var(--line);background:var(--porcelain-dim);cursor:pointer;}
+.liquor-cell[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px;}
 .pass-card{border:1px solid var(--line);border-radius:13px;background:var(--porcelain-dim);padding:12px;margin-top:10px;}
 .pass-deeper{display:block;padding:4px 0 0;font-family:var(--font-mono);font-size:10px;color:var(--jade-deep);text-decoration:underline;}
 .pass-add{flex:none;font-size:12px;padding:6px 10px;}

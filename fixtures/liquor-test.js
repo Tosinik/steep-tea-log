@@ -167,28 +167,42 @@ ok(rows.find(r=>r.slug==='ruan-zhi-oolong').liquor==='gold-pale',
 console.log('  C the assignments: 10 checks');
 
 /* ---- D · the fence: what this slice deliberately does NOT do (R116's pattern) ---- */
-const dataSrc=fs.readFileSync(path.join(repo,'steep-data.js'),'utf8');
-/* D1 CHANGED IN v4.14 — it used to assert "no teas.liquor column yet", which was the v4.11/v4.12
-   fence and is now discharged. A fence that has been crossed is rewritten to the one that still
-   stands, never deleted: the column exists and is mapped (E8/E9), and what is NOT built is the
-   PICKER — so today `teas.liquor` can only be non-null by a hand-edit or an import, and every tea
-   on a real shelf resolves at tier 2 or tier 3. */
-ok(!/liquorPicker|setTeaLiquor|liquorGrid/.test(dataSrc+strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'))),
-   'D1 no picker yet (R39, slice 3) — nothing in the app can WRITE a correction, so tier 1 is currently reachable only by import or hand-edit');
+/* PRESENCE checks read the RAW source; ABSENCE checks read the stripped one. strip() treats the
+   accept=image-slash-star on the photo input as a block-comment OPEN and eats forward to the next
+   comment-close, so the liquorRowHTML(t) call site is absent from the stripped text and a presence
+   check against it silently fails. Eating a region can only ever make an ABSENCE check pass, never
+   fail, so those stay on stripped. Same "check reads the wrong representation" family the register
+   keeps booking. */
+const teasSrc0=fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8');   // raw — presence
+const teasFenceSrc=strip(teasSrc0);                                        // stripped — absence
+/* D1 CHANGED IN v4.19 — the PICKER now exists (slice 3, R39), so the v4.14 "no picker" fence is
+   crossed. Rewritten to the fence that still stands, the way D1/D3 were before it: the picker is the
+   tea-FORM control ONLY. Board 03's PRIMARY path is tea detail, which renders no swatch to hang an
+   in-place picker on (F6); this slice ships the boarded SECONDARY path (#06's form). And there is NO
+   long-press (deviation 3): no machinery exists, it is not keyboard-reachable, and the surfaces it
+   would live on draw nothing to press. */
+ok(/function liquorRowHTML\(/.test(teasSrc0) && /\$\{liquorRowHTML\(t\)\}/.test(teasSrc0),
+   'D1 the picker IS built and is the tea-FORM control — liquorRowHTML renders inside teaFormModal, after Type, above the fold (R39, #06 secondary path)');
+ok(!/long-?press|onlongpress/i.test(teasFenceSrc),
+   'D1b …and long-press is NOT built (deviation 3) — no machinery, not keyboard-reachable, nothing on shelf/detail to press');
 ok(G('TT_INHERIT').indexOf('liquor')===-1,
    'D2 `liquor` is NOT inherited: §8 authors every member explicitly, so inheritance is unused today and its only future effect is a new member silently inheriting a colour nobody authored (R121)');
-/* D3 CHANGED IN v4.15 — it asserted "nothing renders a liquor yet", the v4.11–v4.14 fence, and this
-   slice crosses it. Rewritten to the fence that still stands, the way D1 was: the SHELF does not
-   render one. `shelfPhoto` holds that position on evidence — 21 of 21 teas carry photos, and R78
-   made the tint the colour source only when no photo exists — so a swatch there is an ADDITION
-   alongside the photo that no board has drawn, and re-deciding it is Design's call (R81). */
-ok(!/swatchAttr\('shelf-/.test(strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'))),
-   'D3 the SHELF still draws no swatch — deferred to a board, because shelfPhoto holds that position with evidence behind it and an addition beside it is undrawn (R81)');
+/* D3 UNCHANGED at v4.19 — the picker lives in the FORM, so the shelf still renders no swatch. This is
+   the fence that becomes R124/R125's shelf-and-predicate fence at v4.20 (the shelf), when swatchAttr
+   gains its tier-3 predicate argument. THE A2 FOLD: R124–R129 are recorded here and in SPEC §9 as the
+   v4.20 fences so they are not discovered mid-slice — D6 pins that swatchAttr's signature is unchanged
+   until then, and SPEC §9's shelf/predicate/border-style fences (R124 predicate · R125 ref+social
+   filed behind v4.20 · R126 dashed-border tier mark · R129 no per-tea script) are the wall that stands
+   after this one. */
+ok(!/swatchAttr\('shelf-/.test(teasFenceSrc),
+   'D3 the SHELF still draws no swatch — shelfPhoto holds that position on evidence (R81); this becomes R124/R125\'s predicate fence at v4.20, not now');
 const spec=fs.readFileSync(path.join(repo,'docs/r4/planning/SPEC-liquor-swatch-model.md'),'utf8');
 ok(/These hex values are a first pass by a lane that has not drunk these teas/.test(spec),
    'D4 the spec still says the hexes are unverified by anyone who has tasted these teas — two groupings want a human check');
 ok(/derived, not locked/.test(spec), 'D5 …and that the small 15x20 geometry is derived, not locked (R121)');
-console.log('  D the fence: 5 checks');
+ok(/function swatchAttr\(base, key, type\)/.test(teasSrc0),
+   'D6 swatchAttr\'s signature is UNCHANGED — R124\'s tier-3 predicate argument is v4.20 work (the shelf), not this slice; recorded so the A2 fold is not discovered mid-slice');
+console.log('  D the fence: 7 checks');
 
 /* ---- E · the cascade (v4.14) — read time, never stored ---- */
 const gf={id:'t1', name:'Honey Oolong Gui Fei', type:'oolong'};          // matches gui-fei-oolong → amber
@@ -228,13 +242,16 @@ console.log('  E the cascade: 10 checks');
 /* ---- F · THE SITE SCAN, and it points the OPPOSITE way from the currency scan ----
  *
  * R104's scan caught money fields rendered bare — sites that should have called the helper and did
- * not. This one has to catch the reverse: a colour applied where it does not belong. Twelve places
- * write a `t-<type>` class, and they are four different kinds of thing:
+ * not. This one has to catch the reverse: a colour applied where it does not belong. FOURTEEN places
+ * write a `t-<type>` class (twelve before v4.19; the picker added two), and they are five kinds:
  *
  *   3 SWATCH SLOTS      already Bundle-1 geometry wearing a type tint — these get the liquor
  *   3 PHOTO PLACEHOLDERS  40-100px image substitutes; a design question nobody has drawn
  *   4 TYPE LABELS       pills that literally read "Oolong" — liquor-ising one is an ACTIVE REGRESSION
  *   2 CHART SEGMENTS    a categorical bar of types, not of teas
+ *   2 PICKER TIER-3     v4.19: the COLOUR-row preview + the default grid cell, tinted ONLY when the
+ *                       tea resolves to tier 3 — the honest fallback the picker is choosing among,
+ *                       not a swatch slot to liquor-ise (a fixed liquor there would defeat the picker)
  *
  * A mechanical "replace the type tint" would have been wrong at six of twelve, and nothing else in
  * the app would have noticed. So the classification itself is asserted: a new tinted site has to be
@@ -255,7 +272,7 @@ FILES_SCANNED.forEach(f=>{
   tinted += (src.match(/t-\$\{|dot-\$\{/g)||[]).length;
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
-ok(tinted===9, 'F1 nine type-tint writes remain across the five files — three became swatches, and the rest are labels, placeholders and chart segments (got '+tinted+')');
+ok(tinted===11, 'F1 ELEVEN type-tint writes remain across the six files — the v4.19 picker added two (its tier-3 fallback: COLOUR-row preview + default cell), on top of the nine that stayed labels/placeholders/chart after three became swatches (got '+tinted+')');
 ok(painted===3, 'F2 …and exactly THREE call sites paint a liquor, one per real swatch slot (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
@@ -279,6 +296,50 @@ ok(/background:var\(--liquor-/.test(G('swatchAttr("ref-swatch","amber-deep","ool
 ok(/\.today-tint\{[^}]*border:1px solid var\(--line\)/.test(cssSrc),
    'F9 the third slot gains the hairline the other two already had — which is what makes `ivory` (19.2 from --white) exist on a near-white card, and closes that open item');
 console.log('  F the site scan: 9 checks · '+tinted+' tints kept · '+painted+' liquor sites');
+
+/* ---- G · the picker (v4.19, R39) — the WRITE path, and F1's containment guard ----
+ *
+ * F1 is the central bug of this slice and its guard is the GENERAL form, NOT /liquor/. submitTeaForm
+ * rebuilds the tea from scratch; before v4.19 it wrote every mapped field EXCEPT `liquor`, silently,
+ * and a string match on "liquor" would have missed the NEXT dropped field. The invariant asserted is:
+ * the set of keys submitTeaForm writes ⊇ the set teaFromDb produces. Keys are parsed from source, so
+ * this section reads raw and strips BOTH comment kinds first — teaFromDb carries `// v4.14:`-style
+ * line comments whose colons would otherwise read as keys (strip() only removes block comments).
+ */
+const teasRaw=fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8');
+const dataRaw=fs.readFileSync(path.join(repo,'steep-data.js'),'utf8');
+const noComment=s=>s.replace(/\/\*[\s\S]*?\*\//g,' ').replace(/\/\/[^\n]*/g,' ');
+const objKeys=(src,re)=>{ const m=src.match(re); if(!m) return null;
+  const body=noComment(m[1]); const keys=new Set(); const kre=/([A-Za-z_]\w*)\s*:/g; let k;
+  while((k=kre.exec(body))) keys.add(k[1]); return keys; };
+const fromDbKeys=objKeys(dataRaw,/const teaFromDb = r => \(\{([\s\S]*?)\n {2}\}\);/);
+const dataKeys  =objKeys(teasRaw,/const data = \{([\s\S]*?)\n {2}\};/);
+ok(fromDbKeys && dataKeys, 'G1a both object literals were located and parsed (teaFromDb + submitTeaForm `data`)');
+const dropped=fromDbKeys ? [...fromDbKeys].filter(k=>!dataKeys.has(k)) : ['<parse-failed>'];
+ok(dropped.length===0,
+   'G1 submitTeaForm writes ⊇ teaFromDb produces — no persisted field is silently dropped (F1, the general form; catches the NEXT drop, not just liquor). Missing: ['+dropped.join(', ')+']');
+ok(!!(dataKeys && dataKeys.has('liquor')),
+   'G2 …and `liquor` specifically is now written — the field that was dropped until this slice');
+ok(/liquor: \(f\.liquor && isLiquorKey\(f\.liquor\.value\)\) \? f\.liquor\.value : null/.test(teasRaw),
+   'G3 the write is GATED through isLiquorKey — a tampered DOM cannot persist junk; anything else → null → tier 2');
+ok(/function liquorGridCells\(/.test(teasRaw) && /<button type="button"[^>]*aria-pressed=/.test(teasRaw) && /aria-label=/.test(teasRaw),
+   'G4 the grid is real <button type=button> cells with aria-pressed + aria-label — keyboard-reachable, testable without synthesised pointer events, never an accidental submit');
+ok(/inp\.dispatchEvent\(new Event\('input', \{ bubbles:true \}\)\)/.test(teasRaw),
+   'G5 selection writes the hidden field and DISPATCHES an input event (WS1 dirty guard) — exactly acceptOriginOffer, so a backdrop tap cannot discard the choice silently');
+/* DOM-only: the three interactive functions must never call render() — the form reads fields on
+   submit, so a re-render mid-edit wipes unsaved values (toggleSpecifics' constraint). */
+const pickerFns=(strip(teasRaw).match(/function (?:liquorSelect|liquorRefresh|toggleLiquorGrid)\([\s\S]*?\n\}/g)||[]).join('\n');
+ok(pickerFns && !/\brender\(\)/.test(pickerFns),
+   'G6 open/close and selection are DOM-only — liquorSelect/liquorRefresh/toggleLiquorGrid never call render()');
+ok(/data-liquor=""[\s\S]*?onclick="liquorSelect\(''\)"/.test(teasRaw),
+   "G7 CLEARING is a first-class cell — the default cell writes '' → submitTeaForm maps '' → null → tier 2 by construction (the UI wiring behind E4)");
+ok(/liquorFor\(\{ name, type, liquor: correction \}\)/.test(teasRaw) && /F2: resolution follows NAME/.test(teasRaw),
+   'G8 F2 — the preview resolves via liquorFor(NAME), not the type control; type only re-tints the tier-3 fallback (build to §4.1, not board #06 rev 4)');
+ok(/\.liquor-preview\{[^}]*width:26px;height:34px/.test(cssSrc),
+   'G9 preview swatch is 26x34 — the shipped .social-tile/.ref-swatch family (R121)');
+ok(/\.liquor-cell\{[^}]*width:22px;height:22px/.test(cssSrc) && !/width:40px;height:50px/.test(cssSrc),
+   "G10 grid cells are 22x22 (board #03), and #06 rev 4's 40x50 4:5 aspect is NOT adopted (R121: scale the lock, not a new aspect)");
+console.log('  G the picker + F1 guard: 11 checks');
 
 console.log('');
 if(failures){ console.log('FAILED: '+failures+' of '+(passed+failures)); process.exit(1); }

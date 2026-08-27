@@ -546,6 +546,7 @@ function applyKbSuggest(){
   if(_kbSuggest.origin && !(form.elements['origin'].value||'').trim()) form.elements['origin'].value = _kbSuggest.origin;
   _kbSuggest = null;
   const box = document.getElementById('teaKbSuggest'); if(box) box.innerHTML='';
+  liquorRefresh();   // applied type may change the tier-3 tint; the liquor itself still follows name (F2)
 }
 function dismissKbSuggest(){
   _kbSuggestDismissed = true; _kbSuggest = null;
@@ -585,9 +586,10 @@ function teaFormModal(){
           ${state._draftImage?'':`${icon('i-camera-hl',26)}<span>Tap to add a photo</span>`}
           <input type="file" accept="image/*" class="js-img-input">
         </div>
-        <div class="field" style="margin-top:14px;"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}" oninput="teaFormNameSuggest()" placeholder="e.g. Sencha Kagoshima"><div id="teaKbSuggest"></div></div>
-        <div class="field" style="margin-top:12px;"><label>Tea type</label><select name="type">${typeOpts}</select></div>
+        <div class="field" style="margin-top:14px;"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}" oninput="teaFormNameSuggest();liquorRefresh()" placeholder="e.g. Sencha Kagoshima"><div id="teaKbSuggest"></div></div>
+        <div class="field" style="margin-top:12px;"><label>Tea type</label><select name="type" onchange="liquorRefresh()">${typeOpts}</select></div>
         ${promoted}
+        ${liquorRowHTML(t)}
         <div class="fold-row" onclick="toggleSpecifics(this)" role="button" aria-expanded="false" style="margin-top:14px;">
           <span class="fold-label">Specifics <span class="fold-sub">· amount, harvest, origin…</span></span>
           <span class="fold-caret">${icon('i-caret-hl',22)}</span>
@@ -694,6 +696,10 @@ async function submitTeaForm(e){
     purchaseDate: f.purchaseDate.value || null,
     openedDate: f.openedDate.value || null,
     leafForm: f.leafForm.value || null,
+    // v4.19 — F1: liquor was SILENTLY DROPPED here (data wrote 22 of teaFromDb's 23 keys; latent until
+    // the picker could set tier 1). Gated through isLiquorKey so a tampered DOM can't persist junk;
+    // '' (the cleared/default cell) → null → tier 2 by construction. §G asserts data ⊇ teaFromDb.
+    liquor: (f.liquor && isLiquorKey(f.liquor.value)) ? f.liquor.value : null,
     image: imageUrl,
     dateAdded: state.editingTea?.dateAdded || new Date().toISOString()
   };
@@ -928,6 +934,95 @@ function acceptOriginOffer(btn, value){
   input.dispatchEvent(new Event('input', { bubbles:true }));   // marks the form dirty (WS1 guard)
   const row = btn.closest('.origin-offer');
   if(row) row.innerHTML = '<span class="origin-offer-txt">Origin set — save to keep it.</span>';
+}
+
+/* ---------- the liquor picker (contract 1, R39 · slice 3, v4.19) ----------
+   The COLOUR row in the tea form: a preview swatch, a tier-honest source note, and an inline grid that
+   writes a per-tea correction (tier 1). Modelled on acceptOriginOffer, NOT Borrow — it fills a hidden
+   field and the FORM's own Save commits; a second self-committing control inside a form would make
+   colour the only field that saves itself (#06 is the boarded SECONDARY path; tea detail, the primary,
+   renders no swatch and is not this slice, F6). F2: the default follows the NAME via matchTeaType, never
+   the type — picking a type changes the resolved liquor nothing; type only re-tints the tier-3 fallback.
+   Open/close and selection are DOM-only, never render() — the form reads its fields on submit, so a
+   re-render mid-edit wipes unsaved values (toggleSpecifics' constraint). Geometry is R121 (scale the
+   lock): preview 26x34 (.social-tile family), cells 22x22 (#06's 40x50 4:5 not adopted). */
+function liquorLabel(k){ return k.charAt(0).toUpperCase() + k.slice(1).replace(/-/g,' '); }
+function liquorSourceText(tier, tea){
+  if(tier===1) return 'your correction';
+  if(tier===2){ const m = matchTeaType(tea.name||''); return 'catalog default · ' + (m ? m.display_name : ''); }
+  return 'no colour yet — shows its type tint';
+}
+// The 13 cells: a DEFAULT cell first (value '' → clears → tier 2 by construction), then the twelve ramp
+// stops in order. Every cell a real <button type=button> (keyboard-reachable, testable without
+// synthesised pointer events; type=button so a cell is never an accidental form submit).
+function liquorGridCells(tea){
+  const type = tea.type || (TYPES[0] && TYPES[0].k) || 'green';
+  const correction = tea.liquor || '';
+  const defaultKey = liquorFor(Object.assign({}, tea, {liquor:null}));   // tier 2/3 — what clearing returns to
+  const defAttr = defaultKey ? `class="liquor-cell" style="background:var(--liquor-${escapeHtml(defaultKey)});"`
+                             : `class="liquor-cell t-${escapeHtml((type||'unknown').toLowerCase())}"`;
+  let cells = `<button type="button" ${defAttr} data-liquor="" aria-pressed="${correction===''?'true':'false'}" aria-label="Default — catalog colour or type tint" onclick="liquorSelect('')"></button>`;
+  cells += LIQUOR_KEYS.map(k=>`<button type="button" class="liquor-cell" style="background:var(--liquor-${k});" data-liquor="${k}" aria-pressed="${correction===k?'true':'false'}" aria-label="${escapeHtml(liquorLabel(k))}" onclick="liquorSelect('${k}')"></button>`).join('');
+  return cells;
+}
+function liquorRowHTML(tea){
+  const type = tea.type || (TYPES[0] && TYPES[0].k) || 'green';
+  const correction = tea.liquor || '';
+  const resolved = liquorFor(tea);                                       // tier 1/2/3 (null → tier 3)
+  const defaultKey = liquorFor(Object.assign({}, tea, {liquor:null}));
+  const tier = (correction && isLiquorKey(correction)) ? 1 : (defaultKey ? 2 : 3);
+  const prevAttr = resolved ? `class="liquor-preview" style="background:var(--liquor-${escapeHtml(resolved)});"`
+                            : `class="liquor-preview t-${escapeHtml((type||'unknown').toLowerCase())}"`;
+  return `<div class="field liquor-field" style="margin-top:12px;">
+    <label>Colour</label>
+    <div class="liquor-row">
+      <span id="liquorPreview" ${prevAttr}></span>
+      <div class="liquor-row-txt">
+        <span class="liquor-source" id="liquorSource">${escapeHtml(liquorSourceText(tier, tea))}</span>
+        <button type="button" class="liquor-open" id="liquorOpen" aria-expanded="false" aria-controls="liquorGrid" onclick="toggleLiquorGrid(this)">${resolved?'correct the colour ›':'set a colour ›'}</button>
+      </div>
+    </div>
+    <div class="liquor-grid" id="liquorGrid" role="group" aria-label="Tea colour" style="display:none;">${liquorGridCells(tea)}</div>
+    <input type="hidden" name="liquor" id="liquorInput" value="${escapeHtml(correction)}">
+  </div>`;
+}
+function toggleLiquorGrid(btn){
+  const g = document.getElementById('liquorGrid'); if(!g) return;
+  const open = getComputedStyle(g).display==='none';
+  g.style.display = open ? '' : 'none';           // '' → the .liquor-grid CSS default (flex); mirrors toggleSpecifics
+  btn.setAttribute('aria-expanded', open?'true':'false');
+}
+// Fills the hidden field and marks the form dirty (WS1) — exactly acceptOriginOffer's dispatch, so a
+// backdrop tap does not discard the choice silently. '' clears; submitTeaForm maps '' → null (tier 2).
+function liquorSelect(key){
+  const inp = document.getElementById('liquorInput'); if(!inp) return;
+  inp.value = key;
+  inp.dispatchEvent(new Event('input', { bubbles:true }));
+  liquorRefresh();
+}
+// DOM-only repaint of preview + source note + default cell + aria-pressed, from the live form. Reads,
+// never writes or dispatches, so it is safe on initial setup and on every name/type change.
+function liquorRefresh(){
+  const form = document.getElementById('teaForm'); if(!form) return;
+  const inp = document.getElementById('liquorInput'); if(!inp) return;
+  const name = (form.elements['name'].value||'').trim();
+  const type = form.elements['type'].value;
+  const correction = inp.value || '';
+  const resolved = liquorFor({ name, type, liquor: correction });        // F2: resolution follows NAME, not type
+  const defaultKey = liquorFor({ name, type, liquor: null });
+  const prev = document.getElementById('liquorPreview');
+  if(prev){ if(resolved){ prev.className='liquor-preview'; prev.style.background='var(--liquor-'+resolved+')'; }
+            else { prev.className='liquor-preview t-'+((type||'unknown').toLowerCase()); prev.style.background=''; } }
+  const tier = (correction && isLiquorKey(correction)) ? 1 : (defaultKey ? 2 : 3);
+  const srcEl = document.getElementById('liquorSource'); if(srcEl) srcEl.textContent = liquorSourceText(tier, { name, type });
+  const openEl = document.getElementById('liquorOpen'); if(openEl) openEl.textContent = resolved ? 'correct the colour ›' : 'set a colour ›';
+  const grid = document.getElementById('liquorGrid');
+  if(grid){
+    const def = grid.querySelector('.liquor-cell[data-liquor=""]');
+    if(def){ if(defaultKey){ def.className='liquor-cell'; def.style.background='var(--liquor-'+defaultKey+')'; }
+             else { def.className='liquor-cell t-'+((type||'unknown').toLowerCase()); def.style.background=''; } }
+    grid.querySelectorAll('.liquor-cell').forEach(c=>c.setAttribute('aria-pressed', (c.getAttribute('data-liquor')||'')===correction ? 'true':'false'));
+  }
 }
 
 /* The ⋯ menu (#03), enumerated to what actually exists. Pass-tea LANDS HERE in v4.02, on the R25

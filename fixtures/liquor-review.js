@@ -1,10 +1,12 @@
-/* local-only: render the liquor ramp and the real shelf's resolution, for a human to look at.
+/* Tracked review tool (like figures-report.js): render the liquor ramp and the real shelf's
+ * resolution for a human to look at — committed, NOT local-only, so it cannot drift from the code
+ * it reviews. (F5, v4.19: the two claims below were false since v4.15/a82bda9 and are corrected.)
  *
- * WHY NOT A SHELF RENDER. Nothing renders a liquor yet — the cascade and the migration are the next
- * slice, so the shelf still draws its type tint and would look identical to yesterday. Rendering it
- * would show a human nothing and imply everything. What this slice actually produced is a colour
- * JUDGEMENT, so that is what gets drawn: the ramp at Bundle 1's geometry, and every one of
- * Niklas's 21 teas under the stop it resolves to.
+ * WHAT IT DRAWS. Since v4.15 three slots DO render a liquor (.ref-swatch, .social-tile, .today-tint),
+ * and v4.19's picker writes tier-1 corrections; the shelf CARD still deliberately draws its type tint
+ * (D3 — shelfPhoto holds that position, a swatch beside the photo is undrawn, R81). So this is not a
+ * shelf render — it draws the colour JUDGEMENT directly: the ramp at Bundle 1's geometry, and every
+ * one of Niklas's 21 teas under the stop it resolves to.
  *
  * The two groupings §9 flags for a human check are the point of the second panel — `gold-pale`
  * holding a Fujian white beside a Thai Ruby Ruanzhi, a yellow tea and a Yunnan silver bud, and
