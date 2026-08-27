@@ -986,3 +986,43 @@ licence to adapt the engine.
     read-to-measure division applied to runtime, and the thing `smoke.md` + the CLAUDE.md rule now make
     standing rather than ad-hoc. Booked as a win for the same reason as item 20: a register that only
     catalogues faults forgets that the gates also work.
+22. **A pushed task read as undone from a clone taken before the push propagated.** Planning lane,
+    about itself. Task 0 (`SECURITY.md` + the `ROADMAP-v4.md` hardening line) was committed and pushed
+    this session as `c5347f5` (`b25eb67..c5347f5`), **first in order**, exactly as the prompt directed.
+    The lane re-clones the repo each turn and treats the result as current; this turn's clone was taken
+    at or before `b25eb67`, **before the push propagated**, so it saw no `SECURITY.md`, no roadmap line,
+    no advisor output — and the lane built a narrative on the absence: *the session did the export
+    refresh and the picker plan and silently reordered Task 0 behind the more engaging work.* It then
+    directed a **redo** plus a **§8 skip entry** on that basis. The narrative was wrong end to end — the
+    file was on `origin` the whole time, and Task 0 had landed first.
+
+    **Caught by the Code lane, which verified against the live remote instead of absorbing the claim.**
+    `git fetch origin` → `origin/main` at `c5347f5`, `SECURITY.md` in the tree (13,123 bytes), the
+    roadmap line at `ROADMAP-v4.md:95`, and the four findings + `get_advisors` re-checked against live
+    Supabase that same turn. It then **declined to file the skip**: writing "a task was silently
+    reordered" into this binding register when the commit proves it landed first would be **mode 1
+    (confident invention) aimed UP the gradient** — a fabrication entered to preserve a higher lane's
+    claim, the exact inverse of what the register exists for. The refusal was the more important act
+    than the catch.
+
+    **This is mode 8 (authority inversion) recurring, with one new wrinkle:** the lower-tier source that
+    disagreed with the top tier (the live repo) was the lane's **own clone**, not a lower *document*.
+    The root is exact and **shared with security's own non-shipping**, this register's reason to exist:
+    *acting on a lower-tier source when the top tier is one `fetch` away.* **A stale clone and a
+    session's memory are the same failure wearing different clothes** — item 2 (honest-and-stale) and
+    item 4 (session-memory decisions) are this same fault told about a summary and a decision; here it
+    is told about a checkout. Counter, the picker-inputs counter one tier up: **before acting on a claim
+    that something is undone — from any source, including a higher lane or one's own memory — verify
+    against the live remote, not a clone that may predate the work.**
+
+    **Standing behaviour corrected, recorded so the next turn inherits it:** the per-turn `--depth 1`
+    re-clone is authoritative only if it **post-dates** the thing it checks. When a report says
+    "pushed," the verification is **`git fetch` then check `origin`** — not a fresh clone that may race
+    propagation. The habit assumed a freshness the clone did not have.
+
+    > *Second mode from the one action, kept per items 12 and 18.* The instruction to file this was
+    > itself given as "**ledger** §8" with no file named — **mode 11's under-specified pointer again**,
+    > since the register is not in `R3-RULINGS-LEDGER.md` (its headings stop at §6) but here, in
+    > `R3-STATUS.md` §8. Resolved by the **item-10 counter**: grep the section title across `docs/`, not
+    > the section number inside one file — which is the same counter that kept item 10 itself from being
+    > mis-filed into `HANDOVER-planning-lane.md` §7.
