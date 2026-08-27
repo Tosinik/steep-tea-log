@@ -165,6 +165,11 @@ this correction.
 > (below). The build is `steep-teas.js` (picker + F1) · `styles.css` (`.liquor-*`) · `liquor-test.js`
 > §D/§G (72 green) · `liquor-review.js` (F5). This subsection stays as the authority-of-record; the
 > code is the artifact.
+>
+> **R143 (post-ship, confirmed on device):** deviation 1's above-the-fold placement — the one thing
+> §4.1 could only approve *conditionally* against WS1's "name and type are all you need" — was looked at
+> on the rendered Add form and ruled to **read calm**. No Add/Edit split; the WS1 tension is CLOSED and
+> v4.20+ do not reopen it. R122's looking confirming what the spec approved conditionally.
 
 **F2 — the mechanism is NAME, not TYPE. Build to this, not to board #06 rev 4.** The board (AT1, the
 Add caption) says the Tier-2 default appears "live only after you pick a **TYPE**". **That is wrong.**

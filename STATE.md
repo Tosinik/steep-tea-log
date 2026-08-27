@@ -213,10 +213,13 @@ commit (`steep-teas.js`, `styles.css`, `service-worker.js`, `steep-core.js`, `fi
   local; a local `xss-render-test.js` gained `steep-tea-types.js` in its sandbox) on the fresh
   **2026-08-26 export** (swapped this session; the Aug-17 set → `fixtures/archive/2026-08-26-pre-v4.19/`);
   `liquor-test.js` 59→**72**.
-- **TWO JUDGMENT CALLS surfaced for a look at the pause** (both §4.1-approved): the COLOUR row above the
-  fold on **Add** (the one spot that brushes WS1's "name and type are all you need"), and the tier-3
-  preview re-tinting on **type** change (correct: the tier-3 fallback is type-derived; the liquor still
-  follows name only).
+- **TWO JUDGMENT CALLS — both RESOLVED (R143).** JC1: the COLOUR row above the fold on **Add** (the one
+  spot that brushes WS1's "name and type are all you need") — **Niklas looked at the rendered Add form
+  and ruled it reads calm** (R143); no Add/Edit split, the tension is closed, v4.20+ don't reopen it.
+  JC2: the tier-3 preview re-tinting on **type** change — correct (the tier-3 fallback is type-derived;
+  the liquor still follows name only). **Both filed R143** (ledger). *(While filing R143 the Code lane
+  found **R139–R142 are referenced here + in CHANGELOG but absent from the ledger** — the numbered
+  sequence jumps R138→R143; backfill owed, flagged in the ledger.)*
 - **NEXT: v4.20 — the shelf** (R141 ladder; the R124–R129 fences), **gated on Design's dark redraw** —
   check if it's landed. Then the **security/legal hardening pass** (documented in `SECURITY.md`, after
   v4.20), then the beta is reachable.

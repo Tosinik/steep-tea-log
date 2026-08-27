@@ -1921,6 +1921,34 @@ same failure one tier up, in the document that outranks the boards. R7 is amende
 > an artifact for a *contract*. R7 is unlikely to be alone. Not run now; queued so it is scoped
 > rather than improvised mid-audit.
 
+**R139–R142 are recorded in `STATE.md` / `CHANGELOG.md`, NOT yet transcribed here — a backfill owed,
+flagged by the Code lane at v4.19 so the gap is visible rather than silently bridged.** The v4.17 and
+v4.18 deploys made and referenced four rulings that never reached this ledger, so the numbered sequence
+jumps **R138 → R143**: **R139** (the session draft persists via `saveDraft`/`loadDraft`/`clearDraft`, the
+inline photo is stripped on persist, the drop announced once past-tense), **R140** (restore is silent;
+`goVessels`/`goFriends` bypass `goView`), **R141** (the R4 ladder renumber — v4.17 #34/#35 · v4.18
+#30/#33 · v4.19 picker · v4.20 shelf; R125/R130's sequencing shape a third time, §8 item 19), and
+**R142** (the wake lock follows the timer's `running` state, not the session's existence). These are
+load-bearing — **R141 renumbered R125 inside this very file** while its own entry is missing — so the
+ledger is not contiguous. Their full text is the planning lane's to author; this note only points to
+where they are recorded. Same family as §8's "ledger fell behind" concern, one deploy's discipline
+slipping across two.
+
+**R143 — the COLOUR row above the fold is confirmed by eye; the WS1 tension is CLOSED.** The picker's
+COLOUR row sits above the Specifics fold on **both Add and Edit** (SPEC §4.1, deviation 1). §4.1 could
+only approve that placement *conditionally* — the open question was whether an optional colour affordance
+above the fold crowds WS1's *"name and type are all you need"* on a blank Add form. **Niklas looked at
+the rendered Add form and ruled it reads calm:** the row is optional and quiet, so the minimal-form
+principle holds. **No Add/Edit split; the fallback path is closed, and v4.20+ do not reopen it.** No code
+change — the build already ships it above the fold.
+
+This is **R122's look-to-find settling what a spec could only approve conditionally**, and the *positive*
+counterpart to the four defects the same looking caught this round (the empty greeting v4.15, the
+oversized map marks v4.08, the door's slack margin v4.09, the layout stretch). Here the looking
+**confirmed** rather than caught — both directions are the same instrument, and a record that only books
+what looking *catches* would miss that it also *ratifies*. §8 items 20/21 book the process-side of the
+same point.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
