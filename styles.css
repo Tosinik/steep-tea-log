@@ -1107,7 +1107,15 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .sd-steep-note{font-size:13px;margin-top:5px;white-space:pre-wrap;line-height:1.5;}
 .sd-steep-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
 .sd-note{font-size:13.5px;white-space:pre-wrap;line-height:1.55;}
-.sd-photo{width:100%;border-radius:14px;display:block;}
+.sd-photo{width:100%;border-radius:2px;display:block;} /* R5 spine slice 3 (R156): unrationed → 2px (was 14), the shelf-thumb rule (board §1d); the fence's positive assertion for this box-less surface. */
+/* R5 spine slice 3 (F33/R156): session-detail de-carded — the wrapper .card is gone (a detail page is
+   not a discrete object). Identity → BAND (.sd-band composes .band, full-bleed like .lib-band/.shop-band);
+   the rest are RULE sections in per-group .sd-sec wrappers (grouping survives de-carding). No BOX — a
+   linear detail page has no discrete object; do not add one back. SLAB = the existing .btn-clay on
+   "Brew this again" (the one committing action). */
+.sd-band{display:flex;flex-direction:column;gap:3px;margin:0 -16px 13px;padding:13px 16px;}
+.sd-sec{margin-top:18px;} /* RULE section wrapper — grouping only, no fill/border/radius. */
+.sd-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;} /* a section header; the 2px ink rule comes from .rule-head. */
 
 /* ===== slice C — #12 quick log + #04 strip ===== */
 .when-chips{display:flex;flex-wrap:wrap;gap:7px;}

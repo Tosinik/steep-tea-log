@@ -12,8 +12,9 @@
  * per tea, zero asymmetric radii anywhere else" (board §1d, docs/r5/boards/surface-language-spine.dc.html).
  *
  * Scope (F33 — per-surface, grows a surface at a time): SURFACES registers each re-dressed surface's
- * frame selectors — shelf (slice 1, R153) + shopping (slice 2, R154/R155) — plus the shared primitives
- * and the slab. Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints)
+ * frame selectors — shelf (slice 1, R153) + shopping (slice 2, R154/R155) + session-detail (slice 3,
+ * R156/R157 — the first box-less surface, positive assertion on .sd-photo per the .shelf-thumb precedent)
+ * — plus the shared primitives and the slab. Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints)
  * are NOT frame — excluded, and the photo-tint fallback is a KNOWN deferred fill-law item (R149), reported
  * below, not asserted. Radii/fills are measured FROM SOURCE, never the board's drawn numbers (R127/R128).
  */
@@ -35,8 +36,9 @@ function isTorn(r){ return r!=null && r.trim().split(/\s+/).length === 4; }   //
 // registry (F33: the rollout is per-surface, so the fence names which surface each selector proves). A
 // surface is not fenced until its selectors are in here AND a negative control below bites on one of them.
 const SURFACES = {
-  shelf:    ['.shelf-card', '.shelf-row', '.shelf-row-mid', '.shelf-caret', '.shelf-thumb', '.lib-band'],
-  shopping: ['.shop-band', '.shop-add', '.shop-sec', '.shop-row'],   // R154/R155 — slice 2
+  shelf:         ['.shelf-card', '.shelf-row', '.shelf-row-mid', '.shelf-caret', '.shelf-thumb', '.lib-band'],
+  shopping:      ['.shop-band', '.shop-add', '.shop-sec', '.shop-row'],       // R154/R155 — slice 2
+  sessionDetail: ['.sd-band', '.sd-sec', '.sd-steep', '.sd-photo'],           // R156/R157 — slice 3
 };
 const FRAME = [...Object.values(SURFACES).flat(), '.band'];           // '.band' is the shared primitive
 const FILL_OK = ['var(--porcelain)', 'var(--band)', 'var(--white)'];   // the only fills a frame may carry
@@ -127,6 +129,14 @@ expectFail('shopping: a torn radius on .shop-add reddens radius-law',
   chkFrameRadius(CSS.replace(/(\.shop-add\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
 expectFail('shopping: a torn radius on .shop-add reddens rationing',
   chkRationing(CSS.replace(/(\.shop-add\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+// session-detail (R157) — the first box-less surface; the positive subject is .sd-photo (2px), the
+// .shelf-thumb precedent, so a torn radius on it must redden both radius-law and rationing.
+expectFail('session-detail: a rationed fill on .sd-sec reddens fill-law',
+  chkFrameFill(CSS.replace('.sd-sec{', '.sd-sec{background:var(--jade);')));
+expectFail('session-detail: a torn radius on .sd-photo reddens radius-law',
+  chkFrameRadius(CSS.replace(/(\.sd-photo\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+expectFail('session-detail: a torn radius on .sd-photo reddens rationing',
+  chkRationing(CSS.replace(/(\.sd-photo\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
 // shared primitives + the slab
 expectFail('.band losing its --band fill reddens the primitive',
   chkPrimitive(CSS.replace(/(\.band\{[^}]*?background:)var\(--band\)/, '$1var(--jade)'), '.band', {bg:'var(--band)'}));

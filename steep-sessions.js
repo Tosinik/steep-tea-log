@@ -397,28 +397,34 @@ function viewSessionDetail(){
       <button class="tea-more" onclick="toggleSessionMenu()" aria-label="More" aria-expanded="${state.sessionMenuOpen?'true':'false'}">⋯</button>
     </div>
     ${sessionMenuHTML(s)}
-    <div class="card">
+    <!-- R5 spine slice 3: wrapper .card deleted (a detail page is not a discrete object). Identity → BAND;
+         the rest are RULE sections in per-group .sd-sec wrappers; SLAB = the one .btn-clay on Brew again. -->
+    <div class="band sd-band">
       <div class="sd-kicker mono">${escapeHtml(fmtDateTime(s.date))}</div>
       <h2 class="sd-title">${tea?`<span class="sd-link" onclick="openTeaDetail('${escapeJsArg(tea.id)}','sessions')">${escapeHtml(tea.name)}</span>`:'Unknown tea'}</h2>
       ${ident?`<div class="sd-ident">${ident}</div>`:''}
-      ${s.rating?`<div style="margin-top:8px;">${renderStarsStatic(Number(s.rating),true)}</div>`:''}
-      ${facts.length?`<div class="grid grid-2" style="margin-top:14px;">${facts.join('')}</div>`:''}
+    </div>
+    ${(s.rating || facts.length || quiet) ? `<div class="sd-sec">
+      ${s.rating?`<div>${renderStarsStatic(Number(s.rating),true)}</div>`:''}
+      ${facts.length?`<div class="grid grid-2"${s.rating?' style="margin-top:14px;"':''}>${facts.join('')}</div>`:''}
       ${quiet?`<div class="sd-quiet mono">${quiet}</div>`:''}
+    </div>`:''}
 
-      ${steeps.length ? `<div class="section-title" style="margin-top:20px;"><h2 class="sd-h">Steeps · ${steeps.length}</h2>
+    ${steeps.length ? `<div class="sd-sec">
+      <div class="sd-sechead rule-head"><h2 class="sd-h">Steeps · ${steeps.length}</h2>
         ${steepMeta?`<span class="mono sd-soft">${escapeHtml(steepMeta)}</span>`:''}</div>
-        <div class="sd-steeps">${steeps.map(sessionSteepRowHTML).join('')}</div>`
-      : `<div class="section-title" style="margin-top:20px;"><h2 class="sd-h">Infusions</h2></div>
-         <div class="sd-soft">${brewCountLabel(s)} — logged without timed steeps.</div>`}
+      <div class="sd-steeps">${steeps.map(sessionSteepRowHTML).join('')}</div></div>`
+    : `<div class="sd-sec">
+      <div class="sd-sechead rule-head"><h2 class="sd-h">Infusions</h2></div>
+      <div class="sd-soft">${brewCountLabel(s)} — logged without timed steeps.</div></div>`}
 
-      ${s.description?`<div style="margin-top:18px;"><div class="eyebrow">Your note</div><div class="sd-note">${escapeHtml(s.description)}</div></div>`:''}
-      ${sessTags?`<div style="margin-top:14px;"><div class="eyebrow">Taste words</div><div class="sd-steep-tags">${sessTags}</div></div>`:''}
-      ${s.photoUrl?`<div style="margin-top:16px;"><img src="${escapeHtml(s.photoUrl)}" alt="" class="sd-photo" loading="lazy"></div>`:''}
+    ${s.description?`<div class="sd-sec"><div class="eyebrow rule-head" style="padding-bottom:6px;">Your note</div><div class="sd-note">${escapeHtml(s.description)}</div></div>`:''}
+    ${sessTags?`<div class="sd-sec"><div class="eyebrow rule-head" style="padding-bottom:6px;">Taste words</div><div class="sd-steep-tags">${sessTags}</div></div>`:''}
+    ${s.photoUrl?`<div class="sd-sec"><img src="${escapeHtml(s.photoUrl)}" alt="" class="sd-photo" loading="lazy"></div>`:''}
 
-      <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="brewAgain('${escapeJsArg(s.id)}')">Brew this again</button>
-        <button class="btn" onclick="openSessionEdit('${escapeJsArg(s.id)}')">Edit</button>
-      </div>
+    <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
+      <button class="btn-clay" onclick="brewAgain('${escapeJsArg(s.id)}')">Brew this again</button>
+      <button class="btn" onclick="openSessionEdit('${escapeJsArg(s.id)}')">Edit</button>
     </div>`;
 }
 /* The ⋯ menu. #02b's "Pass this tea to the circle" was OMITTED rather than drawn disabled in v4.00
