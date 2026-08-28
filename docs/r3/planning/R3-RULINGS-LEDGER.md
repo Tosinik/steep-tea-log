@@ -2104,6 +2104,38 @@ three (rogue `--jade` on `.shop-row` reddens fill-law; a torn radius on `.shop-a
 rationing). `.shop-add` also makes a **positive** shopping assertion (`--white` + radius 2px), mirroring
 `.shelf-card`. 16 → **19 checks**, all six+three controls bite. *(fixtures/frame-test.js.)*
 
+**R156 — session-detail is the spine's third surface, and the first that has no BOX; a detail page is not a
+discrete object, so it is de-carded, not re-boxed.** R5 slice 3 (v4.24) re-dresses `viewSessionDetail`
+(containers only, F33). Chosen over the other two self-contained candidates for a reason worth recording:
+**tea-detail is not a containers-only surface** — `savedBrewHTML`/`suggestedBrewHTML` are nested `.card`s
+carrying `var(--jade-pale)`, and two more sites inject jade-pale by **inline style**, which the
+selector-based fence structurally cannot see; it needs mark-remediation and a markup-level guard, deferred
+to R5-AUDIT. **vessels** is a Teas-tab segment whose frame (masthead + clay Add) already shipped in slice 1
+— a one-card rounding error. session-detail verified clean: one wrapper `.card`, no nested cards, no
+jade-pale, `.sd-steep` already `border-bottom`-ruled, zero existing clay. The mapping: the wrapper `.card`
+is **deleted** — boxing the whole page is the uniform-`.card` frame R5 kills, and the board's "one session =
+a BOX" is a session as a *list item among peers*, not the session *as the page*. Identity → **BAND**
+(`.sd-band` composes `.band`, full-bleed like the two shipped mastheads); the rest → **RULE** sections, each
+in its own `.sd-sec` wrapper (grouping survives de-carding, per R154); `.sd-photo` 14→2px (unrationed →
+0/2px, the board §1d shelf-thumb rule). **SLAB = "Brew this again"** — the one action that puts tea in a cup
+(the Tea-First reading, same family as the shelf's Add and tea-detail's Start session), swapped jade
+`.btn-primary` → the existing `.btn-clay`; Edit is a correction (`.btn`), Delete is destructive (`⋯` sheet,
+`--red`), names are `.sd-link`. **The clay cap holds by construction — the surface carried zero clay, so
+exactly one is introduced.** **No BOX is recorded deliberately**, so a later pass does not add one back.
+*(steep-sessions.js, styles.css.)*
+
+**R157 — a box-less surface still gets a positive fence assertion; a non-box frame element carries it.**
+`fixtures/frame-test.js` gains `sessionDetail` in `SURFACES`. session-detail is the first surface with **no
+box**, so there is no `.shelf-card`/`.shop-add`-style container to carry the positive assertion. The masthead
+`.sd-band` **composes** `.band` (its fill is asserted centrally in §B — re-declaring it on `.sd-band` would
+buy a redundant assertion at the price of breaking the band's primitive-reuse, the one thing both shipped
+bands do), so the positive subject is **`.sd-photo` at 2px** — the `.shelf-thumb` precedent, a non-box frame
+selector carrying a positive radius. Three controls bite (rogue `--jade` on `.sd-sec` reddens fill-law; a
+torn radius on `.sd-photo` reddens radius-law and rationing). 19 → **22 checks**. The ruling this pins: a
+surface in the registry with no positive subject and no biting control is fenced in name only — a box-less
+surface must still name a real positive subject, and a frame element (`.sd-photo`) is the right one, not a
+workaround. *(fixtures/frame-test.js.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

@@ -191,8 +191,38 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.23 SHIPPED, LIVE `a2dcf2b` — R5 slice 2: the Shopping list re-dressed to the spine** (cache
-**v133**, APP_VERSION v4.23, **no SQL**). The spine rollout (slice 1 = the shelf, v4.22) continues onto its
+**NOW — v4.24 SHIPPED, LIVE `0bd7f44` — R5 slice 3: the session detail page re-dressed to the spine** (cache
+**v134**, APP_VERSION v4.24, **no SQL**). The spine rollout (shelf v4.22 · Shopping v4.23) continues onto its
+third surface — `viewSessionDetail`, **containers only** (F33). Chosen over tea-detail (nested `.card`s with
+**inline** `var(--jade-pale)` fills — a mark-remediation job the selector fence can't police; deferred, NOT
+containers-only) and vessels (already spined in slice 1 — a Teas-tab segment, one empty-state card).
+session-detail verified cleanest: one wrapper `.card`, no nested cards, no jade-pale, `.sd-steep` already
+`border-bottom`-ruled, zero existing clay.
+- **What shipped:** the wrapper `.card` **deleted** (a detail page is not a discrete object → content on
+  paper); identity → **BAND** (`.sd-band` composes `.band`, full-bleed like the shipped mastheads); the rest
+  → **RULE** sections in per-group `.sd-sec` wrappers (facts · Steeps with `.rule-head` header · Your note ·
+  Taste words); `.sd-photo` radius **14→2px** (board §1d shelf-thumb rule); **SLAB = "Brew this again"** →
+  the existing `.btn-clay` (jade `.btn-primary` retired; Edit stays `.btn`, Delete in the `⋯` sheet, names
+  `.sd-link`). Clay cap holds by construction (screen carried zero clay → exactly one introduced). **No BOX**
+  — recorded (R156) so a later pass doesn't add one back. Files: `styles.css`, `steep-sessions.js`,
+  `fixtures/frame-test.js`, `service-worker.js` (v134), `steep-core.js` (+WHATS_NEW).
+- **The fence sees session-detail (R157):** `SURFACES` gains `sessionDetail`; positive assertion = `.sd-photo`
+  at 2px — the **first box-less surface**, so the `.shelf-thumb` precedent stands in for a box. Three controls
+  bite (fill on `.sd-sec`; torn radius on `.sd-photo` ×2). **19 → 22 checks. 32 suites green.** Ledger:
+  **R156** (session-detail re-dressed; no BOX) · **R157** (fence third surface + no-box positive-assertion).
+- **Left for Niklas's live look:** the F33 grouping-read — "Steeps · N", "Your note", "Taste words" must read
+  as three distinct sections, not one merged run — and the two open hairline questions (band top vs topbar;
+  first row under `.rule-head`), built like-for-like, not pre-diverged; they resolve centrally.
+- **NEXT — the road is near its end for Code-alone re-dresses.** After session-detail, the self-contained set
+  is essentially spent: vessels is a trivial empty-state/segment tidy, and everything left (Home, Settings #8,
+  Insights, stat cards, steeping, **tea-detail**) is entangled behind a Design thread or the tea-detail
+  **mark-remediation** (inline `var(--jade-pale)` → rationed marks; needs a markup-level guard, not the CSS
+  fence — being folded into R5-AUDIT deferrals). Slice 4 is likely the inflection: the small vessels tidy, or
+  hand back to Design to wake the entangled surfaces. **SECURITY stays the deferred pre-widening gate**, not
+  the next slice. The two v4.22 cosmetic items remain open for the phone look — not re-touched.
+
+**Previously — v4.23 (SHIPPED, LIVE `a2dcf2b`) — R5 slice 2: the Shopping list re-dressed to the spine** (cache
+**v133**, APP_VERSION v4.23, **no SQL**). The spine rollout (slice 1 = the shelf, v4.22) continued onto its
 second surface — `viewShopping`, **containers only** (F33, no global find-and-replace). Shopping was the
 low-entanglement pick: a self-contained list screen absent from the R5 punch-list **and** the issue inbox,
 so a containers-only pass can't read half-done (Home carries an element-mix + greeting-bug thread; Settings

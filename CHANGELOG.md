@@ -43,6 +43,44 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.24 — R5 slice 3: the session detail page re-dressed to the spine (F33, containers only)
+Deploy: styles.css, steep-sessions.js, steep-core.js (APP_VERSION v4.24 + WHATS_NEW), service-worker.js
+(**v134**), fixtures/frame-test.js. **No SQL.** No new module → no FILES_TO_CACHE / index.html change.
+*(Docs — CHANGELOG.md, STATE.md, R3-RULINGS-LEDGER.md R156–R157 — push with this deploy.)*
+
+Slice 3 continues the R5 spine rollout (shelf v4.22, Shopping v4.23) onto **session-detail**
+(`viewSessionDetail`), containers only (F33). Chosen over **tea-detail** (nested `.card`s with **inline**
+`var(--jade-pale)` fills — a mark-remediation job the selector-based fence structurally can't police;
+deferred to R5-AUDIT with a note that it is NOT a containers-only pass) and **vessels** (already spined in
+slice 1 — it's a segment rendered under the shelf header, one empty-state card, no SLAB decision).
+session-detail is the cleanest true detail screen: **one** wrapper `.card`, no nested cards, no jade-pale,
+`.sd-steep` rows already `border-bottom`-ruled, and **zero existing clay**.
+
+- **The wrapper `.card` is deleted.** A detail page is not a discrete object; boxing the whole page is the
+  uniform-`.card` frame R5 exists to kill. Content sits on paper.
+- **Identity → BAND** (`.sd-band` composes `.band`, full-bleed like the shelf/Shopping mastheads): date +
+  tea name + method/vessel.
+- **RULE sections, each in its own `.sd-sec` wrapper** (grouping survives de-carding, per slice 2): the
+  facts (Leaf/Water/TDS), the Steeps list (header → `.rule-head`; rows already ruled), Your note, Taste
+  words.
+- **No BOX** — recorded (R156) so a later pass doesn't add one back; a linear detail page has no discrete
+  bordered object.
+- **`.sd-photo` radius 14→2px** — unrationed → 0/2px (board §1d, the shelf-thumb rule).
+- **SLAB = "Brew this again"** — the one committing action (it starts a brew), swapped jade `.btn-primary`
+  → the existing `.btn-clay`. Edit stays `.btn`; Delete lives in the `⋯` sheet (`--red`); tea/vessel names
+  are `.sd-link`. The screen carried zero clay, so exactly one is introduced — the cap holds by construction.
+- **The fence sees session-detail (R157).** `SURFACES` gains `sessionDetail`; the positive assertion is
+  `.sd-photo` at 2px — the **first box-less surface**, so the `.shelf-thumb` precedent (a non-box frame
+  selector carrying the positive value) stands in for a box. Three controls bite (rogue `--jade` on
+  `.sd-sec`; torn radius on `.sd-photo` for radius-law and rationing). **19 → 22 checks.**
+- **Left for Niklas's live look** (one-line follow-ups): the two open hairline questions (band top vs the
+  topbar border; the first `.sd-steep`/section row under each `.rule-head`) — built like-for-like, not
+  pre-diverged; they resolve centrally. The F33 grouping-read: "Steeps · N", "Your note", and "Taste words"
+  must still read as three distinct sections, not one merged run of paper.
+
+Rulings: **R156** (session-detail re-dressed to the spine; no BOX recorded) · **R157** (the fill-law fence
+gains its third surface + records the no-box positive-assertion pattern). 32 suites green.
+
 ## v4.23 — R5 slice 2: the Shopping list re-dressed to the spine (F33, containers only)
 Deploy: styles.css, steep-shopping.js, steep-core.js (APP_VERSION v4.23 + WHATS_NEW), service-worker.js
 (**v133**), fixtures/frame-test.js. **No SQL.** No new module → no FILES_TO_CACHE / index.html change.
