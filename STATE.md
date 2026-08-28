@@ -191,7 +191,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (BUILT — awaiting review + push) — v4.21: the session pickers (#14)** (cache **v131**, APP_VERSION
+**NOW (SHIPPED — v4.21 LIVE, `71ad774`) — the session pickers (#14)** (cache **v131**, APP_VERSION
 v4.21, **no SQL**). Tea + vessel are chosen on searchable **R58 SCREENS**; the three native selects
 (setup, quick-log twin, edit modal) are retired. `teaRowIdentity` extracted from `shelfRowHTML` (one
 writer, two wrappers — the spine re-dresses both); `pickChoose` dispatches by kind to
@@ -201,9 +201,9 @@ writer, two wrappers — the spine re-dresses both); `pickChoose` dispatches by 
 **No long-press** (R89 deferred → its own gesture+commit build). **38 suites green** (new `pick-test.js`
 15; `liquor` §F/F5b retargeted to `teaRowIdentity` + F5c; `render-smoke` 15→17 views). **No on-device
 smoke** — DOM navigation, not touch.
-- **Split-push:** docs (CHANGELOG/STATE/ROADMAP) push on write; the code commit (`steep-teas.js`,
-  `steep-sessions.js`, `steep-core.js`, `service-worker.js`, `styles.css`, `.gitignore`, the four
-  fixtures) **pauses UNPUSHED for review + push**.
+- **PUSHED: origin/main = `71ad774`** (code) atop `28e930c` (R5-AUDIT) atop `b208a47` (v4.21 docs);
+  verified at origin — APP_VERSION v4.21, cache v131, `viewPickTea` + `pick-test.js` present. Origin is
+  consistent (code + docs both v4.21). The **R5 founding reference is `docs/r5/planning/R5-AUDIT.md`**.
 - **NEXT: R5 continues — the SPINE ROLLOUT** (the surface-language frame system, per-surface, F33). The
   **greeting-copy bug** is available as a small early slice.
 - **SECURITY is DEFERRED by decision (2026-08-28)** — it comes **after** the design work, **re-blocking
