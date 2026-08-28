@@ -211,3 +211,20 @@ Capture state, so nothing is lost while this is undecided:
 
 Design constraint if it ever ships: a second axis must not become a second required tap.
 A zero-feedback session stays a complete outcome (Tea-First Principle).
+
+## The unfold-curve problem — feedback conflates "weaker than I wanted" with "weaker than expected here"
+
+Teas with a natural unfold curve steep lighter first and build as the leaves open — pronounced in
+compressed forms (pressed white cakes, tight-rolled oolong, compressed pu'er). A "weak" reading on an
+early steep is expected leaf behaviour, not a brewing error, so a literal "weak → steep longer"
+recommendation is wrong. Today the user must mis-report "just right" because there is no way to say
+"weak, but correctly so for this position." Example: a small pressed white cake — steep 1 can't be strong.
+
+Implications for the phase-2 feedback model:
+- Feedback may need to be steep-POSITION-aware (which infusion), not session-flat — "weak on steep 1"
+  and "weak on steep 4" carry different meaning.
+- The advice model wants a per-tea / per-style expected-strength curve as a prior (compressed forms
+  peak at steep 2–3, not 1), so early-steep lightness reads against the expected curve, not a flat target.
+- The taxonomy itself ("weak / just right / strong" + "shorter / longer") and its placement are
+  disliked — revisit whether the vocabulary can separate "off from what I wanted" from "off from what's
+  expected."
