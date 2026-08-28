@@ -1,11 +1,11 @@
 // App version — the single source of truth for the user-visible version string (Settings footer +
 // the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.20';
+const APP_VERSION = 'v4.21';
 // WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
 // Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
 // (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
 // user-visible, so it carries a line again.)
-const WHATS_NEW = "Your library rows now lead with a colour swatch — filled when a tea's colour is known, a dashed outline when it isn't; the photo moves to the end of the row.";
+const WHATS_NEW = "Choosing a tea or vessel now opens a searchable screen — your whole shelf with its colours and stock, instead of a tiny dropdown.";
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
@@ -166,6 +166,7 @@ let state = {
   calMonth: null, calSelDay: null,
   teaSort: 'type', teaFilter: { type:'', vendor:'', lowStock:false }, teaSeg: 'teas',
   teaSearch: '',      // #19: transient Library search — cleared by goView on leaving the Teas tab (not on same-tab round-trips)
+  pickerCtx: null, pickerQuery: '', pickerFilter: '',   // v4.21 (#14): the tea/vessel picker screens — ctx is a serializable {kind,returnView,currentId} tag
   teaOverflowOpen:false,          // #13: the shelf's ⋯ sheet (sort · density · edit vendors)
   teaMenuOpen:false,              // #03: Tea detail's ⋯ sheet (shopping · Go Deeper · delete)
   refSearch:'', refOpen:null,     // R51 Go Deeper: reference search + the one expanded category
@@ -929,6 +930,8 @@ function render(){
   else if(state.view==='shopping') body = viewShopping();
   else if(state.view==='spend') body = viewSpend();
   else if(state.view==='session') body = viewSessionFlow();
+  else if(state.view==='pick-tea') body = viewPickTea();       // v4.21 (#14): R58 picker screens, opened from setup/flow/edit
+  else if(state.view==='pick-vessel') body = viewPickVessel();
 
   // WS6: the bottom bar recedes to a handle while a steep is running, unless the user swiped it back up.
   const navRecessed = state.view==='session' && fd && fd.stage==='steeping' && !state.navRestored;

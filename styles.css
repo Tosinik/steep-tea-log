@@ -317,6 +317,25 @@ html[data-theme="dark"] .shelf-kanji.t-puerh{background:#2a241c;} html[data-them
 .trio-select{appearance:none;-webkit-appearance:none;width:100%;border:none;background:transparent;padding:0 26px 0 0;font-family:'Inter',sans-serif;font-size:16px;color:var(--ink);cursor:pointer;}
 .trio-select.trio-tea{font-family:var(--font-display);font-weight:600;font-size:20px;line-height:1.22;}
 .trio-caret{position:absolute;right:0;display:flex;color:var(--ink-soft);pointer-events:none;}
+/* v4.21 (#14) — the tea & vessel picker screens. Minimal chrome; rows lean on the shelf primitives
+   (.shelf-row-mid/.shelf-name/.shelf-row-meta) so the spine's frame rollout re-dresses them globally. */
+.trio-picker-field{cursor:pointer;padding:0 26px 0 0;min-height:26px;}
+.trio-value{font-family:var(--font-display);font-weight:600;font-size:18px;line-height:1.25;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.trio-value.trio-placeholder{color:var(--ink-soft);font-weight:400;}
+.pick-search{position:relative;margin:0 0 12px;}
+.pick-search input{width:100%;box-sizing:border-box;padding:10px 34px 10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--white);font-size:15px;color:var(--ink);}
+.pick-filter{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;}
+.pick-chip{font-size:12px;padding:4px 11px;border:1px solid var(--line);border-radius:999px;background:none;color:var(--ink-soft);cursor:pointer;}
+.pick-chip.is-on{background:var(--ink);color:var(--white);border-color:var(--ink);}
+.pick-list{margin-bottom:12px;}
+.pick-row{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:8px;}
+.pick-row.is-selected{background:var(--porcelain-dim);}
+.pick-tick{flex:0 0 auto;color:var(--jade-deep);font-weight:700;font-size:16px;}
+.pick-empty{padding:22px 4px;color:var(--ink-soft);font-size:13px;text-align:center;}
+.pick-showfin{display:block;margin:8px auto 0;background:none;border:0;padding:6px;color:var(--ink-soft);font-size:12px;text-decoration:underline;cursor:pointer;}
+.pick-add{display:block;width:100%;padding:12px;border:1px dashed var(--line);border-radius:10px;background:none;color:var(--ink-soft);font-size:14px;cursor:pointer;margin-bottom:8px;}
+.pick-footer{display:flex;flex-direction:column;gap:6px;}
+.pick-manage{background:none;border:0;padding:4px;color:var(--jade-deep);font-size:13px;cursor:pointer;align-self:flex-start;}
 .trio-method-row{display:flex;align-items:center;justify-content:space-between;}
 .trio-method-row .trio-eyebrow{margin-bottom:0;}
 .seg-sm button{padding:6px 14px;font-size:13.5px;}

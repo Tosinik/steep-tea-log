@@ -294,16 +294,21 @@ ok(/shelf-pill t-\$\{/.test(teasSrc) && !/swatchAttr\('shelf-pill/.test(teasSrc)
    'F3 the shelf type PILL keeps its type tint and takes no liquor — a label reading "Oolong" coloured by liquor is a category error');
 ok(/class="pill t-\$\{/.test(socialSrc) && /class="pill t-\$\{/.test(teasSrc),
    'F4 …and so do the two other type pills, on Social and Tea detail');
-/* F5 SPLITS AT v4.20 — the "no shelf swatch" negation is CROSSED (D3/F5b assert presence now). Two
-   distinct guards: (a) the photo placeholder tint is not liquor-ised — the site-scan's real job; and
-   (b) the photo-trails DECISION, pinned on shelfRowHTML's OWN body, not the whole file, so it reddens
-   if the photo is dropped or the swatch/photo order flips (board S1/S2 · F4/TD1 · R81 for the grid). */
+/* F5 SPLITS AT v4.20, RETARGETED v4.21 — the "no shelf swatch" negation is CROSSED (D3/F5b assert
+   presence now). Three guards: (a) the photo placeholder tint is not liquor-ised; (b) the photo-trails
+   DECISION, pinned on shelfRowHTML's OWN body — v4.21 the identity block moved into teaRowIdentity, so
+   the anchor is teaRowIdentity(t) before shelfPhoto; (c) teaRowIdentity is the SINGLE identity writer,
+   wrapped by BOTH shelfRowHTML and the tea picker (one writer, two wrappers, R58/#14). */
 ok(/shelf-ph t-\$\{/.test(teasSrc),
    'F5a the shelf photo PLACEHOLDER keeps its type tint and takes no liquor — a tint stays a tint');
 { const rowBody=teasSrc.match(/function shelfRowHTML\([\s\S]*?\n\}/)[0];
-  const swAt=rowBody.indexOf("swatchAttr('shelf-swatch'"), phAt=rowBody.indexOf("shelfPhoto(t,'thumb')");
-  ok(swAt!==-1 && phAt!==-1 && swAt<phAt,
-     'F5b the row draws the swatch AND keeps the photo — swatch leading, photo trailing (board S1/S2, F4/TD1); reddens if the photo is dropped or the order flips'); }
+  const idAt=rowBody.indexOf("teaRowIdentity(t)"), phAt=rowBody.indexOf("shelfPhoto(t,'thumb')");
+  ok(idAt!==-1 && phAt!==-1 && idAt<phAt,
+     'F5b the row draws the IDENTITY (teaRowIdentity) then the photo TRAILS — reddens if the photo is dropped or the order flips (board S1/S2, F4/TD1)'); }
+{ const idBody=teasSrc.match(/function teaRowIdentity\([\s\S]*?\n\}/)[0];
+  const pickBody=teasSrc.match(/function pickTeaRow\([\s\S]*?\n\}/)[0];
+  ok(/swatchAttr\('shelf-swatch'/.test(idBody) && /teaRowIdentity\(t/.test(pickBody),
+     'F5c teaRowIdentity paints the swatch (single writer) AND is wrapped by pickTeaRow too — two wrappers, so the spine re-dresses both (R58/#14)'); }
 ok(/dot-\$\{/.test(strip(fs.readFileSync(path.join(repo,'steep-insights.js'),'utf8'))),
    'F6 the type-mix chart still keys on type — it counts categories, not teas, so a per-tea colour would make its legend meaningless');
 /* The three slots actually resolve. Rendered, not merely present in source. */
@@ -315,7 +320,7 @@ ok(/background:var\(--liquor-/.test(G('swatchAttr("ref-swatch","amber-deep","ool
    'F8 the writer paints when there is a key and falls back to the type tint when there is not — tier 3 lives at the render site, not in the resolver');
 ok(/\.today-tint\{[^}]*border:1px solid var\(--line\)/.test(cssSrc),
    'F9 the third slot gains the hairline the other two already had — which is what makes `ivory` (19.2 from --white) exist on a near-white card, and closes that open item');
-console.log('  F the site scan: 10 checks · '+tinted+' tints kept · '+painted+' liquor sites');
+console.log('  F the site scan: 11 checks · '+tinted+' tints kept · '+painted+' liquor sites');
 
 /* ---- G · the picker (v4.19, R39) — the WRITE path, and F1's containment guard ----
  *

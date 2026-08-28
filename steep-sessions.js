@@ -492,10 +492,9 @@ function viewSessionEdit(){
         <div class="field span2"><label>When</label><input type="datetime-local" value="${toLocalDatetimeValue(e.date)}" onchange="es_set('_localDate', this.value)"></div>
         <div class="field"><label>Leaf amount (g)</label><input type="number" step="0.1" value="${e.gramsUsed??''}" oninput="es_set('gramsUsed', this.value)"></div>
         <div class="field"><label>Water (ml)</label><input type="number" value="${e.waterMl??''}" oninput="es_set('waterMl', this.value)" placeholder="${(vesselById(e.vesselId)||{}).capacityMl||'vessel capacity'}"></div>
-        <div class="field span2"><label>Vessel</label><select onchange="es_set('vesselId', this.value)">${
-          (state.vessels.some(v=>v.id===e.vesselId) ? '' : `<option value="${escapeHtml(e.vesselId||'')}" selected>${escapeHtml(e.vesselName||'(unknown vessel)')}</option>`)
-          + state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${e.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}${v.capacityMl?` · ${v.capacityMl}ml`:''}</option>`).join('')
-        }</select></div>
+        <div class="field span2"><label>Vessel</label>
+          <div class="trio-line trio-picker-field" role="button" tabindex="0" onclick="openPicker('edit-vessel','session-edit')" aria-label="Choose a vessel"><span class="trio-value${e.vesselId?'':' trio-placeholder'}">${e.vesselId?escapeHtml((vesselById(e.vesselId)||{}).name||e.vesselName||'(unknown vessel)'):'Which vessel?'}</span><span class="trio-caret">${icon('i-caret-hl',20)}</span></div>
+        </div>
         <div class="field span2"><label>Method</label>
           ${methodLanesHTML({ brewStyle:e.brewStyle, isColdBrew:e.isColdBrew,
             capacityMl:(vesselById(e.vesselId)||{}).capacityMl, resolve:false,
@@ -725,10 +724,7 @@ function sessionQuickHTML(d){
      under R87, where a tea was chosen one tap earlier), so #12's "starts empty" is deliberately not
      built: it would discard a live user choice. The picker changes it; the vessel stays optional and
      never blocks the log (R43). */
-  const teaOpts = groupTeasByType(state.teas.filter(t=>!isTeaFinished(t)))
-    .map(g=>`<optgroup label="${escapeHtml(g.label)}">${g.teas.map(t=>`<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`).join('')}</optgroup>`).join('');
-  const vesselOpts = `<option value="" ${!d.vesselId?'selected':''}>Which vessel? (optional)</option>` +
-    state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
+  const selVesName = (vesselById(d.vesselId)||{}).name;   // v4.21 (#14): the picker screens replace the two selects
   const caret = `<span class="trio-caret">${icon('i-caret-hl',20)}</span>`;
   return `
     <button class="detail-back" onclick="armConfirm(this,'Discard this session log?',()=>cancelSession())">✕ Cancel session</button>
@@ -739,11 +735,11 @@ function sessionQuickHTML(d){
       <div class="trio-card" style="margin-bottom:16px;">
         <div class="trio-row">
           <div class="trio-eyebrow">Which tea</div>
-          <div class="trio-line"><select class="trio-select trio-tea" onchange="d_setTea(this.value)" aria-label="Tea">${teaOpts}</select>${caret}</div>
+          <div class="trio-line trio-picker-field" role="button" tabindex="0" onclick="openPicker('draft-tea','session')" aria-label="Choose a tea"><span class="trio-value${d.teaId?'':' trio-placeholder'}">${d.teaId?escapeHtml((tea&&tea.name)||'(unknown tea)'):'Which tea?'}</span>${caret}</div>
         </div>
         <div class="trio-row">
           <div class="trio-eyebrow">Vessel <span class="trio-optional">optional</span></div>
-          <div class="trio-line"><select class="trio-select" onchange="d_setVessel(this.value)" aria-label="Vessel">${vesselOpts}</select>${caret}</div>
+          <div class="trio-line trio-picker-field" role="button" tabindex="0" onclick="openPicker('draft-vessel','session')" aria-label="Choose a vessel"><span class="trio-value${d.vesselId?'':' trio-placeholder'}">${d.vesselId?escapeHtml(selVesName||'(unknown vessel)'):'Which vessel? (optional)'}</span>${caret}</div>
         </div>
       </div>
       ${d.isColdBrew ? `
@@ -794,16 +790,9 @@ function sessionSetupHTML(d){
   // group an <optgroup> header. Finished teas are hidden by default behind a "show finished" link,
   // but stay loggable (re-weighed tins, a true last session) — revealed as a trailing "Finished"
   // group, and always shown if the current selection is itself finished.
-  const active = state.teas.filter(t=>!isTeaFinished(t));
-  const finished = state.teas.filter(t=>isTeaFinished(t));
-  const showFin = !!d.showFinishedTeas || finished.some(t=>t.id===d.teaId);
-  const optHTML = t => `<option value="${escapeHtml(t.id)}" ${d.teaId===t.id?'selected':''}>${escapeHtml(t.name)}</option>`;
-  let teaOpts = groupTeasByType(active).map(g=>`<optgroup label="${escapeHtml(g.label)}">${g.teas.map(optHTML).join('')}</optgroup>`).join('');
-  if(showFin && finished.length) teaOpts += `<optgroup label="Finished">${sortTeasByTypeThenName(finished).map(optHTML).join('')}</optgroup>`;
-  const showFinLink = (finished.length && !showFin)
-    ? `<button type="button" onclick="d_showFinishedTeas()" style="margin-top:5px;background:none;border:0;padding:0;color:var(--ink-soft);font-size:11px;text-decoration:underline;cursor:pointer;">show finished (${finished.length})</button>`
-    : '';
-  const vesselOpts = state.vessels.map(v=>`<option value="${escapeHtml(v.id)}" ${d.vesselId===v.id?'selected':''}>${escapeHtml(v.name)}</option>`).join('');
+  // v4.21 (#14): tea + vessel are chosen on picker SCREENS now — the setup field shows the current
+  // choice and opens the picker. Search + finished-teas handling moved INTO the tea picker (ruling 3).
+  const selTea = teaById(d.teaId), selVesName = (vesselById(d.vesselId)||{}).name;
   // v3.56 capacity precursor: a quiet inline nudge when the chosen vessel has no capacity — taps to
   // its edit form (draft persists behind the overlay). Never a banner, never blocks logging.
   const selVes = vesselById(d.vesselId);
@@ -823,12 +812,11 @@ function sessionSetupHTML(d){
     <div class="trio-card">
       <div class="trio-row">
         <div class="trio-eyebrow">Tea</div>
-        <div class="trio-line"><select class="trio-select trio-tea" onchange="d_setTea(this.value)" aria-label="Tea">${teaOpts}</select>${caret}</div>
-        ${showFinLink}
+        <div class="trio-line trio-picker-field" role="button" tabindex="0" onclick="openPicker('draft-tea','session')" aria-label="Choose a tea"><span class="trio-value${d.teaId?'':' trio-placeholder'}">${d.teaId?escapeHtml((selTea&&selTea.name)||'(unknown tea)'):'Which tea?'}</span>${caret}</div>
       </div>
       <div class="trio-row">
         <div class="trio-eyebrow">Vessel</div>
-        <div class="trio-line"><select class="trio-select" onchange="d_setVessel(this.value)" aria-label="Vessel">${vesselOpts}</select>${caret}</div>
+        <div class="trio-line trio-picker-field" role="button" tabindex="0" onclick="openPicker('draft-vessel','session')" aria-label="Choose a vessel"><span class="trio-value${d.vesselId?'':' trio-placeholder'}">${d.vesselId?escapeHtml(selVesName||'(unknown vessel)'):'Which vessel? (optional)'}</span>${caret}</div>
         ${capLink}
       </div>
       <div class="trio-row trio-method-row">

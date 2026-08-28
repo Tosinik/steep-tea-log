@@ -236,22 +236,139 @@ function teaCardHTML(t){
     </div>
   </div>`;
 }
-// Row (density = rows) — thumbnail + name + [type pill · status] + caret.
-// v4.20: the SWATCH leads (identity), the PHOTO trails as a small square thumb before the caret
-// (evidence) — board S1/S2, photo kept not dropped (F4/TD1). The row renders shelfPill (a type label),
-// so hasLabel is true: tier 1/2 draws a filled swatch, tier 3 a dashed plate (R124/R144/R145).
-function shelfRowHTML(t){
-  const fin = isTeaFinished(t);
-  const key = liquorFor(t);
-  return `<div class="shelf-row${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
-    ${swatchAttr('shelf-swatch', key, t.type, true)}
+// v4.21 (#14): the row's IDENTITY block — swatch (R124/R145) + name + type pill + status — extracted as
+// the ONE writer, so shelfRowHTML and the tea-picker row wrap the SAME identity and the spine's frame
+// rollout re-dresses both at once (reuse, not invent). Two wrappers, one identity.
+function teaRowIdentity(t){
+  return `${swatchAttr('shelf-swatch', liquorFor(t), t.type, true)}
     <div class="shelf-row-mid">
       <div class="shelf-name">${escapeHtml(t.name)}</div>
       <div class="shelf-row-meta">${shelfPill(t)}${statusLineHTML(t)}</div>
-    </div>
+    </div>`;
+}
+// Row (density = rows) — the swatch LEADS (identity), the PHOTO trails as a small square thumb before
+// the caret (evidence) — board S1/S2, photo kept not dropped (F4/TD1). v4.20.
+function shelfRowHTML(t){
+  const fin = isTeaFinished(t);
+  return `<div class="shelf-row${fin?' tea-finished':''}" onclick="openTeaDetail('${escapeJsArg(t.id)}')">
+    ${teaRowIdentity(t)}
     ${shelfPhoto(t,'thumb')}
     <span class="shelf-caret">${icon('i-caret-hl',20)}</span>
   </div>`;
+}
+/* ---------- the tea & vessel pickers (v4.21, #14 / board 04 rev 6) ----------
+   R58 SCREENS (not overlays, not native <select> — the OS pop-out is the gap #14 names). Opened from
+   session setup / the quick flow / the edit modal; each carries a SERIALIZABLE ctx TAG (kind +
+   returnView + currentId), and pickChoose dispatches BY KIND to the existing setter so its side effects
+   run — crucially d_setVessel's methodPrefillFor, never a raw vesselId write (ruling 1). NOT in
+   HISTORY_VIEWS: in-screen back → returnView; a browser back-gesture exits draft-safe (the v4.17
+   pattern, ruling 2). Tea rows reuse teaRowIdentity (one writer, two wrappers); vessel rows reuse
+   vesselPhoto as-is (ruling 4). Search is a DOM-partial list refresh (mirrors onTeaSearchInput) so the
+   input keeps focus; the type filter and show-finished re-render (a click, focus is not at stake). */
+function openPicker(kind, returnView){
+  const d = state.sessionDraft, e = state.editingSession;
+  const currentId = (kind==='draft-tea') ? (d&&d.teaId) : (kind==='draft-vessel') ? (d&&d.vesselId) : (e&&e.vesselId);
+  state.pickerCtx = { kind, returnView, currentId: currentId||'' };
+  state.pickerQuery = ''; state.pickerFilter = '';
+  state.view = (kind==='draft-tea') ? 'pick-tea' : 'pick-vessel';
+  render();
+}
+function closePicker(){ const c=state.pickerCtx; state.pickerCtx=null; state.view=(c&&c.returnView)||'session'; render(); }
+function pickChoose(id){
+  const c = state.pickerCtx; if(!c) return;
+  state.pickerCtx = null; state.view = c.returnView;   // return view set BEFORE the setter so its own render() lands there
+  if(c.kind==='draft-tea') d_setTea(id);
+  else if(c.kind==='draft-vessel') d_setVessel(id);    // methodPrefillFor runs — NOT bypassed (ruling 1)
+  else if(c.kind==='edit-vessel') es_set('vesselId', id);
+  render();   // es_set doesn't render; d_set* do — the idempotent double-render is accepted (ruling 1)
+}
+function onPickSearchInput(val){
+  state.pickerQuery = val;
+  const list = document.getElementById('pickList');
+  if(list) list.innerHTML = (state.view==='pick-vessel') ? pickVesselListHTML() : pickTeaListHTML();
+  const x = document.getElementById('pickSearchX'); if(x) x.style.display = val ? '' : 'none';
+}
+function clearPickSearch(){ state.pickerQuery=''; render(); }
+function pickSetFilter(type){ state.pickerFilter = (state.pickerFilter===type) ? '' : type; render(); }
+// TEA picker (setup + quick). Flat list, search + one type filter, NO optgroups (ruling 3). Finished
+// hidden behind "show finished (n)" (reuses d.showFinishedTeas), dimmed inline when shown, and the
+// current selection is always shown even when finished, regardless of the toggle.
+function pickTeaListHTML(){
+  const d = state.sessionDraft, c = state.pickerCtx;
+  const curId = c ? c.currentId : '', q = state.pickerQuery, ft = state.pickerFilter;
+  const showFin = !!(d && d.showFinishedTeas);
+  const finishedN = state.teas.filter(isTeaFinished).length;
+  let rows = state.teas.filter(t=>{
+    if(!teaMatchesSearch(t, q)) return false;
+    if(ft && (t.type||'')!==ft) return false;
+    if(isTeaFinished(t) && !showFin && t.id!==curId) return false;   // finished hidden unless shown, or it's the current pick
+    return true;
+  });
+  rows = sortTeasByTypeThenName(rows);
+  const list = rows.length ? rows.map(t=>pickTeaRow(t, curId)).join('') : `<div class="pick-empty">No teas match.</div>`;
+  const finLink = (!showFin && finishedN)
+    ? `<button type="button" class="pick-showfin" onclick="d_showFinishedTeas()">show finished (${finishedN})</button>` : '';
+  return list + finLink;
+}
+function pickTeaRow(t, curId){
+  const sel = t.id===curId, fin = isTeaFinished(t);
+  return `<div class="pick-row${fin?' tea-finished':''}${sel?' is-selected':''}" role="button" tabindex="0" aria-pressed="${sel?'true':'false'}" onclick="pickChoose('${escapeJsArg(t.id)}')">
+    ${teaRowIdentity(t)}
+    ${sel?'<span class="pick-tick">✓</span>':''}
+  </div>`;
+}
+function pickTypeChips(){
+  const types = [...new Set(state.teas.map(t=>t.type).filter(Boolean))].sort();
+  if(types.length<2) return '';
+  return `<div class="pick-filter">${types.map(ty=>`<button type="button" class="pick-chip${state.pickerFilter===ty?' is-on':''}" onclick="pickSetFilter('${escapeJsArg(ty)}')">${escapeHtml(typeLabel(ty))}</button>`).join('')}</div>`;
+}
+function viewPickTea(){
+  return `
+    <button class="detail-back" onclick="closePicker()">← Back</button>
+    <h2 style="margin:2px 0 6px;">Choose a tea</h2>
+    <div class="pick-search">
+      <input id="pickSearchInput" type="text" placeholder="search your shelf…" value="${escapeHtml(state.pickerQuery)}" oninput="onPickSearchInput(this.value)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search your shelf">
+      <button id="pickSearchX" class="lib-search-x" onclick="clearPickSearch()" aria-label="Clear search" style="${state.pickerQuery?'':'display:none;'}">✕</button>
+    </div>
+    ${pickTypeChips()}
+    <div id="pickList" class="pick-list">${pickTeaListHTML()}</div>
+    <button type="button" class="pick-add" onclick="openTeaForm()">＋ Add a new tea</button>
+  `;
+}
+// VESSEL picker (setup + quick + edit). Identity = vesselPhoto (photo → kanji → stripe, as-is, ruling 4).
+function vesselMatchesSearch(v, q){ q=teaSearchNorm(q); if(!q) return true; return [v.name,v.material,v.type].some(f=>teaSearchNorm(f).includes(q)); }
+function pickVesselListHTML(){
+  const c = state.pickerCtx, curId = c ? c.currentId : '', q = state.pickerQuery;
+  const rows = state.vessels.filter(v=>vesselMatchesSearch(v,q));
+  // "No vessel" — the vessel is OPTIONAL (R43), so a real selectable-as-none choice, at the top when
+  // not searching. pickChoose('') → d_setVessel('') clears it (methodPrefillFor('') is a no-op).
+  const none = q ? '' : `<div class="pick-row${curId?'':' is-selected'}" role="button" tabindex="0" aria-pressed="${curId?'false':'true'}" onclick="pickChoose('')"><span class="shelf-name" style="color:var(--ink-soft);">No vessel</span>${curId?'':'<span class="pick-tick">✓</span>'}</div>`;
+  if(!rows.length && !none) return `<div class="pick-empty">No vessels match.</div>`;
+  return none + rows.map(v=>pickVesselRow(v, curId)).join('');
+}
+function pickVesselRow(v, curId){
+  const sel = v.id===curId;
+  const meta = [v.material, v.capacityMl?`${v.capacityMl} ml`:''].filter(Boolean).join(' · ');
+  return `<div class="pick-row${sel?' is-selected':''}" role="button" tabindex="0" aria-pressed="${sel?'true':'false'}" onclick="pickChoose('${escapeJsArg(v.id)}')">
+    ${vesselPhoto(v,'thumb')}
+    <div class="shelf-row-mid"><div class="shelf-name">${escapeHtml(v.name)}</div><div class="shelf-row-meta">${escapeHtml(meta)}</div></div>
+    ${sel?'<span class="pick-tick">✓</span>':''}
+  </div>`;
+}
+function viewPickVessel(){
+  return `
+    <button class="detail-back" onclick="closePicker()">← Back</button>
+    <h2 style="margin:2px 0 6px;">Choose a vessel</h2>
+    <div class="pick-search">
+      <input id="pickSearchInput" type="text" placeholder="search vessels…" value="${escapeHtml(state.pickerQuery)}" oninput="onPickSearchInput(this.value)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search vessels">
+      <button id="pickSearchX" class="lib-search-x" onclick="clearPickSearch()" aria-label="Clear search" style="${state.pickerQuery?'':'display:none;'}">✕</button>
+    </div>
+    <div id="pickList" class="pick-list">${pickVesselListHTML()}</div>
+    <div class="pick-footer">
+      <button type="button" class="pick-add" onclick="openVesselForm()">＋ Add a vessel</button>
+      <button type="button" class="pick-manage" onclick="goVessels()">manage vessels ›</button>
+    </div>
+  `;
 }
 // grid|rows density — a device-local preference (persists like theme), not synced.
 function teaDensity(){ try{ return localStorage.getItem('tealog_teaDensity')==='rows' ? 'rows' : 'grid'; }catch(e){ return 'grid'; } }

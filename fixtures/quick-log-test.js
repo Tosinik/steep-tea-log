@@ -76,9 +76,10 @@ ok(S.sessionDraft.teaId==='t2', 'B1 entering quick log from setup PRESERVES the 
 // The regression this guards: reverting to "the first in-stock tea" would silently swap the record.
 ok(S.sessionDraft.teaId!==S.teas[0].id || 't2'===S.teas[0].id, 'B2 …it does not revert to the first in-stock tea');
 const quickHTML = ctx.sessionQuickHTML(S.sessionDraft);
-ok(/onchange="d_setTea\(/.test(quickHTML), 'B3 quick log renders a TEA picker (it had none at all before)');
-ok(/onchange="d_setVessel\(/.test(quickHTML), 'B4 …and a VESSEL picker (R43)');
-ok(/<option value="" [^>]*>Which vessel\? \(optional\)/.test(quickHTML), 'B5 the vessel picker offers a real empty choice — optional means selectable-as-none');
+ok(/openPicker\('draft-tea'/.test(quickHTML), 'B3 quick log opens the TEA picker screen (v4.21: the native select is retired, #14)');
+ok(/openPicker\('draft-vessel'/.test(quickHTML), 'B4 …and the VESSEL picker screen (R43)');
+{ S.pickerCtx={kind:'draft-vessel',returnView:'session',currentId:''}; S.pickerQuery='';
+  ok(/No vessel/.test(ctx.viewPickVessel()), 'B5 the vessel picker offers a real "No vessel" choice — optional means selectable-as-none (R43)'); }
 ctx.d_setVessel('');
 ok(S.sessionDraft.vesselId==='' && S.sessionDraft.brewStyle===null, 'B6 choosing no vessel is safe (no prefill, no throw)');
 ok(/Save cup/.test(ctx.sessionQuickHTML(S.sessionDraft)), 'B7 …and never blocks the save (R43: optional, never blocking)');
@@ -92,9 +93,9 @@ seed(); ctx.startSessionFor('t1');
 const setupHTML = ctx.sessionSetupHTML(S.sessionDraft);
 ctx.beginQuickLog();
 const qh = ctx.sessionQuickHTML(S.sessionDraft);
-ok(/class="trio-select/.test(setupHTML) && /class="trio-select/.test(qh), 'C1 both twins use the same trio-select mechanics');
-ok(/<optgroup label=/.test(qh), 'C2 quick log groups teas by type, as setup does');
-ok(!/listbox|role="combobox"/.test(qh), 'C3 no custom listbox — #14 stays deferred (R89)');
+ok(/openPicker\('draft-tea','session'\)/.test(setupHTML) && /openPicker\('draft-tea','session'\)/.test(qh), 'C1 both twins open the SAME tea picker screen — one vocabulary (R89), the custom screen #14 was deferred for');
+ok(!/<optgroup/.test(ctx.viewPickTea()), 'C2 the tea picker is a FLAT searchable list — NO optgroups (ruling 3 / board 04); grouping moved out of the field');
+ok(!/role="combobox"|role="listbox"/.test(ctx.viewPickTea()), 'C3 #14 is CLOSED as a screen of simple button rows (role="button") — not an ARIA combobox/listbox widget');
 // The long-press colour correction cannot ship: no per-tea colour column (R78), no palette (R82).
 ok(!/longpress|long-press|setTeaColor|liquorColor/i.test(sessSrc), 'C4 no long-press colour correction reached the pickers (R78/R82)');
 console.log('  C R89 shared vocabulary: 4 checks');

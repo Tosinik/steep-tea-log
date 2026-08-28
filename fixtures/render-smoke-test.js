@@ -76,7 +76,8 @@ const VIEWS=[
   ['viewTeaDetail','tea-detail'],['viewSessions','sessions'],['viewSessionDetail','session-detail'],
   ['viewSessionEdit','session-edit'],['viewSessionFlow','session'],['viewFriends','friends'],
   ['viewShopping','shopping'],['viewSpend','spend'],['viewWrapped','wrapped'],
-  ['viewVessels','vessels'],['viewOrigins','origins'],['viewAchievements','achievements']
+  ['viewVessels','vessels'],['viewOrigins','origins'],['viewAchievements','achievements'],
+  ['viewPickTea','pick-tea'],['viewPickVessel','pick-vessel']    // v4.21 (#14): the R58 picker screens
 ];
 // The output smells that mean a value reached the DOM in the wrong shape.
 const SMELLS=[['[object Object]','a value was interpolated instead of a field of it'],
@@ -159,7 +160,7 @@ runPass('B · an EMPTY account — the "no rows yet" branches');
    cannot quietly turn the whole file into a no-op. */
 console.log('\nC · the checker can fail');
 SMELLS.forEach(([s])=>ok(('<div>'+s+'</div>').indexOf(s)>=0, 'the "'+s+'" check matches when present'));
-ok(VIEWS.length===15, 'C: all 15 top-level views are listed — a new view added to render() must be added here too (got '+VIEWS.length+')');
+ok(VIEWS.length===17, 'C: all 17 top-level views are listed — a new view added to render() must be added here too (got '+VIEWS.length+')');
 // The list must match render()'s own routing, or a view can be added there and silently skipped here.
 const coreSrc=fs.readFileSync(path.join(repo,'steep-core.js'),'utf8');
 const routed=[...coreSrc.matchAll(/body\s*=\s*(view[A-Z]\w*)\s*\(/g)].map(m=>m[1]);
