@@ -11,9 +11,10 @@
  * so it carries NO css radius) and the clay SLAB (.btn-clay) alone — "one slab per screen, one swatch
  * per tea, zero asymmetric radii anywhere else" (board §1d, docs/r5/boards/surface-language-spine.dc.html).
  *
- * Scope this slice (F33 — per-surface): the SHELF pilot's frame selectors + the shared primitives + the
- * slab. Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints) are
- * NOT frame — excluded, and the photo-tint fallback is a KNOWN deferred fill-law item (R149), reported
+ * Scope (F33 — per-surface, grows a surface at a time): SURFACES registers each re-dressed surface's
+ * frame selectors — shelf (slice 1, R153) + shopping (slice 2, R154/R155) — plus the shared primitives
+ * and the slab. Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints)
+ * are NOT frame — excluded, and the photo-tint fallback is a KNOWN deferred fill-law item (R149), reported
  * below, not asserted. Radii/fills are measured FROM SOURCE, never the board's drawn numbers (R127/R128).
  */
 const fs = require('fs'), path = require('path');
@@ -30,8 +31,14 @@ function bg(css, sel){ const b = bodyOf(css, sel); if(b==null) return null; retu
 function radius(css, sel){ const b = bodyOf(css, sel); return b==null ? null : decl(b, 'border-radius'); }
 function isTorn(r){ return r!=null && r.trim().split(/\s+/).length === 4; }   // 4-value = a torn corner set
 
-// The shelf pilot's FRAME selectors (containers/structure) — not the marks that ride on them.
-const FRAME = ['.shelf-card', '.shelf-row', '.shelf-row-mid', '.shelf-caret', '.shelf-thumb', '.lib-band', '.band'];
+// FRAME selectors (containers/structure) — not the marks that ride on them — kept in a PER-SURFACE
+// registry (F33: the rollout is per-surface, so the fence names which surface each selector proves). A
+// surface is not fenced until its selectors are in here AND a negative control below bites on one of them.
+const SURFACES = {
+  shelf:    ['.shelf-card', '.shelf-row', '.shelf-row-mid', '.shelf-caret', '.shelf-thumb', '.lib-band'],
+  shopping: ['.shop-band', '.shop-add', '.shop-sec', '.shop-row'],   // R154/R155 — slice 2
+};
+const FRAME = [...Object.values(SURFACES).flat(), '.band'];           // '.band' is the shared primitive
 const FILL_OK = ['var(--porcelain)', 'var(--band)', 'var(--white)'];   // the only fills a frame may carry
 const RAD_OK  = ['0', '2px'];                                          // the only frame radii
 
@@ -58,20 +65,20 @@ function chkPrimitive(css, sel, want){   // want: {bg, radius, mustHave:[], must
   for(const p of (want.mustNot||[])) if(new RegExp(escRe(p)).test(b)) return {ok:false, msg:sel+' must not contain "'+p+'"'};
   return {ok:true};
 }
-function chkShelfFill(css){
+function chkFrameFill(css){
   for(const sel of FRAME){ const g = bg(css, sel); if(g!=null && !FILL_OK.includes(g)) return {ok:false, msg:sel+' carries a non-frame fill: '+g}; }
   return {ok:true};
 }
-function chkShelfRadius(css){
+function chkFrameRadius(css){
   for(const sel of FRAME){ const r = radius(css, sel); if(r!=null && !RAD_OK.includes(r)) return {ok:false, msg:sel+' radius is '+r+', not 0/2px'}; }
   // the liquor swatch is an SVG path (R145): it must carry NO css border-radius.
   if(radius(css, '.shelf-swatch')!=null) return {ok:false, msg:'.shelf-swatch has a css radius (it is an SVG path, R145)'};
   return {ok:true};
 }
 function chkSlabTorn(css){ const r = radius(css, '.btn-clay'); return isTorn(r) ? {ok:true} : {ok:false, msg:'.btn-clay (the slab) must carry the one torn radius; got '+r}; }
-function chkRationing(css){   // board §1d: exactly one torn radius among {shelf frame ∪ slab}, and it is the slab
+function chkRationing(css){   // board §1d: exactly one torn radius among {all frames ∪ slab}, and it is the slab
   const torn = [...FRAME, '.btn-clay'].filter(sel => isTorn(radius(css, sel)));
-  if(torn.length !== 1) return {ok:false, msg:'torn radii on the shelf: ['+torn.join(', ')+'] — want exactly one'};
+  if(torn.length !== 1) return {ok:false, msg:'torn radii across frames: ['+torn.join(', ')+'] — want exactly one'};
   if(torn[0] !== '.btn-clay') return {ok:false, msg:'the one torn radius is on '+torn[0]+', not the slab'};
   return {ok:true};
 }
@@ -89,26 +96,38 @@ expectPass('.box   — --white fill, radius 2px, no shadow', chkPrimitive(CSS, '
 expectPass('.btn-clay (SLAB) — --clay fill, no border, torn radius', chkPrimitive(CSS, '.btn-clay', {bg:'var(--clay)', mustHave:['border:none']}));
 expectPass('the SLAB carries the one permitted torn radius', chkSlabTorn(CSS));
 
-/* ---------- C · fill-law on the pilot (F31 core) ---------- */
-console.log('\nC · shelf fill-law — frame carries only --porcelain/--band/--white');
-expectPass('no shelf frame selector carries a rationed fill', chkShelfFill(CSS));
+/* ---------- C · fill-law across every fenced surface (F31 core) ---------- */
+console.log('\nC · fill-law — every frame selector carries only --porcelain/--band/--white');
+expectPass('no frame selector carries a rationed fill', chkFrameFill(CSS));
 
-/* ---------- D · radius-law on the pilot ---------- */
-console.log('\nD · shelf radius-law — frame is 0/2px, swatch is an SVG path');
-expectPass('every shelf frame radius is 0 or 2px', chkShelfRadius(CSS));
+/* ---------- D · radius-law across every fenced surface ---------- */
+console.log('\nD · radius-law — every frame selector is 0/2px, swatch is an SVG path');
+expectPass('every frame radius is 0 or 2px', chkFrameRadius(CSS));
 
 /* ---------- E · the rationing lock (board §1d) ---------- */
-console.log('\nE · rationing — exactly one torn radius on the shelf, and it is the slab');
-expectPass('one torn radius among {shelf frame ∪ slab}, = .btn-clay', chkRationing(CSS));
+console.log('\nE · rationing — exactly one torn radius across all frames, and it is the slab');
+expectPass('one torn radius among {all frames ∪ slab}, = .btn-clay', chkRationing(CSS));
 
-/* ---------- F · negative controls — the fence MUST see red ---------- */
+/* ---------- F · negative controls — the fence MUST see red, on EVERY surface it claims to fence ----------
+   A surface added to SURFACES that no control touches is fenced in name only: the checkers null-skip a
+   selector that carries no fill/radius, so absence of red proves nothing. Each surface therefore ships a
+   control that bites on one of ITS OWN selectors. */
 console.log('\nF · negative controls (each must bite)');
-expectFail('a rationed fill on .shelf-row reddens fill-law',
-  chkShelfFill(CSS.replace('.shelf-row{', '.shelf-row{background:var(--jade);')));
-expectFail('a 14px radius on .shelf-card reddens radius-law',
-  chkShelfRadius(CSS.replace(/(\.shelf-card\{[^}]*?border-radius:)2px/, '$114px')));
-expectFail('a torn radius on .shelf-card reddens rationing',
+// shelf
+expectFail('shelf: a rationed fill on .shelf-row reddens fill-law',
+  chkFrameFill(CSS.replace('.shelf-row{', '.shelf-row{background:var(--jade);')));
+expectFail('shelf: a 14px radius on .shelf-card reddens radius-law',
+  chkFrameRadius(CSS.replace(/(\.shelf-card\{[^}]*?border-radius:)2px/, '$114px')));
+expectFail('shelf: a torn radius on .shelf-card reddens rationing',
   chkRationing(CSS.replace(/(\.shelf-card\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+// shopping (R155) — proves the fence SEES the new surface, not just names it
+expectFail('shopping: a rationed fill on .shop-row reddens fill-law',
+  chkFrameFill(CSS.replace('.shop-row{', '.shop-row{background:var(--jade);')));
+expectFail('shopping: a torn radius on .shop-add reddens radius-law',
+  chkFrameRadius(CSS.replace(/(\.shop-add\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+expectFail('shopping: a torn radius on .shop-add reddens rationing',
+  chkRationing(CSS.replace(/(\.shop-add\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+// shared primitives + the slab
 expectFail('.band losing its --band fill reddens the primitive',
   chkPrimitive(CSS.replace(/(\.band\{[^}]*?background:)var\(--band\)/, '$1var(--jade)'), '.band', {bg:'var(--band)'}));
 expectFail('--band as a raw hex reddens the token check',

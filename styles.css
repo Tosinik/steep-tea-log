@@ -1212,6 +1212,18 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .pass-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
 
 /* ===== #08 Shopping, slice H1 (v4.04) ===== */
+/* R5 spine slice 2 (F33/R154): the Shopping list re-dressed to the surface-language spine, containers
+   only. Masthead is a BAND (.shop-band composes .band, layout mirrors the shelf's .lib-band — the
+   top-hairline-vs-topbar question rides the same open note as the shelf, R155); the add-to-list form is
+   a BOX (.shop-add carries the box VALUES itself, mirroring .shelf-card, so the fill-law fence asserts
+   them positively); the two lists are RULE sections (.shop-sec wrappers, opened by an .eyebrow.rule-head,
+   no chrome — F33: two sections must not read as one merged list); the one committing action is the SLAB
+   (the existing .btn-clay on ＋ Add — no second clay container). Shared .section-title / .btn-primary are
+   UNTOUCHED (24/20 other sites); swapped on the Shopping markup only. */
+.shop-band{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 -16px 13px;padding:13px 16px;}
+.shop-band h2{font-family:var(--font-display);font-size:24px;margin:0;line-height:1.15;}
+.shop-add{background:var(--white);border:1px solid var(--line);border-radius:2px;padding:18px;} /* BOX — an inline form (board's canonical box); was .card (radius 14→2). */
+.shop-sec{margin-top:16px;} /* RULE section wrapper — grouping only, no fill/border/radius. */
 .shop-sub{font-size:12px;color:var(--ink-soft);margin:4px 0 8px;}
 .shop-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);}
 .shop-name{font-weight:600;font-size:14px;color:var(--ink);}

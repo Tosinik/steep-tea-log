@@ -27,7 +27,10 @@ function viewShopping(){
   });
   const suggestions = computeRestockSuggestions();
 
-  const addRow = `<div class="card" style="margin-bottom:14px;">
+  // R5 spine slice 2: BOX (.shop-add, an inline form — the board's canonical box). The one committing
+  // action is the SLAB — the existing .btn-clay (jade .btn-primary retired here; the surface's one action
+  // is clay), left in place (no layout move), width kept inline.
+  const addRow = `<div class="shop-add" style="margin-bottom:14px;">
     <div class="field"><label>Add to list</label>
       <input type="text" id="wishName" placeholder="Tea or thing to buy" onkeydown="if(event.key==='Enter'){event.preventDefault();addWishFromInput();}">
     </div>
@@ -35,15 +38,17 @@ function viewShopping(){
       <input type="text" id="wishVendor" list="wishVendorList" placeholder="Where from" onkeydown="if(event.key==='Enter'){event.preventDefault();addWishFromInput();}">
       <datalist id="wishVendorList">${(typeof distinctVendors==='function'?distinctVendors():[]).map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}</datalist>
     </div>
-    <button class="btn btn-primary" style="margin-top:12px;width:100%;" onclick="addWishFromInput()">＋ Add</button>
+    <button class="btn-clay" style="margin-top:12px;width:100%;" onclick="addWishFromInput()">＋ Add</button>
   </div>`;
 
   /* SH2 — two sources, one screen, and they stay visibly different: running low is DERIVED from the
      shelf through stockTier, the list is its own table. SH5's pair is whatever the threshold says
      today, never a pinned name. Each row now offers both verbs: add it to the list (a want) or
      restock it (a repeat purchase, R11) — plus R12's search. */
-  const suggBlock = suggestions.length ? `<div class="card" style="margin-bottom:14px;">
-    <div class="eyebrow">Running low</div>
+  // R5 spine slice 2: a RULE section — no card chrome, opened by an .eyebrow.rule-head (2px ink rule),
+  // rows already hairline-ruled. A distinct wrapper so it never reads as one list with "Your list" (F33).
+  const suggBlock = suggestions.length ? `<div class="shop-sec">
+    <div class="eyebrow rule-head" style="padding-bottom:6px;">Running low</div>
     <div class="shop-sub">From your shelf, by what's left — add it to the list, or log a repeat buy.</div>
     ${suggestions.slice(0,8).map(t=>{
       // statusLine is the single writer for stock words (v3.86 +F); this must not invent its own.
@@ -62,8 +67,10 @@ function viewShopping(){
     }).join('')}
   </div>` : '';
 
-  const listBlock = items.length ? `<div class="card">
-    <div class="eyebrow">Your list</div>
+  // R5 spine slice 2: the second RULE section — its own .shop-sec wrapper + .eyebrow.rule-head header,
+  // no box; the empty state is a message on paper, not a card.
+  const listBlock = items.length ? `<div class="shop-sec">
+    <div class="eyebrow rule-head" style="padding-bottom:6px;">Your list</div>
     <div style="margin-top:2px;">
     ${items.map(w=>{
       // SH1 — the overlap is the design. A want that names a tea already on the shelf reads as a
@@ -85,10 +92,15 @@ function viewShopping(){
       <button class="icon-btn" style="font-size:14px;" onclick="removeWish('${escapeJsArg(w.id)}')" title="Remove" aria-label="Remove">✕</button>
     </div>`;}).join('')}
     </div>
-  </div>` : `<div class="card empty">Your shopping list is empty. Add something above, or pull from what's running low.</div>`;
+  </div>` : `<div class="shop-sec">
+    <div class="eyebrow rule-head" style="padding-bottom:6px;">Your list</div>
+    <div class="empty">Your shopping list is empty. Add something above, or pull from what's running low.</div>
+  </div>`;
 
+  // R5 spine slice 2: the masthead is a BAND (.shop-band composes .band; full-bleed --band stripe). The
+  // shared .section-title is left untouched (24 other sites) — the band is a Shopping-only wrapper.
   return `
-    <div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Shopping list</h2></div>
+    <div class="band shop-band"><h2>Shopping list</h2></div>
     ${addRow}
     ${suggBlock}
     ${listBlock}
