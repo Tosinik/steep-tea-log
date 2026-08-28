@@ -2002,6 +2002,62 @@ still selects the branch; the branch output changes from a border style to a pat
 shelf fences assert against a path now, not a border style — **this is a v4.20 build note, and D3/D6 need
 updating when the shelf is built.**
 
+## R5 rulings begin here (R146 onward) — same ledger, continuous numbering
+
+> R5 lands the design overhaul the R2/R3 boards drew (founding reference: `docs/r5/planning/R5-AUDIT.md`).
+> R146–R152 are the **v4.21 session-picker reconciliations**, deferred to "as R5 slices deploy" by
+> R5-AUDIT §3 and minted here as the spine rollout opens — each traced to shipped code in `71ad774`, not
+> to chat. F31's fill-law fence mints **R153** when slice 1 ships.
+
+**R146 — The picker's context is a serializable `kind` tag dispatched through the existing setters, not a
+stored closure.** `state.pickerCtx = {kind, returnView, currentId}` is a plain object (it survives a draft
+persist); `pickChoose` switches on `kind` to the shipped setter — `d_setTea` / `d_setVessel` / `es_set` —
+so every side effect the setter owns still runs. Crucially `d_setVessel`'s `methodPrefillFor` is **NOT
+bypassed** (a Kyusu still prefills `senchado`); a raw `vesselId` write would have dropped it. The
+idempotent double-render (`d_set*` renders, then `pickChoose`'s own) is accepted over threading a closure
+through the draft. *(steep-teas.js `openPicker`/`pickChoose`.)*
+
+**R147 — The picker screens are absent from `HISTORY_VIEWS`; back is in-screen, the gesture exits
+draft-safe.** `pick-tea`/`pick-vessel` are not surfaces Back should *land on* — Back should leave the
+session flow, not step between its sub-screens. So they push nothing (the v4.17 pattern for the live
+session flow): the in-screen "← Back" returns to `returnView`, and a browser back-gesture exits the flow
+with the draft intact. `saveView` stays the single history writer; the picker rides it by omission, not a
+second code path. *(steep-core.js `HISTORY_VIEWS`.)*
+
+**R148 — Flat list + one quiet type filter, finished-teas behaviour preserved exactly; the "No vessel" row
+is new.** No optgroups (the OS pop-out this replaces is the gap #14 names). The tea picker keeps the
+shelf's finished-tea rule verbatim — hidden by default, "show finished (n)" reveals them dimmed, and the
+current selection shows even when finished regardless of the toggle. The vessel is OPTIONAL under **R43**,
+and v4.21 makes that a real selectable *row* — "No vessel" at the top when not searching, `pickChoose('')
+→ d_setVessel('')` (a `methodPrefillFor('')` no-op). **R43 ruled the option; the row that surfaces it is
+new to v4.21.** *(steep-teas.js `pickTeaListHTML`/`pickVesselListHTML`.)*
+
+**R149 — Vessel kanji reused as-is; the photo-less tinted stripe is deferred to the spine's fill-law.** The
+vessel picker's identity is `vesselPhoto` unchanged (photo → kanji → stripe). The stripe fallback is a
+colour-fill on a non-rationed element — exactly what the spine's fill-law (F31) exists to catch — so it is
+a rollout item, not a picker-slice change. Recorded here so it is not "tidied" into the picker and lost to
+the fence. *(R5-AUDIT §6; steep-teas.js `vesselPhoto`.)*
+
+**R150 — Long-press colour-correction is dropped from the picker; it is its own gesture+commit build.**
+R89's *data* blockers (no per-tea liquor to correct) are resolved by the v4.11–v4.20 swatch model, but two
+live blockers remain: there is no long-press gesture primitive in the app (only the six touch handlers),
+and the v4.19 liquor picker is a form control with no standalone in-place commit path (F6). Correction
+stays in the tea form. If wanted on the picker it is a separate build with its own on-device smoke — not
+smuggled into a screen-swap. *(R5-AUDIT §5.)*
+
+**R151 — No per-tea script on the picker; R129 extends from the shelf to every scanning surface.** R129
+dropped the per-row script from the shelf row because a scanning list reads by composition, not per-row
+ornament. The picker is the same kind of surface, so the same rule holds — the rows carry `teaRowIdentity`
+(swatch + name + type + status) and nothing per-tea beyond it. *(R129; steep-teas.js `teaRowIdentity`.)*
+
+**R152 — The picker's tick and manage controls take `--jade-deep`, not `--clay`, holding the clay cap.**
+`.pick-tick` (the selected ✓) and `.pick-manage` ("manage vessels ›") are chrome, not the surface's one
+committing action, so they must not spend clay — `--clay` is rationed to a single committing action per
+surface (R113). Both render `--jade-deep`. The catch is recorded as **evidence that the rationing fence is
+load-bearing**: a mechanical "make the affordance warm" would have reached for clay and quietly broken the
+cap. The fence-load-bearing observation is filed in **R3-STATUS §8 (item 24)**, where "a check saw red and
+it mattered" lives. *(styles.css `.pick-tick`/`.pick-manage`.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

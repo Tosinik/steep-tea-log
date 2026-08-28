@@ -15,3 +15,4 @@
 # archiving a design export.
 docs/r3/boards/** -text
 docs/r4/boards/** -text
+docs/r5/boards/** -text

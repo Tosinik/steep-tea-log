@@ -124,6 +124,8 @@ design-r3/
 # path-scoped, so without this line the blanket ignore drops every R4 board while committing the
 # folder's other files, which looks like a successful bank. Add one per round.
 !docs/r4/boards/*.dc.html
+# R5's boards need their own negation too (see the R4 note above — one per round).
+!docs/r5/boards/*.dc.html
 # Photographs of copyrighted tea-book pages, kept for transcription only. The repo is
 # PUBLIC — the images must never be committed. The factual data transcribed from them
 # (aroma taxonomy, tasting lexicon) lives in docs/r3/planning/DATA-*.md and IS committed.

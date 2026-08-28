@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#CFC6B2; font-family:'IBM Plex Mono', monospace; }
+  a { color:#8A5A1E; }
+  a:hover { color:#69160F; }
+</style>
+</helmet>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#CFC6B2;">
+
+  <div style="max-width:1180px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:2px;">R5 · TURN 1 · THE SPINE</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:2px;">FRAME ONLY · NO NEW FEATURES, CARDS OR DATA</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:30px; color:#2B2320; margin:0;">Paper, rule, band, slab</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1000px; margin:0; line-height:1.7; text-wrap:pretty;">One <code>.card</code> ×119 radii is not a frame, it is a default. The system below replaces it with <strong>four containers and one law</strong>, and the law is the part that matters: <strong>the frame never carries a fill.</strong> Paper, line and type only — every fill on screen belongs to a rationed mark (liquor, clay, xanthous, blue). That is the lock stated as something you can check by looking, and it is why the radius vocabulary can carry the rationing contracts instead of decorating them.</p>
+  </div>
+
+  <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="1a" style="display:flex; flex-direction:column; gap:9px; width:560px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1a · THE LAW</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">FOUR CONTAINERS · WHAT REPLACES .card</span>
+      </div>
+
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; padding:0; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:20px 24px 14px; border-bottom:2px solid #2B2320;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:#2B2320;">The taxonomy</span>
+          <div style="font-size:11.5px; color:#5C5148; line-height:1.55; margin-top:4px;">Each one drawn as itself. The test for which to reach for is one question, in the last column.</div>
+        </div>
+        <sc-for list="{{ containers }}" as="c" hint-placeholder-count="4">
+          <div style="padding:18px 24px; border-bottom:1px solid #D8CFB9; display:flex; gap:18px; align-items:flex-start;">
+            <div style="width:112px; flex:none; display:flex; flex-direction:column; gap:6px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#2B2320;">{{ c.k }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8C7F6C;">{{ c.share }}</span>
+            </div>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:9px;">
+              <span style="font-size:12px; color:#4A4038; line-height:1.6;">{{ c.d }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8A5A1E; line-height:1.5;">{{ c.spec }}</span>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="padding:18px 24px; display:flex; flex-direction:column; gap:14px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#5C5148;">SPECIMENS · SAME CONTENT, EACH CONTAINER</span>
+
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.1em; color:#8C7F6C;">RULE</span>
+            <div style="background:#F6F2E9; padding:0;">
+              <div style="padding:10px 0 8px; border-bottom:2px solid #2B2320;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15px; color:#2B2320;">This week</span>
+              </div>
+              <div style="padding:11px 0; border-bottom:1px solid #D8CFB9; display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-size:12.5px; color:#2B2320;">Sessions</span><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#5C5148;">14</span>
+              </div>
+              <div style="padding:11px 0; display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-size:12.5px; color:#2B2320;">Steeps logged</span><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#5C5148;">61</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.1em; color:#8C7F6C;">BAND · full-bleed, no radius, no side border</span>
+            <div style="background:#EDE7D6; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:14px 16px; display:flex; align-items:baseline; gap:10px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2B2320;">Shelf</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">21 TEAS · 2 LOW</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.1em; color:#8C7F6C;">BOX · 2px, hairline, no fill of its own</span>
+              <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:2px; padding:13px 15px; display:flex; gap:11px; align-items:center;">
+                <svg viewBox="0 0 24 32" style="width:24px; height:32px; flex:none; overflow:visible;"><path d="{{ PLATE }}" fill="#B87A38" stroke="rgba(42,31,20,0.34)" stroke-width="1"></path></svg>
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2B2320;">Da Hong Pao</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8C7F6C;">A TEA HAS AN EDGE</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:2px; width:186px; flex:none;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.1em; color:#8C7F6C;">SLAB · 14/5/12/6 · one per screen</span>
+              <div style="border-radius:14px 5px 12px 6px; border:1px dashed rgba(138,90,30,0.55); background:repeating-linear-gradient(135deg, rgba(138,90,30,0.09) 0 6px, transparent 6px 12px); padding:15px 16px; display:flex; flex-direction:column; gap:3px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15px; color:#2B2320;">Start a session</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#8A5A1E;">--clay · HEX UNREAD IN THIS LANE (F31)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" style="display:flex; flex-direction:column; gap:9px; width:400px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1b · RADIUS LAW</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">UNIFORM-14 RETIRED</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:18px 22px 12px; border-bottom:2px solid #2B2320;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2B2320;">Four radii, and two are spoken for</span>
+        </div>
+        <sc-for list="{{ radii }}" as="r" hint-placeholder-count="5">
+          <div style="padding:15px 22px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:9px;">
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:{{ r.fg }};">{{ r.k }}</span>
+              <span style="font-size:11.5px; color:#4A4038; line-height:1.55;">{{ r.d }}</span>
+            </div>
+            <div style="display:flex; align-items:flex-end; gap:11px;">
+              <div style="width:{{ r.w }}; height:{{ r.h }}; flex:none; box-sizing:border-box; border-radius:{{ r.css }}; border:1px solid {{ r.stroke }}; background:{{ r.fill }};"></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.08em; color:#8C7F6C;">{{ r.at }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">WHY THIS IS THE SPINE, NOT A STYLE</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">Both asymmetric radii are already rationed by contract — one to identity, one to the single committing action. So a torn corner anywhere else is not a taste question, it is a contract breach, visible at a glance and checkable in a fence. Everything unrationed gets 0 or 2px, which is why the frame goes quiet without going cold: the warmth is the paper, not the corners.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1c" style="display:flex; flex-direction:column; gap:9px; width:404px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1c · PROOF</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SHELF · SHIPPED vs RE-DRESSED</span>
+      </div>
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+
+        <div style="width:190px; flex:none; display:flex; flex-direction:column; gap:6px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.1em; color:#69160F;">SHIPPED · .card ×3</span>
+          <div style="background:#FFFEFB; padding:11px; border-radius:2px; display:flex; flex-direction:column; gap:9px; border:1px solid #D8CFB9;">
+            <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:14px; padding:12px 13px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2B2320;">Teas</span>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#8C7F6C; margin-top:3px;">21 ON THE SHELF</div>
+            </div>
+            <sc-for list="{{ shelf }}" as="r" hint-placeholder-count="3">
+              <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:14px; padding:11px 12px; display:flex; gap:9px; align-items:center;">
+                <svg viewBox="0 0 24 32" style="width:19px; height:25px; flex:none; overflow:visible;"><path d="{{ PLATE }}" fill="{{ r.fill }}" stroke="{{ r.stroke }}" stroke-width="{{ r.sw }}" stroke-dasharray="{{ r.dash }}"></path></svg>
+                <div style="display:flex; flex-direction:column; gap:1px; min-width:0;">
+                  <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:11px; color:#2B2320; line-height:1.2;">{{ r.short }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:7.5px; color:#8C7F6C;">{{ r.type }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-size:10px; color:#5C5148; line-height:1.5;">Three boxes to say one list. Every radius the same, so nothing means anything by having one.</span>
+        </div>
+
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.1em; color:#3F5E42;">RE-DRESSED · BAND + RULE + ONE SLAB</span>
+          <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; overflow:hidden; display:flex; flex-direction:column;">
+            <div style="background:#EDE7D6; border-bottom:1px solid #D8CFB9; padding:14px 16px 12px; display:flex; flex-direction:column; gap:2px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:20px; color:#2B2320;">Teas</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.1em; color:#8C7F6C;">21 ON THE SHELF · 2 RUNNING LOW</span>
+            </div>
+            <div style="padding:0 16px;">
+              <sc-for list="{{ shelf }}" as="r" hint-placeholder-count="3">
+                <div style="padding:12px 0; border-bottom:1px solid #D8CFB9; display:flex; gap:11px; align-items:center;">
+                  <svg viewBox="0 0 24 32" style="width:24px; height:32px; flex:none; overflow:visible;"><path d="{{ PLATE }}" fill="{{ r.fill }}" stroke="{{ r.stroke }}" stroke-width="{{ r.sw }}" stroke-dasharray="{{ r.dash }}"></path></svg>
+                  <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                    <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2B2320; line-height:1.25;">{{ r.name }}</span>
+                    <div style="display:flex; align-items:center; gap:7px;">
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.08em; color:#8C7F6C; border:1px solid #D8CFB9; border-radius:2px; padding:1px 5px;">{{ r.type }}</span>
+                      <span style="font-size:10.5px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                    </div>
+                  </div>
+                  <span style="font-size:12px; color:#8C7F6C; flex:none;">›</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding:15px 16px 17px;">
+              <div style="border-radius:14px 5px 12px 6px; border:1px dashed rgba(138,90,30,0.55); background:repeating-linear-gradient(135deg, rgba(138,90,30,0.09) 0 6px, transparent 6px 12px); padding:12px 14px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2B2320;">Add a tea</span>
+              </div>
+            </div>
+          </div>
+          <span style="font-size:10px; color:#5C5148; line-height:1.5;">No box around the list at all. The band says where you are, the hairlines say how many things there are, and the only two shapes on the screen with character are the swatch and the slab — which is the lock, executed.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1d" style="display:flex; flex-direction:column; gap:9px; width:392px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1d · REFUSED</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">WHERE THE MOMENT-RADII MUST NOT GO</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; padding:18px 22px; display:flex; flex-direction:column; gap:18px;">
+
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.08em; color:#69160F;">NOT ON LIST ROWS</span>
+          <div style="display:flex; gap:11px; align-items:center; padding:10px 13px; border-radius:14px 5px 12px 6px; border:1px solid rgba(105,22,15,0.5); background:rgba(105,22,15,0.04);">
+            <svg viewBox="0 0 24 32" style="width:24px; height:32px; flex:none; overflow:visible;"><path d="{{ PLATE }}" fill="#C99447" stroke="rgba(42,31,20,0.34)" stroke-width="1"></path></svg>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:13.5px; color:#2B2320;">Honey Oolong Gui Fei</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#69160F;">TWO TORN SHAPES, ONE ROW</span>
+            </div>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.55;">A shelf row is not a moment. Give the row the slab's corners and it competes with the swatch inside it — the one shape on the row that is supposed to lead. Rows are ruled.</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.08em; color:#69160F;">NOT ON SECONDARY BUTTONS</span>
+          <div style="display:flex; gap:9px;">
+            <div style="flex:1; padding:12px 14px; border-radius:14px 5px 12px 6px; border:1px dashed rgba(138,90,30,0.55); background:repeating-linear-gradient(135deg, rgba(138,90,30,0.09) 0 6px, transparent 6px 12px); text-align:center;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:13.5px; color:#2B2320;">Start a session</span>
+            </div>
+            <div style="flex:1; padding:12px 14px; border-radius:14px 5px 12px 6px; border:1px solid rgba(105,22,15,0.5); background:rgba(105,22,15,0.04); text-align:center;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:13.5px; color:#2B2320;">Edit notes</span>
+            </div>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.55;">Both torn, so neither commits. The correct second button is 2px and unfilled; the rule is countable, which makes it a fence rather than a preference.</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.08em; color:#69160F;">NOT ON THE TIN THUMB</span>
+          <div style="display:flex; gap:20px; align-items:center;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+              <div style="width:26px; height:26px; box-sizing:border-box; border-radius:9px 4px 8px 5px; border:1px solid rgba(105,22,15,0.5); background:rgba(105,22,15,0.05);"></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#69160F;">9/4/8/5 · NO</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+              <div style="width:26px; height:26px; box-sizing:border-box; border-radius:2px; border:1px solid #D8CFB9; background:#FFFEFB;"></div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#3F5E42;">2px · SHIPS</span>
+            </div>
+            <span style="font-size:11.5px; color:#4A4038; line-height:1.55; flex:1;">Square, 26×26, 2px. It shares no radius family with the swatch on purpose: the photo trails, the swatch leads.</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.08em; color:#69160F;">NOT ON BANDS OR MASTHEADS</span>
+          <div style="background:rgba(105,22,15,0.04); border:1px solid rgba(105,22,15,0.5); border-radius:14px 5px 12px 6px; padding:13px 16px; display:flex; align-items:baseline; gap:10px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2B2320;">Shelf</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.1em; color:#69160F;">CORNERS ON A FULL-BLEED EDGE</span>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.55;">A band spans the screen, so rounding it leaves paper showing at four corners it should have covered. The masthead's torn edge is its own shipped treatment on probation, not the slab radius reused.</span>
+        </div>
+
+        <div style="height:1px; background:#D8CFB9;"></div>
+        <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">The rationing only works if the exceptions are enumerable. Two shapes, two contracts, and a fence can count them: <strong>one slab per screen, one swatch per tea, zero asymmetric radii anywhere else.</strong></span>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:9px; width:430px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">⚑ FINDINGS · FOR RECONCILIATION AGAINST styles.css</span>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; padding:18px 22px; display:flex; flex-direction:column; gap:12px;">
+        <sc-for list="{{ findings }}" as="f" hint-placeholder-count="4">
+          <span style="font-size:12px; color:#4A4038; line-height:1.65;"><strong style="color:#8A5A1E;">{{ f.k }}</strong> {{ f.d }}</span>
+        </sc-for>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; padding:16px 22px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">UNREAD IN THIS LANE</span>
+        <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">Four things this board draws and does not know: <code>--clay</code>, <code>--xanthous-wash</code> and <code>--enso</code> hexes; the washi band's real texture; the shipped <code>--paper</code>-adjacent tone, if one exists at all beyond <code>--white #FFFEFB</code>; and the masthead's torn radius values. Clay and washi are drawn as marked stand-ins — hatched, dashed, labelled — never as a guessed hex, per R128. If <code>--paper #F6F2E9</code> is not already a token, the rollout adds one token and retires none, which is the smallest possible surface for a change this size.</span>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  renderVals() {
+    const PLATE = "M9.75 0.75 H19.25 A4 4 0 0 1 23.25 4.75 V23.25 A8 8 0 0 1 15.25 31.25 H5.75 A5 5 0 0 1 0.75 26.25 V9.75 A9 9 0 0 1 9.75 0.75 Z";
+    return {
+      PLATE,
+      containers: [
+        { k: "RULE", share: "the default · ~70%", d: "No container at all. Content sits on paper and is divided by hairlines; a section header takes a 2px ink rule beneath it. This is what most of the 119 boxes become.", spec: "border-bottom:1px #D8CFB9 · header border-bottom:2px #2B2320 · radius 0 · no background · vertical padding only" },
+        { k: "BAND", share: "one or two per screen", d: "A full-bleed horizontal stripe in a second paper tone, spanning edge to edge. Says where you are, or breaks a long screen. Never boxed, never inset.", spec: "background #EDE7D6 · border-top/bottom 1px #D8CFB9 · radius 0 · no side borders" },
+        { k: "BOX", share: "rare · the discrete object", d: "A real bordered container, for something with an edge in the world — one tea, one session, a modal, an inline form. The test: delete the border, and if the content is still obviously one thing, it was never a box.", spec: "background #FFFEFB · border 1px #D8CFB9 · radius 2px · no shadow, ever" },
+        { k: "SLAB", share: "exactly one per screen", d: "The clay committing action. The only container permitted a torn radius, because it is the only one carrying a rationed colour.", spec: "background --clay · radius 14px 5px 12px 6px · no border · one per screen, enforced" }
+      ],
+      // Specimens are drawn at the element size each radius actually applies to —
+      // a 12–14px radius needs ~3–4× its own size per axis or CSS clamps it to a blob.
+      radii: [
+        { k: "0 · rules, bands, full-bleed", css: "0", stroke: "#D8CFB9", fill: "transparent", fg: "#2B2320", w: "132px", h: "34px", at: "at band size", d: "The default. If it is a section, it has no corners." },
+        { k: "2px · boxes, pills, index bits", css: "2px", stroke: "#D8CFB9", fill: "#FFFEFB", fg: "#2B2320", w: "132px", h: "44px", at: "at box size", d: "The crisp edge for anything that genuinely needs an outline. Reads as printed, not as soft UI." },
+        { k: "9/4/8/5 · liquor swatch ONLY", css: "9px 4px 8px 5px", stroke: "rgba(42,31,20,0.34)", fill: "#B87A38", fg: "#8A5A1E", w: "24px", h: "32px", at: "real size, 24×32", d: "Identity. One per tea, and by R145 it is an SVG path, not a border." },
+        { k: "14/5/12/6 · clay slab ONLY", css: "14px 5px 12px 6px", stroke: "rgba(138,90,30,0.55)", fill: "rgba(138,90,30,0.09)", fg: "#8A5A1E", w: "132px", h: "46px", at: "at slab size", d: "One committing action per screen. Torn corners are what commitment looks like here." },
+        { k: "14 uniform · RETIRED", css: "14px", stroke: "rgba(105,22,15,0.45)", fill: "rgba(105,22,15,0.05)", fg: "#69160F", w: "132px", h: "58px", at: "at .card size", d: "×119. Nothing inherits it. Its absence is most of the redesign." }
+      ],
+      shelf: [
+        { name: "Dawang Feng Da Hong Pao", short: "Da Hong Pao", type: "Oolong", status: "20 g · plenty", fill: "#B87A38", stroke: "rgba(42,31,20,0.34)", sw: 1, dash: "", statusFg: "#8C7F6C" },
+        { name: "Honey Oolong Gui Fei", short: "Gui Fei", type: "Oolong", status: "7 g · running low", fill: "#C99447", stroke: "rgba(42,31,20,0.34)", sw: 1, dash: "", statusFg: "#B07C3E" },
+        { name: "Fei Bing Beeng Cha", short: "Fei Bing", type: "Dark", status: "96 g · ages well", fill: "transparent", stroke: "rgba(42,31,20,0.42)", sw: 1.5, dash: "13 6", statusFg: "#8C7F6C" }
+      ],
+      findings: [
+        { k: "F31 · the frame law is checkable, which is the only reason to prefer it to taste.", d: "\u201cThe frame never carries a fill\u201d can be fenced: every background-color in the frame layer must be --paper, the band tone, or --white on a box. Fills outside that set belong to a rationed mark and must name their contract. That converts four style conventions currently held in conversation into one assertion, and it is what stops the next 119 boxes from arriving." },
+        { k: "F32 · paper tone is the largest visual change and the smallest code change.", d: "#F6F2E9 against the shipped #FFFEFB is the difference between the app looking like paper and looking like a form. If a warm tone is not already a token, this adds one and retires none — and it is the one item on this board that would improve the app even if nothing else here ships." },
+        { k: "F33 · retiring uniform-14 is subtractive, and it is where the risk sits.", d: "119 sites lose a radius and most lose their border and background too. That is not a restyle per site, it is a deletion per site, and deletions are where a rollout goes wrong quietly \u2014 a box removed from something that was load-bearing for grouping reads as two lists merged. The rollout wants the BOX test applied surface by surface, not a global find-and-replace, which is why it is its own slice with its own gate." },
+        { k: "F34 · two contracts now have a shape as well as a colour, and that is new.", d: "Liquor was rationed as a colour; the swatch radius makes it a shape too. Same for clay. So a breach is visible even in a grey screenshot, and the rationing survives a theme it was not written for \u2014 which the dark-mode work showed is exactly where colour-only contracts get thin." }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

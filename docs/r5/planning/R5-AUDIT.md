@@ -9,6 +9,18 @@
 > R81/F2 stale-board family this work keeps catching). Formal R-numbers are assigned to the ledger as
 > R5 slices deploy; this doc is the reference they hang off.
 
+> **R5 STATUS — updated 2026-08-28, slice 1 opening.** The spine board is now **banked in-repo** at
+> `docs/r5/boards/surface-language-spine.dc.html` (with its `support.js` dep and the two repo rules a
+> new-round board needs — `.gitignore` negation + `.gitattributes -text`). **§2 is no longer the sole
+> authority**: the board is, and it reconciles cleanly against §2. The v4.21 picker reconciliations are
+> minted to the ledger as **R146–R152** (they were deferred to "as R5 slices deploy" in §3). **Slice 1
+> (v4.22)** is in flight: the four container primitives (RULE/BAND/BOX + the SLAB reconciled to the
+> existing `.btn-clay`), `--band` as an alias of `--porcelain-dim` (zero new hex — the near-duplicate
+> catch, F32/R128), the **fill-law fence (F31 → R153)**, and the **shelf** as the single re-dressed
+> pilot (containers only; filter chips / type-tints are board-13-rev2, untouched). Radius law reconciled
+> **to shipped source**, not the board's drawn numbers (liquor `8/4/7/4` CSS + the `9/4/8/5` SVG-path
+> shelf swatch; slab = `.btn-clay` `15/5/13/5`) — per R127/R128, source is the measurement of record.
+
 ---
 
 ## 1 · The diagnosis — Surimono landed as ink, not paper

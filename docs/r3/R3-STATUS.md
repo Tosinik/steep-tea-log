@@ -1047,3 +1047,16 @@ licence to adapt the engine.
     refusing to hide that they are missing. The four were backfilled verbatim on the lane's dictation
     once v4.19 was pushed, with a provenance note **stronger than R133's** — they describe live,
     on-device-confirmed deploys reconstructed from shipping code, not a plan that never ran.
+
+24. **A check saw red and it mattered: the rationing fence caught a clay-cap breach the picker would
+    otherwise have shipped.** v4.21, recorded as the counterpart to the warnings above — this is the
+    register for *when a fence earned its keep*, not only for when one was missed. Building the picker's
+    selected-tick and "manage vessels ›" affordances, the reflex is to make them warm; `--clay` is the
+    warm token nearest to hand. Reaching for it would have put a **second** rationed clay mark on the
+    surface — `--clay` is rationed to one committing action per screen (R113) — and nothing in the visual
+    would have announced the breach, because a warm tick reads as friendly, not as a contract violation.
+    The controls took `--jade-deep` instead (chrome's register, not content's), and the cap held. **The
+    lesson is the general one the whole spine rests on (F31/F34):** a rationed colour needs a *check*, not
+    a convention, because the mechanical instinct ("make this warm") points at the rationed token and the
+    breach is invisible by eye. The clay cap survived here by discipline; the spine's fill-law fence makes
+    the next such reach reddenable rather than reliant on the builder remembering. Filed against **R152**.
