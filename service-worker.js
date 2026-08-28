@@ -1,9 +1,15 @@
-const CACHE_NAME = 'steep-tea-log-v134';
+const CACHE_NAME = 'steep-tea-log-v135';
+// The single source of APP_VERSION + WHATS_NEW (R158). importScripts is how the SW REFERENCES the note
+// rather than duplicating it: this worker answers GET_WHATS_NEW with its OWN self.WHATS_NEW, so the
+// waiting (incoming) worker hands the banner the incoming version's note. Runs at SW startup; the file
+// is same-origin and precached, so it is present.
+importScripts('./steep-version.js');
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './styles.css',
   './supabase-config.js',
+  './steep-version.js',
   './steep-data.js',
   './steep-knowledge.js',
   './steep-tea-types.js',
@@ -39,9 +45,21 @@ self.addEventListener('install', (event) => {
   // open session is never yanked out from under them mid-brew.
 });
 
-// The page posts this when the user accepts the update banner.
+// The page posts SKIP_WAITING when the user accepts the banner; GET_WHATS_NEW when it wants to show the
+// banner (R158). Both ride the same client→worker channel. GET_WHATS_NEW is answered on the MessageChannel
+// reply port with this worker's OWN note+version — for the WAITING worker that is the INCOMING version's,
+// which is the whole point. The note string lives only in steep-version.js; this file never repeats it.
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+  const d = event.data;
+  if (!d) return;
+  if (d.type === 'SKIP_WAITING') { self.skipWaiting(); return; }
+  if (d.type === 'GET_WHATS_NEW') {
+    const payload = { type: 'WHATS_NEW',
+      note: (typeof self.WHATS_NEW === 'string' ? self.WHATS_NEW : ''),
+      version: (typeof self.APP_VERSION === 'string' ? self.APP_VERSION : '') };
+    if (event.ports && event.ports[0]) event.ports[0].postMessage(payload);
+    else if (event.source) event.source.postMessage(payload);
+  }
 });
 
 self.addEventListener('activate', (event) => {

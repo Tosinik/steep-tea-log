@@ -736,8 +736,8 @@
     const app = document.getElementById('app');
     if (!app) return;
     /* The stamp is read defensively because this door is the surface you land on when something has
-       gone wrong. `APP_VERSION` is a const in steep-core.js, so if that file failed to load the
-       reference would throw and hand a logged-out user a blank screen instead of a sign-in. Before
+       gone wrong. `APP_VERSION` is a global from steep-version.js (R158), so if that file failed to load
+       the reference would throw and hand a logged-out user a blank screen instead of a sign-in. Before
        #09 the door had no cross-module dependency at all; this keeps that property. */
     let ver = ''; try { ver = APP_VERSION; } catch (e) {}
     /* R32 — the tagline, the what-it-is sentence and the three pillar words are canonical as drawn

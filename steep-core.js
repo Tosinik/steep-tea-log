@@ -1,11 +1,7 @@
-// App version — the single source of truth for the user-visible version string (Settings footer +
-// the feedback mailto subject). BUMP THIS EVERY DEPLOY alongside CACHE_NAME in service-worker.js.
-const APP_VERSION = 'v4.24';
-// WHATS_NEW — one human sentence shown as a second quiet line on the update banner (v3.69+).
-// Bump every deploy alongside APP_VERSION; a stale value mislabels what users just received.
-// (Empty '' suppresses the second line — the WS4/v3.87 dormant-deploy pattern; this deploy is
-// user-visible, so it carries a line again.)
-const WHATS_NEW = "A brewing session's detail page gets the quieter, papery look — its identity banner and hairline-divided sections replace the single boxed-in card.";
+// APP_VERSION + WHATS_NEW moved to steep-version.js (R158, v4.25) — the SINGLE source read by BOTH the
+// page (as `self.` globals, loaded first in index.html) and the service worker (importScripts), so the
+// update banner can show the INCOMING version's note instead of this running page's. Bump them THERE
+// every deploy (ritual 2b/2c); do not redefine them here. Readers still use the bare globals unchanged.
 
 /* ---------- theme ---------- */
 (function applyStoredTheme(){
