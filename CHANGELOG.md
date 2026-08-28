@@ -43,6 +43,42 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.23 — R5 slice 2: the Shopping list re-dressed to the spine (F33, containers only)
+Deploy: styles.css, steep-shopping.js, steep-core.js (APP_VERSION v4.23 + WHATS_NEW), service-worker.js
+(**v133**), fixtures/frame-test.js. **No SQL.** No new module → no FILES_TO_CACHE / index.html change.
+*(Docs — CHANGELOG.md, STATE.md, R3-RULINGS-LEDGER.md R154–R155 — push with this deploy; this session's
+ritual is a single Code push of docs + code, no unpushed pause.)*
+
+Slice 2 continues the R5 spine rollout (slice 1 = the shelf, v4.22) onto the next surface — **per-surface,
+containers only** (F33, no global find-and-replace). Shopping (`viewShopping`) was the pick: a
+self-contained, low-entanglement list screen absent from the R5 punch-list and the issue inbox, so a
+containers-only pass can't read half-done. It exercises all four containers in a new composition — a BOX
+inline-form the shelf never showcased.
+
+- **Four containers, mapped by the BOX test.** Masthead → **BAND** (`.shop-band` composes `.band`;
+  full-bleed `--band` stripe, layout mirrors the shelf's `.lib-band`). Add-to-list form → **BOX**
+  (`.shop-add` carries the box values itself — `--white`, 1px `--line`, radius 14→2px — mirroring
+  `.shelf-card`; the board's canonical "inline form"). The two lists → **RULE** sections (`.shop-sec`
+  wrappers, each opened by an `.eyebrow.rule-head` 2px ink rule; rows were already hairline-ruled). The
+  **SLAB** = the one committing action: `＋ Add`, swapped from jade `.btn-primary` to the existing
+  `.btn-clay` — no second clay container, and the clay cap holds (per-row `.lib-chip`/`.icon-btn` stay
+  quiet, not clay).
+- **Two distinct section wrappers, never one flat list** (F33): "Running low" and "Your list" keep
+  separate `.shop-sec` divs, so stripping the card chrome doesn't merge them.
+- **Shared classes swap on markup only.** The global `.section-title` (24 sites) and `.btn-primary`
+  (20 sites) definitions are UNTOUCHED — only Shopping's markup changed.
+- **The fence now SEES Shopping (R155).** `fixtures/frame-test.js` refactored from a flat list to a
+  per-surface registry (`SURFACES = {shelf, shopping}`); `.shop-add` makes a positive box assertion, and
+  three Shopping negative controls (rogue `--jade` on `.shop-row`; torn radius on `.shop-add` ×2) bite.
+  **19 checks** (was 16). A surface is fenced in name only until a control bites on its own selectors.
+- **Left for Niklas's live look** (each a one-line follow-up if it bugs him): the `.shop-band` top
+  hairline vs the topbar border (the same open question as the shelf — built like-for-like, not
+  pre-dropped); the first `.shop-row` hairline under each `.rule-head`; the two-section grouping read.
+  Filter chips / type-tints are untouched (a separate Design thread).
+
+Rulings: **R154** (Shopping re-dressed to the spine; clay cap held) · **R155** (the fill-law fence
+generalises to a per-surface registry + Shopping selectors/controls). 32 suites green.
+
 ## v4.22 — R5 slice 1: the surface-language spine, and the shelf as its pilot (F31/F33)
 Deploy: styles.css, steep-teas.js, steep-core.js, service-worker.js (**v132**), fixtures/frame-test.js,
 .gitignore. **No SQL.** *(Docs pushed on write, separately — commit `4ef2db9`: R3-RULINGS-LEDGER.md

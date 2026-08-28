@@ -191,7 +191,35 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.22 SHIPPED, LIVE `e8c18fa` — R5 slice 1: the surface-language spine + shelf pilot** (cache
+**NOW — v4.23 SHIPPED, LIVE `a2dcf2b` — R5 slice 2: the Shopping list re-dressed to the spine** (cache
+**v133**, APP_VERSION v4.23, **no SQL**). The spine rollout (slice 1 = the shelf, v4.22) continues onto its
+second surface — `viewShopping`, **containers only** (F33, no global find-and-replace). Shopping was the
+low-entanglement pick: a self-contained list screen absent from the R5 punch-list **and** the issue inbox,
+so a containers-only pass can't read half-done (Home carries an element-mix + greeting-bug thread; Settings
+carries #8 — both would).
+- **What shipped:** masthead → **BAND** (`.shop-band` composes `.band`, layout mirrors the shelf's
+  `.lib-band`); the add-to-list form → **BOX** (`.shop-add` carries the box values itself, radius 14→2px,
+  mirroring `.shelf-card`); the two lists → **RULE** sections (`.shop-sec` wrappers, each opened by an
+  `.eyebrow.rule-head`; rows were already ruled); the one committing action → the **SLAB**, `＋ Add` swapped
+  jade `.btn-primary` → the existing `.btn-clay` (clay cap held — per-row `.lib-chip`/`.icon-btn` stay
+  quiet). Shared `.section-title` (24 sites) / `.btn-primary` (20 sites) UNTOUCHED. Files: `styles.css`,
+  `steep-shopping.js`, `fixtures/frame-test.js`, `service-worker.js` (v133), `steep-core.js` (+WHATS_NEW).
+- **The fence sees Shopping (R155):** `fixtures/frame-test.js` refactored from a flat list to a per-surface
+  registry (`SURFACES={shelf,shopping}`, `FRAME=[...flatten,'.band']`); `.shop-add` makes a positive box
+  assertion, and three shopping negative controls bite (fill on `.shop-row`; torn radius on `.shop-add` ×2).
+  **19 checks** (was 16). **32 suites green.** Ledger: **R154** (Shopping re-dressed; clay cap held) ·
+  **R155** (fence per-surface registry).
+- **Left for Niklas's live look** (one-line follow-ups if they bug him): the `.shop-band` top hairline vs
+  the topbar border (built like-for-like with the shelf, not pre-dropped — the same open question the shelf
+  has); the first `.shop-row` hairline under each `.rule-head`; the two-section grouping read (Running low
+  vs Your list). **Filter chips / type-tints UNTOUCHED** (board-13-rev2, a separate Design thread).
+- **NEXT:** the R5 spine rollout continues — remaining surfaces per-surface (F33), then the per-screen
+  redraws (Home element mix, shelf board-13-rev2, stat cards, steeping) hang off the spine. **SECURITY stays
+  the deferred pre-widening gate** (below), not the next slice. The two v4.22 cosmetic items (slab
+  masthead-vs-bottom; possibly-doubled top band hairline) remain open for Niklas's phone look — not
+  re-touched this slice.
+
+**Previously — v4.22 (SHIPPED, LIVE `e8c18fa`) — R5 slice 1: the surface-language spine + shelf pilot** (cache
 **v132**, APP_VERSION v4.22, **no SQL**). R5 lands the design overhaul the R2/R3 boards drew (founding ref
 `docs/r5/planning/R5-AUDIT.md`); slice 1 adds the FRAME SYSTEM and re-dresses the SHELF as its pilot,
 **containers only** (F33 — no global find-and-replace). Three commits, all on origin/main: docs `4ef2db9`

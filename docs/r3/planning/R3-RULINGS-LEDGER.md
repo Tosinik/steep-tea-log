@@ -2075,6 +2075,35 @@ globally (F33):** slice 1 re-dresses only the **shelf** pilot (BAND masthead, BO
 rows unchanged, photo thumb 5→2px per board §1d, Add → clay slab); filter chips / type-tints are
 board-13-rev2, untouched. *(styles.css, steep-teas.js, fixtures/frame-test.js.)*
 
+**R154 — The Shopping list is the spine's second surface; the rollout spreads by BOX-test, not find-and-replace.**
+R5 slice 2 (v4.23) re-dresses `viewShopping` — containers only (F33). Shopping was chosen over Home/Insights
+as the low-entanglement proof: a self-contained list screen absent from the R5 punch-list **and** the issue
+inbox, so a containers-only pass cannot read half-done (Home carries an element-mix + greeting-bug thread,
+Settings carries #8 — both would). The mapping, each container BOX-tested: masthead → **BAND** (`.shop-band`
+composes `.band`, layout mirrors the shelf's `.lib-band`); the add-to-list form → **BOX** (`.shop-add` — an
+inline form, the board's canonical box; it carries the box values itself, radius 14→2px, mirroring
+`.shelf-card` so the fence asserts them); the two lists → **RULE** sections (`.shop-sec` wrappers opened by
+an `.eyebrow.rule-head`, rows already hairline-ruled); the one committing action → the **SLAB**, `＋ Add`
+swapped from jade `.btn-primary` to the existing `.btn-clay`. **The clay cap held** — the per-row
+`.lib-chip`/`.icon-btn` controls stayed quiet, exactly the catch R152 named. Two guards on the mapping: the
+two lists keep **separate `.shop-sec` wrappers** (F33 — stripping card chrome must not merge "Running low"
+and "Your list" into one list), and the **global `.section-title` (24 sites) / `.btn-primary` (20 sites) are
+untouched** — shared classes swap on Shopping's markup only. Placing the slab inside the `.shop-add` box does
+**not** breach "no clay on a card" (styles.css `.btn-clay`): that rule targets *portable* cards that move
+between surfaces; a fixed form box is a `.box`, not a `.card`, and `home-test.js` §D (a `var(--clay)`
+CSS-selector scan) is unaffected. *(steep-shopping.js, styles.css.)*
+
+**R155 — The fill-law fence generalises to a per-surface registry, and a surface is fenced in name only
+until a control bites on its own selectors.** `fixtures/frame-test.js` (R153) held a flat `FRAME` list; slice
+2 refactors it to `SURFACES = {shelf:[…], shopping:[…]}` with `FRAME = [...flatten(SURFACES), '.band']`, so
+the checkers (`chkFrameFill`/`chkFrameRadius`/`chkRationing`, renamed from `chkShelf*` now that they span
+surfaces) cover every registered surface at once. The catch this ruling pins: the checkers **null-skip** a
+selector that carries no fill/radius, so merely *listing* a surface proves nothing — absence of red is not a
+pass. Each surface therefore ships ≥1 negative control that bites on **its own** selectors: Shopping adds
+three (rogue `--jade` on `.shop-row` reddens fill-law; a torn radius on `.shop-add` reddens radius-law and
+rationing). `.shop-add` also makes a **positive** shopping assertion (`--white` + radius 2px), mirroring
+`.shelf-card`. 16 → **19 checks**, all six+three controls bite. *(fixtures/frame-test.js.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
