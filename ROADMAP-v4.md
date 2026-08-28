@@ -96,9 +96,17 @@ decisions rather than any single ruling:
   predicate and, for a label-bearing row, emits an SVG `<path>` (R145) — filled at tier 1/2, a dashed
   1.5px plate at tier 3 (R144); `.today-tint` keeps its tint by the predicate (R125). Grid cards stay
   photo-forward (R81). **`.ref-swatch`/`.social-tile` are filed behind a later version** — after v4.20,
-  **not yet sequenced** (the security/legal pass is next), R125; enabling the predicate there flips them
-  CSS→SVG. **F29 is the on-device gate** (dashed-plate legibility on a dimmed dark screen).
-- **Security & legal hardening pass — sequenced after v4.20, before any public beta.** Findings
+  **not yet sequenced** (the R5 spine rollout is the active track; security is the deferred pre-widening
+  gate), R125; enabling the predicate there flips them CSS→SVG. **F29 is the on-device gate**.
+- **#14 (the session pickers) — SHIPPED v4.21** (cache v131): tea + vessel chosen on R58 picker screens,
+  the three native selects retired; `teaRowIdentity` shared by shelf + picker (one writer, two wrappers).
+  `pickChoose` dispatches by kind, `methodPrefillFor` preserved; optional "No vessel" (R43). No long-press
+  (R89 deferred → its own gesture+commit build).
+- **ACTIVE TRACK: R5 — the spine rollout** (the surface-language frame system, per-surface, F33). The
+  greeting-copy bug is available as a small early slice.
+- **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
+  next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
+  next person logs in). Findings
   captured and verified against the live project in **`SECURITY.md`**: `profiles` readable by all
   authenticated users with no allowlist (HIGH) · `tea-photos` bucket public + unscoped read (HIGH) ·
   shared sessions/steeps expose the full row incl. `mood`/notes to followers (MEDIUM) · auth

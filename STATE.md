@@ -191,8 +191,27 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (BUILT — awaiting review, the F29 on-device gate, and Niklas's push) — v4.20: the shelf leads with
-the swatch** (cache **v130**, APP_VERSION v4.20, **no SQL**). The library ROWS lead with the liquor swatch
+**NOW (BUILT — awaiting review + push) — v4.21: the session pickers (#14)** (cache **v131**, APP_VERSION
+v4.21, **no SQL**). Tea + vessel are chosen on searchable **R58 SCREENS**; the three native selects
+(setup, quick-log twin, edit modal) are retired. `teaRowIdentity` extracted from `shelfRowHTML` (one
+writer, two wrappers — the spine re-dresses both); `pickChoose` dispatches by kind to
+`d_setTea`/`d_setVessel`/`es_set`, so `methodPrefillFor` is **NOT bypassed** (a Kyusu still sets
+`senchado`). Flat list + type filter, finished behind "show finished (n)", optional **"No vessel"** row
+(R43). **Not in `HISTORY_VIEWS`** — in-screen "← Back"; a back-gesture exits draft-safe (v4.17 pattern).
+**No long-press** (R89 deferred → its own gesture+commit build). **38 suites green** (new `pick-test.js`
+15; `liquor` §F/F5b retargeted to `teaRowIdentity` + F5c; `render-smoke` 15→17 views). **No on-device
+smoke** — DOM navigation, not touch.
+- **Split-push:** docs (CHANGELOG/STATE/ROADMAP) push on write; the code commit (`steep-teas.js`,
+  `steep-sessions.js`, `steep-core.js`, `service-worker.js`, `styles.css`, `.gitignore`, the four
+  fixtures) **pauses UNPUSHED for review + push**.
+- **NEXT: R5 continues — the SPINE ROLLOUT** (the surface-language frame system, per-surface, F33). The
+  **greeting-copy bug** is available as a small early slice.
+- **SECURITY is DEFERRED by decision (2026-08-28)** — it comes **after** the design work, **re-blocking
+  before the beta widens** (before the next person logs in): the **pre-widening gate**, not the next
+  slice. `SECURITY.md`'s two HIGH findings remain that gate; nothing about them changed.
+
+**Previously — v4.20: the shelf leads with the swatch** (SHIPPED, live `5f8a28e`; cache **v130**,
+APP_VERSION v4.20, **no SQL**). The library ROWS lead with the liquor swatch
 and the photo trails as a 26×26 square thumb (board S1/S2, photo KEPT — F4/TD1). `swatchAttr` gained
 R124's predicate `hasLabel` and is now **polymorphic by site** — CSS attributes for `.ref-swatch`/
 `.social-tile`/`.today-tint` (unchanged), an SVG `<path>` for the shelf (R145): filled 1px at tier 1/2, a
@@ -765,7 +784,9 @@ describes a bug fixed in v3.92.
 - **The mood pill is computed**, never the board's stamped `48% (15/31)`: "noted on 5 of your 12
   sittings", omitted below 8 sessions and when unused.
 - **R89 — #14's custom listbox deferred**; its long-press colour correction can't ship at all (R78 no
-  column, R82 no palette data model). The `<select>` controls stay. **#14 reopens with the swatch model.**
+  column, R82 no palette data model). ~~The `<select>` controls stay. **#14 reopens with the swatch
+  model.**~~ **CLOSED v4.21** — the swatch model shipped (v4.11–v4.20), #14 reopened and shipped as the
+  R58 picker screens; the selects are retired. Long-press stays deferred (its own gesture+commit build).
 - New `fixtures/quick-log-test.js` (38 checks) — **20 committed suites, all green.**
   **NEXT: slice D** (#02 Sessions + #02b detail, then the edit-screen move as its own commit — the
   riskiest item in the package, because the modal's deep-copy semantics must survive verbatim).

@@ -43,6 +43,33 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.21 — the session pickers: tea and vessel become screens (#14 / R89, board 04 rev 6)
+Deploy: steep-teas.js, steep-sessions.js, steep-core.js, service-worker.js (v131), styles.css,
+fixtures/liquor-test.js, fixtures/quick-log-test.js, fixtures/render-smoke-test.js, fixtures/pick-test.js,
+.gitignore, CHANGELOG.md, STATE.md, ROADMAP-v4.md. No SQL.
+
+- Tea and vessel are chosen on searchable R58 SCREENS now, not native `<select>`s (the OS pop-out Niklas
+  was hitting). Retired all THREE selects — setup, the quick-log twin, and the edit modal. Tea rows reuse
+  `teaRowIdentity` (extracted from `shelfRowHTML` — one writer, two wrappers, so the spine re-dresses
+  both); vessel rows reuse `vesselPhoto`. **Closes #14.**
+- The picker carries a serializable ctx tag `{kind, returnView, currentId}`; `pickChoose` dispatches BY
+  KIND to the EXISTING setter (`d_setTea` / `d_setVessel` / `es_set`) so its side effects run — crucially
+  `d_setVessel`'s `methodPrefillFor` is NOT bypassed by a raw `vesselId` write (a Kyusu still sets
+  `senchado`). The return view is set before the setter so its own `render()` lands there.
+- Flat searchable list + one type filter, NO optgroups (grouping moved out of the field, ruling 3).
+  Finished teas hidden behind "show finished (n)" (reuses `d.showFinishedTeas`), shown dimmed when on, and
+  the current selection is shown even when finished. The vessel is optional — a real "No vessel" row (R43).
+- Not in `HISTORY_VIEWS`: an in-screen "← Back" returns to `returnView`; a browser back-gesture exits
+  draft-safe (the v4.17 pattern). The draft persists across picker navigation (state-based). **No
+  on-device smoke** — DOM view-navigation, not a touch gesture.
+- **No long-press colour correction:** R89 deferred it on data grounds (R78/R82), since resolved by the
+  swatch model; the live blocker is the missing gesture primitive + the v4.19 picker being a commit-less
+  form control. Deferred as its own gesture+commit build.
+- Tests: `liquor-test` §F/F5b retargets to `teaRowIdentity` + F5c (both wrappers assert single-writer);
+  `painted` stays 4. `render-smoke` covers the two new views (15→17). New `fixtures/pick-test.js` (15)
+  pins select-retirement + dispatch-by-kind incl. the `methodPrefillFor` guard + finished-teas + the
+  "No vessel" option. `shelf-order` already gained `steep-tea-types.js` at v4.20. **38 suites green.**
+
 ## v4.20 — the shelf leads with the swatch (R124 / R144 / R145)
 Deploy: steep-teas.js, styles.css, service-worker.js (v130), steep-core.js, fixtures/liquor-test.js,
 fixtures/shelf-order-test.js, smoke.md, docs/r4/planning/SPEC-liquor-swatch-model.md, CHANGELOG.md,
