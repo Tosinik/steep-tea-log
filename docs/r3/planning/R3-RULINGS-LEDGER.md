@@ -2007,7 +2007,7 @@ updating when the shelf is built.**
 > R5 lands the design overhaul the R2/R3 boards drew (founding reference: `docs/r5/planning/R5-AUDIT.md`).
 > R146–R152 are the **v4.21 session-picker reconciliations**, deferred to "as R5 slices deploy" by
 > R5-AUDIT §3 and minted here as the spine rollout opens — each traced to shipped code in `71ad774`, not
-> to chat. F31's fill-law fence mints **R153** when slice 1 ships.
+> to chat. F31's fill-law fence **minted R153** when slice 1 shipped (v4.22) — see below.
 
 **R146 — The picker's context is a serializable `kind` tag dispatched through the existing setters, not a
 stored closure.** `state.pickerCtx = {kind, returnView, currentId}` is a plain object (it survives a draft
@@ -2057,6 +2057,23 @@ surface (R113). Both render `--jade-deep`. The catch is recorded as **evidence t
 load-bearing**: a mechanical "make the affordance warm" would have reached for clay and quietly broken the
 cap. The fence-load-bearing observation is filed in **R3-STATUS §8 (item 24)**, where "a check saw red and
 it mattered" lives. *(styles.css `.pick-tick`/`.pick-manage`.)*
+
+**R153 — The frame law (F31) becomes a fence, and the shelf is where it first bites.** R5 slice 1 (v4.22,
+`e8c18fa`) builds the surface-language spine the R2/R3 overhaul drew but never shipped. **The law: the
+frame never carries a fill** — every frame-layer background is `--porcelain`, `--band` or `--white`; any
+other fill names a rationed mark (liquor, clay, xanthous, blue). Four containers replace the one `.card`:
+RULE (`.rule`/`.rule-head`), BAND (`.band`), BOX (`.box`), and the SLAB — which is the **existing
+`.btn-clay`**, no second clay container. `--band` is an **alias** of `--porcelain-dim` (the board's
+`#EDE7D6` is a 2/255 near-duplicate of the shipped `#EDE7D8`; aliasing adds zero hex — R128 — and inherits
+the dark value). **Radius law:** frame radii are 0 or 2px; a torn radius is rationed to the liquor swatch
+(an SVG path, R145) and the clay slab alone — "one slab per screen, one swatch per tea, zero asymmetric
+radii anywhere else" (board §1d), measured **from source**, never the board's drawn numbers (R127/R128:
+liquor `8/4/7/4` CSS + the `9/4/8/5` SVG-path shelf swatch; slab `.btn-clay 15/5/13/5` — the board draws
+`9/4/8/5`/`14/5/12/6`, its drawing, not the record). The fence is `fixtures/frame-test.js` (16 checks, six
+negative controls bite) — **this is what stops the next 119 boxes.** Rolled out **per-surface, never
+globally (F33):** slice 1 re-dresses only the **shelf** pilot (BAND masthead, BOX grid cards 16→2px, RULE
+rows unchanged, photo thumb 5→2px per board §1d, Add → clay slab); filter chips / type-tints are
+board-13-rev2, untouched. *(styles.css, steep-teas.js, fixtures/frame-test.js.)*
 
 ### Also recorded (not rulings) — the frame ruling (map still held)
 

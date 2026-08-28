@@ -9,14 +9,14 @@
 > R81/F2 stale-board family this work keeps catching). Formal R-numbers are assigned to the ledger as
 > R5 slices deploy; this doc is the reference they hang off.
 
-> **R5 STATUS — updated 2026-08-28, slice 1 opening.** The spine board is now **banked in-repo** at
+> **R5 STATUS — updated 2026-08-28, slice 1 SHIPPED (v4.22, `e8c18fa`).** The spine board is now **banked in-repo** at
 > `docs/r5/boards/surface-language-spine.dc.html` (with its `support.js` dep and the two repo rules a
 > new-round board needs — `.gitignore` negation + `.gitattributes -text`). **§2 is no longer the sole
 > authority**: the board is, and it reconciles cleanly against §2. The v4.21 picker reconciliations are
 > minted to the ledger as **R146–R152** (they were deferred to "as R5 slices deploy" in §3). **Slice 1
-> (v4.22)** is in flight: the four container primitives (RULE/BAND/BOX + the SLAB reconciled to the
+> (v4.22) SHIPPED:** the four container primitives (RULE/BAND/BOX + the SLAB reconciled to the
 > existing `.btn-clay`), `--band` as an alias of `--porcelain-dim` (zero new hex — the near-duplicate
-> catch, F32/R128), the **fill-law fence (F31 → R153)**, and the **shelf** as the single re-dressed
+> catch, F32/R128), the **fill-law fence (F31, minted R153)**, and the **shelf** as the single re-dressed
 > pilot (containers only; filter chips / type-tints are board-13-rev2, untouched). Radius law reconciled
 > **to shipped source**, not the board's drawn numbers (liquor `8/4/7/4` CSS + the `9/4/8/5` SVG-path
 > shelf swatch; slab = `.btn-clay` `15/5/13/5`) — per R127/R128, source is the measurement of record.
@@ -96,15 +96,15 @@ band tone `#EDE7D6`, which still needs a dark-theme value (every other frame tok
 
 | # | Screen | The gap | Lane | Status |
 |---|--------|---------|------|--------|
-| 1 | **Session-setup pickers** | Tea + vessel are native `<select>` (the OS pop-out); board 04 rev 6 drew them as picker *screens*. #14, unblocked by the v4.20 swatch. | **Code** | In progress — v4.21, plan-gated |
-| 2 | **Library shelf** | Flat type-tint chips + dated filtering; clashes with the new liquor swatch beside them. Board 13 rev 1 predates the swatch and never reconciled the tint language against it. | **Design** (board 13 rev 2, swatch-aware) | Queued |
+| 1 | **Session-setup pickers** | Tea + vessel are native `<select>` (the OS pop-out); board 04 rev 6 drew them as picker *screens*. #14, unblocked by the v4.20 swatch. | **Code** | **Shipped — v4.21** |
+| 2 | **Library shelf** | Flat type-tint chips + dated filtering; clashes with the new liquor swatch beside them. Board 13 rev 1 predates the swatch and never reconciled the tint language against it. | **Design** (board 13 rev 2, swatch-aware) | **Frame SHIPPED v4.22** (spine, containers only — pilot); tint redesign (board 13 rev 2) queued |
 | 3 | **Home** | Under-designed (confirmed). Generic-card frame; greeting copy that doesn't match reality; Wrapped too prominent; Favorites placement uncertain. Keep: week card, Earlier today, Running low. | **Design** (element mix) + **Code** (greeting bug) + spine (frame) | Queued |
 | 4 | **Insights** | Reads the same as pre-overhaul; only origins were added. | **Design** (needs a board-vs-shipped read) | Queued |
 | 5 | **Stat cards** (all-time/month/week) | Data is right, presentation isn't. | **Design** | Queued |
 | 6 | **Steeping** | Temp/time/notes sit *below* the tasting notes (wrong order); tasting-note input needs rework — more vocabulary or a different entry method. | **Code** (reorder) + **Design** (tasting input, touches the flavour model) | Queued |
 | 7 | **Matcha** | No prep *mode*. Wanted: pick the matcha + the preparation (original vs latte), whisked, so no steep ladder. A **new feature**. | **Design → Code**, own track | Queued |
 
-**Session-pickers detail (slice 1, in flight):** two searchable picker screens (R58 "screens not
+**Session-pickers detail (SHIPPED v4.21):** two searchable picker screens (R58 "screens not
 overlays") retiring the three native selects (setup, session flow, edit-modal vessel). Tea rows composed
 from a shared `teaRowIdentity` helper (single writer, two wrappers — `shelfRowHTML` and the picker both
 call it, so the spine re-dresses both at once). Reconciled rulings folded in: **no long-press colour
@@ -120,9 +120,10 @@ current selection always shown); **vessel kanji reused as-is**; **picker context
 
 ## 4 · Sequence
 
-1. **Pickers (v4.21)** — in progress.
-2. **Spine rollout** — per-surface, gated (F33's BOX test), **last**, so the pickers re-dress with the
-   shelf surface.
+1. **Pickers (v4.21)** — SHIPPED.
+2. **Spine rollout** — per-surface, gated (F33's BOX test). **Slice 1 SHIPPED v4.22** (`e8c18fa`): the four
+   container primitives + the fill-law fence (R153) + the **shelf** as the pilot. Continues per-surface;
+   remaining surfaces re-dress against the shelf they share helpers with.
 3. **Per-screen redraws** — Home element mix, shelf rev 2, stat cards, steeping — hang off the spine.
 4. **Feature track** (separate, never smuggled into the restyle) — matcha prep mode; Home-distinct data.
 5. **Greeting-copy bug** — a Code correctness fix; small, can go early.

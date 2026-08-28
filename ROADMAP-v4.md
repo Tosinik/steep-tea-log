@@ -102,8 +102,10 @@ decisions rather than any single ruling:
   the three native selects retired; `teaRowIdentity` shared by shelf + picker (one writer, two wrappers).
   `pickChoose` dispatches by kind, `methodPrefillFor` preserved; optional "No vessel" (R43). No long-press
   (R89 deferred → its own gesture+commit build).
-- **ACTIVE TRACK: R5 — the spine rollout** (the surface-language frame system, per-surface, F33). The
-  greeting-copy bug is available as a small early slice.
+- **ACTIVE TRACK: R5 — the spine rollout** (the surface-language frame system, per-surface, F33).
+  **Slice 1 SHIPPED v4.22** (`e8c18fa`): the four container primitives + the fill-law fence (R153) + the
+  **shelf** as the pilot. The rollout continues per-surface; the greeting-copy bug is available as a small
+  early slice.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
   next person logs in). Findings
