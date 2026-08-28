@@ -191,7 +191,35 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW (SHIPPED — v4.21 LIVE, `71ad774`) — the session pickers (#14)** (cache **v131**, APP_VERSION
+**NOW — v4.22: R5 slice 1, the surface-language spine + shelf pilot** (cache **v132**, APP_VERSION
+v4.22, **no SQL**). **Docs PUSHED on write; the app commit PAUSES UNPUSHED for Niklas's final read.**
+R5 lands the design overhaul the R2/R3 boards drew (founding ref `docs/r5/planning/R5-AUDIT.md`); slice 1
+adds the FRAME SYSTEM and re-dresses the SHELF as its pilot, **containers only** (F33 — no global
+find-and-replace).
+- **Docs PUSHED (`4ef2db9`, origin/main):** ledger **R146–R152** (the v4.21 picker reconciliations),
+  R3-STATUS §8 **item 24** (R152's clay-cap catch — "a check saw red and it mattered"), the spine board
+  **banked** at `docs/r5/boards/surface-language-spine.dc.html` (+ `support.js` + the two repo rules a
+  new-round board needs — `.gitignore` negation, `.gitattributes -text`), R5-AUDIT slice-1 status.
+  CHANGELOG + this STATE block push on write too.
+- **App commit PAUSES UNPUSHED:** `styles.css` (primitives `.rule`/`.rule-head`/`.band`/`.box`; `--band` =
+  **alias** of `--porcelain-dim`, zero new hex, R128; SLAB = existing `.btn-clay`, no second clay container;
+  shelf re-dress — BAND masthead, BOX cards 16→2px, thumb 5→2px, Add→clay slab), `steep-teas.js` (masthead →
+  BAND, Add → `.btn-clay btn-add-slab`), `steep-core.js` (v4.22 + WHATS_NEW), `service-worker.js` (v132),
+  `fixtures/frame-test.js` (the **F31 fill-law fence → R153**), `.gitignore` (its exception).
+- **The fence is the durable win:** frame backgrounds ∈ {`--porcelain`,`--band`,`--white`}, frame radii ∈
+  {0,2px}, torn radius rationed to the liquor swatch (SVG, R145) + the clay slab alone. Measured from
+  **SOURCE** (R127/R128 — the board's `9/4/8/5`/`14/5/12/6` are its drawing; shipped is `8/4/7/4` +
+  `.btn-clay 15/5/13/5`). 16 checks, six negative controls bite. **32 suites green.**
+- **Two judgment calls FOR THE READ:** (1) the SLAB is kept in the masthead vs the board's bottom-of-list
+  placement (containers-only — no layout move; spine-consistent with Home carrying its clay action in the
+  head); (2) the top-most BAND's top hairline sits just under the topbar border. **Filter chips /
+  type-tints are UNTOUCHED** (board-13-rev2, a separate Design thread). No on-device gate (CSS + a static
+  fence).
+- **NEXT (after this lands):** the rest of the spine rollout, per-surface (F33), then the per-screen
+  redraws (Home element mix, shelf board-13-rev2, stat cards, steeping) — all hang off the spine. **SECURITY
+  stays the pre-widening gate** (below), not the next slice.
+
+**Previously — v4.21 (SHIPPED, LIVE `71ad774`) — the session pickers (#14)** (cache **v131**, APP_VERSION
 v4.21, **no SQL**). Tea + vessel are chosen on searchable **R58 SCREENS**; the three native selects
 (setup, quick-log twin, edit modal) are retired. `teaRowIdentity` extracted from `shelfRowHTML` (one
 writer, two wrappers — the spine re-dresses both); `pickChoose` dispatches by kind to

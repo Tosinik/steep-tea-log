@@ -43,6 +43,44 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.22 — R5 slice 1: the surface-language spine, and the shelf as its pilot (F31/F33)
+Deploy: styles.css, steep-teas.js, steep-core.js, service-worker.js (**v132**), fixtures/frame-test.js,
+.gitignore. **No SQL.** *(Docs pushed on write, separately — commit `4ef2db9`: R3-RULINGS-LEDGER.md
+R146–R152, R3-STATUS.md §8 item 24, docs/r5/boards/surface-language-spine.dc.html + support.js,
+R5-AUDIT.md status, .gitignore/.gitattributes r5-board rules. CHANGELOG.md + STATE.md push on write with
+this entry; the app commit above pauses UNPUSHED for the final read.)*
+
+R5 lands the design overhaul the R2/R3 boards drew (founding ref `docs/r5/planning/R5-AUDIT.md`; board
+`docs/r5/boards/surface-language-spine.dc.html`, banked this session). Slice 1 adds the FRAME SYSTEM and
+re-dresses ONE pilot surface — the shelf — **containers only**. No global find-and-replace (F33).
+
+- **Four containers replace one `.card`.** New primitives: `.rule` (the ~70% default — content on paper,
+  hairline dividers; `.rule-head` a 2px ink rule), `.band` (full-bleed paper-tone stripe, radius 0), `.box`
+  (a discrete object — 1px border, radius 2px, no shadow). The **SLAB** (the one clay committing action) is
+  the EXISTING `.btn-clay` — no second clay container (R5 resolution).
+- **One new token, an alias: `--band: var(--porcelain-dim)`.** The board's stand-in `#EDE7D6` is a 2/255
+  near-duplicate of the shipped `--porcelain-dim #EDE7D8`; aliasing adds zero hex, honours R128, and
+  inherits the dark value for free. (The "board doesn't know it's a token" catch the audit made once for
+  `--porcelain` — second instance.)
+- **The fill-law fence (F31 → R153):** `fixtures/frame-test.js`. Every frame-layer background must be
+  `--porcelain`/`--band`/`--white`; frame radii are 0 or 2px; a torn radius is rationed to the liquor
+  swatch (an SVG path, R145) and the clay slab alone — "one slab per screen, one swatch per tea" (board
+  §1d). Measured from SOURCE, never the board's drawn numbers (R127/R128). 16 checks; all six negative
+  controls bite.
+- **Shelf pilot, containers only:** the masthead is a BAND (title + generated count line, full-bleed
+  `--band`, leads the view); grid cards become BOXes (radius 16→2px); the row density was **already** RULE
+  (unchanged — `border-bottom:1px --line`, no box); the photo thumb takes the box radius (5→2px, board §1d);
+  the "Add" action becomes the clay SLAB (`.btn-clay`, masthead-sized `.btn-add-slab`). **Filter chips +
+  type-tints untouched** — that's board-13-rev2, a separate Design thread. `teaRowIdentity` is shared, so
+  the picker rows read consistently in the same stroke.
+- **Radius law reconciled to shipped source** (not the board's `9/4/8/5`/`14/5/12/6` drawing): liquor
+  `8/4/7/4` CSS + the `9/4/8/5` SVG-path shelf swatch; slab `.btn-clay 15/5/13/5`. Source is the record.
+- **32 suites green** (new `frame-test.js`). No on-device gate — CSS + a static fence, no browser API the
+  suites can't reach. **Two judgment calls flagged for the read:** (1) the SLAB kept in the masthead vs the
+  board's bottom-of-list placement (containers-only, no layout move); (2) the top-most BAND's top hairline
+  sits just under the topbar's border.
+
+---
 ## v4.21 — the session pickers: tea and vessel become screens (#14 / R89, board 04 rev 6)
 Deploy: steep-teas.js, steep-sessions.js, steep-core.js, service-worker.js (v131), styles.css,
 fixtures/liquor-test.js, fixtures/quick-log-test.js, fixtures/render-smoke-test.js, fixtures/pick-test.js,
