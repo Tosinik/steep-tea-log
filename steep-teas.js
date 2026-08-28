@@ -461,12 +461,17 @@ function teaHeadHTML(seg){
              : seg==='vessels' ? vesselCount : shelfCount;
   const title = seg==='deeper' ? 'Go Deeper' : (seg==='vessels' ? 'Vessels' : 'Teas');
   // One committing action per screen (§0.5 contract 2) — it stays VISIBLE, never behind the ⋯.
+  // R5 spine: the shelf's ONE committing action is the SLAB (clay), mirroring Home's masthead — reuse
+  // .btn-clay (no second clay container). Board draws it as a bottom block; kept in the masthead here
+  // (containers only — no layout move), spine-consistent with Home carrying its clay action in the head.
   const add = seg==='deeper' ? ''
-    : `<button class="btn-add" onclick="${seg==='vessels'?'openVesselForm()':'openTeaForm()'}">${icon('i-plus-hl',14)} Add</button>`;
+    : `<button class="btn-clay btn-add-slab" onclick="${seg==='vessels'?'openVesselForm()':'openTeaForm()'}">${icon('i-plus-hl',14)} Add</button>`;
   // Overflow is the shelf's, not the reference's or the vessel list's.
   const more = seg==='teas'
     ? `<button class="tea-more" onclick="toggleTeaOverflow()" aria-label="More" aria-expanded="${state.teaOverflowOpen?'true':'false'}">⋯</button>` : '';
-  return `<div class="lib-head">
+  // R5 spine pilot: the masthead is a BAND (full-bleed --band stripe). Title + generated count line lead;
+  // the one committing action (the clay slab) + ⋯ sit on the right. Containers only — copy/data unchanged.
+  return `<div class="band lib-band">
       <div class="lib-title">
         <h2>${title}</h2>
         <span class="lib-kicker mono">${escapeHtml(meta)}</span>

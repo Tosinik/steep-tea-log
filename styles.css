@@ -1,6 +1,9 @@
 :root{
   --porcelain:#F6F2E9;
   --porcelain-dim:#EDE7D8;
+  --band:var(--porcelain-dim); /* R5 spine (F31/F32): BAND surface tone. An ALIAS, not a new hex —
+     --porcelain-dim IS the recessed-paper token (#EDE7D8); the board's stand-in #EDE7D6 differs by 2/255
+     and would duplicate it (R128). Aliasing inherits the dark value for free (no dark block needed). */
   --ink:#2B2320;
   --ink-soft:#5C5148;
   --jade:#3F5E42;
@@ -211,7 +214,9 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
    between surfaces and would either bring a second clay onto a screen that has one or change
    appearance on arrival. The torn-paper radius is the mark; it is not a generic button shape.
    Do not put `.btn-clay` on a card, and do not reach for `--clay` for a second action on any screen.
-   `home-test.js` §D enumerates every use and asserts exactly one of them is an action. */
+   `home-test.js` §D enumerates every use and asserts exactly one of them is an action.
+   R5: this IS the spine's SLAB primitive (no separate .slab class — one clay container). Its torn radius
+   (15/5/13/5) is the shipped measurement of record; the board draws 14/5/12/6, reconciled to source. */
 .btn-clay{background:var(--clay);color:var(--porcelain);border:none;font-weight:600;font-size:14.5px;padding:12px 19px;border-radius:15px 5px 13px 5px;}
 .mast-act{display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-top:15px;}
 .mast-quiet{font-size:14.5px;color:var(--jade-deep);font-weight:500;padding:0;}
@@ -239,6 +244,9 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
 /* WS5 Library — photo shelf + grid⇄rows density + one type-aware status line per tea */
 .lib-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px;}
 .lib-head-actions{display:flex;align-items:center;gap:10px;}
+/* R5 spine pilot: the shelf masthead is a BAND (full-bleed --band stripe, radius 0). Layout only here;
+   fill/border/radius come from .band. Bleeds to the #app edges like .topbar (margin 0 -16px). */
+.lib-band{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 -16px 13px;padding:13px 16px;}
 .lib-count{font-size:12px;color:var(--ink-soft);margin:0 0 11px;}
 /* v3.84 (#23 F1) count row: count left, compact sort select right. flex-wrap is the 390px
    degradation — the select wraps BELOW the count text; the count segments never truncate. */
@@ -260,8 +268,9 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
 .density-toggle{display:flex;gap:3px;background:var(--porcelain-dim);border-radius:9px;padding:3px;}
 .density-seg{display:flex;align-items:center;justify-content:center;padding:5px 8px;border:none;background:none;border-radius:6px;color:var(--nav-inactive);}
 .density-seg.active{background:var(--white);color:var(--ink);}
-.btn-add{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:var(--porcelain);background:var(--jade);border:none;border-radius:999px;padding:6px 12px;}
-.btn-add:hover{background:var(--jade-deep);}
+/* R5 spine: the shelf's committing action is the SLAB — clay + torn radius inherited from .btn-clay,
+   sized for the masthead here. (Retired the old jade .btn-add pill — the surface's one action is clay.) */
+.btn-add-slab{display:inline-flex;align-items:center;gap:5px;font-size:13px;padding:9px 14px;}
 /* type pill on the shelf — colour/bg come from the shared .t-* classes (fixed both themes) */
 .shelf-pill{display:inline-flex;align-items:center;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;line-height:1.4;border-radius:999px;padding:3px 9px;flex:0 0 auto;}
 .shelf-status{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11.5px;}
@@ -283,7 +292,7 @@ html[data-theme="dark"] .shelf-kanji.t-white{background:#26241d;} html[data-them
 html[data-theme="dark"] .shelf-kanji.t-puerh{background:#2a241c;} html[data-theme="dark"] .shelf-kanji.t-puerh span{color:#544733;}
 /* grid density */
 .tea-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
-.shelf-card{background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;}
+.shelf-card{background:var(--white);border:1px solid var(--line);border-radius:2px;overflow:hidden;cursor:pointer;} /* R5 spine: a grid card is a BOX (one tea) — radius 2px, was 16px. */
 .shelf-card:hover{border-color:var(--jade);}
 .shelf-photo-wrap{position:relative;}
 .shelf-photo{height:100px;}
@@ -297,11 +306,12 @@ html[data-theme="dark"] .shelf-kanji.t-puerh{background:#2a241c;} html[data-them
 .shelf-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;}
 .shelf-row:last-child{border-bottom:none;}
 /* v4.20 — the shelf row leads with the liquor swatch (24×32 SVG, stroke/fill from tokens on the path
-   itself), and the photo trails as a small SQUARE thumb: 26×26, 5px radius, a hairline — deliberately
-   NOT the swatch's 9/4/8/5 tin radius, so photo and swatch read as different objects (R144's concern,
-   one level up). Kanji glyph shrinks with the box. .shelf-thumb is shelfRowHTML-only (verified). */
+   itself), and the photo trails as a small SQUARE thumb: 26×26, a hairline. R5 §1d sets its radius to the
+   BOX radius (2px, was 5px) — still NOT the swatch's 9/4/8/5 tin radius, so photo and swatch read as
+   different objects (R144's concern, one level up). Kanji glyph shrinks with the box. .shelf-thumb is
+   shelfRowHTML-only (verified). */
 .shelf-swatch{width:24px;height:32px;flex:0 0 auto;}
-.shelf-thumb{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);flex:0 0 auto;}
+.shelf-thumb{width:26px;height:26px;border-radius:2px;border:1px solid var(--line);flex:0 0 auto;}
 .shelf-kanji.shelf-thumb span{font-size:13px;}
 .shelf-row-mid{flex:1;min-width:0;}
 .shelf-row .shelf-name{font-size:15.5px;line-height:1.2;}
@@ -362,6 +372,18 @@ html[data-theme="dark"] .mood-chip.on{color:#15140F;}
 .img-upload .hl{color:var(--ink-soft);}
 
 /* generic */
+/* ---------- R5 surface-language spine (F31/F33): four containers replace one .card ----------
+   THE LAW (F31): the frame never carries a fill. Paper, line and type only; every fill on screen belongs
+   to a rationed mark (liquor, clay, xanthous, blue). Radius law: 0 or 2px on the frame; a torn (4-value)
+   radius is rationed to the liquor swatch (an SVG path, R145) and the clay SLAB (.btn-clay) alone.
+   Board: docs/r5/boards/surface-language-spine.dc.html. Rolled out per-surface, never globally (F33) —
+   these are the vocabulary; the shelf is slice 1's pilot (only .band is applied to markup this slice). */
+.rule{border-bottom:1px solid var(--line);border-radius:0;} /* the default (~70%): content on paper, split by hairlines. No background. */
+.rule-head{border-bottom:2px solid var(--ink);border-radius:0;} /* a section header beneath a 2px ink rule. */
+.band{background:var(--band);border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;} /* full-bleed paper-tone stripe; no side borders, no radius. */
+.box{background:var(--white);border:1px solid var(--line);border-radius:2px;} /* a discrete object (one tea, one session, a modal, a form). No shadow, ever. */
+/* SLAB — the clay committing action, one per screen — is the existing .btn-clay (no second clay
+   container, per R5 resolution); its torn radius is the only one a container is permitted. */
 .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;}
 .section{margin-top:22px;}
 .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
