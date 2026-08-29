@@ -136,12 +136,19 @@ This is the concrete answer to **R5-AUDIT §3 row 6** (Steeping — *"tasting-no
 vocabulary or a different entry method"*): the **different entry method IS this structured picker.** ("More
 vocabulary" is the deep mode above; "a different entry method" is this — cross-referenced there.)
 
+**Where it feeds — the reflection engine.** Structured input feeds the **character** half of the reflection
+engine (`docs/r5/planning/INSIGHT-ENGINE-SPEC.md`): the authoritative flavour profile, kept clean of the
+free-text noise the baseline excludes. The **brewing** half is separate and complementary — brew guidance
+comes from your **own sessions**, guided toward your **preference**, never a dictated correct brew (the
+refined baseline: behaviour × the tea's character, no single vendor's word).
+
 ## Related
 
 - Tea-First Principle — `PHASE2-PRESPEC-NOTES.md`
 - Liquor swatch three-tier model — R3 lock (user-set / catalog / none)
 - `tagLibrary` growth — the flavour vocabulary that accrues with use (both modes above)
 - Baseline principle — recommendations = behaviour × authoritative profile, never noisy free-text
+- `docs/r5/planning/INSIGHT-ENGINE-SPEC.md` — the reflection engine (structured input feeds its character half)
 - Social "kindred notes" → tea-database enrichment loop
 - **R5-AUDIT §3 row 6 (Steeping)** — the structured picker is the "different entry method"
 - `IDEA-label-scanner.md` — the other parked idea

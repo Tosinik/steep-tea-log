@@ -13,6 +13,13 @@ the identity surface that reads as **empty, not calm**. Home needs its **own con
 which is why R159 holds the frame and ships it combined with this, and why R160 says the austerity that is
 correct on the utility surfaces is *not* a mandate here.
 
+**The lead insight — the reflection engine.** Home's one present-tense revelation (the Seeds below are its
+candidates) is produced by the reflection engine specced in **`INSIGHT-ENGINE-SPEC.md`** — the same engine
+whose full reflection warms Insights (Home = the moment, Insights = the record). Its **governing principle
+is the refined baseline:** reflections read **behaviour × the tea's character, never noisy free-text**;
+**no single vendor is the truth** (vendor reliability varies); and brewing is **guided discovery toward the
+user's own preference**, not a dictated correct brew. Every Home insight must satisfy that baseline.
+
 ## Guardrails (a Home idea must clear all four)
 
 - **Present / forward tense (R115).** Home answers *"what now"* — the next cup, a forward hook — **never a
