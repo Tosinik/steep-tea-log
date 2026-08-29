@@ -46,6 +46,44 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.26 — R5 slice 4: Insights re-dressed to the spine + a register-cull (R161 / R162)
+Deploy: styles.css, steep-insights.js, steep-dashboard.js, steep-version.js (APP_VERSION v4.26 + WHATS_NEW),
+service-worker.js (**v136**), fixtures/frame-test.js, fixtures/insights-room-test.js, fixtures/home-test.js,
+fixtures/stat-period-test.js. **No SQL.** *(Docs — CHANGELOG.md, STATE.md, R3-RULINGS-LEDGER.md R161–R162,
+HOME-VISION.md, and the banked board docs/r5/boards/insights-redress.dc.html — push with this deploy.)*
+
+Insights read the same as pre-overhaul — six white `.stat` boxes holding six numbers is the old app. This
+slice gives it the spine, containers only + a scoped copy pass, and culls three cards that duplicate
+elsewhere or break the surface's own register.
+
+- **The four containers.** Hero → **BAND** (`.ins-band` composes `.band`; the `--jade-pale`/15px fill-law
+  breach retires; the unlabelled hour bars are dropped — they duplicated the labelled brewing clock, which
+  stays). The `totals` / `cost` / `week` KPI tiles → **RULE** hairline **ledger rows** (`.ins-row`) under
+  `.ins-sechead` 2px ink rule-heads — a number on a hairline row is a ledger entry, not a scoreboard.
+  `typemix` / `notes` were already RULE. **Wrapped** + **Origins** are the two **BOX**es (`.ins-door`,
+  `--white`/2px; `.ins-teaser`'s baked `#2A4130` retires), Wrapped more prominent (it read hidden). **0
+  SLAB** — a retrospective commits to nothing.
+- **`.stat` retired** — it was Insights-only (totals + cost, 12 uses, all de-boxed here); `viewSpend` never
+  used it.
+- **Three culls** (each a source-traced duplication/breach): **`cadence`** — the one card whose observation
+  was a vs-last-month comparative, which the surface's register forbids (steep-insights.js:76-82);
+  **`steepshape`** — an unlabelled curve, one of two sentences off no-scale axes, absent for most loggers;
+  **`recent`** — four rows of the Sessions tab (R118 same detail view). Self-migrating: `dashLayout()`
+  filters saved layouts against `DASH_DEFAULT_ORDER`.
+- **Copy (scoped):** only the hero eyebrow's window labels — "This week, mostly"→"This week", "Lately,
+  mostly"→**"Last four weeks"** (the honesty fix — it never said 28 days), "Mostly"→"All time". The type-mix
+  "leads the cup" wording is kept as-is; Origins content is parked (frame only).
+- **Fence (R162):** `SURFACES.insights` added, `.ins-door` positive, three controls bite, plus a new
+  **zero-clay** assertion (`chkNoClay`) — no `var(--clay)` on any Insights selector, an assertion only a
+  0-SLAB surface can make. **22 → 28 checks.**
+- **Cadence's neutral pattern migrates to Home** (`HOME-VISION.md`): the non-comparative "when/how you brew"
+  flavor belongs on the present-tense surface, not the retrospective one.
+
+Rulings: **R161** (Insights re-dressed + register-cull) · **R162** (fence 4th surface + zero-clay). Suite
+updates: `insights-room` (culled builders removed, hero-BAND + no-bars, window eyebrow), `home-test` (B5
+teaser→door, E2/E10 recent culled), `stat-period` (parses `.ins-row`, not `.stat`). 33 suites green. This is
+the **v4.25→v4.26** transition — the deploy that first confirms R158's banner fix on device (`smoke.md §v4.25`).
+
 ## v4.25 — the update banner shows the INCOMING version's note (#36 / R158)
 Deploy: **new** `steep-version.js`, **new** `fixtures/update-banner-test.js`; `index.html` (script added,
 first), `service-worker.js` (`importScripts` + `GET_WHATS_NEW` + `FILES_TO_CACHE` += `./steep-version.js`

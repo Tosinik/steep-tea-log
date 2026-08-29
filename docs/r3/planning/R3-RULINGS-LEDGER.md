@@ -2181,6 +2181,38 @@ Home, alone among the surfaces, earns visual warmth beyond the utility spine. Th
 re-flattening Home into a utility list when its combined redress (R159) is designed. *(Companion to R159;
 recorded in HOME-VISION.md and R5-AUDIT §6.)*
 
+**R161 — Insights re-dressed to the spine, and the surface enforces its own register by culling the card
+that broke it.** R5 slice 4 (v4.26) redresses `viewInsights` — containers only + a scoped copy pass. The
+worst fill-law breach (`.ins-hero`: `--jade-pale` on a frame at 15px) becomes the **BAND** (`.ins-band`
+composes `.band`); the six `.stat` KPI tiles (the priority miss — a boxed number is a scoreboard) de-box
+into hairline **ledger rows** (`.ins-row`) under an `.ins-sechead` (2px ink rule-head) — same for the cost
+card's five tiles; `week` becomes one ledger row; the two doors (**Wrapped**, **Origins**) are the surface's
+two **BOX**es (`.ins-door`, `--white`/2px — `.ins-teaser`'s baked `#2A4130` and `.org-entry`'s 14px retire),
+Wrapped taking the prominent `.ins-door-lead` because it read hidden. **`.stat` is retired** (Insights-only,
+12 uses, all here; `viewSpend`/`viewAchievements` never used it — the "keep it for Spend" flag was a
+mis-read, corrected). **Three culls, each a duplication or a register breach traced in source:** `cadence`
+(`insReadingHTML`) — the ONE card whose observation was a vs-last-month *comparative*, which the surface's
+own register forbids (steep-insights.js:76-82, "observations AS SENTENCES, no vs-last-week %"); `steepshape`
+— an unlabelled curve, one of two sentences off no-scale axes, absent for most loggers; `recent` — four
+rows of the Sessions tab (R118 same detail view). Culls are self-migrating: `dashLayout()` filters saved
+order/hidden against `DASH_DEFAULT_ORDER`, and a stale surface-override never renders. **Copy pass (scoped
+by correction):** only the hero eyebrow's window labels ("This week, mostly"→"This week"; "Lately,
+mostly"→"Last four weeks", the honesty fix — it never said 28 days; "Mostly"→"All time"). The type-mix
+"leads the cup" observation is kept as-is (approved); Origins content is parked (frame only). The hero's
+unlabelled `ins-bars` is dropped (it duplicated the labelled, named-peak brewing clock, which is kept — the
+board's "clock duplicates hero" was backwards) and its `hours` array with it. **calm ≠ spare (R160)** — the
+warmth that survives is information, not decoration. *(steep-insights.js, steep-dashboard.js, styles.css;
+board docs/r5/boards/insights-redress.dc.html, banked in this commit byte-verbatim.)*
+
+**R162 — the fill-law fence gains its 4th surface and a ZERO-CLAY assertion only a slab-less surface can
+make.** `fixtures/frame-test.js`: `SURFACES.insights = ['.ins-band','.ins-sec','.ins-sechead','.ins-door']`;
+the positive subject is `.ins-door` (`--white`/2px, a real BOX). Three controls bite on Insights' own
+selectors (jade-pale on `.ins-sec`; 15px on `.ins-band`; torn on `.ins-door`). The new capability: Insights
+carries **0 SLAB** (a retrospective commits to nothing — the board's own count), so a new `chkNoClay(css,
+selectors)` asserts no `var(--clay)` on ANY Insights frame selector — an assertion no committing surface
+could make — with a control (clay injected on `.ins-sec`) proving it bites. 22 → **28 checks**. *(fixtures/
+frame-test.js.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

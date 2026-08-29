@@ -191,7 +191,35 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.25 SHIPPED, LIVE `55a16ff` — the update banner shows the INCOMING version's note (#36 / R158)**
+**NOW — v4.26 SHIPPED, LIVE `7e0a3a2` — R5 slice 4: Insights re-dressed to the spine + a register-cull**
+(cache **v136**, APP_VERSION v4.26, **no SQL**). Insights read as the old app (six white `.stat` boxes).
+This gives it the spine — **containers only + a scoped copy pass** — and culls three cards. NOT held
+(Insights is the retrospective surface; redress-in-isolation is fine, unlike Home).
+- **What shipped:** hero → **BAND** (`.ins-band`; `--jade-pale`/15px retired; the unlabelled `ins-bars` hour
+  graph dropped — it duplicated the labelled brewing clock, which **stays**). `totals`/`cost`/`week` KPI
+  tiles → **RULE** ledger rows (`.ins-row`) under `.ins-sechead` rule-heads; `typemix`/`notes` already RULE.
+  **Wrapped** + **Origins** → the two **BOX**es (`.ins-door`, `--white`/2px; `.ins-teaser`'s `#2A4130`
+  retired), Wrapped prominent. **0 SLAB.** `.stat` **retired** (Insights-only). Files: `styles.css`,
+  `steep-insights.js`, `steep-dashboard.js`, `steep-version.js` (v4.26), `service-worker.js` (v136), 4
+  fixtures.
+- **Three culls** (source-traced): **`cadence`** — the one vs-last-month *comparative*, which the surface's
+  own register forbids (steep-insights.js:76-82); **`steepshape`** — unlabelled curve; **`recent`** —
+  Sessions-tab duplicate (R118). Self-migrating (`dashLayout()` filters against `DASH_DEFAULT_ORDER`).
+- **Copy (scoped):** hero eyebrow window labels only ("Lately, mostly"→**"Last four weeks"**, the honesty
+  fix). "leads the cup" kept as-is; Origins content parked. **Fence R162:** `SURFACES.insights` + `.ins-door`
+  positive + 3 controls + new **zero-clay** `chkNoClay` (a claim only a 0-SLAB surface makes). **22 → 28
+  checks. 33 suites green.** Ledger: **R161** / **R162**. Cadence's non-comparative pattern → Home
+  (`HOME-VISION.md`).
+- **Phone look (F33 grouping-read):** ledger rows read as one ledger; sections stay distinct; hero reads as
+  a sentence. **Known interaction:** `week` renders a single ledger row *above* the hero band (DASH order
+  puts it first) — pre-existing order, de-boxed not re-ordered; flag if it reads oddly. **This is the
+  v4.25→v4.26 transition** → run **`smoke.md §v4.25`** (first on-device confirmation of R158's banner fix).
+- **NEXT:** **Home** stays HELD (R159/R160 — the combined frame+content effort, gated by `HOME-VISION.md`).
+  Remaining R5: shelf board-13-rev2 tints, steeping (reorder + tasting input), **tea-detail**
+  mark-remediation (inline `--jade-pale` → rationed marks; needs a markup guard, not the CSS fence), and the
+  clay-grams one-liner backlog. **SECURITY stays the deferred pre-widening gate.**
+
+**Previously — v4.25 (SHIPPED, LIVE `55a16ff`) — the update banner shows the INCOMING version's note (#36 / R158)**
 (cache **v135**, APP_VERSION v4.25, **no SQL**). A correctness fix, not an R5 slice. **The bug:**
 `showUpdateBanner` read `WHATS_NEW` from the **running (old) page**, so the banner's sub-line always
 described the version being *left*; secondary, a worker still **installing** at page-load (its

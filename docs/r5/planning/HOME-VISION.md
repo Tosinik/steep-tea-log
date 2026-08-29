@@ -38,6 +38,11 @@ correct on the utility surfaces is *not* a mandate here.
   life the utility spine deliberately omits (R160).
 - **Existing backlog candidates** — palate-this-season, mood-time patterns, per-tea sweet-spot (the
   smarter-over-time backlog).
+- **Cadence's neutral pattern (migrated from Insights, R161)** — Insights culled its Cadence card because
+  its observation was a vs-last-month *comparative* ("a touch less than last month"), which broke the
+  retrospective register. The **non-comparative** flavor of it — *when/how you brew*, a present-tense
+  rhythm rather than a judgement against last month — belongs on Home, not Insights. It overlaps
+  mood-time-patterns; keep it non-comparative and forward (never "you brewed less").
 
 ## Status
 

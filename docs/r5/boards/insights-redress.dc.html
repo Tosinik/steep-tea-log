@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#CFC6B2; font-family:'IBM Plex Mono', monospace; }
+  a { color:#8A5A1E; }
+  a:hover { color:#69160F; }
+</style>
+</helmet>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#CFC6B2;">
+
+  <div style="max-width:1180px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:2px;">R5 · TURN 1 · INSIGHTS</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:2px;">REDRESS · CULL PROPOSED, NOT TAKEN · COPY PROPOSED</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:30px; color:#2B2320; margin:0;">A ledger, not a scoreboard</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1000px; margin:0; line-height:1.7; text-wrap:pretty;">Insights never got the spine, and it shows in one place worst: six white boxes at <code>border-radius:12px</code> holding six numbers. The data is right; the presentation is the old app. Three moves below — the frame, a proposed cull, plainer strings — plus the fence extended so this surface is actually watched. The surface's own structure is closer than it looks: <code>.ins-sec</code> is already a hairline-topped section, which is a RULE in everything but its head.</p>
+  </div>
+
+  <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="1a" style="display:flex; flex-direction:column; gap:9px; width:640px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1a · REDRESS MAPPING</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">TWELVE CARDS · BOX-TESTED</span>
+      </div>
+
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:19px 22px 12px; border-bottom:2px solid #2B2320; display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:#2B2320;">Every card, and what it becomes</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">SHIPPED → SPINE</span>
+        </div>
+        <sc-for list="{{ mapping }}" as="m" hint-placeholder-count="12">
+          <div style="padding:13px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:14px; align-items:flex-start;">
+            <div style="width:104px; flex:none; display:flex; flex-direction:column; gap:3px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:13.5px; color:#2B2320; line-height:1.25;">{{ m.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:#8C7F6C;">{{ m.id }}</span>
+            </div>
+            <div style="width:74px; flex:none; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#F6F2E9; background:{{ m.tone }}; padding:2px 6px; border-radius:2px; align-self:flex-start;">{{ m.container }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:{{ m.flagFg }};">{{ m.flag }}</span>
+            </div>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-size:12px; color:#2B2320; line-height:1.55;">{{ m.reason }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8A5A1E; line-height:1.45;">{{ m.was }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">THE COUNT</span>
+          <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:baseline;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">1 BAND</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">5 RULE</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">2 BOX (both doors)</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#69160F;">0 SLAB</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8A5A1E;">4 CULL PROPOSED</span>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">Zero SLAB is the assertion: a retrospective surface has nothing to commit to. Contract 2 says at most one per surface, not one — Insights correctly carries none, and no card may bring clay in when a user moves it here. The two BOXes are both doors out (Wrapped, Origins); nothing else on the surface is an object.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" style="display:flex; flex-direction:column; gap:9px; width:452px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1b · DRAWN</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SURVIVORS DRAWN · CANDIDATES MARKED</span>
+      </div>
+
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; overflow:hidden;">
+
+        <div style="background:#EDE7D6; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:15px 16px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#8C7F6C;">THIS WEEK</span>
+          <div style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; line-height:1.18; color:#2B2320; margin-top:5px;">Green, and mornings.</div>
+          <div style="display:flex; align-items:flex-end; gap:3px; height:34px; margin-top:13px;">
+            <sc-for list="{{ heroBars }}" as="b" hint-placeholder-count="12">
+              <span style="flex:1; background:#3F5E42; border-radius:2px 2px 0 0; height:{{ b.h }}; opacity:{{ b.o }};"></span>
+            </sc-for>
+          </div>
+          <div style="font-size:12px; color:#5C5148; margin-top:9px; line-height:1.45;">8 of your 21 steeps came in the morning.</div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:9px;">BAND · was .ins-hero: --jade-pale fill at 15px radius. Both retire; the hour bars stay as the mark.</span>
+        </div>
+
+        <div style="padding:0 16px 18px;">
+
+          <div style="margin-top:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:2px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">All-time</span>
+              <div style="display:flex; gap:2px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#2B2320; background:#FFFEFB; border:1px solid #D8CFB9; padding:3px 7px;">All-time</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C; padding:3px 7px;">Month</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C; padding:3px 7px;">Week</span>
+              </div>
+            </div>
+            <sc-for list="{{ ledger }}" as="l" hint-placeholder-count="6">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #D8CFB9;">
+                <span style="font-size:13px; color:#2B2320;">{{ l.k }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:#2B2320;">{{ l.v }}</span>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#69160F; display:block; margin-top:7px;">THE PRIORITY MISS, FIXED · six .stat boxes (--white, 12px radius, centred, jade-deep numerals) → six ledger rows. Same six figures, same period toggle, no boxes.</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:9px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Cadence</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">8 weeks</span>
+            </div>
+            <sc-if value="{{ proposedVoice }}" hint-placeholder-val="{{ true }}">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15px; color:#2B2320; display:block;">Fewer sessions than last month.</span>
+            </sc-if>
+            <sc-if value="{{ currentVoice }}" hint-placeholder-val="{{ false }}">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15px; color:#69160F; display:block;">A touch less than last month — and unhurried about it.</span>
+            </sc-if>
+            <svg viewBox="0 0 200 34" preserveAspectRatio="none" style="width:100%; height:30px; display:block; margin-top:8px;"><polyline points="0,8 28,14 57,6 85,17 114,12 142,22 171,19 200,26" fill="none" stroke="#3F5E42" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C; display:block; margin-top:3px;">sessions · last 8 weeks</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:9px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Type mix</span>
+            </div>
+            <sc-if value="{{ proposedVoice }}" hint-placeholder-val="{{ true }}">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15px; color:#2B2320; display:block;">Most-brewed: green.</span>
+            </sc-if>
+            <sc-if value="{{ currentVoice }}" hint-placeholder-val="{{ false }}">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15px; color:#69160F; display:block;">Green leads the cup.</span>
+            </sc-if>
+            <div style="height:10px; border-radius:6px; overflow:hidden; display:flex; margin-top:10px;">
+              <span style="display:block; height:100%; width:44%; background:#5B9440;"></span>
+              <span style="display:block; height:100%; width:26%; background:#9A5330;"></span>
+              <span style="display:block; height:100%; width:18%; background:#C79328;"></span>
+              <span style="display:block; height:100%; width:12%; background:#6E4A34;"></span>
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8C7F6C;">
+              <span>green</span><span>black</span><span>oolong</span><span>pu-erh</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:8px;">The stacked bar and its swatches are MARKS (type tints) — excluded from the frame, and the same deferred type-tint item as Home's today-tint.</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:10px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Notes</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:11px;">
+              <div style="display:flex; flex-direction:column; gap:2px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.06em; color:#8C7F6C;">MOST REACHED-FOR</span>
+                <span style="font-size:13px; font-weight:600; color:#2B2320;">Liu Bao 2016 · ×9</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:2px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.06em; color:#8C7F6C;">HIGHEST NOTE</span>
+                <span style="font-size:13px; font-weight:600; color:#2B2320;">Da Hong Pao ★★★★½</span>
+              </div>
+            </div>
+          </div>
+
+          <sc-if value="{{ showCandidates }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#69160F;">CULL CANDIDATES · DRAWN IN PLACE, NOT DELETED</span>
+              <sc-for list="{{ candidates }}" as="c" hint-placeholder-count="4">
+                <div style="border:1px dashed rgba(105,22,15,0.45); padding:10px 12px; display:flex; flex-direction:column; gap:3px;">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
+                    <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:13px; color:#69160F;">{{ c.name }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.08em; color:#8C7F6C;">{{ c.id }}</span>
+                  </div>
+                  <span style="font-size:11px; color:#4A4038; line-height:1.5;">{{ c.why }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div style="margin-top:20px; display:flex; flex-direction:column; gap:11px;">
+            <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:2px; padding:14px 15px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; flex-direction:column; gap:2px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">LAST MONTH</span>
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2B2320;">Your July, wrapped</span>
+              </div>
+              <span style="font-size:18px; color:#8A5A1E; line-height:1;">→</span>
+            </div>
+            <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:2px; padding:14px 15px; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">ORIGINS</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15px; color:#2B2320;">3 of your teas name where they grew.</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C;">2 name only a country.</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8A5A1E; margin-top:3px;">Open the atlas →</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E;">TWO BOXES, BOTH DOORS · 2px, --white. The teaser's baked #2A4130 (fixed in both themes, radius 13px) retires: prominence is type and the arrow, not a fill.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="1c" style="display:flex; flex-direction:column; gap:9px; width:520px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#8A5A1E; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1c · CULL PROPOSAL</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">PLANNING + NIKLAS RULE · NOT TAKEN HERE</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:18px 22px 12px; border-bottom:2px solid #2B2320;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2B2320;">Four that may not be earning it</span>
+          <div style="font-size:11.5px; color:#5C5148; line-height:1.55; margin-top:5px;">Each reason is a duplication I can point at in source, not a taste call. Cost overview stays (confirmed). The graph Niklas flagged is <strong>Steep shape</strong> — the curve; Cadence reading is the sparkline, and it survives here for the reason in its row.</div>
+        </div>
+        <sc-for list="{{ cull }}" as="c" hint-placeholder-count="5">
+          <div style="padding:16px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:14px; align-items:flex-start;">
+            <div style="width:88px; flex:none; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:13.5px; color:#2B2320; line-height:1.25;">{{ c.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; color:{{ c.fg }};">{{ c.verdict }}</span>
+            </div>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;">
+              <span style="font-size:12px; color:#2B2320; line-height:1.6;">{{ c.why }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8A5A1E; line-height:1.45;">{{ c.keepCase }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">IF A CULL IS TAKEN</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">A culled card is not deleted from the registry blindly: <code>dashLayout()</code> filters saved <code>{order,hidden}</code> against <code>DASH_DEFAULT_ORDER</code>, so dropping an id is self-migrating — but anyone who moved that card to Home loses it there too, and <code>week</code> is the one card people do move. That is a planning call, and it is the reason this board proposes rather than cuts.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1d" style="display:flex; flex-direction:column; gap:9px; width:600px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1d · COPY</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">CURRENT → PLAINER · NIKLAS APPROVES THE VOICE</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:18px 22px 12px; border-bottom:2px solid #2B2320;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2B2320;">State the thing</span>
+          <div style="font-size:11.5px; color:#5C5148; line-height:1.55; margin-top:5px;">The tic is a second clause that comments on the first — "and unhurried about it", "the pot's seeing you often", "as the session settles". Deleting the clause is usually the whole fix. Every string below is quoted from source.</div>
+        </div>
+        <sc-for list="{{ copy }}" as="c" hint-placeholder-count="9">
+          <div style="padding:14px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:14px; align-items:flex-start;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.06em; color:#8C7F6C; width:76px; flex:none; padding-top:2px;">{{ c.where }}</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-size:12.5px; color:#69160F; line-height:1.5; text-decoration:line-through; text-decoration-color:rgba(105,22,15,0.4);">{{ c.now }}</span>
+              <span style="font-size:13px; color:#2B2320; line-height:1.5; font-weight:600;">{{ c.next }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#8A5A1E; line-height:1.4;">{{ c.note }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:17px 22px; display:flex; flex-direction:column; gap:9px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">THE FLOOR · CALM ≠ SPARE (R160)</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.65;">Three strings are already plain and must survive the pass: the hero title (<em>"Green, and mornings."</em>), the hero sub (<em>"8 of your 21 steeps came in the morning."</em>), and the empty state (<em>"No sessions yet — your insights and Wrapped fill in as you log."</em>). Plainer is not shorter — <code>ins-cap</code>'s "sessions · last 8 weeks" earns its words by naming the unit and the window. What goes is decoration, not information.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1e" style="display:flex; flex-direction:column; gap:9px; width:560px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1e · THE FENCE</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">frame-test.js · INSIGHTS ADDED WITH TEETH</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:18px 22px 12px; border-bottom:2px solid #2B2320;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2B2320;">Four selectors, one positive subject, three controls</span>
+          <div style="font-size:11.5px; color:#5C5148; line-height:1.55; margin-top:5px;">A surface in <code>SURFACES</code> that no control bites on is fenced in name only — the checkers null-skip a selector carrying no fill or radius, so silence proves nothing. Insights ships its own controls, each on one of its own selectors.</div>
+        </div>
+        <div style="padding:16px 22px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:9px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">REGISTRY</span>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#2B2320; line-height:1.85; white-space:pre-wrap; background:#FFFEFB; border:1px solid #D8CFB9; padding:12px 13px;">{{ registry }}</div>
+        </div>
+        <sc-for list="{{ fence }}" as="f" hint-placeholder-count="5">
+          <div style="padding:14px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:12px; align-items:flex-start;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; color:#F6F2E9; background:{{ f.tone }}; padding:2px 6px; border-radius:2px; flex:none;">{{ f.tag }}</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-size:12px; color:#2B2320; line-height:1.55;">{{ f.d }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E; line-height:1.5; white-space:pre-wrap;">{{ f.code }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#8A5A1E;">EXCLUDED, AND WHY</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">Marks and evidence are not frame: the hero's hour bars (<code>.ins-bar</code>, jade), the sparkline and curve strokes, the stacked type bar and its swatches (<code>.ins-typebar</code> 6px, <code>.ins-sw</code> 2px). The period toggle is a control, not a frame — its 6px radii belong to a controls pass, not this fence. The type-tint family stays a REPORTED deferral, same thread as the shelf photo tint (R149) and Home's today-tint: the fence is built to see it, and the rollout resolves it.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1f" style="display:flex; flex-direction:column; gap:9px; width:520px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1f · RULINGS</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">PLANNING MINTS ON SHIP</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <sc-for list="{{ rulings }}" as="r" hint-placeholder-count="5">
+          <div style="padding:18px 22px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#F6F2E9; background:{{ r.tone }}; padding:3px 7px; border-radius:2px;">{{ r.tag }}</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15.5px; color:#2B2320;">{{ r.title }}</span>
+            </div>
+            <span style="font-size:12.5px; color:#2B2320; line-height:1.65;">{{ r.body }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E; line-height:1.5;">{{ r.src }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">MEASURED FROM SOURCE</span>
+          <span style="font-size:11px; color:#4A4038; line-height:1.6;">HEAD f375a38 · v4.25. <code>viewInsights</code> / <code>dashCardsInsights</code> / <code>computeInsights</code> (steep-insights.js), <code>DASH_SURFACE</code> + <code>dashCardsHome</code> totals/clock/cost/week (steep-dashboard.js), <code>.ins-*</code> 917-951 + <code>.stat</code> 12px + <code>.week-card</code> (styles.css), <code>SURFACES</code> (fixtures/frame-test.js).</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;copyVoice&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;proposed&quot;,&quot;current&quot;],&quot;default&quot;:&quot;proposed&quot;,&quot;tsType&quot;:&quot;'proposed' | 'current'&quot;,&quot;section&quot;:&quot;Review&quot;,&quot;label&quot;:&quot;Observation strings in 1b&quot;},&quot;showCullCandidates&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Review&quot;,&quot;label&quot;:&quot;Mark cull candidates in 1b&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const voice = this.props.copyVoice ?? 'proposed';
+    return {
+      proposedVoice: voice === 'proposed',
+      currentVoice: voice === 'current',
+      showCandidates: this.props.showCullCandidates ?? true,
+
+      heroBars: [
+        {h:'18%',o:0.4},{h:'34%',o:0.6},{h:'100%',o:1},{h:'72%',o:0.85},{h:'26%',o:0.5},{h:'44%',o:0.66},
+        {h:'58%',o:0.75},{h:'30%',o:0.55},{h:'22%',o:0.45},{h:'40%',o:0.62},{h:'14%',o:0.32},{h:'8%',o:0.18}
+      ],
+      ledger: [
+        {k:'Sessions', v:'142'}, {k:'Infusions', v:'613'}, {k:'Days logged', v:'96'},
+        {k:'Grams brewed', v:'784.5'}, {k:'Liters (est.)', v:'112.4'}, {k:'Teas brewed', v:'21'}
+      ],
+
+      mapping: [
+        { name:'Hero', id:'hero \u00b7 insHeroHTML', container:'BAND', tone:'#3F5E42', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'The surface\u2019s identity head and its one observation to land on \u2014 the same job the shelf\u2019s band does. Not an object, so not a BOX.',
+          was:'WAS .ins-hero: background var(--jade-pale), border-radius 15px \u2014 a rationed tone on a frame, at an unrationed radius. Both retire.' },
+        { name:'Totals', id:'totals \u00b7 the stat trio', container:'RULE', tone:'#5C5148', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'Six figures under a named window. A number in a centred box is a KPI tile; the same number on a hairline row is a ledger entry, which is what a retrospective surface reads as.',
+          was:'WAS 6\u00d7 .stat: --white, border-radius 12px, centred, 24px mono in --jade-deep. THE MOST VISIBLE MISS \u2014 this is the old app.' },
+        { name:'Cadence reading', id:'reading \u00b7 insReadingHTML', container:'RULE', tone:'#5C5148', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'The only trend on the surface, and eight weeks of sessions is legible at a glance. Gains a rule-head; the sparkline is a mark riding on paper.',
+          was:'WAS .ins-sec (hairline top, 16px margin) \u2014 already a RULE in all but its head. Copy is the worst offender in 1d.' },
+        { name:'Type mix', id:'typemix \u00b7 insTypeMixHTML', container:'RULE', tone:'#5C5148', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'One slim bar and a legend: the mix is a proportion, and a proportion wants a single row, not a panel.',
+          was:'WAS .ins-sec. The bar and swatches stay as marks (type tints) \u2014 excluded from the frame.' },
+        { name:'Quiet notes', id:'notes \u00b7 insNotesHTML', container:'RULE', tone:'#5C5148', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'Two labelled facts. Rows on paper is exactly its weight \u2014 it was never a leaderboard and now cannot look like one.',
+          was:'WAS .ins-sec .ins-notes. Icons (leaf, hanko) are marks and stay.' },
+        { name:'Cost overview', id:'cost \u00b7 CONFIRMED KEEP', container:'RULE', tone:'#5C5148', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'Money is the one thing here you act on. Its own 3-up .stat grid de-boxes into ledger rows like totals, and its low-stock list is already hairline rows.',
+          was:'WAS .section.card + 3\u00d7 .stat (12px) + .rank-row rows. Two nested card layers collapse to one RULE section.' },
+        { name:'Wrapped teaser', id:'wrapped \u00b7 insWrappedTeaserHTML', container:'BOX', tone:'#2B2320', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'A door: one named destination you open. That is the BOX test passing \u2014 it has an edge because it is a discrete thing, like a tea on the shelf.',
+          was:'WAS .ins-teaser: background #2A4130 baked for both themes, border-radius 13px. The fill retires; type and the arrow carry it.' },
+        { name:'Origins', id:'origins \u00b7 insOriginsHTML', container:'BOX', tone:'#2B2320', flag:'KEEP', flagFg:'#3F5E42',
+          reason:'The other door \u2014 same treatment, so the two read as a pair of exits rather than two unrelated panels.',
+          was:'WAS .section.card.org-entry, radius 14px. Pinned to Insights by DASH_PINNED (R54); the redress does not move it.' },
+        { name:'Sessions this week', id:'week \u00b7 dashCardsHome', container:'RULE', tone:'#8C7F6C', flag:'CULL?', flagFg:'#69160F',
+          reason:'If it survives: one ledger row, not a 32px jade numeral in a box. Redressing it here also fixes it on any Home that overrides it in \u2014 the treatment travels with the helper.',
+          was:'WAS .section.card.week-card + .week-num 32px --jade. See 1c \u2014 the totals ledger already prints this number under this word.' },
+        { name:'Brewing clock', id:'clock \u00b7 brewingClockHTML', container:'RULE', tone:'#8C7F6C', flag:'CULL?', flagFg:'#69160F',
+          reason:'If it survives: a RULE section, bars as marks on paper, no panel.',
+          was:'WAS .section.card + .clock-chart. See 1c \u2014 the hero already draws this distribution.' },
+        { name:'Steep shape', id:'steepshape \u00b7 THE FLAGGED CURVE', container:'RULE', tone:'#8C7F6C', flag:'CULL?', flagFg:'#69160F',
+          reason:'If it survives: a RULE section with the amber curve as the mark. This is the graph Niklas flagged \u2014 the keep/kill case is in 1c.',
+          was:'WAS .ins-sec + .ins-shape (amber polyline, unlabelled axes).' },
+        { name:'Recent sessions', id:'recent \u00b7 dashCardsHome', container:'RULE', tone:'#8C7F6C', flag:'CULL?', flagFg:'#69160F',
+          reason:'If it survives: it is already .rank-row hairlines inside a card \u2014 de-carding costs it nothing.',
+          was:'WAS .section.card + 4\u00d7 .rank-row. See 1c \u2014 the Sessions tab is a longer version of this list.' }
+      ],
+
+      candidates: [
+        { name:'Sessions this week', id:'week', why:'The totals ledger prints this number under this word when the period is Week.' },
+        { name:'Brewing clock', id:'clock', why:'The hero band already draws the hour distribution, twelve 2-hour bars.' },
+        { name:'Steep shape', id:'steepshape', why:'Says one of two sentences, ever, off an unlabelled curve.' },
+        { name:'Recent sessions', id:'recent', why:'Four rows of what the Sessions tab lists in full.' }
+      ],
+
+      cull: [
+        { name:'Sessions this week', verdict:'CULL', fg:'#69160F',
+          why:'A duplicate under the same word: with the period on Week, the totals ledger\u2019s first row is "Sessions \u00b7 14" \u2014 the same figure this card renders at 32px. stat-period-test\u2019s own rule is that surfaces say the same number under the same word; here one surface says it twice.',
+          keepCase:'KEEP-CASE: it is the card users move to Home, where it is the only figure. A cull on Insights takes it off those Homes too \u2014 see the note below.' },
+        { name:'Brewing clock', verdict:'CULL', fg:'#69160F',
+          why:'The hero band draws the same distribution: insHeroData buckets sessions into twelve 2-hour slots and renders them as bars, directly above. The clock is the same data at hourly resolution, one section later.',
+          keepCase:'KEEP-CASE: hourly is finer than 2-hourly, and the clock is the only place the resolution exists. If it stays, the hero\u2019s bars should go instead \u2014 not both.' },
+        { name:'Steep shape', verdict:'CULL \u00b7 NIKLAS\u2019 FLAG', fg:'#69160F',
+          why:'The curve Niklas flagged. It has exactly two things to say \u2014 "stretch" or "even measure" \u2014 chosen by comparing the last value to the first, and it draws them on axes with no scale: no seconds, no steep numbers, just a rising line. It also needs \u22653 steep indices with \u22652 timed sessions each, so it is absent for most loggers.',
+          keepCase:'KEEP-CASE: it is the only card about HOW you brew rather than how much. If it stays, it needs an axis \u2014 the caption already lists the real durations, so the fix is to label the line, not to redraw it.' },
+        { name:'Recent sessions', verdict:'CULL', fg:'#69160F',
+          why:'Four rows of the Sessions tab. R118 routes both to the same detail view, so it is a shortcut to a list one tap away \u2014 and Home\u2019s "Earlier today" already covers the recent end for today.',
+          keepCase:'KEEP-CASE: it is the only way from a number on this surface back into a specific session. If Insights is where you reflect, a way in matters.' },
+        { name:'Cadence reading', verdict:'KEEP', fg:'#3F5E42',
+          why:'Survives the same scrutiny the curve fails: the sparkline is eight weeks of session counts with a captioned unit and window, and it is the only trend on the surface. Its problem is the sentence above it, not the drawing.',
+          keepCase:'FIX IS COPY, NOT CONTAINER \u2014 see 1d.' }
+      ],
+
+      copy: [
+        { where:'reading \u00b7 down', now:'A touch less than last month \u2014 and unhurried about it.', next:'Fewer sessions than last month.',
+          note:'The second clause reassures you about a fact the app has no feelings about.' },
+        { where:'reading \u00b7 up', now:'A little more than last month \u2014 the pot\u2019s seeing you often.', next:'More sessions than last month.',
+          note:'"The pot\u2019s seeing you often" gives the crockery a point of view.' },
+        { where:'reading \u00b7 steady', now:'About the same as last month \u2014 a steady rhythm.', next:'About the same as last month.',
+          note:'"A steady rhythm" restates the first clause in nicer words.' },
+        { where:'reading \u00b7 no trend', now:'Your cups, week by week.', next:'Sessions, week by week.',
+          note:'"Cups" is not the unit being drawn \u2014 the caption below says sessions.' },
+        { where:'typemix \u00b7 clear lead', now:'Green leads the cup.', next:'Most-brewed: green.',
+          note:'"Leads the cup" is a race the tea is not in.' },
+        { where:'typemix \u00b7 close', now:'Green leads; black\u2019s catching up.', next:'Green and black, nearly even.',
+          note:'States the proportion instead of narrating a contest.' },
+        { where:'steepshape \u00b7 rising', now:'Your steeps stretch as the session settles.', next:'Later steeps run longer.',
+          note:'"As the session settles" is the tic in its purest form. (Moot if the card is culled.)' },
+        { where:'steepshape \u00b7 flat', now:'Your steeps keep an even measure.', next:'Steeps stay about the same length.',
+          note:'"An even measure" is poetry for "about the same".' },
+        { where:'hero \u00b7 eyebrows', now:'This week, mostly \u00b7 Lately, mostly \u00b7 Mostly', next:'This week \u00b7 Last four weeks \u00b7 All time',
+          note:'The eyebrow names the WINDOW; "mostly" belongs to the title under it, where it already is. This one also fixes an honesty problem \u2014 "Lately" does not say 28 days.' },
+        { where:'origins \u00b7 sub', now:'2 name only the country \u2014 a place makes the map finer.', next:'2 name only a country.',
+          note:'The second clause sells the feature. The lead sentence stays exactly as it is.' }
+      ],
+
+      registry: "const SURFACES = {\n  shelf:         [...],\n  shopping:      [...],\n  sessionDetail: [...],\n  insights:      ['.ins-band', '.ins-sec', '.ins-sechead', '.ins-door'],\n};",
+
+      fence: [
+        { tag:'POSITIVE', tone:'#3F5E42',
+          d:'.ins-door is the positive subject \u2014 the .shelf-thumb / .sd-photo precedent. It is asserted to BE --white at 2px, so a re-baked jade fill or the old 13px reddens rather than null-skipping. Both doors share the class, so one assertion covers Wrapped and Origins.',
+          code:"expectPass('.ins-door \u2014 --white, 2px', chkPrimitive(CSS, '.ins-door', {bg:'var(--white)', radius:'2px'}));" },
+        { tag:'CONTROL 1', tone:'#69160F',
+          d:'Fill-law bites on the surface\u2019s own historical breach: jade-pale on a section.',
+          code:"expectFail('insights: a rationed fill on .ins-sec reddens fill-law',\n  chkFrameFill(CSS.replace('.ins-sec{', '.ins-sec{background:var(--jade-pale);')));" },
+        { tag:'CONTROL 2', tone:'#69160F',
+          d:'Radius-law bites on the hero\u2019s shipped 15px, the number the band replaces.',
+          code:"expectFail('insights: a 15px radius on .ins-band reddens radius-law',\n  chkFrameRadius(CSS.replace(/(\\.ins-band\\{[^}]*?border-radius:)0/, '$115px')));" },
+        { tag:'CONTROL 3', tone:'#69160F',
+          d:'Rationing bites on the door: a torn radius there must fail both radius-law and the one-slab lock \u2014 and Insights has no slab, so a torn corner anywhere on it is a breach by definition.',
+          code:"expectFail('insights: a torn radius on .ins-door reddens rationing',\n  chkRationing(CSS.replace(/(\\.ins-door\\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));" },
+        { tag:'ZERO-SLAB', tone:'#2B2320',
+          d:'One assertion this surface can make that the others cannot: no --clay fill on any Insights selector. A retrospective has nothing to commit to, and a moved card must not bring clay in.',
+          code:"expectPass('insights carries no clay', chkNoClay(CSS, SURFACES.insights));" }
+      ],
+
+      rulings: [
+        { tag:'REDRESS', tone:'#3F5E42', title:'The hero is a BAND; jade-pale retires',
+          body:'.ins-hero is the surface\u2019s worst fill-law breach \u2014 a rationed tone (--jade-pale) on a frame, at a 15px radius the law does not permit. It becomes the BAND: full-bleed --band paper, hairlines, radius 0, mirroring .lib-band / .sd-band / .shop-band and the Home band. The hour bars stay: they are the mark, and jade on them is rationed correctly.',
+          src:'styles.css:917 \u00b7 .ins-hero \u2192 .ins-band' },
+        { tag:'REDRESS', tone:'#3F5E42', title:'Numbers go on rules, not in boxes',
+          body:'The all-time / month / week trio de-boxes: six .stat tiles (--white, 12px, centred) become six hairline ledger rows, label left, mono figure right, under one 2px rule-head that names the window. The period toggle stays where it is \u2014 it is the section\u2019s control, and the eyebrow it sits beside is what stops a cropped screenshot passing a week off as all-time. Cost overview\u2019s own 3-up grid takes the same treatment.',
+          src:'THE PRIORITY MISS \u00b7 .stat, styles.css:421' },
+        { tag:'REDRESS', tone:'#3F5E42', title:'Doors are BOXes; the baked jade goes',
+          body:'The Wrapped teaser and the Origins entry are the only two objects on Insights \u2014 discrete destinations you open \u2014 so they are the surface\u2019s two BOXes at --white / 2px. .ins-teaser\u2019s #2A4130 retires, which also removes a fill hardcoded past both themes. Prominence comes from type and the arrow.',
+          src:'styles.css:948 \u00b7 .ins-teaser + .org-entry \u2192 .ins-door' },
+        { tag:'FENCE', tone:'#2B2320', title:'Insights joins the fill-law fence with teeth',
+          body:'Four selectors in SURFACES, one positive assertion on .ins-door, three negative controls that each bite on an Insights selector, plus a zero-clay assertion this surface alone can make. Marks (hour bars, sparkline, curve, type bar and swatches) are excluded; the type-tint family remains a reported deferral on the R149 thread, as on the shelf and Home.',
+          src:'fixtures/frame-test.js \u00b7 F33 per-surface, no global sweep' },
+        { tag:'PROPOSED', tone:'#8A5A1E', title:'Two proposals, neither taken here',
+          body:'The cull (four candidates, each a duplication I can point at in source \u2014 1c) and the copy pass (ten strings, current \u2192 plainer \u2014 1d) are proposals. Planning and Niklas rule the cull; Niklas approves the voice. The redress does not depend on either: every candidate is drawn with its spine treatment in 1a, so a keep costs no further design.',
+          src:'R160 IN COPY \u00b7 CALM = UNFUSSY, NOT FLOWERY' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>
