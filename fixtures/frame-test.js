@@ -15,7 +15,10 @@
  * frame selectors — shelf (slice 1, R153) + shopping (slice 2, R154/R155) + session-detail (slice 3,
  * R156/R157 — the first box-less surface, positive assertion on .sd-photo per the .shelf-thumb precedent)
  * + insights (slice 4, R161/R162 — .ins-door positive, and a ZERO-CLAY assertion only a 0-SLAB surface
- * can make) — plus the shared primitives and the slab. Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints)
+ * can make) + home (slice 5, R163+ — warm Home: .home-masthead BAND positive; the Wrapped moment's
+ * --wc-jade and the liquor swatches are rationed marks, excluded like liquor/clay) — plus the shared
+ * primitives and the slab. NOTE: the R166 whiter-ground change is --porcelain's VALUE; FILL_OK matches the
+ * var() REFERENCE, so it is transparent to every check (verified: no false redden). Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints)
  * are NOT frame — excluded, and the photo-tint fallback is a KNOWN deferred fill-law item (R149), reported
  * below, not asserted. Radii/fills are measured FROM SOURCE, never the board's drawn numbers (R127/R128).
  */
@@ -41,6 +44,7 @@ const SURFACES = {
   shopping:      ['.shop-band', '.shop-add', '.shop-sec', '.shop-row'],       // R154/R155 — slice 2
   sessionDetail: ['.sd-band', '.sd-sec', '.sd-steep', '.sd-photo'],           // R156/R157 — slice 3
   insights:      ['.ins-band', '.ins-sec', '.ins-sechead', '.ins-door'],      // R161/R162 — slice 4
+  home:          ['.home-masthead', '.home-sechead', '.lead-door', '.today-row'],  // R163+ — slice 5 (warm Home)
 };
 const FRAME = [...Object.values(SURFACES).flat(), '.band'];           // '.band' is the shared primitive
 const FILL_OK = ['var(--porcelain)', 'var(--band)', 'var(--white)'];   // the only fills a frame may carry
@@ -106,6 +110,7 @@ expectPass('.box   — --white fill, radius 2px, no shadow', chkPrimitive(CSS, '
 expectPass('.btn-clay (SLAB) — --clay fill, no border, torn radius', chkPrimitive(CSS, '.btn-clay', {bg:'var(--clay)', mustHave:['border:none']}));
 expectPass('the SLAB carries the one permitted torn radius', chkSlabTorn(CSS));
 expectPass('.ins-door (BOX) — --white, radius 2px', chkPrimitive(CSS, '.ins-door', {bg:'var(--white)', radius:'2px', mustHave:['border:1px solid var(--line)']}));  // R162 positive: the box-less surface's positive subject
+expectPass('.home-masthead (BAND) — --band, radius 0', chkPrimitive(CSS, '.home-masthead', {bg:'var(--band)', radius:'0'}));  // R163 positive: Home's masthead band
 
 /* ---------- C · fill-law across every fenced surface (F31 core) ---------- */
 console.log('\nC · fill-law — every frame selector carries only --porcelain/--band/--white');
@@ -156,6 +161,13 @@ expectFail('insights: a torn radius on .ins-door reddens rationing',
   chkRationing(CSS.replace(/(\.ins-door\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
 expectFail('insights: clay on .ins-sec reddens the zero-clay assertion',
   chkNoClay(CSS.replace('.ins-sec{', '.ins-sec{background:var(--clay);'), SURFACES.insights));
+// home (R163+) — warm Home; the whiter-ground token change is transparent (FILL_OK is reference-based)
+expectFail('home: a rationed fill on .lead-door reddens fill-law',
+  chkFrameFill(CSS.replace('.lead-door{', '.lead-door{background:var(--jade);')));
+expectFail('home: a torn radius on .home-masthead reddens radius-law',
+  chkFrameRadius(CSS.replace(/(\.home-masthead\{[^}]*?border-radius:)0/, '$114px 5px 12px 6px')));
+expectFail('home: a torn radius on .home-masthead reddens rationing',
+  chkRationing(CSS.replace(/(\.home-masthead\{[^}]*?border-radius:)0/, '$19px 4px 8px 5px')));
 // shared primitives + the slab
 expectFail('.band losing its --band fill reddens the primitive',
   chkPrimitive(CSS.replace(/(\.band\{[^}]*?background:)var\(--band\)/, '$1var(--jade)'), '.band', {bg:'var(--band)'}));

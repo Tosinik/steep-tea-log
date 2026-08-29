@@ -285,7 +285,7 @@ FILES_SCANNED.forEach(f=>{
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
 ok(tinted===11, 'F1 ELEVEN type-tint writes remain across the six files — the v4.19 picker added two (its tier-3 fallback: COLOUR-row preview + default cell), on top of the nine that stayed labels/placeholders/chart after three became swatches (got '+tinted+')');
-ok(painted===4, 'F2 …and exactly FOUR call sites paint a liquor now — the three earlier slots plus the shelf row (v4.20), one per real swatch slot (got '+painted+')');
+ok(painted===6, 'F2 …and exactly SIX call sites paint a liquor now — the four earlier (ref/social/today + the shelf row) plus warm Home\'s two (R159): the lead-insight door swatch and the Running-low swatch, one per real swatch slot (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
 const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));
@@ -318,8 +318,8 @@ ok(/background:var\(--liquor-amber\)/.test(G('socialTileHTML("oolong","Honey Ool
 ok(/background:var\(--liquor-/.test(G('swatchAttr("ref-swatch","amber-deep","oolong")'))
    && /class="ref-swatch t-oolong"/.test(G('swatchAttr("ref-swatch",null,"oolong")')),
    'F8 the writer paints when there is a key and falls back to the type tint when there is not — tier 3 lives at the render site, not in the resolver');
-ok(/\.today-tint\{[^}]*border:1px solid var\(--line\)/.test(cssSrc),
-   'F9 the third slot gains the hairline the other two already had — which is what makes `ivory` (19.2 from --white) exist on a near-white card, and closes that open item');
+ok(/\.today-tint\{[^}]*width:30px/.test(cssSrc) && !/\.today-tint\{[^}]*border:1px solid var\(--line\)/.test(cssSrc),
+   'F9 R159: the today fleck becomes a 30px liquor SWATCH and drops the hairline (a bold swatch, not a bullet) — pale-end legibility now rides on the whiter ground + size (a phone-look item, smoke.md); ref/social keep theirs');
 console.log('  F the site scan: 11 checks · '+tinted+' tints kept · '+painted+' liquor sites');
 
 /* ---- G · the picker (v4.19, R39) — the WRITE path, and F1's containment guard ----

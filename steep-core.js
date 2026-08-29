@@ -934,7 +934,7 @@ function render(){
   app.innerHTML = `
     <div class="topbar"><div class="topbar-inner">
       <div class="topbar-brandrow">
-        <div class="brand">${steepLogoSVG(30)}<h1>SlowCup</h1></div>
+        <div class="brand">${steepLogoSVG(30)}<h1>SlowCup</h1><span class="brand-tag">a tea diary</span></div>
         <button class="avatar-btn" onclick="toggleHub()" aria-label="Menu" title="Menu">${escapeHtml(hubIdentity().initial)}</button>
       </div>
     </div></div>

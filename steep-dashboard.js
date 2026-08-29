@@ -879,6 +879,40 @@ function computeLeadInsight(){
   return fresh;
 }
 
+// The lead-insight DOOR (R165) — a band register (0 BOX, a tappable line not a discrete object). The
+// swatch rides only when the insight names a tea (its liquorFor); the chevron + named destination make it
+// the loudest door. Opens Insights — a graceful destination now; the deep "why" pages are a later slice.
+function leadDoorHTML(){
+  // Fail-silent: the door is a non-critical Home extra — any error (or a partial module set) leaves it
+  // absent rather than breaking the whole masthead. The engine itself is proven by insight-engine-test.
+  try {
+    const li = (typeof computeLeadInsight==='function') ? computeLeadInsight() : null;
+    if(!li) return '';
+    const tea = li.teaId ? teaById(li.teaId) : null;
+    const sw = tea ? `<span ${swatchAttr('lead-door-swatch', liquorFor(tea), (tea.type||'').toLowerCase())}></span>` : '';
+    return `<div class="lead-door" onclick="goView('insights')" role="button" tabindex="0" aria-label="See why, on Insights">
+      ${sw}
+      <div class="lead-door-body">
+        <span class="lead-door-text">${escapeHtml(li.text)}</span>
+        <span class="lead-door-why">why, on Insights</span>
+      </div>
+      <span class="lead-door-chevron">${icon('i-caret-hl',19)}</span>
+    </div>`;
+  } catch(e){ return ''; }
+}
+// The Wrapped MOMENT (R159) — time-gated to the first days of a month, then gone (no remnant); the
+// archive stays on Insights (R103). --wc-jade is the shipped Wrapped field, a rationed mark.
+function wrappedMomentHTML(){
+  const now = new Date();
+  if(now.getDate() > 5) return '';                                // the moment, then it recedes
+  const w = (typeof computeWrapped==='function') ? computeWrapped() : null;
+  if(!w || w.empty || !w.season) return '';
+  return `<div class="wrapped-moment" onclick="goView('wrapped')" role="button" tabindex="0">
+    <span class="wm-eyebrow">The month just turned</span>
+    <span class="wm-title">Your ${escapeHtml(w.season.name)}</span>
+    <span class="wm-read">Read &rarr;</span>
+  </div>`;
+}
 function greetingMastheadHTML(){
   const now = new Date();
   const bucket = d_hourBucket(now.getHours());
@@ -897,6 +931,7 @@ function greetingMastheadHTML(){
         <button class="btn-clay" onclick="homeStartSteeping(this,'${escapeJsArg(commitTea.id)}')">Start steeping</button>
         <button class="btn-ghost mast-quiet" onclick="homeLogCup(this,'${escapeJsArg(commitTea.id)}')">Log a cup &rarr;</button>
       </div>` : ''}
+      ${leadDoorHTML()}
     </div>`;
   const todayKey = dayKey(now);
   if(!sessions.length) return card(d_copyPick([
@@ -1223,15 +1258,19 @@ function dashCardsHome(s){
   // a precision the drained tin doesn't need. The grams sort floats them to the top for free.
   const restock = state.teas.filter(restockCandidate)
     .sort((a,b)=>Number(a.amountGrams)-Number(b.amountGrams));
+  // R159: de-carded to a RULE section; a 14px liquor swatch leads (the quieter swatch register — one bold
+  // swatch run per screen is the ration). Value → --amber (the .rval default), NOT clay: low stock is
+  // state, not a commitment, and clay is rationed to the one committing action (the clay-grams fix, R113).
   const restockHTML = restock.length ? `
-    <div class="section card">
-      <div class="section-title"><h2>Running low</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">favourites &amp; rebuys</span></div>
+    <div class="home-sec">
+      <div class="home-sechead"><h2>Running low</h2><span class="home-sec-meta">favourites &amp; rebuys</span></div>
       ${restock.map(t=>{
         const g=Number(t.amountGrams);
         const f=teaForecast(t); const est=f&&f.daysLeft>0?' · '+fmtDaysLeft(f.daysLeft):'';
         return `<div class="rank-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')" style="cursor:pointer;">
-          <span class="rname" style="display:flex;align-items:center;gap:9px;">${favLeaf(15)}${escapeHtml(t.name)}</span>
-          <span class="rval mono" style="color:var(--clay);font-size:13px;">${isTeaFinished(t)?'empty':`${g.toFixed(1)}g${est}`}</span>
+          <span ${swatchAttr('rank-swatch', liquorFor(t), (t.type||'').toLowerCase())}></span>
+          <span class="rname">${escapeHtml(t.name)}</span>
+          <span class="rval mono" style="font-size:13px;">${isTeaFinished(t)?'empty':`${g.toFixed(1)}g${est}`}</span>
         </div>`;
       }).join('')}
     </div>` : '';
@@ -1245,18 +1284,21 @@ function dashCardsHome(s){
      for. Absent until the first cup and gone at midnight — a blank page is what a diary looks like
      before you write on it, and the vanishing is the stated cost of a present-tense surface. */
   const today = sessionsToday();
+  // R159: de-carded to a RULE section; the fleck becomes a 30px liquor swatch leading the row, time drops
+  // to the second line so colour takes the left edge.
   const todayHTML = today.length ? `
-    <div class="section card">
-      <div class="section-title"><h2>Earlier today</h2><span class="mono" style="font-size:11px;color:var(--ink-soft);">${today.length} sitting${today.length===1?'':'s'}</span></div>
+    <div class="home-sec">
+      <div class="home-sechead"><h2>Earlier today</h2><span class="home-sec-meta">${today.length} sitting${today.length===1?'':'s'}</span></div>
       ${today.map(se=>{
         const tea = teaById(se.teaId);
         const type = (se.teaType || (tea && tea.type) || '').toLowerCase();
         const when = new Date(se.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
         return `<div class="today-row" onclick="openSessionDetail('${escapeJsArg(se.id)}')">
-          <span class="today-time mono">${escapeHtml(when)}</span>
           <span ${swatchAttr('today-tint', liquorFor(tea || {name:se.teaName, type:se.teaType}), type)}></span>
-          <span class="today-name">${escapeHtml(se.teaName || (tea?tea.name:'—'))}</span>
-          <span class="today-steeps mono">${escapeHtml(brewCountLabel(se))}</span>
+          <div class="today-main">
+            <span class="today-name">${escapeHtml(se.teaName || (tea?tea.name:'—'))}</span>
+            <span class="today-sub">${escapeHtml(when)} · ${escapeHtml(brewCountLabel(se))}</span>
+          </div>
         </div>`;
       }).join('')}
     </div>` : '';
@@ -1291,8 +1333,8 @@ function dashCardsHome(s){
        than reworded: "No favourites marked yet" is a card explaining why it is a card.
        `renderDashboard`'s edit-mode shell still names an empty card, and must — you cannot reorder
        or unhide what you cannot see (R61). */
-    favorites: s.favorites.length ? `<div class="section card">
-      <div class="eyebrow" style="margin-bottom:12px;">Favourites</div>
+    favorites: s.favorites.length ? `<div class="home-sec">
+      <div class="home-sechead"><h2>Favourites</h2><span class="home-sec-meta">${s.favorites.length}</span></div>
       ${s.favorites.slice(0,6).map(t=>`<div class="fav-row" onclick="openTeaDetail('${escapeJsArg(t.id)}')">${favLeaf(15)}<span>${escapeHtml(t.name)}</span></div>`).join('')}
     </div>` : '',
     // WS2 (v3.74) — the one number that earns Home: sessions since the start of this week (Mon-anchored).
@@ -1324,7 +1366,7 @@ function dashCardsHome(s){
    card and belongs to one surface only. Insights keeps its own head. */
 function viewDashboard(){
   if(!state.teas.length) return dayOneHTML();
-  return `${greetingMastheadHTML()}${renderDashboard(dashCards(), 'home')}`;
+  return `${greetingMastheadHTML()}${wrappedMomentHTML()}${renderDashboard(dashCards(), 'home')}`;
 }
 
 /* ================= TEAS ================= */

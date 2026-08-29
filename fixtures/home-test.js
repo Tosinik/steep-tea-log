@@ -185,10 +185,10 @@ ok(!/renderStarsStatic/.test((withToday.split('Earlier today')[1]||'').split('</
    line with an empty steeps span for exactly this reason — it seeded sessions with no `steeps`, and
    `brewCountLabel` returns '' for those. A class-exists check passes against an empty element. */
 const dayRow=(withToday.match(/<div class="today-row"[\s\S]*?<\/div>\s*<\/div>/)||[''])[0];
-ok(/today-time mono">\d\d:\d\d</.test(dayRow),
-   'E6 a diary line carries a real clock time, derived from the session date (R27 — the board\'s times are illustrative)');
-ok(/today-steeps mono">\d+ (steep|infusion)/.test(dayRow),
-   'E7 …and a real steep count, not an empty span where one belongs');
+ok(/today-sub">\d\d:\d\d /.test(dayRow),
+   'E6 a diary line carries a real clock time, derived from the session date (R27; R159 moved it to .today-sub under the name, so the 30px swatch leads)');
+ok(/today-sub">[^<]*\d+ (steep|infusion)/.test(dayRow),
+   'E7 …and a real steep count on the same sub-line, not an empty span where one belongs');
 G('state.sessions='+JSON.stringify(SESSIONS.map(s=>Object.assign({},s,{date:"2020-01-02T09:00:00Z"})))+';');
 ok(!/Earlier today/.test(G('viewDashboard()')),
    'E8 and it is ABSENT on a day with no cup — blank until written on, not an empty card apologising');

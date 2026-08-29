@@ -1,5 +1,5 @@
 :root{
-  --porcelain:#F6F2E9;
+  --porcelain:#FAF8F3;   /* R166: whiter ground, app-wide — four steps whiter, no hue change; the pale end of the liquor ramp separates from the paper. Was #F6F2E9. Dark block untouched. */
   --porcelain-dim:#EDE7D8;
   --band:var(--porcelain-dim); /* R5 spine (F31/F32): BAND surface tone. An ALIAS, not a new hex —
      --porcelain-dim IS the recessed-paper token (#EDE7D8); the board's stand-in #EDE7D6 differs by 2/255
@@ -157,7 +157,8 @@ a{color:inherit;}
 html[data-theme="dark"] .hl{stroke-width:1.9;}
 .i-fav{color:var(--jade);flex:0 0 auto;}
 .btn-log-wide{width:100%;justify-content:center;padding:12px;font-size:14px;}
-.brand{display:flex;align-items:center;gap:10px;}
+.brand{display:flex;align-items:baseline;gap:10px;}
+.brand-tag{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-soft);}  /* R159: "a tea diary" — app-wide topbar tagline, the identity line that never changes */
 .brand-mark{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%, var(--amber-pale), var(--amber) 60%, var(--clay));flex:0 0 auto;}
 .brand h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.01em;}
 .tabs{display:flex;gap:4px;background:var(--porcelain-dim);padding:4px;border-radius:10px;}
@@ -180,7 +181,7 @@ html[data-theme="dark"] .hl{stroke-width:1.9;}
 .bn-item.active{color:var(--nav-active);}
 .bn-item.active .bn-lbl{font-weight:600;}
 .bn-log{background:none;border:none;padding:0;width:60px;display:flex;flex-direction:column;align-items:center;}
-.bn-log-circle{width:54px;height:54px;border-radius:50%;background:var(--jade);color:var(--porcelain);display:flex;align-items:center;justify-content:center;margin-top:-26px;box-shadow:0 6px 16px -4px rgba(63,94,66,.6);}
+.bn-log-circle{width:58px;height:58px;border-radius:50%;background:var(--jade);color:var(--porcelain);display:flex;align-items:center;justify-content:center;margin-top:-28px;box-shadow:0 7px 18px -5px rgba(63,94,66,.6);}  /* R159: the always-visible front door, boldened 54→58 */
 html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6);}
 .bn-log-lbl{font-size:10px;font-weight:600;color:var(--nav-active);margin-top:3px;}
 
@@ -205,7 +206,26 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
    panel, its border and its 20px radius are gone — the one place a masthead floated on a card was
    the masthead, and a masthead is the top of a page rather than an element on one. The body colour
    moves to `--ink-soft`; the two tokens it used were tuned as green-ink for a fill that is gone. */
-.home-masthead{padding:6px 2px 18px;}
+/* R5/R159 — Home's masthead is a BAND (R163): full-bleed --band paper stripe, radius 0, like .lib-band.
+   Warmth arrives INSIDE it (the lead-insight door), never as it — figure/ground is --band vs paper, not colour. */
+.home-masthead{background:var(--band);border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;margin:0 -16px 0;padding:16px 16px;}
+/* R165 — the lead-insight DOOR: a band register (0 BOX survives — a tappable line, not a discrete object),
+   hairline-separated from the greeting; the swatch is DATA (the named tea's liquor) and absent otherwise;
+   a jade chevron + named destination make it the loudest door; press washes the register (an --ink overlay,
+   not a rationed fill — fence-legal, never a raw hex). Opens Insights (goView). */
+.lead-door{display:flex;align-items:center;gap:13px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);cursor:pointer;}
+.lead-door:active{background:color-mix(in srgb, var(--ink) 5%, transparent);}
+.lead-door-swatch{width:34px;height:34px;flex:none;border-radius:2px;}
+.lead-door-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+.lead-door-text{font-family:var(--font-display);font-weight:600;font-size:16.5px;line-height:1.4;color:var(--ink);}
+.lead-door-why{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--jade-deep);text-decoration:underline;text-underline-offset:3px;}
+.lead-door-chevron{display:flex;color:var(--jade-deep);flex:none;}
+/* R159 — the Wrapped MOMENT: time-gated at the month's turn, then gone (no remnant). --wc-jade is the
+   shipped Wrapped field (a RATIONED mark, not a frame fill — excluded from the fill-law fence, like liquor). */
+.wrapped-moment{background:var(--wc-jade);color:var(--wc-jade-fg);margin:0 -16px 0;padding:17px 16px;display:flex;flex-direction:column;gap:9px;cursor:pointer;}
+.wm-eyebrow{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wc-jade-soft);}
+.wm-title{font-family:var(--font-display);font-weight:700;font-size:24px;line-height:1.15;color:var(--wc-jade-fg);}
+.wm-read{font-size:12px;color:var(--wc-jade-fg);align-self:flex-end;margin-top:-24px;}
 .greeting-eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);}
 .greeting-head{font-family:var(--font-display);font-weight:700;font-size:32px;line-height:1.15;color:var(--ink);margin:8px 0 12px;}
 .greeting-body{font-size:16px;line-height:1.55;color:var(--ink-soft);}
@@ -225,16 +245,23 @@ html[data-theme="dark"] .bn-log-circle{box-shadow:0 6px 16px -4px rgba(0,0,0,.6)
    moved ratings to detail, and a star here turns a diary into a scorecard. The tint is the TYPE
    tint (`.t-<type>`), not a liquor swatch — contract 1 is still unbuilt (R116), and this is one of
    the slots the per-tea colour lands in when R82/R93 gives it a data model. */
-.today-row{display:flex;align-items:center;gap:11px;padding:6px 0;cursor:pointer;}
-.today-time{font-size:12.5px;color:var(--ink-soft);flex:none;width:38px;}
+.today-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer;}  /* R159: hairline-divided RULE row */
+.today-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.today-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);}
+/* R5/R159 — Home RULE sections (today/restock/favorites de-carded): a section header on a 2px ink rule,
+   hairline-divided rows. Mirrors .sd-sec/.ins-sec; each surface carries its own layout class. */
+.home-sec{margin-top:18px;}
+.home-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:4px;border-bottom:2px solid var(--ink);border-radius:0;}
+.home-sechead h2{font-family:var(--font-display);font-weight:700;font-size:16px;margin:0;}
+.home-sec-meta{font-family:var(--font-mono);font-size:10px;color:var(--ink-soft);}
+.rank-swatch{width:14px;height:14px;border-radius:2px;flex:none;}  /* R159: Running low's quieter swatch (one bold swatch run per screen is the ration) */
 /* The hairline is what makes a bud-only white exist on a near-white card. `ivory` sits 19.2
    luminance from `--white` in the light theme — it passes A3b, which only claims it has not
    collapsed into the surface, and says nothing about comfort. `.ref-swatch` and `.social-tile`
    already carried this border, so giving the third slot the same one bounds the pale end
    everywhere it appears and closes that open item rather than leaving it to the cascade. */
-.today-tint{width:13px;height:13px;border-radius:3px;flex:none;border:1px solid var(--line);}
-.today-name{font-size:14.5px;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.today-steeps{font-size:12.5px;color:var(--ink-soft);flex:none;}
+.today-tint{width:30px;height:30px;border-radius:2px;flex:none;}  /* R159: 30px liquor swatch, no outline, leads the row */
+.today-name{font-size:14.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .dash-edit-bar{display:flex;justify-content:center;margin:14px 0 4px;}
 .fav-row{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--ink);padding:6px 0;cursor:pointer;}
 /* R161 — .week-card/.week-num/.week-cap retired: `week` is a spine ledger row now (steep-dashboard.js insRow). */

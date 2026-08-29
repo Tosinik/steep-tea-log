@@ -86,3 +86,28 @@ displayed note is the NEXT deploy's. This is the standing check to run then (v4.
    the incoming worker, which is the actual defect (#36).
 4. **No-banner gap** (harder to stage): if an update was mid-install when you opened the app, the banner
    still appears *this* load, not a version later. Note it if "Refresh" ever arrives a version late again.
+
+---
+
+## v4.27 · R159 the warm Home combined slice  *(confirm on device)*
+
+The lead-insight engine is vm-covered (`fixtures/insight-engine-test.js`), but the render, the
+localStorage cooldown, and the app-wide ground change have no vm reach. On device:
+
+1. **Does the lead insight read as a DOOR?** On Home, the insight line under the greeting shows a jade
+   chevron + "why, on Insights"; tapping it opens Insights (a real destination — the specific deep page
+   is a later slice). Press washes the register edge-to-edge (no card lift, no shadow).
+2. **Does the warmth land?** Earlier-today rows lead with a bold 30px liquor swatch; Running low shows a
+   14px swatch; the door carries the named tea's swatch. Colour is data — an insight naming no tea has
+   no swatch, and the sentence takes the full width.
+3. **Does the whiter ground work on the OTHER FOUR surfaces?** *(highest-attention)* `--porcelain` went
+   `#F6F2E9 → #FAF8F3` **app-wide** — check the shelf, Shopping, session-detail and Insights still read
+   on the new paper (pale liquor swatches should separate *better*, not worse). Dark mode untouched.
+4. **Does the lead stick within a day and rotate across days?** Stable all day; across days it rotates
+   (a shown type isn't repeated for ~7 days). Cooldown is device-local: devtools
+   `localStorage.getItem('tealog_insightlog')` shows `{type→dayKey}`; clear it to reset. Cross-device
+   repetition is the accepted cost (not synced).
+5. **The two ways in** are both visible and independent: the **58px** jade **Log FAB** (always), and
+   **Start steeping** (clay) only when a tea is proposed.
+6. **Wrapped moment:** in the first ~5 days of a month, "Your {month}" appears under the greeting and
+   opens Wrapped; after, it's gone with no remnant (the archive stays on Insights, R103).
