@@ -33,6 +33,7 @@ ctx.escapeHtml=s=>String(s==null?'':s);
 ctx.typeLabel=k=>({green:'Green',oolong:'Oolong',black:'Black',white:'White',puerh:'Pu-erh',yellow:'Yellow'}[k]||k);
 ctx.steepCountOf=s=>(s&&s.steeps&&s.steeps.length)?s.steeps.length:(Number(s&&s.infusionCount)||0);
 ctx.renderStarsStatic=()=>'<span class="stars">★</span>';
+ctx.icon=()=>'';   // R172: insTypeMixHTML gained a door chevron (icon()); this suite stubs core deps, so stub it
 ctx.fmtSecShort=sec=>{ sec=Math.round(sec); if(sec<60) return sec+'s'; const m=Math.floor(sec/60),r=sec%60; return r?`${m}m${r}s`:`${m}m`; };
 ctx.dayKey=d=>{ const x=new Date(d); return x.getFullYear()+'-'+x.getMonth()+'-'+x.getDate(); };
 const TEAS={ 'g':{name:'Shincha Saemidori',type:'green'}, 'o':{name:'Honey Oolong',type:'oolong'}, 'b':{name:'Ruby Ruanzhi',type:'black'}, 'w':{name:'Silver Needle',type:'white'} };

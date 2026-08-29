@@ -136,8 +136,11 @@ function insTypeMixHTML(s){
     : `${typeLabel(k1)} leads the cup.`;
   const segs = entries.map(([k,c])=>`<span class="dot-${k}" style="width:${(c/total*100).toFixed(1)}%"></span>`).join('');
   const legend = entries.map(([k])=>`<span><span class="ins-sw dot-${k}"></span>${typeLabel(k).toLowerCase()}</span>`).join('');
-  return `<div class="ins-sec">
-    <div class="ins-obs">${obs}</div>
+  // v4.30 (R172) — the type mix is the door into Your palate (openReflection lands on #reflect-families).
+  // .ins-sec-door is a behaviour class (cursor + chevron + press wash); .ins-sec's frame is unchanged so the
+  // fence is untouched. Edit mode disables the tap (renderDashboard's pointer-events:none).
+  return `<div class="ins-sec ins-sec-door" onclick="openReflection('palate','families')" role="button" tabindex="0" aria-label="Your palate — why you like what you like">
+    <div class="ins-obs ins-obs-door"><span>${obs}</span><span class="ins-sec-chevron">${icon('i-caret-hl',18)}</span></div>
     <div class="ins-typebar">${segs}</div>
     <div class="ins-legend">${legend}</div>
   </div>`;
@@ -513,4 +516,126 @@ function viewInsights(){
   }
   // No page title — the hero observation leads (matches Home, whose greeting leads). WS2.
   return renderDashboard(dashCards(),'insights');
+}
+
+/* ================= REFLECTION DEEP PAGES (v4.30, R172) =================
+   The deep pages the Home lead-insight door (and the Insights section doors) open into — the record to
+   Home's moment (docs/r5/planning/REFLECTION-SPEC.md). Slice A ships two, built entirely on existing
+   fields: Your ritual (when × what · vessels · temperatures · rhythm) and Your palate (families × ratings
+   · rated highest). They are Insights deep pages, so they wear the Insights spine — a .band masthead and
+   .ins-sec RULE sections — and each deep section carries id="reflect-<focus>" so a deep-link scrolls to it.
+   Never-guess holds: a section with no data is absent, and the palate's flavour-level grain waits on the
+   tasting-input work (a note, not a guess). */
+
+function reflectEmpty(title, msg){
+  return `<button class="detail-back" onclick="goView('insights')">← Back to Insights</button>
+    <div class="band reflect-band"><div class="ins-hero-eyebrow">${escapeHtml(title)}</div></div>
+    <div class="empty">${escapeHtml(msg)}</div>`;
+}
+
+function viewRitual(){
+  const S = state.sessions||[];
+  if(!S.length) return reflectEmpty('Your ritual', 'The shape of how you drink fills in as you log sessions.');
+  const s = computeStats();
+  return `
+    <button class="detail-back" onclick="goView('insights')">← Back to Insights</button>
+    <div class="band reflect-band">
+      <div class="ins-hero-eyebrow">Your ritual</div>
+      <div class="ins-hero-title">The shape of how you drink.</div>
+    </div>
+    <div id="reflect-clock" class="reflect-anchor">${ritualWhenHTML(s)}</div>
+    <div id="reflect-vessels" class="reflect-anchor">${ritualVesselsHTML(S)}</div>
+    <div id="reflect-temps" class="reflect-anchor">${ritualTempsHTML(S)}</div>
+    <div id="reflect-rhythm" class="reflect-anchor">${ritualRhythmHTML(S)}</div>`;
+}
+
+// When × what — the colour clock (reused, no door here) + the dominant tea named per populated slot.
+function ritualWhenHTML(s){
+  const clock = brewingClockHTML(s, false); if(!clock) return '';
+  const slots = Array.from({length:12}, ()=>({}));
+  (state.sessions||[]).forEach(se=>{ const slot=Math.floor(new Date(se.date).getHours()/2); if(se.teaId) slots[slot][se.teaId]=(slots[slot][se.teaId]||0)+1; });
+  const rows = [];
+  slots.forEach((counts,i)=>{ const ent=Object.entries(counts); if(!ent.length) return; ent.sort((a,b)=>b[1]-a[1]);
+    if(ent.length>1 && ent[0][1]===ent[1][1]) return;               // a tie names no single tea (matches clockDominant)
+    const t=teaById(ent[0][0]); if(!t) return;
+    rows.push(insRow(bucketLabel(i), escapeHtml(t.name))); });
+  const named = rows.length ? `<div class="ins-sec"><div class="ins-sechead"><h2>What you drink, when</h2></div>${rows.join('')}</div>` : '';
+  return clock + named;
+}
+
+function ritualVesselsHTML(S){
+  const counts={}; S.forEach(se=>{ if(!se.vesselId) return; counts[se.vesselId]=(counts[se.vesselId]||0)+1; });
+  const rows=Object.entries(counts).map(([id,n])=>{ const v=vesselById(id); return [v?v.name:'(unknown vessel)', n]; }).sort((a,b)=>b[1]-a[1]);
+  if(!rows.length) return '';
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>Vessels</h2></div>${rows.map(([name,n])=>insRow(escapeHtml(name), '×'+n)).join('')}</div>`;
+}
+
+function ritualTempsHTML(S){
+  const byType={}; S.forEach(se=>{ if(se.isColdBrew) return; const t=teaById(se.teaId), ty=t&&t.type; if(!ty) return;
+    (se.steeps||[]).forEach(x=>{ const c=Number(x.tempC)||0; if(c>0)(byType[ty]=byType[ty]||[]).push(c); }); });
+  const rows=Object.entries(byType).filter(([,arr])=>arr.length>=2).map(([ty,arr])=>[ty, Math.round(arr.reduce((a,b)=>a+b,0)/arr.length), arr.length]).sort((a,b)=>b[2]-a[2]);
+  if(!rows.length) return '';
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>Temperatures</h2></div>${rows.map(([ty,avg,n])=>insRow(typeLabel(ty), avg+'°', null, `<span class="mono reflect-mid">${n} timed</span>`)).join('')}</div>`;
+}
+
+function ritualRhythmHTML(S){
+  const partOf=n=>{ const h=new Date(n).getHours(); return h<5?'night':h<12?'morning':h<17?'afternoon':h<22?'evening':'night'; };
+  const parts={morning:0,afternoon:0,evening:0,night:0}; const dow=[0,0,0,0,0,0,0]; let min=Infinity,max=-Infinity;
+  S.forEach(se=>{ const d=new Date(se.date); parts[partOf(se.date)]++; dow[d.getDay()]++; const t=+d; if(t<min)min=t; if(t>max)max=t; });
+  const rows=[]; ['morning','afternoon','evening','night'].forEach(p=>{ if(parts[p]) rows.push(insRow(p[0].toUpperCase()+p.slice(1), '×'+parts[p])); });
+  if(!rows.length) return '';
+  const weeks = (max>min) ? Math.max(1,(max-min)/(7*86400000)) : 1;
+  const perWeek = S.length/weeks;
+  const cad = perWeek>=1 ? `${perWeek.toFixed(1)} cups a week` : `about ${Math.max(1,Math.round(perWeek*4))} a month`;
+  const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const top=dow.map((v,i)=>[i,v]).sort((a,b)=>b[1]-a[1])[0];
+  const busiest = (top && top[1]>0) ? DOW[top[0]] : '';
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>Rhythm</h2></div>${rows.join('')}<div class="ins-cap" style="margin-top:8px;">${escapeHtml(cad)}${busiest?` · most often on ${busiest}`:''}.</div></div>`;
+}
+
+function viewPalate(){
+  const S = state.sessions||[];
+  if(!S.length) return reflectEmpty('Your palate', 'What you reach for and rate highest fills in as you log.');
+  const s = computeStats();
+  return `
+    <button class="detail-back" onclick="goView('insights')">← Back to Insights</button>
+    <div class="band reflect-band">
+      <div class="ins-hero-eyebrow">Your palate</div>
+      <div class="ins-hero-title">Why you like what you like.</div>
+    </div>
+    <div id="reflect-families" class="reflect-anchor">${palateFamiliesHTML(s)}</div>
+    <div id="reflect-rated" class="reflect-anchor">${palateRatedHTML(s)}</div>
+    ${palateFlavourNoteHTML()}`;
+}
+
+// Families × ratings — which type-families you reach for (session count) and the average of their teas' ratings.
+function palateFamiliesHTML(s){
+  const tc = s.typeCounts||{};
+  const rated={}; (state.teas||[]).forEach(t=>{ if(!t.type||!(t.rating>0)) return; (rated[t.type]=rated[t.type]||[]).push(t.rating); });
+  const rows = TYPES.map(ty=>{ const cnt=(tc[ty.k]||{}).count||0; if(!cnt) return null;
+    const rs=rated[ty.k]||[]; const avg=rs.length?rs.reduce((a,b)=>a+b,0)/rs.length:0;
+    return {k:ty.k, label:ty.label, cnt, avg, n:rs.length}; }).filter(Boolean).sort((a,b)=>b.cnt-a.cnt);
+  if(!rows.length) return '';
+  const max=Math.max(...rows.map(r=>r.cnt));
+  const body = rows.map(r=>`<div class="palate-fam">
+    <div class="palate-fam-head"><span class="palate-fam-name">${escapeHtml(r.label)}</span>${r.avg?`<span class="mono palate-fam-rate">avg ${r.avg.toFixed(1)}</span>`:''}</div>
+    <div class="palate-bar-track"><div class="palate-bar dot-${r.k}" style="width:${Math.max(4,Math.round(r.cnt/max*100))}%"></div></div>
+    <div class="ins-cap">${r.cnt} session${r.cnt!==1?'s':''}${r.n?` · ${r.n} tea${r.n!==1?'s':''} rated`:''}</div>
+  </div>`).join('');
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>Families you reach for</h2></div>${body}</div>`;
+}
+
+// Rated highest — the top-rated teas (≥4) + what they share.
+function palateRatedHTML(s){
+  const top=(s.topRated||[]).filter(t=>t.rating>=4).slice(0,5);
+  if(!top.length) return '';
+  const types=[...new Set(top.map(t=>t.type).filter(Boolean))];
+  const share = types.length===1 ? `They're all ${typeLabel(types[0]).toLowerCase()}.`
+    : (types.length===2 ? `Mostly ${typeLabel(types[0]).toLowerCase()} and ${typeLabel(types[1]).toLowerCase()}.` : '');
+  const rows=top.map(t=>`<div class="palate-rated-row"><button class="btn-ghost palate-rated-name" onclick="openTeaDetail('${escapeJsArg(t.id)}','insights')">${escapeHtml(t.name)}</button>${renderStarsStatic(t.rating,false)}</div>`).join('');
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>Rated highest</h2></div>${rows}${share?`<div class="ins-cap" style="margin-top:8px;">${escapeHtml(share)}</div>`:''}</div>`;
+}
+
+// The data-ladder note (REFLECTION-SPEC): flavour-level depth deepens as tasting-input lands — a note, never a guess.
+function palateFlavourNoteHTML(){
+  return `<div class="ins-sec"><div class="ins-cap">The finer grain of your palate — the flavours you actually taste — deepens as you add tasting notes to your sessions.</div></div>`;
 }

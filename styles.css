@@ -962,6 +962,29 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .ins-note-swatch{width:30px;height:30px;border-radius:2px;flex:none;}  /* R170 — the note row's 30px liquor swatch (icons retired) */
 .ins-obs{font-family:var(--font-display);font-weight:600;font-size:15px;line-height:1.35;color:var(--ink);}
 .ins-cap{font-family:var(--font-mono);font-size:9.5px;color:var(--ink-soft);margin-top:2px;}
+/* ---- R5 reflection deep pages (v4.30, R172) ---- */
+/* .reflect-band is the reflection surface's BAND masthead — its own fenceable selector (radius 0; the
+   .band primitive it rides with supplies the --band fill). Mirrors .ins-band so the deep pages read as
+   the Insights record. .reflect-anchor is a scroll target only; scroll-margin clears the sticky topbar. */
+.reflect-band{margin:0 -16px 13px;padding:16px;border-radius:0;}
+.reflect-anchor{scroll-margin-top:72px;}
+/* A section that is a DOOR (R165 grammar): a register that opens a page — cursor + a jade chevron + a
+   press that washes edge-to-edge (no card lift). .ins-sec's own frame is untouched, so the fence holds. */
+.ins-sec-door{cursor:pointer;}
+.ins-sec-door:active{background:color-mix(in srgb, var(--ink) 5%, transparent);}
+.ins-sec-chevron{display:inline-flex;align-items:center;flex:none;color:var(--jade-deep);}
+.ins-sechead-right{display:inline-flex;align-items:center;gap:8px;}
+.ins-obs-door{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+/* palate families — a labelled bar per type in the fixed type colours (.dot-*, a MARK, excluded from the fence) */
+.palate-fam{margin-bottom:12px;}
+.palate-fam-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.palate-fam-name{font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--ink);}
+.palate-fam-rate{font-size:12px;color:var(--ink-soft);}
+.palate-bar-track{height:8px;background:var(--band);border-radius:2px;overflow:hidden;margin:5px 0;}
+.palate-bar{height:100%;border-radius:2px;}
+.palate-rated-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);}
+.palate-rated-name{font-size:14px;color:var(--ink);text-align:left;padding:0;}
+.reflect-mid{font-size:10px;color:var(--ink-soft);}
 
 /* type distribution — one slim stacked bar in the fixed type colors + mono legend */
 .ins-typebar{height:20px;border-radius:2px;overflow:hidden;display:flex;margin-top:11px;}  /* R170: 10→20px, radius 6→2px (spine); hues stay the R149-deferred type tints */

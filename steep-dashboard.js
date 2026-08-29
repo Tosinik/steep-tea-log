@@ -235,7 +235,7 @@ function teasBrewedStrip(sessions){
   keys.sort((a,b)=> order.indexOf(a) - order.indexOf(b));
   return `<span class="ins-strip">${keys.map(k=>`<span style="background:var(--liquor-${k})"></span>`).join('')}</span>`;
 }
-function brewingClockHTML(s){
+function brewingClockHTML(s, asDoor){
   if(s.totalSessions===0) return '';
   const max = Math.max(1, ...s.hourBuckets);
   const labels = ['0','2','4','6','8','10','12','14','16','18','20','22'];
@@ -254,8 +254,12 @@ function brewingClockHTML(s){
   // the 2px ink rule under the column; this label still names it in words.
   const pk = s.peakBuckets||[];
   const peakLabel = pk.length ? `${pk.length>1?'joint peak':'peak'} ${andList(pk.map(bucketLabel))}` : '';
-  return `<div class="ins-sec">
-    <div class="ins-sechead"><h2>When you brew</h2>${peakLabel?`<span class="mono" style="font-size:12px;color:var(--ink-soft);">${peakLabel}</span>`:''}</div>
+  // v4.30 (R172) — asDoor makes the clock the door into Your ritual (openReflection lands on #reflect-clock).
+  // A behaviour class only (.ins-sec-door adds cursor + a jade chevron + a press wash); .ins-sec's frame is
+  // unchanged, so the Insights fence is untouched. Edit mode disables it (renderDashboard's pointer-events:none).
+  const right = `${peakLabel?`<span class="mono" style="font-size:12px;color:var(--ink-soft);">${peakLabel}</span>`:''}${asDoor?`<span class="ins-sec-chevron">${icon('i-caret-hl',18)}</span>`:''}`;
+  return `<div class="ins-sec${asDoor?' ins-sec-door':''}"${asDoor?` onclick="openReflection('ritual','clock')" role="button" tabindex="0" aria-label="Your ritual — the shape of how you drink"`:''}>
+    <div class="ins-sechead"><h2>When you brew</h2>${right?`<span class="ins-sechead-right">${right}</span>`:''}</div>
     <div class="clock-chart">${bars}</div>
   </div>`;
 }
@@ -904,9 +908,23 @@ function computeLeadInsight(){
   return fresh;
 }
 
+// v4.30 (R172) — the routing table: a lead-insight type → the deep page (+ section anchor) that explains
+// it. Only the destinations built in Slice A (palate, ritual) are mapped; the tea-page / terroir types
+// (freshness, haven-t, little-notice) fall back to Insights until Slices B/C wire them — a door is never
+// broken, only not-yet-deep. The Home lead-door and the Insights section doors both read from this idea
+// (the section doors map their section directly; this maps the engine's chosen sentence).
+const REFLECT_ROUTE = {
+  'palate-lean':   {view:'palate', focus:'families'},
+  'highest-rated': {view:'palate', focus:'rated'},
+  'morning-truth': {view:'ritual', focus:'clock'},
+  'temps':         {view:'ritual', focus:'temps'}
+};
+function reflectRouteForInsight(li){ return (li && REFLECT_ROUTE[li.type]) || null; }
+
 // The lead-insight DOOR (R165) — a band register (0 BOX, a tappable line not a discrete object). The
 // swatch rides only when the insight names a tea (its liquorFor); the chevron + named destination make it
-// the loudest door. Opens Insights — a graceful destination now; the deep "why" pages are a later slice.
+// the loudest door. v4.30: a mapped type lands on its deep page (openReflection); the rest still open
+// Insights as the graceful destination until Slices B/C deepen them.
 function leadDoorHTML(){
   // Fail-silent: the door is a non-critical Home extra — any error (or a partial module set) leaves it
   // absent rather than breaking the whole masthead. The engine itself is proven by insight-engine-test.
@@ -915,7 +933,9 @@ function leadDoorHTML(){
     if(!li) return '';
     const tea = li.teaId ? teaById(li.teaId) : null;
     const sw = tea ? `<span ${swatchAttr('lead-door-swatch', liquorFor(tea), (tea.type||'').toLowerCase())}></span>` : '';
-    return `<div class="lead-door" onclick="goView('insights')" role="button" tabindex="0" aria-label="See why, on Insights">
+    const route = reflectRouteForInsight(li);
+    const go = route ? `openReflection('${route.view}','${route.focus}')` : `goView('insights')`;
+    return `<div class="lead-door" onclick="${go}" role="button" tabindex="0" aria-label="See why, on Insights">
       ${sw}
       <div class="lead-door-body">
         <span class="lead-door-text">${escapeHtml(li.text)}</span>
@@ -1353,7 +1373,7 @@ function dashCardsHome(s){
       ${insRow('Teas brewed', g.uniqueTeas, null, teasBrewedStrip(windowed))}
       </div>`;
     })(),
-    clock: brewingClockHTML(s),
+    clock: brewingClockHTML(s, true),   // v4.30 (R172) — the clock is a door into Your ritual on Insights
     /* R115 — a card is ABSENT until it has something to say. Four empty cards would be four
        apologies, and on day two that is most of the screen. The empty branches are dropped rather
        than reworded: "No favourites marked yet" is a card explaining why it is a card.

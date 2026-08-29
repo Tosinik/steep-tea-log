@@ -114,6 +114,33 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.30 · R5 reflection Slice A — the deep pages + the deep-link scroll  *(confirm on device)*
+
+The reflection **logic** is vm-covered (`fixtures/reflection-test.js` — the route map, the aggregations,
+the view render); the **deep-link scroll** (`scrollIntoView` on `#reflect-<focus>`) and real **taps** have no
+`vm` reach (no DOM, no `requestAnimationFrame`). Only a phone shows the door landing *on* the section. On
+device:
+
+1. **The Home lead-insight door lands on the right section, scrolled to it.** When the lead insight is a
+   mapped type, tapping it opens the deep page **already scrolled to the section that explains it** — not the
+   top of the page to hunt from. palate-lean / highest-rated → **Your palate**; morning-truth / temperatures
+   → **Your ritual** (the "When you brew" clock, or Temperatures). *(An unmapped lead — freshness,
+   haven't-reached-for — still opens Insights; that's the graceful fallback until Slice B, not a bug.)*
+2. **The Insights sections are doors.** On Insights, the **type-mix** bar and the **colour clock** each show a
+   jade chevron; tapping type-mix opens **Your palate**, tapping the clock opens **Your ritual** scrolled to
+   the clock. The press washes the section edge-to-edge (no card lift). In **edit layout** mode the taps are
+   inert (you can reorder the cards without navigating away).
+3. **The two views read as spine surfaces.** **Your ritual** = a BAND masthead + the expanded colour clock
+   (+ what you drink when) · vessels · temperatures · rhythm. **Your palate** = families-you-reach-for bars
+   (with per-type average ★) + rated-highest. No card lift, no stray colour — the type bars are the only
+   colour; a section with no data is simply absent (never a guessed figure).
+4. **Back returns to Insights, not a dead-end or a loop.** From either deep page, the OS back gesture (and
+   the "← Back to Insights" button) returns to the Insights tab — once, cleanly. Tapping a tea inside Your
+   palate opens its detail; back from there behaves normally. Reloading while on a deep page lands you back on
+   a tab (the deep pages don't persist), never on a blank deep page.
+
+---
+
 ## v4.29 · R5 warmth pass — the swatch follow-on (shelf / shopping / session-detail)  *(confirm on device)*
 
 The swatch SITES are vm-covered (`liquor-test` F2, `frame-test`); whether the marks READ and the one layout

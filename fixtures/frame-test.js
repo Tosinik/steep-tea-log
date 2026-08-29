@@ -45,6 +45,9 @@ const SURFACES = {
   sessionDetail: ['.sd-band', '.sd-sec', '.sd-steep', '.sd-photo'],           // R156/R157 — slice 3
   insights:      ['.ins-band', '.ins-sec', '.ins-sechead', '.ins-door'],      // R161/R162 — slice 4
   home:          ['.home-masthead', '.home-sechead', '.lead-door', '.today-row'],  // R163+ — slice 5 (warm Home)
+  reflection:    ['.reflect-band'],   // R172 — the reflection deep pages' own BAND masthead (viewRitual/viewPalate);
+                                       // their RULE sections reuse .ins-sec/.ins-sechead (fenced under insights), and
+                                       // the doors (.ins-sec-door) + palate bars (.palate-bar/.dot-*) are marks, excluded.
 };
 const FRAME = [...Object.values(SURFACES).flat(), '.band'];           // '.band' is the shared primitive
 const FILL_OK = ['var(--porcelain)', 'var(--band)', 'var(--white)'];   // the only fills a frame may carry
@@ -111,6 +114,7 @@ expectPass('.btn-clay (SLAB) — --clay fill, no border, torn radius', chkPrimit
 expectPass('the SLAB carries the one permitted torn radius', chkSlabTorn(CSS));
 expectPass('.ins-door (BOX) — --white, radius 2px', chkPrimitive(CSS, '.ins-door', {bg:'var(--white)', radius:'2px', mustHave:['border:1px solid var(--line)']}));  // R162 positive: the box-less surface's positive subject
 expectPass('.home-masthead (BAND) — --band, radius 0', chkPrimitive(CSS, '.home-masthead', {bg:'var(--band)', radius:'0'}));  // R163 positive: Home's masthead band
+expectPass('.reflect-band (BAND) — radius 0 (rides .band for the fill)', chkPrimitive(CSS, '.reflect-band', {radius:'0'}));  // R172 positive: the reflection masthead
 
 /* ---------- C · fill-law across every fenced surface (F31 core) ---------- */
 console.log('\nC · fill-law — every frame selector carries only --porcelain/--band/--white');
@@ -168,6 +172,13 @@ expectFail('home: a torn radius on .home-masthead reddens radius-law',
   chkFrameRadius(CSS.replace(/(\.home-masthead\{[^}]*?border-radius:)0/, '$114px 5px 12px 6px')));
 expectFail('home: a torn radius on .home-masthead reddens rationing',
   chkRationing(CSS.replace(/(\.home-masthead\{[^}]*?border-radius:)0/, '$19px 4px 8px 5px')));
+// reflection (R172) — the deep pages' own BAND masthead; its RULE sections reuse .ins-sec (fenced above)
+expectFail('reflection: a rationed fill on .reflect-band reddens fill-law',
+  chkFrameFill(CSS.replace('.reflect-band{', '.reflect-band{background:var(--jade);')));
+expectFail('reflection: a torn radius on .reflect-band reddens radius-law',
+  chkFrameRadius(CSS.replace(/(\.reflect-band\{[^}]*?border-radius:)0/, '$19px 4px 8px 5px')));
+expectFail('reflection: a torn radius on .reflect-band reddens rationing',
+  chkRationing(CSS.replace(/(\.reflect-band\{[^}]*?border-radius:)0/, '$19px 4px 8px 5px')));
 // shared primitives + the slab
 expectFail('.band losing its --band fill reddens the primitive',
   chkPrimitive(CSS.replace(/(\.band\{[^}]*?background:)var\(--band\)/, '$1var(--jade)'), '.band', {bg:'var(--band)'}));
@@ -183,6 +194,10 @@ console.log('⚡ EXCLUDED MARKS (R170) — the warmth pass paints MARKS, not fra
 console.log('   liquor / --heat-empty), the Teas-brewed .ins-strip, the .ins-note-swatch and the .ins-typebar are');
 console.log('   liquor/type data riding on paper — excluded from SURFACES like the shelf swatch. No frame selector');
 console.log('   changed, so F31 is untouched and nothing above re-reddens.');
+console.log('⚡ REFLECTION (R172) — the deep pages ride the Insights spine: .reflect-band is their fenced BAND (above),');
+console.log('   the RULE sections reuse .ins-sec (fenced under insights). The section DOORS (.ins-sec-door — a cursor +');
+console.log('   chevron + press wash, .ins-sec frame unchanged) and the palate bars (.palate-bar/.dot-*) are marks/');
+console.log('   behaviour, not frame — excluded. The Insights fence is confirmed unchanged (its checks above hold).');
 
 /* ---------- verdict ---------- */
 console.log('');

@@ -925,6 +925,8 @@ function render(){
   else if(state.view==='wrapped') body = viewWrapped();
   else if(state.view==='shopping') body = viewShopping();
   else if(state.view==='spend') body = viewSpend();
+  else if(state.view==='ritual') body = viewRitual();          // v4.30 (R172) — reflection deep pages
+  else if(state.view==='palate') body = viewPalate();
   else if(state.view==='session') body = viewSessionFlow();
   else if(state.view==='pick-tea') body = viewPickTea();       // v4.21 (#14): R58 picker screens, opened from setup/flow/edit
   else if(state.view==='pick-vessel') body = viewPickVessel();
@@ -947,6 +949,12 @@ function render(){
     ${state.settingsOpen ? settingsModal() : ''}
   `;
   bindDynamic();
+  // v4.30 (R172) — the reflection deep-link scroll: after the view paints, bring the focused section
+  // into view once. reflectFocus is one-shot (nulled before the frame) so a later re-render never re-scrolls.
+  if(state.reflectFocus){
+    const f = state.reflectFocus; state.reflectFocus = null;
+    try{ requestAnimationFrame(()=>{ const el = document.getElementById('reflect-'+f); if(el && el.scrollIntoView) el.scrollIntoView({block:'start'}); }); }catch(e){}
+  }
 }
 
 // WS6 — the app shell. The bottom bar carries the five primary destinations (Log is the raised
@@ -1002,7 +1010,7 @@ function hubSheetHTML(){
 
 function goView(v){
   if(v==='vessels') return goVessels();                 // vessels folded into the Teas tab (v3.46)
-  state.view=v; state.activeTeaId=null; state.dashEdit=false;
+  state.view=v; state.activeTeaId=null; state.dashEdit=false; state.reflectFocus=null;   // v4.30: a plain tab tap never carries a stale deep-link focus
   if(v!=='teas'){ state.teaSearch=''; state.refSearch=''; state.refOpen=null; }   // #19: leaving the Library clears search; same-tab round-trips (tea-detail → back = goView('teas')) keep it
   if(v==='teas') state.teaSeg='teas';                    // tapping Teas shows the teas segment (not vessels, not Go Deeper)
   state.teaOverflowOpen=false; state.teaMenuOpen=false;
@@ -1014,6 +1022,14 @@ function goVessels(){
   state.teaSeg='vessels'; state.view='teas'; state.activeTeaId=null; state.dashEdit=false;
   saveView('teas'); render();
 }
+// v4.30 (R172) — the reflection deep-link. Land directly on a deep view AND scroll to the section that
+// explains the pattern (#reflect-<focus>), never open-and-hunt. reflectFocus is a one-shot consumed by
+// render()'s tail; teaId carries the per-tea case (Slice B). saveView records history like any view, so
+// Back leaves the deep page for the tab it opened from.
+function openReflection(view, focus, teaId){
+  state.view = view; state.reflectFocus = focus || null; state.activeTeaId = teaId || null; state.dashEdit = false;
+  saveView(view); render();
+}
 // v4.17 (#34): the app is one state machine with no browser history, so the OS back gesture had
 // nothing to pop and exited the PWA. saveView is the single place a navigable view is recorded, so
 // history rides HERE — one writer, no parallel truth (the F24 drift the tea-detail hand-write used
@@ -1023,7 +1039,7 @@ function goVessels(){
 // Views reached by a direct state.view= (session-detail, origins) don't push in v1; Back from them
 // pops to the last tab, which is the right target anyway. The localStorage relaunch memory keeps its
 // own smaller gate (PERSISTED_VIEWS, tab-level), plus the tea-detail deep-link.
-const HISTORY_VIEWS = ['dashboard','insights','teas','sessions','friends','tea-detail','session-detail','shopping','spend','origins','wrapped'];
+const HISTORY_VIEWS = ['dashboard','insights','teas','sessions','friends','tea-detail','session-detail','shopping','spend','origins','wrapped','ritual','palate'];
 function saveView(v){
   try{
     if(typeof history!=='undefined' && history.pushState && HISTORY_VIEWS.includes(v)){

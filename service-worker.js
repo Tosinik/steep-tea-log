@@ -1,4 +1,4 @@
-const CACHE_NAME = 'steep-tea-log-v139';
+const CACHE_NAME = 'steep-tea-log-v140';
 // The single source of APP_VERSION + WHATS_NEW (R158). importScripts is how the SW REFERENCES the note
 // rather than duplicating it: this worker answers GET_WHATS_NEW with its OWN self.WHATS_NEW, so the
 // waiting (incoming) worker hands the banner the incoming version's note. Runs at SW startup; the file
