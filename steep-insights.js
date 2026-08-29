@@ -150,10 +150,13 @@ function insTypeMixHTML(s){
 // Two quiet notes (leaf = most reached-for, hanko = highest note) — not a leaderboard.
 function insNotesHTML(s){
   const rows = [];
+  // R170: the two rows that name a tea are the surface's warmest moment — the leaf/hanko icon retires for a
+  // 30px liquor swatch (one mark per row; the swatch is the tea's liquorFor, type-tint at the tier-3 floor).
+  const sw = tea => `<span ${swatchAttr('ins-note-swatch', liquorFor(tea), (tea.type||'').toLowerCase())}></span>`;
   if(s.mostBrewed.length){ const m=s.mostBrewed[0];
-    rows.push(`<div class="ins-note"><svg class="ins-note-ic ins-note-leaf" viewBox="0 0 24 24" aria-hidden="true"><use href="#fav-leaf"/></svg><div><div class="ins-note-k">Most reached-for</div><div class="ins-note-v">${escapeHtml(m.tea.name)} · ×${m.count}</div></div></div>`); }
+    rows.push(`<div class="ins-note">${sw(m.tea)}<div><div class="ins-note-k">Most reached-for</div><div class="ins-note-v">${escapeHtml(m.tea.name)} · ×${m.count}</div></div></div>`); }
   if(s.topRated.length){ const t=s.topRated[0];
-    rows.push(`<div class="ins-note"><svg class="ins-note-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#hanko"/></svg><div><div class="ins-note-k">Highest note</div><div class="ins-note-v">${escapeHtml(t.name)} ${renderStarsStatic(t.rating,false)}</div></div></div>`); }
+    rows.push(`<div class="ins-note">${sw(t)}<div><div class="ins-note-k">Highest note</div><div class="ins-note-v">${escapeHtml(t.name)} ${renderStarsStatic(t.rating,false)}</div></div></div>`); }
   if(!rows.length) return '';
   return `<div class="ins-sec ins-notes">${rows.join('')}</div>`;
 }

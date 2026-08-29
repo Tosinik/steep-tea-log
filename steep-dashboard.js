@@ -210,27 +210,52 @@ function costMediansHTML(){
 
 // The two-digit bucket name the boards use: 08–10, not 8:00–10:00.
 function bucketLabel(i){ const p=n=>String(n).padStart(2,'0'); return `${p(i*2)}–${p(i*2+2)}`; }
+// R170 — the COLOUR CLOCK. For each of the 12 two-hour slots (matching hourBuckets = floor(getHours()/2)),
+// the DOMINANT tea's liquor key, or null (empty slot · a tie for top · a dominant tea with no liquor).
+// null → the bar takes --heat-empty: never-guess governs a bar's colour exactly as it governs a number.
+function clockDominant(sessions){
+  const slots = Array.from({length:12}, ()=>({}));
+  (sessions||[]).forEach(se=>{ const slot = Math.floor(new Date(se.date).getHours()/2); if(se.teaId) slots[slot][se.teaId] = (slots[slot][se.teaId]||0)+1; });
+  return slots.map(counts=>{
+    const ent = Object.entries(counts); if(!ent.length) return null;
+    ent.sort((a,b)=>b[1]-a[1]);
+    if(ent.length>1 && ent[0][1]===ent[1][1]) return null;                 // tie → no dominant
+    const t = teaById(ent[0][0]); const k = (t && typeof liquorFor==='function') ? liquorFor(t) : null;
+    return k || null;                                                       // dominant with no liquor → null
+  });
+}
+// R170 — the "Teas brewed" ledger strip: the DISTINCT liquors of the teas brewed in the window, ordered by
+// the ramp — colour as data (that row's subject is teas). No strip if none of them has a liquor.
+function teasBrewedStrip(sessions){
+  if(typeof liquorFor!=='function') return '';
+  const seen = new Set(), keys = [];
+  (sessions||[]).forEach(se=>{ const t = teaById(se.teaId); if(!t || seen.has(t.id)) return; seen.add(t.id); const k = liquorFor(t); if(k && !keys.includes(k)) keys.push(k); });
+  if(!keys.length) return '';
+  const order = (typeof LIQUOR_KEYS!=='undefined') ? LIQUOR_KEYS : keys;    // ramp order when available
+  keys.sort((a,b)=> order.indexOf(a) - order.indexOf(b));
+  return `<span class="ins-strip">${keys.map(k=>`<span style="background:var(--liquor-${k})"></span>`).join('')}</span>`;
+}
 function brewingClockHTML(s){
   if(s.totalSessions===0) return '';
   const max = Math.max(1, ...s.hourBuckets);
   const labels = ['0','2','4','6','8','10','12','14','16','18','20','22'];
   const peaks = new Set(s.peakBuckets||[]);
+  const fills = clockDominant(state.sessions||[]);     // R170: each bar carries what you drank in that slot
   const bars = s.hourBuckets.map((v,i)=>{
     const h = Math.round(v/max*100);
-    const isPeak = peaks.has(i);                       // R100: every tied peak is lit, not just the first
+    const fill = fills[i] ? `var(--liquor-${fills[i]})` : 'var(--heat-empty)';   // never-guess: no dominant → recessed paper
     return `<div class="clock-col">
-      <div class="clock-bar-track"><div class="clock-bar" style="height:${h}%;background:${isPeak?'var(--amber)':'var(--jade)'};"></div></div>
+      <div class="clock-bar-track"><div class="clock-bar" style="height:${h}%;background:${fill};"></div></div>
+      <div class="clock-peak${peaks.has(i)?' is-peak':''}"></div>
       <div class="clock-lbl">${labels[i]}</div>
     </div>`;
   }).join('');
-  // R100 — a tie is named, never resolved. "peak 08–10 and 12–14" says what is true; picking one
-  // asserts a hierarchy that doesn't exist, and the old label did it silently.
+  // R100 — a tie is named, never resolved. R170: the peak moved off the amber fill (fill is data now) onto
+  // the 2px ink rule under the column; this label still names it in words.
   const pk = s.peakBuckets||[];
   const peakLabel = pk.length ? `${pk.length>1?'joint peak':'peak'} ${andList(pk.map(bucketLabel))}` : '';
-  // R161: a RULE section — the clock is the surface's one labelled hour-of-day chart (named peak). The
-  // bars stay: they are the mark, and jade/amber on them is rationed correctly.
   return `<div class="ins-sec">
-    <div class="ins-sechead"><h2>When you brew</h2>${peakLabel?`<span class="mono" style="font-size:12px;color:var(--amber);">${peakLabel}</span>`:''}</div>
+    <div class="ins-sechead"><h2>When you brew</h2>${peakLabel?`<span class="mono" style="font-size:12px;color:var(--ink-soft);">${peakLabel}</span>`:''}</div>
     <div class="clock-chart">${bars}</div>
   </div>`;
 }
@@ -1241,8 +1266,8 @@ function homeLogCup(btn, teaId){
 // R161 — one ledger row: a label on the left, a mono figure on the right, a hairline under it. The
 // spine's RULE row for a retrospective number (totals/week/cost). k and v are literal labels + computed
 // figures, never user text.
-function insRow(k, v, onclick){
-  return `<div class="ins-row"${onclick?` onclick="${onclick}" style="cursor:pointer;"`:''}><span class="ins-row-k">${k}</span><span class="ins-row-v mono">${v}</span></div>`;
+function insRow(k, v, onclick, mid){
+  return `<div class="ins-row"${onclick?` onclick="${onclick}" style="cursor:pointer;"`:''}><span class="ins-row-k">${k}</span>${mid||''}<span class="ins-row-v mono">${v}</span></div>`;
 }
 function dashCardsHome(s){
   const lowStockHTML = s.lowStock.length ? s.lowStock.map(t=>`
@@ -1313,7 +1338,8 @@ function dashCardsHome(s){
     // on a hairline row is a ledger entry, which is what a retrospective surface reads as.
     totals: (function(){
       const p = gridPeriod(), start = gridWindowStart(p);
-      const g = start ? gridStats(state.sessions.filter(se=>new Date(se.date)>=start)) : s;
+      const windowed = start ? state.sessions.filter(se=>new Date(se.date)>=start) : state.sessions;
+      const g = start ? gridStats(windowed) : s;
       const eyebrow = p==='week' ? 'This week' : p==='month' ? 'This month' : 'All-time';
       const seg = (k,lbl)=>`<button class="density-seg ${p===k?'active':''}" style="font-family:var(--font-mono);font-size:11px;" onclick="setGridPeriod('${k}')">${lbl}</button>`;
       return `<div class="ins-sec">
@@ -1324,7 +1350,7 @@ function dashCardsHome(s){
       ${insRow('Days logged', g.days.size)}
       ${insRow('Grams brewed', g.totalGrams.toFixed(1))}
       ${insRow('Liters (est.)', g.totalLiters.toFixed(1))}
-      ${insRow('Teas brewed', g.uniqueTeas)}
+      ${insRow('Teas brewed', g.uniqueTeas, null, teasBrewedStrip(windowed))}
       </div>`;
     })(),
     clock: brewingClockHTML(s),

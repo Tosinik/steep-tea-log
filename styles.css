@@ -456,7 +456,10 @@ html[data-theme="dark"] .mood-chip.on{color:#15140F;}
 .clock-chart{display:flex;gap:4px;align-items:flex-end;height:90px;}
 .clock-col{flex:1;display:flex;flex-direction:column;height:100%;}
 .clock-bar-track{flex:1;display:flex;align-items:flex-end;}
-.clock-bar{width:100%;border-radius:3px 3px 0 0;min-height:2px;}
+.clock-bar{width:100%;border-radius:2px 2px 0 0;min-height:6px;}  /* R170: min-height floor so a low slot's liquor still reads (colour clock) */
+/* R170 — the peak signal moved off the amber FILL (fill is data now) onto a 2px ink rule under the column. */
+.clock-peak{height:2px;margin-top:3px;background:transparent;}
+.clock-peak.is-peak{background:var(--ink);}
 .clock-lbl{font-family:var(--font-mono);font-size:9px;color:var(--ink-soft);text-align:center;margin-top:4px;}
 
 /* type bars */
@@ -951,13 +954,17 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .ins-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:8px;border-bottom:2px solid var(--ink);border-radius:0;}
 .ins-sechead h2{font-family:var(--font-display);font-weight:700;font-size:15px;margin:0;}
 .ins-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);}
-.ins-row-k{font-size:13px;color:var(--ink);}
-.ins-row-v{font-size:14px;color:var(--ink);}
+.ins-row-k{font-size:13px;color:var(--ink);flex:none;}
+.ins-row-v{font-size:14px;color:var(--ink);flex:none;}
+/* R170 — the "Teas brewed" ledger strip: the collection's distinct liquors, a mark riding between label and figure. */
+.ins-strip{flex:1;display:flex;gap:2px;overflow:hidden;padding:0 10px;align-self:center;}
+.ins-strip span{flex:1;max-width:11px;height:13px;border-radius:1px;}
+.ins-note-swatch{width:30px;height:30px;border-radius:2px;flex:none;}  /* R170 — the note row's 30px liquor swatch (icons retired) */
 .ins-obs{font-family:var(--font-display);font-weight:600;font-size:15px;line-height:1.35;color:var(--ink);}
 .ins-cap{font-family:var(--font-mono);font-size:9.5px;color:var(--ink-soft);margin-top:2px;}
 
 /* type distribution — one slim stacked bar in the fixed type colors + mono legend */
-.ins-typebar{height:10px;border-radius:6px;overflow:hidden;display:flex;margin-top:10px;}
+.ins-typebar{height:20px;border-radius:2px;overflow:hidden;display:flex;margin-top:11px;}  /* R170: 10→20px, radius 6→2px (spine); hues stay the R149-deferred type tints */
 .ins-typebar span{display:block;height:100%;}
 .ins-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-family:var(--font-mono);font-size:9px;color:var(--ink-soft);}
 .ins-legend span{display:inline-flex;align-items:center;}

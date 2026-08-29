@@ -38,6 +38,9 @@ ctx.dayKey=d=>{ const x=new Date(d); return x.getFullYear()+'-'+x.getMonth()+'-'
 const TEAS={ 'g':{name:'Shincha Saemidori',type:'green'}, 'o':{name:'Honey Oolong',type:'oolong'}, 'b':{name:'Ruby Ruanzhi',type:'black'}, 'w':{name:'Silver Needle',type:'white'} };
 ctx.teaById=id=>TEAS[id]||null;
 ctx.vesselById=()=>({name:'Gaiwan'});
+// R170: insNotesHTML now paints a liquor swatch (steep-teas.js helpers) instead of the leaf/hanko icon.
+ctx.liquorFor=()=>null;                                       // tier-3 fallback path (type tint) is enough here
+ctx.swatchAttr=(base,key,type)=>`class="${base}${type?' t-'+type:''}"`;
 vm.createContext(ctx);
 vm.runInContext([grab(coreSrc,'argmaxTies'), grab(coreSrc,'andList'), grab(passSrc,'originTier')].join(';\n'), ctx);
 
@@ -87,9 +90,9 @@ const test=`
   check('type mix has a legend', typemix.indexOf('ins-legend')>-1);
   (function(){ const seg=[...typemix.matchAll(/width:([\\d.]+)%/g)].map(m=>parseFloat(m[1])); const sum=seg.reduce((a,b)=>a+b,0); check('type widths sum ~100 ('+sum.toFixed(1)+')', Math.abs(sum-100)<0.6); })();
 
-  // 6) Two quiet notes — leaf (most reached-for) + hanko (highest note).
-  check('note: most reached-for', notes.indexOf('Most reached-for')>-1 && notes.indexOf('#fav-leaf')>-1 && notes.indexOf('×6')>-1);
-  check('note: highest note sealed with hanko', notes.indexOf('Highest note')>-1 && notes.indexOf('#hanko')>-1);
+  // 6) Two quiet notes — R170: each names a tea, so each leads with a 30px liquor swatch (icons retired).
+  check('note: most reached-for + its swatch', notes.indexOf('Most reached-for')>-1 && notes.indexOf('ins-note-swatch')>-1 && notes.indexOf('×6')>-1);
+  check('note: highest note + a swatch on each of the two rows', notes.indexOf('Highest note')>-1 && (notes.match(/ins-note-swatch/g)||[]).length===2);
 
   // 7) Teaser — deep-jade strip into Wrapped (its → is decorative nav, allowed).
   check('teaser links to wrapped', teaser.indexOf("goView('wrapped')")>-1 && teaser.indexOf('wrapped')>-1);

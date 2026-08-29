@@ -111,3 +111,22 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
    **Start steeping** (clay) only when a tea is proposed.
 6. **Wrapped moment:** in the first ~5 days of a month, "Your {month}" appears under the greeting and
    opens Wrapped; after, it's gone with no remnant (the archive stays on Insights, R103).
+
+---
+
+## v4.28 · R5 warmth pass — Insights (the colour clock)  *(confirm on device)*
+
+The colour-clock logic is vm-covered (`fixtures/insight-warmth-test.js`); whether it READS is the phone
+look. On Insights:
+
+1. **Does the colour clock read as information?** "When you brew" — each 2-hour bar takes the liquor of
+   the tea you most drank in that slot (a green morning reads pale, a shou evening near-black). Do the 12
+   bars read as "what you drank when," or as noise?
+2. **Does `--heat-empty` read as "no data"?** An empty / tied / no-liquor slot takes recessed paper
+   (`#E4DCC5`) — it should read as absence, not be mistaken for a pale liquor.
+3. **Does the peak read?** The peak column's signal is now a **2px ink rule** beneath it (not an amber
+   fill), beside the mono "peak 08–10" label — does it read in greyscale?
+4. **Does the "Teas brewed" strip read as your palette, or decoration?** *(Keep/remove call — if it reads
+   decorative rather than as your collection's colours, it's a one-line removal.)*
+5. **Do the note swatches land?** Most reached-for / Highest note now lead with a 30px liquor swatch
+   (leaf/hanko icons retired) — one mark per row.

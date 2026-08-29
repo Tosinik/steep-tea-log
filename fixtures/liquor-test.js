@@ -285,7 +285,7 @@ FILES_SCANNED.forEach(f=>{
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
 ok(tinted===11, 'F1 ELEVEN type-tint writes remain across the six files — the v4.19 picker added two (its tier-3 fallback: COLOUR-row preview + default cell), on top of the nine that stayed labels/placeholders/chart after three became swatches (got '+tinted+')');
-ok(painted===6, 'F2 …and exactly SIX call sites paint a liquor now — the four earlier (ref/social/today + the shelf row) plus warm Home\'s two (R159): the lead-insight door swatch and the Running-low swatch, one per real swatch slot (got '+painted+')');
+ok(painted===7, 'F2 …and exactly SEVEN swatchAttr call sites paint a liquor now — six through warm Home (R159) plus the Insights note swatch (R170); the colour-clock bars and the Teas-brewed strip paint liquor via var(--liquor-*) directly, not swatchAttr, so they are marks outside this count (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
 const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));

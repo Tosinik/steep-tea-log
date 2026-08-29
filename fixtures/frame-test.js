@@ -179,6 +179,10 @@ expectFail('a flattened slab (2px, not torn) reddens the slab check',
 /* ---------- deferred, reported not asserted (R149) ---------- */
 console.log('\n⚡ DEFERRED (R149) — the photo-less .shelf-ph / .shelf-kanji tint is a fill on a non-rationed');
 console.log('   element; the fill-law is built to catch it, but it is resolved in the rollout, not this slice.');
+console.log('⚡ EXCLUDED MARKS (R170) — the warmth pass paints MARKS, not frame: the colour-clock bars (.clock-bar,');
+console.log('   liquor / --heat-empty), the Teas-brewed .ins-strip, the .ins-note-swatch and the .ins-typebar are');
+console.log('   liquor/type data riding on paper — excluded from SURFACES like the shelf swatch. No frame selector');
+console.log('   changed, so F31 is untouched and nothing above re-reddens.');
 
 /* ---------- verdict ---------- */
 console.log('');
