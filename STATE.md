@@ -191,8 +191,10 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.30 committed `08ac1b4`, UNPUSHED (with v4.29 `37f43a7`) — awaiting Niklas's on-device gate + push
-(`/slowcup-deploy` each) — R5 reflection Slice A: the deep pages behind the door (R172)** (cache **v140**,
+**NOW — v4.30 LIVE `08ac1b4` (with v4.29 `37f43a7`), pushed — on-device checks (`smoke.md §v4.29/§v4.30`) run
+**post-deploy** (a live PWA can't exercise the SW / real scroll / touch before it's served; the "before push"
+wording fits only surfaces a local server can drive) — fix-forward if any fail — R5 reflection Slice A: the
+deep pages behind the door (R172)** (cache **v140**,
 APP_VERSION v4.30, **no SQL**). The deep pages the Home lead-insight door (R165) + the Insights sections point
 at (`docs/r5/planning/REFLECTION-SPEC.md`) — the record to Home's moment. Built entirely on existing fields;
 they wear the Insights spine (`.band`/`.reflect-band` masthead + `.ins-sec` RULE sections).
@@ -215,10 +217,10 @@ they wear the Insights spine (`.band`/`.reflect-band` masthead + `.ins-sec` RULE
   sections doors (type-mix→palate, clock→ritual); do ritual/palate read as spine surfaces; does Back return to
   Insights (no dead-end/loop)?
 - **NEXT — reflection Slice B** (per-tea + the earned brew guide, **R173**), then Slice C (terroir +
-  teas-over-time, **R174**). Also queued: the v4.29 + v4.30 phone gate + push. **SECURITY stays the deferred
-  pre-widening gate.**
+  teas-over-time, **R174**). Also queued: run the §v4.29/§v4.30 on-device checks on the **live** site
+  (post-deploy), fix-forward if any fail. **SECURITY stays the deferred pre-widening gate.**
 
-**Previously — v4.29 committed `37f43a7`, UNPUSHED — R5 warmth pass: the swatch follow-on (R171)** (cache **v139**,
+**Previously — v4.29 LIVE `37f43a7` — R5 warmth pass: the swatch follow-on (R171)** (cache **v139**,
 APP_VERSION v4.29, **no SQL**). The follow-on R170 named: the tea's own colour reaches the last three utility
 surfaces. **Marks only, not a re-frame** — every change is a `liquorFor` swatch or a size; no container
 class/count/fill/radius moves, so **F31 untouched** and Insights' fence unaffected. Colour is **data** (a want
