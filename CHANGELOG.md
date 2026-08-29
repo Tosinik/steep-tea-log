@@ -46,6 +46,34 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.29 — R5 warmth pass: the swatch follow-on (shelf / shopping / session-detail) — R171
+Deploy: styles.css, steep-sessions.js, steep-shopping.js, service-worker.js (**v139**), steep-version.js
+(APP_VERSION v4.29 + WHATS_NEW), fixtures/liquor-test.js, smoke.md. **No SQL.** *(Docs — CHANGELOG.md,
+STATE.md, R3-RULINGS-LEDGER.md R171 — push with this deploy. Second warmth slice; closes the shelf/
+shopping/session-detail follow-on the v4.28 entry named.)*
+
+The warmth pass reaches the three utility surfaces v4.28 left. **Marks only, no re-frame**: every change is
+a `liquorFor` swatch (the tea's own colour) or a size — no container's class, count, fill, or radius moves,
+so F31 is untouched and Insights' own fence is unaffected. Colour is **data**: a want with no tea on the
+shelf gets **no swatch** (never-guess).
+
+- **Shelf** — `.shelf-swatch` **24×32 → 30×40**; the identity plate reads larger. The SVG path/viewBox are
+  unchanged (the shape is the same, just scaled).
+- **Shopping** — a **14px `.rank-swatch`** (the same quiet mark Home's Running-low uses, R159) leads every
+  **running-low** row (all name a shelf tea) and each **rebuy** row on Your list — but **only when the want
+  is on the shelf** (`shelfTeaForWish`); a plain want stays swatch-less.
+- **Session-detail** — the `.sd-band` becomes a **row**: a **44×58** identity swatch (`swatchAttr` plate,
+  the session's tea) leads, with the date/name/ident stacked in `.sd-band-main`. Unknown-tea → no swatch.
+- **Fence:** all three are **marks** — excluded from the fill-law like the shelf swatch / R170 clock bars.
+  **frame-test 32 checks unmoved**; Insights' fence confirmed green. `.sd-swatch` is a new selector but a
+  mark, not a frame.
+
+Ruling: **R171** (the swatch follow-on — shelf 30×40, shopping 14px on running-low + on-shelf rebuys only,
+session-detail 44×58 in the band; marks-not-frame, colour-is-data). Suite update: `liquor-test` F2 (7→10
+swatchAttr sites; **steep-shopping.js added to the scan** so the surface that just gained swatches is
+guarded — it contributes 0 type-tint writes, F1 stays 11). **34 committed suites + 2 engine/warmth fixtures
+green.** On-device: `smoke.md §v4.29`.
+
 ## v4.28 — R5 warmth pass: Insights (the colour clock) — R170
 Deploy: styles.css, steep-dashboard.js, steep-insights.js, service-worker.js (**v138**), steep-version.js
 (APP_VERSION v4.28 + WHATS_NEW), **new** fixtures/insight-warmth-test.js, fixtures/frame-test.js,

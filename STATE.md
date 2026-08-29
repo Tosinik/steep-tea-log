@@ -191,7 +191,30 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.28 SHIPPED, LIVE `8d4d44e` — R5 warmth pass: Insights, the colour clock (R170)** (cache **v138**,
+**NOW — v4.29 committed `37f43a7`, UNPUSHED (+ v4.30 reflection Slice A, this session) — awaiting Niklas's
+on-device gate + push (`/slowcup-deploy`) — R5 warmth pass: the swatch follow-on (R171)** (cache **v139**,
+APP_VERSION v4.29, **no SQL**). The follow-on R170 named: the tea's own colour reaches the last three utility
+surfaces. **Marks only, not a re-frame** — every change is a `liquorFor` swatch or a size; no container
+class/count/fill/radius moves, so **F31 untouched** and Insights' fence unaffected. Colour is **data** (a want
+with no shelf tea → no swatch).
+- **Shelf** `.shelf-swatch` 24×32→**30×40** (SVG path/viewBox unchanged). **Shopping** a 14px `.rank-swatch`
+  (Home's Running-low mark, R159) leads every running-low row + each rebuy **only when the want is on the
+  shelf** (`shelfTeaForWish`); a plain want stays swatch-less. **Session-detail** `.sd-band` → a **row**: a
+  **44×58** identity swatch leads, date/name/ident stack in `.sd-band-main`; unknown-tea → none. Files:
+  `styles.css`, `steep-sessions.js`, `steep-shopping.js`, `service-worker.js` (v139), `steep-version.js`,
+  `fixtures/liquor-test.js`, `smoke.md`.
+- **Fence:** all three are **marks**, excluded like the shelf swatch / R170 clock bars (`.sd-swatch` is a new
+  selector but a mark; **frame-test 32 unmoved**; Insights green). `liquor-test` F2 **7→10** swatchAttr sites;
+  **steep-shopping.js added to the scan** (0 tint writes, F1 stays 11). **34 committed suites + 2 fixtures
+  green.** Ledger: **R171**.
+- **ON DEVICE (`smoke.md §v4.29`)** — does the 30×40 shelf plate read (bigger, still a distinct object vs a
+  fill); does the session-detail **band row** hold (44×58 swatch | text, long names wrap, unknown-tea = no
+  gap); do the Shopping swatches read (running-low always, rebuy only when on-shelf).
+- **NEXT — reflection Slice A (v4.30)**, being built this session: the deep-link mechanism + `viewRitual` /
+  `viewPalate` + the whole-Insights-explorable doors (mints **R172**); Slices B/C reserve R173/R174. **SECURITY
+  stays the deferred pre-widening gate.**
+
+**Previously — v4.28 (LIVE `8d4d44e`) — R5 warmth pass: Insights, the colour clock (R170)** (cache **v138**,
 APP_VERSION v4.28, **no SQL**). The warmth pass lands the app's own colour on the utility surfaces, **Insights
 first** (the priority + reflection-pages foundation). A **dressing pass, not a re-frame:** no container
 class/count moves; **F31 untouched** (every mark is a mark, not frame). Colour is **data** (`liquorFor`); no
@@ -211,10 +234,9 @@ tea → no mark (never-guess).
   you drank when," not noise); does `--heat-empty` read as absence; does the peak **ink rule** read; does the
   **Teas-brewed strip** read as your palette *(keep/remove call — one-line removal if decorative)*; do the
   note swatches land.
-- **NEXT — v4.29 the warmth-pass follow-on:** shelf swatch 24×32→30×40 (identity shape unchanged), Shopping
-  14px swatch on Running-low + rebuy rows only, session-detail one 44×58 swatch in the band → mints **R171**.
-  Then the **Insights reflection deep pages** the lead-insight door points at. **SECURITY stays the deferred
-  pre-widening gate.**
+- **NEXT — v4.29 the warmth-pass follow-on:** ~~shelf 24×32→30×40, Shopping 14px on Running-low + rebuy,
+  session-detail 44×58 in the band~~ **SHIPPED v4.29 (R171).** Then the **Insights reflection deep pages** the
+  lead-insight door points at → now **v4.30 reflection Slice A** (see the NOW block).
 - **Warmth-pass backlog (parked follow-ups, on the record — not blocking):** (1) **freshness-framing
   type-awareness** — the "at its freshest now" insight (`computeLeadInsight`) should fire drink-fresh urgency
   only for freshness-urgent types (greens); stable/ageing (oolong/white/pu-erh) get different framing or no
