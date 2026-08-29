@@ -23,6 +23,10 @@ correct on the utility surfaces is *not* a mandate here.
   stays forbidden: gamification, streaks, nagging, metric-worship. Warmth is not a streak.
 - **Never-guess (the three-tier cascade).** Show **nothing** rather than an uncertain value. A blank beats a
   wrong or hollow number on the surface that's supposed to feel alive.
+- **The way to start a session is always reachable and visible.** The nav **Log** button (`bn-log`) becomes
+  a bold, obvious FAB; Home's **"Start steeping"** shows whenever a tea is proposed. Both may be present, but
+  the start-a-session path must **never fully disappear** — it is the app's one indispensable action, and a
+  calm surface still keeps its front door in plain sight.
 
 ## Seeds (from the brainstorm — verbatim intent, not spec)
 
@@ -43,6 +47,55 @@ correct on the utility surfaces is *not* a mandate here.
   retrospective register. The **non-comparative** flavor of it — *when/how you brew*, a present-tense
   rhythm rather than a judgement against last month — belongs on Home, not Insights. It overlaps
   mood-time-patterns; keep it non-comparative and forward (never "you brewed less").
+
+## Contrast & warmth (extends R160 — app-wide)
+
+Four spine slices (shelf, Shopping, session-detail, Insights) collapsed the palette to near-monochrome —
+porcelain, ink, hairlines, one clay, tiny liquor flecks. **Correct as structure, lifeless as a whole.** The
+fix is not to retreat from the spine but to put **the app's own colour on top of it**: liquor swatches used
+**boldly**, tea imagery, type tints, and real **figure/ground** contrast. Colour on the spine's bones, not
+instead of them. **Home is the proving ground** — if warmth-on-structure works there, the utility surfaces
+get a contrast pass too, so R160's "calm ≠ spare" becomes **app-wide**, not Home-only.
+
+- **Palette candidate — a whiter ground.** `--porcelain` today is `#F6F2E9` (warm cream); a whiter, cleaner
+  ground makes the liquor colours **pop**. Niklas prefers it. **Test on Home first, possibly app-wide.** A
+  token change — measured and changed in one place (`styles.css :root` + the dark block); it touches every
+  surface, so it rides its **own** decision, never smuggled into another slice.
+
+## Wrapped is a rhythm, not a card — the model for time-bound Home elements
+
+Wrapped keeps **R103** (it reports the last **complete** month — never a partial). Its life cycle:
+
+- **At each month's turn it arrives on Home as a moment** — *"Your August,"* prominent at the start of the
+  new month — **then recedes** as the month goes on.
+- **It permanently lives on Insights as a shelf** — the current one plus an **archive** to page back
+  through past months.
+
+**Home = the moment; Insights = the record.** This is the model for **any** time-bound element on Home: it
+earns the lead by being **timely**, never by being **permanent** (Home stays present-tense, R115; the
+archive/retrospective stays on Insights). Note this is a *fuller* life cycle than the current Insights
+Wrapped **door** (R161) — that door is the Insights end of the same rhythm; the Home moment is the new half.
+
+## Candidates on the record
+
+- **Topbar tagline "a tea diary."** A candidate identity line under the SlowCup wordmark — **liked, not
+  currently live**. Present in the reference mockup below.
+
+## Reference
+
+The visual direction for Home is the board banked at **`docs/r5/boards/home-warm-reference.dc.html`** (a
+`.dc.html`, the boards-dir convention — the *source* of the screenshot that seeded this direction, not a
+flat PNG). **Provenance:** it is the newest cut of the **R4 "Home is the present tense"** revision lineage
+(internally badged `R4 · HOME`, export 2026-08-05) — effectively **rev3**, adding the "a tea diary" tagline
+that `docs/r4/boards/home-revision-rev1/rev2.dc.html` don't carry; adopted here as the **R5** warm-direction
+reference. It is distinct from `docs/r5/boards/home-element-mix.dc.html` (the R159 FRAME layer): this is the
+**content + warmth** half.
+
+What it shows: a warm, editorial Home — a serif **"Second pour today — a proper tea day."** greeting over a
+"FRIDAY AFTERNOON" eyebrow and a *"Your 42nd cup."* line; a clay **"Start steeping"** beside a quiet **"Log a
+cup →"**; the **"a tea diary"** tagline by the wordmark; **Earlier today** rows led by bold liquor swatches;
+**Running low** and **Favourites** as light groupings; and a bold green **Log FAB** centred in the nav. It is
+the contrast-&-warmth direction executed on Home — colour and imagery on the spine's structure.
 
 ## Status
 
