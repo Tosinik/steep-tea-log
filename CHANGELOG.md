@@ -46,6 +46,43 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.28 — R5 warmth pass: Insights (the colour clock) — R170
+Deploy: styles.css, steep-dashboard.js, steep-insights.js, service-worker.js (**v138**), steep-version.js
+(APP_VERSION v4.28 + WHATS_NEW), **new** fixtures/insight-warmth-test.js, fixtures/frame-test.js,
+fixtures/insights-room-test.js, fixtures/liquor-test.js, .gitignore, smoke.md. **No SQL.** *(Docs —
+CHANGELOG.md, STATE.md, R3-RULINGS-LEDGER.md R170 — push with this deploy. First of the warmth pass;
+shelf/shopping/session-detail follow as v4.29.)*
+
+The warmth pass lands the app's own colour on the utility surfaces, **Insights first** (the priority + the
+reflection-pages foundation). A dressing pass, **not a re-frame**: no container's class or count moves; F31
+is untouched because every mark here is a **mark, not a frame**. Colour arrives as **data** — a swatch/bar
+is the tea's `liquorFor`; no tea → no mark, no placeholder (never-guess).
+
+- **The colour clock** (the one new mechanic) — `brewingClockHTML`'s "When you brew": `clockDominant`
+  gives each 2-hour bar the liquor of the tea most-brewed in that slot; an empty / tied / no-liquor slot
+  takes **`--heat-empty`** (existing token, never a guessed colour). The distribution and the tea are one
+  fact. The **peak moves off the amber fill** (fill is data now) onto a **2px ink rule** under the column
+  (`.clock-peak.is-peak`) beside the mono label — reads in greyscale; R100 ties all lit. Bars gain a
+  min-height floor so a low slot's colour still reads.
+- **"Teas brewed" strip** — that ledger row (its subject is teas) gains a strip of the **distinct liquors
+  of the teas brewed in the window**, ramp-ordered; grams/litres/etc. stay ink; no strip if none has a
+  liquor. *(Phone-look keep/remove call.)*
+- **Notes** — the two tea-naming rows drop the leaf/hanko icon for a **30px `liquorFor` swatch** (one mark
+  per row). **Type bar** 10→20px, radius 6→2px (hues stay R149-deferred). **Hero** unchanged — plain
+  sentence BAND, no bars, no swatch (R161: the cleanest element gets nothing). **Doors** untouched (retired
+  `#2A4130` does not return). **Zero clay holds.**
+- **Fence:** all of it is **marks** (clock fills, strip, note swatch, type bar) — excluded like the shelf
+  swatch / R149 photo-tint; **no new `SURFACES` entry**, frame selectors unchanged. **32 checks, unmoved**
+  — nothing re-reddens; an "excluded marks (R170)" note added.
+
+Ruling: **R170** (the warmth pass realized on the utility surfaces, Insights first + the colour-clock
+mechanic — distribution × tea in one mark, peak off-fill → ink rule, `--heat-empty` for a dominant-less
+slot, marks-not-frame). The v4.29 follow-on mints **R171** (shelf 30×40 / shopping 14px / session-detail
+44×58). New `fixtures/insight-warmth-test.js` (17 — clockDominant dominant/tie/empty/no-liquor, the
+peak-rule set, the strip's distinct-liquor set, real-data sanity). Suite updates: `insights-room` (note
+swatch, harness stubs), `liquor-test` F2 (6→7 swatchAttr sites). **34 committed suites + 2 engine/warmth
+fixtures green.** On-device: `smoke.md §v4.28`.
+
 ## v4.27 — R5: the warm Home combined slice (R159 — frame + content + warmth)
 Deploy: styles.css, steep-dashboard.js, steep-core.js, service-worker.js (**v137**), steep-version.js
 (APP_VERSION v4.27 + WHATS_NEW), fixtures/frame-test.js, fixtures/home-test.js, fixtures/liquor-test.js,

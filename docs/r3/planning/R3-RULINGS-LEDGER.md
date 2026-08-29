@@ -2267,6 +2267,25 @@ Insights (R103, R161). This is the model for any time-bound Home element: it ear
 **timely**, never by being **permanent**. *(steep-dashboard.js `wrappedMomentHTML`; styles.css
 `.wrapped-moment`.)*
 
+**R170 — the warmth pass reaches the utility surfaces (Insights first), and the colour clock makes the
+distribution and the tea one fact.** R5 (v4.28). Home was the proving ground (R164); the app's own colour
+now lands on the utility surfaces, closing the seam between one warmed identity floor and four austere
+utility floors. **A dressing pass, not a re-frame:** no container's class or count moves, and **F31 is
+untouched because every mark here is a mark, not a frame** — the colour-clock bars, the "Teas brewed"
+strip, the note swatches and the type bar are liquor/type data riding on paper, excluded from `SURFACES`
+exactly like the shelf swatch (the fence stays 32 checks; an "excluded marks" note records it). **The
+colour clock** (`brewingClockHTML`) is the one new mechanic: `clockDominant` gives each 2-hour slot the
+liquor of its most-brewed tea; a dominant-less slot (empty · a tie · a tea with no liquor) takes
+**`--heat-empty`** — never-guess governs a bar's colour as it governs a number. The **peak leaves the amber
+fill** (fill is data now) for a **2px ink rule** under the column (reads in greyscale; R100 ties all lit).
+Colour is **data** throughout: the hero, whose subject is a top TYPE not a tea, stays plain (R161 — the
+cleanest element gets nothing); "Teas brewed" gains its collection's palette while grams/litres stay ink;
+the doors keep `--white`/2px (the retired `#2A4130` does not return); **zero clay holds**. Insights is
+first because it read most as a spreadsheet and is the reflection-pages foundation. *(steep-dashboard.js
+`clockDominant`/`teasBrewedStrip`/`brewingClockHTML`; steep-insights.js `insNotesHTML`; styles.css
+`.clock-*`/`.ins-strip`/`.ins-note-swatch`/`.ins-typebar`; fixtures/insight-warmth-test.js. The v4.29
+follow-on — shelf 30×40, shopping 14px, session-detail 44×58 — mints R171.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

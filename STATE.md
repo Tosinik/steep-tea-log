@@ -191,7 +191,43 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.27 SHIPPED, LIVE `50e40f0` — R5: the warm Home combined slice (R159 — frame + content + warmth)**
+**NOW — v4.28 SHIPPED, LIVE `8d4d44e` — R5 warmth pass: Insights, the colour clock (R170)** (cache **v138**,
+APP_VERSION v4.28, **no SQL**). The warmth pass lands the app's own colour on the utility surfaces, **Insights
+first** (the priority + reflection-pages foundation). A **dressing pass, not a re-frame:** no container
+class/count moves; **F31 untouched** (every mark is a mark, not frame). Colour is **data** (`liquorFor`); no
+tea → no mark (never-guess).
+- **The colour clock** (`clockDominant` + `brewingClockHTML`): each 2-hour bar takes the liquor of the tea
+  most-brewed in that slot; empty/tie/no-liquor → **`--heat-empty`**. The peak leaves the amber fill for a
+  **2px ink rule** (`.clock-peak.is-peak`) beside the mono label (R100 ties all lit). **"Teas brewed"** row
+  gains the window's distinct liquors (ramp-ordered strip); grams/litres stay ink. **Notes**: 30px liquor
+  swatch replaces the leaf/hanko icon. **Type bar** 10→20px/6→2px. **Hero** plain (R161), **doors** untouched,
+  **zero clay** holds. Files: `styles.css`, `steep-dashboard.js`, `steep-insights.js`, `service-worker.js`
+  (v138), `steep-version.js`, **new** `fixtures/insight-warmth-test.js` + 3 fixtures, `.gitignore`, `smoke.md`.
+- **Fence:** all marks (clock fills/strip/note swatch/type bar), excluded like the shelf swatch — **no new
+  `SURFACES`**; **32 checks unmoved**, nothing re-reddens; "excluded marks (R170)" note added. **34 committed
+  suites + 2 engine/warmth fixtures green.** Ledger: **R170**. Suite updates: insights-room (note swatch +
+  stubs), liquor-test F2 (6→7).
+- **ON DEVICE (`smoke.md §v4.28`)** — does the colour clock read as **information** (12 liquor bars = "what
+  you drank when," not noise); does `--heat-empty` read as absence; does the peak **ink rule** read; does the
+  **Teas-brewed strip** read as your palette *(keep/remove call — one-line removal if decorative)*; do the
+  note swatches land.
+- **NEXT — v4.29 the warmth-pass follow-on:** shelf swatch 24×32→30×40 (identity shape unchanged), Shopping
+  14px swatch on Running-low + rebuy rows only, session-detail one 44×58 swatch in the band → mints **R171**.
+  Then the **Insights reflection deep pages** the lead-insight door points at. **SECURITY stays the deferred
+  pre-widening gate.**
+- **Warmth-pass backlog (parked follow-ups, on the record — not blocking):** (1) **freshness-framing
+  type-awareness** — the "at its freshest now" insight (`computeLeadInsight`) should fire drink-fresh urgency
+  only for freshness-urgent types (greens); stable/ageing (oolong/white/pu-erh) get different framing or no
+  fire — `ttFreshness` is already type-aware, the insight isn't using it. (2) **reliable masthead
+  session-start** — a "Log a cup" always on the Home masthead, not only the nav FAB. (3) **stale-override
+  reset** — offer a dash layout reset when a user's overrides predate a redesign (old Wrapped/`week` linger).
+  (4) **Favourites default order** — consider lower by default. (5) **liquor ramp too thin for some families**
+  — the 12-stop `--liquor-*` ramp (`SPEC-liquor-swatch-model.md`) is thin at points (notably the green end),
+  so distinct teas can resolve to near-identical swatches; the warmth pass makes this visible (bold swatches
+  + the colour clock, where two greens sharing a bar reads as an error) — consider expanding the ramp without
+  breaking per-row assignments or never-guess.
+
+**Previously — v4.27 (SHIPPED, LIVE `50e40f0`) — R5: the warm Home combined slice (R159 — frame + content + warmth)**
 (cache **v137**, APP_VERSION v4.27, **no SQL**). The HELD Home slice, landed: the R2/R3 overhaul on Home +
 the lead-insight engine + the warm direction. Two commits: **A** `fe42808` (engine dormant + fixture), **B**
 `50e40f0` (visual wiring + fence).
