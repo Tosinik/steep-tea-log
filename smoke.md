@@ -114,6 +114,24 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.29 · R5 warmth pass — the swatch follow-on (shelf / shopping / session-detail)  *(confirm on device)*
+
+The swatch SITES are vm-covered (`liquor-test` F2, `frame-test`); whether the marks READ and the one layout
+change holds is the phone look — same visual half R144 named for the shelf swatch (v4.20). On device:
+
+1. **Shelf swatch at 30×40.** Open the library — the identity swatch/plate reads **larger** than before, and
+   the tier-3 **dashed plate** still reads as a different object from a filled swatch (the v4.20 check, now
+   at the bigger size). No clipping, no aspect distortion (the shape is the same, just scaled).
+2. **Session-detail band — the new row layout.** Open a session's page: the band is now **swatch | text**,
+   a **44×58** colour plate to the left of the date/name/ident stack, vertically centred. A **long tea
+   name** wraps in its column without pushing the swatch or breaking the band. **Unknown-tea** session → no
+   swatch, text alone (no empty gap). The plate is the session's tea's colour.
+3. **Shopping swatches.** On Shopping: every **Running low** row leads with a 14px colour swatch; on **Your
+   list**, a row leads with one **only when it's a rebuy** (the want is already on the shelf) — a plain want
+   has **no** swatch. Colour is data: no invented colour on a want with no tea.
+
+---
+
 ## v4.28 · R5 warmth pass — Insights (the colour clock)  *(confirm on device)*
 
 The colour-clock logic is vm-covered (`fixtures/insight-warmth-test.js`); whether it READS is the phone

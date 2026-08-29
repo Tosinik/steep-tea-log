@@ -56,6 +56,7 @@ function viewShopping(){
       // own words come off .text. Interpolating the object printed '[object Object]' on every row.
       const line = (typeof statusLine==='function') ? (statusLine(t).text||'') : '';
       return `<div class="shop-row">
+        <span ${swatchAttr('rank-swatch', liquorFor(t), (t.type||'').toLowerCase())}></span>
         <div style="flex:1;min-width:0;">
           <div class="shop-name">${escapeHtml(t.name)}${t.isFavorite?' '+favLeaf(12):''}</div>
           <div class="shop-meta">${escapeHtml([line, t.source].filter(Boolean).join(' · '))}</div>
@@ -83,6 +84,7 @@ function viewShopping(){
       const meta = [w.vendor, w.note].filter(Boolean).map(escapeHtml).join(' · ');
       return `<div class="shop-row">
       <input type="checkbox" ${w.done?'checked':''} onchange="toggleWishDone('${escapeJsArg(w.id)}')" aria-label="Mark bought">
+      ${onShelf?`<span ${swatchAttr('rank-swatch', liquorFor(onShelf), (onShelf.type||'').toLowerCase())}></span>`:''}
       <div style="flex:1;min-width:0;">
         <div class="shop-name${w.done?' is-done':''}">${escapeHtml(w.name)}</div>
         ${(meta||rebuy)?`<div class="shop-meta">${[meta, rebuy].filter(Boolean).join(' · ')}</div>`:''}

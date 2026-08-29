@@ -269,7 +269,7 @@ console.log('  E the cascade: 10 checks');
  * the app would have noticed. So the classification itself is asserted: a new tinted site has to be
  * classified rather than defaulted, and a label that quietly acquires a liquor reddens.
  */
-const FILES_SCANNED=['steep-teas.js','steep-sessions.js','steep-social.js','steep-dashboard.js','steep-reference.js','steep-insights.js'];
+const FILES_SCANNED=['steep-teas.js','steep-sessions.js','steep-social.js','steep-dashboard.js','steep-reference.js','steep-insights.js','steep-shopping.js'];
 const SWATCHES=['today-tint','social-tile','ref-swatch','shelf-swatch'];
 const LABELS=['shelf-pill','pill t-'];
 /* THE WRITER'S OWN BODY IS EXCLUDED BEFORE COUNTING, and that is not bookkeeping. `swatchAttr`
@@ -284,8 +284,8 @@ FILES_SCANNED.forEach(f=>{
   tinted += (src.match(/t-\$\{|dot-\$\{/g)||[]).length;
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
-ok(tinted===11, 'F1 ELEVEN type-tint writes remain across the six files — the v4.19 picker added two (its tier-3 fallback: COLOUR-row preview + default cell), on top of the nine that stayed labels/placeholders/chart after three became swatches (got '+tinted+')');
-ok(painted===7, 'F2 …and exactly SEVEN swatchAttr call sites paint a liquor now — six through warm Home (R159) plus the Insights note swatch (R170); the colour-clock bars and the Teas-brewed strip paint liquor via var(--liquor-*) directly, not swatchAttr, so they are marks outside this count (got '+painted+')');
+ok(tinted===11, 'F1 ELEVEN type-tint writes remain across the seven files — the v4.19 picker added two (its tier-3 fallback: COLOUR-row preview + default cell), on top of the nine that stayed labels/placeholders/chart after three became swatches; steep-shopping.js adds none (got '+tinted+')');
+ok(painted===10, 'F2 …and exactly TEN swatchAttr call sites paint a liquor now — the seven prior (six warm Home R159 + the Insights note R170) plus THREE R171 marks: the session-detail band identity swatch and the two Shopping rows (running-low always, rebuy only when the want is on the shelf). The colour-clock bars and the Teas-brewed strip paint liquor via var(--liquor-*) directly, not swatchAttr, so they stay outside this count (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
 const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));

@@ -400,9 +400,12 @@ function viewSessionDetail(){
     <!-- R5 spine slice 3: wrapper .card deleted (a detail page is not a discrete object). Identity → BAND;
          the rest are RULE sections in per-group .sd-sec wrappers; SLAB = the one .btn-clay on Brew again. -->
     <div class="band sd-band">
-      <div class="sd-kicker mono">${escapeHtml(fmtDateTime(s.date))}</div>
-      <h2 class="sd-title">${tea?`<span class="sd-link" onclick="openTeaDetail('${escapeJsArg(tea.id)}','sessions')">${escapeHtml(tea.name)}</span>`:'Unknown tea'}</h2>
-      ${ident?`<div class="sd-ident">${ident}</div>`:''}
+      ${tea?swatchAttr('sd-swatch', liquorFor(tea), tea.type, true):''}
+      <div class="sd-band-main">
+        <div class="sd-kicker mono">${escapeHtml(fmtDateTime(s.date))}</div>
+        <h2 class="sd-title">${tea?`<span class="sd-link" onclick="openTeaDetail('${escapeJsArg(tea.id)}','sessions')">${escapeHtml(tea.name)}</span>`:'Unknown tea'}</h2>
+        ${ident?`<div class="sd-ident">${ident}</div>`:''}
+      </div>
     </div>
     ${(s.rating || facts.length || quiet) ? `<div class="sd-sec">
       ${s.rating?`<div>${renderStarsStatic(Number(s.rating),true)}</div>`:''}

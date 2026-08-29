@@ -335,7 +335,7 @@ html[data-theme="dark"] .shelf-kanji.t-puerh{background:#2a241c;} html[data-them
    BOX radius (2px, was 5px) — still NOT the swatch's 9/4/8/5 tin radius, so photo and swatch read as
    different objects (R144's concern, one level up). Kanji glyph shrinks with the box. .shelf-thumb is
    shelfRowHTML-only (verified). */
-.shelf-swatch{width:24px;height:32px;flex:0 0 auto;}
+.shelf-swatch{width:30px;height:40px;flex:0 0 auto;}  /* R171: 24×32 → 30×40, the shelf's identity mark reads larger (shape/viewBox unchanged) */
 .shelf-thumb{width:26px;height:26px;border-radius:2px;border:1px solid var(--line);flex:0 0 auto;}
 .shelf-kanji.shelf-thumb span{font-size:13px;}
 .shelf-row-mid{flex:1;min-width:0;}
@@ -1151,7 +1151,9 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
    the rest are RULE sections in per-group .sd-sec wrappers (grouping survives de-carding). No BOX — a
    linear detail page has no discrete object; do not add one back. SLAB = the existing .btn-clay on
    "Brew this again" (the one committing action). */
-.sd-band{display:flex;flex-direction:column;gap:3px;margin:0 -16px 13px;padding:13px 16px;}
+.sd-band{display:flex;align-items:center;gap:14px;margin:0 -16px 13px;padding:13px 16px;} /* R171: row now — the 44×58 identity swatch leads, the date/name/ident stack in .sd-band-main */
+.sd-band-main{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.sd-swatch{width:44px;height:58px;flex:none;}  /* R171: session-detail's identity mark in the band (board 1e); a mark, excluded from the fill-law */
 .sd-sec{margin-top:18px;} /* RULE section wrapper — grouping only, no fill/border/radius. */
 .sd-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;} /* a section header; the 2px ink rule comes from .rule-head. */
 
