@@ -105,13 +105,22 @@ the DOM **History API** (`pushState`/`popstate`, the back gesture), the **Screen
 service-worker update flow, real **touch gestures**, actual storage **eviction**. A suite can assert
 the *source facts* around them (the fence is present, the single writer is the writer, the handler
 never loops) but cannot exercise the behaviour, so a green suite is **not** a pass. **A slice that
-ships one of these surfaces ships two things with it: an entry in `smoke.md`, and a phone check by
-Niklas before the push** — the non-automatable check does the certifying, and the deploy's step 7
-says so explicitly. Record the pass in `smoke.md`. Worked example: **#34's back gesture (v4.17)** —
-`session-draft-test.js` pins that the session flow is absent from `HISTORY_VIEWS` and that `popstate`
-never calls `goView`, but only a swipe on a real phone proves Back steps back instead of exiting; that
-was verified on device before v4.17 pushed. Same family as `landing-test.js` asserting the door's
-*source* because `renderLogin` can't be sandboxed.
+ships one of these surfaces ships an entry in `smoke.md` and a phone check by Niklas** — the
+non-automatable check does the certifying; record the pass in `smoke.md`. **But *when* that check runs
+depends on the surface, and it must NEVER hold a green build unpushed.** A **pre-push** phone check
+applies *only where a local server can drive the surface* — static layout, legibility, a rendered
+component the dev machine can serve and inspect (or a phone can reach on the LAN). Anything that
+**exists only on the served PWA** — the **service-worker lifecycle** (install / update banner), the
+**deep-link scroll**, real **install/update behaviour** — is **inherently post-deploy**: **ship on
+green (fixtures + suites), push, then run the phone look on the LIVE app, fix-forward** if it fails.
+Green build + a check that can only happen after deploy = **push, don't wait** (a private beta's blast
+radius is tiny; a bad push is a fast follow-up version, not a rollback). *(Niklas, 2026-08-29, v4.29/
+v4.30 — "we can only do the on device checks after they deployed.")* Worked example: **#34's back
+gesture (v4.17)** — `session-draft-test.js` pins that the session flow is absent from `HISTORY_VIEWS`
+and that `popstate` never calls `goView`, but only a swipe on a real phone proves Back steps back
+instead of exiting; the History API rides any served page, so that one *was* locally drivable and was
+verified on device before v4.17 pushed — the served-PWA-only cases above are not, and ship first.
+Same family as `landing-test.js` asserting the door's *source* because `renderLogin` can't be sandboxed.
 
 ## Deploy ritual (do this every deploy)
 

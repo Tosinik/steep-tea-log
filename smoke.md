@@ -5,9 +5,11 @@ no browser to exercise: the DOM **History API** (`pushState`/`popstate`, the bac
 **Screen Wake Lock API**, the service-worker update flow, real **touch gestures**, and actual
 storage **eviction**. A green suite proves nothing about any of these.
 
-**A slice that ships one of those surfaces ships an entry here and a phone check before push**
-(the rule is in `CLAUDE.md`, "Non-automatable surfaces"). This file is the record: what to do on the
-device, and what a pass looks like. Run the entries for whatever the deploy touched — nothing below
+**A slice that ships one of those surfaces ships an entry here and a phone check by Niklas** — *pre-push*
+only where a local server can drive the surface; anything that exists only on the served PWA (SW lifecycle,
+deep-link scroll, install/update) is **post-deploy on the live app, fix-forward**, and **never holds a green
+build unpushed** (the rule is in `CLAUDE.md`, "Non-automatable surfaces"). This file is the record: what to
+do on the device, and what a pass looks like. Run the entries for whatever the deploy touched — nothing below
 is covered by the suites.
 
 The verifier and `/slowcup-deploy` gate the *automatable* half; this is the half a person has to
