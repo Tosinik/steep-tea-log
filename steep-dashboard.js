@@ -197,16 +197,15 @@ function costMedians(){
 }
 function costMediansHTML(){
   const m = costMedians();
-  const cells = [];
-  if(m.perGramN>=2)    cells.push(`<div class="stat"><div class="num">${currencyFmt(m.perGram)}</div><div class="lbl">Median / gram</div></div>`);
-  if(m.perSessionN>=2) cells.push(`<div class="stat"><div class="num">${currencyFmt(m.perSession)}</div><div class="lbl">Median / session</div></div>`);
-  if(!cells.length) return '';
+  const rows = [];   // R161: median tiles → ledger rows (the cost card de-boxes like totals)
+  if(m.perGramN>=2)    rows.push(insRow('Median / gram', currencyFmt(m.perGram)));
+  if(m.perSessionN>=2) rows.push(insRow('Median / session', currencyFmt(m.perSession)));
+  if(!rows.length) return '';
   // R68: the denominator is generated, so the line can never claim a coverage it doesn't have.
   const src = [];
   if(m.perGramN>=2)    src.push(`${m.perGramN} of ${m.teaN} teas priced`);
   if(m.perSessionN>=2) src.push(`${m.perSessionN} of ${m.sessionN} sittings costable`);
-  return `<div class="grid grid-2" style="margin-bottom:10px;">${cells.join('')}</div>
-    <div class="mono" style="font-size:10px;color:var(--ink-soft);margin-bottom:12px;">${src.join(' · ')}</div>`;
+  return `${rows.join('')}<div class="mono" style="font-size:10px;color:var(--ink-soft);margin:6px 0 10px;">${src.join(' · ')}</div>`;
 }
 
 // The two-digit bucket name the boards use: 08–10, not 8:00–10:00.
@@ -228,8 +227,10 @@ function brewingClockHTML(s){
   // asserts a hierarchy that doesn't exist, and the old label did it silently.
   const pk = s.peakBuckets||[];
   const peakLabel = pk.length ? `${pk.length>1?'joint peak':'peak'} ${andList(pk.map(bucketLabel))}` : '';
-  return `<div class="section card">
-    <div class="section-title"><h2>When you brew</h2>${peakLabel?`<span class="mono" style="font-size:12px;color:var(--amber);">${peakLabel}</span>`:''}</div>
+  // R161: a RULE section — the clock is the surface's one labelled hour-of-day chart (named peak). The
+  // bars stay: they are the mark, and jade/amber on them is rationed correctly.
+  return `<div class="ins-sec">
+    <div class="ins-sechead"><h2>When you brew</h2>${peakLabel?`<span class="mono" style="font-size:12px;color:var(--amber);">${peakLabel}</span>`:''}</div>
     <div class="clock-chart">${bars}</div>
   </div>`;
 }
@@ -586,8 +587,11 @@ function viewAchievements(){
    again. The alternative was a Home with no voice and no control left to bring it back, since the
    thing that would have unhidden it is a card list the greeting has just left. */
 // R117 — `today` LEADS the stack: today outranks supply, so the first card changes through the day.
-const DASH_DEFAULT_ORDER = ['today','restock','favorites','week','hero','reading','typemix','steepshape','notes','wrapped','recent','totals','clock','cost','origins'];
-const DASH_LABELS = { today:'Earlier today', restock:'Running low', favorites:'Favourites', week:'Sessions this week', recent:'Recent sessions', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week, mostly', reading:'Cadence reading', typemix:'Type mix', steepshape:'Steep shape', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
+// R161 CULL — `reading` (cadence), `steepshape`, `recent` dropped. dashLayout() filters saved order/hidden
+// against this list, so a saved layout self-migrates; a stale surface-override for a dropped id never
+// renders (no builder). The `week` label loses its "mostly" hero eyebrow copy fix in DASH_LABELS below.
+const DASH_DEFAULT_ORDER = ['today','restock','favorites','week','hero','typemix','notes','wrapped','totals','clock','cost','origins'];
+const DASH_LABELS = { today:'Earlier today', restock:'Running low', favorites:'Favourites', week:'Sessions this week', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week', typemix:'Type mix', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab.
 // Migration is automatic — existing saved {order,hidden} keep their visibility and gain a surface
 // from this map (nothing a user hid can reappear); ids no longer present are filtered out.
@@ -600,8 +604,8 @@ const DASH_SURFACE = {
   today:'home',                  // R117 — this calendar day is present tense; `recent` stays Insights
   restock:'home', favorites:'home',
   week:'insights',
-  recent:'insights', totals:'insights', clock:'insights', cost:'insights',
-  hero:'insights', reading:'insights', typemix:'insights', steepshape:'insights', notes:'insights', wrapped:'insights',
+  totals:'insights', clock:'insights', cost:'insights',
+  hero:'insights', typemix:'insights', notes:'insights', wrapped:'insights',
   origins:'insights'   // R54 — and PINNED there by DASH_PINNED below; this entry is only the default
 };
 // Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
@@ -1135,26 +1139,19 @@ function homeLogCup(btn, teaId){
   go();
 }
 
+// R161 — one ledger row: a label on the left, a mono figure on the right, a hairline under it. The
+// spine's RULE row for a retrospective number (totals/week/cost). k and v are literal labels + computed
+// figures, never user text.
+function insRow(k, v, onclick){
+  return `<div class="ins-row"${onclick?` onclick="${onclick}" style="cursor:pointer;"`:''}><span class="ins-row-k">${k}</span><span class="ins-row-v mono">${v}</span></div>`;
+}
 function dashCardsHome(s){
   const lowStockHTML = s.lowStock.length ? s.lowStock.map(t=>`
     <div class="rank-row"><span class="rname">${escapeHtml(t.name)}</span><span class="rval" style="color:var(--red)">${Number(t.amountGrams).toFixed(1)}g left</span></div>
   `).join('') : '<div class="empty">All stocked up.</div>';
 
-  const recent = [...state.sessions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
-  const recentHTML = recent.length ? `
-    <div class="section card">
-      <div class="section-title"><h2>Recent sessions</h2></div>
-      ${recent.map(se=>{
-        const tea = teaById(se.teaId);
-        // R118 — a glance row opens DETAIL, which contains edit. Landing in a form because you
-        // tapped a line to look at it is a wrong-verb error, and R58 is what makes detail the
-        // container that offers editing. Same fix as Earlier today's rows; this one is on Insights.
-        return `<div class="rank-row" onclick="openSessionDetail('${escapeJsArg(se.id)}')" style="cursor:pointer;">
-          <span class="rname">${escapeHtml(se.teaName || (tea?tea.name:'—'))}${se.rating?' '+renderStarsStatic(se.rating,false):''}</span>
-          <span class="rval" style="color:var(--ink-soft);font-size:12px;">${brewCountLabel(se)} · ${new Date(se.date).toLocaleDateString()}</span>
-        </div>`;
-      }).join('')}
-    </div>` : '';
+  // R161 CULL — `recent` (Recent sessions) removed: four rows of what the Sessions tab lists in full
+  // (R118 routes both to the same detail view), and Home's "Earlier today" already covers the recent end.
 
   // v3.82: membership back to LOW-only (restockCandidate, steep-teas.js) — v3.81's {low,few}
   // put "a few cups" rows under a "Running low" headline beside a ~months forecast.
@@ -1203,26 +1200,26 @@ function dashCardsHome(s){
   return {
     today: todayHTML,
     restock: restockHTML,
-    recent: recentHTML,
     // #16 (v3.82): a period lens on the RAW numbers only — scoped reinstatement; v3.65's
     // "observations, not KPIs" line stands everywhere else. The eyebrow names the window so a
     // cropped screenshot can't pass a week off as all-time. Empty windows read as quiet zeros.
+    // R161: the six .stat KPI tiles become six hairline LEDGER ROWS under one .ins-sechead — a number
+    // on a hairline row is a ledger entry, which is what a retrospective surface reads as.
     totals: (function(){
       const p = gridPeriod(), start = gridWindowStart(p);
       const g = start ? gridStats(state.sessions.filter(se=>new Date(se.date)>=start)) : s;
       const eyebrow = p==='week' ? 'This week' : p==='month' ? 'This month' : 'All-time';
       const seg = (k,lbl)=>`<button class="density-seg ${p===k?'active':''}" style="font-family:var(--font-mono);font-size:11px;" onclick="setGridPeriod('${k}')">${lbl}</button>`;
-      return `<div class="section">
-      <div class="section-title"><span class="eyebrow">${eyebrow}</span>
+      return `<div class="ins-sec">
+      <div class="ins-sechead"><span class="eyebrow">${eyebrow}</span>
         <div class="density-toggle" role="group" aria-label="Stats period">${seg('all','All-time')}${seg('month','Month')}${seg('week','Week')}</div></div>
-      <div class="grid grid-3">
-      <div class="stat"><div class="num">${g.totalSessions}</div><div class="lbl">Sessions</div></div>
-      <div class="stat"><div class="num">${g.totalSteeps}</div><div class="lbl">Infusions</div></div>
-      <div class="stat"><div class="num">${g.days.size}</div><div class="lbl">Days logged</div></div>
-      <div class="stat"><div class="num">${g.totalGrams.toFixed(1)}</div><div class="lbl">Grams brewed</div></div>
-      <div class="stat"><div class="num">${g.totalLiters.toFixed(1)}</div><div class="lbl">Liters (est.)</div></div>
-      <div class="stat"><div class="num">${g.uniqueTeas}</div><div class="lbl">Teas brewed</div></div>
-      </div></div>`;
+      ${insRow('Sessions', g.totalSessions)}
+      ${insRow('Infusions', g.totalSteeps)}
+      ${insRow('Days logged', g.days.size)}
+      ${insRow('Grams brewed', g.totalGrams.toFixed(1))}
+      ${insRow('Liters (est.)', g.totalLiters.toFixed(1))}
+      ${insRow('Teas brewed', g.uniqueTeas)}
+      </div>`;
     })(),
     clock: brewingClockHTML(s),
     /* R115 — a card is ABSENT until it has something to say. Four empty cards would be four
@@ -1242,18 +1239,16 @@ function dashCardsHome(s){
       // does not open by telling you that you have not brewed. The week is Monday-anchored, as it
       // has been since WS2 — Design drew no weekly figure because it could not verify a boundary
       // from the export; this one is derived here, from `sessions` and that anchor.
-      return n ? `<div class="section card week-card"><div class="week-num">${n}</div><div class="week-cap">sessions<br>this week</div></div>` : '';
+      // R161: the boxed 32px week-number becomes one ledger row (the totals ledger prints the same
+      // figure under Week; here it earns its keep on Home, where it's often the only number).
+      return n ? `<div class="ins-sec">${insRow('Sessions this week', n)}</div>` : '';
     })(),
-    cost: `<div class="section card">
-      <div class="section-title"><h2>Cost overview</h2></div>
+    cost: `<div class="ins-sec">
+      <div class="ins-sechead"><h2>Cost overview</h2></div>
       ${costMediansHTML()}
-      <div class="grid grid-3">
-        <div class="stat" onclick="goView('spend')" style="cursor:pointer;" title="Monthly spending"><div class="num">${currencyFmt(s.totalSpent,0)}</div><div class="lbl">Total spent ›</div></div>
-        <div class="stat"><div class="num">${currencyFmt(s.avgCostPerGram)}</div><div class="lbl">Avg / gram</div></div>
-        ${s.lowStock.length
-          ? `<div class="stat" onclick="goLowStock()" style="cursor:pointer;" title="View low-stock teas"><div class="num">${s.lowStock.length}</div><div class="lbl">Low stock ›</div></div>`
-          : `<div class="stat"><div class="num">0</div><div class="lbl">Low stock</div></div>`}
-      </div>
+      ${insRow('Total spent ›', currencyFmt(s.totalSpent,0), "goView('spend')")}
+      ${insRow('Avg / gram', currencyFmt(s.avgCostPerGram))}
+      ${s.lowStock.length ? insRow('Low stock ›', s.lowStock.length, 'goLowStock()') : insRow('Low stock', 0)}
       ${(function(){ const ms=computeMonthlySpend(); return ms.thisMonth>0 ? `<div style="margin-top:12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;" onclick="goView('spend')">This month: <strong style="color:var(--ink);">${currencyFmt(ms.thisMonth)}</strong> across ${ms.thisMonthCount} tea${ms.thisMonthCount===1?'':'s'} · see monthly ›</div>` : ''; })()}
       ${s.lowStock.length ? `<div style="margin-top:12px;">${lowStockHTML}</div>` : ''}
     </div>`

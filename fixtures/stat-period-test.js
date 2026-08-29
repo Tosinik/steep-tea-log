@@ -47,7 +47,8 @@ const ok=(c,m)=>{ if(c)passed++; else{failures++;console.log('  FAIL: '+m);} };
 const setState=obj=>vm.runInContext('state.teas='+JSON.stringify(obj.teas||[])+';state.vessels='+JSON.stringify(obj.vessels||[])+';state.sessions='+JSON.stringify(obj.sessions||[])+';',ctx);
 const gws=(p,iso)=>vm.runInContext(`(function(){const r=gridWindowStart('${p}'${iso?`, new Date('${iso}')`:''}); return r?r.getTime():null;})()`,ctx);
 const totalsHTML=()=>vm.runInContext('dashCardsHome(computeStats()).totals',ctx);
-const numsOf=html=>[...html.matchAll(/<div class="num">([^<]*)<\/div>/g)].map(m=>m[1]);
+// R161: totals de-boxed from .stat tiles (<div class="num">) to spine ledger rows (.ins-row-v).
+const numsOf=html=>[...html.matchAll(/<span class="ins-row-v mono">([^<]*)<\/span>/g)].map(m=>m[1]);
 
 // ---- A. gridWindowStart calendar boundaries (pinned `now` values — deterministic forever) ----
 // 2026-07-15 is a Wednesday; 2026-07-13 the Monday before it; 2026-08-01 a Saturday.
@@ -95,7 +96,7 @@ ok(memb(msMs).some(s=>s.id==='p4') && !memb(msMs).some(s=>s.id==='p5'), 'B2 boun
 [['all',null,'All-time'],['month',msMs,'This month'],['week',wsMs,'This week']].forEach(([p,start,eyebrow])=>{
   LS.tealog_statPeriod=p;
   const html=totalsHTML(), n=numsOf(html), e=expect(memb(start));
-  ok(n.length===6, 'B '+p+': six stat tiles render');
+  ok(n.length===6, 'B '+p+': six ledger rows render');
   ok(n[0]===String(e.sessions), 'B '+p+' sessions = '+e.sessions+' (got '+n[0]+')');
   ok(n[1]===String(e.steeps), 'B '+p+' infusions = '+e.steeps+' (got '+n[1]+')');
   ok(n[2]===String(e.days), 'B '+p+' days logged = '+e.days+' (got '+n[2]+')');
@@ -108,8 +109,8 @@ ok(memb(msMs).some(s=>s.id==='p4') && !memb(msMs).some(s=>s.id==='p5'), 'B2 boun
 // Decision-1 agreement: the grid's week Sessions equals the Home week card's number.
 LS.tealog_statPeriod='week';
 (function(){ const cards=vm.runInContext('dashCardsHome(computeStats())',ctx);
-  const wk=(cards.week.match(/<div class="week-num">(\d+)<\/div>/)||[])[1];
-  ok(wk===numsOf(cards.totals)[0], 'B9 week grid sessions === Home week card ('+wk+')'); })();
+  const wk=(cards.week.match(/ins-row-v mono">(\d+)</)||[])[1];   // R161: week is a ledger row now
+  ok(wk===numsOf(cards.totals)[0], 'B9 week ledger sessions === totals Sessions row ('+wk+')'); })();
 console.log('  B per-stat windowing (production card): '+(2+3*8+1)+' checks');
 
 // ---- C. single writer — computeStats delegates its six all-time fields to gridStats ----

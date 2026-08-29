@@ -100,8 +100,8 @@ ok(!/btn-clay/.test(G('viewInsights()')),
    'B3 Insights carries no clay — the reflective room has nothing to commit');
 ok(/\.btn-clay\{[^}]*var\(--clay\)/.test(cssSrc), 'B4 clay is a token, not a hex at the render site');
 // R113's own premise, pinned: the Wrapped teaser was never clay, so this is clay's FIRST use.
-ok(/\.ins-teaser\{[^}]*#2A4130/.test(cssSrc) && !/\.ins-teaser\{[^}]*--clay/.test(cssSrc),
-   'B5 the Wrapped teaser is jade-deep, NOT clay — R113 was written as a correction of a misuse that does not exist (R116)');
+ok(/\.ins-door\{[^}]*var\(--white\)/.test(cssSrc) && !/\.ins-door\{[^}]*--clay/.test(cssSrc),
+   'B5 the Wrapped door is --white, NOT clay — R113 was a correction of a misuse that does not exist (R116); R161 de-boxed the #2A4130 teaser to the .ins-door BOX');
 ok(/bn-log-circle\{[^}]*var\(--jade\)/.test(cssSrc),
    'B6 the raised Log stays jade — chrome shared by every tab is a different register from content');
 /* B7 is SOURCE-asserted (R112's shape) and it exists because a negative control found nothing to
@@ -166,8 +166,8 @@ const todays=SESSIONS.slice(0,2).map((s,i)=>Object.assign({},s,{date:new Date(no
 G('state.sessions='+JSON.stringify(todays.concat(SESSIONS))+';');
 const withToday=G('viewDashboard()');
 ok(/Earlier today/.test(withToday), 'E1 the card appears once a cup is logged today');
-ok(G('dashSurface("today")')==='home' && G('dashSurface("recent")')==='insights',
-   'E2 …on Home, while `recent` stays on Insights — two cards over one table, not one card meaning different things by surface (R113)');
+ok(G('dashSurface("today")')==='home',
+   'E2 `today` is present-tense, on Home (R117) — its Insights twin `recent` was culled in R161');
 ok(G('DASH_DEFAULT_ORDER.indexOf("today")')===0 && G('DASH_DEFAULT_ORDER.indexOf("today") < DASH_DEFAULT_ORDER.indexOf("restock")'),
    'E3 …and it LEADS the stack: today outranks supply, so the first card changes through the day');
 /* The boundary check is the one that matters, because its failure is absurd rather than subtle: the
@@ -196,12 +196,11 @@ G('state.sessions='+JSON.stringify(todays.concat(SESSIONS))+';');
 const cards=G('dashCards()');
 ok(/openSessionDetail/.test(cards.today) && !/openSessionEdit/.test(cards.today),
    'E9 R118: a diary row opens DETAIL, not the edit form — tapping a line to look at it must not land in a form');
-ok(/openSessionDetail/.test(cards.recent) && !/openSessionEdit/.test(cards.recent),
-   'E10 …and `recent` is fixed with it, on Insights — the same wrong destination, so the same fix');
+// E10 retired — `recent` (Recent sessions) culled in R161; its R118 fix is covered by E9 on `today`.
 ok(/\$\{body\}\$\{editBar\}/.test(dashSrc) && /\.dash-edit-bar\{[^}]*justify-content:\s*center/.test(cssSrc),
    'E11 Edit layout sits BELOW the stack, centred, on both surfaces — above it, it read as a third action in the masthead\'s row');
 seed();
-console.log('  E earlier today: 11 checks');
+console.log('  E earlier today: 10 checks');
 
 /* ---- D · the contract guards R116 ordered ---- */
 const claySel=(cssSrc.match(/^[^\n{]*\{[^}]*var\(--clay\)[^}]*\}/gm)||[]).map(s=>s.split('{')[0].trim());

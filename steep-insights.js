@@ -86,8 +86,10 @@ function computeInsights(){
 function insHeroData(){
   const sessions = state.sessions; if(!sessions.length) return null;
   const now = Date.now(), DAY = 86400000;
-  const windows = [[7,'This week, mostly'],[28,'Lately, mostly'],[Infinity,'Mostly']];
-  let eyebrow = 'Mostly', inWin = [];
+  // R161: the eyebrow names the WINDOW plainly — "Lately" never said 28 days (the honesty fix). "mostly"
+  // was a comment on the title below; the title already carries it.
+  const windows = [[7,'This week'],[28,'Last four weeks'],[Infinity,'All time']];
+  let eyebrow = 'All time', inWin = [];
   for(const [days,lbl] of windows){
     inWin = days===Infinity ? sessions.slice() : sessions.filter(s=> (now-new Date(s.date))<=days*DAY);
     if(inWin.length>=3 || days===Infinity){ eyebrow = lbl; break; }
@@ -97,51 +99,31 @@ function insHeroData(){
   let topType=null, tn=0; Object.entries(tc).forEach(([k,c])=>{ if(c>tn){ tn=c; topType=k; } });
   const parts = timeOfDayBuckets(inWin);
   const topPart = Object.entries(parts).sort((a,b)=>b[1]-a[1])[0][0];
-  const hours = new Array(12).fill(0); inWin.forEach(s=>{ hours[Math.floor(new Date(s.date).getHours()/2)]++; });
   const ranges = {morning:[5,12], afternoon:[12,17], evening:[17,22]};
   const inPart = s=>{ const h=new Date(s.date).getHours();
     if(topPart==='night') return h>=22||h<5;
     const [a,b]=ranges[topPart]; return h>=a && h<b; };
   const partSteeps = inWin.filter(inPart).reduce((a,s)=>a+steepCountOf(s),0);
   const totalSteeps = inWin.reduce((a,s)=>a+steepCountOf(s),0);
-  return { eyebrow, topType, topPart, hours, partSteeps, totalSteeps };
+  return { eyebrow, topType, topPart, partSteeps, totalSteeps };
 }
+// R161: the hero is the surface's BAND — a clean observation sentence, no ins-bars. The unlabelled hour
+// graph duplicated the (labelled, named-peak) brewing clock and read as decoration; dropped with `hours`.
 function insHeroHTML(){
   const h = insHeroData(); if(!h || !h.topType) return '';
-  const max = Math.max(1, ...h.hours);
-  const bars = h.hours.map(v=>`<div class="ins-bar" style="height:${v>0?Math.max(8,Math.round(v/max*100)):8}%;opacity:${v>0?(0.3+0.7*v/max).toFixed(2):0.18}"></div>`).join('');
   const partWhen = {morning:'in the morning', afternoon:'in the afternoon', evening:'in the evening', night:'late'};
   const sub = h.totalSteeps ? `${h.partSteeps} of your ${h.totalSteeps} steep${h.totalSteeps!==1?'s':''} came ${partWhen[h.topPart]}.` : '';
-  return `<div class="ins-hero">
+  return `<div class="band ins-band">
     <div class="ins-hero-eyebrow">${h.eyebrow}</div>
     <div class="ins-hero-title">${typeLabel(h.topType)}, and ${partWord(h.topPart)}.</div>
-    <div class="ins-bars">${bars}</div>
     ${sub?`<div class="ins-hero-sub">${sub}</div>`:''}
   </div>`;
 }
 
-// Sessions per week for the last N weeks (oldest → newest), for the sparkline.
-function insWeeklySeries(weeks){
-  const now = new Date(), DAY = 86400000, counts = new Array(weeks).fill(0);
-  state.sessions.forEach(s=>{ const age=(now-new Date(s.date))/DAY; if(age<0) return; const w=Math.floor(age/7); if(w<weeks) counts[weeks-1-w]++; });
-  return counts;
-}
-function insReadingHTML(){
-  const n = computeInsights(); if(!n) return '';
-  const series = insWeeklySeries(8);
-  if(series.filter(v=>v>0).length < 2) return '';           // too few weeks to draw a line
-  const obs = n.trend==='down' ? 'A touch less than last month — and unhurried about it.'
-    : n.trend==='up' ? 'A little more than last month — the pot’s seeing you often.'
-    : n.trend==='steady' ? 'About the same as last month — a steady rhythm.'
-    : 'Your cups, week by week.';
-  const max = Math.max(1, ...series), step = 200/(series.length-1);
-  const pts = series.map((v,i)=>`${Math.round(i*step)},${(30-v/max*26).toFixed(1)}`).join(' ');
-  return `<div class="ins-sec">
-    <div class="ins-obs">${obs}</div>
-    <svg class="ins-spark" viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--jade)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="ins-cap">sessions · last 8 weeks</div>
-  </div>`;
-}
+// R161 CULL — `cadence` (insReadingHTML + insWeeklySeries) removed. It was the one card whose observation
+// was a vs-last-month COMPARATIVE ("A touch less than last month…"), which breaks this surface's own
+// register (above: "observations AS SENTENCES, no vs-last-week %"). Its neutral, non-comparative
+// pattern-flavor — when/how you brew — migrates to Home (docs/r5/planning/HOME-VISION.md).
 
 // Type mix as one slim stacked bar in the fixed type colors (.dot-*) + a mono legend.
 function insTypeMixHTML(s){
@@ -161,28 +143,9 @@ function insTypeMixHTML(s){
   </div>`;
 }
 
-// Steep-shape — average steep duration by steep index across timed sessions; an ascending amber line.
-function insSteepShape(){
-  const byIdx = [];
-  state.sessions.forEach(s=>{ if(s.isColdBrew) return; (s.steeps||[]).forEach((x,i)=>{ const sec=Number(x.timeSeconds)||0; if(sec<=0) return; (byIdx[i]=byIdx[i]||{sum:0,n:0}); byIdx[i].sum+=sec; byIdx[i].n++; }); });
-  const series = [];
-  for(let i=0;i<byIdx.length && i<8;i++){ if(byIdx[i] && byIdx[i].n>=2) series.push(byIdx[i].sum/byIdx[i].n); else break; }
-  return series;
-}
-function insSteepShapeHTML(){
-  const series = insSteepShape(); if(series.length < 3) return '';
-  const min = Math.min(...series), rng = Math.max(1, Math.max(...series)-min), step = 190/(series.length-1);
-  const y = v => (34-(v-min)/rng*29).toFixed(1);
-  const pts = series.map((v,i)=>`${Math.round(6+i*step)},${y(v)}`).join(' ');
-  const dots = series.map((v,i)=> i%2===0 ? `<circle cx="${Math.round(6+i*step)}" cy="${y(v)}" r="2.4"/>` : '').join('');
-  const obs = series[series.length-1] > series[0] ? 'Your steeps stretch as the session settles.' : 'Your steeps keep an even measure.';
-  const caption = series.slice(0,5).map(v=>fmtSecShort(Math.round(v))).join(' · ') + (series.length>5?' …':'');
-  return `<div class="ins-sec">
-    <div class="ins-obs">${obs}</div>
-    <svg class="ins-shape" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><g fill="var(--amber)">${dots}</g></svg>
-    <div class="ins-cap">${caption}</div>
-  </div>`;
-}
+// R161 CULL — `steepshape` (insSteepShapeHTML + insSteepShape) removed. The unlabelled amber curve said
+// one of two sentences off no-scale axes and needed ≥3 steep indices with ≥2 timed sessions each, so it
+// was absent for most loggers. Its keep-case (an axis) is a future rework, not this containers pass.
 
 // Two quiet notes (leaf = most reached-for, hanko = highest note) — not a leaderboard.
 function insNotesHTML(s){
@@ -195,12 +158,13 @@ function insNotesHTML(s){
   return `<div class="ins-sec ins-notes">${rows.join('')}</div>`;
 }
 
-// Wrapped teaser — a single quiet deep-jade strip into the WS1 season sequence.
+// Wrapped teaser — R161: one of the surface's two BOXes (a door). The baked #2A4130 retires; it is the
+// LEAD door (it read hidden as a quiet strip), so it takes the prominent .ins-door-lead treatment.
 function insWrappedTeaserHTML(){
   const w = computeWrapped(); if(w.empty) return '';
-  return `<div class="ins-teaser" onclick="goView('wrapped')">
-    <div><div class="ins-teaser-k">Last month</div><div class="ins-teaser-title">Your ${w.season.name}, wrapped</div></div>
-    <span class="ins-teaser-arrow">→</span>
+  return `<div class="ins-door ins-door-lead" onclick="goView('wrapped')" role="button" tabindex="0">
+    <div><div class="ins-door-k">Last month</div><div class="ins-door-title">Your ${w.season.name}, wrapped</div></div>
+    <span class="ins-door-arrow">→</span>
   </div>`;
 }
 
@@ -520,7 +484,9 @@ function insOriginsHTML(){
     ? `${country} name only the country — a place makes the map finer.`
     : `Every placed tea names a region.`;
   // The tap target G deliberately left absent now has an honest destination for the first time.
-  return `<div class="section card org-entry" onclick="goOrigins()" role="button" tabindex="0">
+  // R161: the second BOX (a door) — frame-level redress only (.section card org-entry → .ins-door); the
+  // content (lead/sub strings, the atlas link) is parked for Origins' own rework, untouched.
+  return `<div class="ins-door org-entry" onclick="goOrigins()" role="button" tabindex="0">
     <div class="eyebrow" style="margin-bottom:8px;">Origins</div>
     <div class="ins-obs">${lead}</div>
     <div class="ins-cap" style="margin-top:6px;">${sub}</div>
@@ -530,9 +496,7 @@ function insOriginsHTML(){
 function dashCardsInsights(s){
   return {
     hero: insHeroHTML(),
-    reading: insReadingHTML(),
     typemix: insTypeMixHTML(s),
-    steepshape: insSteepShapeHTML(),
     notes: insNotesHTML(s),
     wrapped: insWrappedTeaserHTML(),
     origins: insOriginsHTML()
@@ -542,7 +506,7 @@ function dashCardsInsights(s){
 function viewInsights(){
   if(state.sessions.length===0){
     return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Insights</h2></div>
-      <div class="card empty">No sessions yet — your insights and Wrapped fill in as you log.</div>`;
+      <div class="empty">No sessions yet — your insights and Wrapped fill in as you log.</div>`;
   }
   // No page title — the hero observation leads (matches Home, whose greeting leads). WS2.
   return renderDashboard(dashCards(),'insights');

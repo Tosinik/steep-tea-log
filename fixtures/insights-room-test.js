@@ -2,13 +2,14 @@
  * synthetic state and exercises the pure section builders. No CSV needed.
  *
  * Invariants guarded:
- *  - THE BRAND GUARDRAIL: the hero + the four viz observations are OBSERVATIONS, NOT KPIs — they must
- *    never contain an up/down arrow (↑ ↓ →), a percentage, or a "vs" comparison. (The Wrapped teaser's
- *    → is decorative navigation and is checked separately.) If a future edit grows an arrow/%/target on
- *    an observation, this fails loudly — the exact drift the design forbids.
+ *  - THE BRAND GUARDRAIL: the hero + the type-mix observation are OBSERVATIONS, NOT KPIs — they must
+ *    never contain an up/down arrow (↑ ↓ →), a percentage, or a "vs" comparison. (The Wrapped door's
+ *    → is decorative navigation and is checked separately.) R161 CULLED `reading` — the one card whose
+ *    observation was a vs-last-month comparative, the register violation this guard exists to catch —
+ *    and `steepshape`; the register is stronger for their absence.
  *  - Graceful degradation: each section returns '' when its data is missing (renderDashboard skips empties).
- *  - Structure: hero states top type + time-of-day; type bar segments sum ~100% with a legend; steep
- *    shape reads as ascending with a ledger caption; the two notes carry the leaf + hanko.
+ *  - Structure: hero is the BAND stating top type + time-of-day (no bars); type bar segments sum ~100%
+ *    with a legend; the two notes carry the leaf + hanko.
  *
  * Run: node fixtures/insights-room-test.js   (exit non-zero on any failure)
  */
@@ -67,31 +68,24 @@ const test=`
   const s={ typeCounts:{ green:{count:12}, oolong:{count:6}, black:{count:3}, white:{count:3}, puerh:{count:0}, yellow:{count:0} },
     mostBrewed:[{tea:{name:'Shincha Saemidori'},count:6}], topRated:[{name:'Ruby Ruanzhi',rating:4.5}] };
 
-  const hero=insHeroHTML(), reading=insReadingHTML(), typemix=insTypeMixHTML(s), shape=insSteepShapeHTML(), notes=insNotesHTML(s), teaser=insWrappedTeaserHTML();
+  const hero=insHeroHTML(), typemix=insTypeMixHTML(s), notes=insNotesHTML(s), teaser=insWrappedTeaserHTML();
 
-  // 1) THE GUARDRAIL — observations, not KPIs.
-  noKPI('hero', hero); noKPI('reading', reading); noKPI('type mix', typemix); noKPI('steep shape', shape);
+  // 1) THE GUARDRAIL — observations, not KPIs. R161 culled the cadence card (the ONE comparative one,
+  //    which broke this register) and steep-shape; the guard now covers the hero + type-mix.
+  noKPI('hero', hero); noKPI('type mix', typemix);
 
-  // 2) Hero — top type (green) + time of day (mornings), honest eyebrow.
+  // 2) Hero — top type (green) + time of day (mornings), honest WINDOW eyebrow, and it is the BAND.
   check('hero names the top type', hero.indexOf('Green,')>-1);
   check('hero names the time of day', hero.indexOf('mornings')>-1);
-  check('hero eyebrow present', /This week, mostly|Lately, mostly|Mostly/.test(hero));
-  check('hero draws the mini rhythm bars', (hero.match(/class="ins-bar"/g)||[]).length===12);
+  check('hero eyebrow names the window (R161 honesty fix)', /This week|Last four weeks|All time/.test(hero));
+  check('hero is the BAND (composes .band)', /class="band ins-band"/.test(hero));
+  check('hero has NO rhythm bars (dropped R161 — the labelled clock is the version that stays)', !/class="ins-bar"/.test(hero));
 
-  // 3) Reading — an approved observation sentence + a sparkline, NO arrow (covered above).
-  check('reading renders (enough weeks)', reading.indexOf('ins-spark')>-1);
-  check('reading obs is a sentence', /last month|week by week/.test(reading));
-
-  // 4) Type mix — 'leads' observation, 4 segments, legend, widths ~100%.
+  // 4) Type mix — 'leads' observation (approved as-is), 4 segments, legend, widths ~100%.
   check('type mix says leads', typemix.indexOf('leads')>-1);
   check('type mix has 4 segments', (typemix.match(/ins-typebar[\\s\\S]*?<\\/div>/)[0].match(/<span/g)||[]).length===4);
   check('type mix has a legend', typemix.indexOf('ins-legend')>-1);
   (function(){ const seg=[...typemix.matchAll(/width:([\\d.]+)%/g)].map(m=>parseFloat(m[1])); const sum=seg.reduce((a,b)=>a+b,0); check('type widths sum ~100 ('+sum.toFixed(1)+')', Math.abs(sum-100)<0.6); })();
-
-  // 5) Steep shape — ascending observation + ledger caption of times.
-  check('steep shape ascending obs', shape.indexOf('stretch')>-1);
-  check('steep shape caption has times', /35s · 45s · 58s/.test(shape));
-  check('steep shape is amber', shape.indexOf('var(--amber)')>-1);
 
   // 6) Two quiet notes — leaf (most reached-for) + hanko (highest note).
   check('note: most reached-for', notes.indexOf('Most reached-for')>-1 && notes.indexOf('#fav-leaf')>-1 && notes.indexOf('×6')>-1);
@@ -105,8 +99,6 @@ const test=`
   check('type mix drops with <2 types', insTypeMixHTML(bareTypes)==='');
   check('notes drop with nothing to note', insNotesHTML(bareTypes)==='');
   state.sessions=[{id:'x',teaId:'g',date:new Date().toISOString(),vesselId:'v1',rating:0,steeps:[]}];
-  check('reading drops with one week of data', insReadingHTML()==='');
-  check('steep shape drops with no timed steeps', insSteepShapeHTML()==='');
   check('hero still shows with one session', insHeroHTML().indexOf('Green')>-1);
 
   console.log('\\n'+(failures===0?'ALL INSIGHTS-ROOM TESTS PASSED':failures+' FAILED')+'  ('+passes+' passed)');

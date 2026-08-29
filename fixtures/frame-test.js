@@ -14,7 +14,8 @@
  * Scope (F33 — per-surface, grows a surface at a time): SURFACES registers each re-dressed surface's
  * frame selectors — shelf (slice 1, R153) + shopping (slice 2, R154/R155) + session-detail (slice 3,
  * R156/R157 — the first box-less surface, positive assertion on .sd-photo per the .shelf-thumb precedent)
- * — plus the shared primitives and the slab. Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints)
+ * + insights (slice 4, R161/R162 — .ins-door positive, and a ZERO-CLAY assertion only a 0-SLAB surface
+ * can make) — plus the shared primitives and the slab. Marks/evidence (.shelf-swatch, .shelf-pill type-tint, .shelf-ph/.shelf-kanji photo tints)
  * are NOT frame — excluded, and the photo-tint fallback is a KNOWN deferred fill-law item (R149), reported
  * below, not asserted. Radii/fills are measured FROM SOURCE, never the board's drawn numbers (R127/R128).
  */
@@ -39,6 +40,7 @@ const SURFACES = {
   shelf:         ['.shelf-card', '.shelf-row', '.shelf-row-mid', '.shelf-caret', '.shelf-thumb', '.lib-band'],
   shopping:      ['.shop-band', '.shop-add', '.shop-sec', '.shop-row'],       // R154/R155 — slice 2
   sessionDetail: ['.sd-band', '.sd-sec', '.sd-steep', '.sd-photo'],           // R156/R157 — slice 3
+  insights:      ['.ins-band', '.ins-sec', '.ins-sechead', '.ins-door'],      // R161/R162 — slice 4
 };
 const FRAME = [...Object.values(SURFACES).flat(), '.band'];           // '.band' is the shared primitive
 const FILL_OK = ['var(--porcelain)', 'var(--band)', 'var(--white)'];   // the only fills a frame may carry
@@ -84,6 +86,12 @@ function chkRationing(css){   // board §1d: exactly one torn radius among {all 
   if(torn[0] !== '.btn-clay') return {ok:false, msg:'the one torn radius is on '+torn[0]+', not the slab'};
   return {ok:true};
 }
+// R162 — the zero-clay assertion. Insights has 0 SLAB (a retrospective commits to nothing), so no
+// var(--clay) may appear on ANY of its frame selectors — an assertion only a slab-less surface can make.
+function chkNoClay(css, selectors){
+  for(const sel of selectors){ const b = bodyOf(css, sel); if(b!=null && /var\(--clay\)/.test(b)) return {ok:false, msg:sel+' carries var(--clay) on a surface that has no SLAB'}; }
+  return {ok:true};
+}
 
 /* ---------- A · the token (F32/R128) ---------- */
 console.log('\nA · --band token');
@@ -97,6 +105,7 @@ expectPass('.band  — --band fill, radius 0, no side border', chkPrimitive(CSS,
 expectPass('.box   — --white fill, radius 2px, no shadow', chkPrimitive(CSS, '.box', {bg:'var(--white)', radius:'2px', mustHave:['border:1px solid var(--line)'], mustNot:['box-shadow']}));
 expectPass('.btn-clay (SLAB) — --clay fill, no border, torn radius', chkPrimitive(CSS, '.btn-clay', {bg:'var(--clay)', mustHave:['border:none']}));
 expectPass('the SLAB carries the one permitted torn radius', chkSlabTorn(CSS));
+expectPass('.ins-door (BOX) — --white, radius 2px', chkPrimitive(CSS, '.ins-door', {bg:'var(--white)', radius:'2px', mustHave:['border:1px solid var(--line)']}));  // R162 positive: the box-less surface's positive subject
 
 /* ---------- C · fill-law across every fenced surface (F31 core) ---------- */
 console.log('\nC · fill-law — every frame selector carries only --porcelain/--band/--white');
@@ -109,6 +118,7 @@ expectPass('every frame radius is 0 or 2px', chkFrameRadius(CSS));
 /* ---------- E · the rationing lock (board §1d) ---------- */
 console.log('\nE · rationing — exactly one torn radius across all frames, and it is the slab');
 expectPass('one torn radius among {all frames ∪ slab}, = .btn-clay', chkRationing(CSS));
+expectPass('insights carries NO clay (0 SLAB — a retrospective commits to nothing)', chkNoClay(CSS, SURFACES.insights));  // R162
 
 /* ---------- F · negative controls — the fence MUST see red, on EVERY surface it claims to fence ----------
    A surface added to SURFACES that no control touches is fenced in name only: the checkers null-skip a
@@ -137,6 +147,15 @@ expectFail('session-detail: a torn radius on .sd-photo reddens radius-law',
   chkFrameRadius(CSS.replace(/(\.sd-photo\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
 expectFail('session-detail: a torn radius on .sd-photo reddens rationing',
   chkRationing(CSS.replace(/(\.sd-photo\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+// insights (R162) — 3 controls on its own selectors + the zero-clay control (a claim only this 0-SLAB surface makes)
+expectFail('insights: a rationed fill on .ins-sec reddens fill-law',
+  chkFrameFill(CSS.replace('.ins-sec{', '.ins-sec{background:var(--jade-pale);')));
+expectFail('insights: a 15px radius on .ins-band reddens radius-law',
+  chkFrameRadius(CSS.replace(/(\.ins-band\{[^}]*?border-radius:)0/, '$115px')));
+expectFail('insights: a torn radius on .ins-door reddens rationing',
+  chkRationing(CSS.replace(/(\.ins-door\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+expectFail('insights: clay on .ins-sec reddens the zero-clay assertion',
+  chkNoClay(CSS.replace('.ins-sec{', '.ins-sec{background:var(--clay);'), SURFACES.insights));
 // shared primitives + the slab
 expectFail('.band losing its --band fill reddens the primitive',
   chkPrimitive(CSS.replace(/(\.band\{[^}]*?background:)var\(--band\)/, '$1var(--jade)'), '.band', {bg:'var(--band)'}));
