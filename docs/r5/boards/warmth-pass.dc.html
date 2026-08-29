@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#CFC6B2; font-family:'IBM Plex Mono', monospace; }
+  a { color:#8A5A1E; }
+  a:hover { color:#69160F; }
+</style>
+</helmet>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#CFC6B2;">
+
+  <div style="max-width:1180px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:2px;">R5 · THE WARMTH PASS · FOUR UTILITY SURFACES</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:2px;">DRESS, DO NOT RE-FRAME · CONTAINERS ARE SETTLED</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:30px; color:#2B2320; margin:0;">One warm thing</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1000px; margin:0; line-height:1.7; text-wrap:pretty;">Home shipped warm and the other four surfaces did not, so the app currently has a visible seam: an identity floor with colour on it, and four austere utility floors behind it. This pass closes the seam. <strong>Nothing here re-frames anything</strong> — every BAND, RULE, BOX and SLAB stays exactly as the spine slices shipped it, and no surface's container count moves. What changes is that the app's own colour arrives on surfaces that had almost none of it: the twelve-stop liquor ramp used <strong>at a size you can read</strong>, on the rows that actually name a tea. <strong>Insights is the priority</strong> — it is the surface Niklas reads as a spreadsheet, and it is the foundation the reflection deep pages get built on next, so it takes the most work here. The rule that governs all four: <strong>colour arrives as data</strong> — a swatch is the tea's <code>liquorFor</code>, so a row with no tea behind it stays plain and gains no placeholder.</p>
+  </div>
+
+  <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="1a" style="display:flex; flex-direction:column; gap:9px; width:452px;">
+      <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1a · INSIGHTS, DRAWN</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">THE PRIORITY · SPINE UNTOUCHED</span>
+      </div>
+
+      <div style="background:#FAF8F3; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; overflow:hidden; display:flex; flex-direction:column;">
+
+        <div style="background:#EDE7D8; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:16px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">THIS WEEK</span>
+          <div style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:25px; line-height:1.18; color:#2B2320; margin-top:6px;">Green, and mornings.</div>
+          <div style="font-size:12px; color:#5C5148; margin-top:9px; line-height:1.45;">8 of your 21 steeps came in the morning.</div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:10px; line-height:1.5;">BAND, UNCHANGED AND GAINING NOTHING · SLICE 4 DROPPED ins-bars WITH THEIR `hours` DATA (R161), AND THIS PASS DOES NOT PUT A GRAPH BACK. THE SENTENCE NAMES A TOP TYPE, NOT A TEA — THERE IS NO liquorFor BEHIND IT, SO IT CARRIES NO SWATCH AND STAYS PLAIN. COLOUR AS DATA MEANS THE CLEANEST ELEMENT ON THE SURFACE IS THE ONE THAT GETS NOTHING.</span>
+        </div>
+
+        <div style="padding:0 16px 18px;">
+
+          <div style="margin-top:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:2px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">All-time</span>
+              <div style="display:flex; gap:2px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#2B2320; background:#FFFEFB; border:1px solid #D8CFB9; padding:3px 7px;">All-time</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C; padding:3px 7px;">Month</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8C7F6C; padding:3px 7px;">Week</span>
+              </div>
+            </div>
+            <sc-for list="{{ ledger }}" as="l" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid #D8CFB9;">
+                <span style="font-size:13px; color:#2B2320; flex:none;">{{ l.k }}</span>
+                <sc-if value="{{ l.marked }}" hint-placeholder-val="{{ false }}">
+                  <span style="flex:1; display:flex; gap:2px; overflow:hidden; padding:0 10px;">
+                    <sc-for list="{{ l.strip }}" as="s" hint-placeholder-count="8">
+                      <span style="flex:1; height:13px; max-width:11px; border-radius:1px; background:{{ s }};"></span>
+                    </sc-for>
+                  </span>
+                </sc-if>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:#2B2320; flex:none;">{{ l.v }}</span>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:8px; line-height:1.5;">RULE ROWS, UNCHANGED · ONE ROW GAINS A MARK AND FIVE DO NOT. "TEAS BREWED" IS THE ONE ROW WHOSE SUBJECT IS TEAS, SO ITS STRIP IS LITERALLY THE FIGURE. GRAMS AND LITRES HAVE NOTHING TO COLOUR AND STAY INK.</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:11px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">When you brew</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8A5A1E;">peak 08–10</span>
+            </div>
+            <sc-if value="{{ clockRich }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; align-items:flex-end; gap:4px;">
+                <sc-for list="{{ clockBars }}" as="b" hint-placeholder-count="12">
+                  <div style="flex:1; display:flex; flex-direction:column; align-items:stretch; gap:5px;">
+                    <span style="height:70px; display:flex; align-items:flex-end;">
+                      <span style="width:100%; border-radius:2px 2px 0 0; height:{{ b.h }}; background:{{ b.fill }};"></span>
+                    </span>
+                    <span style="height:2px; background:{{ b.peak }};"></span>
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:{{ b.lblFg }}; text-align:center;">{{ b.lbl }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ clockSparse }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:12.5px; color:#8C7F6C; line-height:1.5; display:block; padding:6px 0 8px;">One sitting logged in this window — not enough to say when you brew.</span>
+            </sc-if>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:10px; line-height:1.5;">RULE (WAS .section.card) · THE SURVIVING CLOCK IS WHERE THE COLOUR LANDS: EACH 2-HOUR BAR TAKES THE LIQUOR OF THE TEA MOST BREWED IN THAT SLOT, AND THE CHART GROWS SO THE COLOUR READS. A SLOT WITH NO DOMINANT TEA TAKES --heat-empty #E4DCC5, THE APP'S EXISTING EMPTY-TRACK TONE — NOT A NEW PAPER HEX. THE PEAK STOPS BEING AN AMBER FILL — FILL IS DATA NOW — AND BECOMES A 2px INK RULE UNDER THE COLUMN, WHICH THE MONO LABEL ALREADY NAMES (R100 TIES STILL LIGHT BOTH).</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:9px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Type mix</span>
+            </div>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15px; color:#2B2320; display:block;">Most-brewed: green.</span>
+            <div style="height:20px; border-radius:2px; overflow:hidden; display:flex; margin-top:11px;">
+              <sc-for list="{{ typeMix }}" as="t" hint-placeholder-count="4">
+                <span style="width:{{ t.w }}; background:{{ t.fill }};"></span>
+              </sc-for>
+            </div>
+            <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:9px;">
+              <sc-for list="{{ typeMix }}" as="t" hint-placeholder-count="4">
+                <span style="display:flex; align-items:center; gap:5px; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#5C5148;">
+                  <span style="width:9px; height:9px; border-radius:2px; background:{{ t.fill }};"></span>{{ t.label }}
+                </span>
+              </sc-for>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:9px; line-height:1.5;">RULE, UNCHANGED · THE BAR GOES 10→20px AND ITS RADIUS 6→2px (SPINE), THE LEGEND CARRIES COUNTS. THE HUES DO NOT MOVE: TYPE TINTS STAY THE DEFERRED R149 FAMILY, SO WARMTH HERE IS SCALE AND HONESTY, NOT A NEW PALETTE.</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:11px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Notes</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:13px;">
+              <sc-for list="{{ insNotes }}" as="n" hint-placeholder-count="2">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <sc-if value="{{ insSwatchesOn }}" hint-placeholder-val="{{ true }}">
+                    <span style="width:30px; height:30px; flex:none; border-radius:2px; background:{{ n.liquor }};"></span>
+                  </sc-if>
+                  <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.06em; color:#8C7F6C;">{{ n.k }}</span>
+                    <span style="font-size:13px; font-weight:600; color:#2B2320;">{{ n.v }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:10px; line-height:1.5;">RULE, UNCHANGED · THE ONLY TWO ROWS ON INSIGHTS THAT NAME A TEA, SO THEY BECOME THE SURFACE'S WARMEST MOMENT: 30px LIQUOR AT HOME'S EARLIER-TODAY SIZE. THE LEAF AND HANKO ICONS RETIRE FROM THESE ROWS — THE SWATCH IS THE MARK NOW, AND TWO MARKS PER ROW IS ONE TOO MANY.</span>
+          </div>
+
+          <div style="margin-top:20px; display:flex; flex-direction:column; gap:11px;">
+            <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:2px; padding:14px 15px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; flex-direction:column; gap:2px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">LAST MONTH</span>
+                <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2B2320;">Your July, wrapped</span>
+              </div>
+              <span style="font-size:18px; color:#2A4130; line-height:1;">→</span>
+            </div>
+            <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:2px; padding:14px 15px; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">ORIGINS</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15px; color:#2B2320;">3 of your teas name where they grew.</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#2A4130; margin-top:3px;">Open the atlas →</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#69160F; line-height:1.5;">THE TWO DOORS GET NOTHING · --white / 2px, EXACTLY AS R161 SHIPPED THEM. THE WARM PASS IS NOT A LICENCE TO PUT THE RETIRED #2A4130 BACK ON THE WRAPPED TEASER.</span>
+          </div>
+
+        </div>
+      </div>
+      <span style="font-size:11px; color:#4A4038; line-height:1.6;">Drawn on the shipped ground <code>#FAF8F3</code> (R166). Four marks on the whole surface — the clock bars, one ledger strip, the type bar, two note swatches — and zero clay, because a retrospective has nothing to commit to (R161's zero-SLAB assertion still holds).</span>
+    </div>
+
+    <div id="1b" style="display:flex; flex-direction:column; gap:9px; width:404px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1b · THE COLOUR CLOCK</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">THE ONE NEW MECHANIC</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; display:flex; flex-direction:column;">
+        <div style="padding:18px 20px 14px; border-bottom:2px solid #2B2320; display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2B2320;">The distribution and the tea are one fact</span>
+          <span style="font-size:12px; color:#4A4038; line-height:1.65;">The mechanic lands on <strong>"When you brew"</strong> — <code>brewingClockHTML</code>, the surviving clock, and the only hour graph on the surface since slice 4 dropped the hero's bars. Its twelve 2-hour bars carry <em>when</em> you brewed in one jade. They have room for a second fact at no extra ink: <strong>what</strong> you were drinking then. Each bar takes the liquor of the tea most brewed in that slot, so a morning of sencha reads pale green and a late shou reads near-black — the shape of your day and its colour in the same mark.</span>
+          <span style="font-size:12px; color:#4A4038; line-height:1.65;">This is the strongest warmth available on Insights precisely because it is not decoration: remove the colour and you lose information. It is also the surface's answer to "boring data" — the ledger cannot be made pretty, but the chart beside it can be made <em>true and vivid</em> at once.</span>
+        </div>
+        <sc-for list="{{ clockCases }}" as="c" hint-placeholder-count="3">
+          <div style="padding:14px 20px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:8px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:{{ c.tone }};">{{ c.tag }}</span>
+            <div style="display:flex; align-items:flex-end; gap:3px; height:34px;">
+              <sc-for list="{{ c.bars }}" as="b" hint-placeholder-count="12">
+                <span style="flex:1; border-radius:2px 2px 0 0; height:{{ b.h }}; background:{{ b.fill }};"></span>
+              </sc-for>
+            </div>
+            <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">{{ c.d }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 20px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">WHAT HAPPENS TO THE PEAK</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.65;">The clock currently marks its peak by filling that bar <code>--amber</code> instead of <code>--jade</code>. Once fill carries the tea, that signal has to move: the peak column takes a <strong>2px ink rule</strong> beneath it and keeps its mono label ("peak 08–10", or "joint peak 08–10 and 12–14" — R100's tie is still named, never resolved). The peak reads in greyscale, which the amber fill never did.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1c" style="display:flex; flex-direction:column; gap:9px; width:404px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1c · SHELF, DRAWN</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">COLLECTION · COLOUR LEADS</span>
+      </div>
+      <div style="background:#FAF8F3; border:1px solid #D8CFB9; border-radius:2px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="background:#EDE7D8; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:13px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:#2B2320;">Your shelf</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">21 teas · 4 finished</span>
+        </div>
+        <div style="padding:12px 16px 18px;">
+          <sc-for list="{{ shelfRows }}" as="r" hint-placeholder-count="5">
+            <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #D8CFB9;">
+              <span style="width:{{ r.sw }}; height:{{ r.sh }}; flex:none; border-radius:9px 4px 8px 5px; background:{{ r.liquor }};"></span>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:14.5px; color:#2B2320; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.name }}</span>
+                <div style="display:flex; align-items:center; gap:7px;">
+                  <span style="font-size:10px; font-weight:600; border-radius:999px; padding:3px 9px; background:#EDE7D8; color:#5C5148;">{{ r.type }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:{{ r.statusFg }};">{{ r.status }}</span>
+                </div>
+              </div>
+              <span style="width:26px; height:26px; flex:none; border-radius:2px; border:1px solid #D8CFB9; background:{{ r.photo }};"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#a29a86; flex:none;">›</span>
+            </div>
+          </sc-for>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:10px; line-height:1.5;">RULE ROWS, UNCHANGED · THE SHELF'S FLECK WAS ALREADY A PROPER SWATCH (24×32, THE 9/4/8/5 IDENTITY SHAPE). IT GROWS TO 30×40 AND NOTHING ELSE MOVES: THE SHAPE IS THE R124/R145 CONTRACT AND IS NOT TOUCHED, THE PHOTO STAYS A 26px THUMB TRAILING AS EVIDENCE. AT 24px THE PALE STOPS (ivory #F2EBD4, gold-pale #E8D9A0) DISAPPEARED INTO THE NEW WHITER GROUND; AT 30px THEY READ.</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#4A4038; line-height:1.6;">Grid density is left alone: a card already leads with a photo, and adding a swatch beside it would put two identity marks on one tea. The row density is where the ramp does its work — and <code>teaRowIdentity</code> is a single writer, so the tea picker warms with the shelf at no extra cost.</span>
+    </div>
+
+    <div id="1d" style="display:flex; flex-direction:column; gap:9px; width:404px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1d · SHOPPING, DRAWN</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">THE QUIETER REGISTER · 14px</span>
+      </div>
+      <div style="background:#FAF8F3; border:1px solid #D8CFB9; border-radius:2px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="background:#EDE7D8; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:13px 16px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:#2B2320;">Shopping list</span>
+        </div>
+        <div style="padding:14px 16px 18px;">
+          <div style="background:#FFFEFB; border:1px solid #D8CFB9; border-radius:2px; padding:14px; display:flex; flex-direction:column; gap:9px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#8C7F6C;">ADD TO LIST</span>
+            <span style="border:1px solid #D8CFB9; background:#FAF8F3; padding:9px 10px; font-size:12.5px; color:#a29a86;">Tea or thing to buy</span>
+            <span style="background:#8B5E4A; color:#FAF8F3; font-weight:600; font-size:14px; padding:11px; border-radius:15px 5px 13px 5px; text-align:center;">＋ Add</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320; padding-bottom:6px; border-bottom:2px solid #2B2320;">Running low</div>
+            <div style="font-size:12px; color:#5C5148; margin:6px 0 2px; line-height:1.5;">From your shelf, by what's left.</div>
+            <sc-for list="{{ shopLow }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:11px; padding:10px 0; border-top:1px solid #D8CFB9;">
+                <span style="width:14px; height:14px; flex:none; border-radius:2px; background:{{ r.liquor }};"></span>
+                <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-size:14px; font-weight:600; color:#2B2320;">{{ r.name }}</span>
+                  <span style="font-size:11px; color:#8C7F6C;">{{ r.meta }}</span>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C; border:1px solid #D8CFB9; padding:3px 8px;">Restock</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320; padding-bottom:6px; border-bottom:2px solid #2B2320;">Your list</div>
+            <sc-for list="{{ shopList }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:11px; padding:10px 0; border-top:1px solid #D8CFB9;">
+                <span style="width:13px; height:13px; flex:none; border:1px solid #a29a86; border-radius:2px;"></span>
+                <sc-if value="{{ r.onShelf }}" hint-placeholder-val="{{ true }}">
+                  <span style="width:14px; height:14px; flex:none; border-radius:2px; background:{{ r.liquor }};"></span>
+                </sc-if>
+                <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-size:14px; font-weight:600; color:#2B2320;">{{ r.name }}</span>
+                  <span style="font-size:11px; color:{{ r.metaFg }};">{{ r.meta }}</span>
+                </div>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:10px; line-height:1.5;">RULE ROWS + THE BOX FORM, UNCHANGED · 14px, HOME'S RUNNING-LOW SIZE, BECAUSE SUPPLY IS THE QUIETER REGISTER. THE SWATCH APPEARS ON EXACTLY THE ROWS THAT HAVE A TEA BEHIND THEM — SO IT ALSO DOES SH1's WORK: A WANT THAT IS REALLY A REBUY NOW SHOWS ITS COLOUR, AND A PLAIN WANT ("gaiwan, 120ml") CARRIES NO SWATCH AND NO PLACEHOLDER.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1e" style="display:flex; flex-direction:column; gap:9px; width:404px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1e · SESSION-DETAIL, DRAWN</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">ONE TEA · THE LARGEST SWATCH</span>
+      </div>
+      <div style="background:#FAF8F3; border:1px solid #D8CFB9; border-radius:2px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2A4130;">← Back to sittings</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#8C7F6C;">⋯</span>
+        </div>
+        <div style="background:#EDE7D8; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:13px 16px; display:flex; gap:14px; align-items:center;">
+          <span style="width:44px; height:58px; flex:none; border-radius:9px 4px 8px 5px; background:#B87A38;"></span>
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#8C7F6C;">FRI 25 JULY · 13:05</span>
+            <span style="font-family:'Shippori Mincho',serif; font-size:22px; line-height:1.2; color:#2B2320; text-decoration:underline; text-decoration-color:#D8CFB9; text-underline-offset:3px;">Da Hong Pao</span>
+            <span style="font-size:13px; color:#5C5148;">Wuyi yancha · gaiwan 110ml</span>
+          </div>
+        </div>
+        <div style="padding:14px 16px 18px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:15px; color:#8A5A1E;">★★★★½</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#8C7F6C;">6 infusions · total 4m 20s</span>
+          </div>
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'Shippori Mincho',serif; font-size:15px; color:#2B2320;">Steeps · 6</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#8C7F6C;">95°C flat</span>
+            </div>
+            <sc-for list="{{ sdSteeps }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex; align-items:baseline; gap:10px; padding:10px 0; border-bottom:1px solid #D8CFB9;">
+                <span style="width:18px; flex:none; font-size:10.5px; color:#8C7F6C;">{{ s.i }}</span>
+                <span style="font-size:13px; color:#2B2320; flex:none;">{{ s.t }}</span>
+                <span style="font-size:11.5px; color:#8C7F6C; flex:1; min-width:0;">{{ s.c }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:18px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320; padding-bottom:6px; border-bottom:2px solid #2B2320;">Your note</div>
+            <div style="font-size:13.5px; color:#2B2320; line-height:1.55; margin-top:9px;">Third steep was the one — stone fruit under the roast.</div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:20px; flex-wrap:wrap;">
+            <span style="background:#8B5E4A; color:#FAF8F3; font-weight:600; font-size:14px; padding:11px 17px; border-radius:15px 5px 13px 5px;">Brew this again</span>
+            <span style="border:1px solid #D8CFB9; background:#FFFEFB; color:#2B2320; font-size:14px; padding:11px 17px; border-radius:2px;">Edit</span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:14px; line-height:1.5;">BAND AND RULE SECTIONS, UNCHANGED · THE RECORD IS ABOUT ONE TEA AND THERE IS EXACTLY ONE SWATCH ON THE SURFACE, SO IT CAN BE THE APP'S LARGEST: 44×58 IN THE IDENTITY SHAPE, INSIDE THE BAND, BESIDE THE NAME IT BELONGS TO. THE STEEP ROWS STAY PLAIN — A STEEP HAS NO LIQUOR OF ITS OWN, AND SIX TINTED ROWS WOULD BE DECORATION.</span>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#4A4038; line-height:1.6;">The sitting's photo, when there is one, still trails as evidence at the bottom of the surface (<code>.sd-photo</code>, 2px). Identity leads, evidence trails — the same order the shelf row uses.</span>
+    </div>
+
+    <div id="1f" style="display:flex; flex-direction:column; gap:9px; width:620px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1f · THE FOUR SURFACES</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">ONE RATIONALE LINE EACH · COUNTS UNMOVED</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; display:flex; flex-direction:column;">
+        <sc-for list="{{ surfaces }}" as="s" hint-placeholder-count="4">
+          <div style="padding:16px 22px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:9px;">
+            <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:16px; color:#2B2320;">{{ s.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#F6F2E9; background:{{ s.tone }}; padding:3px 7px; border-radius:2px;">{{ s.tag }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; color:#8C7F6C;">{{ s.counts }}</span>
+            </div>
+            <span style="font-size:12.5px; color:#2B2320; line-height:1.65;">{{ s.line }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E; line-height:1.5;">{{ s.marks }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:17px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">WHAT DID NOT MOVE</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.65;">No container changed class, no count changed number, no selector gained or lost a fill: the fill-law (F31) is untouched because every mark drawn here is a mark, not a frame. No new hex — all twelve liquor stops, <code>--clay</code>, <code>--jade</code>, <code>--band</code> and <code>--porcelain</code> are the shipped values. No new radius: swatches take either the 9/4/8/5 identity shape (shelf, session-detail) or 2px (Home-style square tints), and the one radius that changes goes <em>down</em> — the type bar's unrationed 6px to 2px.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1g" style="display:flex; flex-direction:column; gap:9px; width:520px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1g · RULINGS</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">PLANNING MINTS ON SHIP · R170+</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; display:flex; flex-direction:column;">
+        <sc-for list="{{ rulings }}" as="r" hint-placeholder-count="6">
+          <div style="padding:18px 22px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#F6F2E9; background:{{ r.tone }}; padding:3px 7px; border-radius:2px;">{{ r.tag }}</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15.5px; color:#2B2320;">{{ r.title }}</span>
+            </div>
+            <span style="font-size:12.5px; color:#2B2320; line-height:1.65;">{{ r.body }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E; line-height:1.5;">{{ r.src }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:17px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">RECONCILIATION</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">None of this passes Design → Code. Planning reconciles the pass and mints on ship. The four surfaces can warm in one slice or four, in any order. Slice 4 already took most of the Insights redress board's proposals — cadence and steep shape culled, the hero eyebrow's copy fixed — so the only cull candidates still open are <code>week</code> and <code>recent</code>, both dashboard cards, and neither of them is drawn or blocked here.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1h" style="display:flex; flex-direction:column; gap:9px; width:430px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1h · THE FENCE</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">WHAT WARMTH DOES NOT LICENSE</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; display:flex; flex-direction:column;">
+        <sc-for list="{{ fence }}" as="f" hint-placeholder-count="8">
+          <div style="padding:14px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:13px; align-items:flex-start;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#69160F; flex:none; line-height:1.4;">×</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em; color:#2B2320;">{{ f.k }}</span>
+              <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">{{ f.d }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">MEASURED FROM SOURCE</span>
+          <span style="font-size:11px; color:#4A4038; line-height:1.6;">HEAD d61df08 · v4.27 · cache v137 · ledger max R169. <code>--porcelain</code> #FAF8F3 (R166), <code>--band</code>=<code>--porcelain-dim</code> #EDE7D8, the twelve liquor stops (<code>--liquor-jade-pale</code> #A9C46E → <code>--liquor-near-black</code> #2E1C14), <code>.shelf-swatch</code> 24×32, <code>.shelf-thumb</code> 26px/2px, <code>.today-tint</code> 30px, <code>.bn-log-circle</code> 58px, <code>.ins-band</code> radius 0 and bar-less since R161 (<code>insHeroHTML</code>, steep-insights.js:110), <code>.clock-col</code>/<code>.clock-bar</code> jade with <code>--amber</code> on peaks (<code>brewingClockHTML</code>, still <code>.section.card</code>), <code>.ins-typebar</code> 10px/6px, <code>.ins-sw</code> 7px, <code>.ins-door</code> --white/2px, <code>.sd-band</code>, <code>.sd-photo</code> 2px, <code>.shop-row</code> (no swatch today), <code>.btn-clay</code> 15/5/13/5.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1420,&quot;height&quot;:1100},&quot;clockData&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;enough&quot;,&quot;sparse&quot;],&quot;default&quot;:&quot;enough&quot;,&quot;tsType&quot;:&quot;'enough' | 'sparse'&quot;,&quot;section&quot;:&quot;States&quot;,&quot;label&quot;:&quot;When-you-brew: clock data&quot;},&quot;shelfSwatch&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;bold&quot;,&quot;shipped&quot;],&quot;default&quot;:&quot;bold&quot;,&quot;tsType&quot;:&quot;'bold' | 'shipped'&quot;,&quot;section&quot;:&quot;States&quot;,&quot;label&quot;:&quot;Shelf swatch size&quot;},&quot;insSwatches&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;,&quot;label&quot;:&quot;Insights note swatches&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const L = {
+      jadePale:'#A9C46E', straw:'#D8D48A', ivory:'#F2EBD4', yellowPale:'#EDE2B8',
+      goldPale:'#E8D9A0', gold:'#DCB863', amber:'#C99447', amberDeep:'#B87A38',
+      copper:'#A15E2E', mahogany:'#7E3B26', sepia:'#5A3122', nearBlack:'#2E1C14'
+    };
+    const paper = '#E4DCC5';   // --heat-empty: the app's existing empty-track tone, not a new paper hex (F32/R128).
+    const bold = (this.props.shelfSwatch ?? 'bold') === 'bold';
+    const clock = this.props.clockData ?? 'enough';
+
+    const bars = (spec) => spec.map(([h, fill]) => ({ h, fill }));
+
+    return {
+      clockRich: clock === 'enough',
+      clockSparse: clock === 'sparse',
+      insSwatchesOn: this.props.insSwatches ?? true,
+
+      clockBars: [
+        ['14%', paper, '0'], ['10%', paper, '2'], ['22%', L.jadePale, '4'], ['86%', L.jadePale, '6'],
+        ['100%', L.straw, '8'], ['58%', L.goldPale, '10'], ['44%', L.amberDeep, '12'], ['70%', L.amberDeep, '14'],
+        ['36%', L.mahogany, '16'], ['52%', L.sepia, '18'], ['28%', L.nearBlack, '20'], ['12%', paper, '22']
+      ].map(([h, fill, lbl]) => {
+        const isPeak = lbl === '8';
+        return { h, fill, lbl, peak: isPeak ? '#2B2320' : 'transparent', lblFg: isPeak ? '#2B2320' : '#8C7F6C' };
+      }),
+
+      clockCases: [
+        { tag:'A MORNING GREEN DRINKER', tone:'#3F5E42', bars: bars([
+            ['12%', paper], ['8%', paper], ['30%', L.jadePale], ['100%', L.jadePale],
+            ['74%', L.straw], ['40%', L.jadePale], ['22%', L.goldPale], ['30%', L.gold],
+            ['18%', L.mahogany], ['14%', L.mahogany], ['8%', paper], ['8%', paper]
+          ]),
+          d:'The pale end of the ramp does the work it was short of on the old cream ground: two hours of sencha at 07:00 read green, and the day fades to a single red-tea evening.' },
+        { tag:'A LATE ROASTED-OOLONG DRINKER', tone:'#8A5A1E', bars: bars([
+            ['20%', L.nearBlack], ['10%', paper], ['8%', paper], ['24%', L.gold],
+            ['30%', L.amber], ['46%', L.amberDeep], ['62%', L.amberDeep], ['78%', L.copper],
+            ['100%', L.sepia], ['84%', L.sepia], ['52%', L.nearBlack], ['30%', L.nearBlack]
+          ]),
+          d:'The same drawing, the opposite person — and you can tell them apart at a glance now, which twelve opacities of one jade never allowed.' },
+        { tag:'A SLOT WITH NO DOMINANT TEA', tone:'#69160F', bars: bars([
+            ['10%', paper], ['8%', paper], ['26%', L.jadePale], ['64%', L.jadePale],
+            ['40%', paper], ['44%', L.goldPale], ['30%', paper], ['52%', L.amberDeep],
+            ['20%', L.mahogany], ['16%', paper], ['10%', paper], ['8%', paper]
+          ]),
+          d:'A tie, a slot of one-offs, or a tea with no liquor recorded: the bar keeps its height and takes recessed paper. Never-guess holds — a bar\u2019s colour is a claim, and the app does not make one it cannot support.' }
+      ],
+
+      ledger: [
+        { k:'Sessions', v:'142', marked:false, strip:[] },
+        { k:'Infusions', v:'613', marked:false, strip:[] },
+        { k:'Days logged', v:'96', marked:false, strip:[] },
+        { k:'Grams brewed', v:'784.5', marked:false, strip:[] },
+        { k:'Liters (est.)', v:'112.4', marked:false, strip:[] },
+        { k:'Teas brewed', v:'21', marked:true,
+          strip:[L.jadePale, L.straw, L.ivory, L.goldPale, L.gold, L.amber, L.amberDeep, L.copper, L.mahogany, L.sepia, L.nearBlack] }
+      ],
+
+      typeMix: [
+        { label:'green · 9', w:'44%', fill:'#5B9440' },
+        { label:'black · 5', w:'26%', fill:'#9A5330' },
+        { label:'oolong · 4', w:'18%', fill:'#C79328' },
+        { label:'pu-erh · 3', w:'12%', fill:'#6E4A34' }
+      ],
+
+      insNotes: [
+        { k:'MOST REACHED-FOR', v:'Liu Bao 2016 · \u00d79', liquor:L.sepia },
+        { k:'HIGHEST NOTE', v:'Da Hong Pao \u2605\u2605\u2605\u2605\u00bd', liquor:L.amberDeep }
+      ],
+
+      shelfRows: [
+        { name:'Gyokuro, Uji', type:'Green', status:'42g left', statusFg:'#5C5148', liquor:L.jadePale, photo:'#E7E0CE', sw: bold?'30px':'24px', sh: bold?'40px':'32px' },
+        { name:'Bai Mudan', type:'White', status:'4.2g \u00b7 running low', statusFg:'#8A5A1E', liquor:L.goldPale, photo:'#EFE9DA', sw: bold?'30px':'24px', sh: bold?'40px':'32px' },
+        { name:'Da Hong Pao', type:'Oolong', status:'1.8g \u00b7 nearly out', statusFg:'#8A5A1E', liquor:L.amberDeep, photo:'#E7E0CE', sw: bold?'30px':'24px', sh: bold?'40px':'32px' },
+        { name:'Dian Hong', type:'Black', status:'60g left', statusFg:'#5C5148', liquor:L.mahogany, photo:'#EFE9DA', sw: bold?'30px':'24px', sh: bold?'40px':'32px' },
+        { name:'Shou Pu-erh, 2019', type:'Pu-erh', status:'2 cakes', statusFg:'#5C5148', liquor:L.nearBlack, photo:'#E7E0CE', sw: bold?'30px':'24px', sh: bold?'40px':'32px' }
+      ],
+
+      shopLow: [
+        { name:'Bai Mudan', meta:'4.2g \u00b7 ~2 weeks \u00b7 Yunnan Sourcing', liquor:L.goldPale },
+        { name:'Da Hong Pao', meta:'1.8g \u00b7 ~5 days \u00b7 Wuyi Origin', liquor:L.amberDeep },
+        { name:'Gyokuro, Uji', meta:'12g \u00b7 ~3 weeks \u00b7 Ippodo', liquor:L.jadePale }
+      ],
+
+      shopList: [
+        { name:'Da Hong Pao', meta:'rebuy \u00b7 1.8g left', metaFg:'#3F5E42', onShelf:true, liquor:L.amberDeep },
+        { name:'Shui Xian', meta:'Wuyi Origin', metaFg:'#8C7F6C', onShelf:false, liquor:'' },
+        { name:'gaiwan, 120ml', meta:'not a tea \u2014 no swatch', metaFg:'#8C7F6C', onShelf:false, liquor:'' },
+        { name:'Liu Bao 2016', meta:'rebuy \u00b7 finished', metaFg:'#3F5E42', onShelf:true, liquor:L.sepia }
+      ],
+
+      sdSteeps: [
+        { i:'1', t:'15s', c:'95\u00b0C \u00b7 rinse' },
+        { i:'2', t:'20s', c:'95\u00b0C' },
+        { i:'3', t:'25s', c:'95\u00b0C \u00b7 stone fruit' },
+        { i:'4', t:'35s', c:'95\u00b0C' }
+      ],
+
+      surfaces: [
+        { name:'Insights', tag:'PRIORITY', tone:'#69160F', counts:'1 BAND \u00b7 5 RULE \u00b7 2 BOX \u00b7 0 SLAB',
+          line:'The surface reads as a spreadsheet because every fact on it is a number and none of them has a tea attached \u2014 so warmth here is not a coat of paint, it is attaching the data back to the teas it came from: the clock\u2019s bars carry the liquor of what you were drinking in each slot, the one ledger row whose subject is teas carries their ramp, and the two rows that name a tea carry its colour at 30px. The hero, which names a type rather than a tea, stays exactly as slice 4 left it.',
+          marks:'FOUR MARKS \u00b7 CLOCK BARS \u00b7 ONE LEDGER STRIP \u00b7 TYPE BAR (HUES DEFERRED, R149) \u00b7 TWO NOTE SWATCHES. HERO PLAIN. ZERO CLAY HOLDS.' },
+        { name:'Shelf', tag:'COLOUR LEADS', tone:'#3F5E42', counts:'1 BAND \u00b7 RULE ROWS \u00b7 BOX CARDS \u00b7 1 SLAB',
+          line:'It is your collection, so the collection\u2019s colours should be the first thing you see \u2014 and the shelf was already closest: its swatch is a real 24\u00d732 liquor plate, just too small to separate from the whiter ground at the pale end, so it grows to 30\u00d740 and the R124/R145 identity shape is left exactly alone.',
+          marks:'ONE MARK PER ROW, GROWN \u00b7 PHOTO THUMB STILL TRAILS \u00b7 GRID CARDS UNTOUCHED (A PHOTO IS ALREADY THE IDENTITY THERE).' },
+        { name:'Shopping', tag:'QUIETER REGISTER', tone:'#3F5E42', counts:'1 BAND \u00b7 1 BOX \u00b7 2 RULE \u00b7 1 SLAB',
+          line:'Supply is the quiet register, so it takes Home\u2019s 14px Running-low size rather than the bold plate \u2014 and because the swatch appears only where a shelf tea stands behind the row, it does SH1\u2019s job for free: a want that is really a rebuy now shows the colour of the tea it repeats.',
+          marks:'14px ON RUNNING LOW AND ON REBUY ROWS \u00b7 NO SWATCH, NO PLACEHOLDER, ON A WANT WITH NO TEA.' },
+        { name:'Session-detail', tag:'THE SITTING', tone:'#3F5E42', counts:'1 BAND \u00b7 RULE SECTIONS \u00b7 0 BOX \u00b7 1 SLAB',
+          line:'The record is about one tea and carries exactly one swatch, which is why it can be the largest in the app: 44\u00d758 in the band beside the name, so a sitting you scroll back to years later is recognisable by its colour before you read a word.',
+          marks:'ONE MARK, THE BIGGEST \u00b7 STEEP ROWS STAY PLAIN (A STEEP HAS NO LIQUOR OF ITS OWN) \u00b7 PHOTO STILL TRAILS AS EVIDENCE.' }
+      ],
+
+      rulings: [
+        { tag:'DIRECTION \u00b7 R160', tone:'#3F5E42', title:'The warmth pass goes app-wide',
+          body:'Home was the proving ground and it held: warmth on the spine\u2019s structure, colour as data, no container touched. The same pass now lands on the four utility surfaces, which closes the seam the shipped app currently shows \u2014 one warmed identity floor in front of four austere utility floors. This is a dressing pass under F33\u2019s rule read forwards: the BOX test is not re-run, because nothing is re-framed.',
+          src:'R159/R160 \u00b7 HOME-VISION \u00a7CONTRAST & WARMTH \u00b7 R5-AUDIT \u00a73' },
+        { tag:'INSIGHTS', tone:'#69160F', title:'The clock\u2019s bars carry liquor \u2014 the colour clock',
+          body:'"When you brew" is the surface\u2019s one hour graph, and its twelve 2-hour bars stop being flat jade: each takes the liquor of the tea most brewed in that slot, and the chart grows so the colour reads. This is the one genuinely new mark in the pass, and it is information rather than decoration \u2014 remove the colour and the surface loses a fact. A slot with no dominant tea, or a tea with no liquor recorded, keeps its height and takes recessed paper: never-guess governs a bar\u2019s colour exactly as it governs a number. The peak signal moves off fill and onto a 2px ink rule under the column, beside the mono label that already names it \u2014 and it reads in greyscale, which the amber fill never did.',
+          src:'brewingClockHTML \u00b7 s.hourBuckets / s.peakBuckets \u00b7 EMPTY BAR = --heat-empty #E4DCC5 \u00b7 DRAWN IN 1a AND 1b, THREE CASES' },
+        { tag:'INSIGHTS', tone:'#69160F', title:'The hero stays plain \u2014 no bars, no swatch',
+          body:'Slice 4 dropped ins-bars with their hours data (R161), and this pass does not put a graph back: the hero is a clean observation-sentence BAND, which is the right shape for the one thing you land on. It gains no swatch either \u2014 its subject is a top TYPE, not a tea, so there is no liquorFor behind "Green, and mornings." The rule shows its teeth here: the most prominent element on the surface is the one that gets nothing.',
+          src:'insHeroHTML \u00b7 steep-insights.js:110 \u00b7 .band.ins-band' },
+        { tag:'INSIGHTS', tone:'#69160F', title:'A figure gets a mark only when the mark is the figure',
+          body:'The ledger stays a ledger: six hairline rows, label left, mono figure right. Exactly one of them gains colour \u2014 "Teas brewed", whose subject is the teas themselves, so its liquor strip is the figure rather than an ornament beside it. Grams, litres, days and sessions have nothing to colour and stay ink. This is the rule that stops a warmth pass from turning a retrospective back into a scoreboard.',
+          src:'.ins-row \u00b7 THE PRIORITY MISS STAYS FIXED' },
+        { tag:'SHELF', tone:'#3F5E42', title:'The swatch grows; the shape does not',
+          body:'24\u00d732 \u2192 30\u00d740, and that is the whole change: the 9/4/8/5 identity radius is contract 1\u2019s shape (R124/R145) and is not touched, the photo thumb keeps trailing as evidence, and the grid density is left alone because a card already leads with a photo. Because teaRowIdentity is the single writer, the tea picker warms with the shelf at no extra cost.',
+          src:'teaRowIdentity \u00b7 .shelf-swatch \u00b7 swatchAttr' },
+        { tag:'SHOPPING', tone:'#3F5E42', title:'The swatch is the rebuy signal',
+          body:'Running low and any list row backed by a shelf tea take a 14px swatch \u2014 Home\u2019s supply size, because supply is the quieter register and one bold swatch run per screen is the ration. A want with no tea behind it takes none and gets no placeholder, which makes the overlap SH1 designed for visible for the first time: colour marks the rows the app actually knows a tea for.',
+          src:'.shop-row \u00b7 shelfTeaForWish \u00b7 CURRENTLY NO SWATCH AT ALL' },
+        { tag:'SESSION-DETAIL', tone:'#3F5E42', title:'One tea, the largest swatch in the app',
+          body:'The identity band gains the tea\u2019s liquor at 44\u00d758 in the identity shape, beside the name. Rationing is not strained by the size: the ration is one bold swatch run per surface, and here the run is a single mark on a surface about a single tea. The steep rows stay plain \u2014 a steep has no liquor of its own, and six tinted rows would be decoration.',
+          src:'.sd-band \u00b7 liquorFor(tea) \u00b7 .sd-photo UNCHANGED' },
+        { tag:'CORRECTION', tone:'#8A5A1E', title:'Insights re-grounded against slice 4',
+          body:'The first cut of this board reasoned from a pre-slice-4 Insights: it drew liquor onto hero bars that R161 had already deleted, and carried a clock-versus-hero duplication question that slice 4 had already answered (clock kept, hero bars dropped). Both are corrected here \u2014 the mechanic moved to the surviving clock, the hero left plain, the dead question removed. Shelf, Shopping and session-detail were reconciled and are unchanged.',
+          src:'RE-READ AT HEAD d61df08 \u00b7 steep-insights.js \u00b7 dashCardsInsights = hero/typemix/notes/wrapped/origins' }
+      ],
+
+      fence: [
+        { k:'A NEW HEX, TONE OR RADIUS', d:'Every colour drawn here is a shipped token \u2014 the twelve liquor stops, --band, --clay, --porcelain, and --heat-empty #E4DCC5 for a clock bar with no tea behind it (a fifth near-identical paper hex is exactly the F32/R128 catch). The only radius that moves goes down: the type bar\u2019s unrationed 6px to 2px.' },
+        { k:'A RETIRED FILL COMING BACK', d:'.ins-hero\u2019s jade-pale, .ins-teaser\u2019s baked #2A4130 and the shelf card\u2019s 16px stay retired. Warmth is not a reason to reopen a fill-law breach the spine slices closed.' },
+        { k:'A SWATCH WHERE THERE IS NO TEA', d:'Never-guess. No placeholder plate on a want, no averaged colour on a mixed hour, no grey stand-in pretending to be a liquor. The absence is the honest mark.' },
+        { k:'MARKS BECOMING FRAME', d:'F31 is untouched: swatches, bars and the type bar are marks riding on paper. None of them becomes a container, gains a border, or wraps content.' },
+        { k:'TYPE TINTS, DECIDED HERE', d:'The .dot-* type family stays the R149 deferral it has been on the shelf, on Home and on Insights. This pass grows the type bar and labels it; it does not retune a hue.' },
+        { k:'A SECOND CLAY', d:'One committing action per surface, unchanged: \u2795 Add on Shopping, add-a-tea on the shelf, Brew this again on session-detail, and none on Insights.' },
+        { k:'GAMIFICATION BY COLOUR', d:'No progress fills, no streak stripes, no traffic-light stock colours. A swatch says which tea; it never says how well you are doing.' },
+        { k:'RE-FRAMING UNDER COVER OF WARMTH', d:'No container changes class and no count changes number. If a surface needs a different container, that is a spine question and it comes back as one.' },
+        { k:'GENERATED IMAGERY', d:'The image half of warmth still needs real photography. Nothing here stands in for it, and no drawn block pretends to be a photo.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
