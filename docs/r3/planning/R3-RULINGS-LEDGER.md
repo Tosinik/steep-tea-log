@@ -2136,6 +2136,28 @@ surface in the registry with no positive subject and no biting control is fenced
 surface must still name a real positive subject, and a frame element (`.sd-photo`) is the right one, not a
 workaround. *(fixtures/frame-test.js.)*
 
+**R158 — the update banner's note comes from the INCOMING version; the new service worker owns the single
+source and messages it, the running page's constant is fallback only.** #36: `showUpdateBanner` read
+`WHATS_NEW` from the **running (old) page**, so the banner's sub-line always described the version being
+*left*. The only thing that IS the incoming version at banner-time is the **waiting service worker**, so
+the note has to travel with it. The fix (v4.25): a new `steep-version.js` holds `APP_VERSION` + `WHATS_NEW`
+as `self.` globals; the page reads them as before and `service-worker.js` **`importScripts`** the same file
+— it *references* the note, it does not duplicate it. The SW answers **`GET_WHATS_NEW`** (over the same
+client→worker channel `SKIP_WAITING` uses) with its OWN `{note, version}`; `showUpdateBanner` asks the
+waiting worker and swaps the reply into the sub-line, keeping the page-local constant as the fallback
+(shown instantly, kept if no reply lands within the timeout). **Single-writer is the hard requirement and
+is fixture-guarded:** `fixtures/update-banner-test.js` (a static source-scan — the vm cannot reach the SW
+lifecycle) asserts the note lives only in `steep-version.js`, that `service-worker.js` holds no note literal
+and no `WHATS_NEW =` assignment, that the SW replies with `self.WHATS_NEW`+`self.APP_VERSION`, that the
+banner asks+falls-back, and that the register block tracks `reg.installing` (the secondary no-banner gap: a
+worker still installing at load, whose `updatefound` already fired, was caught by neither `reg.waiting` nor
+the `updatefound` listener). **Verification is two-deploy:** the pre-push gate is the source-scan + suites;
+the behaviour is the on-device smoke (`smoke.md`), confirmed on the deploy AFTER the one that ships the fix
+— v4.25's own note still displays via the old v4.24 boot, so the first correctly-displayed note is the next
+deploy's. The deploy ritual's version/note bump (CLAUDE.md 2b/2c) moves from steep-core.js to
+`steep-version.js`. *(steep-version.js, service-worker.js, steep-boot.js, steep-core.js, index.html,
+fixtures/update-banner-test.js.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

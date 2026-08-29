@@ -122,13 +122,16 @@ was verified on device before v4.17 pushed. Same family as `landing-test.js` ass
    after a push — this is the single most important step.
 2. **If you added a new module/asset, add it to `FILES_TO_CACHE`** in
    `service-worker.js` (and to the `<script>` list in `index.html`).
-2b. **Bump `APP_VERSION` in `steep-core.js`** (v3.61+) to match the new version. It's the
-   user-visible version string — the Settings footer label and the feedback-mailto subject —
-   so a stale value silently mislabels every feedback email. Keep it in lockstep with the
+2b. **Bump `APP_VERSION` in `steep-version.js`** (moved there v4.25/R158; was steep-core.js) to match the
+   new version. It's the user-visible version string — the Settings footer label and the feedback-mailto
+   subject — so a stale value silently mislabels every feedback email. Keep it in lockstep with the
    CHANGELOG heading.
-2c. **Bump `WHATS_NEW` in `steep-core.js`** (v3.69+) to a one-sentence, human summary of what
-   this version changed. It renders as a second quiet line on the update banner (`showUpdateBanner`,
-   steep-boot.js), so a stale value mislabels what users just received. One line — no list, no link.
+2c. **Bump `WHATS_NEW` in `steep-version.js`** (moved there v4.25/R158; was steep-core.js) to a
+   one-sentence, human summary of what this version changed. The update banner shows the **incoming**
+   version's note by messaging it off the waiting SW (which `importScripts` `steep-version.js`), so this
+   is the note the *next* deploy's banner displays — a stale value mislabels it. One line — no list, no
+   link. `steep-version.js` is the SINGLE source (page + SW both read it); never duplicate the note into
+   `service-worker.js` (`fixtures/update-banner-test.js` guards this).
 3. **Update CHANGELOG.md** with a new version entry: a version heading, a `Deploy:`
    line naming exactly which files changed (and the new SW cache version), whether any
    SQL must be run, then bullets.

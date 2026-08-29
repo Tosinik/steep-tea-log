@@ -191,8 +191,41 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.24 SHIPPED, LIVE `0bd7f44` — R5 slice 3: the session detail page re-dressed to the spine** (cache
-**v134**, APP_VERSION v4.24, **no SQL**). The spine rollout (shelf v4.22 · Shopping v4.23) continues onto its
+**NOW — v4.25 SHIPPED, LIVE `55a16ff` — the update banner shows the INCOMING version's note (#36 / R158)**
+(cache **v135**, APP_VERSION v4.25, **no SQL**). A correctness fix, not an R5 slice. **The bug:**
+`showUpdateBanner` read `WHATS_NEW` from the **running (old) page**, so the banner's sub-line always
+described the version being *left*; secondary, a worker still **installing** at page-load (its
+`updatefound` already fired) was caught by neither the `reg.waiting` check nor the `updatefound` listener,
+so the banner sometimes appeared a load late.
+- **The fix — the note travels with the new SW, single source preserved:** new **`steep-version.js`** holds
+  `APP_VERSION` + `WHATS_NEW` (`self.` globals), read by BOTH the page (as before) and `service-worker.js`
+  (`importScripts` — *references*, never duplicates). The SW answers **`GET_WHATS_NEW`** (same channel as
+  `SKIP_WAITING`) with its OWN `{note, version}`; `showUpdateBanner` asks the **waiting** worker (= the
+  incoming version) and swaps the reply into the sub-line, with the page-local constant as the fallback.
+  **`watchWorker`** routes `reg.waiting` + `reg.installing` + `updatefound` through one path (no-banner gap
+  closed). Files: **new** `steep-version.js` + `fixtures/update-banner-test.js`; `index.html`,
+  `service-worker.js` (v135), `steep-boot.js`, `steep-core.js` (consts removed → pointer), `steep-data.js`,
+  `.gitignore`, `smoke.md`.
+- **Single-writer is fixture-guarded:** `fixtures/update-banner-test.js` (source-scan — the vm can't reach
+  the SW lifecycle) asserts the note lives only in `steep-version.js`, the SW holds no note literal / no
+  `WHATS_NEW =`, the SW replies with `self.WHATS_NEW`+`self.APP_VERSION`, the banner asks+falls-back, and
+  `reg.installing` is tracked. **33 suites green.** Ledger: **R158**.
+- **Verification is TWO-DEPLOY** (the standing `smoke.md` check runs on the deploy AFTER v4.25): v4.25's own
+  note still displays via the *old* v4.24 boot, so the first correctly-displayed note is the **next**
+  deploy's. On v4.26+: trigger the update, assert the banner sub-line = the incoming deploy's `WHATS_NEW`,
+  and the messaged `version` matches the incoming deploy (console cross-check in `smoke.md`, §v4.25).
+- **Deploy-ritual change:** the per-deploy bump (CLAUDE.md **2b/2c**) now targets `steep-version.js`, not
+  steep-core.js; the module map gained `1b. steep-version.js`. Closes
+  [#36](https://github.com/Tosinik/steep-tea-log/issues/36).
+- **NEXT — R5 rollout resumes.** The self-contained re-dress set is near spent (session-detail was the last
+  clean one; vessels is a trivial empty-state tidy). What's left is entangled: **tea-detail**
+  mark-remediation (inline `var(--jade-pale)` → rationed marks; needs a markup-level guard, not the CSS
+  fence) and the Design-thread surfaces (Home, Settings #8, Insights, stat cards, steeping). Slice 4 is the
+  inflection — the small vessels tidy, or hand back to Design. **SECURITY stays the deferred pre-widening
+  gate.**
+
+**Previously — v4.24 (SHIPPED, LIVE `0bd7f44`) — R5 slice 3: the session detail page re-dressed to the spine** (cache
+**v134**, APP_VERSION v4.24, **no SQL**). The spine rollout (shelf v4.22 · Shopping v4.23) continued onto its
 third surface — `viewSessionDetail`, **containers only** (F33). Chosen over tea-detail (nested `.card`s with
 **inline** `var(--jade-pale)` fills — a mark-remediation job the selector fence can't police; deferred, NOT
 containers-only) and vessels (already spined in slice 1 — a Teas-tab segment, one empty-state card).

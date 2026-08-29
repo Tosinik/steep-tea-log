@@ -62,3 +62,27 @@ always resolve), and whether the **~1.3:1 plate edge** reads at all in the worst
      from the live shelf (board F21: Fei Bing is tier 3, so near-black never appears). If it's not there,
      that's an observation; the plate-vs-fill legibility still holds on the pairs that are present
      (12 filled / 9 plates on the current shelf).
+
+---
+
+## v4.25 · #36 update-banner note comes from the INCOMING version  *(confirm on the NEXT deploy)*
+
+The service-worker update flow has no `vm` reach — `fixtures/update-banner-test.js` pins the source facts
+(single source in `steep-version.js`, the SW references-not-duplicates the note, the `GET_WHATS_NEW`
+reply, the banner asks the waiting worker and falls back to the local constant, `reg.installing` tracked)
+— but only a device shows the banner across a real version transition. **This fix is confirmed on the
+deploy AFTER v4.25**, not v4.25 itself: the v4.24→v4.25 update still runs the OLD (v4.24) boot, which
+reads the note locally. v4.25's boot is the first that reads the *incoming* note, so the first correctly
+displayed note is the NEXT deploy's. This is the standing check to run then (v4.26, v4.27, …):
+
+1. **On v4.25 (or later), deploy the next version** with a DISTINCT `WHATS_NEW` in `steep-version.js`.
+   Open the app (or wait for the hourly check) so the update installs and the **Refresh** banner appears.
+2. **The banner's second line = the INCOMING version's `WHATS_NEW`** — the note committed in the *new*
+   deploy's `steep-version.js`, NOT the one you're leaving. That leaving-version note was the bug.
+3. **Cross-check it came from the new SW, not a stale copy** (console — more than a phone glance):
+   `navigator.serviceWorker.getRegistration().then(r=>{const c=new MessageChannel();c.port1.onmessage=e=>console.log(e.data);r.waiting.postMessage({type:'GET_WHATS_NEW'},[c.port2]);});`
+   → the logged `{note, version}` must equal the INCOMING deploy's `steep-version.js` (version = the new
+   `APP_VERSION`; note = the new `WHATS_NEW`). Matching the **version** is what proves the note came from
+   the incoming worker, which is the actual defect (#36).
+4. **No-banner gap** (harder to stage): if an update was mid-install when you opened the app, the banner
+   still appears *this* load, not a version later. Note it if "Refresh" ever arrives a version late again.

@@ -12,6 +12,9 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 `app.js` byte-for-byte" note is historical only.
 
 1. `supabase-config.js` — Supabase keys.
+1b. `steep-version.js` — the SINGLE source of `APP_VERSION` + `WHATS_NEW` (`self.` globals), read by
+   BOTH the page and `service-worker.js` (`importScripts`). Loaded first (before `steep-data.js`); bumped
+   every deploy (ritual 2b/2c). *(R158, v4.25 — so the update banner shows the INCOMING version's note.)*
 2. `steep-data.js` — Supabase client, `loadKey`/`saveKey`, mappers, per-row CRUD, offline
    write queue (`window.SteepDB`).
 3. `steep-knowledge.js` — curated tea KB (`kbResolve`, `KB_STYLES`, flavour vocab/families).
@@ -43,6 +46,39 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.25 — the update banner shows the INCOMING version's note (#36 / R158)
+Deploy: **new** `steep-version.js`, **new** `fixtures/update-banner-test.js`; `index.html` (script added,
+first), `service-worker.js` (`importScripts` + `GET_WHATS_NEW` + `FILES_TO_CACHE` += `./steep-version.js`
++ **cache v135**), `steep-boot.js`, `steep-core.js` (two consts removed → pointer comment), `steep-data.js`
+(stale comment), `.gitignore` (track the new fixture), `smoke.md`. **No SQL.** *(Docs — CHANGELOG.md,
+STATE.md, R3-RULINGS-LEDGER.md R158, CLAUDE.md deploy ritual — push with this deploy.)*
+
+**The bug (#36):** `showUpdateBanner` read `WHATS_NEW` from the **running (old) page**, so the banner's
+sub-line always described the version being *left*, never the incoming one. Secondary: a worker still
+**installing** at page-load (its `updatefound` already fired) was caught by neither the `reg.waiting`
+check nor the `updatefound` listener, so the banner sometimes only appeared a load late.
+
+**The fix — the note travels with the new service worker, single-writer preserved:**
+- **`steep-version.js`** is the one source of `APP_VERSION` + `WHATS_NEW` (`self.` globals). The page
+  reads them as before; `service-worker.js` **`importScripts`** the same file — it *references* the note,
+  never duplicates it (a committed fixture guards this: no note literal, no `WHATS_NEW =` in the SW).
+- The SW answers **`GET_WHATS_NEW`** (over the same client→worker channel as `SKIP_WAITING`) with its OWN
+  `{note, version}`. At banner-time the waiting worker IS the incoming version, so `showUpdateBanner` asks
+  it and swaps the reply into the sub-line; the page-local `WHATS_NEW` is the **fallback** (shown instantly,
+  kept if no reply arrives). Never blocked on the round-trip, never worse than before.
+- **`watchWorker`** routes `reg.waiting` + `reg.installing` + `updatefound` through one path, closing the
+  no-banner gap; `showUpdateBanner` de-dupes.
+- **Verification is two-deploy** (the vm can't reach the SW lifecycle): the pre-push gate is the source-scan
+  fixture (`fixtures/update-banner-test.js`) + the suites; the *behaviour* is the on-device smoke
+  (`smoke.md`) confirmed on the deploy AFTER v4.25 — v4.25's own note still shows via the old v4.24 boot,
+  so the first correctly-displayed note is the next deploy's. The smoke cross-checks the messaged
+  `{note, version}` against the incoming deploy's `steep-version.js`, so the phone isn't the only signal.
+
+Ruling: **R158** — the update banner's note comes from the incoming version; the new SW owns the single
+source and messages `{note, version}`; the page-local constant is fallback only; single-writer enforced by
+a committed source-scan; banner coverage tracks installing + waiting + updatefound. Closes
+[#36](https://github.com/Tosinik/steep-tea-log/issues/36). 33 suites green.
+
 ## v4.24 — R5 slice 3: the session detail page re-dressed to the spine (F33, containers only)
 Deploy: styles.css, steep-sessions.js, steep-core.js (APP_VERSION v4.24 + WHATS_NEW), service-worker.js
 (**v134**), fixtures/frame-test.js. **No SQL.** No new module → no FILES_TO_CACHE / index.html change.
