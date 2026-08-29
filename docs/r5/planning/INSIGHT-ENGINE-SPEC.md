@@ -103,6 +103,45 @@ repo's CSV exports are **stale** (a snapshot, not the user's live state); a numb
 engine or a mock is wrong the moment the user brews again. **Compute, don't illustrate** — the same
 discipline as the figures reporter (R67 — generated, never hand-copied).
 
+## Feasibility / build notes (Code read, 2026-08-29)
+
+A pre-build read of the seven types against the live data model (`teas` / `sessions` / `steeps` columns),
+the `steep-insights.js` machinery, and `SPEC-freshness-model.md`. Verdict: **the pool as specced is real
+today** — spec it as-is.
+
+**All 7 lead types are buildable now from existing fields**, on the existing `computeInsights` machinery
+(`topPart`/`topPartShare` = the time skew, the `sessions.length < 5` floor, type/hour buckets via
+`timeOfDayBuckets`/`insHeroData`). **No lead type is flavour-gated.**
+
+| Type | Verdict | Fields |
+|---|---|---|
+| palate-lean | buildable now | `tea_type` × `rating` + counts |
+| morning-truth | buildable now | `session_date`→hour; `computeInsights.topPartShare` *is* the skew |
+| highest-rated-&-why | buildable now (structural why) | `rating` + `type` + `origin` + `steeps.temp_c`/`time_seconds`; flavour "why" is a later enhancement, not required to fire |
+| temperatures-by-type | buildable now | `steeps.temp_c` × `tea_type` (timed sessions only — see caveats) |
+| freshness | buildable now | `purchase_date`/`opened_date` (the shipped freshness model; dated-only = the gate) |
+| haven't-reached-for | buildable now | last `session_date` per `tea_id` vs now |
+| little-notice | buildable now | catch-all over the reliable axes; its definition is a design choice, not a data need |
+
+**The "can I say this truly today?" gate needs no schema change.** Each type computes its own fire-condition
+from existing fields; what it needs is a per-type **"enough signal" threshold** — a design number, not data.
+Precedent already in code: `computeInsights`'s `sessions.length < 5 → null` floor.
+
+**The cooldown is the one data-model addition — RULED: device-local localStorage.** A bounded `{type →
+lastFired}` map under key **`tealog_insightlog`** (matching the device-local convention of `tealog_theme` /
+`tealog_view` / `tealog_statPeriod`). It is **ephemeral UI state, not a synced preference** — this avoids a
+DB write on every Home render and stays bounded (one entry per type). **Not synced**; cross-device
+repetition of the lead insight is an **accepted minor cost**. (No `sessions`/`steeps`/`teas`/settings
+schema change; no SQL.)
+
+**Caveats to spec the copy around** (not blockers):
+
+- **temps-by-type covers *timed* sessions only** — `temp_c` is per-steep, and quick-log / cold-brew carry
+  `infusion_count` with no steeps. The copy must not imply it covers quick-logged cups.
+- **Flavour-level depth waits on the tasting-input work** — highest-rated's *flavour* "why" and the
+  palate-map's fine grain (`IDEA-tasting-mode.md` structured input). Already in the **Data ladder** above;
+  restated so the **lead pool** is never specced to need it.
+
 ## Related
 
 - `HOME-VISION.md` — Home = the moment (this engine's lead); the warm direction it serves.
