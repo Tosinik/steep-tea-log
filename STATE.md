@@ -191,7 +191,39 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.26 SHIPPED, LIVE `7e0a3a2` — R5 slice 4: Insights re-dressed to the spine + a register-cull**
+**NOW — v4.27 SHIPPED, LIVE `50e40f0` — R5: the warm Home combined slice (R159 — frame + content + warmth)**
+(cache **v137**, APP_VERSION v4.27, **no SQL**). The HELD Home slice, landed: the R2/R3 overhaul on Home +
+the lead-insight engine + the warm direction. Two commits: **A** `fe42808` (engine dormant + fixture), **B**
+`50e40f0` (visual wiring + fence).
+- **Frame:** masthead → **BAND** (`.home-masthead`); `today`/`restock`/`favorites` de-carded to **RULE**
+  (`.home-sec`/`.home-sechead`); **0 BOX, 1 SLAB**. **Warmth (R160/R164):** 30px liquor swatches (Earlier
+  today), 14px (Running low) — colour as **data**, not decoration. **Whiter ground (R166):** `--porcelain
+  #F6F2E9→#FAF8F3` **app-wide** (one `:root` token — all five surfaces; dark untouched; fence-safe).
+- **The lead-insight engine (R167):** `computeLeadInsight` — 7 self-gating types on `computeInsights`/
+  `computeStats`; pick = most-specifically-true, **sticky per day**, ~7-day cooldown; floor = **nothing**
+  (no door), never fabricated. **Door (R165):** a band register (0 BOX), named-tea swatch + chevron + "why,
+  on Insights" + press-wash → opens Insights (graceful; deep pages a later slice). **Cooldown (R168):**
+  device-local `tealog_insightlog`, not synced. Guarded by `fixtures/insight-engine-test.js` (logic, never
+  live values).
+- **Front door:** Log **FAB** 54→58px (always visible); Start steeping (the one clay) when a tea is
+  proposed. **Wrapped moment (R169):** time-gated ("Your {month}"), then gone (no remnant); archive on
+  Insights (R103). **"a tea diary"** topbar tagline (app-wide). **clay-grams fix folded in** (Running low
+  value → `--amber`). Files: `styles.css`, `steep-dashboard.js`, `steep-core.js`, `service-worker.js`
+  (v137), `steep-version.js`, 3 fixtures + **new** `insight-engine-test.js`, `.gitignore`, `smoke.md`.
+- **Fence:** `SURFACES.home` (masthead BAND positive; Wrapped/swatches excluded as rationed marks); **28 →
+  32 checks**; whiter-ground verified not to falsely redden. **33 committed suites + engine fixture green.**
+  Ledger: **R163–R169**. Suite updates: home-test E6/E7, liquor-test F2(4→6)/F9, greeting-v4 door-safe.
+- **ON DEVICE (`smoke.md §v4.27`)** — the phone look Niklas owns: does the door read as a door; does the
+  warmth land; **does the whiter ground work on the other four surfaces** (highest-attention — a token
+  change touching shelf/Shopping/session-detail/Insights); does the lead stick-per-day + rotate; the FAB.
+- **NEXT:** the R5 warm/contrast pass extends to the **four utility surfaces** (Home was the proving ground
+  — R164); the **Insights reflection deep pages** the lead-insight door points at (the "why": profile/top
+  five/spread, `INSIGHT-ENGINE-SPEC` § reflection layer) are the sequenced-next Insights slice so the door
+  lands precisely; then the remaining threads (shelf board-13-rev2 tints, steeping, **tea-detail**
+  mark-remediation). Insight copy + gate-threshold tuning are a later pass (the templates ship plain).
+  **SECURITY stays the deferred pre-widening gate.**
+
+**Previously — v4.26 (SHIPPED, LIVE `7e0a3a2`) — R5 slice 4: Insights re-dressed to the spine + a register-cull**
 (cache **v136**, APP_VERSION v4.26, **no SQL**). Insights read as the old app (six white `.stat` boxes).
 This gives it the spine — **containers only + a scoped copy pass** — and culls three cards. NOT held
 (Insights is the retrospective surface; redress-in-isolation is fine, unlike Home).

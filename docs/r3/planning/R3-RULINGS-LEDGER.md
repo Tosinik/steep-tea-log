@@ -2213,6 +2213,60 @@ selectors)` asserts no `var(--clay)` on ANY Insights frame selector — an asser
 could make — with a control (clay injected on `.ins-sec`) proving it bites. 22 → **28 checks**. *(fixtures/
 frame-test.js.)*
 
+**R163 — Home's masthead is a BAND (the R114 update lands).** R5 combined slice (v4.27, R159). Home's
+greeting masthead becomes a full-bleed `.band` stripe (`--band` paper, radius 0, `margin:0 -16px` like
+`.lib-band`) — the band-masthead pattern now ships on all four other tabs, so bare ground is the exception
+R114 named. Figure/ground is `--band` vs paper, **not** colour; the greeting **words are unchanged** (the
+existing greeting engine); the deleted `--greeting-*` tokens stay deleted. *(styles.css `.home-masthead`;
+steep-dashboard.js `greetingMastheadHTML`.)*
+
+**R164 — warmth is the app's own colour, at size (R160 realized).** The warm pass adds **no tone, no radius,
+no new hex** — it grows what the app owns: the liquor ramp at **30px** (Earlier today) / **14px** (Running
+low) instead of a 13px fleck, real figure/ground, and the Wrapped field brought by Wrapped. **Colour arrives
+as data** (a tea's liquor), never decoration: an element naming no tea stays plain. Home is the proving
+ground; the four utility surfaces get the same contrast pass next. *(steep-dashboard.js; styles.css
+`.today-tint`/`.rank-swatch`.)*
+
+**R165 — a register reads as a door without an edge.** The lead insight is a **band register** (0 BOX
+survives — a tappable line is not a discrete object, and Home's rows are already doors), made the *loudest*
+door by a jade chevron + the destination in words ("why, on Insights") + a full-bleed press-wash (an `--ink`
+opacity overlay via `color-mix`, not a rationed fill — fence-legal, no raw hex). The named tea's liquor
+swatch rides only when the insight names a tea; the chevron holds when it doesn't. It opens **Insights** — a
+graceful destination now; the deep "why" pages are a later Insights slice, so the door is never dead.
+*(steep-dashboard.js `leadDoorHTML`; styles.css `.lead-door`.)*
+
+**R166 — the ground goes whiter, app-wide.** `--porcelain #F6F2E9 → #FAF8F3` (dark block untouched). The
+ruling to record is its **reach**: `--porcelain` is the global paper token, so the shelf, Shopping,
+session-detail and Insights all land on the new ground at once — there is **no Home-only version** of this
+change. Hairline, band, ink and the twelve liquor stops are unchanged; the pale end of the ramp gains the
+separation it lacked. Fence-safe: `FILL_OK` matches the `var(--porcelain)` reference, not the resolved hex,
+so the value change is transparent to every check (verified). *(styles.css `:root`.)*
+
+**R167 — the insight-engine baseline principle (the governing ruling the spec deferred).** Home's lead
+insight — and every future reflection — reads **behaviour × the tea's character, never noisy free-text**; no
+single vendor is authoritative. `computeLeadInsight` ships the seven-type pool on the `computeInsights`/
+`computeStats` machinery, each type **self-gating** ("can I say this truly today?"), the pick the
+**most-specifically-true not shown recently**, the floor **nothing** (never a fabricated stat), phrasing
+**plain templated data** (no machine prose; a later copy pass), values **computed live** (the exports are
+stale). The swatch is data (the named tea's `liquorFor`), absent when no tea is named. Guarded by
+`fixtures/insight-engine-test.js` (logic, never live values) — this is INSIGHT-ENGINE-SPEC's governing rule,
+minted as the engine ships. *(steep-dashboard.js; docs/r5/planning/INSIGHT-ENGINE-SPEC.md.)*
+
+**R168 — the lead-insight cooldown is device-local, not synced.** `tealog_insightlog` = a bounded
+`{type→dayKey}` map (one entry per type), matching the `tealog_theme`/`tealog_view` device-local convention.
+The pick is **sticky per day** (stamped on show, returned unchanged on re-render) and skipped for ~7 days
+after — so the lead doesn't churn within a day and rotates across days. Ephemeral UI state, **not** a synced
+preference: no DB write per Home render, and cross-device repetition is an accepted minor cost.
+*(steep-dashboard.js `insightLog`/`markInsightFired`.)*
+
+**R169 — Home is the moment, Insights is the record (Wrapped as a rhythm).** The Wrapped **moment** is the
+only element permitted to raise Home's band count, and only for a month's first days: it arrives under the
+greeting, then leaves **completely** — no shrunken remnant, no permanent row. `--wc-jade` is the shipped
+Wrapped field (a rationed mark, excluded from the frame fence), not a new fill. The archive stays on
+Insights (R103, R161). This is the model for any time-bound Home element: it earns the lead by being
+**timely**, never by being **permanent**. *(steep-dashboard.js `wrappedMomentHTML`; styles.css
+`.wrapped-moment`.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

@@ -46,6 +46,51 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.27 — R5: the warm Home combined slice (R159 — frame + content + warmth)
+Deploy: styles.css, steep-dashboard.js, steep-core.js, service-worker.js (**v137**), steep-version.js
+(APP_VERSION v4.27 + WHATS_NEW), fixtures/frame-test.js, fixtures/home-test.js, fixtures/liquor-test.js,
+**new** fixtures/insight-engine-test.js, .gitignore, smoke.md. **No SQL.** *(Docs — CHANGELOG.md, STATE.md,
+R3-RULINGS-LEDGER.md R163–R169 — push with this deploy. Two commits: A the engine dormant+fixture, B the
+visual wiring + fence.)*
+
+The HELD Home slice (R159) — frame + content + warmth together. Home read as "the same app": under-designed
+frame, no reflection, near-monochrome. This lands the R2/R3 overhaul on Home and proves the warm direction.
+
+- **The frame** (element-mix board): the masthead is a **BAND**; `today` / `restock` / `favorites` de-card
+  into three **RULE** sections (2px ink `.home-sechead`, hairline rows); **0 BOX, 1 SLAB** (Start steeping).
+- **Warmth on the bones (R160/R164):** the app's own colour at size — **30px** liquor swatches lead the
+  Earlier-today rows (fleck→swatch, no outline), a **14px** swatch on Running low; colour is **data**, never
+  decoration.
+- **The whiter ground, app-wide (R166):** `--porcelain #F6F2E9 → #FAF8F3` — one `:root` token, so the
+  shelf, Shopping, session-detail and Insights all land on the new paper at once (the pale liquor ramp
+  separates from it). Dark block untouched. Fence-safe (FILL_OK matches the `var()` reference, not the hex).
+- **The lead-insight engine (R167):** `computeLeadInsight` — the 7 INSIGHT-ENGINE-SPEC types on the
+  `computeInsights`/`computeStats` machinery, each self-gating; pick = most-specifically-true not shown in
+  the last 7 days, **sticky per day**; floor = **nothing** (no door), never a fabricated stat. Behaviour ×
+  character only; computed live; plain templated phrasing (a later copy pass polishes it).
+- **The lead insight is a DOOR (R165):** a band register (0 BOX survives) — sentence + the named tea's
+  liquor swatch (only when it names a tea) + jade chevron + "why, on Insights" + press-wash; opens Insights
+  (graceful now; the deep pages are a later slice — the door is never dead).
+- **The cooldown (R168):** device-local `tealog_insightlog` `{type→dayKey}`, bounded, **not synced**.
+- **The reliable front door:** the Log **FAB** boldened `.bn-log-circle` **54→58px** (always visible, never
+  proposal-dependent); Start steeping (the one clay) shows when a tea is proposed — the clay cap holds.
+- **The Wrapped moment (R169):** time-gated to a month's first days ("Your {month}"), then gone with no
+  remnant; the archive stays on Insights (R103).
+- **"a tea diary"** — the topbar tagline, app-wide, beside the wordmark (pixel logo kept).
+- **The clay-grams fix folded in:** Running low's value → `--amber`, not clay (low stock is state, not a
+  commitment; R113).
+- **Fence (R163+):** `SURFACES.home` (masthead BAND positive; `.lead-door`/`.home-sechead`/`.today-row`);
+  the Wrapped `--wc-jade` and the liquor swatches are rationed marks, excluded. 28 → **32 checks**; the
+  whiter-ground change verified not to falsely redden.
+
+Rulings: **R163** (Home's masthead is a BAND — the R114 update) · **R164** (warmth realized, R160) · **R165**
+(the lead-insight door) · **R166** (whiter ground app-wide) · **R167** (the insight-engine baseline governing
+ruling — the one the spec deferred) · **R168** (the cooldown) · **R169** (Wrapped-as-moment; Home the moment,
+Insights the record). Suite updates: `home-test` E6/E7 (today-sub), `liquor-test` F2 (4→6 swatch sites)/F9
+(fleck→swatch, hairline retired), `greeting-v4` (door render-safe). **33 committed suites + the engine
+fixture green.** On-device: `smoke.md §v4.27` (the door, the warmth, the whiter ground on four surfaces, the
+cooldown rotation).
+
 ## v4.26 — R5 slice 4: Insights re-dressed to the spine + a register-cull (R161 / R162)
 Deploy: styles.css, steep-insights.js, steep-dashboard.js, steep-version.js (APP_VERSION v4.26 + WHATS_NEW),
 service-worker.js (**v136**), fixtures/frame-test.js, fixtures/insights-room-test.js, fixtures/home-test.js,
