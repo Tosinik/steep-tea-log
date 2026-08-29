@@ -815,6 +815,70 @@ function d_rediscoveryPick(todayKey, excludeIds, excludeType){
    day rather than proposing a cup correctly carries none, and a redirected suggestion ("save the X
    for tomorrow") must not offer to brew it now — the button would contradict the sentence above it.
    The copy in `greet`/`sub` is untouched; this is a container change plus one action. */
+/* ============ R5 / R159 — the lead insight (Home's one revelation) ==============================
+   INSIGHT-ENGINE-SPEC: behaviour × the tea's character, never free-text; computed LIVE, never
+   hardcoded. The seven types each self-gate (return null unless they can say something specifically
+   true today). The pick is the most-specifically-true type not shown in the last INSIGHT_COOLDOWN_DAYS
+   — STICKY per day, so the lead doesn't churn as you revisit Home. The floor is NOTHING (the door is
+   simply absent) — never a fabricated stat. Phrasing is plain templated data (one clause, no
+   comment-on-itself; a later copy pass polishes it). The swatch is DATA: it rides only when the insight
+   names a specific tea (its liquorFor), never as decoration. Cooldown is device-local (tealog_insightlog
+   {type→dayKey}), bounded, NOT synced — cross-device repetition is an accepted minor cost (R168). */
+const INSIGHT_COOLDOWN_DAYS = 7;
+function insightLog(){ try { return JSON.parse(localStorage.getItem('tealog_insightlog')||'{}')||{}; } catch(e){ return {}; } }
+function markInsightFired(type, dk){ try { const l=insightLog(); l[type]=dk; localStorage.setItem('tealog_insightlog', JSON.stringify(l)); } catch(e){} }
+function _insightDaysSince(dk, today){ const p=s=>{ const a=String(s).split('-').map(Number); return (a.length===3 && a.every(n=>!isNaN(n))) ? new Date(a[0],a[1],a[2]).getTime() : NaN; };
+  const x=p(dk), y=p(today); return (isNaN(x)||isNaN(y)) ? Infinity : Math.round((y-x)/86400000); }
+
+// Returns {type, text, teaId?} for the pick, or null (→ no door; the never-guess floor).
+function computeLeadInsight(){
+  const S = state.sessions||[];
+  if(S.length < 5) return null;                                   // global floor (matches computeInsights)
+  const stats = (typeof computeStats==='function') ? computeStats() : null;
+  const ins   = (typeof computeInsights==='function') ? computeInsights() : null;
+  if(!stats) return null;
+  const today = dayKey(new Date());
+  const tier = t => (typeof stockTier==='function') ? stockTier(t) : 'plenty';
+  const partWhen = { morning:'in the morning', afternoon:'in the afternoon', evening:'in the evening', night:'late at night' };
+
+  const lastSeen = {}; S.forEach(s=>{ const t=+new Date(s.date); if(!lastSeen[s.teaId] || t>lastSeen[s.teaId]) lastSeen[s.teaId]=t; });
+  const tempByType = {}; S.forEach(s=>{ if(s.isColdBrew) return; const tea=teaById(s.teaId), ty=tea&&tea.type; if(!ty) return;
+    (s.steeps||[]).forEach(x=>{ const c=Number(x.tempC)||0; if(c>0)(tempByType[ty]=tempByType[ty]||[]).push(c); }); });
+
+  // builders, most-specific first; each returns {type, text, teaId?} or null (self-gate)
+  const B = [
+    ()=>{ if(typeof freshnessReading!=='function') return null;   // freshness — a dated, grounded, still-fresh tea (names a tea)
+      let best=null; (state.teas||[]).forEach(t=>{ if(tier(t)==='empty') return; const fr=freshnessReading(t);
+        if(fr && fr.grounded && !fr.ageing && fr.leftDays>0 && fr.totalDays>0 && fr.days<=fr.totalDays*0.5 && (!best||fr.days<best.days)) best={t, days:fr.days}; });
+      return best ? {type:'freshness', text:`${best.t.name} is at its freshest now.`, teaId:best.t.id} : null; },
+    ()=>{ const t=(stats.topRated||[])[0];                        // highest-rated — the top-rated tea (names a tea)
+      return (t && t.rating>=4) ? {type:'highest-rated', text:`You rate ${t.name} highest.`, teaId:t.id} : null; },
+    ()=>{ if(!ins || !(ins.topPartShare>=0.45)) return null;      // morning-truth — a real time-of-day skew (names no tea)
+      return {type:'morning-truth', text:`Most of your cups come ${partWhen[ins.topPart]||'through the day'}.`}; },
+    ()=>{ const now=Date.now(), DAY=86400000; let pick=null;      // haven't-reached-for — a favourite gone quiet ≥21 days (names a tea)
+      (state.teas||[]).forEach(t=>{ if(!t.isFavorite || ['empty','untracked'].includes(tier(t))) return;
+        const seen=lastSeen[t.id], gap = seen ? (now-seen)/DAY : Infinity;
+        if(gap>=21 && gap<Infinity && (!pick||gap>pick.gap)) pick={t, gap}; });
+      return pick ? {type:'haven-t', text:`You haven't reached for ${pick.t.name} in a while.`, teaId:pick.t.id} : null; },
+    ()=>{ let best=null; Object.entries(tempByType).forEach(([ty,arr])=>{ if(arr.length>=4 && (!best||arr.length>best.n)) best={ty, avg:Math.round(arr.reduce((a,b)=>a+b,0)/arr.length/5)*5, n:arr.length}; });
+      return best ? {type:'temps', text:`You brew ${typeLabel(best.ty).toLowerCase()} around ${best.avg}°.`} : null; },  // temperatures-by-type — timed sessions only (names no tea)
+    ()=>{ if(S.length<8) return null; const tc=stats.typeCounts||{};   // palate-lean — most-brewed type, ≥2 types (names no tea)
+      const ent=(typeof TYPES!=='undefined'?TYPES:[]).map(t=>[t.k,(tc[t.k]||{}).count||0]).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+      return (ent.length>=2) ? {type:'palate-lean', text:`You reach for ${typeLabel(ent[0][0]).toLowerCase()} most.`} : null; },
+    ()=>{ return (ins && ins.weekendShare>=0.6) ? {type:'little-notice', text:`Your tea is mostly a weekend thing.`} : null; }  // little-notice — catch-all (names no tea)
+  ];
+
+  const firing = B.map(b=>{ try{ return b(); }catch(e){ return null; } }).filter(Boolean);
+  if(!firing.length) return null;
+  const log = insightLog();
+  const sticky = firing.find(f => log[f.type]===today);          // one already chosen today → keep it all day (no churn on re-render)
+  if(sticky) return sticky;
+  const fresh = firing.find(f => !log[f.type] || _insightDaysSince(log[f.type], today) >= INSIGHT_COOLDOWN_DAYS);
+  if(!fresh) return null;                                          // everything shown recently → floor = nothing
+  markInsightFired(fresh.type, today);
+  return fresh;
+}
+
 function greetingMastheadHTML(){
   const now = new Date();
   const bucket = d_hourBucket(now.getHours());
