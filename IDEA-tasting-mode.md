@@ -101,10 +101,47 @@ two or three sittings"). The third is most in register and least invasive.
 Not scoped. Recorded so the stock-tier interaction is known before anyone treats it as a
 one-line checkbox.
 
+## The everyday counterpart: structured note input
+
+The deep guided tasting mode above is the **attentive** end. It has a light, **everyday** sibling — and the
+two are one spectrum, not two unrelated features.
+
+During **ordinary logging**, tasting notes are **picked from the tea's own known profile** — its vendor
+notes, the catalog (`steep-tea-types.js`), the flavour tree — through a quiet **dropdown / picker**, rather
+than free-typed. This is the **house pattern the vendor filter already uses** (a known set, surfaced for
+selection), applied to notes: you tap the notes you actually taste from the ones the tea is known to carry.
+(A free word stays possible when you mean it — the picker is the default, not a cage.)
+
+**Why it matters** — the same three reasons that justify the deep mode, at everyday cost:
+
+- **Anchored to the real profile.** Your picks are always a **subset of what the tea actually is** — never a
+  mis-transcribed guess or a half-remembered word. The logged note can't drift away from the tea.
+- **It teaches the vocabulary** — by showing you the tea's *real* notes at the moment of tasting, the same
+  way the deep mode's prompts do, but inline and in seconds.
+- **It feeds the baseline.** The principle the recommendation engine rests on: recommendations read
+  **behaviour × authoritative profile**, never noisy **free-text self-reports**. Structured picks are clean
+  signal; free-typed notes are noise the baseline would have to distrust.
+
+**The relationship, stated so neither drifts:**
+
+- **Deep tasting mode** — opt-in, attentive, *learn-to-taste*. Entered on purpose (a new tea, a sample); the
+  close attention is the point.
+- **Structured input** — quick, everyday, *anchored*. It rides the normal flow and adds no attention cost,
+  so it does not touch the Tea-First tension the deep mode has to resolve.
+
+Two ends of one spectrum. **Both grow `tagLibrary` and both clean the data** — the deep mode by prompting
+richly, the everyday picker by keeping every note a real subset of the tea's profile.
+
+This is the concrete answer to **R5-AUDIT §3 row 6** (Steeping — *"tasting-note input needs rework: more
+vocabulary or a different entry method"*): the **different entry method IS this structured picker.** ("More
+vocabulary" is the deep mode above; "a different entry method" is this — cross-referenced there.)
+
 ## Related
 
 - Tea-First Principle — `PHASE2-PRESPEC-NOTES.md`
 - Liquor swatch three-tier model — R3 lock (user-set / catalog / none)
-- `tagLibrary` growth — the flavour vocabulary that accrues with use
+- `tagLibrary` growth — the flavour vocabulary that accrues with use (both modes above)
+- Baseline principle — recommendations = behaviour × authoritative profile, never noisy free-text
 - Social "kindred notes" → tea-database enrichment loop
+- **R5-AUDIT §3 row 6 (Steeping)** — the structured picker is the "different entry method"
 - `IDEA-label-scanner.md` — the other parked idea

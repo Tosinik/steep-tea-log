@@ -101,7 +101,7 @@ band tone `#EDE7D6`, which still needs a dark-theme value (every other frame tok
 | 3 | **Home** | Under-designed (confirmed). Generic-card frame; greeting copy that doesn't match reality; Wrapped too prominent; Favorites placement uncertain. Keep: week card, Earlier today, Running low. | **Design** (element mix) + **Code** (greeting bug) + spine (frame) | **HELD — combined frame+content effort (R159/R160)**; frame board banked `docs/r5/boards/home-element-mix.dc.html`, gated by `HOME-VISION.md` |
 | 4 | **Insights** | Reads the same as pre-overhaul; only origins were added. | **Design** (board-vs-shipped read) | **NEXT Design draw** — redress + cull unused cards + non-"AI" copy + re-dress the stat cards (#5); not held |
 | 5 | **Stat cards** (all-time/month/week) | Data is right, presentation isn't. | **Design** | Queued |
-| 6 | **Steeping** | Temp/time/notes sit *below* the tasting notes (wrong order); tasting-note input needs rework — more vocabulary or a different entry method. | **Code** (reorder) + **Design** (tasting input, touches the flavour model) | Queued |
+| 6 | **Steeping** | Temp/time/notes sit *below* the tasting notes (wrong order); tasting-note input needs rework — more vocabulary or a different entry method. | **Code** (reorder) + **Design** (tasting input, touches the flavour model) | Queued — entry-method direction is the **structured note picker** (`IDEA-tasting-mode.md` § "everyday counterpart"); "more vocabulary" is the deep tasting mode there |
 | 7 | **Matcha** | No prep *mode*. Wanted: pick the matcha + the preparation (original vs latte), whisked, so no steep ladder. A **new feature**. | **Design → Code**, own track | Queued |
 
 **Session-pickers detail (SHIPPED v4.21):** two searchable picker screens (R58 "screens not
