@@ -217,12 +217,25 @@ so the banner sometimes appeared a load late.
 - **Deploy-ritual change:** the per-deploy bump (CLAUDE.md **2b/2c**) now targets `steep-version.js`, not
   steep-core.js; the module map gained `1b. steep-version.js`. Closes
   [#36](https://github.com/Tosinik/steep-tea-log/issues/36).
-- **NEXT — R5 rollout resumes.** The self-contained re-dress set is near spent (session-detail was the last
-  clean one; vessels is a trivial empty-state tidy). What's left is entangled: **tea-detail**
-  mark-remediation (inline `var(--jade-pale)` → rationed marks; needs a markup-level guard, not the CSS
-  fence) and the Design-thread surfaces (Home, Settings #8, Insights, stat cards, steeping). Slice 4 is the
-  inflection — the small vessels tidy, or hand back to Design. **SECURITY stays the deferred pre-widening
-  gate.**
+- **NEXT — Home is HELD (R159/R160); the rollout continues around it.**
+  - **Home: HELD (R159).** NOT a containers-only restyle — redressed in isolation its spare spine (masthead
+    + three RULE sections) reads as **empty, not calm**; frame-alone under-delivers on the identity surface.
+    Ships as ONE combined **frame + content** effort, **gated by the Home-distinct-data feature vision**
+    (`docs/r5/planning/HOME-VISION.md`, elevated from parked to Home's gating dependency). The FRAME layer is
+    **banked** at `docs/r5/boards/home-element-mix.dc.html`; its sub-rulings mint only when Home ships
+    combined. **calm ≠ spare (R160):** Home earns warmth/imagery/liquor/character beyond the utility spine —
+    do not re-flatten it into a utility list.
+  - **Insights: the next Design draw** (NOT held — the retrospective surface, redress-in-isolation is fine).
+    Scope: redress + **cull the unused cards** + plainer, **non-"AI"** copy + re-dress the old-looking
+    all-time / month / week **stat cards**. A containers-plus-copy redress.
+  - **Vessels:** a trivial empty-state/segment tidy, available standalone whenever.
+  - **tea-detail:** still deferred — mark-remediation (inline `var(--jade-pale)` → rationed marks; needs a
+    markup-level guard, not the CSS selector fence).
+  - **SECURITY stays the deferred pre-widening gate** (F1/F2), unchanged.
+- **Ready backlog — clay-grams (one-liner, independent of Home, ship anytime):** `steep-dashboard.js:1173`
+  renders the restock grams value `color:var(--clay)`; low stock is **state, not a commitment**, and clay is
+  rationed to the one committing action (R113) → move it to a state/xanthous token. Verified in source; no
+  layout effect.
 
 **Previously — v4.24 (SHIPPED, LIVE `0bd7f44`) — R5 slice 3: the session detail page re-dressed to the spine** (cache
 **v134**, APP_VERSION v4.24, **no SQL**). The spine rollout (shelf v4.22 · Shopping v4.23) continued onto its

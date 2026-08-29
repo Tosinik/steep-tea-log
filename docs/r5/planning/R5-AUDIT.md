@@ -98,8 +98,8 @@ band tone `#EDE7D6`, which still needs a dark-theme value (every other frame tok
 |---|--------|---------|------|--------|
 | 1 | **Session-setup pickers** | Tea + vessel are native `<select>` (the OS pop-out); board 04 rev 6 drew them as picker *screens*. #14, unblocked by the v4.20 swatch. | **Code** | **Shipped — v4.21** |
 | 2 | **Library shelf** | Flat type-tint chips + dated filtering; clashes with the new liquor swatch beside them. Board 13 rev 1 predates the swatch and never reconciled the tint language against it. | **Design** (board 13 rev 2, swatch-aware) | **Frame SHIPPED v4.22** (spine, containers only — pilot); tint redesign (board 13 rev 2) queued |
-| 3 | **Home** | Under-designed (confirmed). Generic-card frame; greeting copy that doesn't match reality; Wrapped too prominent; Favorites placement uncertain. Keep: week card, Earlier today, Running low. | **Design** (element mix) + **Code** (greeting bug) + spine (frame) | Queued |
-| 4 | **Insights** | Reads the same as pre-overhaul; only origins were added. | **Design** (needs a board-vs-shipped read) | Queued |
+| 3 | **Home** | Under-designed (confirmed). Generic-card frame; greeting copy that doesn't match reality; Wrapped too prominent; Favorites placement uncertain. Keep: week card, Earlier today, Running low. | **Design** (element mix) + **Code** (greeting bug) + spine (frame) | **HELD — combined frame+content effort (R159/R160)**; frame board banked `docs/r5/boards/home-element-mix.dc.html`, gated by `HOME-VISION.md` |
+| 4 | **Insights** | Reads the same as pre-overhaul; only origins were added. | **Design** (board-vs-shipped read) | **NEXT Design draw** — redress + cull unused cards + non-"AI" copy + re-dress the stat cards (#5); not held |
 | 5 | **Stat cards** (all-time/month/week) | Data is right, presentation isn't. | **Design** | Queued |
 | 6 | **Steeping** | Temp/time/notes sit *below* the tasting notes (wrong order); tasting-note input needs rework — more vocabulary or a different entry method. | **Code** (reorder) + **Design** (tasting input, touches the flavour model) | Queued |
 | 7 | **Matcha** | No prep *mode*. Wanted: pick the matcha + the preparation (original vs latte), whisked, so no steep ladder. A **new feature**. | **Design → Code**, own track | Queued |
@@ -121,11 +121,21 @@ current selection always shown); **vessel kanji reused as-is**; **picker context
 ## 4 · Sequence
 
 1. **Pickers (v4.21)** — SHIPPED.
-2. **Spine rollout** — per-surface, gated (F33's BOX test). **Slice 1 SHIPPED v4.22** (`e8c18fa`): the four
-   container primitives + the fill-law fence (R153) + the **shelf** as the pilot. Continues per-surface;
-   remaining surfaces re-dress against the shelf they share helpers with.
-3. **Per-screen redraws** — Home element mix, shelf rev 2, stat cards, steeping — hang off the spine.
-4. **Feature track** (separate, never smuggled into the restyle) — matcha prep mode; Home-distinct data.
+2. **Spine rollout** — per-surface, gated (F33's BOX test). **Slice 1 SHIPPED v4.22** (`e8c18fa`, shelf +
+   the fence R153); **slice 2 v4.23** (Shopping, R154/R155); **slice 3 v4.24** (session-detail, R156/R157 —
+   the first box-less surface). session-detail was the **last clean self-contained surface**; vessels is a
+   trivial empty-state tidy still available. What remains is entangled (see below).
+3. **Per-screen redraws** — hang off the spine, but **not all are containers-only**:
+   - **Home is HELD (R159)** — it exits the containers-only rollout into ONE combined **frame + content**
+     slice, gated by the Home-distinct-data feature vision (`HOME-VISION.md`); frame-alone reads as empty,
+     not calm, on the identity surface. **calm ≠ spare (R160).** Its frame board is banked.
+   - **Insights** — a **containers-plus-copy** redress (not held): redress + cull unused cards + non-"AI"
+     copy + re-dress the all-time/month/week **stat cards**.
+   - **shelf rev 2** (board-13-rev2 tints), **steeping** (reorder + tasting input) — still queued.
+   - **tea-detail** — deferred to **mark-remediation** (inline `var(--jade-pale)` → rationed marks; a
+     markup-level guard, not the CSS selector fence — see §6).
+4. **Feature track** (separate, never smuggled into the restyle) — matcha prep mode; **Home-distinct data,
+   now elevated from parked to Home's gating dependency (R159; `HOME-VISION.md`)**.
 5. **Greeting-copy bug** — a Code correctness fix; small, can go early.
 6. **Security / legal — F1/F2** — see §5.
 
@@ -167,6 +177,13 @@ phase 2 (Pillar A, gate met) stays in the important tier.
 - **Greeting copy vs reality** — a correctness bug in the greeting engine (predicted-vs-actual, window
   redirects, the variety guard). Needs a captured live mismatch (what it *said* vs what was *true*) to
   trace.
-- **Home-distinct data candidates** — brainstormed only after the frame is settled; designing new cards
-  before the card language is fixed just makes more boxes. Overlaps the smarter-over-time backlog
-  (palate-this-season, mood-time patterns, per-tea sweet-spot).
+- **Home-distinct data — ELEVATED from parked to Home's gating dependency (R159).** No longer "brainstorm
+  after the frame settles": Home's frame and its content ship as ONE effort, because frame-alone under-
+  delivers on the identity surface. The vision is captured in `docs/r5/planning/HOME-VISION.md`
+  (brainstorm-open, not spec'd): today's-tea-deepened, a recently-brewed showcase/carousel, pass-a-cup-on-
+  Home (deferred until more users), warmth in the frame, plus the smarter-over-time candidates
+  (palate-this-season, mood-time patterns, per-tea sweet-spot). When opened: brainstorm → spec → the
+  combined Home slice = the banked board's frame + this content + warmth.
+- **calm-first is not spare-first (R160).** Recorded here so a future pass does not re-flatten Home into a
+  utility list: calm forbids gamification/streaks/nags/metric-worship, but **permits** warmth, imagery,
+  liquor colour, and character. Austerity belongs to the utility surfaces' spine, not to Home.

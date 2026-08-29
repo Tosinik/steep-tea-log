@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#CFC6B2; font-family:'IBM Plex Mono', monospace; }
+  a { color:#8A5A1E; }
+  a:hover { color:#69160F; }
+</style>
+</helmet>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#CFC6B2;">
+
+  <div style="max-width:1180px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:2px;">R5 · TURN 1 · HOME ELEMENT MIX</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:2px;">RE-MIX ONLY · NO NEW CARDS, DATA, TONES OR RADII</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:30px; color:#2B2320; margin:0;">Three sections and a stripe</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1000px; margin:0; line-height:1.7; text-wrap:pretty;">Home's shipped default set is small: the masthead plus <code>today</code>, <code>restock</code>, <code>favorites</code> (<code>DASH_SURFACE</code>, steep-dashboard.js). Nothing here is new — every element already renders; this board only says which spine container each one is, and why. The answer is unusually clean: <strong>one BAND, three RULE sections, no BOX, one SLAB.</strong> Home is a glance surface, and a glance surface has no discrete object on it.</p>
+  </div>
+
+  <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="1a" style="display:flex; flex-direction:column; gap:9px; width:600px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1a · THE MIX</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">FOUR ELEMENTS · BOX-TESTED</span>
+      </div>
+
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:20px 24px 13px; border-bottom:2px solid #2B2320; display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:#2B2320;">Keep, demote, cut</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#8C7F6C;">NOTHING CUT · ONE DEMOTED</span>
+        </div>
+        <sc-for list="{{ elements }}" as="e" hint-placeholder-count="4">
+          <div style="padding:17px 24px; border-bottom:1px solid #D8CFB9; display:flex; gap:16px; align-items:flex-start;">
+            <div style="width:118px; flex:none; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14.5px; color:#2B2320; line-height:1.25;">{{ e.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.1em; color:#8C7F6C;">{{ e.id }}</span>
+            </div>
+            <div style="width:96px; flex:none; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#F6F2E9; background:{{ e.tone }}; padding:3px 7px; border-radius:2px; align-self:flex-start;">{{ e.container }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.08em; color:{{ e.verdictFg }};">{{ e.verdict }}</span>
+            </div>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:7px;">
+              <span style="font-size:12.5px; color:#2B2320; line-height:1.6;">{{ e.reason }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E; line-height:1.5;">{{ e.test }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:17px 24px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">THE COUNT, SO A BREACH IS COUNTABLE</span>
+          <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:baseline;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">1 BAND</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">3 RULE</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#69160F;">0 BOX</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">1 SLAB (at most)</span>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">The zero is a positive assertion, like session-detail's: a linear glance surface has no discrete object, so do not add a BOX back to Home. If a future element needs an edge, it is not a Home element.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" style="display:flex; flex-direction:column; gap:9px; width:432px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1b · HOME, DRAWN</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">SPINE CONTAINERS, SHIPPED VALUES</span>
+      </div>
+
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; overflow:hidden;">
+
+        <sc-if value="{{ identityMast }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#EDE7D6; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:18px 16px; display:flex; flex-direction:column; gap:0;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#8C7F6C;">FRIDAY AFTERNOON</span>
+            <div style="margin:9px 0 12px; display:flex; flex-direction:column; gap:6px;">
+              <div style="height:22px; width:78%; background:rgba(43,35,32,0.82);"></div>
+              <div style="height:22px; width:46%; background:rgba(43,35,32,0.82);"></div>
+              <div style="height:11px; width:88%; background:rgba(92,81,72,0.42); margin-top:5px;"></div>
+              <div style="height:11px; width:61%; background:rgba(92,81,72,0.42);"></div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#69160F;">GREETING COPY OFF-BOARD · CORRECTNESS BUG + VOICE PASS ON THEIR OWN THREADS. BARS ARE 32px HEAD / 16px BODY AT SIZE.</span>
+            <div style="display:flex; align-items:center; gap:15px; margin-top:15px; flex-wrap:wrap;">
+              <div style="border-radius:15px 5px 13px 5px; border:1px dashed rgba(138,90,30,0.55); background:repeating-linear-gradient(135deg, rgba(138,90,30,0.09) 0 6px, transparent 6px 12px); padding:12px 19px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">Start steeping</span>
+              </div>
+              <span style="font-size:12px; color:#3F5E42; text-decoration:underline;">Log a cup →</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; margin-top:9px;">BAND · margin 0 -16px 13px · padding 18px 16px (RAISED FROM 13, LAYOUT ONLY) · SLAB 15/5/13/5, CLAY HATCHED (HEX UNREAD, F31)</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ parityMast }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#EDE7D6; border-top:1px solid #D8CFB9; border-bottom:1px solid #D8CFB9; padding:13px 16px; display:flex; flex-direction:column; gap:0;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#8C7F6C;">FRIDAY AFTERNOON</span>
+            <div style="margin:7px 0 10px; display:flex; flex-direction:column; gap:5px;">
+              <div style="height:17px; width:72%; background:rgba(43,35,32,0.82);"></div>
+              <div style="height:10px; width:84%; background:rgba(92,81,72,0.42); margin-top:4px;"></div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#69160F;">BAND-HEAD PARITY · 24px HEAD / 9.5px KICKER, EXACTLY THE OTHER THREE TABS</span>
+            <div style="display:flex; align-items:center; gap:15px; margin-top:13px; flex-wrap:wrap;">
+              <div style="border-radius:15px 5px 13px 5px; border:1px dashed rgba(138,90,30,0.55); background:repeating-linear-gradient(135deg, rgba(138,90,30,0.09) 0 6px, transparent 6px 12px); padding:9px 14px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#2B2320;">Start steeping</span>
+              </div>
+              <span style="font-size:11.5px; color:#3F5E42; text-decoration:underline;">Log a cup →</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="padding:0 16px 18px;">
+
+          <div style="margin-top:16px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:8px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Earlier today</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">2 sittings</span>
+            </div>
+            <sc-for list="{{ todayRows }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid #D8CFB9;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:#5C5148; width:38px; flex:none;">{{ r.at }}</span>
+                <span style="width:13px; height:13px; flex:none; border-radius:2px; border:1px solid #D8CFB9; background:{{ r.liquor }};"></span>
+                <span style="font-size:14px; color:#2B2320; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.tea }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#5C5148; flex:none;">{{ r.steeps }}</span>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:7px;">RULE · rows gain the hairline the card used to imply. Tints are real liquor hexes (hei cha, shou pu-erh) at 2px, not the shipped 3px — see 1c.</span>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:8px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Running low</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">favourites &amp; rebuys</span>
+            </div>
+            <sc-for list="{{ lowRows }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #D8CFB9;">
+                <svg viewBox="0 0 15 15" style="width:14px; height:14px; flex:none;"><path d="M7.5 1.5 C11 3.5 12.6 7 11.4 10.4 C10.3 13.4 7.9 13.9 7.5 13.9 C7.1 13.9 4.7 13.4 3.6 10.4 C2.4 7 4 3.5 7.5 1.5 Z" fill="none" stroke="#8C7F6C" stroke-width="1.1"></path></svg>
+                <span style="font-size:13.5px; font-weight:600; color:#2B2320; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.tea }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:#8A5A1E; flex:none;">{{ r.val }}</span>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:7px;">RULE · value drawn XANTHOUS (stand-in hex): low stock is state, not a commitment. Ships as --clay today — see 1c.</span>
+          </div>
+
+          <sc-if value="{{ inlineFavs }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:18px;">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:9px; border-bottom:2px solid #2B2320;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Favourites</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">6</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:7px 18px;">
+                <sc-for list="{{ favs }}" as="f" hint-placeholder-count="6">
+                  <span style="font-size:13.5px; color:#2B2320;">{{ f }}</span>
+                </sc-for>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:9px;">RULE, DEMOTED · one wrapping run of names, no per-row hairlines, no leaves. The section that does not change through the day sits last and quietest.</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ stackedFavs }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:18px;">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:8px; border-bottom:2px solid #2B2320;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Favourites</span>
+              </div>
+              <sc-for list="{{ favs }}" as="f" hint-placeholder-count="6">
+                <div style="display:flex; align-items:center; gap:9px; padding:8px 0; border-bottom:1px solid #D8CFB9;">
+                  <svg viewBox="0 0 15 15" style="width:14px; height:14px; flex:none;"><path d="M7.5 1.5 C11 3.5 12.6 7 11.4 10.4 C10.3 13.4 7.9 13.9 7.5 13.9 C7.1 13.9 4.7 13.4 3.6 10.4 C2.4 7 4 3.5 7.5 1.5 Z" fill="none" stroke="#8C7F6C" stroke-width="1.1"></path></svg>
+                  <span style="font-size:14px; color:#2B2320;">{{ f }}</span>
+                </div>
+              </sc-for>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:7px;">FALLBACK · shipped stacked rows, re-dressed only. Six 15px rows under two present-tense sections is the weight this board is arguing against.</span>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+      <span style="font-size:11px; color:#4A4038; line-height:1.6;">Drawn at 400px content width. Band bleeds to the app edges (<code>margin:0 -16px</code>) exactly as <code>.lib-band</code> / <code>.shop-band</code> / <code>.sd-band</code> do. Clay and xanthous are hatched or stand-in: their hexes are unread in this lane.</span>
+    </div>
+
+    <div id="1c" style="display:flex; flex-direction:column; gap:9px; width:520px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1c · RULINGS</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">WHAT THIS BOARD ESTABLISHES</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <sc-for list="{{ rulings }}" as="r" hint-placeholder-count="3">
+          <div style="padding:18px 22px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#F6F2E9; background:{{ r.tone }}; padding:3px 7px; border-radius:2px;">{{ r.tag }}</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15.5px; color:#2B2320;">{{ r.title }}</span>
+            </div>
+            <span style="font-size:12.5px; color:#2B2320; line-height:1.65;">{{ r.body }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E; line-height:1.5;">{{ r.src }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:17px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">RECONCILIATION</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">None of this passes Design → Code. Planning mints the R114 update across all four tabs on ship, and the two fill-law items ride the F31 thread with §6's vessel stripe rather than being resolved here.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1d" style="display:flex; flex-direction:column; gap:9px; width:420px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1d · THE FENCE</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">WHAT IS NOT ON THIS BOARD</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <sc-for list="{{ fence }}" as="f" hint-placeholder-count="6">
+          <div style="padding:15px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:13px; align-items:flex-start;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#69160F; flex:none; line-height:1.4;">×</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em; color:#2B2320;">{{ f.k }}</span>
+              <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">{{ f.d }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">MEASURED FROM SOURCE, NOT FROM A BOARD</span>
+          <span style="font-size:11px; color:#4A4038; line-height:1.6;">HEAD f375a38 · v4.25. <code>DASH_SURFACE</code> + <code>dashCardsHome</code> (steep-dashboard.js), <code>.home-masthead</code> 6px 2px 18px, <code>.lib-band</code> / <code>.sd-band</code> 0 -16px 13px / 13px 16px, <code>.btn-clay</code> 15/5/13/5, <code>.today-tint</code> 13px @ 3px radius (styles.css).</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;mastheadType&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;identity&quot;,&quot;parity&quot;],&quot;default&quot;:&quot;identity&quot;,&quot;tsType&quot;:&quot;'identity' | 'parity'&quot;,&quot;section&quot;:&quot;Open calls&quot;,&quot;label&quot;:&quot;Masthead type&quot;},&quot;favouritesTreatment&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;inline&quot;,&quot;stacked&quot;],&quot;default&quot;:&quot;inline&quot;,&quot;tsType&quot;:&quot;'inline' | 'stacked'&quot;,&quot;section&quot;:&quot;Open calls&quot;,&quot;label&quot;:&quot;Favourites treatment&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const mast = this.props.mastheadType ?? 'identity';
+    const favs = this.props.favouritesTreatment ?? 'inline';
+    return {
+      identityMast: mast === 'identity',
+      parityMast: mast === 'parity',
+      inlineFavs: favs === 'inline',
+      stackedFavs: favs === 'stacked',
+
+      elements: [
+        { name: 'Greeting masthead', id: 'greetingMastheadHTML()', container: 'BAND', tone: '#3F5E42',
+          verdict: 'KEEP', verdictFg: '#3F5E42',
+          reason: 'Surface identity and the app\u2019s voice: it names where you are and what time of day it is. Not a card \u2014 fixed, unmovable, unhideable (R115) \u2014 so the stripe is the only container that fits it.',
+          test: 'BOX-TEST: no edge, nothing to pick up or open \u2192 not a BOX. Full-bleed identity head \u2192 BAND.' },
+        { name: 'Earlier today', id: 'today \u00b7 LEADS', container: 'RULE', tone: '#5C5148',
+          verdict: 'KEEP \u00b7 FIRST', verdictFg: '#3F5E42',
+          reason: 'A diary page: rows about one day, on paper. Present tense outranks supply (R117), so the first thing under the band is the thing that changes through the day.',
+          test: 'BOX-TEST: a group of rows, not one object \u2192 RULE. Hairline rows replace the card edge.' },
+        { name: 'Running low', id: 'restock', container: 'RULE', tone: '#5C5148',
+          verdict: 'KEEP', verdictFg: '#3F5E42',
+          reason: 'The one question you would otherwise navigate to the shelf to answer. Its rows already carry hairlines (.rank-row), so de-carding costs it nothing.',
+          test: 'BOX-TEST: a supply list \u2192 RULE. Each tea in it has an edge; the list does not.' },
+        { name: 'Favourites', id: 'favorites \u00b7 LAST', container: 'RULE', tone: '#8C7F6C',
+          verdict: 'DEMOTE', verdictFg: '#8A5A1E',
+          reason: 'It passes the default-set rule (what you reach for) but it is the only section that reads the same at 7am and 11pm. Last position, and the quietest treatment of the three.',
+          test: 'BOX-TEST: a name list \u2192 RULE. Six 15px rows with leaves is card weight without a card; the run of names is the demotion.' }
+      ],
+
+      todayRows: [
+        { at: '07:20', tea: 'Liu Bao 2016', steeps: '4 steeps', liquor: '#5A3122' },
+        { at: '13:05', tea: 'Shou Pu-erh, 2019', steeps: '6 steeps', liquor: '#2E1C14' }
+      ],
+      lowRows: [
+        { tea: 'Bai Mudan', val: '4.2g \u00b7 ~2 weeks' },
+        { tea: 'Da Hong Pao', val: '1.8g \u00b7 ~5 days' }
+      ],
+      favs: ['Liu Bao 2016', 'Bai Mudan', 'Da Hong Pao', 'Shui Xian', 'Gaoshan Oolong', 'Dian Hong'],
+
+      rulings: [
+        { tag: 'UPDATES R114', tone: '#69160F', title: 'Home\u2019s masthead is a BAND',
+          body: 'R114 minted \u201cink on bare ground, one rule for every tab\u201d when the shelf still wore a card. The spine\u2019s band masthead has since shipped on the shelf, Shopping and session-detail, so bare ground is now the exception to the rule it was minted as \u2014 Home\u2019s band restores the uniformity R114 was reaching for. Figure/ground is untouched: --band is porcelain-dim paper, not colour, and the deleted --greeting-eye / --greeting-body tokens stay deleted. Only difference from .lib-band is layout: padding rises to 18px 16px so a sentence can sit in the stripe; margin, hairlines and radius 0 are unchanged.',
+          src: 'MINTS ACROSS ALL FOUR TABS ON SHIP \u00b7 PLANNING, NOT CODE' },
+        { tag: 'PLACEMENT', tone: '#3F5E42', title: 'Favourites: keep, last, inline',
+          body: 'Third of three, opened by its own 2px rule (F33 \u2014 two sections must not read as one merged list), then one wrapping run of names at 13.5px: no per-row hairlines, no leaves, no values. It stays because it answers what you reach for; it goes quiet because it is static. Fallback if planning judges six names too terse in a run: the shipped stacked rows, re-dressed only \u2014 drawn as the alternative in 1b.',
+          src: 'PROP: favouritesTreatment \u00b7 BOTH DRAWN, DEFAULT INLINE' },
+        { tag: 'F31 \u00b7 FILL LAW', tone: '#8A5A1E', title: 'The today-row tint: rationed, with a bounded fallback',
+          body: 'swatchAttr(\u2026, liquorFor(\u2026), type) resolves to a liquor tint first \u2014 a rationed mark, allowed, and the correct reading of that slot. Its type-tint fallback (.t-<type>) is the same non-rationed fill as \u00a76\u2019s vessel stripe, and it resolves the same way: deferred to that thread, not blessed here. Bounded meanwhile \u2014 it keeps its hairline, does not grow, does not appear in any new slot, and holds at 2px rather than the unaccounted 3px it ships with (frame radii are 0 or 2px; a 3px square is neither a frame nor the R145 swatch path). When R82/R93 lands per-tea colour, the slot takes the swatch path and the fallback retires.',
+          src: 'RIDES THE \u00a76 VESSEL-STRIPE DEFERRAL \u00b7 .today-tint, styles.css:235' },
+        { tag: 'FINDING', tone: '#8C7F6C', title: 'Running low spends clay on a number',
+          body: 'The grams value renders color:var(--clay). Clay is the commit mark \u2014 contract 2, one committing action per surface \u2014 and a stock reading is state, which is xanthous. On a de-carded Home the clash is louder: the section value would sit a few rules under the masthead\u2019s clay SLAB and read as a second commitment. One-line CSS, no layout effect; flagged, not fixed here.',
+          src: 'dashCardsHome restockHTML \u00b7 steep-dashboard.js' }
+      ],
+
+      fence: [
+        { k: 'week \u00b7 wrapped', d: 'Both default to Insights in DASH_SURFACE; the Insights board owns them. Not pulled onto Home, not re-mixed here, not reserved space.' },
+        { k: 'THE STAT TRIO', d: 'All-time / month / week presentation is the Insights board\u2019s job (#5). Home\u2019s glance sections are not stat cards.' },
+        { k: 'HOME-DISTINCT DATA', d: 'palate-this-season, mood-time patterns, per-tea sweet-spot: a separate feature track (\u00a76 deferral, R3\u2019s don\u2019t-smuggle rule). No slot is left open for it \u2014 three sections is the design.' },
+        { k: 'GREETING COPY', d: 'A correctness bug and a plainer-voice pass are on their own threads. The masthead is drawn as a frame; the words are bars at size.' },
+        { k: 'NEW TONES OR RADII', d: 'Nothing added. Band paper, hairline, 2px, and the clay SLAB\u2019s 15/5/13/5 \u2014 all shipped values.' },
+        { k: 'A SECOND CLAY', d: 'One SLAB at most, in the masthead only. The evening branch that reports the day rather than proposing a cup correctly carries none; \u201cLog a cup \u2192\u201d stays a quiet jade link.' },
+        { k: 'AN EMPTY SECTION', d: 'R115 holds \u2014 a section is absent until it has something to say. De-carding does not make an empty list cheap enough to keep.' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

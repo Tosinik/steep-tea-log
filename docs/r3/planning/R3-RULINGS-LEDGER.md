@@ -2158,6 +2158,29 @@ deploy's. The deploy ritual's version/note bump (CLAUDE.md 2b/2c) moves from ste
 `steep-version.js`. *(steep-version.js, service-worker.js, steep-boot.js, steep-core.js, index.html,
 fixtures/update-banner-test.js.)*
 
+**R159 — Home is not a containers-only restyle; it is HELD and ships combined with its own content.** Home
+is the identity/landing surface, not a utility list. Redressed in isolation, its spare spine default
+(masthead + three RULE sections) reads as **empty, not calm** — frame-alone under-delivers on the identity
+surface specifically. So Home's spine redress is **held** and ships as one effort with its own present-tense
+content (the Home-distinct-data feature track, see `docs/r5/planning/HOME-VISION.md`). R3's don't-smuggle
+rule (new features never ride the visual restyle) stands everywhere else; **Home is the named exception**,
+for that reason alone. The FRAME layer is drawn and planning-reconciled, and is **banked in THIS commit** at
+`docs/r5/boards/home-element-mix.dc.html` (it references the already-tracked shared `support.js`; not
+discarded, not authored here — copied verbatim, no edit). *(Provenance note: the docs prompt first described
+it as "banked as-is"; it was not in the repo at that point — only `surface-language-spine.dc.html` was — so
+it is banked here now, and this ruling records that, not a pre-existing bank. The R81/F2 stale-board check
+fired and was corrected before it entered the ledger.)* Its sub-rulings — masthead BAND updates R114;
+Favourites keep / last / inline, with the stacked-rows fallback as a prop; today-tint liquor rationed, the
+type-tint fallback bound to the §6 vessel-stripe deferral at 2px — are drawn and reconciled but **mint only
+when Home ships as the combined effort**, not now. *(docs/r5/boards/home-element-mix.dc.html; R5-AUDIT §3/§4/§6.)*
+
+**R160 — calm-first is not spare-first.** The calm-first constraint forbids gamification, streaks, nagging,
+and metric-worship. It **permits** warmth, imagery, liquor colour, and character. Austerity is a property of
+the **utility** surfaces' spine (paper / hairline / one clay) — correct *there*, not a mandate everywhere.
+Home, alone among the surfaces, earns visual warmth beyond the utility spine. This guards against
+re-flattening Home into a utility list when its combined redress (R159) is designed. *(Companion to R159;
+recorded in HOME-VISION.md and R5-AUDIT §6.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
