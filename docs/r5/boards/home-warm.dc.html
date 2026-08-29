@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#CFC6B2; font-family:'IBM Plex Mono', monospace; }
+  a { color:#8A5A1E; }
+  a:hover { color:#69160F; }
+</style>
+</helmet>
+
+<section style="padding:44px; display:flex; flex-direction:column; gap:26px; background:#CFC6B2;">
+
+  <div style="max-width:1180px; display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:4px 10px; border-radius:2px;">R5 · R159 · HOME, COMBINED SLICE</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#69160F; border:1px solid rgba(105,22,15,0.4); padding:3px 8px; border-radius:2px;">FRAME IS AUTHORITY · WARMTH AND CONTENT ADDED ON TOP</span>
+      <h1 style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:30px; color:#2B2320; margin:0;">Colour on the bones</h1>
+    </div>
+    <p style="font-size:14px; color:#4A4038; max-width:1000px; margin:0; line-height:1.7; text-wrap:pretty;">The element-mix board settled Home's containers: one BAND, three RULE sections, no BOX, one SLAB. That frame stands here unchanged. What this board adds is the half the frame deliberately omitted — the <strong>lead insight, now a door</strong> onto its deep page, the <strong>Wrapped moment</strong>, a front door that stays visible, and the warmth R160 asks for: bold liquor swatches instead of flecks, real figure/ground, the app's own colour sitting on the spine's structure. Home is the proving ground; if it works here the utility surfaces get the same pass. <strong>Revision pass:</strong> the two open calls are ruled — the lead insight opens onto Insights and stays a register, and the whiter ground is adopted as <code>--porcelain</code> itself.</p>
+  </div>
+
+  <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+    <div id="1a" style="display:flex; flex-direction:column; gap:9px; width:434px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1a · HOME, DRAWN</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">WHITER GROUND · ADOPTED</span>
+      </div>
+
+      <div style="background:#FAF8F3; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; overflow:hidden; display:flex; flex-direction:column;">
+
+        <div style="padding:15px 16px 11px; border-bottom:1px solid #D8CFB9; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <div style="display:flex; align-items:baseline; gap:9px;">
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:21px; color:#2B2320; letter-spacing:-0.01em;">SlowCup</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#8C7F6C;">a tea diary</span>
+          </div>
+          <span style="width:33px; height:33px; border-radius:50%; background:#E4EAE0; border:1px solid #D8CFB9; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:13px; color:#3F5E42;">N</span>
+        </div>
+
+        <div style="background:#EDE7D8; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column;">
+          <div style="padding:17px 16px 16px; display:flex; flex-direction:column;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#8C7F6C;">FRIDAY AFTERNOON</span>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:28px; line-height:1.15; color:#2B2320; margin:8px 0 10px;">Second pour today — a proper tea day.</span>
+            <span style="font-size:14.5px; line-height:1.5; color:#5C5148;">Your 42nd cup.</span>
+            <div style="display:flex; align-items:center; gap:15px; margin-top:15px; flex-wrap:wrap;">
+              <span style="background:#8B5E4A; color:#FAF8F3; font-weight:600; font-size:14px; padding:12px 19px; border-radius:15px 5px 13px 5px;">Start steeping</span>
+              <span style="font-size:14px; color:#2A4130; font-weight:600; text-decoration:underline;">Log a cup →</span>
+            </div>
+          </div>
+
+          <sc-if value="{{ doorAtRest }}" hint-placeholder-val="{{ true }}">
+            <div style="border-top:1px solid #DCD3BD; padding:14px 16px 13px; display:flex; gap:13px; align-items:center;">
+              <span style="width:34px; height:34px; flex:none; border-radius:2px; background:#B87A38;"></span>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:7px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:16.5px; line-height:1.4; color:#2B2320;">You rate oolongs highest.</span>
+                <div style="display:flex; align-items:center; gap:9px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#2A4130; text-decoration:underline; text-underline-offset:3px;">WHY, ON INSIGHTS</span>
+                  <span style="display:flex; align-items:center; gap:5px;">
+                    <span style="width:4.5px; height:4.5px; border-radius:50%; background:#8B5E4A;"></span>
+                    <span style="width:4.5px; height:4.5px; border-radius:50%; background:rgba(140,127,108,0.45);"></span>
+                    <span style="width:4.5px; height:4.5px; border-radius:50%; background:rgba(140,127,108,0.45);"></span>
+                  </span>
+                </div>
+              </div>
+              <svg viewBox="0 0 24 24" style="width:19px; height:19px; flex:none;"><path d="M9 5 L17 12 L9 19" fill="none" stroke="#2A4130" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ doorPressed }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top:1px solid #DCD3BD; background:#E3DBC5; padding:14px 16px 13px; display:flex; gap:13px; align-items:center;">
+              <span style="width:34px; height:34px; flex:none; border-radius:2px; background:#B87A38;"></span>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:7px;">
+                <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:16.5px; line-height:1.4; color:#2B2320;">You rate oolongs highest.</span>
+                <div style="display:flex; align-items:center; gap:9px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#2A4130; text-decoration:underline; text-underline-offset:3px;">WHY, ON INSIGHTS</span>
+                  <span style="display:flex; align-items:center; gap:5px;">
+                    <span style="width:4.5px; height:4.5px; border-radius:50%; background:#8B5E4A;"></span>
+                    <span style="width:4.5px; height:4.5px; border-radius:50%; background:rgba(140,127,108,0.45);"></span>
+                    <span style="width:4.5px; height:4.5px; border-radius:50%; background:rgba(140,127,108,0.45);"></span>
+                  </span>
+                </div>
+              </div>
+              <svg viewBox="0 0 24 24" style="width:19px; height:19px; flex:none;"><path d="M9 5 L17 12 L9 19" fill="none" stroke="#2A4130" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; padding:7px 16px 0;">PRESSED · THE REGISTER WASHES DARKER EDGE-TO-EDGE. A CARD LIFTS; A DOOR IN THE PAPER LIGHTS UP — WHICH IS WHY THE FULL-BLEED WASH IS THE FEEDBACK AND NO SHADOW APPEARS.</span>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ monthTurn }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#2A4130; padding:17px 16px; display:flex; flex-direction:column; gap:11px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.14em; color:#CDE0C4;">THE MONTH JUST TURNED</span>
+            <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:26px; line-height:1.15; color:#F6F2E9;">Your August</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+              <span style="font-size:13.5px; color:#CDE0C4; line-height:1.5;">61 cups, 14 teas, mostly oolong.</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#F6F2E9;">Read →</span>
+            </div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; padding:8px 16px 0;">TIME-GATED BAND · --wc-jade, THE SHIPPED WRAPPED FIELD — NOT A NEW FILL. RECEDES AS THE MONTH GOES ON; THE ARCHIVE STAYS ON INSIGHTS (R103).</span>
+        </sc-if>
+
+        <div style="padding:0 16px 20px;">
+
+          <div style="margin-top:18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:4px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Earlier today</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">2 sittings</span>
+            </div>
+            <sc-for list="{{ todayRows }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid #D8CFB9;">
+                <span style="width:30px; height:30px; flex:none; border-radius:2px; background:{{ r.liquor }};"></span>
+                <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-size:14.5px; color:#2B2320; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.tea }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#8C7F6C;">{{ r.at }} · {{ r.steeps }}</span>
+                </div>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:8px;">RULE · THE FLECK BECOMES A SWATCH: 30px OF REAL LIQUOR HEX LEADS THE ROW. TIME DROPS TO THE SECOND LINE SO COLOUR TAKES THE LEFT EDGE.</span>
+          </div>
+
+          <div style="margin-top:20px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:4px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Running low</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">favourites &amp; rebuys</span>
+            </div>
+            <sc-for list="{{ lowRows }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid #D8CFB9;">
+                <span style="width:14px; height:14px; flex:none; border-radius:2px; background:{{ r.liquor }};"></span>
+                <span style="font-size:14px; color:#2B2320; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.tea }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:500; color:#8A5A1E; flex:none;">{{ r.val }}</span>
+              </div>
+            </sc-for>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:8px;">RULE · SWATCH HELD AT 14px: SUPPLY IS THE QUIETER REGISTER, AND ONE BOLD SWATCH RUN PER SCREEN IS THE RATION. VALUE XANTHOUS, NOT CLAY (FRAME-BOARD FINDING).</span>
+          </div>
+
+          <div style="margin-top:20px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding-bottom:6px; margin-bottom:9px; border-bottom:2px solid #2B2320;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#2B2320;">Favourites</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C7F6C;">6</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px 18px;">
+              <sc-for list="{{ favs }}" as="f" hint-placeholder-count="6">
+                <span style="font-size:13.5px; color:#2B2320;">{{ f }}</span>
+              </sc-for>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:0.09em; color:#8A5A1E; display:block; margin-top:9px;">RULE, DEMOTED · UNCHANGED FROM THE FRAME BOARD. THE STATIC SECTION SITS LAST AND CARRIES NO COLOUR.</span>
+          </div>
+
+        </div>
+
+        <div style="border-top:1px solid #D8CFB9; background:#FAF8F3; padding:9px 10px 11px; display:flex; align-items:flex-end; justify-content:space-between;">
+          <sc-for list="{{ navLeft }}" as="n" hint-placeholder-count="2">
+            <div style="width:62px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+              <span style="width:17px; height:17px; border-radius:2px; border:1.4px solid {{ n.tone }};"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ n.tone }};">{{ n.label }}</span>
+            </div>
+          </sc-for>
+          <div style="width:62px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <span style="width:58px; height:58px; border-radius:50%; background:#3F5E42; color:#FAF8F3; margin-top:-28px; display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:26px; box-shadow:0 7px 18px -5px rgba(43,35,32,0.42);">+</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:500; color:#3F5E42;">Log</span>
+          </div>
+          <sc-for list="{{ navRight }}" as="n" hint-placeholder-count="2">
+            <div style="width:62px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+              <span style="width:17px; height:17px; border-radius:2px; border:1.4px solid {{ n.tone }};"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:{{ n.tone }};">{{ n.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <span style="font-size:11px; color:#4A4038; line-height:1.6;">Drawn at 400px content width on the proposed ground. Band bleeds to the app edges as <code>.lib-band</code> does. Two ways in are visible at once and neither depends on the other: the clay SLAB when a tea is proposed, the jade FAB always.</span>
+    </div>
+
+    <div id="1b" style="display:flex; flex-direction:column; gap:9px; width:392px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1b · THE DOOR, IN CYCLE</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">DRAWN AT BAND WIDTH</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; box-sizing:border-box; display:flex; flex-direction:column;">
+        <div style="padding:18px 20px 14px; border-bottom:2px solid #2B2320; display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:18px; color:#2B2320;">Yes — a register can read as a door</span>
+          <span style="font-size:12px; color:#4A4038; line-height:1.65;">It needs three things, and none of them is an edge. <strong>The destination in words</strong> ("why, on Insights") — the strongest affordance available, and the only one that also says where the tap lands. <strong>A chevron at the trailing edge</strong>, at the sentence's optical centre. <strong>A pressed wash across the full register</strong>, so the tap is answered edge-to-edge.</span>
+          <span style="font-size:12px; color:#4A4038; line-height:1.65;">The grammar is already on the surface: Home's day rows open session detail, and Running low's rows open a tea — every row on Home is a door already. What the lead insight needs is to be the <em>loudest</em> door, not a different kind of thing, and loudness comes from the chevron and the named destination.</span>
+        </div>
+        <sc-for list="{{ insightExamples }}" as="i" hint-placeholder-count="2">
+          <div style="background:#EDE7D8; border-bottom:1px solid #D8CFB9; padding:14px 18px; display:flex; gap:12px; align-items:center;">
+            <sc-if value="{{ i.hasSwatch }}" hint-placeholder-val="{{ true }}">
+              <span style="width:32px; height:32px; flex:none; border-radius:2px; background:{{ i.liquor }};"></span>
+            </sc-if>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:7px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:600; font-size:15.5px; line-height:1.4; color:#2B2320;">{{ i.text }}</span>
+              <div style="display:flex; align-items:center; gap:9px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#2A4130; text-decoration:underline; text-underline-offset:3px;">{{ i.dest }}</span>
+                <span style="display:flex; align-items:center; gap:5px;">
+                  <span style="width:4.5px; height:4.5px; border-radius:50%; background:{{ i.d1 }};"></span>
+                  <span style="width:4.5px; height:4.5px; border-radius:50%; background:{{ i.d2 }};"></span>
+                  <span style="width:4.5px; height:4.5px; border-radius:50%; background:{{ i.d3 }};"></span>
+                </span>
+              </div>
+            </div>
+            <svg viewBox="0 0 24 24" style="width:18px; height:18px; flex:none;"><path d="M9 5 L17 12 L9 19" fill="none" stroke="#2A4130" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+          <div style="padding:9px 18px 13px; border-bottom:1px solid #D8CFB9;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; color:#8A5A1E; line-height:1.55;">{{ i.note }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 20px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">WHAT IS BEHIND THE DOOR</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.65;">The deep page on Insights, where a retrospective is allowed to be one: the profile the claim rests on, the top five it ranks, and the spread behind the ranking. Home carries the one sentence; Insights carries the argument. Same split as Wrapped — moment here, record there.</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; color:#8A5A1E; line-height:1.55;">THE DEEP PAGE ITSELF IS AN INSIGHTS SLICE, NOT DRAWN HERE. THIS BOARD RULES THE DOOR, NOT THE ROOM.</span>
+        </div>
+        <div style="padding:16px 20px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">WHAT THE TREATMENT ASSERTS</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.65;">The swatch is <strong>data</strong>: the named tea's liquor. An insight that names no tea carries no swatch and the sentence takes the full width — colour never arrives as decoration. The chevron does not move when the swatch goes, so the door stays the same door through the whole cycle. Present tense, one clause, no second clause commenting on the first.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1c" style="display:flex; flex-direction:column; gap:9px; width:412px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1c · WRAPPED AS A MOMENT</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">TWO STATES</span>
+      </div>
+
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; padding:16px; display:flex; flex-direction:column; gap:16px;">
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">1–5 SEPTEMBER · THE MOMENT</span>
+          <div style="border:1px solid #D8CFB9; background:#FAF8F3; overflow:hidden;">
+            <div style="background:#EDE7D8; padding:11px 13px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.14em; color:#8C7F6C;">MONDAY MORNING</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#2B2320;">A new month of tea.</span>
+            </div>
+            <div style="background:#2A4130; padding:13px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:19px; color:#F6F2E9;">Your August</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#CDE0C4;">Read →</span>
+            </div>
+            <div style="padding:11px 13px; display:flex; flex-direction:column; gap:6px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#2B2320; border-bottom:1.5px solid #2B2320; padding-bottom:4px;">EARLIER TODAY</span>
+              <span style="font-size:10.5px; color:#8C7F6C;">the floor continues, unchanged</span>
+            </div>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">It takes the position directly under the band — above the day's rows, because for those few days it <em>is</em> the most timely thing on the surface. It never becomes permanent: that is what keeps Home present-tense.</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#8C7F6C;">6 SEPTEMBER ONWARD · GONE, NOT COLLAPSED</span>
+          <div style="border:1px solid #D8CFB9; background:#FAF8F3; overflow:hidden;">
+            <div style="background:#EDE7D8; padding:11px 13px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:0.14em; color:#8C7F6C;">SATURDAY MORNING</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#2B2320;">First pour of the day.</span>
+            </div>
+            <div style="padding:11px 13px; display:flex; flex-direction:column; gap:6px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; color:#2B2320; border-bottom:1.5px solid #2B2320; padding-bottom:4px;">EARLIER TODAY</span>
+              <span style="font-size:10.5px; color:#8C7F6C;">the floor continues, unchanged</span>
+            </div>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">No shrunken remnant, no "view your August" row left behind. The moment ends and the surface closes over it; the record is on Insights, where the archive already lives.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="1d" style="display:flex; flex-direction:column; gap:9px; width:400px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#3F5E42; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1d · GROUND &amp; SWATCH</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">GROUND ADOPTED · APP-WIDE</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; padding:17px 19px; display:flex; flex-direction:column; gap:17px;">
+
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#2B2320;">The whiter ground</span>
+          <div style="display:flex; gap:11px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:#F6F2E9; border:1px solid #D8CFB9; padding:11px; display:flex; gap:8px; align-items:center;">
+                <span style="width:26px; height:26px; flex:none; background:#B87A38; border-radius:2px;"></span>
+                <span style="width:26px; height:26px; flex:none; background:#2E1C14; border-radius:2px;"></span>
+                <span style="width:26px; height:26px; flex:none; background:#A9C46E; border-radius:2px;"></span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8C7F6C;">SHIPPED · #F6F2E9</span>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:#FAF8F3; border:1px solid #D8CFB9; padding:11px; display:flex; gap:8px; align-items:center;">
+                <span style="width:26px; height:26px; flex:none; background:#B87A38; border-radius:2px;"></span>
+                <span style="width:26px; height:26px; flex:none; background:#2E1C14; border-radius:2px;"></span>
+                <span style="width:26px; height:26px; flex:none; background:#A9C46E; border-radius:2px;"></span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#3F5E42;">ADOPTED · #FAF8F3</span>
+            </div>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.65;">Four steps of cream out of the ground, no hue change: still paper, not white. The pale end of the ramp gains the most — <code>ivory</code> and <code>gold-pale</code> sat a few units from the ground they print on. <strong>Adopted, and it is <code>--porcelain</code> itself</strong>: one <code>:root</code> value, so every surface in the app changes with Home. Not a Home token, not a Home-only change — the shelf, Shopping, session-detail and Insights all land on the new paper the moment it moves, and the hairline, band and ink tokens are untouched.</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:9px; border-top:1px solid #D8CFB9; padding-top:15px;">
+          <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:17px; color:#2B2320;">Fleck → swatch</span>
+          <div style="display:flex; gap:11px; align-items:stretch;">
+            <div style="flex:1; background:#FAF8F3; border:1px solid #D8CFB9; padding:11px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="width:13px; height:13px; flex:none; background:#5A3122; border:1px solid #D8CFB9; border-radius:2px;"></span>
+                <span style="font-size:12px; color:#2B2320;">Liu Bao 2016</span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8C7F6C;">SHIPPED · 13px, HAIRLINED</span>
+            </div>
+            <div style="flex:1; background:#FAF8F3; border:1px solid #D8CFB9; padding:11px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:9px;">
+                <span style="width:30px; height:30px; flex:none; background:#5A3122; border-radius:2px;"></span>
+                <span style="font-size:12px; color:#2B2320;">Liu Bao 2016</span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E;">DRAWN · 30px, NO OUTLINE</span>
+            </div>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.65;">Same token, same ramp, no new hex: the swatch grows and drops the hairline that was making it read as a bullet. This is the whole of "bold, not flecks" — a bounded, ordered ramp used at a size where you can see the tea in it.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="1e" style="display:flex; flex-direction:column; gap:9px; width:596px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1e · ELEMENT LINES</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">ONE LINE OF RATIONALE EACH</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; display:flex; flex-direction:column;">
+        <sc-for list="{{ elements }}" as="e" hint-placeholder-count="10">
+          <div style="padding:14px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:15px; align-items:flex-start;">
+            <div style="width:132px; flex:none; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:14px; color:#2B2320; line-height:1.3;">{{ e.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; color:{{ e.stateFg }};">{{ e.state }}</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#F6F2E9; background:{{ e.tone }}; padding:3px 7px; border-radius:2px; flex:none; align-self:flex-start;">{{ e.container }}</span>
+            <span style="flex:1; min-width:0; font-size:12.5px; color:#2B2320; line-height:1.6;">{{ e.line }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">THE COUNT, STILL COUNTABLE</span>
+          <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:baseline;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">1 BAND (+1 TIME-GATED)</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">3 RULE</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#69160F;">0 BOX</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#2B2320;">1 SLAB</span>
+          </div>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">The frame board's zero survives the warm pass, which was the test: both new elements — the lead insight and the Wrapped moment — are band registers, not cards. Nothing on Home gained an edge, and Home gained no new tone or radius; every hex drawn here is a shipped token.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1f" style="display:flex; flex-direction:column; gap:9px; width:520px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#69160F; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1f · RULINGS</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">PLANNING MINTS ON SHIP</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; display:flex; flex-direction:column;">
+        <sc-for list="{{ rulings }}" as="r" hint-placeholder-count="4">
+          <div style="padding:18px 22px; border-bottom:1px solid #D8CFB9; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:#F6F2E9; background:{{ r.tone }}; padding:3px 7px; border-radius:2px;">{{ r.tag }}</span>
+              <span style="font-family:'Shippori Mincho',serif; font-weight:700; font-size:15.5px; color:#2B2320;">{{ r.title }}</span>
+            </div>
+            <span style="font-size:12.5px; color:#2B2320; line-height:1.65;">{{ r.body }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#8A5A1E; line-height:1.5;">{{ r.src }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:17px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">RECONCILIATION</span>
+          <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">None of this passes Design → Code. Planning rules the two open calls (lead-insight container, whiter ground), then mints the R114 masthead update, the warm-Home direction and the lead-insight placement together when the slice ships. The frame must not ship frame-alone; this board is its content half.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="1g" style="display:flex; flex-direction:column; gap:9px; width:430px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; background:#2B2320; color:#F6F2E9; padding:3px 8px; border-radius:2px;">1g · THE FENCE</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#5C5148;">WHAT WARMTH DOES NOT LICENSE</span>
+      </div>
+      <div style="background:#F6F2E9; border:1px solid #D8CFB9; border-radius:2px; display:flex; flex-direction:column;">
+        <sc-for list="{{ fence }}" as="f" hint-placeholder-count="8">
+          <div style="padding:14px 22px; border-bottom:1px solid #D8CFB9; display:flex; gap:13px; align-items:flex-start;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#69160F; flex:none; line-height:1.4;">×</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em; color:#2B2320;">{{ f.k }}</span>
+              <span style="font-size:11.5px; color:#4A4038; line-height:1.6;">{{ f.d }}</span>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; display:flex; flex-direction:column; gap:7px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.12em; color:#3F5E42;">MEASURED FROM SOURCE</span>
+          <span style="font-size:11px; color:#4A4038; line-height:1.6;">HEAD 63224aa · v4.26. <code>--band</code>/<code>--porcelain-dim</code> #EDE7D8, <code>.btn-clay</code> 15/5/13/5 on <code>--clay</code> #8B5E4A, <code>.bn-log-circle</code> 54px <code>--jade</code>, the twelve-stop liquor ramp, <code>--wc-jade</code> #2A4130 (styles.css :root). Three drawn values are not yet shipped and are what this board asks for: the ground at #FAF8F3, the FAB at 58px, and the swatch at 30px.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;doorState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;rest&quot;,&quot;pressed&quot;],&quot;default&quot;:&quot;rest&quot;,&quot;tsType&quot;:&quot;'rest' | 'pressed'&quot;,&quot;section&quot;:&quot;States&quot;,&quot;label&quot;:&quot;Lead insight door&quot;},&quot;monthTurn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;,&quot;label&quot;:&quot;Show the Wrapped moment&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const door = this.props.doorState ?? 'rest';
+    return {
+      doorAtRest: door === 'rest',
+      doorPressed: door === 'pressed',
+      monthTurn: this.props.monthTurn ?? true,
+
+      todayRows: [
+        { at: '07:20', tea: 'Liu Bao 2016', steeps: '4 steeps', liquor: '#5A3122' },
+        { at: '13:05', tea: 'Shou Pu-erh, 2019', steeps: '6 steeps', liquor: '#2E1C14' }
+      ],
+      lowRows: [
+        { tea: 'Bai Mudan', val: '4.2g \u00b7 ~2 weeks', liquor: '#E8D9A0' },
+        { tea: 'Da Hong Pao', val: '1.8g \u00b7 ~5 days', liquor: '#B87A38' }
+      ],
+      favs: ['Liu Bao 2016', 'Bai Mudan', 'Da Hong Pao', 'Shui Xian', 'Gaoshan Oolong', 'Dian Hong'],
+
+      navLeft: [{ label: 'Home', tone: '#3F5E42' }, { label: 'Teas', tone: '#a29a86' }],
+      navRight: [{ label: 'Sessions', tone: '#a29a86' }, { label: 'Insights', tone: '#a29a86' }],
+
+      insightExamples: [
+        { text: 'You rate oolongs highest.', hasSwatch: true, liquor: '#B87A38', dest: 'WHY, ON INSIGHTS',
+          d1: '#8B5E4A', d2: 'rgba(140,127,108,0.45)', d3: 'rgba(140,127,108,0.45)',
+          note: 'STOP 1 \u00b7 GUIDE. NAMES A TYPE, SO IT CARRIES THAT TYPE\u2019S RAMP STOP (amber-deep). THE DOOR OPENS ON THE PROFILE, THE TOP FIVE, THE SPREAD.' },
+        { text: 'Most of your cups start before eight.', hasSwatch: false, liquor: '', dest: 'WHY, ON INSIGHTS',
+          d1: 'rgba(140,127,108,0.45)', d2: '#8B5E4A', d3: 'rgba(140,127,108,0.45)',
+          note: 'STOP 2 \u00b7 CADENCE, NON-COMPARATIVE (R161). NAMES NO TEA \u2192 NO SWATCH, NO PLACEHOLDER, SENTENCE TAKES THE FULL WIDTH. CHEVRON HOLDS ITS POSITION.' }
+      ],
+
+      elements: [
+        { name: '\u201Ca tea diary\u201D', state: 'CANDIDATE \u2192 DRAWN LIVE', stateFg: '#8A5A1E', container: 'TOPBAR', tone: '#8C7F6C',
+          line: 'The wordmark alone names a product; the tagline names what the product is for, and it is the one line on Home that never changes.' },
+        { name: 'Greeting masthead', state: 'KEEP', stateFg: '#3F5E42', container: 'BAND', tone: '#3F5E42',
+          line: 'Unchanged from the frame board: full-bleed identity stripe on band paper, 32px serif head, no colour fill \u2014 warmth arrives inside it, not as it.' },
+        { name: 'Lead insight door', state: 'NEW \u00b7 TAPPABLE', stateFg: '#69160F', container: 'BAND REG.', tone: '#3F5E42',
+          line: 'A teaser, not a statement: the sentence is the handle and the deep page is the room, so it needs a chevron and a named destination \u2014 not a border, because every row on Home is already a door.' },
+        { name: 'Start steeping', state: 'KEEP', stateFg: '#3F5E42', container: 'SLAB', tone: '#8B5E4A',
+          line: 'The one clay on the surface, shown whenever a tea is proposed; the ration holds because the FAB carries no clay.' },
+        { name: 'Log FAB', state: 'BOLDENED', stateFg: '#8A5A1E', container: 'NAV', tone: '#8C7F6C',
+          line: 'The front door must never depend on a proposal existing, so the always-present path is the nav circle \u2014 raised, jade, 58px.' },
+        { name: 'Wrapped moment', state: 'NEW \u00b7 TIME-GATED', stateFg: '#69160F', container: 'BAND', tone: '#2A4130',
+          line: 'It earns the lead by being timely and gives it up when it stops being timely; the record stays on Insights (R103, R161).' },
+        { name: 'Earlier today', state: 'KEEP \u00b7 WARMED', stateFg: '#3F5E42', container: 'RULE', tone: '#5C5148',
+          line: 'The day\u2019s rows are where the app\u2019s colour actually lives, so the liquor fleck becomes a 30px swatch and leads the row.' },
+        { name: 'Running low', state: 'KEEP', stateFg: '#3F5E42', container: 'RULE', tone: '#5C5148',
+          line: 'The practical floor: the question you would otherwise open the shelf to answer, at the quieter swatch size.' },
+        { name: 'Favourites', state: 'KEEP \u00b7 LAST', stateFg: '#8A5A1E', container: 'RULE', tone: '#8C7F6C',
+          line: 'Static through the day, so it stays last, inline, and colourless \u2014 the demotion the frame board ruled.' },
+        { name: 'The ground', state: 'ADOPTED \u00b7 APP-WIDE', stateFg: '#3F5E42', container: 'TOKEN', tone: '#8A5A1E',
+          line: 'Four steps whiter lets the pale end of the liquor ramp separate from the paper it sits on \u2014 and because it is --porcelain, every surface in the app lands on the new paper at once.' },
+        { name: 'Tea imagery', state: 'NOT DRAWN', stateFg: '#69160F', container: '\u2014', tone: '#8C7F6C',
+          line: 'Photography earns space on Home but is a materials ask, not a drawing \u2014 colour carries the warmth until real images exist.' }
+      ],
+
+      rulings: [
+        { tag: 'UPDATES R114', tone: '#69160F', title: 'Home\u2019s masthead is a BAND',
+          body: 'Carried from the frame board unchanged and restated here so the combined slice mints one ruling, not two: the band masthead has shipped on the shelf, Shopping and session-detail, so bare ground is now the exception to the rule R114 was minted as. Figure/ground untouched \u2014 --band is porcelain-dim paper, not colour, and the deleted --greeting-* tokens stay deleted.',
+          src: 'MINTS ACROSS ALL FOUR TABS ON SHIP' },
+        { tag: 'DIRECTION \u00b7 R160', tone: '#3F5E42', title: 'Warmth is the app\u2019s own colour, at size',
+          body: 'The warm pass adds no tone, no radius and no new hex. It grows what the app already owns: the liquor ramp used at 30px instead of 13px, real figure/ground between band and paper, and the Wrapped field brought by Wrapped itself. The test the direction has to pass on every surface is the one Home passes here \u2014 colour arrives as data (a tea\u2019s liquor, a month\u2019s field), never as decoration, so an element with nothing to colour stays plain. Home proves it; the four utility surfaces get the same pass next.',
+          src: 'PROVING GROUND \u00b7 THEN APP-WIDE' },
+        { tag: 'RULED \u00b7 THE DOOR', tone: '#3F5E42', title: 'A register reads as a door without an edge',
+          body: 'The lead insight is a teaser that opens its deep page on Insights, and it stays a band register: one rotating sentence under a hairline, the named tea\u2019s swatch at the left, a jade chevron at the trailing edge, the destination in words underneath, and a full-bleed wash on press. 0 BOX survives, and it survives for a reason rather than by exemption \u2014 a tappable line is not a discrete object, and Home\u2019s rows are already doors (a day row opens session detail, a Running low row opens a tea). The chevron and the named destination make this the loudest door on the surface, not a different kind of thing. A card would have added an edge to say something the words already say. THE ANSWER TO THE QUESTION IS YES: no edge was needed, so 0 BOX is not reopened.',
+          src: 'DRAWN IN 1b, BOTH CYCLE STOPS \u00b7 PRESS STATE ON PROP doorState' },
+        { tag: 'RHYTHM', tone: '#2A4130', title: 'Home is the moment, Insights is the record',
+          body: 'The Wrapped moment is the only element permitted to raise Home\u2019s band count, and only for the first days of a month. It arrives under the greeting, above the day\u2019s rows, then leaves completely \u2014 no shrunken remnant, no permanent row. This is the model for any time-bound Home element: it earns the lead by being timely, never by being permanent.',
+          src: 'R103 HOLDS \u00b7 THE INSIGHTS DOOR IS THE OTHER HALF (R161)' },
+        { tag: 'RULED \u00b7 ADOPTED', tone: '#8A5A1E', title: 'The ground goes whiter, app-wide',
+          body: '--porcelain #F6F2E9 \u2192 #FAF8F3, dark block untouched. This is the drawn default here, not a side proposal \u2014 but the ruling to record is its reach: --porcelain is the global paper token, so the shelf, Shopping, session-detail and Insights all land on the new ground the moment it moves. There is no Home-only version of this change and it must not be described as one. Everything else holds: hairline, band, ink and the twelve liquor stops are unchanged, and the ramp\u2019s pale end gains the separation it was short of.',
+          src: 'styles.css :root \u00b7 ONE VALUE, EVERY SURFACE' }
+      ],
+
+      fence: [
+        { k: 'STREAKS \u00b7 GAMIFICATION', d: 'Warmth is not a streak. No counters that reward returning, no "don\u2019t break it" language, no badge for a run of days. Colour and character are the warmth; pressure never is.' },
+        { k: 'THE WEEK AS A BACKWARD COUNT', d: 'Does not return. Its living form is a discovery insight in the lead rotation \u2014 present tense, about what to reach for next, not a tally of what is behind you.' },
+        { k: 'A FABRICATED FLOOR', d: 'Never-guess holds: with no restock reading, Running low is absent, not filled with an estimate. A blank beats a hollow number on the surface that is meant to feel alive.' },
+        { k: 'A SECOND CLAY', d: 'One committing action. "Start steeping" is it; the FAB is jade, "Log a cup \u2192" is a quiet link, and the Wrapped moment\u2019s "Read \u2192" carries no clay.' },
+        { k: 'INSIGHT ENGINE + FINAL COPY', d: 'Selection, de-repetition and thresholds are Code; wording is a copy pass. The two cycle stops here are treatment specimens, drawn from the guide and cadence pools.' },
+        { k: 'THE DEEP PAGE', d: 'What opens behind the door is an Insights slice on its own thread. This board rules the door \u2014 its container, its affordance, its swatch rule \u2014 and not the room it opens onto.' },
+        { k: 'A RECAP ON HOME', d: 'R115. The lead insight is present tense and the Wrapped moment is time-gated; nothing on Home summarises a closed period at any other time.' },
+        { k: 'PASS A CUP', d: 'Deferred until the userbase grows, per the vision. No slot reserved for it \u2014 a reserved slot is a hole in the design.' },
+        { k: 'GENERATED IMAGERY', d: 'The image half of warmth needs real photography. Nothing on this board stands in for it, and no drawn box pretends to be a photo.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -83,6 +83,23 @@ earns the lead by being **timely**, never by being **permanent** (Home stays pre
 archive/retrospective stays on Insights). Note this is a *fuller* life cycle than the current Insights
 Wrapped **door** (R161) — that door is the Insights end of the same rhythm; the Home moment is the new half.
 
+## The lead insight is a door — Home = the door, Insights = the room
+
+The lead insight (the moment) is **not a dead-end card — it is a door.** Tapping it opens its **deep
+reflection page** on Insights: the *"why"* behind the line — the palate profile, your top five, the spread.
+Same split as Wrapped above: **Home = the door** (this slice), **Insights = the room** (a later reflection
+slice). It reuses the `.ins-door` BOX the Insights redress already shipped (R161).
+
+**Sequencing — so the door is never dead:**
+
+- **On Home's ship**, the door opens **Insights** as a **graceful destination** — the existing surface, not
+  a 404. It always lands somewhere real.
+- **The Insights reflection slice, sequenced right after Home**, builds the specific *"why"* pages
+  (`INSIGHT-ENGINE-SPEC.md` § *Beyond the lead — the reflection layer*) so the door lands **precisely** on
+  the page for that insight.
+
+The door opens a real room from day one, and the *specific* room one slice later — never a dead link.
+
 ## Candidates on the record
 
 - **Topbar tagline "a tea diary."** A candidate identity line under the SlowCup wordmark — **liked, not
