@@ -46,6 +46,52 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.30 — R5 reflection Slice A: the deep pages behind the door (Your ritual + Your palate) — R172
+Deploy: steep-core.js, steep-dashboard.js, steep-insights.js, styles.css, service-worker.js (**v140**),
+steep-version.js (APP_VERSION v4.30 + WHATS_NEW), **new** fixtures/reflection-test.js, fixtures/frame-test.js,
+fixtures/render-smoke-test.js, fixtures/insights-room-test.js, fixtures/liquor-test.js, .gitignore, smoke.md.
+**No SQL.** *(Docs — CHANGELOG.md, STATE.md, R3-RULINGS-LEDGER.md R172 — push with this deploy. First reflection slice;
+Slices B/C — per-tea + earned brew guide, terroir + teas-over-time — reserve R173/R174.)*
+
+The deep pages the Home lead-insight door (R165) and the Insights sections point at — the record to Home's
+moment (`docs/r5/planning/REFLECTION-SPEC.md`). Slice A ships the **deep-link mechanism**, the **whole-
+Insights-explorable doors**, and **two new views** built entirely on existing fields. They wear the Insights
+spine (a `.band` masthead + `.ins-sec` RULE sections) — they *are* the Insights record, deepened.
+
+- **The deep-link mechanism** — `openReflection(view, focus, teaId?)` sets the view + `state.reflectFocus`
+  (+ `activeTeaId` for the per-tea case) and `saveView`s it; `render()`'s tail then scrolls
+  `#reflect-<focus>` into view **once** (one-shot: `reflectFocus` is nulled before the frame, so a later
+  re-render never re-scrolls). `goView` nulls `reflectFocus` so a plain tab tap never carries a stale focus.
+  `palate`/`ritual` join `HISTORY_VIEWS` (Back returns to the opening tab); they do **not** persist.
+- **The routing table** (`REFLECT_ROUTE` / `reflectRouteForInsight`) — a lead-insight type → its deep page +
+  section: palate-lean/highest-rated → **Your palate**, morning-truth/temps → **Your ritual** (`#reflect-clock`
+  / `#reflect-temps`). The Home lead-door reads it; **unmapped** types (freshness, haven-t — the tea-page
+  destinations of Slices B/C) still open Insights as a graceful fallback, never a broken door.
+- **Whole-Insights-explorable** — the type-mix section is a door into Your palate, the colour clock a door
+  into Your ritual: an `onclick=openReflection(…)` + a jade chevron on the **existing** `.ins-sec` (R165's
+  register-is-a-door grammar). `.ins-sec-door` is a **behaviour class** (cursor + chevron + press wash);
+  `.ins-sec`'s own frame is unchanged, so **the Insights fence is untouched** (confirmed green). Edit mode
+  disables the tap (`renderDashboard`'s `pointer-events:none`).
+- **Your ritual** (`viewRitual`) — the colour clock **expanded** (`#reflect-clock`: the reused clock + the
+  dominant tea named per slot), **vessels** by use, **temperatures** averaged by type (timed steeps only,
+  cold-brew excluded), and **rhythm** (time-of-day + a plain cadence + busiest weekday, non-comparative).
+- **Your palate** (`viewPalate`) — **families × ratings** (`#reflect-families`: each type's session count as
+  a bar + the average of its teas' ratings) and **rated highest** (top-rated teas + what they share). The
+  flavour-level grain is a documented **note, not a guess** — it deepens as the tasting-input work lands.
+- **Fence:** the reflection surface adds one fenced selector — `.reflect-band` (its BAND masthead) — with a
+  positive assertion + 3 negative controls; its RULE sections reuse the fenced `.ins-sec`. The doors + palate
+  bars (`dot-*`) are marks/behaviour, excluded (R170 pattern). **frame-test 32 → 36.** New
+  `fixtures/reflection-test.js` (32 — the mechanism with render stubbed, the route map, HISTORY/PERSIST
+  wiring, palate/ritual aggregations on synthetic data, real-data render sanity, and the scroll as a source
+  fact). Suite updates: `render-smoke` (+2 views, 17→19), `insights-room` (icon stub for the new chevron),
+  `liquor-test` F1 (11→12: the palate bar's `dot-` write). **35 committed suites + engine/warmth/reflection
+  fixtures green.** On-device: `smoke.md §v4.30`.
+
+Ruling: **R172** (the reflection deep pages + the deep-link contract — land on the specific page & section,
+never open-and-hunt — + whole-Insights-explorable: the shallow sections are the doors, reuse the structure,
+no parallel nav). Slices B/C reserve **R173** (per-tea + the earned brew guide) / **R174** (terroir +
+teas-over-time).
+
 ## v4.29 — R5 warmth pass: the swatch follow-on (shelf / shopping / session-detail) — R171
 Deploy: styles.css, steep-sessions.js, steep-shopping.js, service-worker.js (**v139**), steep-version.js
 (APP_VERSION v4.29 + WHATS_NEW), fixtures/liquor-test.js, smoke.md. **No SQL.** *(Docs — CHANGELOG.md,

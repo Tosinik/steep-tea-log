@@ -2303,6 +2303,35 @@ type-tint writes; F1 stays 11). *(styles.css `.shelf-swatch`/`.sd-band`/`.sd-ban
 steep-sessions.js sd-band; steep-shopping.js the two rows. On-device: smoke.md §v4.29 — the visual half a
 `vm` can't render.)*
 
+**R172 — the reflection deep pages, and the deep-link contract: land on the section, never open-and-hunt.**
+R5 (v4.30, reflection Slice A; `docs/r5/planning/REFLECTION-SPEC.md`). The lead-insight door (R165) opened
+Insights as a graceful destination but the *specific* "why" page it promised did not exist; this is that
+slice. Three things ship together. **(1) The deep-link mechanism** — `openReflection(view, focus, teaId?)`
+sets the view + `state.reflectFocus` (+ `activeTeaId` for the per-tea case, Slice B) and `saveView`s it;
+`render()`'s tail scrolls `#reflect-<focus>` into view **once** (a one-shot: `reflectFocus` is nulled before
+the frame, so a later re-render never re-scrolls), and `goView` nulls it so a plain tab tap never carries a
+stale focus. `palate`/`ritual` join `HISTORY_VIEWS` (Back returns to the opening tab) but not
+`PERSISTED_VIEWS` (they are sub-views, not tabs). **The contract:** the tap that named a pattern lands on the
+page that explains *that* pattern, scrolled to it — never a surface opened to hunt from. **(2)
+Whole-Insights-explorable** — the shallow Insights sections **are** the doors into their deep views (type mix
+→ Your palate, the colour clock → Your ritual): an `onclick` + a jade chevron on the **existing** `.ins-sec`
+(the R165 register-is-a-door grammar), a behaviour class only (`.ins-sec-door`) — no parallel navigation, no
+container change, so the Insights fence is untouched. `REFLECT_ROUTE` maps each lead-insight type to its
+landing; unmapped types (the tea-page/terroir destinations of Slices B/C) fall back to Insights — a door is
+never broken, only not-yet-deep. **(3) Two views on existing fields** — **Your ritual** (the colour clock
+expanded to when × what · vessels · temperatures-by-type · rhythm) and **Your palate** (families × ratings ·
+rated highest). They wear the Insights spine (a `.band`/`.reflect-band` masthead + `.ins-sec` RULE sections):
+they are the Insights record deepened, not a new surface language. **Never-guess holds** — a section with no
+data is absent, and the palate's flavour-level grain is a documented note that deepens as the tasting-input
+work lands, never a guessed fingerprint. Fence: the reflection surface adds one fenced selector
+(`.reflect-band`, positive + 3 controls; RULE sections reuse the fenced `.ins-sec`); doors + palate bars are
+marks/behaviour, excluded (R170 pattern) — frame-test 32 → 36, Insights' own checks unchanged. *(steep-core.js
+`openReflection`/render-tail scroll/`goView`/`HISTORY_VIEWS`; steep-dashboard.js `REFLECT_ROUTE`/
+`reflectRouteForInsight`/`leadDoorHTML`/`brewingClockHTML(asDoor)`; steep-insights.js `insTypeMixHTML` door +
+`viewRitual`/`viewPalate` + builders; styles.css `.reflect-band`/`.reflect-anchor`/`.ins-sec-door`/`.palate-*`;
+fixtures/reflection-test.js. On-device: smoke.md §v4.30 — the scroll + real taps a `vm` can't reach. Slices
+B/C reserve **R173** (per-tea + the earned brew guide) / **R174** (terroir + teas-over-time).)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

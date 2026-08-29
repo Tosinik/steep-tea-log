@@ -191,8 +191,34 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.29 committed `37f43a7`, UNPUSHED (+ v4.30 reflection Slice A, this session) — awaiting Niklas's
-on-device gate + push (`/slowcup-deploy`) — R5 warmth pass: the swatch follow-on (R171)** (cache **v139**,
+**NOW — v4.30 committed `08ac1b4`, UNPUSHED (with v4.29 `37f43a7`) — awaiting Niklas's on-device gate + push
+(`/slowcup-deploy` each) — R5 reflection Slice A: the deep pages behind the door (R172)** (cache **v140**,
+APP_VERSION v4.30, **no SQL**). The deep pages the Home lead-insight door (R165) + the Insights sections point
+at (`docs/r5/planning/REFLECTION-SPEC.md`) — the record to Home's moment. Built entirely on existing fields;
+they wear the Insights spine (`.band`/`.reflect-band` masthead + `.ins-sec` RULE sections).
+- **Deep-link mechanism** — `openReflection(view, focus, teaId?)` sets view + `state.reflectFocus`; `render()`'s
+  tail scrolls `#reflect-<focus>` into view **once** (one-shot — nulled before the frame; `goView` nulls it too).
+  `palate`/`ritual` join `HISTORY_VIEWS` (Back → opening tab), do **not** persist. **Routing** (`REFLECT_ROUTE`):
+  palate-lean/highest-rated → palate, morning-truth/temps → ritual; unmapped types (freshness, haven-t — Slices
+  B/C) fall back to Insights → never a broken door.
+- **Whole-Insights-explorable** — type mix → Your palate, colour clock → Your ritual: `onclick` + jade chevron
+  on the **existing** `.ins-sec` (`.ins-sec-door` behaviour class; `.ins-sec` frame unchanged → **Insights fence
+  untouched**). Edit mode disables the tap.
+- **Your ritual** (`viewRitual`) — clock expanded (when×what) · vessels · temps-by-type (timed only, cold-brew
+  excluded) · rhythm (non-comparative). **Your palate** (`viewPalate`) — families×ratings bars (per-type avg ★)
+  (per-type avg) + rated-highest; the flavour grain is a **note, not a guess** (awaits the tasting-input work).
+- **Fence:** +`.reflect-band` (positive + 3 controls); RULE sections reuse the fenced `.ins-sec`; doors + palate
+  bars (`dot-*`) are marks/behaviour, excluded (R170 pattern). **frame-test 32→36.** New
+  `fixtures/reflection-test.js` (32). Suites: render-smoke 17→19, insights-room icon stub, liquor-test F1 11→12.
+  **35 committed suites + fixtures green.** Ledger **R172** (Slices B/C reserve **R173**/**R174**).
+- **ON DEVICE (`smoke.md §v4.30`)** — does the Home door land **on the section, scrolled**; are the Insights
+  sections doors (type-mix→palate, clock→ritual); do ritual/palate read as spine surfaces; does Back return to
+  Insights (no dead-end/loop)?
+- **NEXT — reflection Slice B** (per-tea + the earned brew guide, **R173**), then Slice C (terroir +
+  teas-over-time, **R174**). Also queued: the v4.29 + v4.30 phone gate + push. **SECURITY stays the deferred
+  pre-widening gate.**
+
+**Previously — v4.29 committed `37f43a7`, UNPUSHED — R5 warmth pass: the swatch follow-on (R171)** (cache **v139**,
 APP_VERSION v4.29, **no SQL**). The follow-on R170 named: the tea's own colour reaches the last three utility
 surfaces. **Marks only, not a re-frame** — every change is a `liquorFor` swatch or a size; no container
 class/count/fill/radius moves, so **F31 untouched** and Insights' fence unaffected. Colour is **data** (a want
@@ -210,9 +236,8 @@ with no shelf tea → no swatch).
 - **ON DEVICE (`smoke.md §v4.29`)** — does the 30×40 shelf plate read (bigger, still a distinct object vs a
   fill); does the session-detail **band row** hold (44×58 swatch | text, long names wrap, unknown-tea = no
   gap); do the Shopping swatches read (running-low always, rebuy only when on-shelf).
-- **NEXT — reflection Slice A (v4.30)**, being built this session: the deep-link mechanism + `viewRitual` /
-  `viewPalate` + the whole-Insights-explorable doors (mints **R172**); Slices B/C reserve R173/R174. **SECURITY
-  stays the deferred pre-widening gate.**
+- ~~**NEXT — reflection Slice A (v4.30)**: deep-link mechanism + `viewRitual`/`viewPalate` + Insights doors~~
+  **SHIPPED v4.30 (R172)** — see the NOW block.
 
 **Previously — v4.28 (LIVE `8d4d44e`) — R5 warmth pass: Insights, the colour clock (R170)** (cache **v138**,
 APP_VERSION v4.28, **no SQL**). The warmth pass lands the app's own colour on the utility surfaces, **Insights
