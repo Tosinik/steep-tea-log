@@ -178,8 +178,10 @@ Hygiene is strong.
    visible inconsistency.
 5. **Vendor field + keyboard handling.** *Medium.* Real on-phone breakage; fix pattern already exists (vendor
    via the picker pattern; add a general modal focus-scroll for the siblings).
-6. **Session flow → spine + warmth.** *Deep (4 stages, bespoke timer).* Highest-traffic surface; the ritual
-   should feel designed. Likely its own multi-slice track, not a one-shot.
+6. **Session flow → the full IA redesign** — now **designed in `SESSION-FLOW-REDESIGN.md`** (facts-before-
+   feelings #22, session-level tasting, the hierarchical tagger, guided-tasting mode, timer rework, + two
+   folded bugs: focus-breath cue, earned-vocab resurfacing). *Deep, multi-slice track — not a one-shot.*
+   Highest-traffic surface; the ritual should feel designed.
 
 **Do when convenient — lower-traffic surfaces:**
 7. Social/friends, Settings, Spend, Session-edit, add/edit modals → spine. Origins atlas `.card org-card`
