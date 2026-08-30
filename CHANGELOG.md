@@ -46,6 +46,48 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.31 — Brew-advice v4 Stage 1: the context-gated diagnosis engine (dormant) — R175
+Deploy: steep-knowledge.js, steep-core.js, steep-sessions.js, service-worker.js (**v141**), steep-version.js
+(APP_VERSION v4.31 + WHATS_NEW), **new** fixtures/brew-advice-v4-test.js, fixtures/brew-feedback-test.js,
+.gitignore, smoke.md. **No SQL.** *(Docs — CHANGELOG.md, STATE.md, R3-RULINGS-LEDGER.md R175 — push with this
+deploy. Slice 1 of 2; Slice 2 — the 5-tap capture + surfacing — mints R176.)*
+
+Stage 1 of the v4 brew-advice rework (`SPEC-brew-advice-v4.md`, grounded in
+`docs/research/brew-extraction-science.md`): the **feedback model** is replaced, the **engineering reused**
+(v3 §8). This slice ships the engine **dormant + fixture-proven** — the capture still writes the old 3-tap,
+so nothing writes the new enum yet (the house dormant-engine-first pattern, cf. tea-types v3.87 / lead-insight
+v4.27). Slice 2 wires the 5-tap capture + surfacing.
+
+- **The context-gated diagnosis** (`diagnoseFeedback(tap, ctx)`, steep-core.js) — maps one character tap
+  (`good/strong/flat/astringent/bitter`) to **one lever + a one-line mechanism** (the teaching), framed as an
+  experiment. Gated on **tea type** (`KB_TYPE_SHAPE`: temp window + failure mode), **brew style + infusion
+  role** (`KB_STYLE_SHAPE`), the steep's temperature, and a **water/freshness pre-check** (§6 — `flat`/dull is
+  ruled out as a water/stale-leaf issue before any temp/time lever). The **shape gate**: `flat` on a
+  by-design-light **gongfu/senchadō opening** steep says *"extend the next / you may have poured off too
+  fast,"* **never** "add leaf." Astringent→cooler-then-shorter, bitter→temp-for-delicate-else-time,
+  strong→less-leaf; an already-cool tea switches the lever from temp to time.
+- **Senchadō/by-type shape moved into the KB** (`steep-knowledge.js`, §7) — `KB_TYPE_SHAPE` +
+  `KB_STYLE_SHAPE` (senchadō: cool opening, few short pours; sencha ~70–80, gyokuro ~50–60). **Diagnosis shape
+  only** — the v2 ratio axis is untouched; the decorative `senchado:2.8` ratio-seed reachability
+  (`LEAF_RATIO_DEFAULT`) stays a separate v2-ratio task (recorded in STATE's backlog).
+- **`weak ≡ flat` read-side alias** (`FB_ALIAS`, non-destructive) — v3's `weak` meant under-extraction = v4's
+  `flat`. The **23 legacy `weak` values** in real data (17 per-steep + 6 session) read as `flat`; nothing is
+  rewritten (no data migration; the enum is app-only, no DB CHECK).
+- **The net-sign auto-delta is RETIRED** (`computeBrewAdvice`, core.js) — v3's `weak−strong → uniform
+  temp/time nudge` conflated intensity with over-extraction and was shape-blind. `tuned = base`, `hasNudge`
+  always false; the feedback **counts survive** for the memory line; every consumer's existing no-nudge branch
+  degrades gracefully (the "Your tuning" segment simply doesn't appear until Slice 2 surfaces the diagnosis).
+  `adviceSuggestionText` is now dormant (no live caller; Slice 2 repurposes it). The ephemeral in-session
+  `timeShift` is unchanged in Slice 1 (its role-aware wiring rides Slice 2 with the 5-tap capture).
+
+Ruling: **R175** (Slice 1 — the KB shape + the context-gated diagnosis engine + the `weak`→`flat` alias + the
+water/freshness pre-check + the net-sign retirement; engine dormant). New `fixtures/brew-advice-v4-test.js`
+(30 — each tap→lever+mechanism, context-gating incl. bitter-on-already-cool-green→time, the by-design-light
+shape gate, the water gate, the `weak` alias, the retire, KB sanity, real-data over the 72 legacy values).
+`brew-feedback-test` §G rewritten to the v4 contract (the retire; counts survive) — **35 committed suites +
+v4 fixture green.** On-device: `smoke.md §v4.31` (the setup preview reads right without the auto-tuning
+segment). Slice 2 mints **R176**.
+
 ## v4.30 — R5 reflection Slice A: the deep pages behind the door (Your ritual + Your palate) — R172
 Deploy: steep-core.js, steep-dashboard.js, steep-insights.js, styles.css, service-worker.js (**v140**),
 steep-version.js (APP_VERSION v4.30 + WHATS_NEW), **new** fixtures/reflection-test.js, fixtures/frame-test.js,

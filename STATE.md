@@ -115,9 +115,12 @@ v4.30 (reflection Slice A live). What's next, in order — captured so nothing i
 2. **Reflection Slice C:** terroir + teas-over-time.
 3. **Freshness research pass** *(independent)* — verify/refine freshness-by-type against the reference work
    (Gascoyne et al.), not a blunt "greens fresh / oolongs stable"; feeds the Slice-B freshness fix.
-4. **Brew-advice cluster** — the v2 **ratio axis is SHIPPED (v3.85)**; **v3 feedback is specced-not-built and
-   its MODEL needs a rethink before building** (see `SPEC-brew-advice-v3-feedback.md` → "Model critique —
-   REOPEN before build"). Includes the **earned brew guide** (the reflective view of the tuning) +
+4. **Brew-advice cluster** — v2 **ratio axis SHIPPED (v3.85)**. The v3 feedback model was reopened and
+   **replaced by `SPEC-brew-advice-v4.md`** (character-based, context-gated). **v4 Stage 1 Slice 1 SHIPPED
+   v4.31 (R175)** — the diagnosis engine **dormant + fixture-proven** (`diagnoseFeedback`, `KB_TYPE_SHAPE`/
+   `KB_STYLE_SHAPE`, the `weak→flat` alias, the net-sign retire). **NEXT: Slice 2 (R176)** — the 5-tap capture
+   + the diagnosis surfacing + the role-aware `timeShift`. Then **Stage 2** (learned time adaptation +
+   science-prior→preference, post-gate). Includes the **earned brew guide** (reflective view) +
    **guided-discovery framing** (experimental).
 5. **Go Deeper / tea-reference redesign** — a tea opens a proper **detail screen** (not an inline-collapsing
    list entry); expand the sparse reference. **Converges with the Slice-B tea-detail screen.**
@@ -126,8 +129,12 @@ v4.30 (reflection Slice A live). What's next, in order — captured so nothing i
 7. **Full codebase/docs audit** — bloat, stubs, forgotten deferrals, stale docs, ranked next-work. (The
    brew-advice pile in #4 is a preview of what it will surface.)
 8. **Matcha mode** (contained). **Label scanner — deferred.**
-9. **Parked backlog** (unchanged): freshness-framing fix (folds into Slice B #1), masthead session-start,
-   stale-override reset, Favourites default order, liquor-ramp-too-thin.
+9. **Parked backlog**: freshness-framing fix (folds into Slice B #1), masthead session-start, stale-override
+   reset, Favourites default order, liquor-ramp-too-thin; **senchadō ratio-seed reachability** (a v2-ratio
+   task, split out of brew-advice v4 Slice 1 R175) — the decorative `senchado:2.8` in `LEAF_RATIO_DEFAULT`
+   (steep-core.js) is unreachable because the KB tier in `baselineRatioFor` resolves every JP green to
+   `kb.ratioGongfu` first; the gyokuro revisit needs senchadō **ratios in the KB** (`ratioSenchado`), not the
+   decorative seed. (v4 Stage 1 added senchadō's diagnosis *shape* to the KB, not its ratios — deliberately.)
 10. **Security gate F1/F2** — the pre-widening blocker, before anyone but Niklas logs in / the
     Datenschutzerklärung goes live.
 
@@ -217,7 +224,34 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.30 LIVE `08ac1b4` (with v4.29 `37f43a7`), pushed — on-device checks (`smoke.md §v4.29/§v4.30`) run
+**NOW — v4.31 LIVE `fc32549` — Brew-advice v4 Stage 1: the context-gated diagnosis engine (dormant) (R175)**
+(cache **v141**, APP_VERSION v4.31, **no SQL**). Slice 1 of 2 of the v4 rework (`SPEC-brew-advice-v4.md`): the
+**feedback model** is replaced, the **engineering reused** (v3 §8). Engine ships **dormant + fixture-proven** —
+the capture still writes the old 3-tap, nothing writes the new enum yet (dormant-engine-first, cf. tea-types
+v3.87 / lead-insight v4.27). Slice 2 (R176) wires the 5-tap capture + surfacing.
+- **`diagnoseFeedback(tap, ctx)`** (steep-core.js) — one character tap (`good/strong/flat/astringent/bitter`) →
+  one lever + a one-line mechanism, framed as an experiment. Gated on tea type (`KB_TYPE_SHAPE`), style +
+  infusion role (`KB_STYLE_SHAPE`), the steep's temp, and a water/freshness pre-check (§6). **Shape gate:**
+  `flat` on a by-design-light gongfu/senchadō **opening** steep → "extend the next / poured off too fast",
+  never "add leaf". `astringent` ≠ `bitter`; an already-cool tea switches temp→time.
+- **`KB_TYPE_SHAPE`/`KB_STYLE_SHAPE`** (steep-knowledge.js, §7) — senchadō shape in the KB (sencha ~70–80,
+  gyokuro ~50–60). **Diagnosis shape only** — v2 ratio untouched; the senchadō ratio-seed reachability is a
+  separate v2-ratio task (backlog #9).
+- **`weak ≡ flat`** read-side alias (`FB_ALIAS`, non-destructive) — the 23 legacy `weak` values read as `flat`,
+  nothing rewritten (enum app-only, no DB CHECK, no SQL).
+- **Net-sign auto-delta RETIRED** (`computeBrewAdvice`) — `tuned=base`, `hasNudge` false; the counts survive
+  for the memory; consumers degrade gracefully (no "Your tuning" segment until Slice 2). `adviceSuggestionText`
+  dormant; ephemeral `timeShift` unchanged in Slice 1.
+- **fixtures/brew-advice-v4-test.js** (30) + brew-feedback §G rewritten to the v4 contract. **35 committed
+  suites + v4 green.** Ledger **R175**.
+- **ON DEVICE (`smoke.md §v4.31`, post-deploy)** — the setup preview reads right without the "Your tuning"
+  segment (Guide/Off, counts shown, no "suggests"/"landing well"); per-steep taps still record; nothing
+  brewing breaks.
+- **NEXT — Slice 2 (R176): the 5-tap capture + the diagnosis surfacing + the role-aware `timeShift`.**
+  (Reflection Slice B is also queued — whichever builds next takes v4.32.) **SECURITY stays the deferred
+  pre-widening gate.**
+
+**Previously — v4.30 LIVE `08ac1b4` (with v4.29 `37f43a7`), pushed — on-device checks (`smoke.md §v4.29/§v4.30`) run
 **post-deploy** (a live PWA can't exercise the SW / real scroll / touch before it's served; the "before push"
 wording fits only surfaces a local server can drive) — fix-forward if any fail — R5 reflection Slice A: the
 deep pages behind the door (R172)** (cache **v140**,

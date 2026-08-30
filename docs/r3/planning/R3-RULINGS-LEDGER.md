@@ -2332,6 +2332,30 @@ marks/behaviour, excluded (R170 pattern) — frame-test 32 → 36, Insights' own
 fixtures/reflection-test.js. On-device: smoke.md §v4.30 — the scroll + real taps a `vm` can't reach. Slices
 B/C reserve **R173** (per-tea + the earned brew guide) / **R174** (terroir + teas-over-time).)*
 
+**R175 — brew-advice v4 Stage 1: the character-based, context-gated diagnosis replaces the net-sign verdict
+(engine dormant).** Brew round (v4.31; `SPEC-brew-advice-v4.md`, grounded in
+`docs/research/brew-extraction-science.md`). v4 replaces v3's **feedback model** and reuses its
+**engineering** (v3 §8). Slice 1 of 2 ships the engine **dormant + fixture-proven** — the capture still
+writes the old 3-tap, so nothing writes the new enum yet (the house dormant-engine-first pattern, cf.
+tea-types v3.87 / lead-insight v4.27); Slice 2 (R176) wires the 5-tap capture + surfacing. **The diagnosis**
+(`diagnoseFeedback(tap, ctx)`) maps one character tap (`good/strong/flat/astringent/bitter`) to **one lever +
+a one-line mechanism**, framed as an experiment, **context-gated** on tea type (`KB_TYPE_SHAPE` — temp window
++ failure mode), brew style + infusion role (`KB_STYLE_SHAPE`), the steep's temperature, and a
+**water/freshness pre-check** (§6). **The shape gate is the point R172-family shape-awareness demanded here:**
+`flat` on a by-design-light **gongfu/senchadō opening** steep says *"extend the next / poured off too fast,"*
+never "add leaf" — a light opening steep is intended, not under-extraction. **`astringent` ≠ `bitter`** by
+design (mouthfeel vs taste, different levers). **Senchadō's shape moves into the KB** (`KB_STYLE_SHAPE`:
+sencha ~70–80, gyokuro ~50–60) — **diagnosis shape only**; the v2 ratio axis is untouched and the decorative
+`senchado:2.8` ratio-seed reachability (`LEAF_RATIO_DEFAULT`) stays a **separate v2-ratio task** (STATE
+backlog). **`weak ≡ flat` read-side alias** (`FB_ALIAS`) is non-destructive — the 23 legacy `weak` values (17
+per-steep + 6 session) read as `flat`, nothing rewritten (enum app-only, no DB CHECK, no SQL). **The net-sign
+auto-delta is RETIRED** (`computeBrewAdvice`'s `tempAdjC`/`timeAdjPct`): it conflated intensity with
+over-extraction and was shape-blind; `tuned = base`, `hasNudge` always false, counts survive for the memory,
+consumers degrade gracefully (no "Your tuning" segment until Slice 2). Learned per-tea tuning returns in Stage
+2. *(steep-knowledge.js `KB_TYPE_SHAPE`/`KB_STYLE_SHAPE`; steep-core.js `diagnoseFeedback`/`FB_ALIAS`/
+`typeMinTemp` + the `computeBrewAdvice` retire; steep-sessions.js the memory line; fixtures/brew-advice-v4-test.js
+(30) + brew-feedback-test §G rewritten. On-device: smoke.md §v4.31. Slice 2 mints **R176**.)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
