@@ -19,7 +19,8 @@ Run each check and report it as **PASS** or **FAIL** with the concrete evidence
    `git show origin/main:service-worker.js`. Same or lower = FAIL (this is the single
    most important deploy step — stale cache strands users on old files).
 
-2. **Version lockstep.** `APP_VERSION` (`steep-core.js`), the top `## vX.YY` heading in
+2. **Version lockstep.** `APP_VERSION` (`steep-version.js` — moved there R158/v4.25, NOT
+   steep-core.js, which now holds only a moved-away comment), the top `## vX.YY` heading in
    `CHANGELOG.md`, and the `CACHE_NAME` number must all agree with each other and with
    the version being shipped. Any disagreement = FAIL, name the mismatched values.
 

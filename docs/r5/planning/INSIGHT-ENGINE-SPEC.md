@@ -1,5 +1,10 @@
 # INSIGHT-ENGINE-SPEC — the reflection engine (Home's lead + Insights' record)
 
+> **SHIPPED as of v4.27 — kept for rationale; do not build from this.** The lead-insight engine
+> (`computeLeadInsight`, steep-dashboard.js) shipped with the warm Home slice; the baseline principle
+> that below says will "mint when the engine ships" did. Current state: `STATE.md` +
+> `docs/r5/planning/AUDIT-REPORT-v4.36.md` (the living seed).
+
 > **Written 2026-08-29, planning lane. Docs push on write.** The forward spec for the engine that makes
 > SlowCup **reflect the user back to themselves**. **Not yet built** — it ships *with* Home (the combined
 > R159 slice), and its governing ruling (the baseline principle below) **mints when the engine ships**, not

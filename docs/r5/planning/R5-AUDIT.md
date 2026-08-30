@@ -1,5 +1,10 @@
 # R5 — the overhaul-landing audit (drawn vs shipped)
 
+> **The rollout it founds SHIPPED v4.22–v4.36 — kept for the diagnosis + punch-list rationale; do not
+> build forward from this.** Every "HELD/NEXT" call below is resolved (Home v4.27, Insights v4.28,
+> reflection complete v4.36). The surfaces still on the old frame (sessions list, session flow, social,
+> settings) are tracked forward in `docs/r5/planning/AUDIT-REPORT-v4.36.md`, the living seed.
+
 > **Written 2026-08-28, planning lane.** Belongs at `docs/r5/planning/R5-AUDIT.md`. Docs push on write.
 >
 > This is the founding reference for R5, the round that *lands* the design overhaul the R2/R3 boards

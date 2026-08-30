@@ -1,5 +1,10 @@
 # HOME-VISION — what Home should be (the gating vision for the combined redress)
 
+> **SHIPPED as of v4.27 — kept for rationale; do not build from this.** The combined Home frame+content
+> slice landed (`greetingMastheadHTML`/`leadDoorHTML`, steep-dashboard.js). This is the vision it was
+> built from; "Home stays HELD" below is discharged. Current state: `STATE.md` +
+> `docs/r5/planning/AUDIT-REPORT-v4.36.md` (the living seed).
+
 > **Written 2026-08-29, planning lane. Docs push on write.** Companion to **R159** (Home is HELD — a
 > combined frame+content effort, not a containers-only restyle) and **R160** (calm-first is not spare-first).
 > The banked FRAME layer is `docs/r5/boards/home-element-mix.dc.html`; this file is the CONTENT + warmth that

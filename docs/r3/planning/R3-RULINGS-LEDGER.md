@@ -328,8 +328,8 @@ revision board.
 **R60 — Issue #23 ("R2 capability regressions") splits three ways.** (a) The shelf sort control is
 preserved exactly as shipped — `steep-teas.js:248` renders a live seven-option select on the count
 row, handler `setTeaSort` at `:308`, restored in v3.84. #13 does not draw it; that is not
-authorisation to remove it. (b) `setTeaFilter` (`steep-teas.js:309`) and `focusLogSteep`
-(`steep-sessions.js:966`) have zero callers and stay dormant: the regressions are accepted for R3,
+authorisation to remove it. (b) `setTeaFilter` (`steep-teas.js:606`) and `focusLogSteep`
+(`steep-sessions.js:1388`) have zero callers and stay dormant: the regressions are accepted for R3,
 the functions stay in place, and no controls are drawn — reinstating would mean drawing them on #13
 and reopening a closed Design queue. (c) Sort persistence stays session-scoped; making it durable is
 a `user_settings` question for later.

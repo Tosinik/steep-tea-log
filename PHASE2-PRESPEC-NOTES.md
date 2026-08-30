@@ -1,5 +1,10 @@
 # Pre-spec notes — decisions to resolve BEFORE drafting the phase-2 brew-advice spec
 
+> **SUPERSEDED by `SPEC-brew-advice-v4.md` (Stage 1 shipped v4.31–v4.33) — kept for rationale; do not
+> build from this.** The feedback model here (the 3-value good/strong/weak tap; `SESSION_METHODS =
+> [gongfu, western]`) is out of date: senchadō shipped as a real method v3.91 and the capture widened to
+> the 5-value character tap v4.32. The gate is MET (15/15, 2026-07-19). Kept for the decision trail.
+
 **Status:** planning-lane notes, not a Code task. These are decisions that must be made
 *before* `v3_4-brew-advice.sql` / the phase-2 spec is drafted, because they change what
 data the gate collects and therefore how the feature is built. Surfaced from real use

@@ -1,4 +1,8 @@
 # SlowCup R3 — Surface Inventory (S1) + Edit-layout (S2)
+
+> **R3 CLOSED (v4.09) — kept for rationale; do not build from this.** Every surface marked `UNDESIGNED`
+> below shipped (`viewSessions`, `viewTeaDetail`, `renderLogin`, first-run). The status keys are the
+> 2026-07-18 snapshot, not current. See `STATE.md`.
 2026-07-18 · From Design, to Niklas + planning lane. Answers the two structural blockers in
 the Bundle 2 reconciliation before any new screens are built. Mirror of the board file
 `SlowCup R3 - Surface Inventory.dc.html`.

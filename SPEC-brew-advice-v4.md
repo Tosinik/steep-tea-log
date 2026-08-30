@@ -1,6 +1,8 @@
 # Spec — Brew advice v4: character-based feedback + context-gated lever advice
 
-Status: **DECIDED (planning).** Replaces the **feedback model** of `SPEC-brew-advice-v3-feedback.md`;
+Status: **Stage 1 SHIPPED v4.31–v4.33 (R175/R176)** — dormant engine → 5-tap capture → diagnosis
+surfacing → fix-forward; **Stage 2 (learned per-tea adaptation) is post-gate, unbuilt.** Model
+**DECIDED (planning).** Replaces the **feedback model** of `SPEC-brew-advice-v3-feedback.md`;
 keeps v3's **engineering** wholesale. Grounded in the research reference *"Tea Brewing Extraction &
 Tasting Science"* — filed as `docs/research/brew-extraction-science.md` (the deep source; cite it for the
 mechanisms below).

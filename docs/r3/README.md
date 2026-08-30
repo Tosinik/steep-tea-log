@@ -1,5 +1,9 @@
 # R3 — the design record
 
+> **R3 CLOSED (v4.09) — kept for rationale; do not build from this.** The whole R3 build package shipped;
+> the "remaining #07–#09b + hand-off" list below is done. See `R3-STATUS.md` §7 for what R3 left open and
+> `STATE.md` for current state. (The ledger below now runs to R177, not the "29" this file cites.)
+
 The visual level-up round. **Direction D · 摺物 Surimono** is locked. This folder is the
 durable record: what was decided, why, and what the screens look like.
 

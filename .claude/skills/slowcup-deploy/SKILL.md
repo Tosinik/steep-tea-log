@@ -25,8 +25,8 @@ The ritual, in order. Do not skip, reorder, or batch steps silently:
 
 1. **Version bumps** (all three, same commit):
    - `service-worker.js`: `CACHE_NAME` `steep-tea-log-vNN` → `vNN+1`. Never rename the prefix.
-   - `steep-core.js`: `APP_VERSION` → the new `vX.YY`.
-   - `WHATS_NEW` (once it exists, v3.69+): one short human sentence for the update banner.
+   - `steep-version.js`: `APP_VERSION` → the new `vX.YY`. (Moved here R158/v4.25 — NOT steep-core.js.)
+   - `steep-version.js`: `WHATS_NEW` — one short human sentence for the update banner (v3.69+).
 2. **CHANGELOG.md** — newest-first entry in house format:
    `## vX.YY — <title>` · `Deploy: <exact file list> (vNN). [SQL note or "No SQL."]` ·
    bullets that explain *why*, name the key functions/constants, and record any judgment

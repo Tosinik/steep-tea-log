@@ -1,5 +1,9 @@
 # R3 Implementation Hand-off → Code — FINAL
 
+> **R3 CLOSED (v4.09) — kept for rationale; do not build from this.** Every §2 board shipped through v4.09
+> and the four held rulings landed; the imperative "build the gap as drawn" is discharged. The currency
+> row (§ noted as owed) shipped v4.04. Current state: `STATE.md`; R3 close-out: `R3-STATUS.md` §7.
+
 **Planning lane, 2026-07-25.** This supersedes both earlier drafts (v1 omitted Social, Quick log,
 the bundles and the visual contracts; v2 wrongly promoted the bundles to visual authority). It is
 the complete build package: twenty-one boards, the full rulings ledger, and the verified data every

@@ -136,7 +136,7 @@ v3.40 tea lifecycle.
 ## slowcup.app launch checklist (consolidated — do before pointing the domain at the page)
 Gathered here (2026-07-10) from scattered HTML comments / CHANGELOG notes / Frozen flags so launch day is
 a checklist read, not an archaeology dig. None are blocking the beta *app*; all block the public *landing*.
-- [ ] **Register `slowcup.app`.** Time-sensitive — the name is public in a public repo since the v3.59
+- [x] **Register `slowcup.app`.** **DONE 2026-07-13** (registered + migrated — see STATE.md "Domain & auth origins"). ~~Time-sensitive — the name is public in a public repo since the v3.59
   rename; register before someone squats it. (Was under Frozen § install-guide.)
 - [ ] **Reshoot the 3 landing screenshots** (`landing-assets/{app-home,app-tea-detail,app-sessions}.png`).
   The current ones are handoff placeholders that predate WS3/WS1, and `app-tea-detail.png` still shows the
@@ -216,6 +216,11 @@ Not cut, but explicitly parked with the reason, so we don't re-litigate each ses
   bet. Frozen until there's a clear pull and appetite to stand up server-side infra.
 
 ## Passport — PARKED (dot-map approach rejected)
+> **SHIPPED — do not build from this.** The redesign this section prescribes (dots → drawn country
+> outlines) landed as `viewOrigins` (R3/#37, v4.07–v4.08) and was re-dressed to "Your terroir" v4.36.
+> Kept as the record of the pre-atlas decision. **One stale claim below:** the "aggregation layer …
+> REUSABLE" line names `passportSubFor`/`PASSPORT_SUB`, which in fact have **no live consumers** — only
+> `passportCountryFor`/`PASSPORT_GEO` are reused by the atlas (see `docs/r5/planning/AUDIT-REPORT-v4.36.md`).
 Shipped as a curated dot-map (v3.33 sub-regions + China/Japan zoom; v3.34 smaller pins + name/count
 labels + wider zoom). **Niklas's verdict (2026-07): not good enough — you can't recognise countries or
 borders, "just dots basically."** The dot-grid was the wrong foundation. **Parked pending a redesign
@@ -301,5 +306,6 @@ Genuinely open, not sequenced/cut/frozen. Pull into a deploy when it fits:
 
 ## Bugs / ideas / feedback → GitHub issues
 Open issues (`Tosinik/steep-tea-log`, public) are the live queue alongside this roadmap — fetch at
-session start (see CLAUDE.md). Labels: `bug` / `idea` / `feedback`. Currently open: **#1** in-session
-`d_setBrewMode('off')` gives weird feedback mid-session (fold into a batch deploy).
+session start (see CLAUDE.md). Labels: `bug` / `idea` / `feedback`. ~~Currently open: **#1** in-session
+`d_setBrewMode('off')` gives weird feedback mid-session~~ — **#1 fixed v3.68** (reversible in-session
+hide). New bugs/ideas live in GitHub issues.

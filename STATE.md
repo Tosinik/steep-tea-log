@@ -106,8 +106,10 @@ longer need a manual hard reload (dev still should, to verify). The SW waits for
 
 ## Continue here
 
-**ROADMAP — the current ordered forward plan (reordered 2026-08-30, v4.35).** The R5 spine + warmth pass is
-landed; **reflection Slices A + B + C are all done — the reflection is complete (v4.36).** What's next, in order:
+**ROADMAP — the current ordered forward plan (reordered 2026-08-30, v4.36 — post-audit).** The R5 spine +
+warmth pass is landed; **reflection Slices A + B + C are all done (v4.36).** **The codebase/docs audit is
+DONE** (`docs/r5/planning/AUDIT-REPORT-v4.36.md`); planning ruled its fixes into waves — **wave 1 is the next
+build.** What's next, in order:
 
 1. **Reflection Slice B — DONE.** B1 (R177, v4.34: the full tea-detail spine + warm re-dress) + B2 (R173,
    v4.35: why-this-tea palate-connected + type-aware freshness incl. the oolong-by-roast fix + the
@@ -116,9 +118,20 @@ landed; **reflection Slices A + B + C are all done — the reflection is complet
 2. ~~**Reflection Slice C (R174):** terroir + teas-over-time — the last reflection views.~~ **DONE (v4.36)** —
    terroir extends `viewOrigins` in place; teas-over-time is a new `viewTimeline` behind an Insights door.
    **The reflection is complete (A/B/C all shipped).**
-3. **The full codebase/docs audit** *(moved up — after the reflection, before features)*: bloat, stubs,
-   forgotten deferrals, stale docs → a **ranked backlog that INFORMS the feature order below**. A read first,
-   so features are prioritised by what the audit surfaces, not by memory. (The brew-advice pile was a preview.)
+3. ~~**The full codebase/docs audit**~~ **DONE — read of v4.36 (`72db72b`); report at
+   `docs/r5/planning/AUDIT-REPORT-v4.36.md`** (gate table + both arms + ranked backlog; the **living seed** —
+   append future finds there, it replaces the never-created `AUDIT-TARGETS`). Ruled into waves:
+   - **Wave 0 — docs-only (SHIPPED, this commit):** deploy-gate repoint (`verifier.md` + `slowcup-deploy`
+     → `steep-version.js`), "do-not-build" banners on the command-rebuild docs, misinformer reconciles.
+     No app files, no version/cache bump.
+   - **Wave 1 — the design gap (NEXT build): sessions list → vendor/keyboard → session-flow re-dress.**
+     The sessions LIST is still old label-picture `.card`s (no spine, no warmth) while its own detail is
+     full spine; the session FLOW (setup/steeping/finish/quick — the core ritual) is entirely unspined; the
+     vendor `<datalist>` sits behind the mobile keyboard (the app has no viewport/focus-scroll handling).
+   - **Hygiene riders (thereafter):** free-delete orphans (`dotsRow`/`fmtStars`/`toggleTheme`/
+     `flavorFamilyOf`/`achievementsHTML` + the unguarded passport dot-map leftovers); achievements R134
+     delete-vs-keep (bookkeeping still recomputes on every write); fix CLAUDE.md's passport dead-table
+     over-claim (`passportSubFor`/`PASSPORT_SUB` are not live).
 4. **Features, prioritised by the audit:** Go Deeper / tea-reference redesign · tasting input (the
    "What are you tasting?" tags — partly live — + the guided tasting mode, `IDEA-tasting-mode.md`) · matcha
    mode (contained). **Backlog the audit ranks into this:** ~~freshness-framing fix~~ **DONE in B2**; the
@@ -131,9 +144,15 @@ landed; **reflection Slices A + B + C are all done — the reflection is complet
    guide, guided-discovery framing). **Data-gated — floats to whenever the feedback gate fills** (the
    ~15-session gate; the v4 five-tap capture now feeds it with the richer vocabulary).
 
-**SECURITY — F1/F2 is a HARD pre-widening GATE, not a backlog item.** The security fixes MUST land before
-anyone but Niklas logs in / the Datenschutzerklärung goes live — it blocks widening regardless of where the
-feature roadmap stands.
+**SECURITY + LEGAL — the HARD pre-widening GATE, not a backlog item.** These MUST land before anyone but
+Niklas logs in (the trigger is *pre-widening*, not a date; deferred by decision 2026-08-28 while he is the
+sole user — see `SECURITY.md`): **F1** (`profiles` readable by all authed users, no allowlist — HIGH) ·
+**F2** (`tea-photos` bucket public + unscoped read — HIGH) · **F3** (shared sessions/steeps expose the full
+row — `mood`/free-text notes/`feedback` — to followers — MEDIUM) · **GDPR erasure** (no account/data-delete
+function exists anywhere in the codebase — legally required for a public EU beta) · **Datenschutzerklärung +
+Impressum** (neither is in the repo; F1/F2 must be fixed before the privacy policy can be truthful, and the
+Impressum needs a ladungsfähige Anschrift). F4 (auth redirect allowlist) is a 30-second dashboard confirm.
+It blocks widening regardless of where the feature roadmap stands.
 
 **The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16 →
 v3.83 audit riders → v3.84 interim sort → v3.85 #24+#29 water/word fixes (**all SHIPPED**, below).

@@ -8,7 +8,7 @@ complete: v3.63 WS3 language · v3.64 WS1 Wrapped · WS4 landing · v3.65 WS2 In
 ## What SlowCup is
 A personal tea-logging PWA — a quiet companion for a daily brewing ritual (sessions, steeps,
 teas, brew guidance, light social). Currently private beta, one primary user + testers.
-Live at tosinik.github.io/steep-tea-log (auth-gated; design work happens from the repo +
+Live at slowcup.app (auth-gated; design work happens from the repo +
 screenshots, not the live app).
 
 ## The one rule that governs everything: calm-first
@@ -125,8 +125,8 @@ shared data-viz family — sparkline / type-bar / time-of-day / steep-shape — 
 notes and a deep-jade Wrapped teaser; **observation register, not KPIs** — no arrows/%/targets, guarded
 by `fixtures/insights-room-test.js`) · **SlowCup Wrapped** (WS1: a horizontal scroll-snap sequence of
 full-width seasonal story cards, reached from the Insights teaser) · Settings (appearance, brew guidance,
-data: export/import/error log/data health/feedback) · light social feed · shopping list · passport
-(parked). **Off-app:** `landing.html` — the static `slowcup.app` marketing page (WS4; own tokens, not part
+data: export/import/error log/data health/feedback) · light social feed · shopping list · Origins / *Your terroir*
+(live — drawn-outline atlas + terroir summaries, re-dressed to the reflection spine v4.36). **Off-app:** `landing.html` — the static `slowcup.app` marketing page (WS4; own tokens, not part
 of the PWA).
 
 ## What a design session may NOT change casually

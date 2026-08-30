@@ -1,5 +1,10 @@
 # REFLECTION-SPEC — the deep pages behind the door (Insights' record)
 
+> **SHIPPED as of v4.36 — kept for rationale; do not build from this.** The deep pages all shipped —
+> Slice A (`viewRitual`/`viewPalate`, v4.30), Slice B (tea-detail why + freshness, v4.34–v4.35), Slice C
+> (`viewTimeline`, v4.36); the reflection is complete. Current state: `STATE.md` +
+> `docs/r5/planning/AUDIT-REPORT-v4.36.md` (the living seed).
+
 > **Written 2026-08-29, planning lane. Docs push on write.** The deep reflection views that the Home
 > lead-insight **door** (R165) opens into. Companion to `INSIGHT-ENGINE-SPEC.md` (the lead engine — the
 > door's sentence) and `HOME-VISION.md` (Home = the moment, Insights = the record). **Not yet built** — its

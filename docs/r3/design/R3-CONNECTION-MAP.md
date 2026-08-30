@@ -1,4 +1,8 @@
 # SlowCup R3 — Connection Map
+
+> **R3 CLOSED (v4.09) — kept for rationale; do not build from this.** The `MISSING` edges below were
+> built; "build it (#03)" etc. are discharged. This is the 2026-07-18 connection snapshot, not current.
+> See `STATE.md`.
 2026-07-18 · From Design, to Niklas + planning lane. The companion to the surface inventory:
 the inventory lists the **nodes** (what surfaces exist); this lists the **edges** (what links
 to what). Third time this class of gap surfaced — nav completeness → surface inventory → now
