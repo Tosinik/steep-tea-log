@@ -1187,6 +1187,19 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .sd-sec{margin-top:18px;} /* RULE section wrapper — grouping only, no fill/border/radius. */
 .sd-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;} /* a section header; the 2px ink rule comes from .rule-head. */
 
+/* R177 — tea-detail joins the spine (mirrors .sd-*): BAND masthead + RULE sections + one clay SLAB.
+   Identity → .td-band (composes .band for the --band fill; radius 0, the fence's positive subject). The
+   .td-swatch (liquor) + .td-thumb (photo) are MARKS, excluded from the fill-law. */
+.td-band{display:flex;align-items:center;gap:14px;margin:0 -16px 16px;padding:14px 16px;border-radius:0;}
+.td-band-main{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.td-title{font-family:var(--font-display);font-size:22px;line-height:1.15;margin:0;}
+.td-pills{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.td-swatch{width:44px;height:58px;flex:none;}
+.td-thumb{width:56px;height:58px;flex:none;border-radius:2px;background-size:cover;background-position:center;background-color:var(--jade-pale);}
+.td-sec{margin-top:18px;} /* RULE section wrapper — grouping only, no fill/border/radius. */
+.td-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;} /* section header; the 2px ink rule comes from .rule-head. */
+.td-slab-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;} /* the one clay SLAB (Start session) + ghost Edit. */
+
 /* ===== slice C — #12 quick log + #04 strip ===== */
 .when-chips{display:flex;flex-wrap:wrap;gap:7px;}
 .when-chip{font-family:var(--font-mono);font-size:12px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--white);color:var(--ink-soft);}

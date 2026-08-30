@@ -1041,11 +1041,8 @@ function teaProvenanceHTML(t, costPerSession){
   row('Cost / gram', t.costOriginalGrams ? currencyFmt(t.costTotal/t.costOriginalGrams) : '');
   row('Cost / session', costPerSession>0 ? currencyFmt(costPerSession) : '');
   if(!rows.length && !t.image) return '';
-  return `<div style="margin-top:18px;">
-      <div class="eyebrow">Where this came from</div>
-      <div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>
-      ${t.image?`<div class="tea-label-note">The photo is the label — evidence for where it came from, never the tea's identity.</div>`:''}
-    </div>`;
+  // R177: returns bare content — viewTeaDetail's tdSec provides the "Where this came from" RULE header.
+  return `<div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>${t.image?`<div class="tea-label-note">The photo is the label — evidence for where it came from, never the tea's identity.</div>`:''}`;
 }
 /* R55's offer, and the ONLY new affordance on this field — R56 rules out a suggestion list, so the
    input stays free text with no `list=`. The rule lives in `originOffer` (steep-passport.js, the
@@ -1210,48 +1207,45 @@ function viewTeaDetail(){
   const back = state.teaDetailFrom==='passport' ? {v:'passport',l:'passport'}
              : state.teaDetailFrom==='sessions' ? {v:'sessions',l:'sessions'}
              : {v:'teas',l:'teas'};
+  // R177 — the tea page re-dressed to the spine: identity → BAND masthead, the blocks → RULE sections
+  // (grouped: Character = leaf facts + flavour + description; Brewing = guide + advice, de-carded), one
+  // clay SLAB (Start session). Reflection-first order: Character leads, On hand second. Each section
+  // renders only WITH content (no empty headers). B2 inserts #reflect-why into secChar (after the
+  // character line) and a Freshness section (#reflect-freshness) after Brewing — structure left ready.
+  const onHandBody = `<div style="font-size:14px;${isRunningLow(t)?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>${cupsLine}${forecastLine(t)}${inventorySparkline(t) || sparklineHintHTML(t)}`;
+  const descBody = t.description?`<div style="margin-top:14px;font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div>`:'';
+  const secChar = [teaCharacterHTML(t), flavorProfileHTML(t), descBody].filter(Boolean).join('');
+  const secBrew = [t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t), teaBrewAdviceHTML(t)].filter(Boolean).join('');
+  const secProv = teaProvenanceHTML(t, costPerSession);
+  const tdSec = (title, body) => body ? `<div class="td-sec"><div class="td-sechead rule-head"><span class="eyebrow">${title}</span></div>${body}</div>` : '';
   return `
     <div class="detail-head">
       <button class="detail-back" onclick="goView('${back.v}')">← Back to ${back.l}</button>
       <button class="tea-more" onclick="toggleTeaMenu()" aria-label="More" aria-expanded="${state.teaMenuOpen?'true':'false'}">⋯</button>
     </div>
     ${teaMenuHTML(t)}
-    <div class="card">
-      <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <div style="width:140px;height:140px;border-radius:12px;background:${t.image?`url(${escapeHtml(t.image)}) center/cover`:'var(--jade-pale)'};flex:0 0 auto;"></div>
-        <div style="flex:1;min-width:200px;">
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
-            ${t.isFavorite?`<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">${favLeaf(12)} favourite</span>`:''}
-            ${t.wouldRebuy?'<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">would rebuy</span>':''}
-          </div>
-          <h2 style="margin:8px 0 4px;">${escapeHtml(t.name)}</h2>
-          ${renderStarsStatic(Number(t.rating)||0,true)}
-          <div class="eyebrow" style="margin-top:8px;">On hand</div>
-          <div style="font-size:14px;${isRunningLow(t)?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>
-          ${cupsLine}
-          ${forecastLine(t)}
-          ${inventorySparkline(t) || sparklineHintHTML(t)}
+    <div class="band td-band">
+      ${swatchAttr('td-swatch', liquorFor(t), t.type, true)}
+      ${t.image?`<div class="td-thumb" style="background-image:url(${escapeHtml(t.image)});"></div>`:''}
+      <div class="td-band-main">
+        <div class="td-pills">
+          <span class="pill t-${escapeHtml(t.type)}">${escapeHtml(typeLabel(t.type))}</span>
+          ${t.isFavorite?`<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">${favLeaf(12)} favourite</span>`:''}
+          ${t.wouldRebuy?'<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">would rebuy</span>':''}
         </div>
-      </div>
-
-      ${teaCharacterHTML(t)}
-      ${t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t)}
-      ${teaBrewAdviceHTML(t)}
-      ${flavorProfileHTML(t)}
-      ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div></div>`:''}
-      ${teaProvenanceHTML(t, costPerSession)}
-
-      <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="startSessionFor('${t.id}')">Start session</button>
-        <button class="btn" onclick="openTeaForm(teaById('${t.id}'))">Edit</button>
-      </div>
-
-      <div class="session-hist">
-        <div class="eyebrow" style="margin-bottom:6px;">Session history</div>
-        ${histHTML}
+        <h2 class="td-title">${escapeHtml(t.name)}</h2>
+        ${renderStarsStatic(Number(t.rating)||0,true)}
       </div>
     </div>
+    ${tdSec('Character', secChar)}
+    ${tdSec('On hand', onHandBody)}
+    ${tdSec('Brewing', secBrew)}
+    ${tdSec('Where this came from', secProv)}
+    <div class="td-slab-row">
+      <button class="btn-clay" onclick="startSessionFor('${t.id}')">Start session</button>
+      <button class="btn-ghost" onclick="openTeaForm(teaById('${t.id}'))">Edit</button>
+    </div>
+    ${tdSec('Your diary', histHTML)}
   `;
 }
 
@@ -1274,7 +1268,7 @@ function savedBrewHTML(tea){
     ? 'Steep times come from the leaf type — your guide sets the rest. The session timer uses this schedule.'
     : 'Parsed from your brew guide — the session timer uses this schedule.';
   return `
-    <div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
+    <div style="margin-top:10px;">
       <div class="eyebrow">Brew guide · saved</div>
       <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
       <div style="font-size:12.5px;white-space:pre-wrap;margin-top:10px;">${escapeHtml(tea.brewGuide)}</div>
@@ -1313,7 +1307,7 @@ function suggestedBrewHTML(tea){
   if(ratio!=null) rows.push(`<div><div class="eyebrow">Leaf</div><div>${ratio} g / 100 ml</div></div>`);
   rows.push(`<div><div class="eyebrow">First steeps</div><div class="mono">${sched.times.slice(0,6).map(fmtSecShort).join(' / ')}</div></div>`);
   return `
-    <div class="card" style="margin-top:14px;background:var(--jade-pale);border:1px solid var(--line);">
+    <div style="margin-top:10px;">
       <div class="eyebrow">Suggested brew · ${escapeHtml(source)}</div>
       <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
       <div style="font-size:11.5px;color:var(--ink-soft);margin-top:10px;">A starting point from ${kb&&kb.style?'the tea knowledge base':'the leaf type'} — not a saved guide. The session timer uses these times until you save your own.</div>

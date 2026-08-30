@@ -116,6 +116,28 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.34 · reflection Slice B1 — tea-detail re-dressed to the spine  *(on device, post-deploy)*
+
+A pure re-dress (containers, same content); render is vm-covered (render-smoke renders `viewTeaDetail`
+substantially), whether it READS is the phone. Open a tea's page:
+
+1. **It reads as a warm spine surface** — a **BAND masthead** (the tea's brewed-colour swatch + a photo
+   thumb + name/type/pills/stars), then RULE sections with 2px ink headers: **Character → On hand → Brewing →
+   Where this came from → Your diary**. No card-in-a-card (the brew guide flows as plain rows, not a
+   jade-pale box).
+2. **The photo thumb — the call-out.** The old 140×140 hero shrank to a **56×58 thumb** in the band. Does it
+   read right, or do you want the larger hero back? *(This is the one visual judgment — say and I'll adjust.)*
+3. **One clay action.** **Start session** is the single clay slab; Edit is a quiet ghost; nothing else on the
+   page competes.
+4. **Nothing broke** — stock/running-low, the sparkline, the brew guide, "Your last cup," flavour, provenance,
+   and the session history all still show, just re-framed. A tea with **no photo / no description / no
+   sessions** still reads whole (empty sections are absent, not blank headers).
+5. **Colour is data** — only the masthead swatch (and the flavour marks) carry colour; the rest is ink.
+
+*(B2 — the why + freshness content — rides this frame next.)*
+
+---
+
 ## v4.33 · fix-forward — the "change" button + the flat/water dead-end  *(on device, post-deploy)*
 
 Two v4.32 surfacing bugs; the logic is vm-covered (`brew-advice-v4-test` §D/§I7/§I8), the feel is the phone.

@@ -285,7 +285,7 @@ FILES_SCANNED.forEach(f=>{
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
 ok(tinted===12, 'F1 TWELVE type-tint writes across the seven files — the v4.19 picker\'s two (its tier-3 fallback: COLOUR-row preview + default cell) and the nine labels/placeholders/chart, plus the R172 palate-families bar (a dot-<type> write) in steep-insights.js; steep-shopping.js adds none (got '+tinted+')');
-ok(painted===10, 'F2 …and exactly TEN swatchAttr call sites paint a liquor now — the seven prior (six warm Home R159 + the Insights note R170) plus THREE R171 marks: the session-detail band identity swatch and the two Shopping rows (running-low always, rebuy only when the want is on the shelf). The colour-clock bars and the Teas-brewed strip paint liquor via var(--liquor-*) directly, not swatchAttr, so they stay outside this count (got '+painted+')');
+ok(painted===11, 'F2 …and exactly ELEVEN swatchAttr call sites paint a liquor now — the ten prior (six warm Home R159 + the Insights note R170 + the three R171 marks: session-detail band + the two Shopping rows) plus the R177 tea-detail masthead swatch (.td-swatch, the identity mark of the re-dressed tea page). The colour-clock bars and the Teas-brewed strip paint liquor via var(--liquor-*) directly, not swatchAttr, so they stay outside this count (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
 const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));
