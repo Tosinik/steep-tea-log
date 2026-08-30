@@ -124,7 +124,9 @@ build.** What's next, in order:
    - **Wave 0 — docs-only (SHIPPED, this commit):** deploy-gate repoint (`verifier.md` + `slowcup-deploy`
      → `steep-version.js`), "do-not-build" banners on the command-rebuild docs, misinformer reconciles.
      No app files, no version/cache bump.
-   - **Wave 1 — the design gap (NEXT build): sessions list → vendor/keyboard → session-flow re-dress.**
+   - **Wave 1 — the design gap (NEXT build): sessions list → vendor/keyboard → session-flow re-dress.** The
+     session-flow rework is **designed in `docs/r5/planning/SESSION-FLOW-REDESIGN.md`** (the build authority;
+     Q1/Q2 resolved 2026-08-30; matches the audit report's pointer).
      The sessions LIST is still old label-picture `.card`s (no spine, no warmth) while its own detail is
      full spine; the session FLOW (setup/steeping/finish/quick — the core ritual) is entirely unspined; the
      vendor `<datalist>` sits behind the mobile keyboard (the app has no viewport/focus-scroll handling).

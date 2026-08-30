@@ -80,10 +80,19 @@ set of notes for the cup, **no per-steep timing implied.**
     positions.
   These read **absence-of-a-re-log as evidence of fade.** Session-level tasting removes the artifact at the
   root: with no per-steep timing implied, a single tag is just "tasted this in this sitting."
-- **Per-steep evolution becomes an opt-in layer.** Its natural home is **guided mode** (D4), where
-  re-logging each steep *is* the explicit intent — so the positional reads (`flavorObservation`,
-  `sessionFlavorStory`, `teaFlavorProfile.positions`) run only on data that actually carries per-steep
-  intent, never on incidental single-tags. See open question Q2 for how present this layer should be.
+- **Per-steep evolution — recognized, never manufactured (Q2, RESOLVED).** The default is session-level;
+  genuine per-steep evolution *is* recognized and told back — but **only from real per-steep logging**
+  (actually-different notes across steeps that were themselves logged). Its natural home is **guided mode**
+  (D4), where re-logging each steep *is* the explicit intent, so the positional reads (`flavorObservation`,
+  `sessionFlavorStory`, `teaFlavorProfile.positions`) run only on data that carries per-steep intent, never
+  on incidental single-tags. **The read-back must never infer fade/lead from a note's *absence* in later
+  steeps** — that inference is the "led early" artifact (D2's core defect).
+  - **Implementation note (the fix's shape).** Gate `sessionFlavorStory` (`:1599`) / `flavorObservation`
+    (`steep-teas.js:947`) claims on **real per-steep presence *differences*** — a note present in one logged
+    steep and genuinely different in another logged steep — **not on absence.** A steep that carried no
+    tasting contributes no evidence. Today `sessionFlavorStory` builds "X led early" from `first[0]` alone and
+    `flavorObservation` reads a lone steep-0 tag as "peaks at steep 1, softens after" — those are
+    absence-inferences and must go.
 - **Data model (design note, no migration mandated here):** both arrays already exist — session tasting
   rides `sessions.tags` (the `sessionTags` draft field), per-steep rides `steeps[].tags`. This is the
   **bare + membership** scheme unchanged (WS4), **no SQL.** The reads that currently pull from `steeps[]`
@@ -129,6 +138,12 @@ A **separate flow** running the `IDEA-tasting-mode.md` sequence, entered on purp
 to a tea (usually new, or a sample). It produces a **rich record that feeds the tea's profile** — it is not
 the ordinary log with extra fields.
 
+- **Entry door (Q1, RESOLVED — prominent, not buried).** Guided tasting is a **delight / showcase feature**
+  and must be surfaced as one, never buried. A **prominent primary entry** (exact placement — a Home action
+  vs a dedicated entry — is a design detail for the guided-mode slice), **tea-anchored**: **picking the tea
+  is step zero** of the flow. Plus a **secondary contextual "Taste this properly" link on the tea's detail
+  page**, since guided tasting is usually *this specific tea*. Rationale: a showcase feature reachable only
+  from a tea-detail link would go unfound — surface it primarily; keep the contextual link as the shortcut.
 - **The sequence** (`IDEA-tasting-mode.md` §"Rough step sequence"): **dry leaf → wet/rinsed leaf → liquor →
   aroma of the liquor → taste → mouthfeel/texture → where it sits → finish → across steeps.** Order follows
   the tea, not the form.
@@ -205,17 +220,18 @@ the ordinary log with extra fields.
 
 ---
 
-## 4 · Open — unresolved, needed before the full build spec
+## 4 · Resolved — the two questions that were open
 
-- **Q1 · Guided-mode entry door.** Planning-lean: **the tea's detail page** ("Taste this properly"), since
-  guided tasting is almost always *this specific tea* (often new / a sample). **Confirm vs elsewhere**
-  (session setup as a method variant alongside cold brew / matcha? a first-run prompt?). `IDEA-tasting-mode.md`
-  §"Open questions" leaves this open; D4's "session variant" lean and this door lean should be ruled together.
-- **Q2 · Per-steep evolution presence.** Opt-in layer (**lean**, D2 — lives in guided mode, invisible in the
-  ordinary flow) **vs** more present in the normal flow (a lightweight per-steep toggle for gongfu/senchadō
-  sessions where evolution is genuinely the point). The lean protects Tea-First and kills the "led early"
-  artifact cleanly; the alternative keeps evolution reachable without entering guided mode. Rule before the
-  tagger slice, because it decides whether the per-steep positional reads run at all outside guided mode.
+Both were open in the first draft; **ruled 2026-08-30** and folded into the settled decisions above.
+
+- **Q1 · Guided-mode entry door → RESOLVED (see D4).** Prominent + discoverable — a delight / showcase
+  feature, not buried: a prominent primary entry (Home action vs dedicated entry is a design detail for the
+  slice), **tea-anchored** (pick the tea as step zero), plus a secondary contextual "Taste this properly"
+  link on the tea's detail page. *Rationale: guided tasting is a delight feature and must be surfaced as one.*
+- **Q2 · Per-steep evolution presence → RESOLVED (see D2).** Session-level default; genuine per-steep
+  evolution is **recognized, never manufactured** — surfaced only from real per-steep logging (actually-
+  different notes across logged steeps), **never inferred from a note's absence**. The implementation note
+  (gate `sessionFlavorStory`/`flavorObservation` on real presence *differences*, not absence) is in D2.
 
 ---
 
@@ -227,9 +243,11 @@ A multi-slice track. Likely shape:
   ±5/±10). Contained, no data-model change. **Bug A** slots here (same focus/timer surface).
 - **(b) The hierarchical tagger + earned-vocab resurfacing** — D3, replacing `flavorCaptureHTML`'s flat grid
   with the 12-family tree, tea-typical + earned vocab per family. **Bug B** *is* this slice's earned-vocab
-  requirement. Needs Q2 ruled (session-level vs per-steep default) and D2's read-repointing.
+  requirement. **Q2 ruled** (D2: session-level default; evolution only from real per-steep logging); needs
+  D2's read-repointing.
 - **(c) Guided mode as a separate path** — D4, the `IDEA-tasting-mode.md` sequence as its own flow, with the
-  per-steep evolution layer and Tier-1 liquor capture. Needs Q1 (entry door) ruled. Largest slice; may
+  per-steep evolution layer and Tier-1 liquor capture. **Q1 ruled** (D4: prominent primary entry,
+  tea-anchored, + contextual tea-detail link). Largest slice; may
   itself split (the sequence UI vs the new-field capture vs the profile feed).
 
 **Each slice is its own `/slowcup-deploy`, paused for review; the two bugs ride whichever slice touches their
