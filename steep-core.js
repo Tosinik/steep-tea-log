@@ -1082,6 +1082,7 @@ function goVessels(){
 // Back leaves the deep page for the tab it opened from.
 function openReflection(view, focus, teaId){
   state.view = view; state.reflectFocus = focus || null; state.activeTeaId = teaId || null; state.dashEdit = false;
+  if(view==='tea-detail') state.teaDetailFrom = 'insights';   // R173 (B2): a tea-page deep-link → Back returns to Insights
   saveView(view); render();
 }
 // v4.17 (#34): the app is one state machine with no browser history, so the OS back gesture had

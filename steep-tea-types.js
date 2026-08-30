@@ -229,7 +229,14 @@ function ttFreshness(tea){
   if(!tea) return null;
   const row = (typeof matchTeaType==='function') ? matchTeaType(tea.name) : null;
   if(row){
-    const fam = TT_FRESHNESS[row.family];
+    let fam = TT_FRESHNESS[row.family];
+    // R173: oolong "widens with roast, per tea" (the model's design). A medium/heavy-roast oolong is
+    // age-friendly (Wuyi yancha + its members, roasted Dong Ding), not a fresh-window tea — flip ageing on
+    // from the catalog roast field, so the reading, the Home freshness insight, and statusLine all read it
+    // (all consult ttFreshness). Light/floral oolong (none/none-light/variable) stays a fresh-window tea.
+    if(fam && row.family==='oolong' && /medium|heavy/.test(String(row.roast||''))){
+      fam = Object.assign({}, fam, { ageing:true, sealed_days:null, opened_days:null });
+    }
     const slug = TT_FRESHNESS_SLUG[row.slug];
     if(slug && fam) return Object.assign({}, fam, slug, { rung:'slug' });
     if(fam) return Object.assign({}, fam, { rung:'family' });

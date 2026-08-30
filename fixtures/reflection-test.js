@@ -47,12 +47,15 @@ ok(route('palate-lean')==='{"view":"palate","focus":"families"}', 'B palate-lean
 ok(route('highest-rated')==='{"view":"palate","focus":"rated"}', 'B highest-rated → palate/rated');
 ok(route('morning-truth')==='{"view":"ritual","focus":"clock"}', 'B morning-truth → ritual/clock');
 ok(route('temps')==='{"view":"ritual","focus":"temps"}', 'B temps → ritual/temps');
-ok(route('freshness')==='null', 'B freshness → null (tea-page destination, Slice B — a graceful Insights fallback, never a broken door)');
-ok(route('haven-t')==='null' && route('little-notice')==='null', 'B other unmapped types → null');
-ok(route(null)==='null', 'B a null insight → null');
-// the Home door reads the route: mapped → openReflection, unmapped → goView('insights')
+ok(route('freshness')==='{"view":"tea-detail","focus":"freshness"}', 'B freshness → tea-detail/freshness (R173 B2 — the last unmapped types now land)');
+ok(route('haven-t')==='{"view":"tea-detail","focus":"why"}', 'B haven-t → tea-detail/why');
+ok(route('little-notice')==='null' && route(null)==='null', 'B a still-unmapped type / a null insight → null (graceful Insights fallback)');
+// the Home door reads the route; tea-page routes carry the tea's id so the deep-link lands on THAT tea's page
 const leadSrc=fs.readFileSync(path.join(REPO,'steep-dashboard.js'),'utf8');
-ok(/route\s*\?\s*`openReflection\(/.test(leadSrc) && /:\s*`goView\('insights'\)`/.test(leadSrc), 'B the lead-door onclick branches on the route (openReflection when mapped, Insights otherwise)');
+ok(/route\.view==='tea-detail'/.test(leadSrc) && /openReflection\('tea-detail','\$\{route\.focus\}','\$\{escapeJsArg\(li\.teaId/.test(leadSrc), 'B the lead-door passes li.teaId for tea-detail routes (openReflection with the tea id)');
+ok(/:\s*`goView\('insights'\)`/.test(leadSrc), 'B an unmapped type still falls back to Insights (never a broken door)');
+// openReflection sets teaDetailFrom='insights' for a tea-page deep-link (Back returns to Insights)
+ok(/view==='tea-detail'\) state\.teaDetailFrom = 'insights'/.test(fs.readFileSync(path.join(REPO,'steep-core.js'),'utf8')), 'B a tea-page deep-link sets teaDetailFrom=insights (Back → Insights)');
 
 /* ---- C · routing wiring — HISTORY_VIEWS has palate/ritual, PERSISTED_VIEWS does not ---- */
 ok(G('HISTORY_VIEWS.includes("palate") && HISTORY_VIEWS.includes("ritual")'), 'C palate/ritual are in HISTORY_VIEWS (Back returns to the opening tab)');
@@ -116,6 +119,25 @@ const coreSrc=fs.readFileSync(path.join(REPO,'steep-core.js'),'utf8');
 ok(/state\.reflectFocus\)\s*\{[\s\S]*?getElementById\('reflect-'\+f\)[\s\S]*?scrollIntoView/.test(coreSrc), 'G render() scrolls #reflect-<focus> into view after paint (the deep-link lands ON the section)');
 ok(/const f = state\.reflectFocus; state\.reflectFocus = null;/.test(coreSrc), 'G reflectFocus is a one-shot — nulled before the frame, so a later re-render never re-scrolls');
 ok(/state\.reflectFocus=null;/.test(coreSrc.replace(/const f = state\.reflectFocus; state\.reflectFocus = null;/,'')), 'G goView also nulls reflectFocus (the stale-focus fence)');
+
+/* ---- J · B2 the tea's page — palate connection + type-aware freshness (R173) ---- */
+G("state.teas=[]; state.sessions=[]; state.vessels=[];");
+// ttFreshness roast unit — the catalog roast field drives oolong ageing (real cover names so matchTeaType hits)
+ok(/"ageing":true/.test(G('JSON.stringify(ttFreshness({name:"Dawang Feng Da Hong Pao", type:"oolong"}))')), 'J ttFreshness: a medium/heavy-roast oolong (Da Hong Pao ← Wuyi) → ageing:true (age-friendly)');
+ok(/"ageing":false/.test(G('JSON.stringify(ttFreshness({name:"Ali Shan Fo Shou Dong Pian", type:"oolong"}))')), 'J ttFreshness: a light/floral oolong (Alishan) → ageing:false (fresh-window)');
+// the reading framing FITS the type (the sticky-rice fix): fade-fast urgency vs age-friendly holding
+function freshOf(name,type,extra){ G("state.teas=[Object.assign({id:'x',name:"+JSON.stringify(name)+",type:"+JSON.stringify(type)+"},"+JSON.stringify(extra||{})+")]; state.activeTeaId='x';"); return G("teaFreshnessHTML(state.teas[0])"); }
+{ const yr=String(new Date(Date.parse('2026-08-30')).getFullYear());
+  const g = freshOf('Sencha','green',{harvestYear:yr});
+  const o = freshOf('Dawang Feng Da Hong Pao','oolong',{harvestYear:yr});
+  ok(/peak|Best within|Best enjoyed soon/.test(g) && !/ages|Holding/.test(g), 'J a fade-fast green reads drink-fresh (peak/urgency), not age-friendly');
+  ok(/ages|Holding/.test(o) && !/Best within|Best enjoyed soon|freshest/i.test(o), 'J a roasted oolong reads HOLDING, never "freshest now" (the sticky-rice fix)'); }
+// palate connection: shared type across favourites → the why line (#reflect-why); too little signal → ''
+G("state.teas=[{id:'t',name:'Test Oolong',type:'oolong'},{id:'f1',name:'A',type:'oolong',isFavorite:true},{id:'f2',name:'B',type:'oolong',rating:5}]; state.activeTeaId='t';");
+{ const w=G("teaWhyHTML(state.teas[0])"); ok(/id="reflect-why"/.test(w) && /reaching for oolong/i.test(w), 'J palate connection: shared type → the why line, anchored #reflect-why'); }
+G("state.teas=[{id:'t',name:'Lonely',type:'green'}]; state.activeTeaId='t';");
+ok(G("teaWhyHTML(state.teas[0])")==='', 'J too little palate signal → empty (the curated character stands alone)');
+console.log('  J B2 tea-page content: 6 checks');
 
 console.log('');
 if(failed){ console.log('REFLECTION TESTS FAILED — '+failed+' failed, '+passed+' passed'); process.exit(1); }

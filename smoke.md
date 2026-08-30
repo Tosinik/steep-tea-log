@@ -116,6 +116,26 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.35 · reflection Slice B2 — the tea's page: why + type-aware freshness  *(on device, post-deploy)*
+
+The logic is vm-covered (`reflection-test` §B/§J — palate, the freshness split, routing); whether it reads
+warm + the deep-link lands are the phone. On a tea's page:
+
+1. **"Why you like it" reads as a palate connection, not a catalog reprint** — a tea whose type matches your
+   favourites shows a line like *"You keep reaching for oolong — this is one of them"* (in Character). A tea
+   with no palate overlap shows nothing there (the character stands alone) — not a hollow line.
+2. **Freshness framing fits the type — the one to check.** A **green** with a harvest date reads drink-fresh
+   ("at its peak" / "best within N"); a **roasted oolong** (Wuyi / Da Hong Pao / a roasted Dong Ding) reads
+   **"holding well — ages rather than fades," never "at its freshest."** A **white / pu-erh** reads
+   age-friendly too. This is the sticky-rice fix — verify on a real roasted oolong vs a real green.
+3. **The Home doors land on the tea page, scrolled.** When the lead insight is **freshness** or
+   **haven't-reached-for**, tapping it opens **that tea's page scrolled to** the Freshness / Why section (not
+   Insights). Back returns to Insights.
+4. *(Caveat, expected)* an unmatched "sticky-rice oolong" not in the catalog still reads fresh-window — it
+   needs a catalog row (STATE backlog), not a bug.
+
+---
+
 ## v4.34 · reflection Slice B1 — tea-detail re-dressed to the spine  *(on device, post-deploy)*
 
 A pure re-dress (containers, same content); render is vm-covered (render-smoke renders `viewTeaDetail`

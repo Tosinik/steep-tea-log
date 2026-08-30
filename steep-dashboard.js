@@ -917,7 +917,9 @@ const REFLECT_ROUTE = {
   'palate-lean':   {view:'palate', focus:'families'},
   'highest-rated': {view:'palate', focus:'rated'},
   'morning-truth': {view:'ritual', focus:'clock'},
-  'temps':         {view:'ritual', focus:'temps'}
+  'temps':         {view:'ritual', focus:'temps'},
+  'freshness':     {view:'tea-detail', focus:'freshness'},   // R173 (B2) — lands on the tea's Freshness section
+  'haven-t':       {view:'tea-detail', focus:'why'}          // R173 (B2) — lands on the tea's Why-you-like-it section
 };
 function reflectRouteForInsight(li){ return (li && REFLECT_ROUTE[li.type]) || null; }
 
@@ -934,7 +936,13 @@ function leadDoorHTML(){
     const tea = li.teaId ? teaById(li.teaId) : null;
     const sw = tea ? `<span ${swatchAttr('lead-door-swatch', liquorFor(tea), (tea.type||'').toLowerCase())}></span>` : '';
     const route = reflectRouteForInsight(li);
-    const go = route ? `openReflection('${route.view}','${route.focus}')` : `goView('insights')`;
+    // R173 (B2): tea-page routes (freshness, haven-t) carry the tea's id so the deep-link lands on THAT
+    // tea's page, scrolled to the section; openReflection sets teaDetailFrom='insights' so Back returns here.
+    const go = route
+      ? (route.view==='tea-detail'
+          ? `openReflection('tea-detail','${route.focus}','${escapeJsArg(li.teaId||'')}')`
+          : `openReflection('${route.view}','${route.focus}')`)
+      : `goView('insights')`;
     return `<div class="lead-door" onclick="${go}" role="button" tabindex="0" aria-label="See why, on Insights">
       ${sw}
       <div class="lead-door-body">

@@ -1044,6 +1044,41 @@ function teaProvenanceHTML(t, costPerSession){
   // R177: returns bare content — viewTeaDetail's tdSec provides the "Where this came from" RULE header.
   return `<div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>${t.image?`<div class="tea-label-note">The photo is the label — evidence for where it came from, never the tea's identity.</div>`:''}`;
 }
+// R173 (B2) — the palate connection: why THIS tea, for YOU. The tea's traits (type, roast) crossed with your
+// favourites + highly-rated teas (behaviour × character; type/rating reliable now, flavour-grain later —
+// never a claim it can't support). Anchors #reflect-why (the haven't-reached-for door lands here). Graceful:
+// too little palate signal → '', and the curated character above it stands alone.
+function teaWhyHTML(t){
+  if(!t) return '';
+  const mine = (state.teas||[]).filter(x=>x && x.id!==t.id && (x.isFavorite || Number(x.rating)>=4));
+  if(mine.length < 2) return '';
+  const roastOf = x => { const r = (typeof matchTeaType==='function') && matchTeaType(x.name); return r ? String(r.roast||'') : ''; };
+  const bits = [];
+  if(mine.filter(x=>x.type===t.type).length >= 2) bits.push(`You keep reaching for ${typeLabel(t.type).toLowerCase()} — this is one of them.`);
+  if(/medium|heavy/.test(roastOf(t)) && mine.filter(x=>/medium|heavy/.test(roastOf(x))).length >= 2) bits.push(`Your favourites lean toward roasted teas, like this one.`);
+  if(!bits.length) return '';
+  return `<div id="reflect-why" class="td-why"><div class="eyebrow">Why you like it</div><div class="td-why-line">${escapeHtml(bits[0])}</div></div>`;
+}
+// R173 (B2) — the type-aware freshness reading (SPEC §7). Reads freshnessReading, which is type-aware via
+// ttFreshness (incl. the R173 oolong-by-roast fix). Framing FITS the type: fade-fast → peak/urgency;
+// age-friendly (white, pu-erh, roasted oolong) → holding/stable, never drink-fresh urgency. Anchors
+// #reflect-freshness (the freshness door lands here). Age-friendly reads even without a date (statusLine precedent).
+function teaFreshnessHTML(t){
+  const fr = (typeof freshnessReading==='function') ? freshnessReading(t) : null;
+  const win = (typeof ttFreshness==='function') ? ttFreshness(t) : null;
+  if(!fr){
+    if(win && win.ageing) return `<div class="td-fresh">This kind of tea ages rather than fades — no rush.</div>`;
+    return '';
+  }
+  const since = fr.days!=null ? `${fmtSoftDays(fr.days).replace(/^~/,'')} since ${fr.measured?'opened':'harvested'}` : '';
+  if(fr.ageing) return `<div class="td-fresh">Holding well — this kind of tea ages rather than fades.${since?` <span class="ins-cap">${since}.</span>`:''}</div>`;
+  if(fr.grounded){
+    if(fr.leftDays > fr.totalDays/2) return `<div class="td-fresh">At its peak — plenty of its fresh window still ahead.</div>`;
+    if(fr.leftDays >= 7) return `<div class="td-fresh">Best within ${fmtSoftDays(fr.leftDays).replace(/^~/,'')} — a fresh-window tea; drink it while it's bright.</div>`;
+    return `<div class="td-fresh">Best enjoyed soon — near the end of its fresh window.</div>`;
+  }
+  return since ? `<div class="td-fresh ins-cap">${since}.</div>` : '';
+}
 /* R55's offer, and the ONLY new affordance on this field — R56 rules out a suggestion list, so the
    input stays free text with no `list=`. The rule lives in `originOffer` (steep-passport.js, the
    Origins home per R66); this is just its card. Absent, not disabled, when there is nothing to
@@ -1214,10 +1249,10 @@ function viewTeaDetail(){
   // character line) and a Freshness section (#reflect-freshness) after Brewing — structure left ready.
   const onHandBody = `<div style="font-size:14px;${isRunningLow(t)?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>${cupsLine}${forecastLine(t)}${inventorySparkline(t) || sparklineHintHTML(t)}`;
   const descBody = t.description?`<div style="margin-top:14px;font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div>`:'';
-  const secChar = [teaCharacterHTML(t), flavorProfileHTML(t), descBody].filter(Boolean).join('');
+  const secChar = [teaCharacterHTML(t), teaWhyHTML(t), flavorProfileHTML(t), descBody].filter(Boolean).join('');   // B2: #reflect-why after the character line
   const secBrew = [t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t), teaBrewAdviceHTML(t)].filter(Boolean).join('');
   const secProv = teaProvenanceHTML(t, costPerSession);
-  const tdSec = (title, body) => body ? `<div class="td-sec"><div class="td-sechead rule-head"><span class="eyebrow">${title}</span></div>${body}</div>` : '';
+  const tdSec = (title, body, id) => body ? `<div class="td-sec"${id?` id="${id}"`:''}><div class="td-sechead rule-head"><span class="eyebrow">${title}</span></div>${body}</div>` : '';
   return `
     <div class="detail-head">
       <button class="detail-back" onclick="goView('${back.v}')">← Back to ${back.l}</button>
@@ -1240,6 +1275,7 @@ function viewTeaDetail(){
     ${tdSec('Character', secChar)}
     ${tdSec('On hand', onHandBody)}
     ${tdSec('Brewing', secBrew)}
+    ${tdSec('Freshness', teaFreshnessHTML(t), 'reflect-freshness')}
     ${tdSec('Where this came from', secProv)}
     <div class="td-slab-row">
       <button class="btn-clay" onclick="startSessionFor('${t.id}')">Start session</button>

@@ -1199,6 +1199,10 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .td-sec{margin-top:18px;} /* RULE section wrapper — grouping only, no fill/border/radius. */
 .td-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;} /* section header; the 2px ink rule comes from .rule-head. */
 .td-slab-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;} /* the one clay SLAB (Start session) + ghost Edit. */
+/* R173 (B2) — why-you-like-it + freshness content: spine-content (ink, no fill/border/radius → fence untouched). */
+.td-why{margin-top:14px;}
+.td-why-line{font-size:13.5px;color:var(--ink);line-height:1.5;}
+.td-fresh{font-size:13.5px;color:var(--ink);line-height:1.5;}
 
 /* ===== slice C — #12 quick log + #04 strip ===== */
 .when-chips{display:flex;flex-wrap:wrap;gap:7px;}
