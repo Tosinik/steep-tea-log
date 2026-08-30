@@ -1,12 +1,40 @@
 # Spec — Brew advice v3: per-steep feedback (the A2 capture control)
 
-Status: **DECIDED — ready to build** (planning lane, claude.ai, 2026-07-16). Reviewed
-slice-by-slice; this is the committable spec a later Code session implements. Covers
-issues **#15 + #9** (the A2 feedback control).
+Status: **MODEL REOPENED before build (2026-08-30).** The *engineering* was decided/ready
+(planning lane, claude.ai, 2026-07-16, reviewed slice-by-slice) and stays reusable; the
+**feedback model** must be reworked first — see "Model critique — REOPEN before build" below.
+Covers issues **#15 + #9** (the A2 feedback control).
 
 Extends only the **feedback** layer of the tuning stack `base → ratio → feedback →
 timeShift`. The ratio axis (`SPEC-brew-advice-v2.md`, shipped v3.85) is untouched.
 Source of truth for the rulings: `PHASE2-PRESPEC-NOTES.md` §A + the Tea-First Principle.
+
+## Model critique — REOPEN before build
+
+> **Added 2026-08-30 (review).** The "ready to build" that this spec once carried holds for the
+> **engineering**, not the **feedback model**. Before any implementation, the model must be reworked —
+> three gaps surfaced in review, each of which would ship a *wrong* correction:
+>
+> **(a) The single strength axis conflates two different things.** `good / strong / weak` collapses
+> **intensity** (how strong the cup is) with **over-extraction character** (bitterness / astringency) — but
+> these want *different levers*: **temperature** for astringency, **leaf amount** for intensity, **time** for
+> extraction. A one-axis tap can't tell the engine which lever to move, so it will move the wrong one. The
+> **capture itself** must distinguish intensity from bitterness/astringency, not just the engine.
+>
+> **(b) Net-verdict reduction is shape-blind.** Reducing a session to one verdict (the shipped Fork 2 = A)
+> ignores that a real gongfu schedule is a **shape**: a by-design-light **opening** steep tapped "too weak"
+> would wrongly lengthen the **whole** schedule. **Shape-awareness (the shelved Fork 2 = B) is not optional**
+> given the gongfu schedules actually on the shelf — it is required, not a later nicety.
+>
+> **(c) No time-deviation re-flow.** When the user brews a steep **off** the suggested time, the rest of the
+> guide should **adapt** to what they actually did. Neither v2 (ratio-only) nor this v3 spec covers this —
+> the guide stays fixed while the session diverges from it.
+>
+> **What stays.** The **engineering foundation is sound and reusable**: the data model (§1), the aggregation
+> ladder (§2), the capture UX (§3), and the Tea-First quietness (the load-bearing constraint). It is the
+> **feedback model** — the axis, the net-verdict reduction, the absence of time re-flow — that reopens.
+> Rebuild the model on this foundation; do **not** discard the foundation. The sections below describe the
+> *engineering* as decided; read them through this critique until the model is re-specced.
 
 ## Ruled decisions this spec builds from
 

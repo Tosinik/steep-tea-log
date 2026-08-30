@@ -105,6 +105,32 @@ Since v3.27 the app shows a "new version — Refresh" banner when a new SW insta
 longer need a manual hard reload (dev still should, to verify). The SW waits for that tap now.
 
 ## Continue here
+
+**ROADMAP — the current ordered forward plan (2026-08-30).** The R5 spine + warmth pass is landed through
+v4.30 (reflection Slice A live). What's next, in order — captured so nothing is lost:
+
+1. **Reflection Slice B — parts 1 & 2 only:** *why-this-tea* (palate-connected) + *freshness* (type-aware,
+   folds in the freshness-framing backlog fix). **Part 3 (the earned brew guide) has MOVED to the brew-advice
+   cluster (#4)** — it's the reflective view of the tuning, not standalone.
+2. **Reflection Slice C:** terroir + teas-over-time.
+3. **Freshness research pass** *(independent)* — verify/refine freshness-by-type against the reference work
+   (Gascoyne et al.), not a blunt "greens fresh / oolongs stable"; feeds the Slice-B freshness fix.
+4. **Brew-advice cluster** — the v2 **ratio axis is SHIPPED (v3.85)**; **v3 feedback is specced-not-built and
+   its MODEL needs a rethink before building** (see `SPEC-brew-advice-v3-feedback.md` → "Model critique —
+   REOPEN before build"). Includes the **earned brew guide** (the reflective view of the tuning) +
+   **guided-discovery framing** (experimental).
+5. **Go Deeper / tea-reference redesign** — a tea opens a proper **detail screen** (not an inline-collapsing
+   list entry); expand the sparse reference. **Converges with the Slice-B tea-detail screen.**
+6. **Tasting input** — the "What are you tasting?" tags (partly live) + the guided tasting mode
+   (`IDEA-tasting-mode.md`).
+7. **Full codebase/docs audit** — bloat, stubs, forgotten deferrals, stale docs, ranked next-work. (The
+   brew-advice pile in #4 is a preview of what it will surface.)
+8. **Matcha mode** (contained). **Label scanner — deferred.**
+9. **Parked backlog** (unchanged): freshness-framing fix (folds into Slice B #1), masthead session-start,
+   stale-override reset, Favourites default order, liquor-ramp-too-thin.
+10. **Security gate F1/F2** — the pre-widening blocker, before anyone but Niklas logs in / the
+    Datenschutzerklärung goes live.
+
 **The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16 →
 v3.83 audit riders → v3.84 interim sort → v3.85 #24+#29 water/word fixes (**all SHIPPED**, below).
 **Next up (ruled 2026-07-13): v3.86 stock-tier slice** — #26 options A+B+C (empty in the tallies ·
@@ -216,9 +242,11 @@ they wear the Insights spine (`.band`/`.reflect-band` masthead + `.ins-sec` RULE
 - **ON DEVICE (`smoke.md §v4.30`)** — does the Home door land **on the section, scrolled**; are the Insights
   sections doors (type-mix→palate, clock→ritual); do ritual/palate read as spine surfaces; does Back return to
   Insights (no dead-end/loop)?
-- **NEXT — reflection Slice B** (per-tea + the earned brew guide, **R173**), then Slice C (terroir +
-  teas-over-time, **R174**). Also queued: run the §v4.29/§v4.30 on-device checks on the **live** site
-  (post-deploy), fix-forward if any fail. **SECURITY stays the deferred pre-widening gate.**
+- **NEXT — reflection Slice B: why-this-tea + freshness (parts 1 & 2 only)** — the earned brew guide moved
+  to the brew-advice cluster; freshness folds in the freshness-framing fix and rides the freshness research
+  pass. See the **ROADMAP** at the top of "Continue here" for the full ordered plan. Also queued: run the
+  §v4.29/§v4.30 on-device checks on the **live** site (post-deploy), fix-forward if any fail. **SECURITY
+  stays the deferred pre-widening gate.**
 
 **Previously — v4.29 LIVE `37f43a7` — R5 warmth pass: the swatch follow-on (R171)** (cache **v139**,
 APP_VERSION v4.29, **no SQL**). The follow-on R170 named: the tea's own colour reaches the last three utility
