@@ -46,6 +46,48 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.35 — reflection Slice B2: the tea's page — why + type-aware freshness — R173
+Deploy: steep-teas.js, steep-tea-types.js, steep-dashboard.js, steep-core.js, styles.css, service-worker.js
+(**v145**), steep-version.js (APP_VERSION v4.35 + WHATS_NEW), fixtures/reflection-test.js, smoke.md. **No SQL.**
+*(Docs — CHANGELOG.md, STATE.md (incl. the roadmap reorder), R3-RULINGS-LEDGER.md R173 — push with this
+deploy. B2 completes reflection Slice B, riding B1's re-dressed frame.)*
+
+The reflection content on B1's frame — **why you like this tea** and **how fresh it is, framed for its type**.
+The lead-insight door's last two unmapped types now land here.
+
+- **Why this tea** (`teaWhyHTML`, `#reflect-why` in the Character section) — the palate connection: the tea's
+  traits (type, roast) crossed with your **favourites + highly-rated teas** → *"You keep reaching for oolong —
+  this is one of them"* / *"Your favourites lean toward roasted teas, like this one."* Baseline: behaviour ×
+  character, **type/rating reliable now** (flavour-grain deepens with the tasting-input work — no claim it
+  can't support). Graceful — too little palate signal → absent, the curated character stands alone.
+- **Type-aware freshness** (`teaFreshnessHTML`, `#reflect-freshness` after Brewing) — the reading's **framing
+  fits the type**: fade-fast (greens) → peak/urgency ("at its peak" / "best within N"); age-friendly (white,
+  pu-erh, roasted oolong) → **holding/stable** ("holding well — ages rather than fades"), never drink-fresh
+  urgency.
+- **The `ttFreshness` oolong-by-roast fix** — the model was designed to "widen with roast, per tea"
+  (steep-teas.js:10) but oolong was one `ageing:false` family. Now a **medium/heavy-roast oolong** (Wuyi
+  yancha + its members, roasted Dong Ding — read from the catalog `roast` field) is **age-friendly**;
+  light/floral (none/none-light/variable) stays fresh-window. **This corrects the reading, the Home freshness
+  insight, and `statusLine` at once** (all consult `ttFreshness`) — the fix for "a roasted oolong told it's at
+  its freshest." *(Reaches catalog-matched teas; an unmatched "sticky-rice oolong" still needs a catalog row —
+  STATE backlog.)*
+- **Deep-link landings** — `REFLECT_ROUTE`: freshness → {tea-detail, freshness}, haven-t → {tea-detail, why};
+  `leadDoorHTML` passes `li.teaId` for tea-detail routes; `openReflection` sets `teaDetailFrom='insights'` so
+  Back returns to Insights; the render-tail one-shot scroll hits the anchors. **The last two unmapped lead
+  types now land** (freshness + haven't-reached-for → the tea's page, scrolled).
+- **Fence:** the why/freshness are spine-content (`.td-why`/`.td-fresh`, ink, no fill) — **frame-test 40,
+  unchanged**. `reflection-test`: §B routing updated (freshness/haven-t now mapped + the teaId branch) + §J
+  (the ttFreshness roast unit, the green-vs-roasted-oolong reading split, the palate connection). **36
+  committed suites + v4 fixture green.** On-device: `smoke.md §v4.35`.
+
+Also (same doc-sweep, bundled): **STATE roadmap reordered** — 1 Reflection B (done) · 2 Slice C · **3 the
+audit, moved up** (a read → a ranked backlog that informs the feature order) · 4 features prioritised by the
+audit · 5 brew-advice Stage 2 (data-gated, floats). Security F1/F2 flagged as a **hard pre-widening gate, not
+a backlog item.**
+
+Ruling: **R173** (the tea's page — why-this-tea palate-connected + type-aware freshness incl. the
+oolong-by-roast fix + the two deep-link landings). Reflection Slice B complete.
+
 ## v4.34 — reflection Slice B1: tea-detail re-dressed to the spine (BAND + RULE + one SLAB) — R177
 Deploy: steep-teas.js, styles.css, service-worker.js (**v144**), steep-version.js (APP_VERSION v4.34 +
 WHATS_NEW), fixtures/frame-test.js, fixtures/liquor-test.js, smoke.md. **No SQL.** *(Docs — CHANGELOG.md,

@@ -106,40 +106,32 @@ longer need a manual hard reload (dev still should, to verify). The SW waits for
 
 ## Continue here
 
-**ROADMAP — the current ordered forward plan (2026-08-30).** The R5 spine + warmth pass is landed through
-v4.30 (reflection Slice A live). What's next, in order — captured so nothing is lost:
+**ROADMAP — the current ordered forward plan (reordered 2026-08-30, v4.35).** The R5 spine + warmth pass is
+landed; reflection Slices A + B are done. What's next, in order:
 
-1. **Reflection Slice B — parts 1 & 2:** *why-this-tea* (palate-connected) + *freshness* (type-aware, folds in
-   the freshness-framing fix). **B1 (R177, v4.34) SHIPPED** — the full tea-detail spine + warm re-dress (BAND
-   masthead + RULE sections + one clay SLAB, containers only). **NEXT: B2 (R173)** — the why + freshness
-   content on that frame (`teaWhyHTML`; `ttFreshness` roast-awareness — the oolong-by-roast data fix; the
-   deep-link routes freshness→tea-detail/freshness + haven-t→tea-detail/why). **Part 3 (the earned brew guide)
-   MOVED to the brew-advice cluster (#4).**
-2. **Reflection Slice C:** terroir + teas-over-time.
-3. **Freshness research pass** *(independent)* — verify/refine freshness-by-type against the reference work
-   (Gascoyne et al.), not a blunt "greens fresh / oolongs stable"; feeds the Slice-B freshness fix.
-4. **Brew-advice cluster** — v2 **ratio axis SHIPPED (v3.85)**. The v3 feedback model was reopened and
-   **replaced by `SPEC-brew-advice-v4.md`** (character-based, context-gated). **v4 Stage 1 COMPLETE** — Slice 1
-   (R175, v4.31: the diagnosis engine dormant) + Slice 2 (R176, v4.32: the five-tap capture + the diagnosis
-   surfacing, experiment-framed + the role-aware `timeShift`; the reducer moved to the character model). **NEXT:
-   Stage 2** (learned per-tea time adaptation + science-prior→preference) — **post-gate** (needs the feedback'd
-   sessions Stage 1 collects, the ~15-session gate). Includes the **earned brew guide** (reflective view) +
-   **guided-discovery framing** (experimental).
-5. **Go Deeper / tea-reference redesign** — a tea opens a proper **detail screen** (not an inline-collapsing
-   list entry); expand the sparse reference. **Converges with the Slice-B tea-detail screen.**
-6. **Tasting input** — the "What are you tasting?" tags (partly live) + the guided tasting mode
-   (`IDEA-tasting-mode.md`).
-7. **Full codebase/docs audit** — bloat, stubs, forgotten deferrals, stale docs, ranked next-work. (The
-   brew-advice pile in #4 is a preview of what it will surface.)
-8. **Matcha mode** (contained). **Label scanner — deferred.**
-9. **Parked backlog**: freshness-framing fix (folds into Slice B #1), masthead session-start, stale-override
-   reset, Favourites default order, liquor-ramp-too-thin; **senchadō ratio-seed reachability** (a v2-ratio
-   task, split out of brew-advice v4 Slice 1 R175) — the decorative `senchado:2.8` in `LEAF_RATIO_DEFAULT`
-   (steep-core.js) is unreachable because the KB tier in `baselineRatioFor` resolves every JP green to
-   `kb.ratioGongfu` first; the gyokuro revisit needs senchadō **ratios in the KB** (`ratioSenchado`), not the
-   decorative seed. (v4 Stage 1 added senchadō's diagnosis *shape* to the KB, not its ratios — deliberately.)
-10. **Security gate F1/F2** — the pre-widening blocker, before anyone but Niklas logs in / the
-    Datenschutzerklärung goes live.
+1. **Reflection Slice B — DONE.** B1 (R177, v4.34: the full tea-detail spine + warm re-dress) + B2 (R173,
+   v4.35: why-this-tea palate-connected + type-aware freshness incl. the oolong-by-roast fix + the
+   freshness/haven-t deep-link landings). *(The earned brew guide R173 first reserved moved to brew-advice v4,
+   R175/R176.)*
+2. **Reflection Slice C (R174):** terroir + teas-over-time — the last reflection views.
+3. **The full codebase/docs audit** *(moved up — after the reflection, before features)*: bloat, stubs,
+   forgotten deferrals, stale docs → a **ranked backlog that INFORMS the feature order below**. A read first,
+   so features are prioritised by what the audit surfaces, not by memory. (The brew-advice pile was a preview.)
+4. **Features, prioritised by the audit:** Go Deeper / tea-reference redesign · tasting input (the
+   "What are you tasting?" tags — partly live — + the guided tasting mode, `IDEA-tasting-mode.md`) · matcha
+   mode (contained). **Backlog the audit ranks into this:** ~~freshness-framing fix~~ **DONE in B2**; the
+   **sticky-rice catalog row** (an unmatched roasted oolong still defaults to the oolong family — B2's roast
+   fix reaches catalog-matched teas only); a **vendor picker**; masthead session-start; stale-override reset;
+   Favourites default order; liquor-ramp-too-thin; the **senchadō ratio-seed reachability** (a v2-ratio task —
+   `senchado:2.8` in `LEAF_RATIO_DEFAULT` is unreachable; the gyokuro revisit needs `ratioSenchado` in the KB).
+   Label scanner — deferred.
+5. **Brew-advice Stage 2** — learned per-tea time adaptation + science-prior→preference (+ the earned brew
+   guide, guided-discovery framing). **Data-gated — floats to whenever the feedback gate fills** (the
+   ~15-session gate; the v4 five-tap capture now feeds it with the richer vocabulary).
+
+**SECURITY — F1/F2 is a HARD pre-widening GATE, not a backlog item.** The security fixes MUST land before
+anyone but Niklas logs in / the Datenschutzerklärung goes live — it blocks widening regardless of where the
+feature roadmap stands.
 
 **The work queue (post-R2 issues, decided order):** v3.79 #13 → v3.80 #19/#20 → v3.81 #18 → v3.82 #16 →
 v3.83 audit riders → v3.84 interim sort → v3.85 #24+#29 water/word fixes (**all SHIPPED**, below).
@@ -227,7 +219,29 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.34 LIVE `68979db` — reflection Slice B1: tea-detail re-dressed to the spine (R177)** (cache
+**NOW — v4.35 LIVE `d0a994d` — reflection Slice B2: the tea's page, why + type-aware freshness (R173)** (cache
+**v145**, APP_VERSION v4.35, **no SQL**). The reflection content on B1's re-dressed frame — **Reflection Slice
+B complete.**
+- **Why this tea** (`teaWhyHTML`, `#reflect-why` in Character): the palate connection — the tea's traits
+  (type, roast) × your favourites + highly-rated teas ("You keep reaching for oolong — this is one of them").
+  Type/rating reliable now; graceful (too little signal → the curated character alone).
+- **Type-aware freshness** (`teaFreshnessHTML`, `#reflect-freshness` after Brewing): framing fits the type —
+  fade-fast (greens) → peak/urgency; age-friendly (white/pu-erh/roasted oolong) → holding, never "freshest".
+- **The `ttFreshness` oolong-by-roast fix** — a medium/heavy-roast oolong (catalog `roast` field) is now
+  age-friendly; corrects the reading + the Home freshness insight + `statusLine` at once. (Catalog-matched; an
+  unmatched sticky-rice oolong needs a catalog row — backlog.)
+- **Deep-link landings** — freshness → tea-detail/freshness, haven-t → tea-detail/why (`REFLECT_ROUTE` +
+  `leadDoorHTML` teaId + `openReflection` `teaDetailFrom='insights'`). **The last two unmapped lead types now
+  land**, scrolled.
+- **Fence:** why/freshness are spine-content (`.td-why`/`.td-fresh`, ink) — **frame-test 40 unchanged**.
+  `reflection-test` §B + §J. **36 committed suites + v4 fixture green.** Ledger **R173**.
+- **ON DEVICE (`smoke.md §v4.35`, post-deploy)** — the why reads as a palate connection; a roasted oolong
+  reads "holding," never "freshest"; a green reads drink-fresh; the Home freshness + haven't doors land on the
+  tea page, scrolled.
+- **NEXT — reflection Slice C (R174)** (terroir + teas-over-time), then **the audit** (see the reordered
+  ROADMAP at the top of "Continue here"). **SECURITY F1/F2 is a hard pre-widening gate.**
+
+**Previously — v4.34 LIVE `68979db` — reflection Slice B1: tea-detail re-dressed to the spine (R177)** (cache
 **v144**, APP_VERSION v4.34, **no SQL**). The **last major surface** joins the R5 spine — `viewTeaDetail`
 re-dressed to a BAND masthead + RULE sections + one clay SLAB, on the session-detail precedent.
 **Containers only — same content, re-framed** (no content logic; the why + freshness is B2/R173).
@@ -243,9 +257,8 @@ re-dressed to a BAND masthead + RULE sections + one clay SLAB, on the session-de
   10→11. **36 committed suites + v4 fixture green.** Ledger **R177**.
 - **ON DEVICE (`smoke.md §v4.34`, post-deploy)** — reads as a warm spine surface (BAND + RULE + one slab);
   **the photo thumb — does it read or want the hero back** (the one visual call); nothing broke.
-- **NEXT — reflection Slice B2 (R173): the why + freshness content on this frame** (`teaWhyHTML`; the
-  `ttFreshness` oolong-by-roast fix; the two deep-link landings). **SECURITY stays the deferred pre-widening
-  gate.**
+- ~~**NEXT — reflection Slice B2 (R173): the why + freshness content**~~ **SHIPPED v4.35 (R173)** — see the
+  NOW block. Reflection Slice B complete.
 
 **Previously — v4.33 LIVE `7e674ca` — fix-forward: v4 pour-feedback surfacing (two bugs, R176 addendum)** (cache
 **v143**, APP_VERSION v4.33, **no SQL**). Both content/render, fence unaffected. (1) **The "change" button

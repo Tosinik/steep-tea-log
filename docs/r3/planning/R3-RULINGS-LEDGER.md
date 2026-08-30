@@ -2410,6 +2410,30 @@ Brewing). Fence: `SURFACES.teaDetail = ['.td-band','.td-sec','.td-sechead']` + a
 `suggestedBrewHTML` de-card + `teaProvenanceHTML` strip; styles.css `.td-*`. On-device: smoke.md §v4.34 — the
 read + the photo thumb-vs-hero call. **B2 (R173) — why + freshness — rides this frame.**)*
 
+**R173 — the tea's page: why-this-tea (palate-connected) + type-aware freshness + the two deep-link landings.**
+R5 (v4.35, reflection Slice B2; `docs/r5/planning/REFLECTION-SPEC.md` "each tea's page"). The content on B1's
+re-dressed frame (R177) — Slice B complete. *(R173 first reserved per-tea + the earned brew guide; the brew
+guide moved to brew-advice v4 (R175/R176), so R173 shrank to why + freshness — as ruled.)* **Why this tea**
+(`teaWhyHTML`, `#reflect-why` in Character): the palate connection — the tea's traits (type, roast) crossed
+with your favourites + highly-rated teas ("You keep reaching for oolong — this is one of them"). Baseline:
+behaviour × character, **type/rating reliable now**, flavour-grain later — never a claim it can't support;
+graceful (too little signal → the curated character alone). **Type-aware freshness** (`teaFreshnessHTML`,
+`#reflect-freshness` after Brewing): the reading's framing FITS the type — fade-fast (greens) → peak/urgency;
+age-friendly (white, pu-erh, roasted oolong) → holding/stable, never drink-fresh urgency. **The `ttFreshness`
+oolong-by-roast fix** realizes the model's design ("widens with roast, per tea", steep-teas.js:10): a
+medium/heavy-roast oolong (Wuyi yancha + inheriting members, roasted Dong Ding — read from the catalog `roast`
+field) is age-friendly; light/floral stays fresh-window — **correcting the reading + the Home freshness
+insight + statusLine at once** (all consult `ttFreshness`); the fix for "a roasted oolong told it's at its
+freshest." (Reaches catalog-matched teas; an unmatched sticky-rice oolong needs a catalog row — STATE
+backlog.) **Deep-link landings:** `REFLECT_ROUTE` freshness → {tea-detail, freshness}, haven-t →
+{tea-detail, why}; `leadDoorHTML` passes `li.teaId` for tea-detail routes; `openReflection` sets
+`teaDetailFrom='insights'` (Back → Insights); the render-tail one-shot scroll hits the anchors — **the last
+two unmapped lead types now land** on the tea's page, scrolled. Fence: why/freshness are spine-content
+(`.td-why`/`.td-fresh`, ink, no fill) — frame-test 40, unchanged. *(steep-teas.js `teaWhyHTML`/
+`teaFreshnessHTML` + viewTeaDetail wiring; steep-tea-types.js `ttFreshness` roast branch; steep-dashboard.js
+`REFLECT_ROUTE` + `leadDoorHTML` teaId; steep-core.js `openReflection` teaDetailFrom; fixtures/reflection-test.js
+§B + §J. On-device: smoke.md §v4.35. **Reflection Slice B complete; Slice C (R174) is next.**)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
