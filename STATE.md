@@ -116,11 +116,11 @@ v4.30 (reflection Slice A live). What's next, in order — captured so nothing i
 3. **Freshness research pass** *(independent)* — verify/refine freshness-by-type against the reference work
    (Gascoyne et al.), not a blunt "greens fresh / oolongs stable"; feeds the Slice-B freshness fix.
 4. **Brew-advice cluster** — v2 **ratio axis SHIPPED (v3.85)**. The v3 feedback model was reopened and
-   **replaced by `SPEC-brew-advice-v4.md`** (character-based, context-gated). **v4 Stage 1 Slice 1 SHIPPED
-   v4.31 (R175)** — the diagnosis engine **dormant + fixture-proven** (`diagnoseFeedback`, `KB_TYPE_SHAPE`/
-   `KB_STYLE_SHAPE`, the `weak→flat` alias, the net-sign retire). **NEXT: Slice 2 (R176)** — the 5-tap capture
-   + the diagnosis surfacing + the role-aware `timeShift`. Then **Stage 2** (learned time adaptation +
-   science-prior→preference, post-gate). Includes the **earned brew guide** (reflective view) +
+   **replaced by `SPEC-brew-advice-v4.md`** (character-based, context-gated). **v4 Stage 1 COMPLETE** — Slice 1
+   (R175, v4.31: the diagnosis engine dormant) + Slice 2 (R176, v4.32: the five-tap capture + the diagnosis
+   surfacing, experiment-framed + the role-aware `timeShift`; the reducer moved to the character model). **NEXT:
+   Stage 2** (learned per-tea time adaptation + science-prior→preference) — **post-gate** (needs the feedback'd
+   sessions Stage 1 collects, the ~15-session gate). Includes the **earned brew guide** (reflective view) +
    **guided-discovery framing** (experimental).
 5. **Go Deeper / tea-reference redesign** — a tea opens a proper **detail screen** (not an inline-collapsing
    list entry); expand the sparse reference. **Converges with the Slice-B tea-detail screen.**
@@ -224,7 +224,30 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.31 LIVE `fc32549` — Brew-advice v4 Stage 1: the context-gated diagnosis engine (dormant) (R175)**
+**NOW — v4.32 LIVE `82435e4` — Brew-advice v4 Stage 1, Slice 2: the five-tap capture + the diagnosis (R176)**
+(cache **v142**, APP_VERSION v4.32, **no SQL**). The deploy where the app **tells you which knob, and why.**
+Wires the dormant Slice-1 engine (R175) to the UI (`SPEC-brew-advice-v4.md` §1/§2/§5), reusing v3's quietness.
+- **Five-tap capture** — per-steep tap + session row widen to `{good, strong, flat, astringent, bitter}` and
+  now write the new enum. Per-steep quietness: **collapsed-faint → expand → recorded-marker** (never five open
+  chip-rows), method-gated (gongfu/senchadō), Tea-First.
+- **Diagnosis surfacing** — tap → `diagnoseFeedback` → **one lever + a mechanism, as an experiment, never a
+  verdict**; quiet on the tap, fuller **"Your last cup"** on the tea page (`teaBrewAdviceHTML`). Spine-content,
+  no new BOX.
+- **Role-aware `timeShift`** — astringent/bitter → shorten next (−); flat on a by-design-light opening steep →
+  extend next (+); strong / flat-elsewhere → advice only. **Water/freshness pre-check** for flat (§6).
+- **Reducer → character model** (consequence): `reduceSteepFeedback`/`feedbackSignalOf` return the dominant
+  character (weak→flat alias), feeding the count-memory + tea-page line; the per-tap advice reads the raw tap.
+- **Fence:** `.pour-*` advice/affordance classes are spine-content (no fill/border/radius) → no `SURFACES`
+  entry, **frame-test 36 green**. Suites: `brew-advice-v4-test` 30→**41** (render wiring + timeShift),
+  `brew-feedback-test` §A–F character model, `focus-test` §C. **36 committed suites + v4 green.** Ledger **R176**.
+- **ON DEVICE (`smoke.md §v4.32`, post-deploy — the real gate)** — the 5-tap reads quiet + method-gated; the
+  advice reads as an experiment not a verdict, right lever per context; the by-design-light opening case says
+  "extend next / poured off too fast", never "add leaf"; flat surfaces the water check first.
+- **NEXT — Stage 2 (post-gate): learned per-tea time adaptation + science-prior→preference** (needs the ~15
+  feedback'd sessions Stage 1 collects). Also queued: **reflection Slice B** (roadmap #1). **SECURITY stays the
+  deferred pre-widening gate.**
+
+**Previously — v4.31 LIVE `fc32549` — Brew-advice v4 Stage 1: the context-gated diagnosis engine (dormant) (R175)**
 (cache **v141**, APP_VERSION v4.31, **no SQL**). Slice 1 of 2 of the v4 rework (`SPEC-brew-advice-v4.md`): the
 **feedback model** is replaced, the **engineering reused** (v3 §8). Engine ships **dormant + fixture-proven** —
 the capture still writes the old 3-tap, nothing writes the new enum yet (dormant-engine-first, cf. tea-types
@@ -247,9 +270,8 @@ v3.87 / lead-insight v4.27). Slice 2 (R176) wires the 5-tap capture + surfacing.
 - **ON DEVICE (`smoke.md §v4.31`, post-deploy)** — the setup preview reads right without the "Your tuning"
   segment (Guide/Off, counts shown, no "suggests"/"landing well"); per-steep taps still record; nothing
   brewing breaks.
-- **NEXT — Slice 2 (R176): the 5-tap capture + the diagnosis surfacing + the role-aware `timeShift`.**
-  (Reflection Slice B is also queued — whichever builds next takes v4.32.) **SECURITY stays the deferred
-  pre-widening gate.**
+- ~~**NEXT — Slice 2 (R176): the 5-tap capture + the diagnosis surfacing + the role-aware `timeShift`.**~~
+  **SHIPPED v4.32 (R176)** — see the NOW block. Stage 1 complete; Stage 2 is post-gate.
 
 **Previously — v4.30 LIVE `08ac1b4` (with v4.29 `37f43a7`), pushed — on-device checks (`smoke.md §v4.29/§v4.30`) run
 **post-deploy** (a live PWA can't exercise the SW / real scroll / touch before it's served; the "before push"

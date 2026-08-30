@@ -2356,6 +2356,29 @@ consumers degrade gracefully (no "Your tuning" segment until Slice 2). Learned p
 `typeMinTemp` + the `computeBrewAdvice` retire; steep-sessions.js the memory line; fixtures/brew-advice-v4-test.js
 (30) + brew-feedback-test §G rewritten. On-device: smoke.md §v4.31. Slice 2 mints **R176**.)*
 
+**R176 — brew-advice v4 Stage 1, Slice 2: the five-tap capture + the diagnosis surfacing (the app tells you
+which knob, and why).** Brew round (v4.32; `SPEC-brew-advice-v4.md` §1/§2/§5, reusing v3's §3 quietness).
+Wires the dormant Slice-1 engine (R175) to the UI. **Capture:** the per-steep tap and the session-level row
+widen to the five-tap character set `{good, strong, flat, astringent, bitter}` (astringent ≠ bitter, separate
+by design) and now write the new enum. Per-steep quietness is **collapsed-faint → expand-on-tap →
+recorded-marker** ("five faint markers, never five open chip-rows"), method-gated to gongfu/senchadō
+(`steepFbActive`, unchanged), Tea-First. **Surfacing:** the tap → `diagnoseFeedback` → **one lever + a
+one-line mechanism, framed as an experiment, never a verdict** ("Next time, try cooler first, then shorter —
+hot water pulls the drying tannins…"); a quiet reason on the tap, the fuller **"Your last cup"** on the tea
+page (`teaBrewAdviceHTML`). It is **spine-content** — a plain teaching line, no new BOX, no verdict card; the
+capture reuses `.lib-chip` and the advice classes carry no fill/border/radius, so **the fence is untouched
+(frame-test 36, green)**. **Role-aware `timeShift`:** over-extraction (astringent/bitter) shortens the next
+pour; a by-design-light opening steep tapped flat extends it; strong / flat-elsewhere advise only. **Water
+pre-check** (§6): flat routes through water/stale-leaf before temp/time. **Consequence — the reducer moves to
+the v4 character model:** `reduceSteepFeedback` / `feedbackSignalOf` return the dominant character (was
+net-sign; most-frequent, tie→most-actionable, `weak`→`flat` alias), feeding the count-memory tally + the
+tea-page line; the per-tap advice reads the raw tap. *(steep-sessions.js `d_nudgeNextSteep`/`brewNudgeRowHTML`/
+`feedbackRowHTML`/`pourAdviceCtx`/`pourAdviceHTML`/`d_openPourFb`/`STEEP_FB_LABELS`; steep-core.js the
+character reducer + `computeBrewAdvice` tally + `adviceMemoryText`; steep-teas.js `teaBrewAdviceHTML`;
+styles.css `.pour-*`. Fixtures: brew-advice-v4-test §I (render wiring + timeShift, 30→41), brew-feedback-test
+§A–F character model, focus-test §C. On-device: smoke.md §v4.32 — the real gate. **Stage 1 complete; Stage 2
+(learned time adaptation + preference) is post-gate.**)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

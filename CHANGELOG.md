@@ -46,6 +46,44 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.32 — Brew-advice v4 Stage 1, Slice 2: the five-tap capture + the diagnosis surfacing — R176
+Deploy: steep-core.js, steep-sessions.js, steep-teas.js, styles.css, service-worker.js (**v142**),
+steep-version.js (APP_VERSION v4.32 + WHATS_NEW), fixtures/brew-advice-v4-test.js, fixtures/brew-feedback-test.js,
+fixtures/focus-test.js, smoke.md. **No SQL.** *(Docs — CHANGELOG.md, STATE.md, R3-RULINGS-LEDGER.md R176 —
+push with this deploy. Slice 2 wires the dormant Slice-1 engine (v4.31/R175) to the UI; Stage 1 is complete.
+Stage 2 — learned time adaptation + preference — is post-gate.)*
+
+The deploy where the app **starts telling you which knob and why**. Slice 2 wires the dormant diagnosis engine
+(`diagnoseFeedback`, v4.31) to the capture + surfacing (`SPEC-brew-advice-v4.md` §1/§2/§5), reusing v3's
+capture-UX quietness (§3).
+
+- **The five-tap capture** — the per-steep tap and the session-level row widen from the 3-chip set to
+  `{good, strong, flat, astringent, bitter}` (astringent and bitter separate by design). The capture now
+  **writes the new enum**. Per-steep quietness: **collapsed-faint → expand-on-tap → recorded-marker** ("five
+  faint markers, never five open chip-rows"), method-gated to `gongfu`/`senchadō` (`steepFbActive`, unchanged),
+  Tea-First (skippable, zero-feedback complete).
+- **The diagnosis surfacing** — the tap resolves through `diagnoseFeedback(tap, ctx)` to **one lever + a
+  one-line mechanism**, framed as an **experiment, never a verdict** ("Next time, try cooler first, then
+  shorter. Hot water pulls the drying tannins…"). A quiet reason on the tap; the fuller **"Your last cup"** on
+  the tea page (`teaBrewAdviceHTML`). Spine-content — a plain teaching line, no new BOX.
+- **Role-aware `timeShift`** — the ephemeral next-pour nudge: `astringent`/`bitter` → shorten the next (−); a
+  by-design-light gongfu/senchadō **opening** steep tapped `flat` → extend the next (+); `strong` and
+  `flat`-elsewhere → advice only, no mid-brew timer change.
+- **Water/freshness check** (§6) — `flat`/dull routes through the water/stale-leaf pre-check (does the session
+  log water?) before any temp/time lever.
+- **The reducer moves to the v4 character model** (a consequence of the new enum): `reduceSteepFeedback` /
+  `feedbackSignalOf` now return the **dominant character** (was v3's net-sign verdict; most-frequent wins, a
+  tie surfaces the most-actionable, `weak`→`flat` alias), feeding the count-memory tally (v4 vocabulary) and
+  the tea-page "last cup" line. The per-tap *advice* reads the raw tap, not the reducer.
+- **Fence:** the capture chips reuse `.lib-chip`; the advice/affordance classes (`.pour-open`/`.pour-advice`/
+  `.pour-why`/`.pour-redo`/`.pour-note`) are **spine-content — no fill/border/radius**, so no `SURFACES` entry
+  and **frame-test stays 36, green**. Suites: `brew-advice-v4-test` +11 render-wiring/timeShift checks (30→41),
+  `brew-feedback-test` §A–F rewritten to the character model, `focus-test` §C updated (the write is `= kind`,
+  the marker is `✓ <label>`). **36 committed suites + v4 fixture green.** On-device: `smoke.md §v4.32`.
+
+Ruling: **R176** (Slice 2 — the five-tap capture + the diagnosis surfacing, experiment-framed, quiet-on-tap +
+fuller-on-tea-page + the role-aware `timeShift`; the reducer to the character model). Stage 1 complete.
+
 ## v4.31 — Brew-advice v4 Stage 1: the context-gated diagnosis engine (dormant) — R175
 Deploy: steep-knowledge.js, steep-core.js, steep-sessions.js, service-worker.js (**v141**), steep-version.js
 (APP_VERSION v4.31 + WHATS_NEW), **new** fixtures/brew-advice-v4-test.js, fixtures/brew-feedback-test.js,
