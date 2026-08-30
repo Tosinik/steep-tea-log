@@ -376,3 +376,29 @@ function kbResolve(text){
   for(const r in KB_REGIONS){ if(r.length>rlen && text.includes(r)){ country=KB_REGIONS[r]; rlen=r.length; } }
   return { style:styleKey, ...s, country };
 }
+
+/* ================= v4 BREW-ADVICE — the diagnosis SHAPE (Stage 1, R175) =================
+   Reference data the context-gate in diagnoseFeedback (steep-core.js) reads: per tea-TYPE the temperature
+   RANGE + dominant failure mode, and per brew-STYLE the intended progression (SPEC-brew-advice-v4.md §7,
+   grounded in docs/research/brew-extraction-science.md). Temps are °C STARTING POINTS, not constants. This
+   is DIAGNOSIS shape only — NOT ratios: the v2 ratio axis (KB_STYLES ratio/ratioGongfu) is untouched, and
+   the decorative senchadō ratio-seed reachability (LEAF_RATIO_DEFAULT) stays a separate v2-ratio task.
+   DORMANT in Slice 1 — diagnoseFeedback is fixture-called only until Slice 2 wires the capture. */
+const KB_TYPE_SHAPE = {
+  // tempMin/tempMax = the type's usual brewing window; failHot/failCool = the character it drifts to at
+  // each edge (the lever gate uses tempMin as the "already cool → switch temp→time" threshold).
+  green:  { tempMin:70, tempMax:85,  failHot:'astringent', failCool:'flat', note:'catechin-heavy; Japanese greens cooler; harsh/astringent hot, flat cool' },
+  white:  { tempMin:75, tempMax:90,  failHot:'astringent', failCool:'flat', note:'delicate, bud-heavy; easy to under-extract' },
+  yellow: { tempMin:75, tempMax:85,  failHot:'bitter',     failCool:'flat', note:'treat like green; should never be bitter' },
+  oolong: { tempMin:85, tempMax:100, failHot:'astringent', failCool:'flat', note:'light/floral ~85-95 (rolled open slowly, early steeps light by design); dark/roasted ~90-100' },
+  black:  { tempMin:90, tempMax:100, failHot:'astringent', failCool:'flat', note:'robust; astringent/brassy when over-steeped' },
+  puerh:  { tempMin:90, tempMax:100, failHot:'bitter',     failCool:'flat', note:'sheng bitter by nature, flash-steep; shou forgiving ~95-100' }
+};
+const KB_STYLE_SHAPE = {
+  // openingLightByDesign = the shape-awareness gate: a light OPENING steep is intended here, not under-
+  // extraction, so `flat` on it must never say "add leaf" (diagnoseFeedback §3).
+  gongfu:   { openingLightByDesign:true,  shape:'high leaf, many short infusions; opening 1-3 light by design, lengthening across the session' },
+  senchado: { openingLightByDesign:true,  shape:'cool opening, few short pours lengthening slightly — concentrated and gentle',
+              sencha:{ tempMin:70, tempMax:80 }, gyokuro:{ tempMin:50, tempMax:60 } },
+  western:  { openingLightByDesign:false, shape:'one long steep — a light cup here is genuine under-extraction' }
+};

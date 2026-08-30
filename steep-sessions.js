@@ -966,7 +966,10 @@ function brewGuidePreviewHTML(d){
   const seg = `<div class="seg" style="margin-top:10px;">${base?opt('guide','Guide'):''}${(adv&&adv.hasNudge)?opt('tuned','Your tuning'):''}${opt('off','Off')}</div>`;
   const shownSched = d.brewMode==='tuned' ? (adv&&adv.tuned) : base;
   const summary = shownSched ? `<div class="mono" style="font-size:13px;margin-top:2px;">${brewScheduleSummary(shownSched)}</div>` : '';
-  const memory = (adv && adv.count) ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${adviceMemoryText(adv)}${adv.hasNudge?` — suggests ${adviceSuggestionText(adv)}.`:' — landing well; using your guide as-is.'}</div>` : '';
+  // v4 Stage 1 (R175): the net-sign auto-delta is retired (hasNudge always false), so the memory shows the
+  // neutral counts only — no "suggests …" (gone) and no "landing well" claim (it over-stated once feedback
+  // stopped auto-tuning). The context-gated diagnosis replaces this line's advice in Slice 2.
+  const memory = (adv && adv.count) ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${adviceMemoryText(adv)}</div>` : '';
   const ratioMemo = (ratio && d.brewMode!=='off') ? `<div style="font-size:11.5px;color:var(--ink-soft);margin-top:6px;">${ratioMemoryText(ratio)}</div>` : '';
   const saveLink = (d.brewMode==='tuned' && adv && adv.hasNudge)
     ? `<div style="margin-top:8px;"><button class="btn-ghost" style="font-size:11.5px;padding:0;" onclick="saveTuningToGuide('${tea.id}')">Save this tuning as the tea\u2019s brew guide →</button></div>` : '';

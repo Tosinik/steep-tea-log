@@ -116,6 +116,23 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.31 · Brew-advice v4 Stage 1 — the diagnosis engine (dormant) + the net-sign retire  *(confirm on device, post-deploy)*
+
+The diagnosis engine is **dormant** (vm-covered by `fixtures/brew-advice-v4-test.js`; no capture writes the
+new enum yet — that's Slice 2). The only user-visible change this slice is the **retire** of the old net-sign
+auto-tuning, which degrades gracefully. On the live app:
+
+1. **The setup preview reads right without the "Your tuning" segment.** Open a session for a tea you've given
+   feedback on before: the brew-guide preview shows **Guide / Off** (no "Your tuning" option), the schedule is
+   your guide (ratio-scaled if applicable), and the memory line still shows the counts (e.g. "Logged 5× · 3
+   just right · 2 a bit strong") — with **no** "suggests cooler/shorter" and **no** "landing well" claim.
+   Nothing about starting or running a steep breaks.
+2. **Per-steep taps still record** (the old 3-tap, gongfu/senchadō only) — the tap still nudges the next
+   steep's timer and still saves; it just no longer auto-tunes the saved guide. (The richer 5-tap capture +
+   the advice itself arrive in Slice 2.)
+
+---
+
 ## v4.30 · R5 reflection Slice A — the deep pages + the deep-link scroll  *(confirm on device)*
 
 The reflection **logic** is vm-covered (`fixtures/reflection-test.js` — the route map, the aggregations,

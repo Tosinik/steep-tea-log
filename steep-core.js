@@ -663,20 +663,14 @@ function computeBrewAdvice(tea, baseOverride){
   let strong=0, weak=0, good=0;
   sessions.forEach(s=>{ const sig=feedbackSignalOf(s); if(sig==='strong')strong++; else if(sig==='weak')weak++; else if(sig==='good')good++; });
   const count = strong+weak+good;
-  const net = weak - strong; // + => hotter/longer, - => cooler/shorter
-  const tempAdjC = Math.max(-6, Math.min(6, net*2));
-  const timeAdjPct = Math.max(-24, Math.min(24, net*8));
-  let tuned = base;
-  if(base && (tempAdjC||timeAdjPct)){
-    tuned = {
-      tempC: base.tempC!=null ? Math.max(60, Math.min(100, base.tempC+tempAdjC)) : null,
-      rinseSeconds: base.rinseSeconds,
-      times: (base.times||[]).map(t=>Math.max(3, Math.round(t*(1+timeAdjPct/100)))),
-      form: base.form, generated: base.generated
-    };
-  }
   if(!base && !count) return null;
-  return { base, tuned, tempAdjC, timeAdjPct, net, count, strong, weak, good, hasNudge: !!(base && (tempAdjC||timeAdjPct)) };
+  // v4 Stage 1 (R175): the net-sign auto-delta is RETIRED. v3 turned weak−strong into a uniform temp/time
+  // nudge that conflated intensity with over-extraction (bitter ≠ astringent ≠ too-strong) and was
+  // shape-blind. Feedback becomes ADVICE now (diagnoseFeedback), not auto-tuning: tuned = base, no delta.
+  // Counts stay for the memory line; learned per-tea tuning returns in Stage 2. hasNudge is always false,
+  // so every consumer's existing no-nudge branch degrades gracefully (the "Your tuning" segment simply
+  // does not appear until Slice 2 surfaces the diagnosis).
+  return { base, tuned: base, net:0, count, strong, weak, good, hasNudge:false };
 }
 // "Logged 5× · 3 just right · 2 a bit strong"
 function adviceMemoryText(adv){
@@ -700,6 +694,55 @@ function adviceSuggestionText(adv){
     parts.push((adv.timeAdjPct<0?'shorter':'longer')+' ('+secTxt+')');
   }
   return parts.join(' and ');
+}
+/* ---------- brew advice v4 \u2014 the context-gated diagnosis (Stage 1, R175) ----------
+   Replaces v3's net-sign verdict as the FEEDBACK MODEL (SPEC-brew-advice-v4.md \u00a72/\u00a73/\u00a76). Maps ONE
+   character tap to ONE lever + a one-line mechanism (the teaching), framed as an experiment \u2014 never a
+   verdict, never more than one change at a time. Gated on tea type (KB_TYPE_SHAPE), brew style + infusion
+   role (KB_STYLE_SHAPE), the steep's temperature, and whether water/freshness is ruled out. DORMANT: no
+   caller yet \u2014 Slice 2 wires the 5-tap capture + surfacing and the role-aware timeShift. Science grounded
+   in docs/research/brew-extraction-science.md. */
+// v3 \u2192 v4 read-side alias, NON-DESTRUCTIVE: v3's 'weak' meant under-extraction, which is v4's 'flat'. Old
+// rows keep the string 'weak' in the DB; the diagnosis reads it as 'flat'. (23 legacy 'weak' values live.)
+const FB_ALIAS = { weak:'flat' };
+function typeMinTemp(type){ const s = (typeof KB_TYPE_SHAPE!=='undefined') && KB_TYPE_SHAPE[type]; return s ? s.tempMin : null; }
+// tap \u2208 {good, strong, flat, astringent, bitter} (or legacy 'weak' \u2192 flat). ctx: {type, style,
+// infusionRole:'opening'|\u2026, curTempC, waterOK}. Returns {lever, dir, why, experiment} or null (good/none).
+function diagnoseFeedback(tap, ctx){
+  ctx = ctx || {};
+  const t = FB_ALIAS[tap] || tap;
+  if(!t || t==='good') return null;                       // affirmation / nothing \u2192 no advice
+  const { type, style, infusionRole, curTempC, waterOK } = ctx;
+  const styleShape = (typeof KB_STYLE_SHAPE!=='undefined') && KB_STYLE_SHAPE[style];
+  const lightByDesign = !!(styleShape && styleShape.openingLightByDesign) && infusionRole==='opening';
+  const alreadyCool = (m => m!=null && curTempC!=null && curTempC<=m)(typeMinTemp(type));
+
+  if(t==='flat'){
+    // \u00a76 \u2014 flat/dull is FREQUENTLY water/stale leaf; rule it out BEFORE chasing extraction levers.
+    if(waterOK!==true) return { lever:'water', dir:'check water & leaf freshness first',
+      why:'Flat or dull is often a water-quality or stale-leaf problem, not extraction \u2014 rule it out before changing temp or time. Fresh, filtered water (~150 ppm) is the target.', experiment:true };
+    // \u00a73 shape gate \u2014 a by-design-light gongfu/senchad\u014d OPENING steep is not under-extraction.
+    if(lightByDesign) return { lever:'time', dir:'extend the next steep a few seconds',
+      why:'A light opening steep is by design here \u2014 extend the next steep a little, or you may have poured off too fast.', experiment:true };
+    return { lever:'leaf', dir:'more leaf first, then hotter, time last',
+      why:'More leaf makes it stronger in balance; longer steeping mostly just adds bitterness.', experiment:true };
+  }
+  if(t==='strong') return { lever:'ratio', dir:'less leaf / more water',
+    why:"That's concentration \u2014 dilute it, don't re-time it.", experiment:true };
+  if(t==='astringent'){
+    if(alreadyCool) return { lever:'time', dir:'shorter (already at this leaf\u2019s cool end)',
+      why:'It\u2019s already brewing cool, so time is the lever left \u2014 a shorter steep pulls fewer of the drying tannins.', experiment:true };
+    return { lever:'temp', dir:'cooler first (~5\u201310\u00b0C), then shorter',
+      why:'Hot water pulls the drying tannins from the leaf faster than anything else.', experiment:true };
+  }
+  if(t==='bitter'){
+    const delicate = (type==='green'||type==='white'||type==='yellow');
+    if(delicate && !alreadyCool) return { lever:'temp', dir:'cooler first, then shorter',
+      why:'Caffeine and catechins are bitter and extract fast in hot water \u2014 for a delicate green or white, cool the water first.', experiment:true };
+    return { lever:'time', dir:'shorter time',
+      why:'Caffeine and catechins are bitter and extract fast \u2014 a shorter steep pulls less of them.', experiment:true };
+  }
+  return null;
 }
 // Normalise a schedule back into brew-guide text: "92\u00b0C, 5s rinse, 13s / 17s / 26s". Times are
 // emitted in RAW SECONDS on purpose \u2014 not fmtSecShort's "1m15s", whose compound m+s token

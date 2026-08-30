@@ -76,21 +76,23 @@ ok(reduce([{feedback:'garbage'}])===null,                      'F1 [{feedback:ga
 ok(sig(sess([{order:1,feedback:'garbage'}]))===null,           'F2 malformed steep → null, no throw (signal)');
 console.log('  F malformed ignored: 2 checks');
 
-// ---- G · computeBrewAdvice composition (feedback tunes ON TOP of a ratio-scaled base) ----
+// ---- G · computeBrewAdvice — v4 (R175): feedback is ADVICE, the net-sign auto-delta is RETIRED ----
+// v3 turned weak−strong into a uniform temp/time nudge; v4 retires it (it conflated intensity with
+// over-extraction and was shape-blind — the diagnosis in brew-advice-v4-test.js replaces it). The COUNTS
+// survive for the memory line; tuned === base (no mutation); hasNudge is always false.
 const base={tempC:90, rinseSeconds:null, times:[15,20,30], form:'open', generated:false};
-// Two 'strong' sessions → strong=2, net=-2 → tempAdjC=-4, timeAdjPct=-16.
 setSessions([ sess(st('strong','strong')), sess([], {feedback:'strong', date:'2026-01-02T08:00:00.000Z'}) ]);
 let adv=ctx.computeBrewAdvice({id:'T'}, base);
-ok(adv.net===-2 && adv.tempAdjC===-4 && adv.timeAdjPct===-16, 'G1 net=-2 → tempAdjC=-4, timeAdjPct=-16');
-ok(adv.tuned.tempC===86,                                       'G2 tuned.tempC = 90-4 = 86');
-ok(eq(adv.tuned.times,[13,17,25]),                             'G3 tuned.times = [13,17,25] (×0.84)');
-ok(adv.hasNudge===true,                                        'G4 hasNudge true');
-// Convergence: same verdict, different SOURCE (all-steep vs all-session) → identical tuned.
+ok(adv.strong===2 && adv.count===2,                            'G1 the feedback COUNTS survive (two strong → strong=2)');
+ok(adv.hasNudge===false,                                       'G2 hasNudge is always false (the auto-delta is retired)');
+ok(adv.tuned===base,                                           'G3 tuned === base (the schedule is not mutated by feedback)');
+ok(adv.tempAdjC===undefined && adv.timeAdjPct===undefined,     'G4 no tempAdjC/timeAdjPct delta fields remain');
+// The precedence ladder still classifies for the COUNTS: same verdict from steep vs session → same counts.
 setSessions([ sess(st('strong','strong')), sess(st('strong','strong'), {date:'2026-01-02T08:00:00.000Z'}) ]);
-const tunedSteep=ctx.computeBrewAdvice({id:'T'}, base).tuned;
+const cntSteep=ctx.computeBrewAdvice({id:'T'}, base);
 setSessions([ sess([], {feedback:'strong'}), sess([], {feedback:'strong', date:'2026-01-02T08:00:00.000Z'}) ]);
-const tunedSess=ctx.computeBrewAdvice({id:'T'}, base).tuned;
-ok(eq(tunedSteep,tunedSess),                                   'G5 swapping signal source for the same verdict yields identical tuned');
+const cntSess=ctx.computeBrewAdvice({id:'T'}, base);
+ok(cntSteep.strong===2 && cntSess.strong===2,                  'G5 swapping signal source for the same verdict yields identical counts');
 // Absence → no nudge, tuned is the base itself, count 0 (nothing to prompt).
 setSessions([ sess(st(null,null), {tags:[]}) ]);
 adv=ctx.computeBrewAdvice({id:'T'}, base);
