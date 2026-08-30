@@ -2389,6 +2389,27 @@ styles.css `.pour-*`. Fixtures: brew-advice-v4-test §I (render wiring + timeShi
 > (§6 realized correctly). Content/render only — fence unaffected. Fixtures: brew-advice-v4-test §D (caveat
 > contract) + §I7/§I8. smoke.md §v4.33.
 
+**R177 — tea-detail joins the spine: the last major surface re-dressed (BAND masthead + RULE sections + one
+clay SLAB + colour-as-data).** R5 (v4.34; reflection Slice B1). Flag #1 of Slice B ruled A — the full spine +
+warm re-dress of `viewTeaDetail`, on the session-detail precedent (R156/R157). **Containers only — same
+content, re-framed** (no content logic; the why + freshness content is B2/R173). **Masthead → `.td-band`**
+(composes `.band`, full-bleed, `--band` fill, radius 0): the tea's `liquorFor` swatch (identity mark,
+colour-as-data) + a 56×58 photo thumb (the 140×140 hero shrinks; a mark, not frame) + name / type pill /
+favourite-rebuy pills / stars — identity only, stock lifted out. **Five RULE sections** (`.td-sec` +
+`.td-sechead.rule-head`), reflection-first (Character above On hand): **Character** (leaf facts + flavour +
+description merged — grouping earns its keep, three blocks → one) → **On hand** → **Brewing** (guide +
+"Your last cup" merged; the nested `.jade-pale` brew card **de-carded** to plain rows — no card-in-a-section)
+→ **Where this came from** (provenance wrapper stripped so the section headers it) → **Your diary**. Each
+renders only WITH content (no empty headers). **One clay SLAB** — Start session (was `btn-primary`); Edit
+ghost; the rationing lock holds (one torn radius on the page). **Warmth = marks only** (masthead swatch +
+flavour marks carry colour; the rest ink; the thumb is content, not a mark). The section structure is left
+ready for B2 to insert `#reflect-why` (in Character) + a Freshness section (`#reflect-freshness`, after
+Brewing). Fence: `SURFACES.teaDetail = ['.td-band','.td-sec','.td-sechead']` + a `.td-band` radius-0 positive
++ 3 biting controls; `.td-swatch`/`.td-thumb`/flavour excluded as marks — **frame-test 36 → 40, green.**
+`liquor-test` F2 10 → 11 (the masthead swatch). *(steep-teas.js `viewTeaDetail` + `savedBrewHTML`/
+`suggestedBrewHTML` de-card + `teaProvenanceHTML` strip; styles.css `.td-*`. On-device: smoke.md §v4.34 — the
+read + the photo thumb-vs-hero call. **B2 (R173) — why + freshness — rides this frame.**)*
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

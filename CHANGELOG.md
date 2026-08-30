@@ -46,6 +46,40 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.34 — reflection Slice B1: tea-detail re-dressed to the spine (BAND + RULE + one SLAB) — R177
+Deploy: steep-teas.js, styles.css, service-worker.js (**v144**), steep-version.js (APP_VERSION v4.34 +
+WHATS_NEW), fixtures/frame-test.js, fixtures/liquor-test.js, smoke.md. **No SQL.** *(Docs — CHANGELOG.md,
+STATE.md, R3-RULINGS-LEDGER.md R177 — push with this deploy. B1 of reflection Slice B — the re-dress,
+containers only; B2 (the why + freshness content, R173) rides this frame next.)*
+
+The **last major surface** joins the R5 spine — `viewTeaDetail` re-dressed to a BAND masthead + RULE sections
++ one clay SLAB, on the session-detail precedent. **Containers only — same content, re-framed** (no content
+logic: no `teaWhyHTML`, no `ttFreshness` touch, no deep-link — those are B2). The diff reads "nothing changed
+but the frame."
+
+- **Masthead → `.td-band`** (composes `.band`, full-bleed, `--band` fill, radius 0): the tea's **`liquorFor`
+  swatch** (identity mark, colour-as-data) + a **56×58 photo thumb** (the 140×140 hero shrinks; a mark, not
+  frame) + name / type pill / favourite-rebuy pills / stars. Identity only — stock moved out.
+- **Five RULE sections** (`.td-sec` + `.td-sechead.rule-head`), reflection-first order (**Character above On
+  hand** — the GO's suggested lean): **Character** (leaf facts + flavour + description *merged* — three
+  blocks → one section) → **On hand** (grams/cups/forecast/sparkline, lifted from the band) → **Brewing**
+  (guide + "Your last cup" advice *merged*; the nested `.jade-pale` brew card **de-carded** to plain rows —
+  no card-in-a-section) → **Where this came from** (provenance, its wrapper stripped so the section headers
+  it) → **Your diary** (session history + first-cup empty state). Each renders **only with content** — no
+  empty headers.
+- **One clay SLAB** — **Start session** becomes the sole `.btn-clay` (was `btn-primary`); Edit stays ghost;
+  nothing else competes (the rationing lock holds — one torn radius on the page).
+- **Warmth = marks only** — the masthead `liquorFor` swatch + the existing flavour marks carry colour;
+  everything else ink; the photo thumb is content, not a mark.
+- **Anchors reserved** — the section structure is left ready for **B2** to insert `#reflect-why` (after the
+  character line, in Character) and a Freshness section (`#reflect-freshness`, after Brewing); not wired here.
+
+Ruling: **R177** (tea-detail joins the spine — BAND masthead + RULE sections + one clay SLAB + colour-as-data;
+the last major surface re-dressed). Fence: **`SURFACES.teaDetail = ['.td-band','.td-sec','.td-sechead']`** +
+the `.td-band` radius-0 positive + 3 biting controls; `.td-swatch`/`.td-thumb`/flavour excluded as marks —
+**frame-test 36 → 40, green**. `liquor-test` F2 10 → 11 (the tea-detail masthead swatch). **36 committed suites
++ v4 fixture green.** On-device: `smoke.md §v4.34`.
+
 ## v4.33 — fix-forward: v4 pour-feedback surfacing (two bugs) — R176
 Deploy: steep-core.js, steep-sessions.js, steep-teas.js, service-worker.js (**v143**), steep-version.js
 (APP_VERSION v4.33 + WHATS_NEW), fixtures/brew-advice-v4-test.js, smoke.md. **No SQL.** *(Docs — CHANGELOG.md,

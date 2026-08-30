@@ -109,9 +109,12 @@ longer need a manual hard reload (dev still should, to verify). The SW waits for
 **ROADMAP — the current ordered forward plan (2026-08-30).** The R5 spine + warmth pass is landed through
 v4.30 (reflection Slice A live). What's next, in order — captured so nothing is lost:
 
-1. **Reflection Slice B — parts 1 & 2 only:** *why-this-tea* (palate-connected) + *freshness* (type-aware,
-   folds in the freshness-framing backlog fix). **Part 3 (the earned brew guide) has MOVED to the brew-advice
-   cluster (#4)** — it's the reflective view of the tuning, not standalone.
+1. **Reflection Slice B — parts 1 & 2:** *why-this-tea* (palate-connected) + *freshness* (type-aware, folds in
+   the freshness-framing fix). **B1 (R177, v4.34) SHIPPED** — the full tea-detail spine + warm re-dress (BAND
+   masthead + RULE sections + one clay SLAB, containers only). **NEXT: B2 (R173)** — the why + freshness
+   content on that frame (`teaWhyHTML`; `ttFreshness` roast-awareness — the oolong-by-roast data fix; the
+   deep-link routes freshness→tea-detail/freshness + haven-t→tea-detail/why). **Part 3 (the earned brew guide)
+   MOVED to the brew-advice cluster (#4).**
 2. **Reflection Slice C:** terroir + teas-over-time.
 3. **Freshness research pass** *(independent)* — verify/refine freshness-by-type against the reference work
    (Gascoyne et al.), not a blunt "greens fresh / oolongs stable"; feeds the Slice-B freshness fix.
@@ -224,7 +227,27 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.33 LIVE `7e674ca` — fix-forward: v4 pour-feedback surfacing (two bugs, R176 addendum)** (cache
+**NOW — v4.34 LIVE `68979db` — reflection Slice B1: tea-detail re-dressed to the spine (R177)** (cache
+**v144**, APP_VERSION v4.34, **no SQL**). The **last major surface** joins the R5 spine — `viewTeaDetail`
+re-dressed to a BAND masthead + RULE sections + one clay SLAB, on the session-detail precedent.
+**Containers only — same content, re-framed** (no content logic; the why + freshness is B2/R173).
+- **Masthead → `.td-band`** (composes `.band`, radius 0): the tea's `liquorFor` swatch (identity mark,
+  colour-as-data) + a 56×58 photo thumb (the hero shrinks; a mark) + name/type/fav-rebuy pills/stars.
+- **Five RULE sections** (reflection-first — Character above On hand): **Character** (leaf facts + flavour +
+  description merged) → **On hand** → **Brewing** (guide + "Your last cup" merged; nested brew card
+  **de-carded**) → **Where this came from** → **Your diary**. Each renders only with content.
+- **One clay SLAB** (Start session; Edit ghost); warmth = marks only (masthead swatch + flavour marks).
+  Anchors reserved for B2 (`#reflect-why` in Character, `#reflect-freshness` after Brewing).
+- **Fence:** `SURFACES.teaDetail = ['.td-band','.td-sec','.td-sechead']` + `.td-band` radius-0 positive + 3
+  controls; `.td-swatch`/`.td-thumb`/flavour excluded as marks — **frame-test 36→40**. `liquor-test` F2
+  10→11. **36 committed suites + v4 fixture green.** Ledger **R177**.
+- **ON DEVICE (`smoke.md §v4.34`, post-deploy)** — reads as a warm spine surface (BAND + RULE + one slab);
+  **the photo thumb — does it read or want the hero back** (the one visual call); nothing broke.
+- **NEXT — reflection Slice B2 (R173): the why + freshness content on this frame** (`teaWhyHTML`; the
+  `ttFreshness` oolong-by-roast fix; the two deep-link landings). **SECURITY stays the deferred pre-widening
+  gate.**
+
+**Previously — v4.33 LIVE `7e674ca` — fix-forward: v4 pour-feedback surfacing (two bugs, R176 addendum)** (cache
 **v143**, APP_VERSION v4.33, **no SQL**). Both content/render, fence unaffected. (1) **The "change" button
 was dead** — `brewNudgeRowHTML`'s recorded-marker branch ran before the open-state check; reordered so the
 actively-editing state (`pourFbOpenIdx===idx`) is checked first and renders the five chips even when a verdict
