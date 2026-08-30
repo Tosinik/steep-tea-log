@@ -224,7 +224,18 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.32 LIVE `82435e4` — Brew-advice v4 Stage 1, Slice 2: the five-tap capture + the diagnosis (R176)**
+**NOW — v4.33 LIVE `7e674ca` — fix-forward: v4 pour-feedback surfacing (two bugs, R176 addendum)** (cache
+**v143**, APP_VERSION v4.33, **no SQL**). Both content/render, fence unaffected. (1) **The "change" button
+was dead** — `brewNudgeRowHTML`'s recorded-marker branch ran before the open-state check; reordered so the
+actively-editing state (`pourFbOpenIdx===idx`) is checked first and renders the five chips even when a verdict
+is recorded, current pick highlighted (re-tap changes it). (2) **The water check dead-ended `flat`** — it
+replaced the extraction advice; now water is a **caveat alongside the lever** (`waterCaveat`; the shape gate
+runs first so an opening-light flat still extends without a water caveat), so the flow always ends on
+something actionable. Fixtures: brew-advice-v4-test §D (caveat contract) + §I7/§I8; **v4 fixture 45, 36 suites
+green.** On-device: `smoke.md §v4.33`. **NEXT — reflection Slice B (R173)** (why + freshness; the earned brew
+guide moved to v4) or brew-advice **Stage 2** (post-gate). **SECURITY stays the deferred pre-widening gate.**
+
+**Previously — v4.32 LIVE `82435e4` — Brew-advice v4 Stage 1, Slice 2: the five-tap capture + the diagnosis (R176)**
 (cache **v142**, APP_VERSION v4.32, **no SQL**). The deploy where the app **tells you which knob, and why.**
 Wires the dormant Slice-1 engine (R175) to the UI (`SPEC-brew-advice-v4.md` §1/§2/§5), reusing v3's quietness.
 - **Five-tap capture** — per-steep tap + session row widen to `{good, strong, flat, astringent, bitter}` and

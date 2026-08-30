@@ -2379,6 +2379,16 @@ styles.css `.pour-*`. Fixtures: brew-advice-v4-test §I (render wiring + timeShi
 §A–F character model, focus-test §C. On-device: smoke.md §v4.32 — the real gate. **Stage 1 complete; Stage 2
 (learned time adaptation + preference) is post-gate.**)*
 
+> **R176 addendum (v4.33, fix-forward — no new ruling).** Two surfacing bugs corrected. (1) The "change"
+> button was dead: `brewNudgeRowHTML`'s recorded-marker branch ran before the open-state check, so
+> `d_openPourFb` (`pourFbOpenIdx = idx`) couldn't surface the chips — reordered so the actively-editing state
+> is checked first and renders the five chips even when a verdict is recorded, current pick highlighted. (2)
+> The water pre-check dead-ended `flat`: it replaced the extraction advice with a water-only line — now water
+> is a **caveat alongside the lever** (`diagnoseFeedback` flat → lever + `waterCaveat`; the shape gate runs
+> first, so an opening-light flat still extends without a water caveat), so the flow always ends actionable
+> (§6 realized correctly). Content/render only — fence unaffected. Fixtures: brew-advice-v4-test §D (caveat
+> contract) + §I7/§I8. smoke.md §v4.33.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

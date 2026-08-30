@@ -46,6 +46,32 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.33 — fix-forward: v4 pour-feedback surfacing (two bugs) — R176
+Deploy: steep-core.js, steep-sessions.js, steep-teas.js, service-worker.js (**v143**), steep-version.js
+(APP_VERSION v4.33 + WHATS_NEW), fixtures/brew-advice-v4-test.js, smoke.md. **No SQL.** *(Docs — CHANGELOG.md,
+STATE.md, R3-RULINGS-LEDGER.md (R176 addendum) — push with this deploy. A fix-forward on v4.32/R176; no new
+ruling.)*
+
+Two bugs in the v4.32 pour-feedback surfacing, both content/render (fence unaffected):
+
+- **The "change" button was dead** (`brewNudgeRowHTML`). The recorded-marker branch (`if(rec)`) ran *before*
+  the open-state check, so tapping **change** — which sets `pourFbOpenIdx = idx` — still hit the marker branch
+  and never surfaced the chips. **Fix:** the actively-editing state (`pourFbOpenIdx === idx`) is now checked
+  **first** and renders the five chips even when a verdict is recorded, **with the current pick highlighted**
+  (`rec===k` → active), so a re-tap changes it → new marker + advice.
+- **The water check dead-ended `flat`.** When `flat` routed through the §6 water/freshness pre-check (no water
+  logged), it *replaced* the extraction advice with a water-only line — no actionable lever. **Fix:** water is
+  now a **caveat alongside the lever** (`diagnoseFeedback`'s flat branch returns the lever + `waterCaveat`;
+  `pourAdviceHTML`/`teaBrewAdviceHTML` render *"Could be your water or stale leaf — but if not, more leaf
+  next time."*). The shape gate runs first, so a by-design-light **opening** flat still says "extend the next"
+  (no water caveat — it isn't flat-from-water). The flow always ends on something actionable.
+
+`fixtures/brew-advice-v4-test.js`: §D rewritten to the caveat contract (flat + no water → `lever:'leaf'` +
+`waterCaveat`, never `lever:'water'`; opening flat → extend, no caveat), + §I7/§I8 render checks (the caveat
+pairs with the lever; the change-reopen path surfaces the chips with the current pick active). **36 committed
+suites + v4 fixture (45) green.** On-device: `smoke.md §v4.33`. Corrects **R176** (no new ruling — a
+fix-forward on the surfacing).
+
 ## v4.32 — Brew-advice v4 Stage 1, Slice 2: the five-tap capture + the diagnosis surfacing — R176
 Deploy: steep-core.js, steep-sessions.js, steep-teas.js, styles.css, service-worker.js (**v142**),
 steep-version.js (APP_VERSION v4.32 + WHATS_NEW), fixtures/brew-advice-v4-test.js, fixtures/brew-feedback-test.js,
