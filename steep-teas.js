@@ -1343,7 +1343,8 @@ function teaBrewAdviceHTML(tea){
   const dg = diagnoseFeedback(ch, { type:tea.type, style, infusionRole:'session', curTempC, waterOK });
   if(!dg) return '';
   const label = (typeof STEEP_FB_LABELS!=='undefined' && STEEP_FB_LABELS[ch]) || ch;
-  const suggestion = dg.lever==='water' ? 'Worth ruling out first: your water or leaf freshness.' : ('Next time, try '+dg.dir+'.');
+  const core = /^extend/i.test(dg.dir) ? (dg.dir.charAt(0).toUpperCase()+dg.dir.slice(1)) : ('Next time, try '+dg.dir);
+  const suggestion = (dg.waterCaveat ? ('Could be your water or stale leaf — but if not, '+core.charAt(0).toLowerCase()+core.slice(1)) : core) + '.';
   return `<div style="margin-top:14px;">
     <div class="eyebrow">Your last cup</div>
     <div style="font-size:13px;margin-top:6px;">Ran <strong>${escapeHtml(label)}</strong>. ${escapeHtml(suggestion)}</div>

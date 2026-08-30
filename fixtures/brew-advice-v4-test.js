@@ -68,10 +68,13 @@ ok(dg('good', midGongfuGreen)===null, 'A good → null (affirmation, no advice)'
 { const w=dg('flat', { type:'green', style:'western', infusionRole:'opening', curTempC:80, waterOK:true });
   ok(w && w.lever==='leaf', 'C flat on a WESTERN opening steep → add leaf (western is not light-by-design)'); }
 
-/* ---- D · the water/freshness gate (§6) — rule out water before extraction ---- */
-ok(dg('flat', { type:'green', style:'western', waterOK:false }).lever==='water', 'D flat + waterOK false → water check first');
-ok(dg('flat', { type:'green', style:'western' }).lever==='water', 'D flat + water UNKNOWN → water check first (default: rule it out)');
-ok(dg('flat', { type:'green', style:'western', waterOK:true }).lever!=='water', 'D flat + water ruled out → proceeds to the extraction lever');
+/* ---- D · the water/freshness caveat (§6, v4.33) — rule out water, but NEVER dead-end on the check ---- */
+{ const noWater=dg('flat', { type:'green', style:'western', waterOK:false });
+  ok(noWater.lever==='leaf' && noWater.waterCaveat===true, 'D flat + no water → the leaf lever WITH a water caveat (actionable, not a dead-end)');
+  ok(dg('flat', { type:'green', style:'western' }).waterCaveat===true, 'D flat + water UNKNOWN → water caveat too (default: rule it out)');
+  ok(!dg('flat', { type:'green', style:'western', waterOK:true }).waterCaveat, 'D flat + water logged → the lever alone, no caveat');
+  const openNoWater=dg('flat', { type:'green', style:'gongfu', infusionRole:'opening', waterOK:false });
+  ok(openNoWater.lever==='time' && !openNoWater.waterCaveat, 'D a by-design-light OPENING flat + no water → extend, NO water caveat (by design, not flat-from-water)'); }
 
 /* ---- E · the weak≡flat read-side alias (non-destructive) ---- */
 [ { type:'green', style:'western', infusionRole:'opening', curTempC:80, waterOK:true },
@@ -139,7 +142,15 @@ G("state.sessionDraft={teaId:'t1',brewStyle:'western',feedback:'bitter',waterTyp
 { const h=G('feedbackRowHTML(state.sessionDraft)');
   ok(/Just right/.test(h) && /Drying/.test(h) && /Bitter/.test(h), 'I6 session-level row has the five taps');
   ok(/pour-advice/.test(h), 'I6 …and surfaces advice when a non-good tap is set'); }
-console.log('  I render wiring + role-aware timeShift: 11 checks');
+// v4.33 bug 2 — flat + no water: the advice pairs the water caveat WITH the actionable lever (not water-only)
+{ const h=G('pourAdviceHTML(diagnoseFeedback("flat",{type:"green",style:"western",waterOK:false}))');
+  ok(/Could be your water/i.test(h) && /more leaf/i.test(h), 'I7 flat + no water → advice pairs the water caveat WITH the lever, never a dead-end'); }
+// v4.33 bug 1 — the change-reopen path: rec set + open (pourFbOpenIdx===idx) → the five chips, current pick active
+G(draftJS({steeps:[{tempC:80,timeSeconds:30,feedback:'bitter'}],pourFbOpenIdx:0}));
+{ const h=G('brewNudgeRowHTML(state.sessionDraft)');
+  ok(/Just right/.test(h) && /Bitter/.test(h) && !/✓/.test(h), 'I8 change-reopen: rec set + open → the five chips, not the ✓ marker');
+  ok(/lib-chip active/.test(h), 'I8 …with the current pick highlighted so a re-tap changes it'); }
+console.log('  I render wiring + role-aware timeShift: 13 checks');
 
 console.log('');
 if(failed){ console.log('BREW-ADVICE-V4 TESTS FAILED — '+failed+' failed, '+passed+' passed'); process.exit(1); }

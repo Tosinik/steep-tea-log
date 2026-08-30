@@ -116,6 +116,22 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.33 · fix-forward — the "change" button + the flat/water dead-end  *(on device, post-deploy)*
+
+Two v4.32 surfacing bugs; the logic is vm-covered (`brew-advice-v4-test` §D/§I7/§I8), the feel is the phone.
+In a gongfu/senchadō session:
+
+1. **"change" works.** Record a pour's note (tap a character) → the ✓ marker + advice show. Tap **change** →
+   the five chips reappear **with your current pick highlighted** → tap a different one → the marker + advice
+   update to the new pick. (Before, "change" did nothing.)
+2. **`flat` never dead-ends on water.** On a session with **no water logged**, tap **Flat** on a normal
+   (non-opening) steep → the advice pairs the caveat with the lever: *"Could be your water or stale leaf — but
+   if not, next time try more leaf…"* — always something to act on, not a water-check that stops there. On a
+   **by-design-light opening** steep, Flat still says "extend the next / poured off too fast" (no water
+   caveat). With water logged, it's the lever alone.
+
+---
+
 ## v4.32 · Brew-advice v4 Stage 1, Slice 2 — the five-tap capture + the diagnosis  *(the real gate — on device, post-deploy)*
 
 The logic is vm-covered (`brew-advice-v4-test` incl. render-wiring + timeShift; `brew-feedback-test` character

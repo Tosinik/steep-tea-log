@@ -1091,9 +1091,10 @@ function pourAdviceCtx(d){
 // The advice line — experiment-framed, never a verdict (SPEC §5): one quiet suggestion + the mechanism.
 function pourAdviceHTML(dg){
   if(!dg) return '';
-  const suggestion = dg.lever==='water' ? 'Worth ruling out first: your water or leaf freshness.'
-    : /^extend/i.test(dg.dir) ? (dg.dir.charAt(0).toUpperCase()+dg.dir.slice(1)+'.')   // opening: a now-action
-    : ('Next time, try '+dg.dir+'.');
+  const core = /^extend/i.test(dg.dir) ? (dg.dir.charAt(0).toUpperCase()+dg.dir.slice(1)) : ('Next time, try '+dg.dir);
+  // v4.33: water is a CAVEAT alongside the lever (§6 — rule it out, but always end on the actionable
+  // experiment), never an exclusive dead-end.
+  const suggestion = (dg.waterCaveat ? ('Could be your water or stale leaf — but if not, '+core.charAt(0).toLowerCase()+core.slice(1)) : core) + '.';
   return `<div class="pour-advice"><span class="pour-advice-do">${escapeHtml(suggestion)}</span> <span class="pour-why">${escapeHtml(dg.why)}</span></div>`;
 }
 // v4 (R176): five faint markers, never five open chip-rows. Collapsed faint "how did it pour?" → tap to
@@ -1104,7 +1105,16 @@ function brewNudgeRowHTML(d){
   const rec = (d.steeps[idx]||{}).feedback || null;                   // recorded character for this pour
   const shift = d.timeShift||0;
   const note = shift ? `<span class="pour-note mono">next steep ${shift>0?'+':''}${shift}s vs guide</span>` : '';
-  if(rec){                                                            // recorded → faint marker + the advice
+  // v4.33: the actively-editing state wins FIRST — "change" (d_openPourFb sets pourFbOpenIdx=idx) must surface
+  // the chips even when a verdict is already recorded, with the current pick highlighted so a re-tap changes it.
+  if(d.pourFbOpenIdx===idx){                                         // expanded → the 5 taps (current pick active)
+    const chip=(k,l)=>`<button type="button" class="lib-chip ${rec===k?'active':''}" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;
+    return `<div class="pour-row">
+      <span class="pour-q">Steep ${d.steeps.length}</span>
+      <span class="pour-chips">${chip('good','Just right')}${chip('strong','Too strong')}${chip('flat','Flat')}${chip('astringent','Drying')}${chip('bitter','Bitter')}</span>
+    </div>`;
+  }
+  if(rec){                                                            // recorded (not editing) → faint marker + advice + change
     const dg = (typeof diagnoseFeedback==='function') ? diagnoseFeedback(rec, pourAdviceCtx(d)) : null;
     return `<div class="pour-row">
       <span class="pour-saved mono">✓ ${escapeHtml(STEEP_FB_LABELS[rec]||rec)}</span>${note}
@@ -1112,14 +1122,7 @@ function brewNudgeRowHTML(d){
       ${pourAdviceHTML(dg)}
     </div>`;
   }
-  if(d.pourFbOpenIdx!==idx){                                          // collapsed faint affordance
-    return `<div class="pour-row"><button type="button" class="pour-open" onclick="d_openPourFb()">Steep ${d.steeps.length} — how did it pour?</button>${note}</div>`;
-  }
-  const chip=(k,l)=>`<button type="button" class="lib-chip" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;   // expanded → the 5 taps
-  return `<div class="pour-row">
-    <span class="pour-q">Steep ${d.steeps.length}</span>
-    <span class="pour-chips">${chip('good','Just right')}${chip('strong','Too strong')}${chip('flat','Flat')}${chip('astringent','Drying')}${chip('bitter','Bitter')}</span>
-  </div>`;
+  return `<div class="pour-row"><button type="button" class="pour-open" onclick="d_openPourFb()">Steep ${d.steeps.length} — how did it pour?</button>${note}</div>`;  // collapsed faint affordance
 }
 
 // Per-steep verdict has a single writer now — the nudge (d_nudgeNextSteep) records it on the pour you

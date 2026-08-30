@@ -727,14 +727,16 @@ function diagnoseFeedback(tap, ctx){
   const alreadyCool = (m => m!=null && curTempC!=null && curTempC<=m)(typeMinTemp(type));
 
   if(t==='flat'){
-    // \u00a76 \u2014 flat/dull is FREQUENTLY water/stale leaf; rule it out BEFORE chasing extraction levers.
-    if(waterOK!==true) return { lever:'water', dir:'check water & leaf freshness first',
-      why:'Flat or dull is often a water-quality or stale-leaf problem, not extraction \u2014 rule it out before changing temp or time. Fresh, filtered water (~150 ppm) is the target.', experiment:true };
-    // \u00a73 shape gate \u2014 a by-design-light gongfu/senchad\u014d OPENING steep is not under-extraction.
+    // \u00a73 shape gate FIRST \u2014 a by-design-light gongfu/senchad\u014d OPENING steep is not under-extraction (it is
+    // intended; the fix is to extend the next pour, never "add leaf"). No water caveat: it is not flat-from-water.
     if(lightByDesign) return { lever:'time', dir:'extend the next steep a few seconds',
       why:'A light opening steep is by design here \u2014 extend the next steep a little, or you may have poured off too fast.', experiment:true };
-    return { lever:'leaf', dir:'more leaf first, then hotter, time last',
+    // \u00a76 \u2014 genuine flat: give the actionable lever, and caveat water/stale leaf ALONGSIDE it when water
+    // wasn't logged (a frequent cause; rule it out, but never dead-end on the water check \u2014 v4.33 fix).
+    const r = { lever:'leaf', dir:'more leaf first, then hotter, time last',
       why:'More leaf makes it stronger in balance; longer steeping mostly just adds bitterness.', experiment:true };
+    if(waterOK!==true) r.waterCaveat = true;
+    return r;
   }
   if(t==='strong') return { lever:'ratio', dir:'less leaf / more water',
     why:"That's concentration \u2014 dilute it, don't re-time it.", experiment:true };
