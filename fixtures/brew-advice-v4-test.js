@@ -15,7 +15,7 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const REPO=path.resolve(__dirname,'..');
-const SRC=['steep-knowledge.js','steep-tea-types.js','steep-core.js']
+const SRC=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-teas.js','steep-sessions.js']
   .map(f=>fs.readFileSync(path.join(REPO,f),'utf8')).join('\n;\n');
 const ctx={}; ctx.window=ctx; ctx.globalThis=ctx; ctx.console=console;
 ctx.document={documentElement:{setAttribute(){},getAttribute(){return'light'}},getElementById:()=>null,querySelectorAll:()=>[],querySelector:()=>null,addEventListener(){},createElement:()=>({style:{},setAttribute(){},appendChild(){},classList:{add(){},remove(){}}})};
@@ -118,6 +118,28 @@ if(steeps && sessions){
   ok(weakSeen>0 && weakEqFlat===weakSeen, 'H all '+weakSeen+' legacy "weak" values take the flat path (alias holds on real data)');
   console.log('  H real-data: '+vals.length+' legacy values · '+weakSeen+' weak → flat');
 } else { console.log('  H skipped — no real CSVs'); }
+
+/* ---- I · render wiring (Slice 2, R176) — the capture surfaces render each state + the role-aware
+   timeShift maps correctly. Render strings only (no browser); the visual reading is smoke.md §v4.32. ---- */
+G("state.teas=[{id:'t1',name:'Sencha',type:'green'}]; state.vessels=[]; state.settings.brewAdvice=true; render=function(){}; applyScheduleToCurrentSteep=function(){};");
+const draftJS=extra=>"state.sessionDraft=Object.assign({teaId:'t1',brewStyle:'gongfu',waterType:'filtered',waterTDS:'',timeShift:0,schedule:{tempC:80,times:[30,40,50],form:'open'},steeps:[{tempC:80,timeSeconds:30,feedback:null}]},"+JSON.stringify(extra||{})+");";
+G(draftJS()); { const h=G('brewNudgeRowHTML(state.sessionDraft)');
+  ok(/how did it pour/i.test(h) && !/✓/.test(h) && !/Bitter/.test(h), 'I1 collapsed: faint "how did it pour?", no marker, no open chips'); }
+G(draftJS({pourFbOpenIdx:0})); { const h=G('brewNudgeRowHTML(state.sessionDraft)');
+  ok(/Just right/.test(h) && /Too strong/.test(h) && /Flat/.test(h) && /Drying/.test(h) && /Bitter/.test(h), 'I2 expanded: the five taps'); }
+G(draftJS({steeps:[{tempC:80,timeSeconds:30,feedback:'bitter'}]})); { const h=G('brewNudgeRowHTML(state.sessionDraft)');
+  ok(/✓ bitter/.test(h), 'I3 recorded: the ✓ character marker');
+  ok(/pour-advice/.test(h) && /Next time, try/.test(h), 'I3 …and the experiment-framed advice line'); }
+G(draftJS()); G("d_nudgeNextSteep('bitter');"); ok(G('state.sessionDraft.timeShift')===-5, 'I4 bitter → shorten the next pour (−)');
+G(draftJS()); G("d_nudgeNextSteep('flat');"); ok(G('state.sessionDraft.timeShift')===5, 'I4 flat on a by-design-light OPENING steep → extend the next (+)');
+G(draftJS()); G("d_nudgeNextSteep('strong');"); ok(G('state.sessionDraft.timeShift')===0, 'I4 strong → advice only, no mid-brew timer change');
+G(draftJS({steeps:[{feedback:null},{feedback:null},{feedback:null},{tempC:80,feedback:null}]})); G("d_nudgeNextSteep('flat');"); ok(G('state.sessionDraft.timeShift')===0, 'I4 flat on a LATE steep (idx≥3) → advice only (add leaf), no extend');
+G(draftJS()); G("d_nudgeNextSteep('astringent');"); ok(G("state.sessionDraft.steeps[0].feedback")==='astringent', 'I5 the tap writes the character on the pour');
+G("state.sessionDraft={teaId:'t1',brewStyle:'western',feedback:'bitter',waterType:'filtered',schedule:{tempC:95}};");
+{ const h=G('feedbackRowHTML(state.sessionDraft)');
+  ok(/Just right/.test(h) && /Drying/.test(h) && /Bitter/.test(h), 'I6 session-level row has the five taps');
+  ok(/pour-advice/.test(h), 'I6 …and surfaces advice when a non-good tap is set'); }
+console.log('  I render wiring + role-aware timeShift: 11 checks');
 
 console.log('');
 if(failed){ console.log('BREW-ADVICE-V4 TESTS FAILED — '+failed+' failed, '+passed+' passed'); process.exit(1); }

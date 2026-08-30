@@ -88,8 +88,8 @@ const steepChrome = css.slice(css.indexOf('.timer-box'), css.indexOf('.focus-scr
 ok(!/var\(--kachi/.test(steepChrome), 'B4 the non-Focus steeping chrome carries NO kachi (R53 + contract 4)');
 console.log('  B kachi confinement: 4 checks');
 
-/* ---- C. the v3.92 write and its gate are untouched (R95) ---- */
-ok(/last\.feedback = \(kind==='weak'\)/.test(sessSrc), 'C1 d_nudgeNextSteep still WRITES steeps[last].feedback');
+/* ---- C. the per-steep write + its gate (v3.92 gate; v4 R176 character write) ---- */
+ok(/last\.feedback = kind/.test(sessSrc), 'C1 d_nudgeNextSteep WRITES steeps[last].feedback = the character tap (v4 5-enum)');
 ok(/function steepFbActive\(d\)\{[\s\S]{0,240}isColdBrew \|\| state\.settings\.brewAdvice===false/.test(sessSrc),
    'C2 …and steepFbActive still gates on cold brew + the brewAdvice opt-out');
 seed();
@@ -99,11 +99,11 @@ ok(ctx.steepFbActive(draft({isColdBrew:true}))===false, 'C4 cold brew is not');
 S.settings.brewAdvice=false;
 ok(ctx.steepFbActive(gongfu)===false, 'C5 …and the brewAdvice opt-out still closes it');
 S.settings.brewAdvice=true;
-// The ✓ saved state is a READ. It appears only once a verdict exists, and never invents one.
+// The ✓ recorded-marker is a READ. It appears only once a verdict exists, and never invents one.
 S.sessionDraft = draft({schedule:{tempC:100,times:[45,30],form:'open'},steeps:[{tempC:100,timeSeconds:45,tags:[],description:'',feedback:null}]});
-ok(!/✓ saved/.test(ctx.brewNudgeRowHTML(S.sessionDraft)), 'C6 no saved marker before a verdict is recorded');
+ok(!/✓ /.test(ctx.brewNudgeRowHTML(S.sessionDraft)), 'C6 no recorded marker before a verdict is recorded');
 S.sessionDraft.steeps[0].feedback='good';
-ok(/✓ saved/.test(ctx.brewNudgeRowHTML(S.sessionDraft)), 'C7 …and one appears once it is');
+ok(/✓ /.test(ctx.brewNudgeRowHTML(S.sessionDraft)), 'C7 …and one appears once it is (v4: ✓ + the character label)');
 console.log('  C the write + its gate: 7 checks');
 
 /* ---- D. R53's guarantee: every non-Focus steeping state renders unchanged ---- */

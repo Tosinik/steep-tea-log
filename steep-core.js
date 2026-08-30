@@ -612,30 +612,39 @@ function fmtSecShort(s){ s=Math.round(s); if(s<60) return s+'s'; const m=Math.fl
    Signal per session: explicit "how was it?" pick (feedback: good|strong|weak),
    else inferred from tasting tags. Aggregated into a small temp/time nudge from
    the parsed guide baseline. Sessions stay loose — this only surfaces when asked. */
-const BREW_STRONG_TAGS = ['bitter','astringent','harsh','over-steeped','oversteeped','overbrewed','too strong','stewed'];
-const BREW_WEAK_TAGS   = ['weak','watery','thin','flat','under-steeped','understeeped','bland','too light'];
-// A session's per-steep taps → one verdict. Net sign only (shape deliberately ignored
-// until the shape-aware upgrade earns its data). Untapped steeps contribute nothing.
+// v4 (R176) — the CHARACTER vocabulary replaces v3's net-sign verdict. The tag-inference rung maps a free
+// tag to the nearest character (the weakest signal; per-steep taps and the session verdict rank above it).
+const FB_CHARS = ['good','strong','flat','astringent','bitter'];
+const BREW_TAG_CHAR = {
+  bitter:'bitter', harsh:'bitter', 'over-steeped':'bitter', oversteeped:'bitter', overbrewed:'bitter', stewed:'bitter',
+  astringent:'astringent',
+  'too strong':'strong', strong:'strong',
+  weak:'flat', watery:'flat', thin:'flat', flat:'flat', 'under-steeped':'flat', understeeped:'flat', bland:'flat', 'too light':'flat'
+};
+const FB_TIE_ORDER = ['bitter','astringent','strong','flat','good'];   // ties surface the most-actionable character
+function fbChar(v){ v = FB_ALIAS[v] || v; return FB_CHARS.includes(v) ? v : null; }   // normalise (weak→flat); reject malformed
+// v4: a session's per-steep taps → its dominant CHARACTER (was v3's net-sign verdict). Most-frequent wins;
+// a tie surfaces the most-actionable (FB_TIE_ORDER); untapped / malformed steeps contribute nothing. The
+// per-tap ADVICE reads the raw tap (diagnoseFeedback); this reducer is the session's representative signal
+// (the count-memory tally + the tea-page "your last cup" line).
 function reduceSteepFeedback(steeps){
-  let strong=0, weak=0, any=false;
-  (steeps||[]).forEach(st=>{
-    if(st.feedback==='strong'){ strong++; any=true; }
-    else if(st.feedback==='weak'){ weak++; any=true; }
-    else if(st.feedback==='good'){ any=true; }
-  });
-  if(!any) return null;                       // no per-steep tap → fall through to session/tags
-  const net = weak - strong;
-  return net>0 ? 'weak' : (net<0 ? 'strong' : 'good');   // tie → 'good' (counted, net-neutral)
+  const tally = {};
+  (steeps||[]).forEach(st=>{ const c = fbChar(st && st.feedback); if(c) tally[c] = (tally[c]||0)+1; });
+  const keys = Object.keys(tally); if(!keys.length) return null;    // no per-steep tap → fall through
+  const max = Math.max(...keys.map(k=>tally[k]));
+  const top = keys.filter(k=>tally[k]===max);
+  return top.length===1 ? top[0] : FB_TIE_ORDER.find(c=>top.includes(c));
 }
+// The read-side precedence ladder (unchanged shape): per-steep character → session verdict → tag → null.
 function feedbackSignalOf(session){
   if(!session) return null;
   const curve = reduceSteepFeedback(session.steeps);   // 1 · per-steep wins
   if(curve) return curve;
-  if(session.feedback==='strong'||session.feedback==='weak'||session.feedback==='good') return session.feedback; // 2 · session verdict (fallback)
+  const sv = fbChar(session.feedback);                 // 2 · session verdict (fallback)
+  if(sv) return sv;
   const tags = [].concat(session.tags||[], ...((session.steeps||[]).map(st=>st.tags||[])))
-    .map(t=>String(t).toLowerCase().trim());       // 3 · tag inference (weakest)
-  if(tags.some(t=>BREW_STRONG_TAGS.includes(t))) return 'strong';
-  if(tags.some(t=>BREW_WEAK_TAGS.includes(t))) return 'weak';
+    .map(t=>String(t).toLowerCase().trim());           // 3 · tag inference → character (weakest)
+  for(const t of tags){ if(BREW_TAG_CHAR[t]) return BREW_TAG_CHAR[t]; }
   return null;
 }
 // Gate predicate: does this session carry ANY feedback (per-steep or session-level)? The
@@ -654,31 +663,31 @@ function adviceSessionsFor(teaId){
     .sort((a,b)=>new Date(b.date)-new Date(a.date))
     .slice(0,6);
 }
-// baseOverride (v3.57): when the caller has already ratio-scaled the base schedule, pass it in so the
-// feedback nudge tunes ON TOP of the ratio correction (ordering: base → ratio → feedback → timeShift).
+// baseOverride (v3.57): when the caller has already ratio-scaled the base schedule, pass it in (ordering:
+// base → ratio → feedback → timeShift). v4: the feedback layer no longer tunes — it advises (diagnoseFeedback).
 function computeBrewAdvice(tea, baseOverride){
   if(!tea) return null;
   const base = (baseOverride!==undefined) ? baseOverride : effectiveGuideSchedule(tea, state.settings.brewAdvice!==false);
   const sessions = adviceSessionsFor(tea.id);
-  let strong=0, weak=0, good=0;
-  sessions.forEach(s=>{ const sig=feedbackSignalOf(s); if(sig==='strong')strong++; else if(sig==='weak')weak++; else if(sig==='good')good++; });
-  const count = strong+weak+good;
+  let good=0, strong=0, flat=0, astringent=0, bitter=0;
+  sessions.forEach(s=>{ const c=feedbackSignalOf(s); if(c==='good')good++; else if(c==='strong')strong++; else if(c==='flat')flat++; else if(c==='astringent')astringent++; else if(c==='bitter')bitter++; });
+  const count = good+strong+flat+astringent+bitter;
   if(!base && !count) return null;
-  // v4 Stage 1 (R175): the net-sign auto-delta is RETIRED. v3 turned weak−strong into a uniform temp/time
-  // nudge that conflated intensity with over-extraction (bitter ≠ astringent ≠ too-strong) and was
-  // shape-blind. Feedback becomes ADVICE now (diagnoseFeedback), not auto-tuning: tuned = base, no delta.
-  // Counts stay for the memory line; learned per-tea tuning returns in Stage 2. hasNudge is always false,
-  // so every consumer's existing no-nudge branch degrades gracefully (the "Your tuning" segment simply
-  // does not appear until Slice 2 surfaces the diagnosis).
-  return { base, tuned: base, net:0, count, strong, weak, good, hasNudge:false };
+  // v4 (R175/R176): the net-sign auto-delta is RETIRED — v3's weak−strong→uniform temp/time nudge conflated
+  // intensity with over-extraction and was shape-blind. Feedback is ADVICE now (diagnoseFeedback), not
+  // auto-tuning: tuned = base, hasNudge always false; every consumer's no-nudge branch degrades gracefully.
+  // The per-character counts (v4 vocabulary) feed the memory line; learned tuning returns in Stage 2.
+  return { base, tuned: base, count, good, strong, flat, astringent, bitter, hasNudge:false };
 }
-// "Logged 5× · 3 just right · 2 a bit strong"
+// "Logged 5× · 3 just right · 1 too strong · 1 bitter" (v4 characters)
 function adviceMemoryText(adv){
   if(!adv || !adv.count) return '';
   const bits=[];
   if(adv.good) bits.push(adv.good+' just right');
-  if(adv.strong) bits.push(adv.strong+' a bit strong');
-  if(adv.weak) bits.push(adv.weak+' a bit weak');
+  if(adv.strong) bits.push(adv.strong+' too strong');
+  if(adv.flat) bits.push(adv.flat+' flat');
+  if(adv.astringent) bits.push(adv.astringent+' drying');
+  if(adv.bitter) bits.push(adv.bitter+' bitter');
   return `Logged ${adv.count}×${bits.length?' · '+bits.join(' · '):''}`;
 }
 // Short human suggestion, e.g. "cooler (\u22125\u00b0) and shorter (\u2248\u22124s/steep)".

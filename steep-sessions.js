@@ -1057,34 +1057,68 @@ function steepFbActive(d){
 // (the per-steep card is a read-only echo). Feedback write is §3-gated (steepFbActive); western still
 // only nudges the timer. Last-write-wins, not toggle-clear — timeShift accumulates, so a re-tap can't
 // mean "clear" here without the two axes disagreeing.
+// v4 (R176): the tap records the CHARACTER on the pour (good/strong/flat/astringent/bitter), drives the
+// ROLE-AWARE ephemeral timeShift, and collapses the affordance. The advice (diagnoseFeedback) surfaces in
+// brewNudgeRowHTML. §3-gated by steepFbActive; western still only carries the timer.
 function d_nudgeNextSteep(kind){
   const d = state.sessionDraft; if(!d || !d.schedule) return;
   const STEP=5, clamp=x=>Math.max(-45, Math.min(45, x));
-  if(kind==='weak') d.timeShift = clamp((d.timeShift||0)+STEP);        // under-extracted → longer
-  else if(kind==='strong') d.timeShift = clamp((d.timeShift||0)-STEP); // over-extracted → shorter
-  // 'ok' leaves the current carry as-is (timeShift behaviour unchanged; the write below is the new part)
   const last = d.steeps.length ? d.steeps[d.steeps.length-1] : null;   // the pour "that" refers to
-  if(last && steepFbActive(d)) last.feedback = (kind==='weak') ? 'weak' : (kind==='strong') ? 'strong' : 'good';
+  if(last && steepFbActive(d)) last.feedback = kind;                   // the character write (v4 5-enum)
+  // role-aware timeShift (SPEC §2/§4): over-extraction (astringent/bitter) → shorten the next pour; a
+  // by-design-light opening steep tapped flat → extend the next (diagnosis lever 'time'); strong /
+  // flat-elsewhere / good → advice only, no mid-brew timer change (you can't add leaf mid-session).
+  const dg = (typeof diagnoseFeedback==='function') ? diagnoseFeedback(kind, pourAdviceCtx(d)) : null;
+  if(kind==='astringent' || kind==='bitter') d.timeShift = clamp((d.timeShift||0)-STEP);
+  else if(kind==='flat' && dg && dg.lever==='time') d.timeShift = clamp((d.timeShift||0)+STEP);
+  d.pourFbOpenIdx = null;                                              // collapse to the recorded marker
   applyScheduleToCurrentSteep(d);
   render();
 }
+// Open the 5-tap set for the current pour (collapsed-faint → expand-on-tap → recorded-marker).
+function d_openPourFb(){ const d=state.sessionDraft; if(!d) return; d.pourFbOpenIdx = d.steeps.length-1; render(); }
+// ctx for diagnoseFeedback, from the live draft: type, resolved method, infusion role (research: opening
+// 1-3 light by design), the pour's temperature, and whether water was logged (§6 pre-check).
+function pourAdviceCtx(d){
+  const tea = teaById(d.teaId), ves = vesselById(d.vesselId);
+  const style = (typeof brewMethodFor==='function') ? brewMethodFor(d.brewStyle, ves&&ves.capacityMl) : d.brewStyle;
+  const idx = Math.max(0, d.steeps.length-1);
+  const last = d.steeps[d.steeps.length-1] || {};
+  const curTempC = (last.tempC!=null && last.tempC!=='') ? Number(last.tempC) : ((d.schedule && d.schedule.tempC!=null) ? d.schedule.tempC : null);
+  const waterOK = !!(String(d.waterType||'').trim() || (d.waterTDS!=='' && d.waterTDS!=null));
+  return { type: tea && tea.type, style, infusionRole: idx<3 ? 'opening' : 'middle', curTempC, waterOK };
+}
+// The advice line — experiment-framed, never a verdict (SPEC §5): one quiet suggestion + the mechanism.
+function pourAdviceHTML(dg){
+  if(!dg) return '';
+  const suggestion = dg.lever==='water' ? 'Worth ruling out first: your water or leaf freshness.'
+    : /^extend/i.test(dg.dir) ? (dg.dir.charAt(0).toUpperCase()+dg.dir.slice(1)+'.')   // opening: a now-action
+    : ('Next time, try '+dg.dir+'.');
+  return `<div class="pour-advice"><span class="pour-advice-do">${escapeHtml(suggestion)}</span> <span class="pour-why">${escapeHtml(dg.why)}</span></div>`;
+}
+// v4 (R176): five faint markers, never five open chip-rows. Collapsed faint "how did it pour?" → tap to
+// expand the 5 taps → tap one → recorded marker + the experiment-framed advice. §3-gated (steepFbActive).
 function brewNudgeRowHTML(d){
-  if(!d.schedule || !d.steeps.length || d.scheduleHidden) return '';
+  if(!d.schedule || !d.steeps.length || d.scheduleHidden || !steepFbActive(d)) return '';
+  const idx = d.steeps.length-1;
+  const rec = (d.steeps[idx]||{}).feedback || null;                   // recorded character for this pour
   const shift = d.timeShift||0;
-  const rec = steepFbActive(d) ? (d.steeps[d.steeps.length-1].feedback||null) : null; // recorded verdict for this pour
-  const on = { weak:'weak', ok:'good', strong:'strong' };
-  const chip=(k,l)=>`<button type="button" class="lib-chip ${rec===on[k]?'active':''}" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;
-  /* #10's ✓ SAVED (v4.01). The WRITE has shipped since v3.92 and this is a read of
-     steeps[i].feedback — no write change. It is worth drawing precisely because the write has been
-     silent for weeks: a verdict registered and a verdict stored looked identical on screen, so the
-     app was under-reporting its own reliability. The distinction the board draws is committed-vs-
-     ephemeral, which is exactly what the old bare "saved" word failed to carry. */
-  const saved = rec ? `<span class="pour-saved mono">✓ saved</span>` : '';
-  const note = shift ? `<span style="font-size:11px;color:var(--ink-soft);">next steep ${shift>0?'+':''}${shift}s vs guide</span>` : '';
+  const note = shift ? `<span class="pour-note mono">next steep ${shift>0?'+':''}${shift}s vs guide</span>` : '';
+  if(rec){                                                            // recorded → faint marker + the advice
+    const dg = (typeof diagnoseFeedback==='function') ? diagnoseFeedback(rec, pourAdviceCtx(d)) : null;
+    return `<div class="pour-row">
+      <span class="pour-saved mono">✓ ${escapeHtml(STEEP_FB_LABELS[rec]||rec)}</span>${note}
+      <button type="button" class="pour-redo" onclick="d_openPourFb()">change</button>
+      ${pourAdviceHTML(dg)}
+    </div>`;
+  }
+  if(d.pourFbOpenIdx!==idx){                                          // collapsed faint affordance
+    return `<div class="pour-row"><button type="button" class="pour-open" onclick="d_openPourFb()">Steep ${d.steeps.length} — how did it pour?</button>${note}</div>`;
+  }
+  const chip=(k,l)=>`<button type="button" class="lib-chip" onclick="d_nudgeNextSteep('${k}')">${l}</button>`;   // expanded → the 5 taps
   return `<div class="pour-row">
-    <span class="pour-q">Steep ${d.steeps.length} — how did it pour?</span>
-    <span class="pour-chips">${chip('weak','Weak → longer')}${chip('ok','Just right')}${chip('strong','Strong → shorter')}</span>
-    ${saved}${note}
+    <span class="pour-q">Steep ${d.steeps.length}</span>
+    <span class="pour-chips">${chip('good','Just right')}${chip('strong','Too strong')}${chip('flat','Flat')}${chip('astringent','Drying')}${chip('bitter','Bitter')}</span>
   </div>`;
 }
 
@@ -1093,11 +1127,11 @@ function brewNudgeRowHTML(d){
 // tappable "strength?" marker, whose write duplicated the nudge's field (the "two controls, one field"
 // duplication). Observational copy; renders only once a verdict exists; §3-gated by steepFbActive at the
 // call site. Persists in-draft via d.steeps → steepToDb at commit, unchanged.
-const STEEP_FB_LABELS = { weak:'a touch weak', good:'good', strong:'a touch strong' };
+const STEEP_FB_LABELS = { good:'just right', strong:'too strong', flat:'flat', astringent:'drying', bitter:'bitter', weak:'flat' };
 function steepFeedbackHTML(d, i){
   const fb = (d.steeps[i]||{}).feedback || null;
   if(!fb) return '';
-  return `<div style="margin-top:6px;font-size:11px;color:var(--ink-soft);">· ${STEEP_FB_LABELS[fb]}</div>`;
+  return `<div style="margin-top:6px;font-size:11px;color:var(--ink-soft);">· ${escapeHtml(STEEP_FB_LABELS[fb]||fb)}</div>`;
 }
 
 function beginSteeping(){
@@ -1628,11 +1662,21 @@ function setSessionRating(v){
 function feedbackRowHTML(d){
   if(state.settings.brewAdvice===false) return '';
   const opt=(v,label)=>`<button type="button" class="lib-chip ${d.feedback===v?'active':''}" onclick="setSessionFeedback('${v}')">${label}</button>`;
+  // v4 (R176): the whole-cup verdict → the diagnosis. No single steep here, so the opening shape-gate never
+  // fires (the per-steep tap carries that); experiment-framed, quiet, only when a non-good tap is set.
+  let advice = '';
+  if(d.feedback && d.feedback!=='good' && typeof diagnoseFeedback==='function'){
+    const tea = teaById(d.teaId), ves = vesselById(d.vesselId);
+    const style = (typeof brewMethodFor==='function') ? brewMethodFor(d.brewStyle, ves&&ves.capacityMl) : d.brewStyle;
+    const waterOK = !!(String(d.waterType||'').trim() || (d.waterTDS!=='' && d.waterTDS!=null));
+    advice = pourAdviceHTML(diagnoseFeedback(d.feedback, { type: tea&&tea.type, style, infusionRole:'session', curTempC:(d.schedule&&d.schedule.tempC!=null)?d.schedule.tempC:null, waterOK }));
+  }
   return `<div class="field" style="margin-bottom:14px;">
-    <label>How was this cup? <span style="color:var(--ink-soft);font-weight:400;">— optional, tunes next time</span></label>
+    <label>How was this cup? <span style="color:var(--ink-soft);font-weight:400;">— optional, shapes future advice</span></label>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      ${opt('good','Just right')}${opt('strong','A bit strong')}${opt('weak','A bit weak')}
+      ${opt('good','Just right')}${opt('strong','Too strong')}${opt('flat','Flat')}${opt('astringent','Drying')}${opt('bitter','Bitter')}
     </div>
+    ${advice}
   </div>`;
 }
 function setSessionFeedback(v){

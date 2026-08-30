@@ -1237,6 +1237,7 @@ function viewTeaDetail(){
 
       ${teaCharacterHTML(t)}
       ${t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t)}
+      ${teaBrewAdviceHTML(t)}
       ${flavorProfileHTML(t)}
       ${t.description?`<div style="margin-top:14px;"><div class="eyebrow">Description</div><div style="font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div></div>`:''}
       ${teaProvenanceHTML(t, costPerSession)}
@@ -1319,6 +1320,35 @@ function suggestedBrewHTML(tea){
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" onclick="saveSuggestedGuide('${tea.id}')">Save as brew guide</button>${borrowButtonHTML(tea)}</div>
       ${borrowSourceHTML(tea)}${goDeeperLinkHTML(tea)}
     </div>`;
+}
+// v4 (R176) — the fuller "why this, for this tea" on the tea page: the tea's most recent feedback'd cup →
+// its representative character → the context-gated diagnosis (lever + mechanism), experiment-framed. A
+// whole-cup reading (infusionRole 'session'), so the opening shape-gate never fires here. Reads the raw
+// stored feedback; no learned aggregation (that is Stage 2). Absent when brew-advice is off, when there is
+// no feedback yet, or when the last cup was 'good' (nothing to change).
+function teaBrewAdviceHTML(tea){
+  if(!tea || state.settings.brewAdvice===false || typeof diagnoseFeedback!=='function') return '';
+  const has = (typeof sessionHasFeedback==='function') ? sessionHasFeedback : (s=>!!s.feedback || (s.steeps||[]).some(st=>st.feedback));
+  const sess = (state.sessions||[]).filter(s=>s.teaId===tea.id && !s.isColdBrew && has(s))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!sess.length) return '';
+  const s = sess[0];
+  const ch = feedbackSignalOf(s);
+  if(!ch || ch==='good') return '';
+  const ves = vesselById(s.vesselId);
+  const style = (typeof brewMethodFor==='function') ? brewMethodFor(s.brewStyle, ves&&ves.capacityMl) : s.brewStyle;
+  const st = (s.steeps||[]).find(x=>x.tempC!=null && x.tempC!=='');
+  const curTempC = st ? Number(st.tempC) : ((s.schedule&&s.schedule.tempC!=null)?s.schedule.tempC:null);
+  const waterOK = !!(String(s.waterType||'').trim() || (s.waterTDS!=='' && s.waterTDS!=null));
+  const dg = diagnoseFeedback(ch, { type:tea.type, style, infusionRole:'session', curTempC, waterOK });
+  if(!dg) return '';
+  const label = (typeof STEEP_FB_LABELS!=='undefined' && STEEP_FB_LABELS[ch]) || ch;
+  const suggestion = dg.lever==='water' ? 'Worth ruling out first: your water or leaf freshness.' : ('Next time, try '+dg.dir+'.');
+  return `<div style="margin-top:14px;">
+    <div class="eyebrow">Your last cup</div>
+    <div style="font-size:13px;margin-top:6px;">Ran <strong>${escapeHtml(label)}</strong>. ${escapeHtml(suggestion)}</div>
+    <div style="font-size:12px;color:var(--ink-soft);margin-top:4px;">${escapeHtml(dg.why)}</div>
+  </div>`;
 }
 /* Borrow from Go Deeper (R51, slice B2) — the same gesture as "Save as brew guide" against the
    CATALOG instead of the KB. Both can match one tea and disagree on temp, which is why the line

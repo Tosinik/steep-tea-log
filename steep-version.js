@@ -5,6 +5,6 @@
    BUMP BOTH HERE EVERY DEPLOY (deploy ritual 2b/2c) — nowhere else. The update banner shows the INCOMING
    version's note by messaging it off the waiting SW (which importScripts this file); the running page's
    constant is only the fallback, so a stale value here mislabels what the next deploy tells users. */
-self.APP_VERSION = 'v4.31';
+self.APP_VERSION = 'v4.32';
 // WHATS_NEW — one human sentence, the quiet second line on the update banner (v3.69+). '' suppresses it.
-self.WHATS_NEW = "Groundwork for smarter, character-based brewing advice — your cup feedback keeps being recorded while the new version is built.";
+self.WHATS_NEW = "When a cup runs bitter, drying, flat or too strong, SlowCup now suggests one thing to try next time — and tells you why.";

@@ -2,13 +2,13 @@
  * Committed; runs every deploy. Guards the read-side aggregation CONTRACT that spans
  * steep-data (the mapper) + steep-core (reduceSteepFeedback / feedbackSignalOf / the gate).
  *
- * The contract (SPEC-brew-advice-v3-feedback.md §2): tuning reads a precedence ladder
- *     per-steep curve → session verdict → tag inference → null
- * Per-steep wins whenever ANY steep on the session carries a tap; the session verdict is a
- * strict fallback, NEVER merged. reduceSteepFeedback is net-sign only (shape shelved): tie
- * → 'good' (a fully-tapped neutral session is the most-engaged logging and must stay
- * gate-visible). sessionHasFeedback ships as a real function so its steep-only→true linchpin
- * — without which A2's own data would be invisible to its own gate — is pinned here.
+ * The contract (SPEC-brew-advice-v4.md, reusing v3's ladder): the read side resolves a precedence ladder
+ *     per-steep character → session verdict → tag inference → null
+ * Per-steep wins whenever ANY steep on the session carries a tap; the session verdict is a strict
+ * fallback, NEVER merged. v4: reduceSteepFeedback returns the dominant CHARACTER (was v3's net-sign
+ * verdict) — most-frequent wins, a tie surfaces the most-actionable (FB_TIE_ORDER); legacy 'weak' reads as
+ * 'flat' (FB_ALIAS). sessionHasFeedback ships as a real function so its steep-only→true linchpin — without
+ * which A2's own data would be invisible to its own gate — is pinned here.
  *
  * Synthetic sections A–I carry the boundary assertions and run everywhere; the real-data
  * pass is the forward no-op regression, degrading gracefully when fixtures/{sessions,steeps}
@@ -40,40 +40,42 @@ const st=(...fbs)=>fbs.map((f,i)=>({order:i+1, feedback:f}));
 const setSessions=arr=>vm.runInContext('state.sessions='+JSON.stringify(arr)+';', ctx);
 const sess=(steeps,extra)=>Object.assign({teaId:'T', date:'2026-01-01T08:00:00.000Z', isColdBrew:false, tags:[], feedback:null, steeps}, extra||{});
 
-// ---- A · reduceSteepFeedback unit (net-sign; tie → 'good'; untapped ignored) ----
-ok(reduce(st('strong','strong','good'))==='strong', 'A1 [strong,strong,good] → strong (net -2)');
-ok(reduce(st('weak'))==='weak',                       'A2 [weak] → weak');
-ok(reduce(st('strong','weak'))==='good',              'A3 [strong,weak] → good (tie, counted)');
-ok(reduce(st('good','good'))==='good',                'A4 [good,good] → good (net-neutral, any=true)');
-ok(reduce([])===null,                                 'A5 [] → null');
-ok(reduce(st(null,null))===null,                      'A6 all-untapped → null');
+// ---- A · reduceSteepFeedback unit (v4: dominant CHARACTER; weak→flat alias; tie→most-actionable) ----
+ok(reduce(st('strong','strong','good'))==='strong',            'A1 [strong,strong,good] → strong (2 vs 1)');
+ok(reduce(st('bitter'))==='bitter',                            'A2 [bitter] → bitter');
+ok(reduce(st('astringent','astringent','flat'))==='astringent','A3 [astringent×2, flat] → astringent (2 vs 1)');
+ok(reduce(st('strong','flat'))==='strong',                     'A4 tie [strong,flat] → strong (FB_TIE_ORDER: most-actionable)');
+ok(reduce(st('weak'))==='flat',                                'A5 legacy [weak] → flat (non-destructive alias)');
+ok(reduce([])===null && reduce(st(null,null))===null,          'A6 [] / all-untapped → null');
 console.log('  A reduceSteepFeedback unit: 6 checks');
 
-// ---- B · Precedence ladder + disagreement (per-steep wins; each lower rung fires alone) ----
-ok(sig(sess(st('strong','strong','good'), {feedback:'good'}))==='strong', 'B1 per-steep beats a disagreeing session verdict');
-ok(sig(sess([], {feedback:'weak'}))==='weak',                             'B2 session-verdict rung fires when no steep tapped');
-ok(sig(sess([], {feedback:null, tags:['bitter']}))==='strong',           'B3 tag-inference rung fires when the two above are empty');
-ok(sig(sess([], {feedback:null, tags:['watery']}))==='weak',             'B4 weak tag inference');
+// ---- B · Precedence ladder + disagreement (per-steep wins; each lower rung fires; tag→character) ----
+ok(sig(sess(st('bitter','bitter','good'), {feedback:'good'}))==='bitter', 'B1 per-steep beats a disagreeing session verdict');
+ok(sig(sess([], {feedback:'flat'}))==='flat',                            'B2 session-verdict rung fires when no steep tapped');
+ok(sig(sess([], {feedback:'weak'}))==='flat',                            'B2b legacy session verdict weak → flat');
+ok(sig(sess([], {feedback:null, tags:['bitter']}))==='bitter',           'B3 tag inference → bitter (its own character now, not net-sign strong)');
+ok(sig(sess([], {feedback:null, tags:['astringent']}))==='astringent',   'B3b tag inference → astringent (separate from bitter)');
+ok(sig(sess([], {feedback:null, tags:['watery']}))==='flat',             'B4 weak-family tag → flat');
 ok(sig(sess([], {feedback:null, tags:[]}))===null,                       'B5 nothing anywhere → null (no-op)');
-console.log('  B precedence + disagreement: 5 checks');
+console.log('  B precedence + disagreement: 7 checks');
 
-// ---- C · Tie wins over session (the tie returns a counted verdict, not the session token) ----
-ok(sig(sess(st('strong','weak'), {feedback:'weak'}))==='good', 'C1 {feedback:weak, steeps:[strong,weak]} → good');
+// ---- C · Per-steep tie beats the session verdict (returns a character, not the session token) ----
+ok(sig(sess(st('strong','flat'), {feedback:'bitter'}))==='strong', 'C1 per-steep tie [strong,flat] → strong, beats session bitter');
 console.log('  C tie wins over session: 1 check');
 
-// ---- D · Partial tap (one tap among untapped steeps still drives the curve) ----
-ok(reduce(st(null,null,'weak',null,null))==='weak',            'D1 5 steeps, one weak → weak (reduce)');
-ok(sig(sess(st(null,null,'weak',null,null)))==='weak',         'D2 5 steeps, one weak → weak (signal)');
+// ---- D · Partial tap (one tap among untapped steeps still drives the character) ----
+ok(reduce(st(null,null,'bitter',null,null))==='bitter',       'D1 5 steeps, one bitter → bitter (reduce)');
+ok(sig(sess(st(null,null,'flat',null,null)))==='flat',        'D2 5 steeps, one flat → flat (signal)');
 console.log('  D partial tap: 2 checks');
 
 // ---- E · Steepless + absence ----
-ok(sig(sess([], {feedback:'weak'}))==='weak',                  'E1 steeps:[] + feedback weak → weak (fallback)');
-ok(sig(sess([], {feedback:null, tags:[]}))===null,             'E2 steeps:[] + no feedback + no tags → null');
+ok(sig(sess([], {feedback:'astringent'}))==='astringent',     'E1 steeps:[] + session astringent → astringent (fallback)');
+ok(sig(sess([], {feedback:null, tags:[]}))===null,            'E2 steeps:[] + no feedback + no tags → null');
 console.log('  E steepless + absence: 2 checks');
 
 // ---- F · Malformed value ignored (no DB CHECK, so a non-enum value must count as no-signal) ----
-ok(reduce([{feedback:'garbage'}])===null,                      'F1 [{feedback:garbage}] → null, no throw (reduce)');
-ok(sig(sess([{order:1,feedback:'garbage'}]))===null,           'F2 malformed steep → null, no throw (signal)');
+ok(reduce([{feedback:'garbage'}])===null,                     'F1 [{feedback:garbage}] → null, no throw (reduce)');
+ok(sig(sess([{order:1,feedback:'garbage'}]))===null,          'F2 malformed steep → null, no throw (signal)');
 console.log('  F malformed ignored: 2 checks');
 
 // ---- G · computeBrewAdvice — v4 (R175): feedback is ADVICE, the net-sign auto-delta is RETIRED ----

@@ -1148,6 +1148,13 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .pour-q{font-size:11.5px;color:var(--ink-soft);}
 .pour-chips{display:inline-flex;gap:6px;flex-wrap:wrap;}
 .pour-saved{font-size:10.5px;color:var(--jade-deep);letter-spacing:.06em;}
+/* v4 (R176) brew-advice capture + surfacing — spine-content (no fill/border/radius, so the fence is untouched). */
+.pour-open{background:none;border:none;padding:0;font-size:11.5px;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line);cursor:pointer;}
+.pour-note{font-size:11px;color:var(--ink-soft);}
+.pour-redo{background:none;border:none;padding:0;font-size:10.5px;color:var(--ink-soft);text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+.pour-advice{flex-basis:100%;margin-top:2px;font-size:12px;line-height:1.45;}
+.pour-advice-do{color:var(--ink);font-weight:600;}
+.pour-why{color:var(--ink-soft);}
 
 /* ===== #02b session detail (slice D) ===== */
 .sd-kicker{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);}

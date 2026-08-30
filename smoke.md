@@ -116,6 +116,37 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.32 · Brew-advice v4 Stage 1, Slice 2 — the five-tap capture + the diagnosis  *(the real gate — on device, post-deploy)*
+
+The logic is vm-covered (`brew-advice-v4-test` incl. render-wiring + timeShift; `brew-feedback-test` character
+model); whether it **reads right** is the user-facing half a `vm` can't judge. This is the deploy where the
+app tells you which knob and why — the capture + advice must feel quiet and helpful, not naggy or verdict-y.
+On a real device, in a **gongfu or senchadō** session (the per-steep tap is method-gated — it should NOT
+appear in a western session, nor for cold brew, nor with brew-advice off):
+
+1. **The five-tap reads quiet.** After a pour, the tap is a **faint** "how did it pour?" — not five open
+   chips. Tap it → the five taps (Just right / Too strong / Flat / Drying / Bitter) → tap one → it collapses
+   to a faint **✓ marker** + the advice. Five faint markers down a session, never five open rows. Skipping it
+   entirely is normal (Tea-First — a zero-feedback session is complete).
+2. **The advice reads as an experiment, not a verdict.** It says *"Next time, try cooler first, then
+   shorter — hot water pulls the drying tannins…"*, not *"brew at 85°."* One lever + the reason. Check the
+   context is right: **Drying** on a hot black → cooler; **Bitter** on a hot green → cooler; **Bitter** on a
+   green already at its cool end → shorter (time), not cooler.
+3. **The by-design-light case — the one to get right.** On a **gongfu/senchadō opening steep** (steep 1–3),
+   tapping **Flat** says *"extend the next steep a few seconds / you may have poured off too fast"* and nudges
+   the next pour **longer** — it must **never** say "add leaf." On a later steep (or a western session),
+   **Flat** *does* say "more leaf."
+4. **Flat routes through water first.** If the session logged **no water type/TDS**, tapping **Flat** first
+   suggests ruling out water / stale leaf before temp/time. If you logged your water, it goes straight to the
+   extraction lever.
+5. **The fuller "why this, for this tea" on the tea page.** A tea you've given feedback on shows a **"Your last
+   cup"** line — the character it ran + the one thing to try + the reason. Absent when the last cup was "just
+   right" or there's no feedback yet.
+6. **The session-level "How was this cup?"** (finish screen) has the same five taps and surfaces the same
+   experiment-framed advice when you pick a non-good one.
+
+---
+
 ## v4.31 · Brew-advice v4 Stage 1 — the diagnosis engine (dormant) + the net-sign retire  *(confirm on device, post-deploy)*
 
 The diagnosis engine is **dormant** (vm-covered by `fixtures/brew-advice-v4-test.js`; no capture writes the
