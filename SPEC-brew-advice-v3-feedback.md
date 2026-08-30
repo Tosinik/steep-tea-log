@@ -2,8 +2,9 @@
 
 Status: **MODEL REOPENED before build (2026-08-30).** The *engineering* was decided/ready
 (planning lane, claude.ai, 2026-07-16, reviewed slice-by-slice) and stays reusable; the
-**feedback model** must be reworked first — see "Model critique — REOPEN before build" below.
-Covers issues **#15 + #9** (the A2 feedback control).
+**feedback model** must be reworked first — **that rework is now `SPEC-brew-advice-v4.md`**
+(character-based feedback + context-gated lever advice); see "Model critique — REOPEN before
+build" below for why. Covers issues **#15 + #9** (the A2 feedback control).
 
 Extends only the **feedback** layer of the tuning stack `base → ratio → feedback →
 timeShift`. The ratio axis (`SPEC-brew-advice-v2.md`, shipped v3.85) is untouched.
@@ -33,8 +34,9 @@ Source of truth for the rulings: `PHASE2-PRESPEC-NOTES.md` §A + the Tea-First P
 > **What stays.** The **engineering foundation is sound and reusable**: the data model (§1), the aggregation
 > ladder (§2), the capture UX (§3), and the Tea-First quietness (the load-bearing constraint). It is the
 > **feedback model** — the axis, the net-verdict reduction, the absence of time re-flow — that reopens.
-> Rebuild the model on this foundation; do **not** discard the foundation. The sections below describe the
-> *engineering* as decided; read them through this critique until the model is re-specced.
+> Rebuild the model on this foundation; do **not** discard the foundation. **The model IS now re-specced:
+> `SPEC-brew-advice-v4.md`** (a five-tap character set → context-gated one-lever advice) — build from v4;
+> the sections below are the *engineering* v4 keeps, read through this critique.
 
 ## Ruled decisions this spec builds from
 
