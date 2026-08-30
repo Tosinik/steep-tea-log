@@ -267,11 +267,15 @@ vendor-sourced reference layer that grounds the KB baselines — it is NOT loade
 (reference only), but consult and extend it when tuning brew defaults (`KB_STYLES`) or the
 `LEAF_PROFILES` curves.
 
-**Tea passport** (`steep-passport.js`): **PARKED.** The shipped dot-map (v3.33/34) was
-rejected as unrecognisable ("just dots"). Do not extend the dot rendering — a redesign
-toward drawn country outlines/borders is planned. The parsing/aggregation layer
-(`passportCountryFor`, `passportSubFor`, `PASSPORT_GEO`, `PASSPORT_SUB`) is reusable;
-only the rendering gets replaced. See ROADMAP/STATE.
+**Tea passport / Origins / terroir** (`steep-passport.js`): the rejected dot-map (v3.33/34,
+"just dots") was **replaced by the shipped drawn-outline atlas** (`viewOrigins` — country
+outlines + projected pins, R3/#37, with `steep-origins-map.js` holding the Natural-Earth
+outline + projection). **v4.36 (R174) re-dressed `viewOrigins` to the reflection spine as
+"Your terroir"** (`.reflect-band` masthead + `terroirCensus`/`terroirGravitate` summaries over
+the kept atlas). So Origins is **live and extended, not parked** — the atlas render + terroir
+summaries build ON the aggregation layer (`passportCountryFor`, `passportSubFor`, `PASSPORT_GEO`,
+`PASSPORT_SUB`, `originsRegionMarks`, `originsCountryRows`, `originTier`), which stays the reusable
+core. `fixtures/origins-test.js` pins the map geometry as numbers — read it before touching pins.
 
 ## Calm-first principles & conventions
 

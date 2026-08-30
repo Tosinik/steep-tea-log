@@ -116,6 +116,27 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.36 · reflection Slice C — Your terroir + Teas over time  *(on device, post-deploy)*
+
+Both views ride the reflection spine; the logic is vm-covered (`reflection-test §K`) — whether they READ,
+and whether the doors + Back land, is the phone look.
+
+1. **Terroir reads as a warm spine surface.** Insights → the **"Terroir"** door: it names terroir and lands
+   on `viewOrigins`, now a `.reflect-band` masthead ("Your terroir") over the atlas, then **"Where you span"**
+   (the country count + the country-tier list) and **"What you reach for"** (brew-weighted). Does it read as a
+   reflection, not the old "Origins" card?
+2. **Teas over time reads.** Insights → the **"Over time"** door lands on `viewTimeline`: **"Month by month"**
+   density bars legible (cups, with `+N` arrivals), **"How your shelf arrived"** chronology reads (newest first,
+   liquor swatch + tap-through), **"Then and now"** is **absent-not-broken** on the current log (needs ≥3
+   distinct months) — or reads if long enough. Nothing shows "undefined".
+3. **Back returns correctly.** Terroir Back from **both** entries — the Insights door **and** the hub menu →
+   the right place, no dead-end/loop (it has no hardcoded back by design). Timeline **← Back to Insights** →
+   Insights.
+4. **Nothing else broke.** The other Insights doors (palate / ritual / Wrapped) still land; the shelf and
+   session-detail are unaffected.
+
+---
+
 ## v4.35 · reflection Slice B2 — the tea's page: why + type-aware freshness  *(on device, post-deploy)*
 
 The logic is vm-covered (`reflection-test` §B/§J — palate, the freshness split, routing); whether it reads

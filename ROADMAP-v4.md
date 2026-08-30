@@ -102,10 +102,13 @@ decisions rather than any single ruling:
   the three native selects retired; `teaRowIdentity` shared by shelf + picker (one writer, two wrappers).
   `pickChoose` dispatches by kind, `methodPrefillFor` preserved; optional "No vessel" (R43). No long-press
   (R89 deferred → its own gesture+commit build).
-- **ACTIVE TRACK: R5 — the spine rollout** (the surface-language frame system, per-surface, F33).
-  **Slice 1 SHIPPED v4.22** (`e8c18fa`): the four container primitives + the fill-law fence (R153) + the
-  **shelf** as the pilot. The rollout continues per-surface; the greeting-copy bug is available as a small
-  early slice.
+- **R5 — the spine rollout** (the surface-language frame system, per-surface, F33). **Slice 1 SHIPPED v4.22**
+  (`e8c18fa`): the four container primitives + the fill-law fence (R153) + the **shelf** as the pilot. The
+  rollout then ran per-surface through Shopping/session-detail/Insights/Home + the warmth pass and the
+  **reflection deep pages** — Slice A (ritual/palate, v4.30/R172), Slice B (tea-detail, v4.34/R177 + v4.35/R173),
+  and **Slice C (terroir + teas-over-time, v4.36/R174) — the reflection is now COMPLETE.** **NEXT: the full
+  codebase/docs audit** (the head of the queue — a ranked backlog that informs the feature order), then
+  SECURITY re-blocks before the beta widens.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
   next person logs in). Findings

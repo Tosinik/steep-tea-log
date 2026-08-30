@@ -2434,6 +2434,33 @@ two unmapped lead types now land** on the tea's page, scrolled. Fence: why/fresh
 `REFLECT_ROUTE` + `leadDoorHTML` teaId; steep-core.js `openReflection` teaDetailFrom; fixtures/reflection-test.js
 §B + §J. On-device: smoke.md §v4.35. **Reflection Slice B complete; Slice C (R174) is next.**)*
 
+**R174 — reflection Slice C: terroir + teas-over-time — the last two reflection views (the reflection is
+COMPLETE).** Shipped v4.36 (cache v146, no SQL, no new module). REFLECTION-SPEC views 3 + 5, both on shipped
+fields. **Your terroir** re-dresses `viewOrigins` **in place** to the reflection spine (`.reflect-band` masthead
++ `.ins-sec` sections) over the kept atlas, keeping `state.view='origins'` / `goOrigins()` and every existing
+return target: `terroirCensus` (shelf-weighted — the countries you span, the lead count) + `terroirGravitate`
+(brew-weighted — sessions per origin, "what you reach for"). The country-tier list (`originsCountryRows`) is
+preserved under the span count; region-tier teas stay the map's pins and are **not duplicated** in the list — a
+full-census list would show the pinned teas twice, so the census supplies only the count. **No `REFLECT_ROUTE`
+entry** — the lead engine (`computeLeadInsight`) has no origins type, by REFLECTION-SPEC's design (the table's
+"(the origins section)" is parenthesised — a section door, not an engine lead); terroir is reached only via the
+Insights Origins door (renamed "terroir"). **No hardcoded back** — origins is hub+Insights reachable
+(`hubGo('origins')`), so a "Back to Insights" would misroute a hub entry; it rides the generic `HISTORY_VIEWS`
+Back (timeline, Insights-only, keeps its `← Back to Insights`). **Teas over time** is a NEW `viewTimeline`
+(`state.view='timeline'`, a reflection sibling of ritual/palate): `overtimeSeries` (month density — cups +
+acquisitions on one axis), `overtimeArrivals` (first-cup chronology, newest first), `overtimeThenVsNow` (gated
+≥3 distinct months → absent on a short log, never-guess). Reached via a **new Insights BOX door** (`overtime`
+dashCard, gated ≥2 months) → `openReflection('timeline')`. In the router + `HISTORY_VIEWS` + render-smoke's view
+list. **Fence:** both ride the already-fenced `.reflect-band` + `.ins-sec` — **no new frame container, so no
+`SURFACES` entry and no new control** (a class invented only to feed the fence is fenced in name only, per the
+fence's own doctrine); a ⚡ note records the family join, and the atlas pins (`.org-*`) + timeline marks
+(`.tot-*`) are excluded data marks. frame-test 40 unchanged. **Suites moved to the new model** (expected, not
+regressions): liquor-test F2 swatch count 11→12 (`.tot-arr-swatch`), landing-test D1 "atlas"→"terroir",
+origins-test C2/C3 ("Known by country"→"Where you span") + F13 (the span count now speaks where the old
+blank-screen fallback did); reflection-test §K +12. Also swept: CLAUDE.md's stale passport-"PARKED" paragraph
+corrected — Origins is the shipped drawn-outline atlas, now extended into terroir, not parked. On-device:
+smoke.md §v4.36. **The reflection is complete (Slices A/B/C).**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

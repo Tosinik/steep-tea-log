@@ -107,13 +107,15 @@ longer need a manual hard reload (dev still should, to verify). The SW waits for
 ## Continue here
 
 **ROADMAP — the current ordered forward plan (reordered 2026-08-30, v4.35).** The R5 spine + warmth pass is
-landed; reflection Slices A + B are done. What's next, in order:
+landed; **reflection Slices A + B + C are all done — the reflection is complete (v4.36).** What's next, in order:
 
 1. **Reflection Slice B — DONE.** B1 (R177, v4.34: the full tea-detail spine + warm re-dress) + B2 (R173,
    v4.35: why-this-tea palate-connected + type-aware freshness incl. the oolong-by-roast fix + the
    freshness/haven-t deep-link landings). *(The earned brew guide R173 first reserved moved to brew-advice v4,
    R175/R176.)*
-2. **Reflection Slice C (R174):** terroir + teas-over-time — the last reflection views.
+2. ~~**Reflection Slice C (R174):** terroir + teas-over-time — the last reflection views.~~ **DONE (v4.36)** —
+   terroir extends `viewOrigins` in place; teas-over-time is a new `viewTimeline` behind an Insights door.
+   **The reflection is complete (A/B/C all shipped).**
 3. **The full codebase/docs audit** *(moved up — after the reflection, before features)*: bloat, stubs,
    forgotten deferrals, stale docs → a **ranked backlog that INFORMS the feature order below**. A read first,
    so features are prioritised by what the audit surfaces, not by memory. (The brew-advice pile was a preview.)
@@ -219,7 +221,29 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.35 LIVE `d0a994d` — reflection Slice B2: the tea's page, why + type-aware freshness (R173)** (cache
+**NOW — v4.36 `87264cf` (STAGED — code committed, awaiting push) — reflection Slice C: Your terroir + Teas over time (R174)** (cache
+**v146**, APP_VERSION v4.36, **no SQL**, **no new module**). The last two reflection views — **the reflection
+is COMPLETE** (Slices A/B/C all shipped). Both built on shipped fields; both ride the reflection spine.
+- **Your terroir** (`viewOrigins` re-dressed IN PLACE — `state.view='origins'`/`goOrigins()` kept): a
+  `.reflect-band` masthead over the kept atlas + two summaries — `terroirCensus` (shelf-weighted, the
+  countries you span) + `terroirGravitate` (brew-weighted, what you reach for). Country-tier list preserved
+  under the span count; region-tier teas stay the map's pins (not duplicated). No `REFLECT_ROUTE` entry (the
+  lead engine has no origins type — untouched); **no hardcoded back** (origins is hub+Insights reachable). The
+  Insights Origins door names "terroir."
+- **Teas over time** (new `viewTimeline`, `state.view='timeline'`): `overtimeSeries` (month density) +
+  `overtimeArrivals` (chronology) + `overtimeThenVsNow` (gated ≥3 months). Reached via a new Insights BOX door
+  (`overtime` dashCard, gated ≥2 months) → `openReflection('timeline')`; `← Back to Insights`. In router +
+  `HISTORY_VIEWS`.
+- **Fence:** no new frame container — both ride `.reflect-band` + `.ins-sec`; a ⚡ note documents the join,
+  atlas + timeline are excluded marks (frame-test 40 unchanged). Suites moved to the new model: liquor-test F2
+  11→12, landing-test D1 "atlas"→"terroir", origins-test C2/C3/F13; reflection-test §K +12. **37 suites green.**
+- **ON DEVICE (`smoke.md §v4.36`, post-deploy)** — terroir reads as a warm spine surface + the door names
+  terroir & lands; teas-over-time reads (density legible, arrivals chronology, then-vs-now absent-not-broken on
+  the thin log); Back returns correctly (terroir from **both** the hub and the Insights door; timeline → Insights).
+- **NEXT — the full codebase/docs audit** (ROADMAP #3 — reflection is done) → a ranked backlog that informs the
+  feature order. **SECURITY F1/F2 stays the hard pre-widening gate.**
+
+**Previously — v4.35 LIVE `d0a994d` — reflection Slice B2: the tea's page, why + type-aware freshness (R173)** (cache
 **v145**, APP_VERSION v4.35, **no SQL**). The reflection content on B1's re-dressed frame — **Reflection Slice
 B complete.**
 - **Why this tea** (`teaWhyHTML`, `#reflect-why` in Character): the palate connection — the tea's traits

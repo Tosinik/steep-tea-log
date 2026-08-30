@@ -46,6 +46,45 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.36 — reflection Slice C: Your terroir + Teas over time — R174
+
+Deploy: styles.css, steep-passport.js, steep-insights.js, steep-dashboard.js, steep-core.js,
+service-worker.js (cache v146), steep-version.js,
+fixtures/{reflection,frame,render-smoke,liquor,landing,origins}-test.js + CHANGELOG.md, STATE.md,
+ROADMAP-v4.md, CLAUDE.md, smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL. No new module.
+
+The last two reflection views (REFLECTION-SPEC 3 + 5), both built on shipped fields — **the
+reflection is complete** (Slices A/B/C all shipped).
+
+- **Your terroir** — `viewOrigins` re-dressed **in place** to the reflection spine (`.reflect-band`
+  masthead + `.ins-sec` RULE sections), keeping `state.view='origins'` / `goOrigins()` and every
+  existing return target. Beside the kept atlas, two summaries: `terroirCensus` (shelf-weighted — the
+  countries you span, as the lead count) and `terroirGravitate` (brew-weighted — sessions per origin,
+  "what you reach for"). Judgment call: the country-tier list (`originsCountryRows`) is **preserved
+  under the span count**, re-dressed; region-tier teas stay the map's pins and are **not duplicated**
+  in the list (a full-census list would show the 12 pinned teas twice). `#reflect-*` anchors added
+  for future lead routing; **no `REFLECT_ROUTE` entry** — the lead engine has no origins type, by
+  design (`computeLeadInsight` untouched). The Insights Origins door names "terroir." **No hardcoded
+  back** — origins is hub+Insights reachable, so it rides the generic `HISTORY_VIEWS` Back rather than
+  a "Back to Insights" that would misroute a hub entry.
+- **Teas over time** — new `viewTimeline` (`state.view='timeline'`, a reflection sibling of
+  ritual/palate): `overtimeSeries` (month density — cups + acquisitions on one axis), `overtimeArrivals`
+  (first-cup chronology, newest first), `overtimeThenVsNow` (early-vs-recent dominant type, **gated to
+  ≥3 distinct months** → absent on a short log, never-guess). Reached via a **new Insights BOX door**
+  (`overtime` dashCard, gated ≥2 months) → `openReflection('timeline')`; `← Back to Insights` is safe
+  (Insights-only entry). Joined the router + `HISTORY_VIEWS` + render-smoke's view list.
+- **Fence:** both views ride the already-fenced reflection (`.reflect-band`) + insights (`.ins-sec`)
+  spine — they introduce **no new frame container**, so no `SURFACES` entry and no new control (a class
+  invented only to feed the fence is fenced in name only). A ⚡ note documents the family join; the
+  atlas pins (`.org-*`) and the timeline marks (`.tot-*`) are excluded data marks. **frame-test 40,
+  unchanged.**
+- **Suites updated to the new model** (expected, not regressions): `liquor-test` F2 swatch count
+  **11→12** (the `.tot-arr-swatch` arrivals mark); `landing-test` D1 empty-state **"atlas"→"terroir"**;
+  `origins-test` C2/C3 (**"Known by country"→"Where you span"**) + F13 (the span count now speaks where
+  the old blank-screen fallback did). `reflection-test` **+12** (§K: census/gravitate grouping,
+  month-bucketing, arrivals order, the then-vs-now gate, both views render with anchors). **37 suites
+  green + review tools clean.**
+
 ## v4.35 — reflection Slice B2: the tea's page — why + type-aware freshness — R173
 Deploy: steep-teas.js, steep-tea-types.js, steep-dashboard.js, steep-core.js, styles.css, service-worker.js
 (**v145**), steep-version.js (APP_VERSION v4.35 + WHATS_NEW), fixtures/reflection-test.js, smoke.md. **No SQL.**
