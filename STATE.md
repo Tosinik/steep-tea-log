@@ -221,7 +221,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.36 `87264cf` (STAGED — code committed, awaiting push) — reflection Slice C: Your terroir + Teas over time (R174)** (cache
+**NOW — v4.36 LIVE `87264cf` — reflection Slice C: Your terroir + Teas over time (R174)** (cache
 **v146**, APP_VERSION v4.36, **no SQL**, **no new module**). The last two reflection views — **the reflection
 is COMPLETE** (Slices A/B/C all shipped). Both built on shipped fields; both ride the reflection spine.
 - **Your terroir** (`viewOrigins` re-dressed IN PLACE — `state.view='origins'`/`goOrigins()` kept): a
