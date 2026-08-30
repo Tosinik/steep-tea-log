@@ -102,8 +102,8 @@ console.log('  B merge: 6 checks');
 const countries=G('originsCountryRows()');
 const countryTeas=countries.reduce((s,r)=>s+r.teas.length,0);
 ok(countryTeas===10, 'C1 ten teas live in the country tier — a first-class half of the screen, not a footnote (got '+countryTeas+')');
-ok(/Known by country/.test(html), 'C2 …and it is drawn as a list');
-const listPart=html.split('Known by country')[1]||'';
+ok(/Where you span/.test(html), 'C2 …and it is drawn as a list (R174: the terroir census section "Where you span" carries the country-tier list)');
+const listPart=html.split('Where you span')[1]||'';
 ok(!/org-pin/.test(listPart),
    'C3 no country is drawn as a pin — R28 defines a country mark as a computed point inside a shape, so listing it is the honest rendering');
 ok(countries.some(r=>r.teas.some(t=>/Da Hong Pao/.test(t.name))),
@@ -195,8 +195,8 @@ G('state.teas=' + JSON.stringify(TEAS.filter(t => /kagoshima, japan/i.test(t.ori
 const one = G('viewOrigins()');
 ok(G('originsRegionMarks().length') === 1 && !/org-map/.test(one),
    'F12 one region pin draws no map — rule 6, and one pin is not an atlas');
-ok(/card empty/.test(one),
-   'F13 …and that shelf still says something: no map AND no country list would otherwise be a bare heading over a blank screen');
+ok(/You span/.test(one) && !/org-map/.test(one),
+   'F13 …and that shelf still says something: with no map and no country list, the R174 span count still speaks ("You span 1 country…") — never a bare heading over a blank screen');
 G('state.teas=' + REAL + ';');
 const tightFrame = G('originsFrame([{x:800,y:400},{x:801,y:400.5}])');
 ok(Math.abs(tightFrame.w - G('ORIGINS_MIN_SPAN')) < 0.001,

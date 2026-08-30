@@ -981,6 +981,7 @@ function render(){
   else if(state.view==='spend') body = viewSpend();
   else if(state.view==='ritual') body = viewRitual();          // v4.30 (R172) — reflection deep pages
   else if(state.view==='palate') body = viewPalate();
+  else if(state.view==='timeline') body = viewTimeline();      // v4.36 (R174) — teas over time (reflection Slice C)
   else if(state.view==='session') body = viewSessionFlow();
   else if(state.view==='pick-tea') body = viewPickTea();       // v4.21 (#14): R58 picker screens, opened from setup/flow/edit
   else if(state.view==='pick-vessel') body = viewPickVessel();
@@ -1094,7 +1095,7 @@ function openReflection(view, focus, teaId){
 // Views reached by a direct state.view= (session-detail, origins) don't push in v1; Back from them
 // pops to the last tab, which is the right target anyway. The localStorage relaunch memory keeps its
 // own smaller gate (PERSISTED_VIEWS, tab-level), plus the tea-detail deep-link.
-const HISTORY_VIEWS = ['dashboard','insights','teas','sessions','friends','tea-detail','session-detail','shopping','spend','origins','wrapped','ritual','palate'];
+const HISTORY_VIEWS = ['dashboard','insights','teas','sessions','friends','tea-detail','session-detail','shopping','spend','origins','wrapped','ritual','palate','timeline'];
 function saveView(v){
   try{
     if(typeof history!=='undefined' && history.pushState && HISTORY_VIEWS.includes(v)){

@@ -986,6 +986,18 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .palate-rated-name{font-size:14px;color:var(--ink);text-align:left;padding:0;}
 .reflect-mid{font-size:10px;color:var(--ink-soft);}
 
+/* R174 (Slice C) — Teas over time. All MARKS (data viz + layout), excluded from the fill-law fence like
+   the palate bars / clock bars: the density bar carries an ink fill, the arrival swatch a liquor fill. */
+.tot-mrow{display:flex;align-items:center;gap:10px;padding:5px 0;}
+.tot-mlabel{font-size:10px;color:var(--ink-soft);flex:none;width:46px;}
+.tot-bar-track{flex:1;height:8px;background:var(--band);border-radius:2px;overflow:hidden;}
+.tot-bar{display:block;height:100%;border-radius:2px;background:var(--ink-soft);}
+.tot-mcount{font-family:var(--font-mono);font-size:10px;color:var(--ink);flex:none;min-width:52px;text-align:right;}
+.tot-arr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);}
+.tot-arr-swatch{width:22px;height:22px;border-radius:2px;flex:none;}
+.tot-arr-name{flex:1;min-width:0;text-align:left;font-size:14px;color:var(--ink);padding:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tot-arr-when{font-size:10px;color:var(--ink-soft);flex:none;}
+
 /* type distribution — one slim stacked bar in the fixed type colors + mono legend */
 .ins-typebar{height:20px;border-radius:2px;overflow:hidden;display:flex;margin-top:11px;}  /* R170: 10→20px, radius 6→2px (spine); hues stay the R149-deferred type tints */
 .ins-typebar span{display:block;height:100%;}

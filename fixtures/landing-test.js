@@ -92,8 +92,8 @@ vm.createContext(ctx);vm.runInContext(SRC,ctx);
 const G=e=>vm.runInContext(e,ctx);
 G('state.settings=Object.assign({},DEFAULT_SETTINGS);state.teas=[];state.sessions=[];state.steeps=[];state.vessels=[];state.wishlist=[];');
 const origins=G('viewOrigins()'), shelf=G('viewTeas()'), home=G('viewDashboard()');
-ok(/Your atlas fills in as you add teas/.test(origins),
-   'D1 R19: zero teas gives Origins its empty state — the addendum #09 could not be written until Origins existed');
+ok(/Your terroir fills in as you add teas/.test(origins),
+   'D1 R19: zero teas gives terroir its empty state — the addendum #09 could not be written until Origins existed (R174: "atlas" → "terroir")');
 ok(!/org-map/.test(origins), 'D2 …and draws no map of nowhere');
 ok(/No teas yet/.test(shelf), 'D3 the empty shelf says what to do next');
 /* D4 CHANGED IN v4.10, and the change was flagged before it happened. R115 replaced the three-step

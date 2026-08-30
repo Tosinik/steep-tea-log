@@ -12,8 +12,8 @@
  */
 const fs=require('fs'), path=require('path'), vm=require('vm');
 const REPO=path.resolve(__dirname,'..');
-const SRC=['steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-teas.js','steep-insights.js','steep-dashboard.js']
-  .map(f=>fs.readFileSync(path.join(REPO,f),'utf8')).join('\n;\n');
+const SRC=['steep-origins-map.js','steep-knowledge.js','steep-tea-types.js','steep-core.js','steep-teas.js','steep-passport.js','steep-insights.js','steep-dashboard.js']
+  .map(f=>fs.readFileSync(path.join(REPO,f),'utf8')).join('\n;\n');   // v4.36 (R174): +origins-map/+passport for terroir
 const ctx={}; ctx.window=ctx; ctx.globalThis=ctx; ctx.console=console;
 ctx.document={documentElement:{setAttribute(){},getAttribute(){return'light'}},getElementById:()=>null,querySelectorAll:()=>[],querySelector:()=>null,addEventListener(){},createElement:()=>({style:{},setAttribute(){},appendChild(){},classList:{add(){},remove(){}}})};
 ctx.localStorage={getItem:()=>null,setItem(){},removeItem(){}};
@@ -138,6 +138,42 @@ G("state.teas=[{id:'t',name:'Test Oolong',type:'oolong'},{id:'f1',name:'A',type:
 G("state.teas=[{id:'t',name:'Lonely',type:'green'}]; state.activeTeaId='t';");
 ok(G("teaWhyHTML(state.teas[0])")==='', 'J too little palate signal → empty (the curated character stands alone)');
 console.log('  J B2 tea-page content: 6 checks');
+
+/* ---- K · Slice C (R174) — terroir census/gravitate + teas-over-time bucketing, both LOGIC ---- */
+// terroir — shelf-weighted census groups by country, sorted by count; brew-weighted gravitate counts sessions.
+seed([{id:'a',name:'A',origin:'China'},{id:'b',name:'B',origin:'Japan'},{id:'c',name:'C',origin:'China'}]);
+{ const cen=JSON.parse(G('JSON.stringify(terroirCensus())'));
+  ok(cen.length===2 && cen[0].country==='China' && cen[0].n===2 && cen[1].country==='Japan', 'K terroirCensus groups by country, sorted by count desc'); }
+seed([{id:'x',name:'Zzz'}]);
+ok(G('terroirCensus().length')===0, 'K terroirCensus empty when no origin resolves (never-guess)');
+seed([{id:'a',name:'A',origin:'China'},{id:'b',name:'B',origin:'Japan'}], [{id:'s1',teaId:'a',date:'2026-08-01'},{id:'s2',teaId:'a',date:'2026-08-02'},{id:'s3',teaId:'b',date:'2026-08-03'}]);
+{ const g=JSON.parse(G('JSON.stringify(terroirGravitate())'));
+  ok(g[0].country==='China' && g[0].n===2, 'K terroirGravitate is brew-weighted (sessions per origin)'); }
+// viewOrigins now renders as terroir: reflect-band masthead + span/reach anchors (country-tier, no map)
+seed([{id:'a',name:'A',origin:'China'}], [{id:'s1',teaId:'a',date:'2026-08-01'}]);
+{ const v=G('viewOrigins()');
+  ok(/reflect-band/.test(v) && /Your terroir/.test(v) && /id="reflect-span"/.test(v) && /id="reflect-reach"/.test(v), 'K viewOrigins renders as terroir — reflect-band masthead + span/reach anchors'); }
+// teas over time — month bucketing (sessions + acquisitions), arrivals chronology, then-vs-now gate
+seed([{id:'a',name:'A',purchaseDate:'2026-06-15'}], [{id:'s1',teaId:'a',date:'2026-06-01'},{id:'s2',teaId:'a',date:'2026-07-01'},{id:'s3',teaId:'a',date:'2026-07-15'}]);
+{ const ser=JSON.parse(G('JSON.stringify(overtimeSeries())'));
+  ok(ser.length===2 && ser[0].month==='2026-06' && ser[0].sessions===1 && ser[0].acquired===1 && ser[1].month==='2026-07' && ser[1].sessions===2, 'K overtimeSeries buckets sessions + acquisitions by month, sorted'); }
+seed([{id:'a',name:'A'},{id:'b',name:'B'}], [{id:'s1',teaId:'a',date:'2026-06-01'},{id:'s2',teaId:'b',date:'2026-07-01'},{id:'s3',teaId:'a',date:'2026-08-01'}]);
+{ const arr=JSON.parse(G('JSON.stringify(overtimeArrivals().map(function(r){return r.tea.id;}))'));
+  ok(arr[0]==='b' && arr[1]==='a', 'K overtimeArrivals is first-cup chronology, newest first (a first-seen June, b July)'); }
+seed([{id:'a',name:'A',type:'green'}], [{id:'s1',teaId:'a',date:'2026-07-01'},{id:'s2',teaId:'a',date:'2026-08-01'}]);
+ok(G('overtimeThenVsNow()')===null, 'K then-vs-now gated: <3 distinct months → null (never-guess)');
+seed([{id:'a',name:'A',type:'green'},{id:'b',name:'B',type:'oolong'}], [{id:'s1',teaId:'a',date:'2026-06-01'},{id:'s2',teaId:'a',date:'2026-07-01'},{id:'s3',teaId:'b',date:'2026-08-01'},{id:'s4',teaId:'b',date:'2026-08-02'}]);
+{ const t=JSON.parse(G('JSON.stringify(overtimeThenVsNow())'));
+  ok(t && t.earlyType==='green' && t.recentType==='oolong', 'K then-vs-now splits early vs recent by month median'); }
+// viewTimeline renders the spine + anchors; the Insights door gates on ≥2 months
+seed([{id:'a',name:'A',type:'green'}], [{id:'s1',teaId:'a',date:'2026-06-01'},{id:'s2',teaId:'a',date:'2026-07-01'},{id:'s3',teaId:'a',date:'2026-08-01'}]);
+{ const tl=G('viewTimeline()');
+  ok(/reflect-band/.test(tl) && /Teas over time/.test(tl) && /id="reflect-timeline"/.test(tl) && /id="reflect-arrivals"/.test(tl), 'K viewTimeline renders the spine + #reflect-* anchors'); }
+ok(/openReflection\('timeline'/.test(G('insOvertimeHTML()')), 'K insOvertimeHTML is the door into the timeline (≥2 months)');
+seed([{id:'a',name:'A'}], [{id:'s1',teaId:'a',date:'2026-08-01'}]);
+ok(G('insOvertimeHTML()')==='', 'K insOvertimeHTML absent under 2 months (never-guess)');
+ok(G('HISTORY_VIEWS.includes("timeline")'), 'K timeline is in HISTORY_VIEWS (Back returns to Insights)');
+console.log('  K Slice C terroir + teas-over-time: 12 checks');
 
 console.log('');
 if(failed){ console.log('REFLECTION TESTS FAILED — '+failed+' failed, '+passed+' passed'); process.exit(1); }

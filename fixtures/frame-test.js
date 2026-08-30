@@ -211,6 +211,12 @@ console.log('   behaviour, not frame — excluded. The Insights fence is confirm
 console.log('⚡ TEA-DETAIL (R177) — the last major surface joins the spine: .td-band is its fenced BAND masthead');
 console.log('   (above), the blocks are .td-sec RULE sections, Start session is the one clay SLAB. The .td-swatch');
 console.log('   (liquor) + .td-thumb (photo) are marks/content, not frame — excluded like the shelf swatch.');
+console.log('⚡ REFLECTION SLICE C (R174) — Your terroir (viewOrigins re-dressed in place) + Teas over time');
+console.log('   (viewTimeline) join the reflection family: both ride .reflect-band (fenced above) + reuse .ins-sec');
+console.log('   RULE sections (fenced under insights). They introduce NO new frame container — so no SURFACES');
+console.log('   entry and no new control (a class invented only to feed the fence is fenced in name only). The');
+console.log('   atlas pins/rings (.org-*) and the timeline bars/arrivals (.tot-*) are data marks, not frame —');
+console.log('   excluded like the palate bars. Reflection + insights checks above are confirmed unchanged.');
 
 /* ---------- verdict ---------- */
 console.log('');

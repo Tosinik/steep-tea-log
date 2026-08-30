@@ -619,8 +619,8 @@ function viewAchievements(){
 // R161 CULL — `reading` (cadence), `steepshape`, `recent` dropped. dashLayout() filters saved order/hidden
 // against this list, so a saved layout self-migrates; a stale surface-override for a dropped id never
 // renders (no builder). The `week` label loses its "mostly" hero eyebrow copy fix in DASH_LABELS below.
-const DASH_DEFAULT_ORDER = ['today','restock','favorites','week','hero','typemix','notes','wrapped','totals','clock','cost','origins'];
-const DASH_LABELS = { today:'Earlier today', restock:'Running low', favorites:'Favourites', week:'Sessions this week', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week', typemix:'Type mix', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins' };
+const DASH_DEFAULT_ORDER = ['today','restock','favorites','week','hero','typemix','notes','wrapped','totals','clock','cost','origins','overtime'];
+const DASH_LABELS = { today:'Earlier today', restock:'Running low', favorites:'Favourites', week:'Sessions this week', totals:'Totals', clock:'Brewing clock', cost:'Cost overview', hero:'This week', typemix:'Type mix', notes:'Quiet notes', wrapped:'SlowCup Wrapped', origins:'Origins', overtime:'Teas over time' };
 // Each card's home surface (v3.44 split): 'home' or 'insights'. Reorder/hide work per-tab.
 // Migration is automatic — existing saved {order,hidden} keep their visibility and gain a surface
 // from this map (nothing a user hid can reappear); ids no longer present are filtered out.
@@ -635,7 +635,8 @@ const DASH_SURFACE = {
   week:'insights',
   totals:'insights', clock:'insights', cost:'insights',
   hero:'insights', typemix:'insights', notes:'insights', wrapped:'insights',
-  origins:'insights'   // R54 — and PINNED there by DASH_PINNED below; this entry is only the default
+  origins:'insights',   // R54 — and PINNED there by DASH_PINNED below; this entry is only the default
+  overtime:'insights'   // R174 — the Teas-over-time door (unpinned, movable like wrapped)
 };
 // Per-user surface override (v3.47): edit mode can move a card between Home and Insights.
 // dashLayout.surface maps id→'home'|'insights', overriding the built-in DASH_SURFACE. Absent

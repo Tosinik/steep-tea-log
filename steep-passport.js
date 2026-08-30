@@ -292,13 +292,37 @@ function originsCountryRows(){
 }
 function goOrigins(){ state.view='origins'; state.activeTeaId=null; render(); }
 
+/* R174 (reflection Slice C) — terroir's two summaries, computed from the origins the whole shelf already
+   carries (no new field). terroirCensus is shelf-weighted (teas per country — the regions you span);
+   terroirGravitate is brew-weighted (sessions per country — what you reach for). Both count, never write
+   (R68); each returns [] when empty so the section stays absent (never-guess). passportCountryFor resolves
+   the country from origin-then-name, so a region-tier tea ("Uji, Japan") is counted under its country too. */
+function terroirCensus(){
+  const by = {};
+  (state.teas||[]).forEach(t=>{ const c = passportCountryFor(t); if(!c) return;
+    (by[c] = by[c] || {country:c, teas:[]}).teas.push(t); });
+  return Object.values(by).map(r=>({country:r.country, n:r.teas.length, teas:r.teas}))
+    .sort((a,b)=>b.n-a.n || a.country.localeCompare(b.country));
+}
+function terroirGravitate(){
+  const by = {};
+  (state.sessions||[]).forEach(s=>{ const t = teaById(s.teaId); if(!t) return;
+    const c = passportCountryFor(t); if(!c) return; by[c] = (by[c]||0)+1; });
+  return Object.entries(by).map(([country,n])=>({country, n}))
+    .sort((a,b)=>b.n-a.n || a.country.localeCompare(b.country));
+}
+
 function viewOrigins(){
   const marks = originsRegionMarks();
-  const countries = originsCountryRows();
-  // R19's zero-tea state (#09's slim addendum): no shelf, no atlas, and no map of nowhere.
-  if(!marks.length && !countries.length){
-    return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Origins</h2></div>
-      <div class="card empty">Your atlas fills in as you add teas — each one's origin puts it on the map.</div>`;
+  const countries = originsCountryRows();     // country-tier teas (not pinned) — listed under the span count
+  const census = terroirCensus();            // R174 — shelf-weighted: every country you span (the count)
+  const reach = terroirGravitate();          // R174 — brew-weighted: what you reach for
+  const totalTeas = census.reduce((a,c)=>a+c.n,0);
+  // R174 (Slice C): terroir extends Origins in place — a reflect-band masthead over the atlas plus two
+  // summaries. never-guess: no resolvable origin anywhere → the fill-in state, no masthead over nothing.
+  if(!marks.length && !census.length){
+    return `<div class="band reflect-band"><div class="ins-hero-eyebrow">Your terroir</div></div>
+      <div class="empty">Your terroir fills in as you add teas — each one's origin puts it on the map.</div>`;
   }
   let mapHTML = '';
   if(marks.length >= ORIGINS_MIN_MARKS){
@@ -337,23 +361,30 @@ function viewOrigins(){
       <div class="org-cap mono">${merged.length} place${merged.length===1?'':'s'} · ${total} tea${total===1?'':'s'}</div>
     </div>`;
   }
-  const listHTML = countries.length ? `<div class="card">
-    <div class="eyebrow">Known by country</div>
-    <div class="org-sub">These name a country, not a place inside it — so they are listed rather than pinned.</div>
+  // Where you span — the census COUNT (every country, both tiers) as the lead, then the country-tier teas
+  // listed (they name a country, not a place, so they're listed rather than pinned — the region-tier ones
+  // are the map's pins above, never duplicated here). Tap-throughs return to terroir (Back = 'origins').
+  const spanHTML = census.length ? `<div class="ins-sec"><div class="ins-sechead"><h2>Where you span</h2></div>
+    <div class="ins-cap" style="margin-bottom:10px;">You span ${census.length} countr${census.length===1?'y':'ies'} across ${totalTeas} tea${totalTeas!==1?'s':''}.</div>
+    ${countries.length ? `<div class="org-sub">These name a country, not a place inside it — so they are listed rather than pinned.</div>
     ${countries.map(c=>`<div class="org-row">
       <div style="flex:1;min-width:0;">
         <div class="org-country">${escapeHtml(c.country)}</div>
         <div class="org-teas">${c.teas.map(t=>`<button class="btn-ghost org-tea" onclick="openTeaDetail('${escapeJsArg(t.id)}','origins')">${escapeHtml(t.name)}</button>`).join('')}</div>
       </div>
       <span class="org-count mono">${c.teas.length}</span>
-    </div>`).join('')}
+    </div>`).join('')}` : ''}
   </div>` : '';
-  /* Rule 6 suppresses the map below two pins, and on a shelf of one pinned tea and no country-tier
-     ones that leaves the screen with nothing on it. The rule says "list only" and assumes the list
-     is there; this is the case where it isn't. A blank screen is worse than the empty state, which
-     at least says what would fill it. */
-  if(!mapHTML && !listHTML) return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Origins</h2></div>
-      <div class="card empty">Your atlas fills in as you add teas — each one's origin puts it on the map.</div>`;
-  return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Origins</h2></div>
-    ${mapHTML}${listHTML}`;
+  // What you reach for — brew-weighted (sessions per origin); absent until you've brewed (never-guess).
+  const reachHTML = reach.length ? `<div class="ins-sec"><div class="ins-sechead"><h2>What you reach for</h2></div>
+    ${reach.map(c=>insRow(escapeHtml(c.country), '×'+c.n)).join('')}
+    <div class="ins-cap" style="margin-top:8px;">You reach for ${escapeHtml(reach[0].country)} most.</div>
+  </div>` : '';
+  return `<div class="band reflect-band">
+      <div class="ins-hero-eyebrow">Your terroir</div>
+      <div class="ins-hero-title">Where your teas grew.</div>
+    </div>
+    ${mapHTML?`<div id="reflect-atlas" class="reflect-anchor">${mapHTML}</div>`:''}
+    ${spanHTML?`<div id="reflect-span" class="reflect-anchor">${spanHTML}</div>`:''}
+    ${reachHTML?`<div id="reflect-reach" class="reflect-anchor">${reachHTML}</div>`:''}`;
 }

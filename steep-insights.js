@@ -492,11 +492,26 @@ function insOriginsHTML(){
   // The tap target G deliberately left absent now has an honest destination for the first time.
   // R161: the second BOX (a door) — frame-level redress only (.section card org-entry → .ins-door); the
   // content (lead/sub strings, the atlas link) is parked for Origins' own rework, untouched.
-  return `<div class="ins-door org-entry" onclick="goOrigins()" role="button" tabindex="0">
-    <div class="eyebrow" style="margin-bottom:8px;">Origins</div>
+  // R174 (Slice C): the door now opens Your terroir (viewOrigins re-dressed to the reflection spine + the
+  // span/reach summaries). The lead/sub still describe the origin census; only the naming names terroir.
+  return `<div class="ins-door org-entry" onclick="goOrigins()" role="button" tabindex="0" aria-label="Your terroir">
+    <div class="eyebrow" style="margin-bottom:8px;">Terroir</div>
     <div class="ins-obs">${lead}</div>
     <div class="ins-cap" style="margin-top:6px;">${sub}</div>
-    <div class="org-entry-go mono">Open the atlas →</div>
+    <div class="org-entry-go mono">Open your terroir →</div>
+  </div>`;
+}
+// R174 (Slice C) — the door into Teas over time (viewTimeline). A BOX like Wrapped/Origins; needs a span
+// of ≥2 distinct months to be "over time" (never-guess), and opens the deep view via openReflection.
+function insOvertimeHTML(){
+  const S = state.sessions||[]; if(!S.length) return '';
+  const months = new Set(S.filter(s=>s.date).map(s=>monthKey(s.date))).size;
+  if(months < 2) return '';
+  return `<div class="ins-door" onclick="openReflection('timeline', null)" role="button" tabindex="0" aria-label="Teas over time">
+    <div class="eyebrow" style="margin-bottom:8px;">Over time</div>
+    <div class="ins-obs">Your shelf and your cups across ${months} months.</div>
+    <div class="ins-cap" style="margin-top:6px;">The seasons of your practice — teas coming and going.</div>
+    <div class="org-entry-go mono">Open the timeline →</div>
   </div>`;
 }
 function dashCardsInsights(s){
@@ -505,7 +520,8 @@ function dashCardsInsights(s){
     typemix: insTypeMixHTML(s),
     notes: insNotesHTML(s),
     wrapped: insWrappedTeaserHTML(),
-    origins: insOriginsHTML()
+    origins: insOriginsHTML(),
+    overtime: insOvertimeHTML()
   };
 }
 
@@ -638,4 +654,85 @@ function palateRatedHTML(s){
 // The data-ladder note (REFLECTION-SPEC): flavour-level depth deepens as tasting-input lands — a note, never a guess.
 function palateFlavourNoteHTML(){
   return `<div class="ins-sec"><div class="ins-cap">The finer grain of your palate — the flavours you actually taste — deepens as you add tasting notes to your sessions.</div></div>`;
+}
+
+/* ============ TEAS OVER TIME (v4.36, R174) — the continuous record (REFLECTION-SPEC view 5) ============
+   Wrapped is the monthly moment; this is the continuous record. Built entirely on shipped dates — session
+   .date (drinking), tea .purchaseDate||.dateAdded (acquisition), first-ever session per tea (arrivals, the
+   firstSeen pattern of R103/computeWrapped). Never-guess: then-vs-now needs ≥3 distinct session months or it
+   stays absent; every section drops when empty. All counts, never written (R68). monthKey lives in core. */
+function overtimeSeries(){
+  const sess={}, acq={};
+  (state.sessions||[]).forEach(s=>{ if(!s.date) return; const k=monthKey(s.date); sess[k]=(sess[k]||0)+1; });
+  (state.teas||[]).forEach(t=>{ const d=t.purchaseDate||t.dateAdded; if(!d) return; const k=monthKey(d); acq[k]=(acq[k]||0)+1; });
+  const keys=[...new Set([...Object.keys(sess),...Object.keys(acq)])].sort();
+  return keys.map(k=>({month:k, sessions:sess[k]||0, acquired:acq[k]||0}));
+}
+function overtimeArrivals(){
+  const first={};
+  (state.sessions||[]).forEach(s=>{ if(!s.teaId||!s.date) return; const t=+new Date(s.date);
+    if(first[s.teaId]==null || t<first[s.teaId]) first[s.teaId]=t; });
+  return Object.entries(first).map(([id,t])=>({tea:teaById(id), t})).filter(r=>r.tea)
+    .sort((a,b)=>b.t-a.t);                                  // most recent arrival first
+}
+function overtimeThenVsNow(){
+  const months=[...new Set((state.sessions||[]).filter(s=>s.date).map(s=>monthKey(s.date)))].sort();
+  if(months.length < 3) return null;                        // too short a history to speak of "then vs now"
+  const mid=months[Math.floor(months.length/2)];
+  const early=[], recent=[];
+  (state.sessions||[]).forEach(s=>{ if(!s.date) return; (monthKey(s.date)<mid?early:recent).push(s); });
+  const topType = arr => { const c={}; arr.forEach(s=>{ const t=teaById(s.teaId); if(t&&t.type) c[t.type]=(c[t.type]||0)+1; });
+    const e=Object.entries(c).sort((a,b)=>b[1]-a[1]); return e.length?e[0][0]:null; };
+  return { earlyType:topType(early), recentType:topType(recent), earlyN:early.length, recentN:recent.length, mid };
+}
+
+function viewTimeline(){
+  const S=state.sessions||[], T=state.teas||[];
+  if(!S.length && !T.length) return reflectEmpty('Teas over time', 'Your shelf and your cups fill in a timeline as you log.');
+  return `
+    <button class="detail-back" onclick="goView('insights')">← Back to Insights</button>
+    <div class="band reflect-band">
+      <div class="ins-hero-eyebrow">Teas over time</div>
+      <div class="ins-hero-title">Your shelf and your cups, across time.</div>
+    </div>
+    <div id="reflect-timeline" class="reflect-anchor">${overtimeSeriesHTML()}</div>
+    <div id="reflect-thenvsnow" class="reflect-anchor">${overtimeThenVsNowHTML()}</div>
+    <div id="reflect-arrivals" class="reflect-anchor">${overtimeArrivalsHTML()}</div>`;
+}
+const TOT_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function totMonthLabel(k){ const [y,m]=k.split('-'); return TOT_MON[+m-1]+' '+y.slice(2); }
+// Month density — cups per month as a bar (a mark), +N marking teas that arrived that month.
+function overtimeSeriesHTML(){
+  const rows=overtimeSeries(); if(rows.length<2) return '';   // a single month isn't a timeline
+  const max=Math.max(...rows.map(r=>r.sessions), 1);
+  const body=rows.map(r=>`<div class="tot-mrow">
+    <span class="mono tot-mlabel">${totMonthLabel(r.month)}</span>
+    <span class="tot-bar-track"><span class="tot-bar" style="width:${Math.max(3,Math.round(r.sessions/max*100))}%"></span></span>
+    <span class="mono tot-mcount">${r.sessions}${r.acquired?` · +${r.acquired}`:''}</span>
+  </div>`).join('');
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>Month by month</h2></div>${body}
+    <div class="ins-cap" style="margin-top:8px;">Bars are cups logged; +N marks teas that arrived that month.</div></div>`;
+}
+function overtimeThenVsNowHTML(){
+  const t=overtimeThenVsNow(); if(!t || !t.earlyType || !t.recentType) return '';
+  const line = t.earlyType===t.recentType
+    ? `${typeLabel(t.earlyType)} then, ${typeLabel(t.recentType).toLowerCase()} now — steady.`
+    : `${typeLabel(t.earlyType)} then, ${typeLabel(t.recentType).toLowerCase()} now.`;
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>Then and now</h2></div>
+    ${insRow('Earlier', typeLabel(t.earlyType))}
+    ${insRow('Lately', typeLabel(t.recentType))}
+    <div class="ins-cap" style="margin-top:8px;">${escapeHtml(line)}</div></div>`;
+}
+// How your shelf arrived — the chronology of first cups, newest first, each a liquor swatch (colour as data)
+// + a tap-through. The full history lives on the shelf; this names the recent arrivals.
+function overtimeArrivalsHTML(){
+  const arr=overtimeArrivals(); if(!arr.length) return '';
+  const recent=arr.slice(0,8);
+  const rows=recent.map(r=>{
+    const when=fmtDate(new Date(r.t).toISOString());
+    const sw=`<span ${swatchAttr('tot-arr-swatch', liquorFor(r.tea), (r.tea.type||'').toLowerCase())}></span>`;
+    return `<div class="tot-arr">${sw}<button class="btn-ghost tot-arr-name" onclick="openTeaDetail('${escapeJsArg(r.tea.id)}','insights')">${escapeHtml(r.tea.name)}</button><span class="mono tot-arr-when">${escapeHtml(when)}</span></div>`;
+  }).join('');
+  return `<div class="ins-sec"><div class="ins-sechead"><h2>How your shelf arrived</h2></div>${rows}
+    ${arr.length>recent.length?`<div class="ins-cap" style="margin-top:8px;">The ${recent.length} most recent of ${arr.length}.</div>`:''}</div>`;
 }
