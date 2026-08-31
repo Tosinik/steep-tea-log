@@ -250,9 +250,9 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.39 STAGED (built, unpushed — awaiting review + `/slowcup-deploy`; flip to LIVE + hash on push) —
-wave-1 #2.5: tea-page polish + the info-popover + material suggester (R180)** (cache **v149**, APP_VERSION
-v4.39, **no SQL**, **no new module**). Four parts, one slice, off `TEA-PAGE-CALM-COPY-POLISH.md`.
+**NOW — v4.39 LIVE `96be0d8` — wave-1 #2.5: tea-page polish + the info-popover + material suggester (R180)**
+(cache **v149**, APP_VERSION v4.39, **no SQL**, **no new module**). Four parts, one slice, off
+`TEA-PAGE-CALM-COPY-POLISH.md`.
 - **D1 section rhythm** — three scoped CSS rules (`.td-sec` gap 18→30px; scoped `.td-sechead .eyebrow`
   presence; `.td-sechead` air), typography+space only, no re-box. **frame-test 46.**
 - **D2 the info-popover** — `infoMark(text,label)` + `toggleInfoPop`/`closeInfoPop` in core.js beside
