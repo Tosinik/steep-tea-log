@@ -125,10 +125,16 @@ build.** What's next, in order:
      → `steep-version.js`), "do-not-build" banners on the command-rebuild docs, misinformer reconciles.
      No app files, no version/cache bump.
    - **Wave 1 — the design gap: ~~sessions list~~ (#1 DONE v4.37/R178) → vendor/keyboard (#2, NEXT) →
-     session-flow re-dress (#3).** #1 shipped: the sessions LIST joined the spine (rows → RULE, the
-     photo→liquor-swatch lead — Sessions distinct from Library). #2 next: the vendor `<datalist>` behind the
-     mobile keyboard (the app has no viewport/focus-scroll handling — `AUDIT-REPORT-v4.36.md` §B2). #3 the
-     session FLOW (setup/steeping/finish/quick — the core ritual) is **designed in
+     tea-page + calm-copy polish (#2.5) → session-flow re-dress (#3).** #1 shipped: the sessions LIST joined
+     the spine (rows → RULE, the photo→liquor-swatch lead — Sessions distinct from Library). #2 next: the
+     vendor `<datalist>` behind the mobile keyboard (the app has no viewport/focus-scroll handling —
+     `AUDIT-REPORT-v4.36.md` §B2). **#2.5 tea-page + calm-copy polish**
+     (`docs/r5/planning/TEA-PAGE-CALM-COPY-POLISH.md`, from the on-device review of v4.37). Three parts.
+     Tea-page section rhythm so each section reads as a distinct journal entry, with no re-boxing. A reusable
+     ⓘ-popover explainer component, an app-wide pattern proven on the tea page. Copy de-AI-ification, an
+     em-dash purge that becomes a house-style rule going forward and binds specs and prompts too. It feeds
+     #3: the session-flow track uses the ⓘ-popover for its own explainers. #3 the session FLOW
+     (setup/steeping/finish/quick — the core ritual) is **designed in
      `docs/r5/planning/SESSION-FLOW-REDESIGN.md`** (the build authority; Q1/Q2 resolved 2026-08-30).
    - **Hygiene riders (thereafter):** free-delete orphans (`dotsRow`/`fmtStars`/`toggleTheme`/
      `flavorFamilyOf`/`achievementsHTML` + the unguarded passport dot-map leftovers); achievements R134

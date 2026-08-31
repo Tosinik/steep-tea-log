@@ -109,7 +109,9 @@ decisions rather than any single ruling:
   and **Slice C (terroir + teas-over-time, v4.36/R174) — the reflection is now COMPLETE.** The **codebase/docs
   audit is DONE** (`docs/r5/planning/AUDIT-REPORT-v4.36.md`, the living seed): wave 0 (docs, shipped) + a ranked
   wave-1 build queue. **Wave 1 building: #1 the Sessions list re-dress SHIPPED v4.37/R178** (rows → RULE, the
-  photo→liquor-swatch lead); #2 vendor+keyboard next; #3 session-flow re-dress designed
+  photo→liquor-swatch lead); #2 vendor+keyboard next; **#2.5 tea-page + calm-copy polish** (section rhythm +
+  a reusable ⓘ-popover explainer component + copy de-AI-ification; `TEA-PAGE-CALM-COPY-POLISH.md`, from
+  on-device review of v4.37, feeds #3); #3 session-flow re-dress designed
   (`SESSION-FLOW-REDESIGN.md`). Then SECURITY re-blocks before the beta widens.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the

@@ -179,6 +179,10 @@ Hygiene is strong.
    distinct from Library (moment-forward vs identity-forward).
 5. **Vendor field + keyboard handling.** *Medium.* Real on-phone breakage; fix pattern already exists (vendor
    via the picker pattern; add a general modal focus-scroll for the siblings).
+   **Then #2.5 — tea-page + calm-copy polish** (inserted from the on-device review of v4.37, not an audit
+   finding; `TEA-PAGE-CALM-COPY-POLISH.md`): tea-page section rhythm (journal-distinct, no re-boxing), a
+   reusable ⓘ-popover explainer component (app-wide, proven on the tea page), and copy de-AI-ification
+   (em-dash purge, a house-style rule going forward). Feeds #3.
 6. **Session flow → the full IA redesign** — now **designed in `SESSION-FLOW-REDESIGN.md`** (facts-before-
    feelings #22, session-level tasting, the hierarchical tagger, guided-tasting mode, timer rework, + two
    folded bugs: focus-breath cue, earned-vocab resurfacing). *Deep, multi-slice track — not a one-shot.*

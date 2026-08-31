@@ -12,7 +12,9 @@
 > Companions: `IDEA-tasting-mode.md` (the guided-mode sequence + the deep/everyday spectrum),
 > `docs/r3/planning/DATA-flavour-tree.md` (the 12-family tree the tagger is built on),
 > `docs/r5/planning/INSIGHT-ENGINE-SPEC.md` (structured tasting feeds its *character* half — clean signal,
-> never free-text noise).
+> never free-text noise),
+> `docs/r5/planning/TEA-PAGE-CALM-COPY-POLISH.md` (wave-1 #2.5, built before this track; #3's explainers use
+> its reusable ⓘ-popover component, and its copy follows the de-AI'd house style).
 
 ---
 
