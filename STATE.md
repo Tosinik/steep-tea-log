@@ -242,7 +242,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.37 STAGED (built green, UNPUSHED — awaiting review + `/slowcup-deploy`) — wave-1 #1: the Sessions
+**NOW — v4.37 LIVE `5a8b03b` — wave-1 #1: the Sessions
 list re-dress (spine + warmth + photo→swatch) (R178)** (cache **v147**, APP_VERSION v4.37, **no SQL**, **no
 new module**). The first wave-1 build off the audit — the last list joins the spine, and colour-as-data reaches
 the one surface that missed it.
@@ -256,8 +256,9 @@ the one surface that missed it.
 - **Fence:** new `SURFACES.sessions` + a `.sess-cal` BOX positive + `chkNoClay(SURFACES.sessions)` + 3 biting
   controls; `.sess-lead`/`.sess-swatch` are MARKS, excluded (guarded in liquor-test). **frame-test 40→46;
   liquor-test 78→82** (F1 tints 12→10, F2 swatch sites 12→13). **All 44 committed suites exit 0**, export-gate first.
-- **HAND-OFF:** UNPUSHED for review + the on-device smoke (`smoke.md §v4.37`, locally drivable — a rendered
-  component). After Niklas pushes, flip this NOW block STAGED→LIVE with the commit hash (the v4.36 precedent).
+- **ON DEVICE (`smoke.md §v4.37`, post-push, locally drivable — a rendered component):** rows read as one warm
+  list; a photo row vs a swatch row both read; tier-3 / deleted-tea → the dashed plate; header BAND + calendar
+  BOX read; **Sessions now reads distinct from Library** (moment-forward vs identity-forward). Fix-forward if any fail.
 - **NEXT — wave-1 #2: the vendor field + keyboard handling** (`AUDIT-REPORT-v4.36.md` §B2), then wave-1 #3
   (session-flow re-dress, `SESSION-FLOW-REDESIGN.md`). **SECURITY F1/F2 stays the hard pre-widening gate.**
 

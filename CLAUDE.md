@@ -159,7 +159,11 @@ because *the planning lane cannot review what it cannot clone* — so a **docs-o
 STATE, ROADMAP, CHANGELOG-only, `smoke.md`, this file) is **pushed the moment it is written**, because
 pushing is what makes it cloneable and reviewable; holding it back serves the opposite of the rule's
 purpose. A change that **touches an app file** (a real deploy) still **pauses UNPUSHED** for review and
-for any `smoke.md` on-device gate the slice requires; Niklas pushes it. When a deploy carries both —
+for any `smoke.md` on-device gate the slice requires. **The code commit waits unpushed for Niklas's
+review; it is pushed on Niklas's go-ahead — Niklas runs `git push` / `/slowcup-deploy`, or authorizes
+Claude to push. Nothing goes live without Niklas's authorization** (Claude cannot self-invoke
+`/slowcup-deploy` — it is `disable-model-invocation`, so "push" means Claude runs `git push` once
+authorized). When a deploy carries both —
 docs *and* code — keep them as **separate commits** (the docs push on write; the code commit waits),
 so the reviewable record isn't held hostage to the code gate. One rule, two speeds, same reason.
 
