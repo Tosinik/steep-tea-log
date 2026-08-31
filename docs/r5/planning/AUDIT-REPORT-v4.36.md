@@ -150,8 +150,8 @@ Hygiene is strong.
   handlers resolve; the v4.33 `brewNudgeRowHTML` ordering fix has **no unfixed siblings** (timer + profile
   check their edit-state in the right order); `return ''` guards are intentional calm-first "absent when no
   data." A genuine clean bill on the interaction layer.
-- **Class 5 (keyboard/viewport) — the one real bug, and it's systemic.** The app has **zero**
-  `visualViewport`/`resize`/focus-scroll handling anywhere.
+- **Class 5 (keyboard/viewport) — the one real bug, and it's systemic.** *(FIXED v4.38 / R179 — see ranked
+  #5.)* The app had **zero** `visualViewport`/`resize`/focus-scroll handling anywhere (the finding as read).
   - **Vendor picker (steep-teas.js:751)** — the flagged target, confirmed: a native `<input list=vendorList>`
     in the Specifics fold near the *bottom* of a `position:fixed` tea-form overlay; iOS won't reliably scroll
     it above the keyboard, and the datalist popup fights the keyboard for the same strip. Effectively dead on
@@ -177,8 +177,12 @@ Hygiene is strong.
 4. ~~**Sessions list → spine + warmth.**~~ **DONE — v4.37 / R178** (wave-1 #1): rows → RULE, the
    session's own photo → liquor-swatch lead (`sessLeadHTML`), header BAND, calendar BOX. Sessions is now
    distinct from Library (moment-forward vs identity-forward).
-5. **Vendor field + keyboard handling.** *Medium.* Real on-phone breakage; fix pattern already exists (vendor
-   via the picker pattern; add a general modal focus-scroll for the siblings).
+5. ~~**Vendor field + keyboard handling.**~~ **DONE — v4.38 / R179** (wave-1 #2): the occlusion is closed
+   app-wide by one systemic `visualViewport` focus-scroll (`installKeyboardReveal`, delegated over all three
+   overlays + the inline-page fields); both native `<datalist>`s (tea-form `#source` + wishlist `#wishVendor`)
+   → an in-form `.tag-suggest` inline suggester. **Vendor stayed in-form, NOT a full-screen picker** — the
+   ratified split, because the tea form is uncontrolled (read on submit) and a router picker's `render()`
+   would wipe every typed field (the code-verified blocker the build confirmed).
    **Then #2.5 — tea-page + calm-copy polish** (inserted from the on-device review of v4.37, not an audit
    finding; `TEA-PAGE-CALM-COPY-POLISH.md`): tea-page section rhythm (journal-distinct, no re-boxing), a
    reusable ⓘ-popover explainer component (app-wide, proven on the tea page), and copy de-AI-ification

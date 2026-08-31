@@ -46,6 +46,59 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.38 — wave-1 #2: vendor field + keyboard occlusion — R179
+
+Deploy: steep-core.js, steep-teas.js, steep-sessions.js, steep-shopping.js, service-worker.js (cache v148),
+steep-version.js, .gitignore, fixtures/vendor-keyboard-test.js, CHANGELOG.md, STATE.md, ROADMAP-v4.md,
+smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md, docs/r5/planning/AUDIT-REPORT-v4.36.md. No SQL. No new module.
+
+The one genuine on-phone bug the v4.36 audit found (`AUDIT-REPORT-v4.36.md` §B2, wave-1 #2): the mobile
+keyboard occludes the Shop/vendor field. It was two problems, not one — the app had **zero**
+`visualViewport`/focus-scroll handling anywhere (every low field in the fixed-overlay modals sat behind the
+keyboard), and the native `<datalist>`'s OS popup fought the keyboard for the same bottom strip. Fix-split
+(R179): the datalist becomes an in-form inline suggester; the occlusion is closed app-wide by one systemic
+mechanism. **Vendor is NOT a full-screen picker** — the tea form is uncontrolled (values read from the DOM
+on submit), so a router picker's full `render()` would wipe every typed field; the picker pattern
+presupposes state-backed data (the session draft), which the tea form isn't (the code-verified blocker).
+
+- **Systemic keyboard-reveal** (`installKeyboardReveal`, steep-core.js, installed once from `init` —
+  mirrors `installResumeSync`): a delegated `visualViewport` resize listener plus a `focusin` handler
+  scrolls the active field above the keyboard, using the visual viewport's real height. Scrolls
+  **only when the field is actually occluded** (no jank on already-visible fields), instant under
+  `prefers-reduced-motion`, `if(window.visualViewport)` feature-detected + try/catch. Covers all three
+  `.overlay` modals (tea/vessel/settings) **and** the inline-page fields (`#tagInputField` during steeping,
+  `#wishName`, `#userSearch`, `#timerTargetEdit`) by delegation — no per-field wiring, so the whole Class-5
+  finding closes at once, not one field at a time.
+- **Both native `<datalist>`s retired** — the tea-form `#source` (steep-teas.js) and the wishlist
+  `#wishVendor` (steep-shopping.js) → an inline `.tag-suggest` popover that rides the layout instead of an
+  OS popup. `distinctVendors()` substring-filtered; a tap writes `input.value` (a plain DOM write — the
+  uncontrolled form is untouched, `submitTeaForm` still reads `name="source"`); a brand-new typed vendor
+  still saves.
+- **One suggester writer** — `renderTagSuggest` (steep-sessions.js) and the vendor suggester both call a
+  shared `renderFieldSuggest(boxId, query, items, onPickExpr)` (steep-core.js), extracted from the tag
+  renderer with its #29 mousedown+preventDefault discipline preserved exactly (flavor-ladder H9 green across
+  the extraction). `renderVendorSuggest`/`pickVendorSuggest` (steep-teas.js) are the two-call-site wrappers.
+  The shared extraction was chosen over a parallel renderer because H9 pins the tag markup and stayed green.
+- **Fence:** no new `SURFACES` entry. The reveal is behaviour (no CSS frame); the suggester reuses the
+  already-un-fenced `.tag-suggest`/`.tag-input-wrap` transient popover on the tea-form modal, itself
+  not-yet-spined (audit ranked #7). Inventing a class to feed the fence is exactly what R179 declines. No
+  styles.css change (the vendor input takes full width via inline `width:100%` under the global
+  `box-sizing:border-box`). **frame-test 46 unchanged.**
+- **Fixtures:** new `fixtures/vendor-keyboard-test.js` (24) — Arm A (vm) the suggester value round-trip
+  (`distinctVendors` → render → pick writes the value back, HTML/JS-escaped, capped at 6); Arm B (source
+  scan) the wiring a vm can't drive (both datalists gone, `name="source"` intact, the reveal present +
+  feature-detected + installed-once + reduced-motion-gated + occlusion-gated, the shared renderer). **45th
+  suite; all committed suites green, export-gate first.**
+- **ON DEVICE (`smoke.md §v4.38`, post-push — the real gate; a vm has no keyboard):** focusing vendor +
+  every sibling below it + the vessel/settings-modal fields + `#tagInputField` during steeping + the
+  inline-page fields all clear the keyboard; the vendor suggester reads (no native popup; a tap fills; a
+  new typed vendor still saves); nothing regresses (forms save, vendor round-trips, already-visible fields
+  don't jump).
+- **NEXT — wave-1 #2.5: tea-page + calm-copy polish** (`TEA-PAGE-CALM-COPY-POLISH.md`), then wave-1 #3
+  (session-flow re-dress, `SESSION-FLOW-REDESIGN.md`). **SECURITY F1/F2 stays the hard pre-widening gate.**
+  Ledger **R179**.
+
+---
 ## v4.37 — wave-1 #1: the Sessions list re-dress (spine + warmth + photo→swatch) — R178
 
 Deploy: styles.css, steep-sessions.js, steep-dashboard.js, service-worker.js (cache v147),

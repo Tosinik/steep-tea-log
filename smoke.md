@@ -116,6 +116,29 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.38 · wave-1 #2 — vendor field + keyboard occlusion  *(on device, post-deploy — a vm has no keyboard)*
+
+The suggester value round-trip + the reveal wiring are vm-covered (`vendor-keyboard-test.js`); whether the
+keyboard actually clears the field is only visible on a real phone. Do these on a phone, in portrait.
+
+1. **The vendor field clears the keyboard.** Add or edit a tea → open **Specifics** → tap **Shop / vendor**
+   (near the bottom of the form). The field **scrolls up and stays visible above the keyboard** — not left
+   behind it. Typing shows an **inline suggestion list** (no native dropdown fighting the keyboard); tapping a
+   suggestion **fills the field**; typing a **brand-new** shop and saving keeps that new value.
+2. **Every sibling below vendor clears the keyboard too.** Same form: **Price paid**, **Grams bought**,
+   **Purchase/Opened date**, **Description** — each, on focus, sits above the keyboard.
+3. **The other overlays.** Add/edit a **vessel** and open **Settings**: focusing any text field keeps it
+   visible above the keyboard (same fixed-overlay pattern, covered by the one mechanism).
+4. **`#tagInputField` during steeping — the worst-placed one.** In a live gongfu/senchadō sitting, open **your
+   own word** under "What are you tasting?" (it sits below the timer + chips) → the field clears the keyboard.
+5. **Inline-page fields.** Shopping **Add to list** (`#wishName`) and **Shop / vendor** (`#wishVendor` — now the
+   same inline suggester, no native dropdown); **Find people** on Friends (`#userSearch`); the **timer target**
+   inline edit — each stays visible on focus.
+6. **No regression.** Tea / vessel / session forms **save** correctly; the vendor value **round-trips** into the
+   saved tea; an **already-visible** field (e.g. the Library search at the top) does **not** jump when focused.
+
+---
+
 ## v4.37 · wave-1 #1 — the Sessions list re-dress  *(locally drivable — a rendered component, pre-push)*
 
 The rows/lead/BOX are vm-covered (frame-test §sessions, liquor-test §R178); whether they READ as one warm,

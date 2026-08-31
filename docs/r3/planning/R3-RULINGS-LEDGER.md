@@ -2484,9 +2484,44 @@ biting controls (jade fill on `.sess-row`; torn radius on `.sess-cal` → radius
 `.sess-row` → zero-clay). The `.sess-lead` photo + `.sess-swatch` liquor are MARKS, excluded from the
 frame (guarded in liquor-test). frame-test 40→46; liquor-test 78→82 (`sessLeadHTML`'s four branches +
 site scan F1 12→10 / F2 12→13). All 44 committed suites exit 0. On-device: smoke.md §v4.37 (locally
-drivable). **R179 reserved** for a later calendar/heatmap-box split if wanted (not needed here — both
-ride `.sess-cal` / de-carded). **NEXT: wave-1 #2 (vendor + keyboard), then #3 (session-flow re-dress,
-`SESSION-FLOW-REDESIGN.md`).**
+drivable). *(A later calendar/heatmap-box split, if ever wanted, is **unnumbered** — both ride `.sess-cal`
+/ de-carded; **R179 was assigned to wave-1 #2, vendor + keyboard, below** (v4.38), not to that split.)*
+**NEXT: wave-1 #2 (vendor + keyboard), then #3 (session-flow re-dress, `SESSION-FLOW-REDESIGN.md`).**
+
+**R179 — wave-1 #2: vendor field + keyboard occlusion, fixed as a class not a field.** Shipped v4.38
+(cache v148, no SQL, no new module). The v4.36 audit (§B2, "Class 5") ranked this wave-1 #2 — the one
+genuine on-phone bug, and systemic: the app had **zero** `visualViewport`/focus-scroll handling, so every
+low field in the three fixed `.overlay` modals (tea/vessel/settings) sat behind the soft keyboard, and the
+native `<datalist>`'s OS popup fought the keyboard for the same bottom strip. **Two problems, split two
+ways.** (1) **Occlusion → one systemic writer.** `installKeyboardReveal` (steep-core.js, installed once from
+`init`, mirroring `installResumeSync`): a delegated `visualViewport` resize listener + a `focusin` handler
+scrolls the active field above the keyboard using the visual viewport's real height — **only when it
+is actually occluded** (no jank on already-visible fields), instant under `prefers-reduced-motion`,
+`if(window.visualViewport)` feature-detected + try/catch. Covers all three overlays **and** the inline-page
+fields (`#tagInputField` during steeping, `#wishName`/`#userSearch`/`#timerTargetEdit`) by delegation — the
+whole Class-5 finding closes at once, not one field at a time. (2) **The datalist → an in-form inline
+suggester.** Both native `<datalist>`s (tea-form `#source`, wishlist `#wishVendor`) become a `.tag-suggest`
+popover that rides the layout instead of an OS popup; `distinctVendors()` substring-filtered; a tap writes
+`input.value` (a plain DOM write — the uncontrolled tea form is untouched, `submitTeaForm` still reads
+`name="source"`); a brand-new typed vendor still saves. **The ratified fix-split: vendor is NOT a
+full-screen picker.** The code-verified blocker — the tea form is *uncontrolled* (typed values live in the
+DOM, read on submit), so a router picker's full `render()` would wipe every in-progress field; the picker
+pattern (`openPicker`) presupposes state-backed data (the session draft), which the tea form is not. Making
+vendor a picker would force the form into state-backing (biggest change, real regression surface on
+fold/draft-image/tare/stars) or fork the picker into a sub-overlay — both rejected. **Single writer:**
+`renderTagSuggest` (steep-sessions) and the vendor suggester both call a shared `renderFieldSuggest`
+(steep-core), extracted from the tag renderer with its #29 mousedown+preventDefault preserved exactly
+(flavor-ladder H9 green across the extraction — chosen over a parallel renderer *because* H9 pins the
+markup and stayed green). **Fence verdict: no new surface.** The reveal is behaviour (no CSS frame); the
+suggester reuses the already-un-fenced `.tag-suggest`/`.tag-input-wrap` transient popover on the tea-form
+modal (itself not-yet-spined, audit #7); no styles.css change (the vendor input takes full width via inline
+`width:100%` under the global `box-sizing:border-box`). Inventing a `SURFACES` entry to feed the fence is
+exactly what this declines — **frame-test stays 46.** Fixtures: new `vendor-keyboard-test.js` (24 — Arm A
+the suggester value round-trip in the vm, Arm B the wiring source-scan a vm cannot drive: both datalists
+gone, `name="source"` intact, the reveal present + feature-detected + installed-once + reduced-motion-gated,
+the shared renderer); 45th suite, all green, export-gate first. On-device: smoke.md §v4.38 (post-push — a vm
+has no keyboard). **NEXT: wave-1 #2.5 (tea-page + calm-copy polish, `TEA-PAGE-CALM-COPY-POLISH.md`), then #3
+(session-flow, `SESSION-FLOW-REDESIGN.md`).**
 
 ### Also recorded (not rulings) — the frame ruling (map still held)
 

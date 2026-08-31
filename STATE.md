@@ -124,11 +124,13 @@ build.** What's next, in order:
    - **Wave 0 — docs-only (SHIPPED, this commit):** deploy-gate repoint (`verifier.md` + `slowcup-deploy`
      → `steep-version.js`), "do-not-build" banners on the command-rebuild docs, misinformer reconciles.
      No app files, no version/cache bump.
-   - **Wave 1 — the design gap: ~~sessions list~~ (#1 DONE v4.37/R178) → vendor/keyboard (#2, NEXT) →
-     tea-page + calm-copy polish (#2.5) → session-flow re-dress (#3).** #1 shipped: the sessions LIST joined
-     the spine (rows → RULE, the photo→liquor-swatch lead — Sessions distinct from Library). #2 next: the
-     vendor `<datalist>` behind the mobile keyboard (the app has no viewport/focus-scroll handling —
-     `AUDIT-REPORT-v4.36.md` §B2). **#2.5 tea-page + calm-copy polish**
+   - **Wave 1 — the design gap: ~~sessions list~~ (#1 DONE v4.37/R178) → ~~vendor/keyboard~~ (#2 DONE
+     v4.38/R179) → tea-page + calm-copy polish (#2.5, NEXT) → session-flow re-dress (#3).** #1 shipped: the
+     sessions LIST joined the spine (rows → RULE, the photo→liquor-swatch lead — Sessions distinct from
+     Library). #2 shipped: the mobile keyboard occlusion closed app-wide by one systemic `visualViewport`
+     focus-scroll (`installKeyboardReveal`) + both native `<datalist>`s → an in-form inline suggester; vendor
+     stayed in-form (NOT a router picker — the uncontrolled tea form would lose typed fields). **#2.5 (NEXT)
+     tea-page + calm-copy polish**
      (`docs/r5/planning/TEA-PAGE-CALM-COPY-POLISH.md`, from the on-device review of v4.37). Three parts.
      Tea-page section rhythm so each section reads as a distinct journal entry, with no re-boxing. A reusable
      ⓘ-popover explainer component, an app-wide pattern proven on the tea page. Copy de-AI-ification, an
@@ -248,7 +250,35 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.37 LIVE `5a8b03b` — wave-1 #1: the Sessions
+**NOW — v4.38 STAGED (built, unpushed — awaiting review + `/slowcup-deploy`; flip to LIVE + hash on push, the
+v4.37 STAGED→LIVE pattern) — wave-1 #2: vendor field + keyboard occlusion (R179)** (cache **v148**, APP_VERSION
+v4.38, **no SQL**, **no new module**). The one genuine on-phone bug the v4.36 audit found (§B2, "Class 5"), and
+it was systemic — the app had **zero** `visualViewport`/focus-scroll handling. Fixed as a class, not a field.
+- **Systemic keyboard-reveal** (`installKeyboardReveal`, steep-core.js, installed once from `init` — mirrors
+  `installResumeSync`): a delegated `visualViewport` resize + `focusin` scrolls the focused field above the
+  keyboard using the visual viewport's real height, **only when it's occluded** (no jank on visible fields),
+  instant under `prefers-reduced-motion`, `if(window.visualViewport)` feature-detected + try/catch. Covers all
+  three `.overlay` modals (tea/vessel/settings) **and** the inline-page fields (`#tagInputField` during steeping,
+  `#wishName`/`#userSearch`/`#timerTargetEdit`) by delegation — one writer, no per-field patch.
+- **Both native `<datalist>`s retired** (tea-form `#source` + wishlist `#wishVendor`) → an in-form `.tag-suggest`
+  inline suggester that rides the layout instead of an OS popup fighting the keyboard. `distinctVendors()`
+  substring-filtered; a tap writes `input.value` (plain DOM write — uncontrolled form untouched, `submitTeaForm`
+  still reads `name="source"`); a new typed vendor still saves.
+- **Ratified split: vendor is NOT a full-screen picker.** Code-verified blocker — the tea form is uncontrolled
+  (read on submit), so a router picker's `render()` would wipe every typed field. **Single writer:**
+  `renderTagSuggest` + the vendor suggester share `renderFieldSuggest` (steep-core), extracted with the #29
+  mousedown+preventDefault preserved (flavor-ladder H9 green across it).
+- **Fence:** no new `SURFACES` — the reveal is behaviour, the suggester reuses the un-fenced `.tag-suggest`
+  popover on the not-yet-spined tea-form modal; no styles.css change. **frame-test 46 unchanged.** New
+  `fixtures/vendor-keyboard-test.js` (24, the 45th suite); all committed suites green, export-gate first.
+- **ON DEVICE (`smoke.md §v4.38`, post-push — a vm has no keyboard):** vendor + every sibling + vessel/settings
+  fields + `#tagInputField` during steeping + inline-page fields clear the keyboard; the suggester reads (no
+  native popup; a tap fills; a new typed vendor saves); no regression (forms save, vendor round-trips, visible
+  fields don't jump). Fix-forward if any fail.
+- **NEXT — wave-1 #2.5: tea-page + calm-copy polish** (`TEA-PAGE-CALM-COPY-POLISH.md`), then wave-1 #3
+  (session-flow re-dress, `SESSION-FLOW-REDESIGN.md`). **SECURITY F1/F2 stays the hard pre-widening gate.**
+
+**Previously — v4.37 LIVE `5a8b03b` — wave-1 #1: the Sessions
 list re-dress (spine + warmth + photo→swatch) (R178)** (cache **v147**, APP_VERSION v4.37, **no SQL**, **no
 new module**). The first wave-1 build off the audit — the last list joins the spine, and colour-as-data reaches
 the one surface that missed it.
