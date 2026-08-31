@@ -388,14 +388,23 @@ function rebuyNo(id){ markRebuyAsked(id); render(); }
 function distinctVendors(){
   return [...new Set(state.teas.map(t=>(t.source||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 }
-// R179: the shop/vendor inline suggester (tea form + wishlist), replacing the native <datalist>.
-// Substring-filters distinctVendors() through the shared renderFieldSuggest; a tap writes the value
-// straight into the input (a plain DOM write — the tea form is uncontrolled, read on submit), and a
-// brand-new typed vendor is simply left as-is. Parametrized by input/box id for its two call sites.
-function renderVendorSuggest(query, inputId, boxId){
-  renderFieldSuggest(boxId, query, distinctVendors(), m=>`pickVendorSuggest('${escapeJsArg(m)}','${escapeJsArg(inputId)}','${escapeJsArg(boxId)}')`);
+// R180 D4: the analog of distinctVendors over the vessel shelf, feeding the material suggester.
+function distinctMaterials(){
+  return [...new Set(state.vessels.map(v=>(v.material||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 }
-function pickVendorSuggest(val, inputId, boxId){
+// R179/R180: the shop/vendor + material inline suggesters, replacing the native <datalist>/OS strip.
+// Each substring-filters a distinct-values set through the shared renderFieldSuggest; a tap writes the
+// value straight into the input (a plain DOM write — the forms are uncontrolled, read on submit), and a
+// brand-new typed value is simply left as-is. Parametrized by input/box id for their call sites.
+function renderVendorSuggest(query, inputId, boxId){
+  renderFieldSuggest(boxId, query, distinctVendors(), m=>`pickFieldSuggest('${escapeJsArg(m)}','${escapeJsArg(inputId)}','${escapeJsArg(boxId)}')`);
+}
+function renderMaterialSuggest(query, inputId, boxId){
+  renderFieldSuggest(boxId, query, distinctMaterials(), m=>`pickFieldSuggest('${escapeJsArg(m)}','${escapeJsArg(inputId)}','${escapeJsArg(boxId)}')`);
+}
+// R180: generic pick — sets the input value and clears the box. Was pickVendorSuggest (R179); renamed
+// when material became the second caller, so the name no longer lies. Both suggesters bind it.
+function pickFieldSuggest(val, inputId, boxId){
   const inp = document.getElementById(inputId); if(inp) inp.value = val;
   const box = document.getElementById(boxId); if(box) box.innerHTML = '';
 }
@@ -766,7 +775,7 @@ function teaFormModal(){
             <div class="tag-input-wrap"><input type="text" name="source" id="teaVendorInput" value="${escapeHtml(t.source||'')}" autocomplete="off" style="width:100%;" placeholder="Pick a shop you've used, or type a new one" oninput="renderVendorSuggest(this.value,'teaVendorInput','teaVendorSuggest')"><div id="teaVendorSuggest"></div></div></div>
           <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
           <div class="field"><label>Grams bought (for that price)</label><input type="number" step="0.1" name="costOriginalGrams" value="${t.costOriginalGrams??''}" placeholder="50"></div>
-          <div class="field span2"><label>Purchase date <span style="color:var(--ink-soft);font-weight:400;">— for spend tracking; leave blank if you already had it</span></label>
+          <div class="field span2"><label>Purchase date <span style="color:var(--ink-soft);font-weight:400;">· for spend tracking. Leave blank if you already had it.</span></label>
             <div style="display:flex;gap:6px;align-items:center;">
               <input type="date" name="purchaseDate" value="${escapeHtml(t.purchaseDate||'')}" style="flex:1;">
               <button type="button" class="lib-chip" onclick="setPurchaseToday(this)">Today</button>
@@ -775,13 +784,13 @@ function teaFormModal(){
           <!-- v3.98: beside purchase date because they share a provenance cluster, NOT because they
                are the same join. Purchase = cost + inventory; opened = the freshness clock. Sealed
                vs opened is roughly a 5-10x swing, which is why this is the one measured rung. -->
-          <div class="field span2"><label>Opened <span style="color:var(--ink-soft);font-weight:400;">— when you broke the seal; this is what freshness counts from</span></label>
+          <div class="field span2"><label>Opened <span style="color:var(--ink-soft);font-weight:400;">· when you broke the seal. Freshness counts from here.</span></label>
             <div style="display:flex;gap:6px;align-items:center;">
               <input type="date" name="openedDate" value="${escapeHtml(t.openedDate||'')}" style="flex:1;">
               <button type="button" class="lib-chip" onclick="setOpenedToday(this)">Today</button>
             </div>
           </div>
-          <div class="field span2"><label>Leaf form <span style="color:var(--ink-soft);font-weight:400;">— shapes suggested steep times when there's no guide, and how they ramp past the last listed steep</span></label>
+          <div class="field span2"><label>Leaf form <span style="color:var(--ink-soft);font-weight:400;">· shapes the suggested steep times when there's no guide, and how they ramp past the last listed steep.</span></label>
             <select name="leafForm">
               <option value="" ${!t.leafForm?'selected':''}>Auto — infer from type &amp; name</option>
               ${LEAF_FORM_KEYS.map(k=>`<option value="${k}" ${t.leafForm===k?'selected':''}>${LEAF_PROFILES[k].label}</option>`).join('')}
@@ -1057,7 +1066,8 @@ function teaProvenanceHTML(t, costPerSession){
   row('Cost / session', costPerSession>0 ? currencyFmt(costPerSession) : '');
   if(!rows.length && !t.image) return '';
   // R177: returns bare content — viewTeaDetail's tdSec provides the "Where this came from" RULE header.
-  return `<div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>${t.image?`<div class="tea-label-note">The photo is the label — evidence for where it came from, never the tea's identity.</div>`:''}`;
+  // R180 D2/D3: the always-on photo-label caption moved behind an info mark, rewritten plain.
+  return `<div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>${t.image?`<div class="tea-label-note">${infoMark("This photo is the tea's label, not the tea itself. It shows where the tea came from.","About the photo")}</div>`:''}`;
 }
 // R173 (B2) — the palate connection: why THIS tea, for YOU. The tea's traits (type, roast) crossed with your
 // favourites + highly-rated teas (behaviour × character; type/rating reliable now, flavour-grain later —
@@ -1315,15 +1325,15 @@ function savedBrewHTML(tea){
   if(sched.tempC!=null) rows.push(`<div><div class="eyebrow">Temp</div><div>${cToDisplay(sched.tempC)}${tempUnitLabel()}</div></div>`);
   if(sched.rinseSeconds!=null) rows.push(`<div><div class="eyebrow">Rinse</div><div>${sched.rinseSeconds}s</div></div>`);
   if(sched.times && sched.times.length) rows.push(`<div><div class="eyebrow">First steeps</div><div class="mono">${sched.times.slice(0,6).map(fmtSecShort).join(' / ')}</div></div>`);
+  // R180 D2/D3: the always-on "where the times come from" caption moved behind an info mark by the title, plain.
   const note = sched.generated
-    ? 'Steep times come from the leaf type — your guide sets the rest. The session timer uses this schedule.'
-    : 'Parsed from your brew guide — the session timer uses this schedule.';
+    ? 'These steep times come from the leaf type. The session timer uses them.'
+    : 'Parsed from your brew guide. The session timer uses it.';
   return `
     <div style="margin-top:10px;">
-      <div class="eyebrow">Brew guide · saved</div>
+      <div class="eyebrow">Brew guide · saved${infoMark(note,'Where these times come from')}</div>
       <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
       <div style="font-size:12.5px;white-space:pre-wrap;margin-top:10px;">${escapeHtml(tea.brewGuide)}</div>
-      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">${note}</div>
       ${goDeeperLinkHTML(tea)}
     </div>`;
 }
@@ -1357,11 +1367,12 @@ function suggestedBrewHTML(tea){
   if(tempC!=null) rows.push(`<div><div class="eyebrow">Temp</div><div>${cToDisplay(tempC)}${tempUnitLabel()}</div></div>`);
   if(ratio!=null) rows.push(`<div><div class="eyebrow">Leaf</div><div>${ratio} g / 100 ml</div></div>`);
   rows.push(`<div><div class="eyebrow">First steeps</div><div class="mono">${sched.times.slice(0,6).map(fmtSecShort).join(' / ')}</div></div>`);
+  // R180 D2/D3: the always-on suggestion caption moved behind an info mark by the title, rewritten plain.
+  const suggestNote = `A starting point from ${kb&&kb.style?'the tea knowledge base':'the leaf type'}, not a saved guide. The session timer uses these times until you save your own.`;
   return `
     <div style="margin-top:10px;">
-      <div class="eyebrow">Suggested brew · ${escapeHtml(source)}</div>
+      <div class="eyebrow">Suggested brew · ${escapeHtml(source)}${infoMark(suggestNote,'Where this suggestion comes from')}</div>
       <div class="grid grid-3" style="margin-top:8px;">${rows.join('')}</div>
-      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:10px;">A starting point from ${kb&&kb.style?'the tea knowledge base':'the leaf type'} — not a saved guide. The session timer uses these times until you save your own.</div>
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" onclick="saveSuggestedGuide('${tea.id}')">Save as brew guide</button>${borrowButtonHTML(tea)}</div>
       ${borrowSourceHTML(tea)}${goDeeperLinkHTML(tea)}
     </div>`;

@@ -1178,6 +1178,50 @@ function renderFieldSuggest(boxId, query, items, onPickExpr){
   const matches = items.filter(t=>t && t.toLowerCase().includes(q)).slice(0,6);
   box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onmousedown="event.preventDefault();${onPickExpr(m)}">${escapeHtml(m)}</div>`).join('')}</div>` : '';
 }
+// Info-popover explainer (R180): a small tappable info mark that reveals its explainer in a popover on
+// tap, so an always-on caption can leave the calm surface and teach only on demand. Built here beside
+// armConfirm/showToast (same calm-first DOM-created-on-tap, dismissable, cleared by any render()).
+// App-wide contract #3 inherits: a surface drops `infoMark(text,label)` where a caption sat. Intended to
+// serve insight-reveals too (INSIGHT-ENGINE-SPEC refinement), not only captions; the text-string API
+// suffices now and a richer-content extension is deliberately left open.
+function infoMark(text, label){
+  return `<span class="info-wrap"><button type="button" class="info-mark" aria-label="${escapeHtml(label||'What is this?')}" aria-expanded="false" data-info="${escapeHtml(text)}" onclick="toggleInfoPop(this)">${icon('i-info-hl',15)}</button></span>`;
+}
+let _infoPopCleanup = null;
+function closeInfoPop(){
+  const open = document.querySelector('.info-pop');
+  if(open){ const b = open._mark; open.remove(); if(b) b.setAttribute('aria-expanded','false'); }
+  if(_infoPopCleanup){ _infoPopCleanup(); _infoPopCleanup = null; }
+}
+function toggleInfoPop(btn){
+  const wrap = btn.closest('.info-wrap'); if(!wrap) return;
+  const already = wrap.querySelector('.info-pop');
+  closeInfoPop();                 // one popover at a time; also handles tap-again-to-close
+  if(already) return;
+  const pop = document.createElement('span');
+  pop.className = 'info-pop';
+  pop.setAttribute('role','tooltip');
+  pop.textContent = btn.dataset.info || '';   // textContent: the decoded text renders literally, no re-injection
+  pop._mark = btn;
+  wrap.appendChild(pop);
+  btn.setAttribute('aria-expanded','true');
+  // Viewport-safe (the #2 lesson): default below-left; flip above if it overflows the bottom, align right
+  // if it overflows the right. Measured against the visual viewport so the keyboard is respected.
+  try{
+    const vv = window.visualViewport;
+    const vTop = vv ? vv.offsetTop : 0, vBot = vTop + (vv ? vv.height : window.innerHeight);
+    const vLeft = vv ? vv.offsetLeft : 0, vRight = vLeft + (vv ? vv.width : window.innerWidth);
+    const r = pop.getBoundingClientRect();
+    if(r.bottom > vBot - 8) pop.classList.add('info-pop-above');
+    if(r.right > vRight - 8) pop.classList.add('info-pop-right');
+  }catch(e){}
+  // Dismiss: outside tap (armed next tick so this opening tap does not self-close) + Escape. Re-tap and
+  // any render() clear it too (the pop lives in #app).
+  const onDown = (e)=>{ if(!wrap.contains(e.target)) closeInfoPop(); };
+  const onKey = (e)=>{ if(e.key==='Escape') closeInfoPop(); };
+  setTimeout(()=>{ document.addEventListener('pointerdown', onDown); document.addEventListener('keydown', onKey); }, 0);
+  _infoPopCleanup = ()=>{ document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey); };
+}
 function bindDynamic(){
   // image upload
   document.querySelectorAll('.js-img-input').forEach(inp=>{

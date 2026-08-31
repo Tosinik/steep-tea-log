@@ -90,6 +90,7 @@ fixtures/*
 !fixtures/reflection-test.js
 !fixtures/brew-advice-v4-test.js
 !fixtures/vendor-keyboard-test.js
+!fixtures/tea-polish-test.js
 # THE REVIEW HARNESSES. Not tests — they render a surface for a HUMAN to look at, which is how
 # every defect this round was actually found: the map's unreadable labels, the door's 500px slack,
 # clay reaching one branch of two, and a preview that showed the content region for a whole slice

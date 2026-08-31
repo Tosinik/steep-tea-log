@@ -182,7 +182,10 @@ function vesselFormModal(){
         </div>
         <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan" value="${escapeHtml(v.name||'')}"></div>
         <div class="field" style="margin-bottom:12px;"><label>Type</label><select name="type">${opts}</select></div>
-        <div class="field" style="margin-bottom:12px;"><label>Material</label><input type="text" name="material" placeholder="Porcelain, clay, glass..." value="${escapeHtml(v.material||'')}"></div>
+        <div class="field" style="margin-bottom:12px;"><label>Material</label>
+          <!-- R180 D4: the vendor treatment — an in-app suggester from the shelf's materials, not the OS strip.
+               name="material" unchanged so submitVesselForm still reads it; installKeyboardReveal (R179) covers focus. -->
+          <div class="tag-input-wrap"><input type="text" name="material" id="materialInput" autocomplete="off" style="width:100%;" placeholder="Porcelain, clay, glass..." value="${escapeHtml(v.material||'')}" oninput="renderMaterialSuggest(this.value,'materialInput','materialSuggest')"><div id="materialSuggest"></div></div></div>
         <div class="field" style="margin-bottom:12px;"><label>Capacity (ml) <span style="color:var(--ink-soft);font-weight:400;">— helps tune brew advice by leaf-to-water ratio</span></label><input type="number" name="capacityMl" placeholder="e.g. 110 for a gaiwan, 200 for a kyusu" value="${v.capacityMl??''}"></div>
         <div style="display:flex;justify-content:flex-end;gap:8px;"><button type="button" class="btn" onclick="closeVesselForm()">Cancel</button><button type="submit" class="btn btn-primary">Save vessel</button></div>
       </form>

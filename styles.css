@@ -530,6 +530,18 @@ html[data-theme="dark"] .field input[type=datetime-local]{color-scheme:dark;}
 .tag-suggest div{padding:7px 10px;font-size:12.5px;cursor:pointer;}
 .tag-suggest div:hover{background:var(--jade-pale);}
 
+/* R180 D2 — info-popover explainer. A transient popover like .tag-suggest / .confirm-inline, NOT a spine
+   frame, so it is outside the fill-law fence. The mark is a quiet inline SVG button; the popover is DOM,
+   created on tap, dismissable, cleared by any render(). */
+.info-wrap{position:relative;display:inline-flex;vertical-align:middle;}
+.info-mark{background:none;border:none;padding:3px;margin:-1px 0 -1px 4px;color:var(--ink-soft);cursor:pointer;line-height:0;display:inline-flex;border-radius:50%;}
+.info-mark:hover{color:var(--ink);}
+.info-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:30;width:max-content;max-width:min(240px,72vw);background:var(--white);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12.5px;line-height:1.45;color:var(--ink);box-shadow:var(--glow);font-family:'Inter',sans-serif;text-transform:none;letter-spacing:normal;font-weight:400;}
+.info-pop-above{top:auto;bottom:calc(100% + 6px);}
+.info-pop-right{left:auto;right:0;}
+@media (prefers-reduced-motion: no-preference){ .info-pop{animation:info-pop-in .12s ease-out;} }
+@keyframes info-pop-in{from{opacity:0;transform:translateY(-2px);}to{opacity:1;transform:none;}}
+
 /* timer */
 /* WS3 breathing keyframes (ambient, CSS-only; honoured off under reduced-motion) */
 @keyframes sc-breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
@@ -1209,8 +1221,9 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .td-pills{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
 .td-swatch{width:44px;height:58px;flex:none;}
 .td-thumb{width:56px;height:58px;flex:none;border-radius:2px;background-size:cover;background-position:center;background-color:var(--jade-pale);}
-.td-sec{margin-top:18px;} /* RULE section wrapper — grouping only, no fill/border/radius. */
-.td-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;} /* section header; the 2px ink rule comes from .rule-head. */
+.td-sec{margin-top:30px;} /* R180 D1: wider inter-section air (was 18px) so each section reads as a distinct journal entry. Grouping only, no fill/border/radius. */
+.td-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:7px;margin-bottom:12px;} /* section header; the 2px ink rule comes from .rule-head. */
+.td-sechead .eyebrow{font-size:12.5px;color:var(--ink);letter-spacing:.08em;} /* R180 D1: tea-page section-HEADER titles get presence (scoped to the header eyebrow — not the sub-labels inside a section, not the global .eyebrow) so each heads its entry. Typography only. */
 .td-slab-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;} /* the one clay SLAB (Start session) + ghost Edit. */
 /* R173 (B2) — why-you-like-it + freshness content: spine-content (ink, no fill/border/radius → fence untouched). */
 .td-why{margin-top:14px;}

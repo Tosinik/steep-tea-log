@@ -2,7 +2,7 @@
  * wiring. Two arms, because half of this bug lives where a vm can't reach:
  *   A. LOGIC (vm sandbox) — the suggester VALUE ROUND-TRIP: distinctVendors() feeds renderVendorSuggest,
  *      which renders the shared .tag-suggest popover (mousedown+preventDefault, HTML/JS-escaped, capped
- *      at 6), and pickVendorSuggest writes the chosen value back into the input and clears the box.
+ *      at 6), and pickFieldSuggest writes the chosen value back into the input and clears the box.
  *   B. WIRING (source scan) — the parts a vm CANNOT exercise (no keyboard, no visualViewport, no layout):
  *      both native <datalist>s are gone, the vendor input still carries name="source" (the save contract
  *      submitTeaForm reads), and the keyboard-reveal mechanism is present, feature-detected, installed
@@ -43,7 +43,7 @@ fakeEls['teaVendorSuggest']={innerHTML:''};
 run("renderVendorSuggest('pa','teaVendorInput','teaVendorSuggest')");
 const html=fakeEls['teaVendorSuggest'].innerHTML;
 ok(/class="tag-suggest"/.test(html),'A2 renders the shared .tag-suggest popover (no forked class)');
-ok(/onmousedown="event\.preventDefault\(\);pickVendorSuggest\(/.test(html)&&html.indexOf('onclick=')<0,
+ok(/onmousedown="event\.preventDefault\(\);pickFieldSuggest\(/.test(html)&&html.indexOf('onclick=')<0,
   'A3 picks bind mousedown+preventDefault, never onclick (#29 blur-safe)');
 ok(html.indexOf('Paper &amp; Tea')>=0,'A4 the visible label is HTML-escaped');
 ok((html.match(/onmousedown=/g)||[]).length===1,'A5 substring filter keeps only the matching vendor');
@@ -60,7 +60,7 @@ ok(fakeEls['teaVendorSuggest'].innerHTML==='','A8 no matches → empty box (no s
 
 fakeEls['teaVendorInput']={value:''};
 fakeEls['teaVendorSuggest']={innerHTML:'stale'};
-run("pickVendorSuggest('Paper & Tea','teaVendorInput','teaVendorSuggest')");
+run("pickFieldSuggest('Paper & Tea','teaVendorInput','teaVendorSuggest')");
 ok(fakeEls['teaVendorInput'].value==='Paper & Tea','A9 pick writes the chosen value into the input (round-trip)');
 ok(fakeEls['teaVendorSuggest'].innerHTML==='','A10 pick clears the suggestion box');
 
