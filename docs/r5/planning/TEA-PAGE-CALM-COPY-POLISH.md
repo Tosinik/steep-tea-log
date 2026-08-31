@@ -126,10 +126,27 @@ first example, and DESIGN.md's voice section should fold in the rule on the app-
 **Not in scope.** Purging every em-dash from every doc and string in one pass. That is the app-wide
 rollout, ruled at build. This slice rewrites the tea-page strings and sets the rule.
 
+## D4. Material field suggester (app-wide consistency)
+
+This is not tea-page work. It is the same app-wide consistency thread as D2 and D3, and it rides #2.5
+because it is small and it closes the gap wave-1 #2 opened elsewhere. The vessel form's Material field is
+a bare text input (`steep-sessions.js:185`). It leans on the browser's own autocomplete strip, the same OS
+popup that fought the keyboard on the vendor field before wave-1 #2. Vendor now has the calm in-app
+suggester and material does not, so the two inconsistent fields sit one screen apart. The fix is the vendor
+treatment. Add `autocomplete="off"` so the OS strip stays down. Wrap the input in the shared `.tag-input-wrap`
+popover container with a suggestion box beside it. Source the suggestions from a new `distinctMaterials`
+helper, the analog of `distinctVendors`, reading the distinct materials already on the shelf, and feed them
+through the shared `renderFieldSuggest`. This is one more caller of an existing component. It adds no new
+component and no new CSS. One open item to confirm at build: whether the Material field already clears the
+keyboard through the delegated `installKeyboardReveal` from wave-1 #2. That is expected, because that writer
+is document-wide and fires for any focused field in the vessel-form overlay. If it does not, add a reveal
+check.
+
 ## Scope, in one place
 
 - D1 is tea-page only.
 - D2 and D3 are app-wide passes. They start on the tea page as the proving surface.
+- D4 is an app-wide consistency fix on one field. It rides #2.5 with the tea-page work.
 
 ## Slicing (indicative, ruled at build)
 
