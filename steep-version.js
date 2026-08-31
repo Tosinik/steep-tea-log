@@ -5,6 +5,6 @@
    BUMP BOTH HERE EVERY DEPLOY (deploy ritual 2b/2c) — nowhere else. The update banner shows the INCOMING
    version's note by messaging it off the waiting SW (which importScripts this file); the running page's
    constant is only the fallback, so a stale value here mislabels what the next deploy tells users. */
-self.APP_VERSION = 'v4.37';
+self.APP_VERSION = 'v4.38';
 // WHATS_NEW — one human sentence, the quiet second line on the update banner (v3.69+). '' suppresses it.
-self.WHATS_NEW = "Your Sessions list is redrawn — each sitting now leads with its own photo, or the tea's liquor colour.";
+self.WHATS_NEW = "On phones, the field you're filling now stays above the keyboard, and the shop/vendor box suggests shops you've used.";

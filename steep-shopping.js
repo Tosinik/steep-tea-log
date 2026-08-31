@@ -35,8 +35,9 @@ function viewShopping(){
       <input type="text" id="wishName" placeholder="Tea or thing to buy" onkeydown="if(event.key==='Enter'){event.preventDefault();addWishFromInput();}">
     </div>
     <div class="field" style="margin-top:8px;"><label>Shop / vendor (optional)</label>
-      <input type="text" id="wishVendor" list="wishVendorList" placeholder="Where from" onkeydown="if(event.key==='Enter'){event.preventDefault();addWishFromInput();}">
-      <datalist id="wishVendorList">${(typeof distinctVendors==='function'?distinctVendors():[]).map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}</datalist>
+      <!-- R179: native <datalist> retired → the shared .tag-suggest inline popover (renderVendorSuggest),
+           so the OS suggestion popup no longer fights the mobile keyboard. -->
+      <div class="tag-input-wrap"><input type="text" id="wishVendor" autocomplete="off" style="width:100%;" placeholder="Where from" oninput="renderVendorSuggest(this.value,'wishVendor','wishVendorSuggest')" onkeydown="if(event.key==='Enter'){event.preventDefault();addWishFromInput();}"><div id="wishVendorSuggest"></div></div>
     </div>
     <button class="btn-clay" style="margin-top:12px;width:100%;" onclick="addWishFromInput()">＋ Add</button>
   </div>`;

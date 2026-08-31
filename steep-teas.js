@@ -388,6 +388,17 @@ function rebuyNo(id){ markRebuyAsked(id); render(); }
 function distinctVendors(){
   return [...new Set(state.teas.map(t=>(t.source||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 }
+// R179: the shop/vendor inline suggester (tea form + wishlist), replacing the native <datalist>.
+// Substring-filters distinctVendors() through the shared renderFieldSuggest; a tap writes the value
+// straight into the input (a plain DOM write — the tea form is uncontrolled, read on submit), and a
+// brand-new typed vendor is simply left as-is. Parametrized by input/box id for its two call sites.
+function renderVendorSuggest(query, inputId, boxId){
+  renderFieldSuggest(boxId, query, distinctVendors(), m=>`pickVendorSuggest('${escapeJsArg(m)}','${escapeJsArg(inputId)}','${escapeJsArg(boxId)}')`);
+}
+function pickVendorSuggest(val, inputId, boxId){
+  const inp = document.getElementById(inputId); if(inp) inp.value = val;
+  const box = document.getElementById(boxId); if(box) box.innerHTML = '';
+}
 function vendorManagerHTML(){
   const vendors = distinctVendors();
   const rows = vendors.map(v=>{
@@ -748,7 +759,11 @@ function teaFormModal(){
           </select></div>
           <div class="field"><label>Origin</label><input type="text" name="origin" value="${escapeHtml(t.origin||'')}" placeholder="Fujian, China">${originOfferHTML(t)}</div>
           <div class="field"><label>Cultivar</label><input type="text" name="cultivar" value="${escapeHtml(t.cultivar||'')}" placeholder="Qi Dan" onblur="cultivarHintCheck()"><div id="teaCultivarHint"></div></div>
-          <div class="field span2"><label>Shop / vendor</label><input type="text" name="source" list="vendorList" value="${escapeHtml(t.source||'')}" placeholder="Pick a shop you've used, or type a new one"><datalist id="vendorList">${distinctVendors().map(v=>`<option value="${escapeHtml(v)}"></option>`).join('')}</datalist></div>
+          <div class="field span2"><label>Shop / vendor</label>
+            <!-- R179: the native <datalist> is retired — on a phone its OS popup fought the keyboard
+                 for the bottom strip. Reuses the .tag-suggest inline popover (renderFieldSuggest);
+                 name="source" is unchanged so submitTeaForm still reads the value on submit. -->
+            <div class="tag-input-wrap"><input type="text" name="source" id="teaVendorInput" value="${escapeHtml(t.source||'')}" autocomplete="off" style="width:100%;" placeholder="Pick a shop you've used, or type a new one" oninput="renderVendorSuggest(this.value,'teaVendorInput','teaVendorSuggest')"><div id="teaVendorSuggest"></div></div></div>
           <div class="field"><label>Price paid</label><input type="number" step="0.01" name="costTotal" value="${t.costTotal??''}" placeholder="12.50"></div>
           <div class="field"><label>Grams bought (for that price)</label><input type="number" step="0.1" name="costOriginalGrams" value="${t.costOriginalGrams??''}" placeholder="50"></div>
           <div class="field span2"><label>Purchase date <span style="color:var(--ink-soft);font-weight:400;">— for spend tracking; leave blank if you already had it</span></label>

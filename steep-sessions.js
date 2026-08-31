@@ -1498,13 +1498,10 @@ function useTimerValue(){
 }
 
 function renderTagSuggest(query, target){
-  const box = document.getElementById('tagSuggestBox');
-  if(!box) return;
-  if(!query){ box.innerHTML=''; return; }
-  const matches = state.tagLibrary.filter(t=>t.toLowerCase().includes(query.toLowerCase())).slice(0,6);
-  // #29: mousedown+preventDefault — a suggestion tap must not blur-commit the half-typed word first
-  // (blur now commits, so onclick here would double-add "cara" AND "caramel").
-  box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onmousedown="event.preventDefault();pickTagSuggest('${escapeJsArg(m)}','${target}')">${escapeHtml(m)}</div>`).join('')}</div>` : '';
+  // R179: delegates to the shared renderFieldSuggest (steep-core). #29 mousedown+preventDefault is
+  // preserved — a tap must not blur-commit the half-typed word first (blur now commits, so onclick
+  // here would double-add "cara" AND "caramel").
+  renderFieldSuggest('tagSuggestBox', query, state.tagLibrary, m=>`pickTagSuggest('${escapeJsArg(m)}','${target}')`);
 }
 function pickTagSuggest(tag, target){
   addTag(tag, target);

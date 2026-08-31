@@ -216,6 +216,7 @@ async function init(){
   if(state.view==='friends') loadSocial();
   syncAchievements(false); // reconcile seen list on load, no celebration
   installResumeSync();
+  installKeyboardReveal();
 }
 
 // Re-pull data from Supabase when the app regains focus, so the installed PWA
@@ -235,6 +236,40 @@ function installResumeSync(){
   };
   document.addEventListener('visibilitychange', onResume);
   window.addEventListener('focus', onResume);
+}
+// Keyboard occlusion (R179): the fixed .overlay modals (tea/vessel/settings) and the page are sized
+// to the LAYOUT viewport, which the soft keyboard doesn't shrink — so a focused field low in the form
+// sits behind the keyboard, and iOS won't reliably scroll it up. One delegated writer reveals the
+// active field above the keyboard, covering all three overlays + the inline-page fields (vendor,
+// tags, search, timer-edit) by delegation — no per-field wiring. visualViewport gives the real
+// visible band; we scroll ONLY when the field is actually occluded (no jank on already-visible
+// fields), and instantly under reduced-motion.
+let _kbdRevealInstalled = false;
+function installKeyboardReveal(){
+  if(_kbdRevealInstalled) return;
+  _kbdRevealInstalled = true;
+  const vv = window.visualViewport;
+  if(!vv) return; // no visualViewport → the layout viewport isn't shrunk under the keyboard; nothing to correct
+  const isField = el => !!el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) &&
+    el.type!=='hidden' && el.type!=='checkbox' && el.type!=='radio' && el.type!=='file' && el.type!=='button';
+  const reveal = ()=>{
+    try{
+      const el = document.activeElement;
+      if(!isField(el)) return;
+      const r = el.getBoundingClientRect();
+      const top = vv.offsetTop, bottom = vv.offsetTop + vv.height, m = 12;
+      if(r.bottom > bottom - m || r.top < top + m){
+        const smooth = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+        el.scrollIntoView({block:'center', behavior: smooth ? 'smooth' : 'auto'});
+      }
+    }catch(e){}
+  };
+  // resize fires as the keyboard opens/closes — the reliable signal on both iOS and Android; focusin
+  // catches a field→field move while the keyboard is already up (no resize fires then), after a short
+  // beat so the keyboard settles first. We deliberately do NOT listen to visualViewport 'scroll': it can
+  // fire mid-gesture and would fight a user deliberately scrolling away from the focused field.
+  vv.addEventListener('resize', reveal);
+  document.addEventListener('focusin', ()=>{ setTimeout(reveal, 100); });
 }
 async function refreshData(){
   if(!state.loaded) return;
@@ -1130,6 +1165,19 @@ function armConfirm(btn, message, onYes){
   btn.insertAdjacentElement('afterend', box);
 }
 
+// Shared inline suggestion list under a text field — the .tag-suggest popover, extracted (R179) so
+// the tag input and the vendor fields share ONE renderer. It rides the layout (an absolutely-
+// positioned box under the input), unlike a native <datalist> whose OS popup fights the mobile
+// keyboard for the same strip. onPickExpr(match) returns the JS to run on tap; the pick binds
+// mousedown+preventDefault so a tap never blur-commits the half-typed word first (#29).
+function renderFieldSuggest(boxId, query, items, onPickExpr){
+  const box = document.getElementById(boxId);
+  if(!box) return;
+  const q = (query||'').toLowerCase();
+  if(!q){ box.innerHTML=''; return; }
+  const matches = items.filter(t=>t && t.toLowerCase().includes(q)).slice(0,6);
+  box.innerHTML = matches.length ? `<div class="tag-suggest">${matches.map(m=>`<div onmousedown="event.preventDefault();${onPickExpr(m)}">${escapeHtml(m)}</div>`).join('')}</div>` : '';
+}
 function bindDynamic(){
   // image upload
   document.querySelectorAll('.js-img-input').forEach(inp=>{
