@@ -155,3 +155,32 @@ schema change; no SQL.)
 - `IDEA-tasting-mode.md` — the character/flavour capture that feeds the authoritative half.
 - `docs/r3/planning/DATA-flavour-tree.md` — the flavour tree (the curated character source).
 - `R5-AUDIT.md` §3 — the Home / Insights surfaces this engine warms.
+
+## Insight-engine refinement — direction (from v4.38 on-device review)
+
+Added 2026-08-31 after the on-device review of v4.38. This is design direction, not a build. It records
+where the "why" surfaces go next. Cross-links: `TEA-PAGE-CALM-COPY-POLISH.md` (the info-popover component
+and the copy voice this pairs with) and `SESSION-FLOW-REDESIGN.md` (the tasting input that unlocks the
+depth below).
+
+**The "why" surfaces overpromise.** The lead-door "why, on Insights" and `teaWhyHTML`'s "why you like it"
+frame a pattern as a motivation. The engine sees patterns in the data. It cannot know why the user does
+anything. Direction: reframe "why" into pattern and connection language. "What your cups share." "What your
+favourites have in common." This pairs with the app-wide copy voice work in `TEA-PAGE-CALM-COPY-POLISH.md`
+D3.
+
+**Depth is downstream of the flavour grain.** "You keep reaching for green" is coarse because type is all
+the engine reliably has today. As the richer tasting input lands (the hierarchical tagger and guided mode
+in `SESSION-FLOW-REDESIGN.md`, track #3), `teaWhyHTML` can move from "green" to a real flavour profile the
+user recognizes their own reason in, subtype awareness included. The engine draws the pattern richly. It
+never claims the motivation. This is gated on the tasting data landing. It is not a build now.
+
+**On-demand through the info-popover.** The insight pattern should be tap-to-reveal, something the user
+asks for, not always shown. That is the same component #2.5 builds (`infoMark` and the popover in
+`TEA-PAGE-CALM-COPY-POLISH.md` D2), applied to insight-reveals rather than only captions. The text-string
+API suffices for what this needs today. Richer popover content is a later extension, and the component
+should not preclude it.
+
+**Greeting-card rework, a later slot.** Separately, the Home greeting and lead-insight card content needs a
+rethink. This was verified as not a miscount. There is no phantom session. It is a design pass, and it
+slots after the tasting work gives it richer data to draw on. Backlog direction, unscheduled.
