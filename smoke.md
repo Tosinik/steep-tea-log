@@ -116,6 +116,26 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.37 · wave-1 #1 — the Sessions list re-dress  *(locally drivable — a rendered component, pre-push)*
+
+The rows/lead/BOX are vm-covered (frame-test §sessions, liquor-test §R178); whether they READ as one warm,
+distinct list is the phone look. `viewSessions`.
+
+1. **Rows read as one warm list.** Hairline-divided RULE rows (no boxes, no 12px cards). Each row leads with a
+   **44×58 mark**: a session **with a photo** shows its **own photo** (the moment); a session **without** shows
+   the tea's **liquor swatch**. Both read; the list scans as one surface.
+2. **Photo-row vs swatch-row both read**, side by side. A tier-3 tea (no liquor) or a **deleted-tea** row shows
+   the **dashed plate**, not a gap or a broken image.
+3. **Header + calendar.** The masthead is a **BAND** ("Sittings" + count + Brewing-days chip). Open **Brewing
+   days**: the month calendar is a **BOX** (white, hairline, 2px), its **has/selected cell states** still read
+   (jade-pale / jade); the heatmap below is de-carded (on paper). Empty states read (no card).
+4. **Sessions is now visually distinct from Library.** Side by side: **Sessions leads with your moment** (photo,
+   else liquor colour); **Library leads with tea identity** (the swatch, photo trailing). No longer one list.
+5. **Nothing else broke.** A row taps to the **session** detail (not the tea); the tea **name** still taps to
+   the tea; the day-filter + "show all" still work.
+
+---
+
 ## v4.36 · reflection Slice C — Your terroir + Teas over time  *(on device, post-deploy)*
 
 Both views ride the reflection spine; the logic is vm-covered (`reflection-test §K`) — whether they READ,

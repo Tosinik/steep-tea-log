@@ -2461,6 +2461,33 @@ blank-screen fallback did); reflection-test §K +12. Also swept: CLAUDE.md's sta
 corrected — Origins is the shipped drawn-outline atlas, now extended into terroir, not parked. On-device:
 smoke.md §v4.36. **The reflection is complete (Slices A/B/C).**
 
+**R178 — wave-1 #1: the Sessions list re-dressed to the spine (the last list joins), with the ruled
+image treatment.** Shipped v4.37 (cache v147, no SQL, no new module). The v4.36 audit
+(`AUDIT-REPORT-v4.36.md`) ranked the Sessions list wave-1 #1 — the starkest inconsistency: old
+label-picture `.card` rows + a `.card` calendar, no spine/warmth, while its own detail page is full
+spine + a liquor swatch. **Rows → RULE** (`.sess-row` de-carded to the `.shelf-row` hairline pattern —
+content unchanged, on paper). **The lead mark is the SESSION'S own, not the tea's:** new single writer
+`sessLeadHTML(s, tea)` (replaces `sessThumbHTML`) — the session `photoUrl` → its own photo (the moment,
+content, 44×58 cohering with `.sd-swatch`); else the tea's liquor swatch via
+`swatchAttr('sess-swatch', liquorFor(tea), …, true)` (the single swatch writer — no raw `--liquor-*` in
+sessions.js); deleted-tea + no-photo → the dashed tier-3 plate. **Never `tea.image` again** — that was
+Library identity leaking onto Sessions; the ruled treatment differentiates Sessions (your *moments*)
+from Library (tea *identity*) and finishes colour-as-data on the one list that missed it. The lead
+rides the row's `openSessionDetail` tap; the tea NAME keeps its `openTeaDetail` link. **Header →
+`.lib-band` BAND** (reuse, not invent); **calendar → `.sess-cal` BOX** (`--white`/2px; cell-state fills
+untouched); the two empty states + the Brewing-days heatmap card de-carded → a fully-spine tab.
+**Zero SLAB** (a log commits to nothing on-surface; the Log FAB is global — the Insights posture),
+fenced by `chkNoClay(SURFACES.sessions)`. **Fence (F33):** new
+`SURFACES.sessions = ['.sess-row','.sess-cal','.sess-main','.sess-chev']` (so `chkFrameRadius` bites the
+old 12px), a `.sess-cal` BOX positive (the masthead rides the shared `.band`/`.lib-band`), and three
+biting controls (jade fill on `.sess-row`; torn radius on `.sess-cal` → radius+rationing; `--clay` on
+`.sess-row` → zero-clay). The `.sess-lead` photo + `.sess-swatch` liquor are MARKS, excluded from the
+frame (guarded in liquor-test). frame-test 40→46; liquor-test 78→82 (`sessLeadHTML`'s four branches +
+site scan F1 12→10 / F2 12→13). All 44 committed suites exit 0. On-device: smoke.md §v4.37 (locally
+drivable). **R179 reserved** for a later calendar/heatmap-box split if wanted (not needed here — both
+ride `.sess-cal` / de-carded). **NEXT: wave-1 #2 (vendor + keyboard), then #3 (session-flow re-dress,
+`SESSION-FLOW-REDESIGN.md`).**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

@@ -174,8 +174,9 @@ Hygiene is strong.
 3. **F4 dashboard confirm** (30 sec) + reconcile `DESIGN.md:129/:11` passport/URL. *~15 min.*
 
 **Do as the next real UX wave — this is what "looks like the old app" means to a user:** *(= wave 1)*
-4. **Sessions list → spine + warmth.** *Medium.* Precedent is its own detail page + the shelf rows; highest
-   visible inconsistency.
+4. ~~**Sessions list → spine + warmth.**~~ **DONE — v4.37 / R178** (wave-1 #1): rows → RULE, the
+   session's own photo → liquor-swatch lead (`sessLeadHTML`), header BAND, calendar BOX. Sessions is now
+   distinct from Library (moment-forward vs identity-forward).
 5. **Vendor field + keyboard handling.** *Medium.* Real on-phone breakage; fix pattern already exists (vendor
    via the picker pattern; add a general modal focus-scroll for the siblings).
 6. **Session flow → the full IA redesign** — now **designed in `SESSION-FLOW-REDESIGN.md`** (facts-before-

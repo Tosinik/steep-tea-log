@@ -432,10 +432,10 @@ function heatmapHTML(days){
 // v3.72 hid achievements. The calendar heatmap stays on Sessions (per Niklas, v3.44), now neutral.
 function streakCardHTML(){
   const s = computeStats();
-  return `<div class="section card" style="margin-top:16px;">
+  return `<div class="section" style="margin-top:16px;">
     <div class="section-title"><h2>Brewing days</h2></div>
     ${heatmapHTML(s.days)}
-  </div>`;
+  </div>`;  // R178: de-carded (was .section card) — the fully-spine Sessions tab
 }
 function teaForecast(tea){
   // v2 (v3.28): prefer a purchase-date LEDGER — actual net drawdown since you bought it,

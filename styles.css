@@ -715,9 +715,11 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .cal-cell.sel .cal-dot{background:var(--amber);}
 
 /* ---------- session rows ---------- */
-.sess-row{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;}
-.sess-row:hover{border-color:var(--jade);}
-.sess-thumb{width:44px;height:44px;border-radius:9px;flex:0 0 auto;background:var(--jade-pale);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.sess-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;} /* R178: de-carded to the .shelf-row hairline RULE — content on paper, no box */
+.sess-lead{width:44px;height:58px;border-radius:2px;flex:0 0 auto;background-size:cover;background-position:center;} /* R178: the session's OWN photo — the moment (content); 44×58 coheres with .sd-swatch */
+.sess-swatch{width:44px;height:58px;flex:0 0 auto;} /* R178: the liquor-swatch fallback — an SVG path (no css radius), a MARK excluded from the fill-law */
+.sess-cal{background:var(--white);border:1px solid var(--line);border-radius:2px;padding:14px 16px;margin-bottom:13px;} /* R178: the month calendar as a BOX (a discrete control); its cell-state fills stay */
+.sess-empty{color:var(--ink-soft);padding:16px 0;} /* R178: de-carded empty states — text on paper */
 .sess-main{flex:1;min-width:0;}
 .sess-top{display:flex;align-items:center;gap:8px;justify-content:space-between;}
 .sess-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
@@ -1097,9 +1099,8 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .flavp-cloud{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:baseline;padding:4px 0;}
 .flavp-cloud-term{color:var(--ink);line-height:1.1;}
 
-/* WS4 thumb placeholders (no emoji) — .sess-thumb.shelf-ph needs (0,2,0) to beat .sess-thumb's bg */
-.sess-thumb.shelf-ph{background:repeating-linear-gradient(135deg,var(--ph-a,#E7E0CE),var(--ph-a,#E7E0CE) 7px,var(--ph-b,#EFE9DA) 7px,var(--ph-b,#EFE9DA) 14px);}
-.sess-thumb.shelf-kanji span{font-size:20px;}
+/* R178: .sess-thumb + its type-tinted placeholders removed — the sessions-list lead is now the
+   session's own photo (.sess-lead) or the liquor swatch (.sess-swatch), never the tea's label picture. */
 /* Vessel identity ladder (R63): photo → kanji plate → type-tinted stripe. The stripe keeps its exact
    shipped appearance — --vph-a/--vph-b fall back to the original vars, so an unmapped type renders
    byte-identically to before and a future per-type tint is a one-line addition. Same local-custom-prop

@@ -50,6 +50,8 @@ const SURFACES = {
                                        // the doors (.ins-sec-door) + palate bars (.palate-bar/.dot-*) are marks, excluded.
   teaDetail:     ['.td-band', '.td-sec', '.td-sechead'],   // R177 — tea-detail re-dressed to the spine (BAND masthead +
                                        // RULE sections + one clay SLAB); the .td-swatch (liquor) + .td-thumb (photo) are marks, excluded.
+  sessions:      ['.sess-row', '.sess-cal', '.sess-main', '.sess-chev'],   // R178 — the sessions LIST joins the spine
+                                       // (rows → RULE, calendar → BOX); the .sess-lead (photo) + .sess-swatch (liquor) are marks, excluded.
 };
 const FRAME = [...Object.values(SURFACES).flat(), '.band'];           // '.band' is the shared primitive
 const FILL_OK = ['var(--porcelain)', 'var(--band)', 'var(--white)'];   // the only fills a frame may carry
@@ -118,6 +120,7 @@ expectPass('.ins-door (BOX) — --white, radius 2px', chkPrimitive(CSS, '.ins-do
 expectPass('.home-masthead (BAND) — --band, radius 0', chkPrimitive(CSS, '.home-masthead', {bg:'var(--band)', radius:'0'}));  // R163 positive: Home's masthead band
 expectPass('.reflect-band (BAND) — radius 0 (rides .band for the fill)', chkPrimitive(CSS, '.reflect-band', {radius:'0'}));  // R172 positive: the reflection masthead
 expectPass('.td-band (BAND) — radius 0 (rides .band for the fill)', chkPrimitive(CSS, '.td-band', {radius:'0'}));  // R177 positive: tea-detail's masthead
+expectPass('.sess-cal (BOX) — --white, radius 2px', chkPrimitive(CSS, '.sess-cal', {bg:'var(--white)', radius:'2px', mustHave:['border:1px solid var(--line)']}));  // R178 positive: the sessions calendar box (the masthead rides the shared .lib-band/.band)
 
 /* ---------- C · fill-law across every fenced surface (F31 core) ---------- */
 console.log('\nC · fill-law — every frame selector carries only --porcelain/--band/--white');
@@ -131,6 +134,7 @@ expectPass('every frame radius is 0 or 2px', chkFrameRadius(CSS));
 console.log('\nE · rationing — exactly one torn radius across all frames, and it is the slab');
 expectPass('one torn radius among {all frames ∪ slab}, = .btn-clay', chkRationing(CSS));
 expectPass('insights carries NO clay (0 SLAB — a retrospective commits to nothing)', chkNoClay(CSS, SURFACES.insights));  // R162
+expectPass('sessions carries NO clay (0 SLAB — a log commits to nothing on-surface; the Log FAB is global)', chkNoClay(CSS, SURFACES.sessions));  // R178
 
 /* ---------- F · negative controls — the fence MUST see red, on EVERY surface it claims to fence ----------
    A surface added to SURFACES that no control touches is fenced in name only: the checkers null-skip a
@@ -189,6 +193,16 @@ expectFail('tea-detail: a torn radius on .td-band reddens radius-law',
   chkFrameRadius(CSS.replace(/(\.td-band\{[^}]*?border-radius:)0/, '$19px 4px 8px 5px')));
 expectFail('tea-detail: a torn radius on .td-band reddens rationing',
   chkRationing(CSS.replace(/(\.td-band\{[^}]*?border-radius:)0/, '$19px 4px 8px 5px')));
+// sessions (R178) — the last list joins the spine; controls bite its OWN selectors. .sess-row is a RULE
+// (no radius), so the radius/rationing controls bite the .sess-cal BOX; the swatch/photo are marks, excluded.
+expectFail('sessions: a rationed fill on .sess-row reddens fill-law',
+  chkFrameFill(CSS.replace('.sess-row{', '.sess-row{background:var(--jade);')));
+expectFail('sessions: a torn radius on .sess-cal reddens radius-law',
+  chkFrameRadius(CSS.replace(/(\.sess-cal\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+expectFail('sessions: a torn radius on .sess-cal reddens rationing',
+  chkRationing(CSS.replace(/(\.sess-cal\{[^}]*?border-radius:)2px/, '$19px 4px 8px 5px')));
+expectFail('sessions: clay on .sess-row reddens the zero-clay assertion',
+  chkNoClay(CSS.replace('.sess-row{', '.sess-row{background:var(--clay);'), SURFACES.sessions));
 // shared primitives + the slab
 expectFail('.band losing its --band fill reddens the primitive',
   chkPrimitive(CSS.replace(/(\.band\{[^}]*?background:)var\(--band\)/, '$1var(--jade)'), '.band', {bg:'var(--band)'}));

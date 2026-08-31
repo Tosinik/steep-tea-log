@@ -46,6 +46,51 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.37 — wave-1 #1: the Sessions list re-dress (spine + warmth + photo→swatch) — R178
+
+Deploy: styles.css, steep-sessions.js, steep-dashboard.js, service-worker.js (cache v147),
+steep-version.js, fixtures/frame-test.js, fixtures/liquor-test.js, CHANGELOG.md, STATE.md, ROADMAP-v4.md,
+smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md, docs/r5/planning/AUDIT-REPORT-v4.36.md. No SQL. No new module.
+
+The starkest inconsistency the v4.36 audit found (`AUDIT-REPORT-v4.36.md`, wave-1 #1): the Sessions
+list was still old label-picture `.card` rows + a `.card` calendar, no spine and no warmth, while its
+own detail page was full spine + a liquor swatch. First wave-1 build — the last list joins the spine,
+and colour-as-data reaches the one surface that missed it.
+
+- **Rows → RULE.** `.sess-row` de-carded to the `.shelf-row` hairline pattern (`border-bottom`, no
+  bg/border/radius) — content unchanged, now on paper.
+- **The lead mark is the SESSION'S own, not the tea's.** New single writer `sessLeadHTML(s, tea)`
+  (replaces `sessThumbHTML`): the session's `photoUrl` → its own photo (the moment, content) at 44×58;
+  else the tea's liquor swatch via `swatchAttr('sess-swatch', liquorFor(tea), …, true)` — the single
+  swatch writer, no raw `--liquor-*` in sessions.js; deleted-tea + no-photo → the dashed tier-3 plate.
+  **Never `tea.image` again** — that was Library identity leaking onto Sessions. Differentiates Sessions
+  (your *moments*) from Library (tea *identity*), and finishes colour-as-data. The lead rides the row's
+  `openSessionDetail` tap; the tea NAME keeps its `openTeaDetail` link.
+- **Header → `.lib-band` BAND** (reuse the shelf/shopping masthead, don't invent). **Calendar →
+  `.sess-cal` BOX** (`--white`, 2px, no shadow; the cell-state fills stay — control marks, not frame).
+  The two empty states + the Brewing-days heatmap card **de-carded** → a fully-spine tab.
+- **Zero SLAB.** A log commits to nothing on-surface; the Log action is the global nav FAB (the Insights
+  posture). Fenced by `chkNoClay(SURFACES.sessions)`.
+- **Fence (F33):** new `SURFACES.sessions = ['.sess-row','.sess-cal','.sess-main','.sess-chev']`, so
+  `chkFrameRadius` bites the old 12px on `.sess-row`. Positive: the `.sess-cal` BOX (`--white`/2px); the
+  masthead rides the shared `.band`/`.lib-band`. Three biting controls (jade fill on `.sess-row` →
+  fill-law; torn radius on `.sess-cal` → radius-law + rationing; `--clay` on `.sess-row` → zero-clay).
+  The `.sess-lead` photo + `.sess-swatch` liquor are MARKS, excluded from the frame (guarded in
+  liquor-test). **frame-test 40 → 46.**
+- **Fixtures:** `liquor-test` gains `sessLeadHTML`'s four branches (photo → `background-image`, no
+  swatch; no-photo+liquor → `.sess-swatch` fill, no photo; tier-3 → dashed; deleted+no-photo → dashed,
+  no throw) and the §F site scan moves (F1 tints **12 → 10** — the removed `.sess-thumb` placeholders;
+  F2 swatch sites **12 → 13** — the new `.sess-swatch`). **liquor-test 78 → 82.** All 44 committed
+  suites exit 0, export-gate first.
+- **ON DEVICE (`smoke.md §v4.37`, locally drivable — a rendered component):** rows read as one warm
+  list; a photo row vs a swatch row both read; tier-3 / deleted-tea → the dashed plate, not a gap; the
+  header BAND reads; the calendar BOX + its cell states read; **Sessions is now visually distinct from
+  Library** (moment-forward vs identity-forward).
+- **NEXT — wave-1 #2: the vendor field + keyboard handling** (the tea-form `<datalist>` behind the
+  mobile keyboard; the app has no viewport/focus-scroll handling — `AUDIT-REPORT-v4.36.md` §B2), then
+  wave-1 #3 (the session-flow re-dress, `SESSION-FLOW-REDESIGN.md`). Ledger **R178**.
+
+---
 ## v4.36 — reflection Slice C: Your terroir + Teas over time — R174
 
 Deploy: styles.css, steep-passport.js, steep-insights.js, steep-dashboard.js, steep-core.js,

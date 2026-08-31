@@ -22,14 +22,14 @@ function sessionsByDay(){
 // white(白)/pu'er(餅) kanji plate — mirrors shelfPhoto (steep-teas.js).
 // #20: `tap` adds a stopPropagation onclick → tea detail. Passed only when the tea still exists
 // (a deleted tea's row shows the placeholder with no tap target — no dead link).
-function sessThumbHTML(tea, tap){
-  const attr = tap ? ` role="link" onclick="event.stopPropagation();openTeaDetail('${escapeJsArg(tea.id)}','sessions')"` : '';
-  const cur = tap ? 'cursor:pointer;' : '';
-  if(tea && tea.image) return `<div class="sess-thumb"${attr} style="background-image:url(${escapeHtml(tea.image)});${cur}"></div>`;
-  const type = (tea && tea.type || '').toLowerCase();
-  const kanji = type==='white' ? '白' : (type==='puerh' ? '餅' : '');
-  if(kanji) return `<div class="sess-thumb shelf-kanji t-${escapeHtml(type)}"${attr}${cur?` style="${cur}"`:''}><span>${kanji}</span></div>`;
-  return `<div class="sess-thumb shelf-ph t-${escapeHtml(type||'unknown')}"${attr}${cur?` style="${cur}"`:''}></div>`;
+// R178 — the sessions-list lead is the SESSION'S OWN mark, not the tea's label picture: the session
+// photo (the moment, content) when present, else the tea's liquor swatch via the single writer
+// (swatchAttr — no raw --liquor- here), else the dashed tier-3 plate. Differentiates Sessions (your
+// moments) from Library (tea identity). 44×58, cohering with the session-detail band swatch (.sd-swatch).
+// No tap of its own — the lead rides the row's openSessionDetail; the tea NAME keeps the openTeaDetail link.
+function sessLeadHTML(s, tea){
+  if(s && s.photoUrl) return `<div class="sess-lead" style="background-image:url(${escapeHtml(s.photoUrl)})"></div>`;
+  return swatchAttr('sess-swatch', liquorFor(tea), tea && tea.type, true);  // null tea/liquor → dashed plate (graceful floor)
 }
 function sessionRowHTML(s){
   const tea = teaById(s.teaId);
@@ -50,7 +50,7 @@ function sessionRowHTML(s){
   // v4.00: a row opens the sitting's DETAIL, not the edit form. Reading a record and changing it are
   // different intents, and the list was doing the second by default.
   return `<div class="sess-row" onclick="openSessionDetail('${escapeJsArg(s.id)}')">
-    ${sessThumbHTML(tea, !!tea)}
+    ${sessLeadHTML(s, tea)}
     <div class="sess-main">
       <div class="sess-top">${teaName}${s.rating?renderStarsStatic(s.rating,false):''}</div>
       <div class="sess-sub">${fmtDateTime(s.date)} · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}${all.length?'':' · no notes'}</div>
@@ -62,7 +62,7 @@ function sessionRowHTML(s){
 function viewSessions(){
   if(state.sessions.length===0){
     return `<div class="section-title"><h2 style="font-family:var(--font-display);font-size:20px;">Sessions</h2></div>
-      <div class="card empty">No sessions yet. Tap <strong>＋ Log session</strong> to record your first brew.</div>`;
+      <div class="sess-empty">No sessions yet. Tap <strong>＋ Log session</strong> to record your first brew.</div>`;
   }
   if(!state.calMonth) state.calMonth = startOfMonth(new Date());
   const m = state.calMonth;
@@ -87,7 +87,7 @@ function viewSessions(){
      reading). R42 names only the heatmap and #02 redraws away from the stack, so both go behind ONE
      toggle with the list as default. The calendar's day-filter stays reachable, so R61 holds: the
      capability survives, its position changes. */
-  const cal = state.sessionsCalOpen ? `<div class="card">
+  const cal = state.sessionsCalOpen ? `<div class="sess-cal">
     <div class="cal-head"><button class="btn-ghost" onclick="calShift(-1)">‹</button><strong>${monthLabel}</strong><button class="btn-ghost" onclick="calShift(1)">›</button></div>
     <div class="cal-grid cal-dows">${dow}</div>
     <div class="cal-grid">${cells}</div>
@@ -102,7 +102,7 @@ function viewSessions(){
   const rows = listSessions.map(sessionRowHTML).join('');
   const open = !!state.sessionsCalOpen;
   return `
-    <div class="lib-head">
+    <div class="band lib-band">
       <div class="lib-title"><h2>Sittings</h2>
         <span class="lib-kicker mono">${state.sessions.length} logged${state.calSelDay?' · filtered to one day':''}</span></div>
       <div class="lib-head-actions">
@@ -113,7 +113,7 @@ function viewSessions(){
     ${open ? streakCardHTML() : ''}
     <div class="section-title" style="margin-top:20px;"><h2>${listTitle}</h2>
       ${state.calSelDay?`<button class="btn-ghost" onclick="selectCalDay('${state.calSelDay}')">show all</button>`:''}</div>
-    <div>${rows || '<div class="card empty">No sittings on this day.</div>'}</div>
+    <div>${rows || '<div class="sess-empty">No sittings on this day.</div>'}</div>
   `;
 }
 // One toggle for both date surfaces (R92). Closing it clears any day filter, so the list can never be

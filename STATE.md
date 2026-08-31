@@ -124,12 +124,12 @@ build.** What's next, in order:
    - **Wave 0 — docs-only (SHIPPED, this commit):** deploy-gate repoint (`verifier.md` + `slowcup-deploy`
      → `steep-version.js`), "do-not-build" banners on the command-rebuild docs, misinformer reconciles.
      No app files, no version/cache bump.
-   - **Wave 1 — the design gap (NEXT build): sessions list → vendor/keyboard → session-flow re-dress.** The
-     session-flow rework is **designed in `docs/r5/planning/SESSION-FLOW-REDESIGN.md`** (the build authority;
-     Q1/Q2 resolved 2026-08-30; matches the audit report's pointer).
-     The sessions LIST is still old label-picture `.card`s (no spine, no warmth) while its own detail is
-     full spine; the session FLOW (setup/steeping/finish/quick — the core ritual) is entirely unspined; the
-     vendor `<datalist>` sits behind the mobile keyboard (the app has no viewport/focus-scroll handling).
+   - **Wave 1 — the design gap: ~~sessions list~~ (#1 DONE v4.37/R178) → vendor/keyboard (#2, NEXT) →
+     session-flow re-dress (#3).** #1 shipped: the sessions LIST joined the spine (rows → RULE, the
+     photo→liquor-swatch lead — Sessions distinct from Library). #2 next: the vendor `<datalist>` behind the
+     mobile keyboard (the app has no viewport/focus-scroll handling — `AUDIT-REPORT-v4.36.md` §B2). #3 the
+     session FLOW (setup/steeping/finish/quick — the core ritual) is **designed in
+     `docs/r5/planning/SESSION-FLOW-REDESIGN.md`** (the build authority; Q1/Q2 resolved 2026-08-30).
    - **Hygiene riders (thereafter):** free-delete orphans (`dotsRow`/`fmtStars`/`toggleTheme`/
      `flavorFamilyOf`/`achievementsHTML` + the unguarded passport dot-map leftovers); achievements R134
      delete-vs-keep (bookkeeping still recomputes on every write); fix CLAUDE.md's passport dead-table
@@ -242,7 +242,26 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.36 LIVE `87264cf` — reflection Slice C: Your terroir + Teas over time (R174)** (cache
+**NOW — v4.37 STAGED (built green, UNPUSHED — awaiting review + `/slowcup-deploy`) — wave-1 #1: the Sessions
+list re-dress (spine + warmth + photo→swatch) (R178)** (cache **v147**, APP_VERSION v4.37, **no SQL**, **no
+new module**). The first wave-1 build off the audit — the last list joins the spine, and colour-as-data reaches
+the one surface that missed it.
+- **Rows → RULE** (`.sess-row` de-carded to the `.shelf-row` hairline pattern — content on paper). **The lead
+  is the SESSION'S own, not the tea's:** new single writer `sessLeadHTML(s, tea)` (replaces `sessThumbHTML`) —
+  `photoUrl` → the session's own photo (the moment, 44×58 cohering with `.sd-swatch`); else the liquor swatch
+  via `swatchAttr('sess-swatch', liquorFor(tea), …, true)` (single writer, no raw `--liquor-*`); deleted-tea +
+  no-photo → the dashed tier-3 plate. **Never `tea.image`** — Sessions (your moments) vs Library (tea identity).
+- **Header → `.lib-band` BAND; calendar → `.sess-cal` BOX** (cell-state fills untouched); the empty states + the
+  Brewing-days heatmap card **de-carded** → a fully-spine tab. **Zero SLAB** (Log FAB is global; Insights posture).
+- **Fence:** new `SURFACES.sessions` + a `.sess-cal` BOX positive + `chkNoClay(SURFACES.sessions)` + 3 biting
+  controls; `.sess-lead`/`.sess-swatch` are MARKS, excluded (guarded in liquor-test). **frame-test 40→46;
+  liquor-test 78→82** (F1 tints 12→10, F2 swatch sites 12→13). **All 44 committed suites exit 0**, export-gate first.
+- **HAND-OFF:** UNPUSHED for review + the on-device smoke (`smoke.md §v4.37`, locally drivable — a rendered
+  component). After Niklas pushes, flip this NOW block STAGED→LIVE with the commit hash (the v4.36 precedent).
+- **NEXT — wave-1 #2: the vendor field + keyboard handling** (`AUDIT-REPORT-v4.36.md` §B2), then wave-1 #3
+  (session-flow re-dress, `SESSION-FLOW-REDESIGN.md`). **SECURITY F1/F2 stays the hard pre-widening gate.**
+
+**Previously — v4.36 LIVE `87264cf` — reflection Slice C: Your terroir + Teas over time (R174)** (cache
 **v146**, APP_VERSION v4.36, **no SQL**, **no new module**). The last two reflection views — **the reflection
 is COMPLETE** (Slices A/B/C all shipped). Both built on shipped fields; both ride the reflection spine.
 - **Your terroir** (`viewOrigins` re-dressed IN PLACE — `state.view='origins'`/`goOrigins()` kept): a

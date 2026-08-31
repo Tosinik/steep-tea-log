@@ -284,8 +284,8 @@ FILES_SCANNED.forEach(f=>{
   tinted += (src.match(/t-\$\{|dot-\$\{/g)||[]).length;
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
-ok(tinted===12, 'F1 TWELVE type-tint writes across the seven files — the v4.19 picker\'s two (its tier-3 fallback: COLOUR-row preview + default cell) and the nine labels/placeholders/chart, plus the R172 palate-families bar (a dot-<type> write) in steep-insights.js; steep-shopping.js adds none (got '+tinted+')');
-ok(painted===12, 'F2 …and exactly TWELVE swatchAttr call sites paint a liquor now — the eleven prior (six warm Home R159 + the Insights note R170 + the three R171 marks: session-detail band + the two Shopping rows + the R177 tea-detail masthead swatch .td-swatch) plus the R174 teas-over-time arrivals swatch (.tot-arr-swatch, the colour beside each newest-arrival). The colour-clock bars and the Teas-brewed strip paint liquor via var(--liquor-*) directly, not swatchAttr, so they stay outside this count (got '+painted+')');
+ok(tinted===10, 'F1 TEN type-tint writes across the seven files (was 12 — R178 removed the sessions-list thumb placeholders .sess-thumb.shelf-ph/.shelf-kanji, now the photo/liquor-swatch lead): the v4.19 picker two + seven labels/placeholders/chart + the R172 palate-families dot-<type> bar; steep-shopping.js adds none (got '+tinted+')');
+ok(painted===13, 'F2 …and exactly THIRTEEN swatchAttr call sites paint a liquor now — the twelve prior (six warm Home R159 + the Insights note R170 + the three R171 marks + the R177 .td-swatch + the R174 .tot-arr-swatch) plus R178 .sess-swatch (the sessions-list lead liquor fallback). The colour-clock bars and the Teas-brewed strip paint via var(--liquor-*) directly, not swatchAttr, so they stay outside this count (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
 const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));
@@ -321,6 +321,21 @@ ok(/background:var\(--liquor-/.test(G('swatchAttr("ref-swatch","amber-deep","ool
 ok(/\.today-tint\{[^}]*width:30px/.test(cssSrc) && !/\.today-tint\{[^}]*border:1px solid var\(--line\)/.test(cssSrc),
    'F9 R159: the today fleck becomes a 30px liquor SWATCH and drops the hairline (a bold swatch, not a bullet) — pale-end legibility now rides on the whiter ground + size (a phone-look item, smoke.md); ref/social keep theirs');
 console.log('  F the site scan: 11 checks · '+tinted+' tints kept · '+painted+' liquor sites');
+
+/* ---- R178 · sessLeadHTML — the sessions-list lead: the SESSION'S own photo (the moment) → else the
+   tea's liquor swatch via the single writer → else the dashed tier-3 plate. Never tea.image. The swatch
+   is a MARK, so it is guarded HERE (rendered output), not in frame-test (excluded from the frame). ---- */
+console.log('\nR178 · sessLeadHTML — photo → swatch → dashed plate');
+{ const withPhoto=G("sessLeadHTML({photoUrl:'http://x/p.jpg'},{id:'t',type:'green'})");
+  ok(/background-image:url\(http:\/\/x\/p\.jpg\)/.test(withPhoto) && /class="sess-lead"/.test(withPhoto) && !/sess-swatch|--liquor-/.test(withPhoto),
+     'R178a photo present → the session\'s OWN photo (.sess-lead, content), no swatch'); }
+{ const withLiquor=G("sessLeadHTML({},{id:'t',type:'oolong',liquor:'amber'})");
+  ok(/class="sess-swatch"/.test(withLiquor) && /fill:var\(--liquor-amber\)/.test(withLiquor) && !/background-image/.test(withLiquor),
+     'R178b no photo + liquor → the .sess-swatch painted via swatchAttr (single writer), no photo'); }
+ok(/stroke-dasharray/.test(G("sessLeadHTML({},{id:'t',type:'green'})")),
+   'R178c no photo + tier-3 (no liquor) → the dashed tier-3 plate, not a fill');
+ok(/stroke-dasharray/.test(G("sessLeadHTML({},null)")),
+   'R178d deleted tea + no photo → the dashed plate, no throw (the graceful floor)');
 
 /* ---- G · the picker (v4.19, R39) — the WRITE path, and F1's containment guard ----
  *
