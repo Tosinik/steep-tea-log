@@ -250,9 +250,8 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.38 STAGED (built, unpushed — awaiting review + `/slowcup-deploy`; flip to LIVE + hash on push, the
-v4.37 STAGED→LIVE pattern) — wave-1 #2: vendor field + keyboard occlusion (R179)** (cache **v148**, APP_VERSION
-v4.38, **no SQL**, **no new module**). The one genuine on-phone bug the v4.36 audit found (§B2, "Class 5"), and
+**NOW — v4.38 LIVE `ad7b088` — wave-1 #2: vendor field + keyboard occlusion (R179)** (cache **v148**,
+APP_VERSION v4.38, **no SQL**, **no new module**). The one genuine on-phone bug the v4.36 audit found (§B2, "Class 5"), and
 it was systemic — the app had **zero** `visualViewport`/focus-scroll handling. Fixed as a class, not a field.
 - **Systemic keyboard-reveal** (`installKeyboardReveal`, steep-core.js, installed once from `init` — mirrors
   `installResumeSync`): a delegated `visualViewport` resize + `focusin` scrolls the focused field above the
