@@ -46,6 +46,57 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.39 — wave-1 #2.5: tea-page polish + the info-popover + material suggester — R180
+
+Deploy: index.html, styles.css, steep-core.js, steep-teas.js, steep-sessions.js, service-worker.js (cache
+v149), steep-version.js, .gitignore, fixtures/tea-polish-test.js, fixtures/vendor-keyboard-test.js,
+CHANGELOG.md, STATE.md, ROADMAP-v4.md, CLAUDE.md, smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL.
+No new module.
+
+Wave-1 #2.5 (`TEA-PAGE-CALM-COPY-POLISH.md`): the tea page reads correct since B1/B2 but not yet as a
+journal; the always-on explainer captions clutter the calm; the microcopy has an AI tell; and the vessel
+Material field still leaned on the OS autocomplete strip while vendor got the calm suggester in #2. Four
+parts, one slice.
+
+- **D1 · section rhythm (tea page).** Three scoped CSS rules, typography and space only, no re-boxing:
+  `.td-sec` inter-section gap 18px → 30px, a scoped `.td-sechead .eyebrow` (12.5px, ink, wider tracking —
+  NOT the global eyebrow, NOT the sub-labels inside a section), and a touch more `.td-sechead` air. Each of
+  the six sections now reads as a distinct entry under its 2px rule. No fill, no radius: **frame-test 46**.
+- **D2 · the info-popover (built once, app-wide).** `infoMark(text, label)` + `toggleInfoPop`/`closeInfoPop`
+  in steep-core.js beside `armConfirm`, plus a new `i-info-hl` line-glyph in the index.html sprite. A surface
+  drops `infoMark(text,label)` where a caption sat; a tap reveals the explainer in a small popover; tap-again
+  / outside-tap / Escape / any `render()` dismiss it. Viewport-safe (measures against `visualViewport`, flips
+  above or right so it never runs off-screen or under the keyboard — the #2 lesson), `textContent` boundary,
+  reduced-motion-aware, a real button with `aria-label` + `aria-expanded`. It is the contract track #3
+  inherits, and it is intended for insight-reveals too (`INSIGHT-ENGINE-SPEC.md` refinement; text-string API
+  for now, richer content left open). A transient popover (the `.tag-suggest` family), NOT a spine frame: no
+  `SURFACES` entry, frame-test unmoved. Proven here — the always-on photo note and both brew notes (saved +
+  suggested) move behind marks; the captions are **deleted, not hidden**.
+- **D3 · copy de-AI-ification (starts here; house rule set).** The named tea-page strings rewritten plain,
+  em-dashes gone, no "X, Y, never Z": the photo note ("This photo is the tea's label, not the tea itself. It
+  shows where the tea came from."), both brew notes, the suggested-brew note, and the three tea-form hints
+  (purchase / opened / leaf-form — the em-dash lead-ins become the app's middot separator plus short
+  sentences). The rule is added to **CLAUDE.md** ("Copy voice"); it binds app strings, specs, and prompts.
+  The full app-wide em-dash purge + the DESIGN.md voice-section fold-in are a later pass (the spec scopes the
+  existing-doc purge there, which is why this CHANGELOG keeps the established provenance voice).
+- **D4 · material suggester (app-wide consistency).** The vessel Material field gets the vendor treatment:
+  `autocomplete="off"` + the shared `.tag-suggest` popover fed by a new `distinctMaterials()` through the
+  shared `renderFieldSuggest`. One more caller, no new component, no new CSS. `pickVendorSuggest` →
+  **`pickFieldSuggest`** (generic now that material is a second caller; the two vendor `onPickExpr` sites +
+  `vendor-keyboard-test.js` follow the rename). `installKeyboardReveal` (R179) already covers the field by
+  delegation — confirmed by design, no new code; verified on device.
+- **Fixtures:** new `fixtures/tea-polish-test.js` (27) — `infoMark` output + escaping and `distinctMaterials`
+  round-trip (vm); the component wiring, the sprite, captions-behind-mark, the plain rewrites with no U+2014
+  on the named lines, the material vendor-treatment (source scan). `vendor-keyboard-test.js` updated for the
+  rename. All committed suites green, export-gate first; **frame-test 46**.
+- **ON DEVICE (`smoke.md §v4.39`):** the tea page reads as distinct journal entries; the info marks open a
+  popover on tap, stay on-screen, dismiss four ways, and the captions are gone from the always-on surface;
+  the copy reads human; the Material field suggests from your shelf, shows no OS strip, and clears the
+  keyboard. D1/D2/D3 are locally drivable (a rendered component); D4's keyboard-clear is on-device.
+- **NEXT — wave-1 #3: the session-flow re-dress** (`SESSION-FLOW-REDESIGN.md`), which picks up the
+  info-popover for its own explainers. **SECURITY F1/F2 stays the hard pre-widening gate.** Ledger **R180**.
+
+---
 ## v4.38 — wave-1 #2: vendor field + keyboard occlusion — R179
 
 Deploy: steep-core.js, steep-teas.js, steep-sessions.js, steep-shopping.js, service-worker.js (cache v148),

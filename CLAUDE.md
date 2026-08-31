@@ -320,6 +320,20 @@ core. `fixtures/origins-test.js` pins the map geometry as numbers — read it be
   `html[data-theme="dark"]` (and `html[data-mono="clean"]` for the non-pixel font). Add
   new UI colors as variables in both blocks — never hardcode.
 
+## Copy voice (house style — R180, v4.39)
+
+User-facing copy is plain and declarative. This is a house rule going forward, set by wave-1 #2.5
+(`docs/r5/planning/TEA-PAGE-CALM-COPY-POLISH.md` D3). It binds app strings, and it binds specs and prompts
+too. Write new docs this way.
+
+- No em-dash as a connector. Use a period, a colon, a comma with a conjunction, or the app's middot separator.
+- No "X, Y, never Z" or "the label, for X, not Y" triple shapes. They are an AI writing tell.
+- One idea per sentence. Short and declarative. Say the thing plainly.
+
+The rule is in effect now. The full app-wide em-dash purge across existing strings, and the DESIGN.md
+voice-section fold-in, are a later pass. #2.5 rewrote the tea-page strings and set the rule; the rest follows
+when the app-wide copy pass runs.
+
 ## Cleanup backlog (dead / superseded code — remove when touching the area)
 
 - ~~**`ratioSetupHTML` (steep-sessions.js) is dead as of v3.77.**~~ **DELETED in v3.95** (R3 slice A),

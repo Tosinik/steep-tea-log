@@ -116,6 +116,37 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.39 · wave-1 #2.5 — tea-page polish + info-popover + material suggester  *(mostly locally drivable; D4 keyboard on device)*
+
+The info-popover output, the material round-trip, and the copy are vm-covered (`tea-polish-test.js`); whether
+the page READS as a journal and the popover behaves on a phone is the look. D1/D2/D3 a local server can drive;
+D4's keyboard-clear is on device.
+
+1. **The tea page reads as journal entries (D1).** Open any tea. The six sections (Character, On hand, Brewing,
+   Freshness, Where this came from, Your diary) each read as a **distinct entry**: more air between them, and a
+   **heavier, darker section title** under its 2px rule. It should no longer read as one wall of text. No boxes
+   appeared (still de-boxed).
+2. **The info marks open and dismiss (D2).** In Brewing, a small **info icon** sits by "Brew guide · saved" (or
+   "Suggested brew · …"), and one sits in "Where this came from" when the tea has a photo. Tap it: a small
+   **popover** with the explainer appears, **fully on screen** (not off the edge, not under anything). Dismiss
+   it **four ways**: tap the mark again, tap outside, press Escape (hardware keyboard), and by navigating away
+   (it is gone on the next screen). Near the bottom of the page, the popover **flips above** the mark rather
+   than off-screen.
+3. **The always-on captions are gone (D2).** The old lines ("The photo is the label…", "Steep times come
+   from…") are **no longer printed on the surface**. They live only behind the marks now.
+4. **The copy reads human (D3).** The photo explainer reads "This photo is the tea's label, not the tea
+   itself. It shows where the tea came from." The brew explainer reads "These steep times come from the leaf
+   type. The session timer uses them." No em-dashes, no "X, Y, never Z". In the tea form, the Purchase / Opened
+   / Leaf-form hints read as short plain sentences after a middot.
+5. **The Material field suggests (D4).** Add or edit a **vessel**. Focus **Material**: no OS autocomplete
+   strip; typing shows the **in-app suggester** drawn from materials already on your shelf; a tap fills it; a
+   brand-new typed material still saves. On a phone, the field **stays above the keyboard** (it rides the #2
+   reveal).
+6. **No regression.** Tea and vessel forms save; the tea page's Start-session, Edit, and Go-Deeper still work;
+   the vendor suggester (tea form + wishlist) still works after the `pickFieldSuggest` rename.
+
+---
+
 ## v4.38 · wave-1 #2 — vendor field + keyboard occlusion  *(on device, post-deploy — a vm has no keyboard)*
 
 The suggester value round-trip + the reveal wiring are vm-covered (`vendor-keyboard-test.js`); whether the

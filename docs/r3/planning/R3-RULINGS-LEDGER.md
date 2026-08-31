@@ -2523,6 +2523,41 @@ the shared renderer); 45th suite, all green, export-gate first. On-device: smoke
 has no keyboard). **NEXT: wave-1 #2.5 (tea-page + calm-copy polish, `TEA-PAGE-CALM-COPY-POLISH.md`), then #3
 (session-flow, `SESSION-FLOW-REDESIGN.md`).**
 
+**R180 — wave-1 #2.5: tea-page polish, the info-popover component, copy de-AI-ification, and the material
+suggester.** Shipped v4.39 (cache v149, no SQL, no new module). One slice off `TEA-PAGE-CALM-COPY-POLISH.md`
+(D1–D4), all three build-gate calls ruled: one slice not two; the suggested-brew note joins the two named
+notes behind the info mark (a consistent Brewing section); the house-style rule lands in CLAUDE.md now.
+**D1 section rhythm** — three scoped CSS rules (`.td-sec` inter-section gap 18→30px; a scoped
+`.td-sechead .eyebrow` at 12.5px/ink — the header eyebrow only, NOT the global class and NOT the in-section
+sub-labels; a little more `.td-sechead` air). Typography and space, no re-boxing, no fill/radius →
+**frame-test 46**. **D2 the info-popover** — `infoMark(text,label)` + `toggleInfoPop`/`closeInfoPop` in
+steep-core.js beside `armConfirm`, plus a new `i-info-hl` line-glyph in the index.html sprite (no literal
+circled-i; DESIGN.md's SVG-iconography rule). A surface drops `infoMark(text,label)` where a caption sat; a
+tap reveals the explainer in a `.info-pop`; dismiss four ways (re-tap, outside pointerdown, Escape, any
+render()). Viewport-safe: measured against `visualViewport`, flips `.info-pop-above` / `.info-pop-right` so
+it never runs off-screen or under the keyboard (the #2 lesson). `textContent` boundary (no re-injection),
+reduced-motion via a `no-preference` gate, a real button with aria-label + aria-expanded. It is the contract
+**track #3 inherits**, and is intended for insight-reveals too (INSIGHT-ENGINE-SPEC refinement, pushed
+`1edadef`); the text-string API suffices now and richer content is left open. **Fence verdict: no new
+surface** — `.info-wrap` / `.info-mark` / `.info-pop` are a transient popover (the `.tag-suggest` /
+`.confirm-inline` family), outside the fill-law fence; no `SURFACES` entry, frame-test unmoved. Proven on the
+tea page: the always-on photo note and both brew notes (saved-guide + suggested) move behind marks, the
+caption divs deleted not hidden. **D3 copy** — the named tea-page strings rewritten plain (em-dashes gone, no
+"X, Y, never Z"): photo note, both brew notes, suggested-brew note, and the three tea-form hints
+(purchase / opened / leaf-form — em-dash lead-ins become the middot separator plus short sentences). The rule
+is added to **CLAUDE.md "Copy voice"**: it binds app strings, specs, and prompts. The full app-wide em-dash
+purge across existing strings and the DESIGN.md voice fold-in are a later pass — the spec scopes the
+existing-doc purge there, which is why the CHANGELOG / STATE / this ledger keep their established provenance
+voice for now. **D4 material suggester** — the vessel Material field gets the vendor treatment
+(`autocomplete="off"` + the shared `.tag-suggest` popover fed by a new `distinctMaterials()` through
+`renderFieldSuggest`); one more caller, no new component or CSS. `pickVendorSuggest` → `pickFieldSuggest`
+(generic once material is the second caller; the two vendor `onPickExpr` sites + `vendor-keyboard-test.js`
+follow). `installKeyboardReveal` (R179) already covers the field by delegation, confirmed by design and
+verified on device. Fixtures: new `tea-polish-test.js` (27, committed via the `.gitignore` exception) + the
+`vendor-keyboard-test.js` rename update; all committed suites green, export-gate first, frame-test 46.
+On-device: smoke.md §v4.39. **NEXT: wave-1 #3 (session-flow re-dress, `SESSION-FLOW-REDESIGN.md`), which
+picks up the info-popover.**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

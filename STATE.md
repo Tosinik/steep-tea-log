@@ -250,7 +250,32 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.38 LIVE `ad7b088` — wave-1 #2: vendor field + keyboard occlusion (R179)** (cache **v148**,
+**NOW — v4.39 STAGED (built, unpushed — awaiting review + `/slowcup-deploy`; flip to LIVE + hash on push) —
+wave-1 #2.5: tea-page polish + the info-popover + material suggester (R180)** (cache **v149**, APP_VERSION
+v4.39, **no SQL**, **no new module**). Four parts, one slice, off `TEA-PAGE-CALM-COPY-POLISH.md`.
+- **D1 section rhythm** — three scoped CSS rules (`.td-sec` gap 18→30px; scoped `.td-sechead .eyebrow`
+  presence; `.td-sechead` air), typography+space only, no re-box. **frame-test 46.**
+- **D2 the info-popover** — `infoMark(text,label)` + `toggleInfoPop`/`closeInfoPop` in core.js beside
+  `armConfirm`, plus a new `i-info-hl` sprite glyph. Tap-reveal explainer; four-way dismiss
+  (re-tap/outside/Escape/render); viewport-safe (visualViewport flip above/right); `textContent` boundary;
+  reduced-motion; button + aria. The app-wide contract **track #3 inherits**, intended for insight-reveals
+  too (INSIGHT-ENGINE-SPEC refinement). Transient popover (tag-suggest family) → no `SURFACES`, frame-test 46.
+  Proven on the tea page: photo note + both brew notes move behind marks, captions **deleted**.
+- **D3 copy** — the named tea-page strings + the three tea-form hints rewritten plain (em-dashes gone, no
+  "X, Y, never Z"). The house rule is in **CLAUDE.md** ("Copy voice"); it binds app strings + specs +
+  prompts. Full app-wide purge + DESIGN.md fold-in = later pass.
+- **D4 material suggester** — the vessel Material field gets the vendor treatment (`autocomplete="off"` +
+  `distinctMaterials()` through the shared `renderFieldSuggest`); `pickVendorSuggest` → `pickFieldSuggest`
+  (generic, two callers). `installKeyboardReveal` covers it by delegation (confirmed by design).
+- **Fixtures:** new `tea-polish-test.js` (27) + `vendor-keyboard-test.js` rename update. All committed suites
+  green, export-gate first; frame-test 46.
+- **ON DEVICE (`smoke.md §v4.39`):** tea page reads as distinct journal entries; the info marks
+  open/dismiss/stay-on-screen and the captions are gone from the always-on surface; copy reads human;
+  material suggests from the shelf, no OS strip, clears the keyboard.
+- **NEXT — wave-1 #3: session-flow re-dress** (`SESSION-FLOW-REDESIGN.md`), which picks up the info-popover.
+  **SECURITY F1/F2 stays the hard pre-widening gate.**
+
+**Previously — v4.38 LIVE `ad7b088` — wave-1 #2: vendor field + keyboard occlusion (R179)** (cache **v148**,
 APP_VERSION v4.38, **no SQL**, **no new module**). The one genuine on-phone bug the v4.36 audit found (§B2, "Class 5"), and
 it was systemic — the app had **zero** `visualViewport`/focus-scroll handling. Fixed as a class, not a field.
 - **Systemic keyboard-reveal** (`installKeyboardReveal`, steep-core.js, installed once from `init` — mirrors

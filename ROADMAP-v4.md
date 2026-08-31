@@ -111,9 +111,10 @@ decisions rather than any single ruling:
   wave-1 build queue. **Wave 1 building: #1 the Sessions list re-dress SHIPPED v4.37/R178** (rows → RULE, the
   photo→liquor-swatch lead); **#2 vendor+keyboard SHIPPED v4.38/R179** (one systemic `visualViewport`
   focus-scroll + both native `<datalist>`s → an in-form inline suggester; vendor stayed in-form, not a router
-  picker); **#2.5 tea-page + calm-copy polish (NEXT)** (section rhythm +
-  a reusable ⓘ-popover explainer component + copy de-AI-ification; `TEA-PAGE-CALM-COPY-POLISH.md`, from
-  on-device review of v4.37, feeds #3); #3 session-flow re-dress designed
+  picker); **#2.5 tea-page + calm-copy polish + material suggester SHIPPED v4.39/R180** (section rhythm;
+  the reusable info-popover explainer component `infoMark`/`toggleInfoPop` + `i-info-hl` glyph; copy
+  de-AI-ification + the CLAUDE.md "Copy voice" rule; the material field's vendor treatment;
+  `TEA-PAGE-CALM-COPY-POLISH.md`, feeds #3); **#3 session-flow re-dress (NEXT)**, designed
   (`SESSION-FLOW-REDESIGN.md`). Then SECURITY re-blocks before the beta widens.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
