@@ -591,6 +591,9 @@ html[data-theme="dark"] .steep-pill.active{color:#15140F;}
 .timer-ctrls button{flex:1;background:var(--porcelain);color:var(--jade-deep);border:none;padding:12px 0;border-radius:11px;font-weight:600;font-size:14px;}
 .timer-ctrls button.soft{background:var(--timer-soft);color:var(--porcelain);}
 .timer-ctrls button.wide{flex:1.4;}
+.timer-nudge{display:flex;gap:6px;justify-content:center;margin-top:12px;}
+.timer-nudge button{flex:1;max-width:70px;background:var(--timer-soft);color:var(--porcelain);border:none;padding:9px 0;border-radius:9px;font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.03em;}
+.steep-ratio{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);letter-spacing:.06em;margin-top:9px;}
 .timer-focus{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;padding-top:13px;border-top:1px solid var(--timer-soft);color:var(--porcelain);opacity:.85;font-size:13.5px;font-weight:600;cursor:pointer;}
 @media (prefers-reduced-motion: reduce){ .timer-enso-wrap{animation:none;} .timer-enso .enso-arc{transition:none;} }
 
@@ -818,18 +821,28 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .focus-head{position:relative;text-align:center;padding:44px 24px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7c745f;}
 .focus-ringwrap{position:relative;width:276px;height:276px;max-width:82vw;max-height:82vw;margin:96px auto 0;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .focus-halo{position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid var(--kachi);animation:sc-halo 6s ease-out infinite;}
-.focus-enso-breathe{position:absolute;inset:0;filter:drop-shadow(0 0 20px var(--kachi-line));animation:sc-breathe-slow 6s ease-in-out infinite;}
+.focus-enso-breathe{position:absolute;inset:0;filter:drop-shadow(0 0 20px var(--kachi-line));}
+.focus-ringwrap:not(.is-paused) .focus-enso-breathe{animation:sc-breathe-slow 6s ease-in-out infinite;}
 .focus-enso{width:100%;height:100%;transform:rotate(-4deg);}
 .focus-enso .enso-track{stroke:#2a271e;}
 .focus-enso .enso-arc{stroke:var(--kachi);transition:stroke-dashoffset .9s linear;}
 .focus-center{position:relative;text-align:center;}
 .focus-digit{font-family:var(--font-mono);font-weight:400;font-size:36px;color:#8f866f;line-height:1;animation:sc-digit 6s ease-in-out infinite;}
-.focus-cue{font-family:var(--font-display);font-size:16px;color:#A79C87;margin-top:16px;}
+.focus-cue{position:relative;font-family:var(--font-display);font-size:16px;color:#A79C87;margin-top:16px;min-height:1.25em;text-align:center;}
+.focus-cue span{display:block;}
+.focus-cue .cue-rest,.focus-cue .cue-paused{display:none;}
+.focus-cue .cue-anim{position:absolute;left:0;right:0;top:0;opacity:0;}
+.focus-ringwrap:not(.is-paused) .focus-cue .cue-in{animation:sc-cue-in 6s ease-in-out infinite;}
+.focus-ringwrap:not(.is-paused) .focus-cue .cue-out{animation:sc-cue-out 6s ease-in-out infinite;}
+.focus-ringwrap.is-paused .focus-cue .cue-anim{display:none;}
+.focus-ringwrap.is-paused .focus-cue .cue-paused{display:block;}
+@keyframes sc-cue-in{0%{opacity:0;}8%{opacity:1;}42%{opacity:1;}50%{opacity:0;}100%{opacity:0;}}
+@keyframes sc-cue-out{0%{opacity:0;}50%{opacity:0;}58%{opacity:1;}92%{opacity:1;}100%{opacity:0;}}
 .focus-foot{position:absolute;left:0;right:0;bottom:44px;text-align:center;}
 .focus-foot-chip{display:inline-flex;align-items:center;gap:7px;color:#6b6455;font-size:13px;margin-bottom:12px;}
 .focus-foot-chip .mono{letter-spacing:.05em;}
 .focus-foot-hint{font-size:12px;color:#7c745f;letter-spacing:.04em;cursor:pointer;}
-@media (prefers-reduced-motion: reduce){ .focus-halo,.focus-enso-breathe,.focus-digit{animation:none;} .focus-enso .enso-arc{transition:none;} }
+@media (prefers-reduced-motion: reduce){ .focus-halo,.focus-digit{animation:none;} .focus-ringwrap:not(.is-paused) .focus-enso-breathe{animation:none;} .focus-enso .enso-arc{transition:none;} .focus-cue .cue-anim{display:none;} .focus-ringwrap:not(.is-paused) .focus-cue .cue-rest{display:block;} }
 
 /* v3 — consumption forecast */
 .forecast-line{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.45;}

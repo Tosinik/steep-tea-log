@@ -1248,6 +1248,8 @@ function toggleFlavor(term){
 }
 function d_flavorMore(v){ if(state.sessionDraft){ state.sessionDraft.flavorMore=!!v; render(); } }
 function d_flavorFreeOpen(){ if(state.sessionDraft){ state.sessionDraft.flavorFreeOpen=true; render(); setTimeout(()=>{ const el=document.getElementById('tagInputField'); if(el) el.focus(); },0); } }
+// D1: tasting capture is a named collapse, closed by default.
+function d_toggleTaste(){ const d=state.sessionDraft; if(d){ d.tasteOpen=!d.tasteOpen; render(); } }
 
 function sessionSteepingHTML(d){
   const tea = teaById(d.teaId);
@@ -1255,6 +1257,10 @@ function sessionSteepingHTML(d){
   // Per-steep verdict echo rides the same §3 gate as the nudge's write (steepFbActive: brewAdvice on,
   // not cold brew, gongfu/senchadō) so the cards and the writer always agree. Cold brew → no cards.
   const showSteepFb = steepFbActive(d);
+  const ves = vesselById(d.vesselId);
+  // D1 facts read: computeSessionRatio self-omits (cold brew, no grams or water, ratioAdjust off), so the line just does not render.
+  const ratio = computeSessionRatio(tea, { gramsUsed:d.gramsUsed, waterMl:d.waterMl, brewStyle:d.brewStyle, capacityMl:ves&&ves.capacityMl, isColdBrew:d.isColdBrew });
+  const ratioStr = ratio ? (Math.round(ratio.actualRatio*10)/10)+' g/100ml' : '';
   const steepsHTML = d.steeps.map((s,i)=>`
     <div class="steep-item">
       <div class="steep-head"><span>Steep ${i+1}</span><span class="mono">${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC)+tempUnitLabel()+' · ':''}${fmtSec(s.timeSeconds)}</span></div>
@@ -1272,12 +1278,11 @@ function sessionSteepingHTML(d){
 
   const displaySeconds = tm.mode==='timer' ? Math.max(0, tm.target - tm.elapsed) : tm.elapsed;
   const active = (d.activeSteep!=null ? d.activeSteep : d.steeps.length);
-  // #13: the countdown length is tap-to-edit here (only while stopped) — it IS the logged steep time.
+  // #13/D5: the countdown length is tap-to-edit here (running AND stopped). It IS the logged steep time.
   let subLabel;
   if(tm.mode!=='timer'){ subLabel = `steep ${active+1}`; }
   else if(d.timeEditing){ subLabel = `of <input type="number" id="timerTargetEdit" class="timer-target-inline" value="${tm.target||''}" oninput="setSteepTime(this.value)" onblur="d_endTimeEdit()" onkeydown="if(event.key==='Enter'){this.blur();}">s · steep ${active+1}`; }
-  else if(!tm.running){ subLabel = `of <button type="button" class="timer-target-tap" onclick="d_beginTimeEdit()"><span id="timerTargetLabel">${tm.target}</span>s</button> · steep ${active+1}`; }
-  else { subLabel = `of <span id="timerTargetLabel">${tm.target}</span>s · steep ${active+1}`; }
+  else { subLabel = `of <button type="button" class="timer-target-tap" onclick="d_beginTimeEdit()"><span id="timerTargetLabel">${tm.target}</span>s</button> · steep ${active+1}`; }
   const soundOn = !!state.settings.soundEnabled;
 
   return `
@@ -1305,6 +1310,12 @@ function sessionSteepingHTML(d){
           <div class="timer-sub">${subLabel}</div>
         </div>
       </div>
+      ${tm.mode==='timer' ? `<div class="timer-nudge">
+        <button type="button" onclick="d_bumpTime(-10)">−10</button>
+        <button type="button" onclick="d_bumpTime(-5)">−5</button>
+        <button type="button" onclick="d_bumpTime(5)">+5</button>
+        <button type="button" onclick="d_bumpTime(10)">+10</button>
+      </div>` : ''}
       <div class="timer-ctrls">
         <button onclick="timerStartPause()">${tm.running?'Pause':'Start'}</button>
         <button class="soft" onclick="timerReset()">Reset</button>
@@ -1313,15 +1324,21 @@ function sessionSteepingHTML(d){
       <div class="timer-focus" onclick="toggleFocusMode()" role="button">${icon('i-focus-hl',18)}<span>Enter focus mode</span></div>
     </div>
 
-    ${flavorCaptureHTML(d)}
+    <div class="form-grid" style="margin-top:14px;">
+      <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
+      <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="setSteepTime(this.value)"></div>
+    </div>
+    ${ratioStr ? `<div class="steep-ratio">${ratioStr}</div>` : ''}
+    <div class="field" style="margin-top:12px;"><label>Notes for this steep</label><textarea id="steepDesc" placeholder="optional" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
+
+    <div class="fold-row" onclick="d_toggleTaste()" role="button" aria-expanded="${!!d.tasteOpen}">
+      <span class="fold-label">What are you tasting?<span class="fold-sub"> · optional${d.curSteepTags.length?' · '+d.curSteepTags.length+' noted':''}</span></span>
+      <span class="fold-caret">${icon(d.tasteOpen?'i-caret-up-hl':'i-caret-hl',22)}</span>
+    </div>
+    ${(!d.tasteOpen && d.curSteepTags.length) ? `<div class="flav-freesel" style="margin-top:10px;">${d.curSteepTags.map(t=>`<span class="flav-chip on">${escapeHtml(flavorLabel(t))} <button onclick="removeCurTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : ''}
+    ${d.tasteOpen ? flavorCaptureHTML(d) : ''}
 
     ${d.steeps.length ? `<div style="margin-top:14px;">${steepsHTML}</div>` : ''}
-
-      <div class="form-grid" style="margin-top:14px;">
-        <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
-        <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="setSteepTime(this.value)"></div>
-        <div class="field span2"><label>Notes for this steep</label><textarea id="steepDesc" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
-      </div>
 
       <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="saveSteepAndContinue()">Save steep & brew another</button>
@@ -1369,7 +1386,7 @@ function sessionFocusHTML(d){
     <div class="focus-glow"></div>
     <div class="focus-mala">${mala}</div>
     <div class="focus-head">${tea?escapeHtml(tea.name):'Steeping'} · steep ${active+1}</div>
-    <div class="focus-ringwrap" id="focusRing" onclick="timerStartPause()" role="button" aria-label="Tap to pause or resume">
+    <div class="focus-ringwrap${tm.running?'':' is-paused'}" id="focusRing" onclick="timerStartPause()" role="button" aria-label="Tap to pause or resume">
       <div class="focus-halo"></div>
       <div class="focus-enso-breathe">
         <svg class="focus-enso" viewBox="0 0 120 120" aria-hidden="true">
@@ -1379,7 +1396,7 @@ function sessionFocusHTML(d){
       </div>
       <div class="focus-center">
         <div class="focus-digit" id="focusTime">${fmtSec(disp)}</div>
-        <div class="focus-cue">${tm.running?'breathe out':'paused'}</div>
+        <div class="focus-cue" aria-hidden="true"><span class="cue-anim cue-in">breathe in</span><span class="cue-anim cue-out">breathe out</span><span class="cue-rest">breathe</span><span class="cue-paused">paused</span></div>
       </div>
     </div>
     <div class="focus-foot">
@@ -1408,9 +1425,9 @@ function setSteepTime(secs){
   d.timer.target=v; d.curTime=v?String(v):'';
   updateTimerDisplayOnly();
 }
-// Inline tap-to-edit on the countdown's "of Ns" (never a popup; only while stopped).
+// Inline tap-to-edit on the countdown's "of Ns" (never a popup). D5: works running AND stopped.
 function d_beginTimeEdit(){
-  const d=state.sessionDraft; if(!d || d.timer.running) return;
+  const d=state.sessionDraft; if(!d) return;
   d.timeEditPrev=d.timer.target; // for the cancelled-edit revert below
   d.timeEditing=true; render();
   setTimeout(()=>{ const el=document.getElementById('timerTargetEdit'); if(el){ el.focus(); el.select&&el.select(); } },0);
@@ -1422,6 +1439,9 @@ function d_endTimeEdit(){
   if(!(Number(d.curTime)>0)) setSteepTime(d.timeEditPrev||0);
   d.timeEditing=false; render();
 }
+// D5: ±5/±10 mid- and post-run nudges. A CALLER of the single writer setSteepTime (#13), never a
+// second writer. Floors at 5s so Start never faces a 0s countdown.
+function d_bumpTime(delta){ const d=state.sessionDraft; if(!d) return; setSteepTime(Math.max(5, (d.timer.target||0)+delta)); }
 
 let _audioCtx = null;
 function playTimerDone(){
@@ -1482,8 +1502,11 @@ function updateTimerDisplayOnly(){
   if(farc) farc.setAttribute('stroke-dashoffset', (100*(1-focusProgress(tm))).toFixed(1));
   const ft = document.getElementById('focusTime');
   if(ft) ft.textContent = fmtSec(tm.mode==='timer'?Math.max(0,tm.target-tm.elapsed):tm.elapsed);
-  const fcue = document.querySelector('.focus-cue');
-  if(fcue) fcue.textContent = tm.running?'breathe out':'paused';
+  // Bug A: the breath cue's 4 states are CSS-driven off #focusRing.is-paused. The interval-completion
+  // path (elapsed>=target) sets running=false with NO render(), so this class toggle is the only cue
+  // updater there. A self-completing steep must land on the static "paused", not a stranded cross-fade.
+  const fring = document.getElementById('focusRing');
+  if(fring) fring.classList.toggle('is-paused', !tm.running);
 }
 function timerReset(){
   const tm = state.sessionDraft.timer;

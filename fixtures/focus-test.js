@@ -168,5 +168,20 @@ const sessCode = sessSrc.replace(/\/\*[\s\S]*?\*\//g,' ').split(/\r?\n/).filter(
 ok(!/95°C · guide 25s · Dragon Gaiwan/.test(sessCode), 'G4 the board\'s example line is not hard-coded as copy');
 console.log('  G generated context: 4 checks');
 
+/* ---- H. Bug A: the breath cue is CSS-driven off #focusRing.is-paused (4 honest states) ---- */
+seed();
+const runF = ctx.sessionFocusHTML(draft({focusMode:true, schedule:{tempC:100,times:[45],form:'open'}, timer:{mode:'timer',target:45,elapsed:10,running:true,intervalId:null}}));
+const pauseF = ctx.sessionFocusHTML(draft({focusMode:true, schedule:{tempC:100,times:[45],form:'open'}, timer:{mode:'timer',target:45,elapsed:10,running:false,intervalId:null}}));
+ok(/breathe in/.test(runF) && /breathe out/.test(runF), 'H1 running cue renders BOTH labels (a CSS cross-fade, not one pinned string)');
+ok(/class="focus-ringwrap"/.test(runF) && !/is-paused/.test(runF), 'H2 running ring carries no is-paused');
+ok(/class="focus-ringwrap is-paused"/.test(pauseF), 'H3 paused ring carries is-paused (static "paused" via CSS)');
+ok(!/fcue/.test(sessSrc), 'H4 the JS cue-text override (fcue) is gone — nothing pins the text');
+ok(/getElementById\('focusRing'\)[\s\S]{0,90}classList\.toggle\('is-paused'/.test(sessSrc), 'H5 updateTimerDisplayOnly toggles #focusRing.is-paused instead (covers the no-render completion path)');
+ok(css.includes('.focus-ringwrap:not(.is-paused) .focus-enso-breathe{animation:sc-breathe-slow 6s'), 'H6 ring breathe gated to :not(.is-paused) on the 6s clock');
+ok(/@keyframes sc-cue-in/.test(css) && /@keyframes sc-cue-out/.test(css) && css.includes('.cue-in{animation:sc-cue-in 6s') && css.includes('.cue-out{animation:sc-cue-out 6s'), 'H7 cue cross-fade keyframes locked to the ring 6s period (cannot drift)');
+ok(css.includes('.focus-ringwrap:not(.is-paused) .focus-enso-breathe{animation:none'), 'H8 reduced-motion re-asserts ring animation:none at matching specificity');
+ok(css.includes('.focus-ringwrap:not(.is-paused) .focus-cue .cue-rest{display:block'), 'H9 …and degrades the running cue to a single static label');
+console.log('  H Bug A breath cue: 9 checks');
+
 console.log(failures ? '\n'+failures+' FOCUS TEST(S) FAILED' : '\nALL FOCUS TESTS PASSED ('+passed+' passed)');
 process.exit(failures?1:0);

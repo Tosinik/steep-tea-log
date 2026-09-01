@@ -120,5 +120,21 @@ for(const v of [3,9,15,23,45,90,120,300, 0, -1, '', 7.4]){
 ok(inv, 'F6 target and logged time are the same number for every input (no drift, ever)');
 console.log('  F #13 reconcile: 12 checks');
 
+// ---- G. D5 — ±5/±10 nudges + edit-while-running route through the ONE writer (#13) ----
+run(`state.sessionDraft.timer={mode:'timer',target:30,elapsed:0,running:false,intervalId:null}; setSteepTime(30);`);
+run(`d_bumpTime(10);`);
+ok(run(`state.sessionDraft.timer.target`)===40 && run(`state.sessionDraft.curTime`)==='40', 'G1 +10 moves target AND logged time together (one writer)');
+run(`d_bumpTime(-5);`);
+ok(run(`state.sessionDraft.timer.target`)===35, 'G2 −5 subtracts');
+run(`d_bumpTime(-100);`);
+ok(run(`state.sessionDraft.timer.target`)===5 && run(`state.sessionDraft.curTime`)==='5', 'G3 a big − floors at 5s (Start never faces 0s), still via setSteepTime');
+run(`state.sessionDraft.timer.running=true; state.sessionDraft.timeEditing=false; d_beginTimeEdit();`);
+ok(run(`state.sessionDraft.timeEditing`)===true, 'G4 the time edit opens WHILE RUNNING (D5 lifted the stopped-only gate)');
+run(`state.sessionDraft.timer.running=false;`);
+let ginv=true;
+for(const dlt of [5,10,-5,-10,-999,5]){ run(`d_bumpTime(${dlt});`); const t=run(`state.sessionDraft.timer.target`), c=run(`state.sessionDraft.curTime`); if(t!==(Number(c)||0) || t<5) ginv=false; }
+ok(ginv, 'G5 target===logged and never below the 5s floor across a run of nudges');
+console.log('  G D5 nudges + edit-while-running: 5 checks');
+
 if(failures){ console.log('\n'+failures+' STEEPING-TIMER TEST(S) FAILED'); process.exit(1); }
 console.log('\nALL STEEPING-TIMER TESTS PASSED  ('+passed+' passed)');
