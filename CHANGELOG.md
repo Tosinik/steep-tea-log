@@ -46,6 +46,49 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.40 — wave-1 #3 slice a: session-flow re-dress (IA + timer + focus cue) — R181
+
+Deploy: steep-sessions.js, styles.css, service-worker.js (cache v150), steep-version.js,
+fixtures/steeping-timer-test.js, fixtures/focus-test.js, CHANGELOG.md, STATE.md, ROADMAP-v4.md,
+smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md, docs/r5/planning/SESSION-FLOW-REDESIGN.md. No SQL.
+No new module.
+
+Slice a of wave-1 #3 (`SESSION-FLOW-REDESIGN.md`): the contained IA + timer + cue re-dress, no
+data-model change. Slice b (the `FLAVOR_TREE` tagger + session-level D2 reads) and slice c (guided
+mode) follow, with D2 isolated as its own step. Three parts, one slice.
+
+- **D1 · facts before feelings (issue #22, twice-slipped).** The objective facts — water temp · steep
+  time · ratio — now render directly under the timer, ABOVE tasting. The tasting capture
+  (`flavorCaptureHTML`) moved into a named collapse ("What are you tasting?"), closed by default, reusing
+  the house `.fold-row` idiom; a "· N noted" count and the tapped chips render beneath the header while
+  collapsed so no entered data is stranded. Notes (`#steepDesc`) stays a visible field WITH the facts —
+  it must, because `saveSteepAndContinue` reads `#steepTemp`/`#steepTime`/`#steepDesc` via bare `.value`
+  (no null guard), so all three ids stay in the live DOM (a build constraint the design doc missed,
+  caught against live code). Ratio READS `computeSessionRatio` (mirrors the two live callers' ctx), shown
+  as "N g/100ml" when it computes and omitted silently when it doesn't (cold brew, no grams-or-water, or
+  `ratioAdjust` off — the common case, not a bug).
+- **D5 · time on the ring.** The countdown target is tap-to-edit on the ring while running AND stopped
+  (was stopped-only: `d_beginTimeEdit` no longer bails on `timer.running`, and the tap affordance renders
+  in both branches). A `±10/±5` nudge row (`d_bumpTime`, countdown mode only, between the ring and
+  `.timer-ctrls`) adjusts the target mid- and post-run. Every write routes through the single writer
+  `setSteepTime` (#13) — `d_bumpTime` is a caller, not a second writer — and floors at 5s so Start never
+  faces a 0s countdown. The stopped-only type-a-number path and the blank/zero-reverts contract are kept.
+- **Bug A · focus breath cue.** The cue was pinned to "breathe out" in two places (the render and a
+  per-tick override re-forcing it every second). Now the four states are CSS-driven off
+  `#focusRing.is-paused`: running → "breathe in" ⇄ "breathe out" cross-faded on the ring's own
+  `sc-breathe-slow` 6s clock (in on the expand half, out on the contract half, so they cannot drift);
+  paused/complete → static "paused"; reduced-motion + running → a static "breathe" (a static "paused"
+  would be false while running). `updateTimerDisplayOnly` now toggles the class instead of writing the
+  text: the interval-completion path (`elapsed>=target`) sets `running=false` with NO `render()`, so the
+  toggle is the only cue updater there and a self-completing steep lands on "paused" instead of a stranded
+  cross-fade. `.focus-enso-breathe`'s animation is gated to `:not(.is-paused)` so ring and cue stop
+  together, and the reduced-motion block re-asserts `animation:none` at matching specificity. The class
+  sits on the shared ancestor `#focusRing`, not `.focus-cue` — a sibling cannot gate the ring in CSS.
+- **Fixtures.** `steeping-timer-test.js` §G (± nudges + edit-while-running through the one writer, the 5s
+  floor); `focus-test.js` §H (the four cue states, source-asserted since the cue is CSS). All committed
+  suites green, export-gate first: export-gate 26 · steeping-timer 35 · focus 63 · session-edit 19 ·
+  flavor-tree 27 · flavor-ladder 106. On-device: `smoke.md §v4.40` (post-deploy).
+
 ## v4.39 — wave-1 #2.5: tea-page polish + the info-popover + material suggester — R180
 
 Deploy: index.html, styles.css, steep-core.js, steep-teas.js, steep-sessions.js, service-worker.js (cache

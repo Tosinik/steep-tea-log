@@ -188,7 +188,7 @@ the ordinary log with extra fields.
 
 ## 3 · Two bugs — fix regardless of the redesign (fold into whichever slice touches the surface)
 
-### Bug A · Focus-mode breath cue is stuck on "breathe out"
+### Bug A · Focus-mode breath cue is stuck on "breathe out" — FIXED v4.40/R181
 
 - **Symptom:** in focus mode the guidance never alternates — it reads "breathe out" the whole time.
 - **Root cause (verified):** the ring *does* breathe — `.focus-enso-breathe` runs `sc-breathe-slow 6s
@@ -241,7 +241,7 @@ Both were open in the first draft; **ruled 2026-08-30** and folded into the sett
 
 A multi-slice track. Likely shape:
 
-- **(a) IA reorg + timer + layout** — D1 (facts above tasting, tasting collapsible) + D5 (time-on-timer,
+- **(a) IA reorg + timer + layout — SHIPPED v4.40/R181.** D1 (facts above tasting, tasting collapsible) + D5 (time-on-timer,
   ±5/±10). Contained, no data-model change. **Bug A** slots here (same focus/timer surface).
 - **(b) The hierarchical tagger + earned-vocab resurfacing** — D3, replacing `flavorCaptureHTML`'s flat grid
   with the 12-family tree, tea-typical + earned vocab per family. **Bug B** *is* this slice's earned-vocab

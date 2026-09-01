@@ -116,6 +116,28 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.40 · wave-1 #3 slice a — session-flow re-dress: IA + timer + focus cue  *(post-deploy on the served PWA)*
+
+Render paths are vm-covered (focus-test §D/§H, steeping-timer §G); a phone confirms the look and the
+served-PWA behaviour. On a live-brewing session:
+
+1. **#22 · facts before feelings.** The objective facts — water temp · steep time · ratio — sit directly
+   under the timer, ABOVE "What are you tasting?". The tasting capture is a **named collapse**, closed by
+   default; tapping "What are you tasting?" opens it. When notes are already tapped, the collapsed header
+   shows "· N noted" and the chips beneath it (nothing hidden). Notes stays a visible field with the facts.
+2. **Ratio.** The "N g/100ml" line shows only when `ratioAdjust` is on AND grams + water are set; it is
+   silently absent otherwise (cold brew, or the setting off — the common case). Absence is correct.
+3. **D5 · time on the ring.** Tap "of Ns" on the ring **while the timer is running** → the inline edit
+   opens, keeps focus, the countdown keeps ticking. The **±10 / ±5** row nudges the remaining time live
+   mid-run and the target post-run. A big − floors at 5s (Start never faces 0s).
+4. **Bug A · the breath cue.** In focus mode the cue **alternates** "breathe in" / "breathe out" in time
+   with the ring (in as it expands, out as it contracts). **Pause** → the ring stops and the cue reads
+   "paused". **Let a steep run out on its own** → the cue lands on "paused", NOT a stranded cross-fade.
+   With **reduced motion** on, the cue is a single static "breathe" while running and "paused" when paused,
+   and the ring does not breathe.
+5. **Regression.** Cold brew, stopwatch, and senchadō steeping screens still render normally; the steeping
+   chrome carries no kachi (that accent stays the focus ring's alone).
+
 ## v4.39 · wave-1 #2.5 — tea-page polish + info-popover + material suggester  *(mostly locally drivable; D4 keyboard on device)*
 
 The info-popover output, the material round-trip, and the copy are vm-covered (`tea-polish-test.js`); whether

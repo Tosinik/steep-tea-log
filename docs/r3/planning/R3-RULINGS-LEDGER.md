@@ -2558,6 +2558,32 @@ verified on device. Fixtures: new `tea-polish-test.js` (27, committed via the `.
 On-device: smoke.md §v4.39. **NEXT: wave-1 #3 (session-flow re-dress, `SESSION-FLOW-REDESIGN.md`), which
 picks up the info-popover.**
 
+**R181 — wave-1 #3 slice a: session-flow IA + timer + focus cue.** Shipped v4.40 (cache v150, no SQL, no
+new module). The first, contained slice of `SESSION-FLOW-REDESIGN.md` (D1 + D5 + Bug A); slices b (the
+`FLAVOR_TREE` tagger + session-level D2 reads) and c (guided mode) follow, D2 isolated as its own step per
+the plan-gate. **D1 facts-before-feelings (issue #22, twice-slipped):** the objective facts (temp · time ·
+ratio) promoted directly under the timer, above tasting; the tasting capture (`flavorCaptureHTML`) demoted
+into a named `.fold-row` collapse, closed by default, with "· N noted" + the tapped chips shown while
+collapsed so no entered data is stranded. Ratio READS `computeSessionRatio` (shown when it computes, omitted
+otherwise — null for `ratioAdjust`-off users, most of the beta; absence is not a bug). Notes (`#steepDesc`)
+stays a live input WITH the facts, forced by `saveSteepAndContinue`'s bare `.value` reads of
+`#steepTemp`/`#steepTime`/`#steepDesc` (no null guard) — a build constraint the design doc missed, caught
+against live code. **D5 time-on-ring:** the countdown target is tap-to-edit running AND stopped
+(`d_beginTimeEdit` un-gated), plus a `±10/±5` nudge row (`d_bumpTime`), every write through the single writer
+`setSteepTime` (#13, never a second writer; floors at 5s). **Bug A focus cue:** was pinned to "breathe out"
+in the render and a per-tick override; now four CSS states off `#focusRing.is-paused` (running → "breathe in"
+⇄ "breathe out" cross-faded on the ring's own `sc-breathe-slow` 6s clock so they cannot drift;
+paused/complete → "paused"; reduced-motion+running → a neutral static "breathe"). The override BECAME a class
+toggle rather than a deletion — the interval-completion path sets `running=false` with NO `render()`, so the
+toggle is the only cue updater there (a self-completing steep must land on "paused", not a stranded
+cross-fade). Ring breathe gated to `:not(.is-paused)` so ring and cue stop together; the reduced-motion block
+re-asserts `animation:none` at matching specificity. The `.is-paused` class sits on the shared ancestor
+`#focusRing`, not `.focus-cue` — a sibling cannot gate the ring in CSS (flagged and confirmed at plan-gate).
+Fixtures: steeping-timer §G, focus §H (source-asserted, the cue is CSS). All committed suites green.
+On-device: `smoke.md §v4.40` (post-deploy). **NEXT: slice b — the tagger writes session-level `sessionTags`
+(Q1 ruled: kills the "led early" artifact at the root), D2 repoints the reads and subsumes the two
+overall-tags UIs; R182.**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
