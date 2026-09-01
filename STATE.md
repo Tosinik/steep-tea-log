@@ -250,7 +250,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.41 STAGED `7c27cb9` (code committed, UNPUSHED — awaiting Niklas's push) — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3, Bug B) (R182)**
+**NOW — v4.41 LIVE `7c27cb9` — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3, Bug B) (R182)**
 (cache **v151**, APP_VERSION v4.41, **no SQL**, **no new module**). The data-touching slice of
 `SESSION-FLOW-REDESIGN.md`; slice c (guided mode, D4) is the remaining piece.
 - **D3 tagger** — `flavorCaptureHTML` rewritten on `FLAVOR_TREE` (12 families → sub-families → notes): a
@@ -271,9 +271,8 @@ low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unseq
 - **ON DEVICE (`smoke.md §v4.41`, POST-DEPLOY):** tagger tap-through (family expand, the two rows, free word
   + resolution echo, one session-tag UI everywhere); D2 on the tea page (session-level tags feed it, no
   "softens after" from a single tag); finish recap + edit still work.
-- **PUSH STATE:** code commit `7c27cb9` is UNPUSHED (pauses for Niklas's `git push` per CLAUDE.md
-  PAUSE-THEN-PUSH); this docs commit stages the record. After push + phone-look + Planning's clone-verify,
-  flip STAGED→LIVE.
+- **SHIPPED:** code `7c27cb9` + docs `e8155ae` pushed; phone-look (`smoke.md §v4.41`) + Planning's
+  clone-verify passed → LIVE.
 - **NEXT — wave-1 #3 slice c:** guided tasting as its own path (D4), the per-steep evolution layer + Tier-1
   liquor capture. Then SECURITY re-blocks before the beta widens. **Design calls confirmed:** lowercase free
   words (exact-case a logged follow), merged "chosen" row, finish recap kept (drop-if-double phone-look).
