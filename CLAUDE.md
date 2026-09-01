@@ -351,11 +351,18 @@ when the app-wide copy pass runs.
 
 - **`KB_FLAVOR_AXES` (steep-knowledge.js) is dead as of R30/v3.93** — an 11-item list declared "a
   separate analytic list" and referenced by nothing (the vocabulary is `KB_FLAVOR_CHIPS`, the capture
-  grouping is `KB_FLAVOR_FAMILIES`). **Do not delete yet** — the planning lane may promote its last four
+  grouping was `KB_FLAVOR_FAMILIES`, replaced by the `FLAVOR_TREE` tagger at R182/v4.41). **Do not delete yet** — the planning lane may promote its last four
   (`tannin · bitterness · oxidation · complexity` are structural dimensions, not taste notes; the
   two-layer question sits on the brewing-session agenda, ledger §4). Flagged here so it can't quietly
   become a *fourth* vocabulary: don't wire it into `isFlavorVocab`/capture/seeds without that decision.
   If the two-layer question is settled as "no", delete it.
+
+- **`KB_FLAVOR_FAMILIES` + `FLAVOR_DEFAULT_FAMILIES` (steep-knowledge.js), `flavorFamilyOf`
+  (steep-knowledge.js), and `d_flavorMore` (steep-sessions.js) are dead as of R182/v4.41** — the flat WS4
+  capture grid they drove was replaced by the `FLAVOR_TREE` hierarchical tagger (`flavorCaptureHTML`, slice
+  b). **Left in place on purpose:** `flavor-ladder-test.js §A` still asserts `KB_FLAVOR_FAMILIES`'s shape
+  (4 families / 20 terms / the R30 orphans), so deleting it reddens the suite. Remove them together with a
+  §A rewrite when the flavour-capture area is next opened.
 
 ## Known open bugs
 

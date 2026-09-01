@@ -69,7 +69,7 @@ water temp · time · ratio — sit ABOVE "What are you tasting?"**; tasting is 
 - **Rationale, recorded:** facts are what you know *now, at the cup*; feelings are what you *choose* to
   attend to. Facts before feelings is the calm order and the honest one.
 
-### D2 · Tasting model — session-level by default; per-steep is an opt-in layer
+### D2 · Tasting model — session-level by default; per-steep is an opt-in layer — SHIPPED v4.41/R182
 
 Tasting notes belong to **the sitting**, not to a timed infusion. **Default tasting is session-level** — one
 set of notes for the cup, **no per-steep timing implied.**
@@ -105,7 +105,7 @@ set of notes for the cup, **no per-steep timing implied.**
   `ROADMAP-v4.md` Pillar D (the `distinctVocab` choke point). Confirm the profile rungs
   (`teaFlavorProfile.rung`, `:943`) still read sensibly off session counts.
 
-### D3 · The tagger — hierarchical / guided, not a flat wall and not a literal wheel
+### D3 · The tagger — hierarchical / guided, not a flat wall and not a literal wheel — SHIPPED v4.41/R182 (guided mode itself = slice c)
 
 Built on the **flavour tree** — **12 families → sub-families → notes** (`DATA-flavour-tree.md`, ratified
 R31; the wheel's ~111 notes are the ceiling, ~80 curated-seeded today). The interaction: **tap a family →
@@ -243,10 +243,11 @@ A multi-slice track. Likely shape:
 
 - **(a) IA reorg + timer + layout — SHIPPED v4.40/R181.** D1 (facts above tasting, tasting collapsible) + D5 (time-on-timer,
   ±5/±10). Contained, no data-model change. **Bug A** slots here (same focus/timer surface).
-- **(b) The hierarchical tagger + earned-vocab resurfacing** — D3, replacing `flavorCaptureHTML`'s flat grid
-  with the 12-family tree, tea-typical + earned vocab per family. **Bug B** *is* this slice's earned-vocab
-  requirement. **Q2 ruled** (D2: session-level default; evolution only from real per-steep logging); needs
-  D2's read-repointing.
+- **(b) The hierarchical tagger + earned-vocab resurfacing — SHIPPED v4.41/R182.** D3 replaced
+  `flavorCaptureHTML`'s flat grid with the 12-family tree, tea-typical + earned vocab per family. **Bug B**
+  *was* this slice's earned-vocab requirement (the "Words you've used" row). **Q1 ruled session-level**: the
+  tagger writes `sessionTags`; D2 repointed `distinctVocab`/`flavorObservation`/`sessionFlavorStory` and
+  dropped the absence-inferences; both "Overall tags" UIs subsumed.
 - **(c) Guided mode as a separate path** — D4, the `IDEA-tasting-mode.md` sequence as its own flow, with the
   per-steep evolution layer and Tier-1 liquor capture. **Q1 ruled** (D4: prominent primary entry,
   tea-anchored, + contextual tea-detail link). Largest slice; may

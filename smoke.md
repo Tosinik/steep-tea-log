@@ -116,6 +116,25 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.41 · wave-1 #3 slice b — the flavour tagger + session-level tasting  *(post-deploy on the served PWA)*
+
+Render paths are vm-covered (flavor-tagger 27, render-smoke 219); a phone confirms the tap-through and the
+reads. On the steeping / quick-log / finish screens:
+
+1. **The tagger.** "What are you tasting?" opens a `sweet · umami · crisp` strip above a 12-family cloud.
+   Tapping a family expands its notes IN PLACE (never a modal); a family you've tasted before shows a
+   "You've noted in this tea" row and your earned words show a "Words you've used" row (Bug B — no retype).
+   Tapping a note toggles it; the chosen words show at the top, removable. It should read calm, not a wall.
+2. **Free word + resolution.** Open "your own word", type e.g. "aprikose" → a live "aprikose → Fruity ·
+   Fresh fruits" echo appears; on Enter it stores as written and comes back under "Words you've used".
+3. **One session-tag UI.** The same tagger is the ONLY tasting surface on steeping (in the collapse),
+   quick-log, and finish — no separate "Overall tags" box anywhere.
+4. **D2 on the tea page.** A tea's "What you taste" reflects your session-level tags (quick/cold-brew now
+   count); the observation line no longer claims a note "softens after" from a single early tag — ordinary
+   sittings read quietly. Confirm `teaFlavorProfile.rung` still reads sensibly off session counts.
+5. **Finish + edit.** The "You tasted" recap shows the sitting's notes (drop the read-only recap only if it
+   reads double against the tagger below); the session-edit screen's tags still edit and save normally.
+
 ## v4.40 · wave-1 #3 slice a — session-flow re-dress: IA + timer + focus cue  *(post-deploy on the served PWA)*
 
 Render paths are vm-covered (focus-test §D/§H, steeping-timer §G); a phone confirms the look and the

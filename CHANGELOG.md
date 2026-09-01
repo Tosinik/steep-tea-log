@@ -46,6 +46,50 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.41 — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3) — R182
+
+Deploy: steep-sessions.js, steep-teas.js, styles.css, service-worker.js (cache v151), steep-version.js,
+fixtures/flavor-ladder-test.js, fixtures/flavor-tagger-test.js, .gitignore, CHANGELOG.md, STATE.md,
+ROADMAP-v4.md, smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md, docs/r5/planning/SESSION-FLOW-REDESIGN.md,
+CLAUDE.md. No SQL. No new module.
+
+Slice b of wave-1 #3 (`SESSION-FLOW-REDESIGN.md`): the data-touching half. The flat WS4 capture grid
+becomes the hierarchical `FLAVOR_TREE` tagger, and the reads repoint to session-level (D2, the reviewable
+heart). Slice c (guided mode) is the remaining piece.
+
+- **D3 · the hierarchical tagger (Bug B folded in).** `flavorCaptureHTML` is rewritten on `FLAVOR_TREE`
+  (12 families → sub-families → notes, the R31 resolver as the source of truth). A taste-&-structure strip
+  (`sweet · umami · crisp`, vocab but non-resolving — Design's proposal) sits above the twelve; tapping a
+  family (`d_flavFam`) expands its notes in place with two shortcut rows first: **"You've noted in this
+  tea"** (`teaFlavorProfile ∩ family`) and **"Words you've used"** (`tagLibrary ∩ family` — **Bug B**, no
+  earned word ever needs retyping). The free-word door shows a live resolution echo ("aprikose → Fruity ·
+  Fresh fruits") and stores the word as written (never rewritten to the English canonical). New:
+  `toggleSessionFlavor`, `d_flavFam`, `flavFamilyPanelHTML`, `flavorFamilies`, `FLAV_STRIP`.
+- **Q1 · tasting is session-level.** The tagger writes `sessionTags`, not per-steep `curSteepTags` — one
+  set of notes for the sitting, which removes the "led early" artifact at its root rather than suppressing
+  it at read. The tagger is now the SOLE session-tasting surface: it subsumed both "Overall tags" chip UIs
+  (`sessionQuickHTML` + `sessionFinishHTML`) and the slice-a steeping collapse. `curSteepTags`/`toggleFlavor`
+  are left intact, reserved for guided mode (slice c).
+- **D2 · read-repointing (the reviewable heart).** `distinctVocab` now reads `session.tags` (primary) ∪
+  `steeps[].tags` (overlay), so quick and cold-brew sessions finally feed the tea-page profile. The
+  evolution reads speak only from a real per-steep presence-difference, never from a note's absence:
+  `flavorObservation` dropped "peaks at steep 1, softens after" (fade inferred from a lone-index tag) and
+  gates "runs steady" on a genuine spread of steep indices; `sessionFlavorStory` dropped "X led early"
+  (fired on `first[0]` alone) and keeps only "opened up by steep N". The finish "You tasted" + readback
+  repoint to session-level; the tea-page chips/bars/radar rendering is unchanged (only which sessions count
+  + the observation prose). Ordinary session-level sessions simply go quiet — the intent.
+- **Fixtures.** New `fixtures/flavor-tagger-test.js` (27 — family structure from `FLAVOR_TREE`, the two
+  shortcut rows, honest-floor absence, strip-is-structural, session-level writes, escaping). `flavor-ladder`
+  §E revised to the honest reads (E8: a lone-index term makes no fade claim). `flavor-tree` untouched
+  (resolver unchanged); `session-edit` green (the per-steep deep-copy guard is unaffected — `session.tags`
+  is the edit surface's native content). All 40 suites green, export-gate first.
+- **Design calls (confirmed, not rebuilt):** free words stay lowercased (exact-case "Aprikose" preservation
+  is a logged shared-code follow, `addTagFromInput`); the "chosen" row is one merged summary, not a separate
+  "your words" bucket; the finish keeps the "You tasted" recap above the tagger (a phone-look drop-if-double
+  item). `KB_FLAVOR_FAMILIES` / `flavorFamilyOf` / `d_flavorMore` are now dead (the tree replaced them),
+  left in place so `flavor-ladder §A` stays green — a cleanup follow (see CLAUDE.md backlog).
+- On-device: `smoke.md §v4.41` (post-deploy).
+
 ## v4.40 — wave-1 #3 slice a: session-flow re-dress (IA + timer + focus cue) — R181
 
 Deploy: steep-sessions.js, styles.css, service-worker.js (cache v150), steep-version.js,

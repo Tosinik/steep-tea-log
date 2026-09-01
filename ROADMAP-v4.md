@@ -115,9 +115,9 @@ decisions rather than any single ruling:
   the reusable info-popover explainer component `infoMark`/`toggleInfoPop` + `i-info-hl` glyph; copy
   de-AI-ification + the CLAUDE.md "Copy voice" rule; the material field's vendor treatment;
   `TEA-PAGE-CALM-COPY-POLISH.md`, feeds #3); **#3 session-flow re-dress — slice a (IA + timer + focus cue)
-  SHIPPED v4.40/R181** (facts-above-tasting per #22, time-on-ring + ±nudge through the single writer, the
-  focus breath cue synced to the ring's 6s clock; `SESSION-FLOW-REDESIGN.md`), **slices b (FLAVOR_TREE
-  tagger + session-level D2) and c (guided mode) NEXT**. Then SECURITY re-blocks before the beta widens.
+  SHIPPED v4.40/R181, slice b (FLAVOR_TREE tagger + session-level D2/Bug B) SHIPPED v4.41/R182**
+  (`SESSION-FLOW-REDESIGN.md`); **slice c (guided mode, D4) is the remaining piece**. Then SECURITY
+  re-blocks before the beta widens.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
   next person logs in). Findings

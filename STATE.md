@@ -250,7 +250,35 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.40 LIVE `46ea175` — wave-1 #3 slice a: session-flow re-dress: IA + timer + focus cue (R181)**
+**NOW — v4.41 STAGED `7c27cb9` (code committed, UNPUSHED — awaiting Niklas's push) — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3, Bug B) (R182)**
+(cache **v151**, APP_VERSION v4.41, **no SQL**, **no new module**). The data-touching slice of
+`SESSION-FLOW-REDESIGN.md`; slice c (guided mode, D4) is the remaining piece.
+- **D3 tagger** — `flavorCaptureHTML` rewritten on `FLAVOR_TREE` (12 families → sub-families → notes): a
+  `sweet · umami · crisp` strip above the twelve; tap a family (`d_flavFam`) to expand notes in place, two
+  rows first ("You've noted in this tea" = `teaFlavorProfile ∩ family`; "Words you've used" =
+  `tagLibrary ∩ family` = **Bug B**). Free-word door with a live resolution echo, stored as written. New
+  `toggleSessionFlavor`/`d_flavFam`/`flavFamilyPanelHTML`/`flavorFamilies`/`FLAV_STRIP`.
+- **Q1 session-level** — the tagger writes `sessionTags` (not per-steep), killing the "led early" artifact
+  at the root; SOLE session-tasting UI, subsuming both "Overall tags" chip UIs (quick-log + finish) and the
+  slice-a collapse. `curSteepTags`/`toggleFlavor` reserved for guided mode.
+- **D2 reads (the reviewable heart)** — `distinctVocab` = `session.tags` ∪ `steeps[].tags` (quick/cold-brew
+  now feed the profile); `flavorObservation` dropped "peaks/softens" + gates "runs steady" on a real spread;
+  `sessionFlavorStory` dropped "led early". Finish "You tasted" + readback repointed; tea-page chips/bars/
+  radar rendering unchanged.
+- **Fixtures** — new `flavor-tagger-test.js` (27), `flavor-ladder §E` revised, all 40 green, export-gate
+  first. Dead `KB_FLAVOR_FAMILIES`/`flavorFamilyOf`/`d_flavorMore` left for `flavor-ladder §A` (cleanup
+  follow, CLAUDE.md backlog).
+- **ON DEVICE (`smoke.md §v4.41`, POST-DEPLOY):** tagger tap-through (family expand, the two rows, free word
+  + resolution echo, one session-tag UI everywhere); D2 on the tea page (session-level tags feed it, no
+  "softens after" from a single tag); finish recap + edit still work.
+- **PUSH STATE:** code commit `7c27cb9` is UNPUSHED (pauses for Niklas's `git push` per CLAUDE.md
+  PAUSE-THEN-PUSH); this docs commit stages the record. After push + phone-look + Planning's clone-verify,
+  flip STAGED→LIVE.
+- **NEXT — wave-1 #3 slice c:** guided tasting as its own path (D4), the per-steep evolution layer + Tier-1
+  liquor capture. Then SECURITY re-blocks before the beta widens. **Design calls confirmed:** lowercase free
+  words (exact-case a logged follow), merged "chosen" row, finish recap kept (drop-if-double phone-look).
+
+**Previously — v4.40 LIVE `46ea175` — wave-1 #3 slice a: session-flow re-dress: IA + timer + focus cue (R181)**
 (cache **v150**, APP_VERSION v4.40, **no SQL**, **no new module**). The first, contained slice of
 `SESSION-FLOW-REDESIGN.md` (D1 + D5 + Bug A); slices b (`FLAVOR_TREE` tagger + session-level D2) and c
 (guided mode) follow, D2 isolated as its own step.

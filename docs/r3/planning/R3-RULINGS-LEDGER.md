@@ -2584,6 +2584,30 @@ On-device: `smoke.md §v4.40` (post-deploy). **NEXT: slice b — the tagger writ
 (Q1 ruled: kills the "led early" artifact at the root), D2 repoints the reads and subsumes the two
 overall-tags UIs; R182.**
 
+**R182 — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3/Bug B).** Shipped v4.41
+(cache v151, no SQL, no new module). The data-touching slice of `SESSION-FLOW-REDESIGN.md`; slice c (guided
+mode, D4) remains. **D3 tagger:** `flavorCaptureHTML` rewritten on `FLAVOR_TREE` (12 families → sub-families
+→ notes). A `sweet · umami · crisp` taste-&-structure strip (vocab but non-resolving, Design's proposal)
+above the twelve; tap a family (`d_flavFam`) to expand its notes in place, two shortcut rows first
+("You've noted in this tea" = `teaFlavorProfile ∩ family`; "Words you've used" = `tagLibrary ∩ family` =
+**Bug B**), then sub-family rows (4 families) or notes straight up (8). Free-word door with a live
+resolution echo, stored as written. New `toggleSessionFlavor`/`d_flavFam`/`flavFamilyPanelHTML`/
+`flavorFamilies`/`FLAV_STRIP`. **Q1 ruled session-level (NOT keep-per-steep-and-suppress):** the tagger
+writes `sessionTags`, killing the "led early" artifact at the root; it is the SOLE session-tasting UI,
+having subsumed both "Overall tags" chip UIs (`sessionQuickHTML` + `sessionFinishHTML`) and the slice-a
+collapse. `curSteepTags`/`toggleFlavor` kept for guided mode. **D2 read-repointing (the reviewable heart,
+its own scrutiny before push):** `distinctVocab` = `session.tags` ∪ `steeps[].tags` (quick/cold-brew now
+feed the profile); `flavorObservation` dropped "peaks at steep 1, softens after" and gates "runs steady" on
+a real spread of steep indices; `sessionFlavorStory` dropped "X led early"; finish "You tasted" + readback
+repointed. The tea-page chips/bars/radar rendering is unchanged (only which sessions count + the prose).
+**Design calls (confirmed, not rebuilt):** lowercase free-word storage kept (exact-case a logged shared-code
+follow, `addTagFromInput`); one merged "chosen" row (not a separate "your words" bucket); finish keeps the
+recap above the tagger (phone-look drop-if-double). `KB_FLAVOR_FAMILIES`/`flavorFamilyOf`/`d_flavorMore` now
+dead, left for `flavor-ladder §A` (cleanup follow, CLAUDE.md backlog). Fixtures: new `flavor-tagger-test.js`
+(27), `flavor-ladder §E` revised, all 40 green, export-gate first. On-device: `smoke.md §v4.41` (post-deploy).
+**NEXT: slice c — guided tasting as its own path (D4), the per-steep evolution layer + Tier-1 liquor
+capture; then SECURITY re-blocks before the beta widens.**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**
