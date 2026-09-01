@@ -1075,6 +1075,15 @@ html[data-theme="dark"] .toast{background:var(--amber);color:#1C1A14;}
 .flav-door{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--ink-soft);font-size:14px;padding:2px 0;cursor:pointer;}
 .flav-freesel{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
 .flav-reassure{display:block;text-align:center;font-size:11px;color:var(--ink-soft);margin-top:16px;}
+/* D3 (slice b) hierarchical tagger: taste-&-structure strip, the 12-family cloud, an in-place panel */
+.flav-strip{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+.flav-fams{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.flav-fam-chip{font-size:14px;padding:13px 15px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;line-height:1;}
+.flav-fam-chip.open{border-color:var(--jade);color:var(--jade);font-weight:600;}
+.flav-panel{margin:6px 0 12px;padding:2px 0 2px 12px;border-left:2px solid var(--line);}
+.flav-sub{margin-bottom:12px;}
+.flav-sub:last-child{margin-bottom:2px;}
+.flav-resolve{font-size:11px;color:var(--ink-soft);padding:7px 10px;letter-spacing:.03em;border-bottom:1px solid var(--line);}
 
 /* Session story — the finish summary */
 .sess-story{margin-bottom:6px;}

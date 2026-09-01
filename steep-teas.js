@@ -948,9 +948,11 @@ function sparklineHintHTML(tea){
 const FLAVOR_PROFILE_RECENT = 6;                    // "last 6" sessions carrying flavour data
 const FLAVOR_WARM = ['sweetness','honey','malty'];  // rendered amber on bars/radar (sweet/warm notes)
 
-function distinctVocab(session){ // distinct vocabulary terms in a session's steeps
+function distinctVocab(session){ // distinct vocabulary in a session — session-level primary + per-steep overlay (D2)
   const set=[];
-  (session.steeps||[]).forEach(st=>(st.tags||[]).forEach(t=>{ t=String(t).toLowerCase(); if(isFlavorVocab(t) && !set.includes(t)) set.push(t); }));
+  const add=arr=>(arr||[]).forEach(t=>{ t=String(t).toLowerCase(); if(isFlavorVocab(t) && !set.includes(t)) set.push(t); });
+  add(session.tags);                               // D2: session-level tasting is the primary source (quick/cold-brew feed the profile too)
+  (session.steeps||[]).forEach(st=>add(st.tags));  // per-steep overlay — guided mode + legacy per-steep data
   return set;
 }
 function teaFlavorProfile(teaId){
@@ -974,10 +976,11 @@ function flavorObservation(p){
     const pos=p.positions[t]||[]; if(pos.length<2) continue;
     const avg=pos.reduce((a,b)=>a+b,0)/pos.length;
     if(avg>=1.2) return `${capWord(flavorLabel(t))} climbs in later steeps`;
-    if(pos.filter(i=>i===0).length>=Math.ceil(pos.length/2) && avg<0.6) return `${capWord(flavorLabel(t))} peaks at steep 1, softens after`;
   }
+  // D2: only a real per-steep SPREAD speaks (a note logged across distinct steeps), never a note's
+  // ABSENCE in later steeps — the retired "peaks at steep 1, softens after" read fade from a lone-index tag.
   const top=p.terms[0], pos=p.positions[top]||[];
-  return pos.length>=2 ? `${capWord(flavorLabel(top))} runs steady across the steeps` : '';
+  return (pos.length>=2 && new Set(pos).size>=2) ? `${capWord(flavorLabel(top))} runs steady across the steeps` : '';
 }
 function setFlavorView(v){ state.flavorView=v; render(); } // not persisted — see openTeaDetail
 function flavpChipsHTML(p){

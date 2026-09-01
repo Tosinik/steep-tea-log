@@ -106,11 +106,11 @@ ok(!p.tally['smells like rain'], 'D5 free words never become a bar/axis');
 console.log('  D free-word isolation: 5 checks');
 
 // ---- 5. Honesty guard: observations read as observation, never verdict/score/grade ----
-// Allowed: "peaks at steep 1" (a steep index). Forbidden: %, arrows, score/grade/rating/best/worst, N/M fractions.
+// Allowed: "opened up by steep 3" (a steep index). Forbidden: %, arrows, score/grade/rating/best/worst, N/M fractions.
 const BAD=/[%↑↓→]|\b(score|scored|grade|graded|rating|rated|ranked|rank|best|worst|out of)\b|\d+\s*\/\s*\d+/i;
 const obsCases=[
   {terms:['umami'],   positions:{umami:[1,2,2]},    tally:{umami:3}},      // → climbs in later steeps
-  {terms:['sweetness'],positions:{sweetness:[0,0]}, tally:{sweetness:2}},  // → peaks at steep 1, softens after
+  {terms:['sweetness'],positions:{sweetness:[0,0]}, tally:{sweetness:2}},  // → '' (D2: lone index 0, no spread — absence is never read as fade)
   {terms:['marine'],  positions:{marine:[0,1,2]},   tally:{marine:3}},     // → runs steady / climbs
   {terms:['honey'],   positions:{honey:[0]},        tally:{honey:1}},      // → '' (not enough signal)
   {terms:[],          positions:{},                 tally:{}}              // → ''
@@ -119,7 +119,7 @@ let nonEmpty=0;
 obsCases.forEach((pp,i)=>{ const o=ctx.flavorObservation(pp); if(o) nonEmpty++; ok(typeof o==='string' && !BAD.test(o), 'E'+(i+1)+' observation clean: "'+o+'"'); });
 ok(nonEmpty>=2, 'E6 at least two of the synthetic cases produce an observation');
 ok(/climbs in later steeps/.test(ctx.flavorObservation(obsCases[0])), 'E7 later-skewed term → "climbs in later steeps"');
-ok(/peaks at steep 1/.test(ctx.flavorObservation(obsCases[1])), 'E8 steep-1-skewed term → "peaks at steep 1, softens after"');
+ok(ctx.flavorObservation(obsCases[1])==='', 'E8 D2: a lone-index term (steep 0 only) makes NO observation — absence is never read as "softens after"');
 // the static "still early" footer is copy, not a verdict
 ok(!BAD.test('Still early — a couple of notes so far. The picture fills in as you brew.'), 'E9 "still early" footer is clean copy');
 console.log('  E honesty guard: 9 checks');

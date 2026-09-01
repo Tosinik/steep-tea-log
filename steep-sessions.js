@@ -779,15 +779,7 @@ function sessionQuickHTML(d){
       <div class="field" style="margin-bottom:14px;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
       ${feedbackRowHTML(d)}
       <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${escapeHtml(d.sessionDesc)}</textarea></div>
-      <div class="field">
-        <label>Overall tags</label>
-        <div>${d.sessionTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeSessionTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
-        <div class="tag-input-wrap">
-          <input type="text" id="tagInputField" data-target="session" enterkeyhint="done" placeholder="Type your own, press Enter...">
-          <div id="tagSuggestBox"></div>
-        </div>
-        ${tagLibraryChipsHTML('session')}
-      </div>
+      ${flavorCaptureHTML(d)}
       <label class="checkrow" style="margin-top:16px;"><input type="checkbox" ${d.isShared?'checked':''} onchange="state.sessionDraft.isShared=this.checked"> Share this session with followers</label>
       ${d.teaId
         ? `<button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save cup</button>`
@@ -1210,32 +1202,50 @@ function scheduleStripHTML(d){
 // curSteepTags (committed into steeps[].tags on saveSteepAndContinue). Two families by default;
 // "more" reveals the other two in place; a quiet door opens a free-text input. Never a modal,
 // never required — skipping leaves no gap. Vocab is stored bare (bare + membership scheme).
+// D3 (slice b): the session-tasting tagger on FLAVOR_TREE (12 families → sub-families → notes). Writes
+// SESSION-LEVEL sessionTags — one set of notes for the sitting (D2). Replaces the flat WS4 grid and is the
+// sole session-tag surface (steeping collapse, quick-log, finish — the old "Overall tags" chip UIs are
+// subsumed). Never a modal, never required; the stored word is the word as written, membership resolves.
+const FLAV_STRIP = ['sweet','umami','crisp']; // taste & structure (Design's proposal) — NOT astringent/bitter (the pour-feedback nudge owns those); creamy lives in Milky only.
+function flavorFamilies(){ return [...new Set(FLAVOR_TREE.map(n=>n.f))]; } // 12, in tree order
+function flavFamilyPanelHTML(d){
+  const fam = d.flavFam; const nodes = FLAVOR_TREE.filter(n=>n.f===fam);
+  const sel = (d.sessionTags||[]).map(t=>String(t).toLowerCase());
+  const chip = t => `<button type="button" class="flav-chip${sel.includes(String(t).toLowerCase())?' on':''}" onclick="toggleSessionFlavor('${escapeJsArg(t)}')">${escapeHtml(flavorLabel(t))}</button>`;
+  const rows=[];
+  // (1) this tea's own noted profile within the family (relabelled from "Typical for X"; the catalog row is a later fast-follow)
+  const noted = (d.teaId ? teaFlavorProfile(d.teaId).terms : []).filter(t=>{ const r=flavorResolve(t); return r && r.family===fam; });
+  if(noted.length) rows.push(`<div class="flav-sub"><div class="flav-eyebrow">You've noted in this tea</div><div class="flav-chips">${noted.map(chip).join('')}</div></div>`);
+  // (2) earned vocabulary resolving into this family — Bug B: no earned word ever needs retyping
+  const earned = (state.tagLibrary||[]).filter(w=>{ const r=flavorResolve(w); return r && r.family===fam && !noted.some(n=>n.toLowerCase()===String(w).toLowerCase()); });
+  if(earned.length) rows.push(`<div class="flav-sub"><div class="flav-eyebrow">Words you've used</div><div class="flav-chips">${earned.map(chip).join('')}</div></div>`);
+  // sub-family groups (work down), then any family-level notes; the 8 childless families show notes straight up
+  [...new Set(nodes.filter(n=>n.s).map(n=>n.s))].forEach(s=>{
+    rows.push(`<div class="flav-sub"><div class="flav-eyebrow">${escapeHtml(s)}</div><div class="flav-chips">${nodes.filter(n=>n.s===s).map(n=>chip(n.t)).join('')}</div></div>`);
+  });
+  const bare = nodes.filter(n=>!n.s).map(n=>n.t);
+  if(bare.length) rows.push(`<div class="flav-sub"><div class="flav-chips">${bare.map(chip).join('')}</div></div>`);
+  return `<div class="flav-panel">${rows.join('')}</div>`;
+}
 function flavorCaptureHTML(d){
-  const sel = d.curSteepTags || [];
-  const shown = d.flavorMore ? KB_FLAVOR_FAMILIES : KB_FLAVOR_FAMILIES.slice(0, FLAVOR_DEFAULT_FAMILIES);
-  const families = shown.map(f=>`
-    <div class="flav-fam">
-      <div class="flav-eyebrow">${escapeHtml(f.label)}</div>
-      <div class="flav-chips">${f.terms.map(t=>`<button type="button" class="flav-chip${sel.includes(t)?' on':''}" onclick="toggleFlavor('${escapeJsArg(t)}')">${escapeHtml(flavorLabel(t))}</button>`).join('')}</div>
-    </div>`).join('');
-  const hidden = KB_FLAVOR_FAMILIES.slice(FLAVOR_DEFAULT_FAMILIES);
-  const hiddenCount = hidden.reduce((n,f)=>n+f.terms.length,0);
-  const teaser = hidden.map(f=>f.terms[0]).join(', '); // "roast, spice"
-  const moreRow = d.flavorMore
-    ? `<button type="button" class="flav-more" onclick="d_flavorMore(false)">${icon('i-caret-up-hl',18)}<span>fewer flavours</span></button>`
-    : `<button type="button" class="flav-more" onclick="d_flavorMore(true)">${icon('i-caret-hl',18)}<span>${hiddenCount} more flavours · ${escapeHtml(teaser)}</span></button>`;
-  // Free-typed words already chosen (not vocabulary) stay visible + removable — nothing hidden.
-  const freeSel = sel.filter(t=>!isFlavorVocab(t));
-  const freeChips = freeSel.length ? `<div class="flav-freesel">${freeSel.map(t=>`<span class="flav-chip on">${escapeHtml(t)} <button onclick="removeCurTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : '';
+  const sel = (d.sessionTags||[]).map(t=>String(t).toLowerCase());
+  const chip = t => `<button type="button" class="flav-chip${sel.includes(String(t).toLowerCase())?' on':''}" onclick="toggleSessionFlavor('${escapeJsArg(t)}')">${escapeHtml(flavorLabel(t))}</button>`;
+  // What you've chosen so far — every picked word visible + removable (the honest floor: nothing stranded
+  // when a family is collapsed, and a word the tree can't place stays here bare rather than force-fit).
+  const chosen = (d.sessionTags||[]).length ? `<div class="flav-freesel">${d.sessionTags.map(t=>`<span class="flav-chip on">${escapeHtml(flavorLabel(t))} <button onclick="removeSessionTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : '';
+  const strip = `<div class="flav-strip">${FLAV_STRIP.map(chip).join('')}</div>`;
+  const fams = `<div class="flav-fams">${flavorFamilies().map(f=>`<button type="button" class="flav-fam-chip${d.flavFam===f?' open':''}" onclick="d_flavFam('${escapeJsArg(f)}')">${escapeHtml(f)}</button>`).join('')}</div>`;
   const freeDoor = d.flavorFreeOpen
-    ? `<div class="tag-input-wrap"><input type="text" id="tagInputField" data-target="steep" enterkeyhint="done" placeholder="your own word, press Enter…"><div id="tagSuggestBox"></div></div>`
+    ? `<div class="tag-input-wrap"><input type="text" id="tagInputField" data-target="session" enterkeyhint="done" placeholder="your own word, press Enter…"><div id="tagSuggestBox"></div></div>`
     : `<button type="button" class="flav-door" onclick="d_flavorFreeOpen()">${icon('i-plus-hl',18)}<span>your own word</span></button>`;
   return `
     <div class="flav-capture">
       <div class="flav-prompt"><span class="flav-q">What are you tasting?</span><span class="flav-opt mono">optional</span></div>
-      ${families}
-      ${moreRow}
-      <div class="flav-free">${freeDoor}${freeChips}</div>
+      ${chosen}
+      ${strip}
+      ${fams}
+      ${d.flavFam?flavFamilyPanelHTML(d):''}
+      <div class="flav-free">${freeDoor}</div>
       <div class="flav-reassure mono">saved as you tap — nothing to submit</div>
     </div>`;
 }
@@ -1246,6 +1256,16 @@ function toggleFlavor(term){
   if(i>=0) d.curSteepTags.splice(i,1); else d.curSteepTags.push(term);
   render();
 }
+// D3 (slice b): the tagger toggles SESSION-level tags. Vocab stored lowercase; free words ride addTag.
+function toggleSessionFlavor(term){
+  const d = state.sessionDraft; if(!d) return;
+  term = String(term).toLowerCase();
+  if(!d.sessionTags) d.sessionTags=[];
+  const i = d.sessionTags.findIndex(t=>String(t).toLowerCase()===term);
+  if(i>=0) d.sessionTags.splice(i,1); else d.sessionTags.push(term);
+  render();
+}
+function d_flavFam(fam){ const d=state.sessionDraft; if(d){ d.flavFam = d.flavFam===fam ? null : fam; render(); } } // tap a family → expand its notes in place
 function d_flavorMore(v){ if(state.sessionDraft){ state.sessionDraft.flavorMore=!!v; render(); } }
 function d_flavorFreeOpen(){ if(state.sessionDraft){ state.sessionDraft.flavorFreeOpen=true; render(); setTimeout(()=>{ const el=document.getElementById('tagInputField'); if(el) el.focus(); },0); } }
 // D1: tasting capture is a named collapse, closed by default.
@@ -1332,10 +1352,10 @@ function sessionSteepingHTML(d){
     <div class="field" style="margin-top:12px;"><label>Notes for this steep</label><textarea id="steepDesc" placeholder="optional" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
 
     <div class="fold-row" onclick="d_toggleTaste()" role="button" aria-expanded="${!!d.tasteOpen}">
-      <span class="fold-label">What are you tasting?<span class="fold-sub"> · optional${d.curSteepTags.length?' · '+d.curSteepTags.length+' noted':''}</span></span>
+      <span class="fold-label">What are you tasting?<span class="fold-sub"> · optional${d.sessionTags.length?' · '+d.sessionTags.length+' noted':''}</span></span>
       <span class="fold-caret">${icon(d.tasteOpen?'i-caret-up-hl':'i-caret-hl',22)}</span>
     </div>
-    ${(!d.tasteOpen && d.curSteepTags.length) ? `<div class="flav-freesel" style="margin-top:10px;">${d.curSteepTags.map(t=>`<span class="flav-chip on">${escapeHtml(flavorLabel(t))} <button onclick="removeCurTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : ''}
+    ${(!d.tasteOpen && d.sessionTags.length) ? `<div class="flav-freesel" style="margin-top:10px;">${d.sessionTags.map(t=>`<span class="flav-chip on">${escapeHtml(flavorLabel(t))} <button onclick="removeSessionTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : ''}
     ${d.tasteOpen ? flavorCaptureHTML(d) : ''}
 
     ${d.steeps.length ? `<div style="margin-top:14px;">${steepsHTML}</div>` : ''}
@@ -1528,6 +1548,10 @@ function renderTagSuggest(query, target){
   // preserved — a tap must not blur-commit the half-typed word first (blur now commits, so onclick
   // here would double-add "cara" AND "caramel").
   renderFieldSuggest('tagSuggestBox', query, state.tagLibrary, m=>`pickTagSuggest('${escapeJsArg(m)}','${target}')`);
+  // D3: live resolution echo — as you type, show which family the word lands in, so a novel word feels understood.
+  const r = query && query.trim() ? flavorResolve(query.trim()) : null;
+  const box = document.getElementById('tagSuggestBox');
+  if(r && box){ const hint=document.createElement('div'); hint.className='flav-resolve mono'; hint.textContent=`${query.trim()} → ${r.family}${r.subFamily?' · '+r.subFamily:''}`; box.insertBefore(hint, box.firstChild); }
 }
 function pickTagSuggest(tag, target){
   addTag(tag, target);
@@ -1617,19 +1641,17 @@ function sessionFlavorTags(steeps){
   (steeps||[]).forEach(s=>(s.tags||[]).forEach(t=>{ const k=String(t).toLowerCase(); if(!seen.includes(k)){ seen.push(k); out.push(t); } }));
   return out;
 }
-// The session read-back: which vocabulary note led early vs opened up in a later steep. An
-// observation of what happened across the steeps, never a verdict/score of the cup.
+// The session read-back: a note that opened up in a later logged steep. An observation of what
+// happened across the steeps, never a verdict, and never inferred from a note's absence (D2).
 function sessionFlavorStory(steeps){
   const rows=(steeps||[]).map(s=>(s.tags||[]).filter(isFlavorVocab).map(t=>String(t).toLowerCase()));
   const n=rows.length; if(n<2) return '';
   const first=rows[0]||[];
-  const early=first[0];
   let late=null, lateStep=null;
   for(let i=1;i<n && !late;i++){ for(const t of rows[i]){ if(!first.includes(t)){ late=t; lateStep=i+1; break; } } }
-  const clauses=[];
-  if(early) clauses.push(`${capWord(flavorLabel(early))} led early`);
-  if(late)  clauses.push(`${flavorLabel(late)} opened up by steep ${lateStep}`);
-  return clauses.length ? clauses.join('; ')+'.' : '';
+  // Only the positive presence-difference: a note that genuinely appears in a later logged steep. The
+  // old "X led early" fired on first[0] alone and implied a fade the log never recorded (D2's core defect).
+  return late ? `${flavorLabel(late)} opened up by steep ${lateStep}.` : '';
 }
 function hhmm(iso){ const d=iso?new Date(iso):new Date(); return d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}); }
 
@@ -1642,7 +1664,9 @@ function sessionFinishHTML(d){
   if(temps.length) metaBits.push(cToDisplay(temps[0])+tempUnitLabel());
   if(method) metaBits.push(method);
   if(ves) metaBits.push(ves.name);
-  const tasted = sessionFlavorTags(d.steeps);
+  const steepFlav = sessionFlavorTags(d.steeps);
+  // D2: session-level tasting is primary — union the sitting's tags with any per-steep tags (guided/legacy).
+  const tasted = steepFlav.concat((d.sessionTags||[]).filter(t=>!steepFlav.some(f=>f.toLowerCase()===String(t).toLowerCase())));
   const story = sessionFlavorStory(d.steeps);
   const breakdown = d.steeps.map((s,i)=>{ const st=(s.tags||[]); return st.length?`<div class="readback-step"><span class="rb-idx mono">steep ${i+1}</span><span class="rb-chips">${st.map(t=>`<span class="rb-chip">${escapeHtml(flavorLabel(t))}</span>`).join('')}</span></div>`:''; }).join('');
   return `
@@ -1653,7 +1677,7 @@ function sessionFinishHTML(d){
         <h2 class="story-name">${tea?escapeHtml(tea.name):''}</h2>
         <div class="story-meta mono">${metaBits.map(escapeHtml).join(' · ')}</div>
         ${tasted.length?`<div class="story-tasted"><div class="eyebrow">You tasted</div><div class="flav-chips">${tasted.map(t=>`<span class="flav-chip on static">${escapeHtml(flavorLabel(t))}</span>`).join('')}</div></div>`:''}
-        ${tasted.length?`<div class="readback-card">${story?`<div class="readback-obs">${escapeHtml(story)}</div>`:''}<div class="readback-steps">${breakdown}</div></div>`:''}
+        ${(story||breakdown)?`<div class="readback-card">${story?`<div class="readback-obs">${escapeHtml(story)}</div>`:''}<div class="readback-steps">${breakdown}</div></div>`:''}
         ${d.mood?`<div class="story-mood">Arrived <strong>${escapeHtml(String(d.mood).toLowerCase())}</strong>.</div>`:''}
       </div>
       <div class="field span2" style="margin:14px 0;">
@@ -1666,15 +1690,7 @@ function sessionFinishHTML(d){
       <div class="field" style="margin:14px 0;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
       ${feedbackRowHTML(d)}
       <div class="field" style="margin-bottom:14px;"><label>Overall notes</label><textarea id="sessDesc" oninput="state.sessionDraft.sessionDesc=this.value">${escapeHtml(d.sessionDesc)}</textarea></div>
-      <div class="field">
-        <label>Overall tags</label>
-        <div>${d.sessionTags.map(t=>`<span class="tagchip">${escapeHtml(t)} <button onclick="removeSessionTag('${escapeJsArg(t)}')">✕</button></span>`).join(' ')}</div>
-        <div class="tag-input-wrap">
-          <input type="text" id="tagInputField" data-target="session" enterkeyhint="done" placeholder="Type your own, press Enter...">
-          <div id="tagSuggestBox"></div>
-        </div>
-        ${tagLibraryChipsHTML('session')}
-      </div>
+      ${flavorCaptureHTML(d)}
       <label class="checkrow" style="margin-top:16px;"><input type="checkbox" ${d.isShared?'checked':''} onchange="state.sessionDraft.isShared=this.checked"> Share this session with followers</label>
       <button class="btn btn-primary" style="margin-top:14px;" onclick="commitSession()">Save to journal</button>
     </div>
