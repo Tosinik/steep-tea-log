@@ -59,9 +59,12 @@ The ritual, in order. Do not skip, reorder, or batch steps silently:
    ship red. The gitignored `fixtures/*.csv` exports must be **current** before this step
    counts — a fresh clone has none, so real-data sections (e.g. brew-feedback's R) graceful-
    skip and their guards never fire; drop the latest Supabase exports in first.
-8. **Commit & push** — message `vX.YY — <title>` (matches the changelog heading). Docs-only
-   changes use a `docs:` prefix and SKIP steps 1 and 7 (no bumps for non-app artifacts —
-   the landing-page precedent). Step 5 still runs: a docs-only deploy is often the sweep itself.
+8. **Commit, then PAUSE unpushed** — message `vX.YY — <title>` (matches the changelog heading). Do
+   NOT push an app-file commit — report the commit hash and wait for Niklas's separate `git push` (or
+   explicit authorization). Docs-only changes (a `docs:` prefix; they SKIP steps 1 and 7 — no bumps for
+   non-app artifacts, the landing-page precedent) push on write. Step 5 still runs: a docs-only deploy
+   is often the sweep itself. The skill does NOT perform the STATE STAGED→LIVE flip — that is a separate
+   docs-only commit after Niklas's phone-look + Planning's clone-verify (see CLAUDE.md deploy ritual).
 9. **Report** — in the pause message: commit hash, cache number, what shipped, verification
    summary, judgment calls flagged, what's next in the tail.
 

@@ -159,13 +159,18 @@ because *the planning lane cannot review what it cannot clone* — so a **docs-o
 STATE, ROADMAP, CHANGELOG-only, `smoke.md`, this file) is **pushed the moment it is written**, because
 pushing is what makes it cloneable and reviewable; holding it back serves the opposite of the rule's
 purpose. A change that **touches an app file** (a real deploy) still **pauses UNPUSHED** for review and
-for any `smoke.md` on-device gate the slice requires. **The code commit waits unpushed for Niklas's
-review; it is pushed on Niklas's go-ahead — Niklas runs `git push` / `/slowcup-deploy`, or authorizes
-Claude to push. Nothing goes live without Niklas's authorization** (Claude cannot self-invoke
-`/slowcup-deploy` — it is `disable-model-invocation`, so "push" means Claude runs `git push` once
-authorized). When a deploy carries both —
+for any `smoke.md` on-device gate the slice requires. **Invoking `/slowcup-deploy` (disable-model-invocation — only Niklas) runs the ritual through the
+commit and then PAUSES UNPUSHED. It does NOT push.** The push is a separate, explicit go-ahead:
+Niklas runs `git push`, or authorizes Claude to run it. Invoking the deploy authorizes committing
+and staging — never going live. Docs-only commits still push on write; a commit that touches an app
+file pauses. Nothing reaches origin without the separate push. When a deploy carries both —
 docs *and* code — keep them as **separate commits** (the docs push on write; the code commit waits),
 so the reviewable record isn't held hostage to the code gate. One rule, two speeds, same reason.
+
+**STATE STAGED→LIVE flip.** At deploy the STATE.md NOW-block is written STAGED (code committed, not
+yet verified on the live app). After Niklas's phone-look AND Planning's clone-verify pass, a separate
+docs-only commit flips it STAGED→LIVE, titled `docs: vX.YY STATE STAGED->LIVE (<code-hash>)`. This is
+the one doc step the deploy does not perform automatically — it gates on live verification.
 
 The service worker deliberately does **not** auto-`skipWaiting()`. On a new SW install
 `steep-boot.js` shows a "new version — Refresh" banner and only swaps in the new worker
