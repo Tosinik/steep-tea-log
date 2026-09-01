@@ -82,6 +82,10 @@ the overlap row renders the relationship without copying it.
 **R11 — Restock action prefills Add tea with `purchase_type='repeat'`** (plus name, vendor,
 type). The one place "repeat" is set truthfully inside an explicit action; revives a field that
 is 100% `"first"` today and gives cost-over-time first-vs-repeat variance.
+**SUPERSEDED by R183 (Smart Restock, r5).** A rebuy of the exact same tea (name + vendor + harvest year)
+now tops up ONE entry via a Restock button + purchase log, not a new row. The `isRepeat` /
+`purchaseType:'repeat'` create path retires; existing R11 rows are left as-is (forward-only) and
+soft-linked read-only.
 
 **R12 — Vendor link-out ships as a web-search action** (vendor + tea name) on wishlist/restock
 rows — pull, user-initiated, no schema. A `url` column and a vendor entity are deferred (§4).
@@ -2607,6 +2611,25 @@ dead, left for `flavor-ladder §A` (cleanup follow, CLAUDE.md backlog). Fixtures
 (27), `flavor-ladder §E` revised, all 40 green, export-gate first. On-device: `smoke.md §v4.41` (post-deploy).
 **NEXT: slice c — guided tasting as its own path (D4), the per-steep evolution layer + Tier-1 liquor
 capture; then SECURITY re-blocks before the beta widens.**
+
+**R183 — Smart Restock: one entry + a purchase log RETIRES R11 (rebuy = new row).** Ruled by Niklas, r5
+stock-management (`docs/r5/planning/SPEC-restock-model.md`). **R11 is superseded** (annotated at its entry,
+not deleted). Rebuying the *exact same tea* — **name + vendor (`source`) + harvest year all matching** — no
+longer creates a second tea row; it **tops up one entry** via a **Restock button** (grams · date · cost)
+that: `amountGrams += grams` (`stockTier` reads the new total — the single stock writer, untouched);
+`openedDate ← restock date` (freshness refreshes through `freshnessReading`, the single freshness writer,
+untouched — restock only sets the date); appends a `{grams,date,cost}` event to a per-entry **purchase
+log**; sets `wouldRebuy = true`. The log is the engine: purchase history, per-batch lifespan
+(`openedDate`→next restock), total spend + a true weighted cost/gram across all buys, and a calm "teas you
+return to" reflection insight. **Any of name/vendor/harvest differing = a separate entry** (new character,
+new freshness clock, last year's notes stay last year's); cross-harvest entries are **soft-linked read-only**
+by name+vendor, never merged. **Migration is forward-only:** R11's existing duplicate rows are NOT
+auto-merged (guessing which rows are the same tea is the guess to avoid); the soft-link groups them
+read-only. The R11 create path (`isRepeat`/`purchaseType:'repeat'` → new row) retires. Storage (JSONB
+`purchase_log` on `teas` is Code's lean), the cost math, and the R11-path retirement are Code's plan-gate
+proposal; **SQL-first** per the deploy ritual (the migration file ships and applies alone, before the code
+commit exists). Mints its own build ruling on ship. The **sample flag** pairs with this round; sample→
+full-buy conversion is deferred to that slice.
 
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
