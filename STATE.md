@@ -250,7 +250,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.40 STAGED `46ea175` (code committed, UNPUSHED — awaiting Niklas's push) — wave-1 #3 slice a: session-flow re-dress: IA + timer + focus cue (R181)**
+**NOW — v4.40 LIVE `46ea175` — wave-1 #3 slice a: session-flow re-dress: IA + timer + focus cue (R181)**
 (cache **v150**, APP_VERSION v4.40, **no SQL**, **no new module**). The first, contained slice of
 `SESSION-FLOW-REDESIGN.md` (D1 + D5 + Bug A); slices b (`FLAVOR_TREE` tagger + session-level D2) and c
 (guided mode) follow, D2 isolated as its own step.
@@ -271,8 +271,8 @@ low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unseq
   time tap-editable on the ring while running + the ± nudge the countdown live; the focus cue alternates with
   the breathe and lands on "paused" on pause AND on natural completion; reduced-motion degrades to a static
   label.
-- **PUSH STATE:** code commit `46ea175` is UNPUSHED (pauses for Niklas's `git push` per CLAUDE.md
-  split-push); this docs commit stages the record. After push + phone-look, flip STAGED→LIVE.
+- **SHIPPED:** code `46ea175` + docs `762b5ba` pushed; Niklas's phone-look (`smoke.md §v4.40`) + Planning's
+  clone-verify passed → LIVE.
 - **NEXT — wave-1 #3 slice b:** the tagger writes session-level `sessionTags` (Q1: kills the "led early"
   artifact at the root), D2 repoints the reads + subsumes the two overall-tags UIs (`:784`/`:1648`); R182.
   Then slice c (guided mode). **SECURITY F1/F2 stays the hard pre-widening gate.**
