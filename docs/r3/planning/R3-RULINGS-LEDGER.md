@@ -2654,6 +2654,20 @@ the mapper value reworded to dodge the ternary-colon parse). All 41 suites green
 §v4.42` (post-deploy). **NEXT: guided mode (D4, wave-1 #3 slice c) + the "teas you return to" fast-follow;
 then SECURITY re-blocks before the beta widens.**
 
+**R185 — camera alongside gallery + bigger session-rating stars.** Shipped v4.43 (cache v153, no SQL, no
+new module). A small UX-polish slice, direct-built (no plan-gate). **Camera:** all five `.js-img-input`
+photo-add spots (three session inputs, the social avatar, the tea photo) swap their single tap-anywhere
+input for two labelled buttons from a shared `photoInputs()` (steep-core.js) — "Take photo"
+(`capture="environment"`, camera on mobile / picker fallback on desktop) + "Choose" (the kept gallery input,
+no capture); both `js-img-input`, so the unchanged `bindDynamic` handler wires both. Gallery never removed,
+handler never changed; `.btn-photo` on `--line`/`--ink`, not the controlled `--clay`. **Stars — judgment
+call:** every `renderStarsInteractive` call ALREADY passed `big=true` (`.starL` 22px), so "point the session
+rating at the big variant" was a no-op against live code (flagged, challenge-don't-absorb). The intent
+(bigger tap targets) shipped instead as a 32px tier scoped to `#sessRatingWrap` + `#editRatingWrap`;
+half-stars untouched (the 50%-width hit-zones scale). Display size only, no model change. Fixtures can't
+reach either surface → on-device `smoke.md §v4.43`. All 41 suites green. **NEXT: guided mode (D4, slice c) +
+the "teas you return to" fast-follow; then SECURITY re-blocks before the beta widens.**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

@@ -46,6 +46,33 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.43 — camera alongside gallery + bigger session-rating stars — R185
+
+Deploy: steep-core.js, steep-sessions.js, steep-social.js, steep-teas.js, styles.css, service-worker.js
+(cache v153), steep-version.js, CHANGELOG.md, STATE.md, smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md.
+No SQL. No new module.
+
+A small UX-polish slice.
+
+- **Camera alongside gallery.** Every photo-add place — the three session photo inputs, the social avatar,
+  the tea photo — replaced its single tap-anywhere `<input class="js-img-input">` with two labelled buttons
+  from a shared `photoInputs()` helper (steep-core.js): "Take photo" (`capture="environment"`, the camera on
+  mobile with a picker fallback on desktop) and "Choose" (the existing gallery input, kept, no capture).
+  Both carry `js-img-input`, so the unchanged `bindDynamic` handler (which binds every match) wires both;
+  the labels wrap `hidden` inputs. The gallery is never removed, the handler never changed. `.btn-photo`
+  uses `--line`/`--ink` (not the controlled `--clay` accent). The now-inaccurate "Tap to…" hints became
+  "Add a photo".
+- **Bigger session-rating stars.** Every `renderStarsInteractive` call already passed `big=true` (the
+  `.starL` 22px variant), so the session rating was already "big" — pointing it there was a no-op. The
+  intent (bigger tap targets) ships as a 32px tier scoped to `#sessRatingWrap` + `#editRatingWrap` (the two
+  session-rating surfaces; the tea-form rating stays 22px). Half-stars are untouched: the half/full
+  hit-zones are 50%-width and scale with the star, so the gradient half-fill and the half tap-zone grow with
+  it. Display size only, no model change.
+- **Validation.** `node --check` on all touched JS; all 41 committed suites green (home-test's
+  controlled-accent guard passed — the buttons avoid `--clay`). UI changes fixtures can't fully reach →
+  `smoke.md §v4.43` on device: the camera opens, the gallery still works, the bigger stars (incl. half-star
+  taps) are easier to hit.
+
 ## v4.42 — Smart Restock: one entry + a purchase log (retires R11) — R184
 
 Deploy: steep-data.js, steep-core.js, steep-teas.js, steep-shopping.js, styles.css, service-worker.js

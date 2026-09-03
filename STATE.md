@@ -250,7 +250,24 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.42 LIVE `9c25e52` — Smart Restock: one entry + a purchase log (retires R11) (R184)**
+**NOW — v4.43 STAGED `0b34649` (code committed, UNPUSHED — awaiting Niklas's push) — camera alongside gallery + bigger session-rating stars (R185)**
+(cache **v153**, APP_VERSION v4.43, **no SQL**, **no new module**). A small UX-polish slice, direct-built.
+- **Camera alongside gallery** — all 5 `.js-img-input` spots (3 session · social avatar · tea) now render two
+  labelled buttons via a shared `photoInputs()`: "Take photo" (`capture="environment"`) + "Choose" (the kept
+  gallery input). Both `js-img-input`, so the unchanged `bindDynamic` handler wires both. `.btn-photo` on
+  `--line`/`--ink`, not `--clay`.
+- **Bigger session stars** — the session rating was ALREADY `.starL` (22px; every `renderStarsInteractive`
+  passes big=true), so the literal ask was a no-op; the intent shipped as a 32px tier scoped to
+  `#sessRatingWrap`+`#editRatingWrap`. Half-stars untouched (50%-width hit-zones scale). Display size only.
+- **Fixtures:** none new (UI-only); all 41 suites green, node --check clean.
+- **ON DEVICE (`smoke.md §v4.43`, POST-DEPLOY):** "Take photo" opens the camera; "Choose" opens the gallery;
+  both save + preview; the session stars are bigger and half-star taps still work.
+- **PUSH STATE:** code commit `0b34649` is UNPUSHED (PAUSE-THEN-PUSH). After Niklas's push + phone-look +
+  Planning's clone-verify, flip STAGED→LIVE.
+- **NEXT:** guided mode (D4, wave-1 #3 slice c) + the "teas you return to" fast-follow. Then SECURITY
+  re-blocks before the beta widens.
+
+**Previously — v4.42 LIVE `9c25e52` — Smart Restock: one entry + a purchase log (retires R11) (R184)**
 (cache **v152**, APP_VERSION v4.42, **SQL: apply `sql/v4_42-purchase-log.sql` FIRST**, **no new module**).
 Standalone stock-management slice (`docs/r5/planning/SPEC-restock-model.md`); retires R11 (rebuy = new row).
 - **Restock button + modal** on the tea's "On hand" (grams · date · cost; the new-harvest cue; "Opening

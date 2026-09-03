@@ -116,6 +116,18 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.43 · camera alongside gallery + bigger session stars  *(post-deploy — the camera + tap targets need a phone)*
+
+UI-only; no fixture reaches the camera or a tap target. On a phone:
+
+1. **Camera.** On every photo add (a session photo, the profile avatar, a tea photo), two buttons show:
+   **Take photo** and **Choose**. "Take photo" opens the **camera** directly; "Choose" opens the gallery.
+   Both save the photo and update the preview. The gallery path still works everywhere.
+2. **Bigger session stars.** The **session rating** stars (finish screen, quick-log, and the session-edit
+   screen) are visibly bigger and easier to tap. **Half-stars still work** — tapping the left half of a star
+   gives a half, the right half a whole; the half-filled gradient still renders. (The tea-page rating stays
+   its normal size.)
+
 ## v4.42 · Smart Restock — one entry + a purchase log  *(post-deploy; needs the SQL applied)*
 
 `commitRestock` + the log math are vm-covered (restock-test 20); a phone confirms the modal + the reads.
