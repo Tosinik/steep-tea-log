@@ -149,17 +149,12 @@ function teaFromWishItem(id){
   openTeaForm(); // editingTea stays null → create path, pre-filled from teaPrefill
 }
 
-/* R11 / SH7 — restock is a REPEAT PURCHASE, not a wishlist add. The distinction is the whole point:
-   adding to the list says "I want this", restocking says "I bought it again", and the second one
-   creates a real tea row. It needs no new mechanism — `state.teaPrefill` already flows into the tea
-   form and `purchaseType` has been 'first' | 'repeat' since v3.x with an `isRepeat` checkbox reading
-   it, so this is three keys and the shipped create path. Nothing is written until the user commits
-   the form, the same contract as copy-to-new-entry and Add-to-shelf. */
+/* R184 / SH7 (retires R11) — restock tops up ONE entry via the Restock modal, no longer a new tea row.
+   R11 created a second row for a rebuy; the reversal (docs/r5/planning/SPEC-restock-model.md) is that
+   rebuying the exact same tea (name + vendor + harvest) is a purchase-log event on the existing entry.
+   The modal is an overlay (state.restockFor), so it opens over whatever surface restock was tapped from. */
 function restockTea(teaId){
-  const t = teaById(teaId); if(!t) return;
-  state.teaPrefill = { name:t.name, source:t.source||'', type:t.type||'',
-                       purchaseType:'repeat', purchaseDate: dayKey(new Date()) };
-  openTeaForm();
+  if(teaById(teaId)) openRestock(teaId);
 }
 /* R12 / SH8 — a vendor web search, and deliberately nothing more. R12's vendor entity and stored URL
    stay deferred, so this stores nothing and knows nothing: it composes a search from the vendor name

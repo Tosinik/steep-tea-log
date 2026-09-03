@@ -56,6 +56,7 @@
     isFavorite: !!r.is_favorite, wouldRebuy: !!r.would_rebuy,
     purchaseType: r.purchase_type || 'first', image: r.image_data || null,
     purchaseDate: r.purchase_date || null,
+    purchaseLog: (Array.isArray(r.purchase_log) && r.purchase_log) || [],   // R184 (Smart Restock) — requires sql/v4_42-purchase-log.sql
     // v3.98: the freshness clock's rung 1. NOT the same join as purchase_date — purchase says when
     // the tea reached you, opened says when the seal broke, and only the second starts the real clock.
     openedDate: r.opened_date || null,
@@ -78,6 +79,7 @@
       is_favorite: !!t.isFavorite, would_rebuy: !!t.wouldRebuy,
       purchase_type: t.purchaseType || 'first', image_data: t.image || null,
       purchase_date: t.purchaseDate || null,
+      purchase_log: (t.purchaseLog && t.purchaseLog.length) ? t.purchaseLog : null,   // R184 — requires sql/v4_42-purchase-log.sql applied FIRST
       opened_date: t.openedDate || null,   // v3.98 — requires sql/v3_11-opened-date.sql to be applied FIRST
       liquor: t.liquor || null,            // v4.14 — requires sql/v3_12-liquor.sql to be applied FIRST
       leaf_form: t.leafForm || null

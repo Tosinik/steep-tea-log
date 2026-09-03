@@ -802,7 +802,6 @@ function teaFormModal(){
           <div class="field span2" style="flex-direction:row;gap:18px;flex-wrap:wrap;">
             ${isEdit?'':favField}
             <label class="checkrow"><input type="checkbox" name="wouldRebuy" ${t.wouldRebuy?'checked':''}> Would rebuy</label>
-            <label class="checkrow"><input type="checkbox" name="isRepeat" ${t.purchaseType==='repeat'?'checked':''}> Repeat buy (unchecked = first time)</label>
           </div>
         </div>
         <button type="submit" class="btn btn-primary begin-btn" style="margin-top:20px;">Save tea</button>
@@ -854,7 +853,7 @@ async function submitTeaForm(e){
     description: f.description.value.trim(),
     isFavorite: f.isFavorite.checked,
     wouldRebuy: f.wouldRebuy.checked,
-    purchaseType: f.isRepeat.checked?'repeat':'first',
+    purchaseType: state.editingTea ? state.editingTea.purchaseType : 'first',   // R184: isRepeat retired (rebuy = Restock, not a new row); legacy purchaseType kept on edit
     purchaseDate: f.purchaseDate.value || null,
     openedDate: f.openedDate.value || null,
     leafForm: f.leafForm.value || null,
@@ -863,8 +862,11 @@ async function submitTeaForm(e){
     // '' (the cleared/default cell) → null → tier 2 by construction. §G asserts data ⊇ teaFromDb.
     liquor: (f.liquor && isLiquorKey(f.liquor.value)) ? f.liquor.value : null,
     image: imageUrl,
+    purchaseLog: (state.editingTea && state.editingTea.purchaseLog) || [],   // R184: form never rebuilds the log, so preserve it on edit (else teaToDb wipes the JSONB); buy #1 seeded below
     dateAdded: state.editingTea?.dateAdded || new Date().toISOString()
   };
+  // R184: seed buy #1 on a NEW add when a quantity was entered (an edit preserves via the literal above).
+  if(!state.editingTea && data.amountGrams>0) data.purchaseLog = [{ grams:data.amountGrams, date:data.purchaseDate||dayKey(new Date()), cost:data.costTotal||0, opened:data.openedDate||null }];
   if(state.editingTea){
     const idx = state.teas.findIndex(t=>t.id===data.id);
     state.teas[idx] = data;
@@ -1064,13 +1066,22 @@ function teaProvenanceHTML(t, costPerSession){
   const rows = [];
   const row = (label, val) => { if(val) rows.push(`<div><div class="eyebrow">${label}</div><div>${val}</div></div>`); };
   row('Vendor', t.source ? escapeHtml(t.source) : '');
-  row('Purchase', `${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}`);
-  row('Cost / gram', t.costOriginalGrams ? currencyFmt(t.costTotal/t.costOriginalGrams) : '');
+  const totals = purchaseTotals(t);
+  const log = t.purchaseLog||[];
+  // R184: purchase HISTORY from the log (oldest → newest); a legacy row (no log) keeps its single first-buy line.
+  if(log.length) row(log.length>1?'Purchases':'Purchase', escapeHtml(log.map(e=>`${fmtStockG(Number(e.grams)||0)} · ${fmtDate(e.date)}${e.cost?` · ${currencyFmt(Number(e.cost)||0)}`:''}${e.opened?'':' · sealed'}`).join('  →  ')));
+  else row('Purchase', `${t.purchaseType==='repeat'?'Repeat buy':'First time'}${t.purchaseDate?` · ${fmtDate(t.purchaseDate)}`:''}`);
+  // Cost/gram: weighted across the log (R184), else the legacy cost_total / cost_original_grams.
+  row('Cost / gram', totals ? currencyFmt(totals.perGram) : '');
+  if(totals && !totals.legacy && totals.buys>1) row('Total spent', currencyFmt(totals.spend));
   row('Cost / session', costPerSession>0 ? currencyFmt(costPerSession) : '');
-  if(!rows.length && !t.image) return '';
+  // Soft-link: the same tea + vendor across harvests (read-only, never merged).
+  const links = teaSoftLinks(t);
+  const linkLine = links.length ? `<div class="tea-softlink mono">You come back to this. Also on your shelf: ${links.map(l=>`<button type="button" class="linklike" onclick="openTeaDetail('${escapeJsArg(l.id)}')">${escapeHtml(l.harvestYear||l.name||'other harvest')}</button>`).join(', ')}</div>` : '';
+  if(!rows.length && !linkLine && !t.image) return '';
   // R177: returns bare content — viewTeaDetail's tdSec provides the "Where this came from" RULE header.
   // R180 D2/D3: the always-on photo-label caption moved behind an info mark, rewritten plain.
-  return `<div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>${t.image?`<div class="tea-label-note">${infoMark("This photo is the tea's label, not the tea itself. It shows where the tea came from.","About the photo")}</div>`:''}`;
+  return `<div class="grid grid-2" style="margin-top:8px;">${rows.join('')}</div>${linkLine}${t.image?`<div class="tea-label-note">${infoMark("This photo is the tea's label, not the tea itself. It shows where the tea came from.","About the photo")}</div>`:''}`;
 }
 // R173 (B2) — the palate connection: why THIS tea, for YOU. The tea's traits (type, roast) crossed with your
 // favourites + highly-rated teas (behaviour × character; type/rating reliable now, flavour-grain later —
@@ -1245,6 +1256,87 @@ function teaMenuHTML(t){
 }
 function teaMenuAddWish(id){ state.teaMenuOpen=false; addWishFromTea(id); }   // addWishFromTea renders
 
+/* ===== Smart Restock (R184, retires R11): one entry + a purchase log. The log is
+   [{grams, date, cost, opened}] — `date` is the buy, `opened` is when that bag was opened (null while
+   stockpiled). Source of truth for cost + purchase history; cost_total/cost_original_grams are the
+   legacy fallback for rows with no log. Single writers untouched: restock only SETS amountGrams
+   (stockTier reads it) and openedDate (freshnessReading reads it). ===== */
+function purchaseTotals(tea){                        // total spend + a true weighted cost/gram across all buys
+  const log = tea.purchaseLog||[];
+  if(!log.length) return Number(tea.costOriginalGrams)>0
+    ? { spend:Number(tea.costTotal)||0, grams:Number(tea.costOriginalGrams)||0, perGram:(Number(tea.costTotal)||0)/Number(tea.costOriginalGrams), legacy:true, buys:0 } : null;
+  let spend=0, grams=0;
+  log.forEach(e=>{ spend+=Number(e.cost)||0; grams+=Number(e.grams)||0; });
+  return { spend, grams, perGram: grams>0?spend/grams:0, legacy:false, buys:log.length };
+}
+function openedEvents(tea){ return (tea.purchaseLog||[]).filter(e=>e.opened).sort((a,b)=>new Date(a.opened)-new Date(b.opened)); }
+function batchLifespanDays(tea){                      // the latest opened bag: days it has been open
+  const ev=openedEvents(tea); if(!ev.length) return null;
+  return Math.max(0, Math.round((Date.now()-new Date(ev[ev.length-1].opened).getTime())/86400000));
+}
+function unopenedBatch(tea){ return (tea.purchaseLog||[]).some(e=>!e.opened); }   // a sealed bag awaits opening
+// Read-only soft-link: the same tea from the same vendor across harvest years (never merged).
+function teaSoftLinks(tea){
+  const key = t => String(t.name||'').trim().toLowerCase()+'|'+String(t.source||'').trim().toLowerCase();
+  const k = key(tea);
+  return (state.teas||[]).filter(t=>t.id!==tea.id && key(t)===k).sort((a,b)=>String(b.harvestYear||'').localeCompare(String(a.harvestYear||'')));
+}
+function openRestock(teaId){ state.restockFor = teaId; state.teaMenuOpen=false; render(); }
+function closeRestock(){ state.restockFor = null; render(); }
+function restockModal(){
+  const t = teaById(state.restockFor); if(!t) return '';
+  return `<div class="overlay" onclick="if(event.target===this) closeRestock()">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-head"><h2>Restock ${escapeHtml(t.name)}</h2><button class="close-x" onclick="closeRestock()">✕</button></div>
+      <form onsubmit="commitRestock(event)">
+        <div class="form-grid">
+          <div class="field"><label>Grams bought</label><input type="number" name="grams" step="0.1" min="0" required inputmode="decimal" autofocus></div>
+          <div class="field"><label>Date</label><input type="date" name="date" value="${dayKey(new Date())}"></div>
+          <div class="field span2"><label>Cost (${currencySymbol()})</label><input type="number" name="cost" step="0.01" min="0" inputmode="decimal"></div>
+        </div>
+        <label class="checkrow" style="margin-top:12px;"><input type="checkbox" name="openingNow" checked> Opening this bag now <span class="mono" style="color:var(--ink-soft);">· resets the freshness clock</span></label>
+        <div class="restock-newharvest mono">New harvest or crop year? <button type="button" class="linklike" onclick="closeRestock(); openTeaForm();">Add it as a separate tea →</button></div>
+        <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;"><button type="submit" class="btn btn-primary">Restock</button><button type="button" class="btn" onclick="closeRestock()">Cancel</button></div>
+      </form>
+    </div>
+  </div>`;
+}
+let _restockSaving=false;
+function commitRestock(ev){
+  ev.preventDefault(); if(_restockSaving) return;
+  const t = teaById(state.restockFor); if(!t) return;
+  const f = ev.target;
+  const grams = Number(f.grams.value)||0;
+  if(!(grams>0)){ showToast('Enter the grams you bought.'); return; }
+  const date = f.date.value || dayKey(new Date());
+  const cost = f.cost.value ? Number(f.cost.value) : 0;
+  const openingNow = f.openingNow.checked;
+  _restockSaving = true;
+  // Legacy tea with cost but no log yet: seed buy #1 from the existing fields so the log is honest forward.
+  if(!(t.purchaseLog&&t.purchaseLog.length) && Number(t.costOriginalGrams)>0){
+    t.purchaseLog = [{ grams:Number(t.costOriginalGrams), date:t.purchaseDate||date, cost:Number(t.costTotal)||0, opened:t.openedDate||null }];
+  }
+  t.purchaseLog = [...(t.purchaseLog||[]), { grams, date, cost, opened: openingNow?date:null }];
+  t.amountGrams = (Number(t.amountGrams)||0) + grams;   // single STOCK writer: stockTier reads amountGrams
+  if(openingNow) t.openedDate = date;                    // single FRESHNESS writer: freshnessReading reads openedDate
+  t.wouldRebuy = true;                                   // you literally rebought it (the control still lets you unset it)
+  persistTea(t);
+  state.restockFor = null; _restockSaving = false; render();
+  showToast(openingNow ? 'Restocked. Fresh clock started.' : 'Restocked. Bag stored, sealed.');
+}
+// A stockpiled bag is opened when the USER says so (the app can't detect it): open the oldest sealed
+// batch and reset the entry's freshness clock to today. Single writers only.
+function d_openBatch(teaId){
+  const t = teaById(teaId); if(!t) return;
+  const log = (t.purchaseLog||[]).slice();
+  const i = log.findIndex(e=>!e.opened); if(i<0) return;
+  const today = dayKey(new Date());
+  log[i] = { ...log[i], opened: today };
+  t.purchaseLog = log; t.openedDate = today;
+  persistTea(t); render();
+  showToast('Opened. Fresh clock started.');
+}
+
 function viewTeaDetail(){
   const t = teaById(state.activeTeaId);
   if(!t) return '<div class="empty">Tea not found.</div>';
@@ -1275,7 +1367,7 @@ function viewTeaDetail(){
   // clay SLAB (Start session). Reflection-first order: Character leads, On hand second. Each section
   // renders only WITH content (no empty headers). B2 inserts #reflect-why into secChar (after the
   // character line) and a Freshness section (#reflect-freshness) after Brewing — structure left ready.
-  const onHandBody = `<div style="font-size:14px;${isRunningLow(t)?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>${cupsLine}${forecastLine(t)}${inventorySparkline(t) || sparklineHintHTML(t)}`;
+  const onHandBody = `<div style="font-size:14px;${isRunningLow(t)?'color:var(--red);font-weight:600;':''}">${Number(t.amountGrams).toFixed(1)}g</div>${cupsLine}${forecastLine(t)}${inventorySparkline(t) || sparklineHintHTML(t)}<div class="restock-row"><button class="btn-ghost" onclick="openRestock('${escapeJsArg(t.id)}')">Restock</button>${unopenedBatch(t)?`<button class="btn-ghost restock-open" onclick="d_openBatch('${escapeJsArg(t.id)}')">Newest bag still sealed — open it?</button>`:''}</div>`;
   const descBody = t.description?`<div style="margin-top:14px;font-size:13.5px;white-space:pre-wrap;">${escapeHtml(t.description)}</div>`:'';
   const secChar = [teaCharacterHTML(t), teaWhyHTML(t), flavorProfileHTML(t), descBody].filter(Boolean).join('');   // B2: #reflect-why after the character line
   const secBrew = [t.brewGuide?savedBrewHTML(t):suggestedBrewHTML(t), teaBrewAdviceHTML(t)].filter(Boolean).join('');

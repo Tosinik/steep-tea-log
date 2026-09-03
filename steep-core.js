@@ -148,7 +148,7 @@ let state = {
   teas: [], vessels: [], sessions: [], tagLibrary: [...DEFAULT_TAGS],
   view: 'dashboard',
   activeTeaId: null,
-  teaFormOpen: false, editingTea: null,
+  teaFormOpen: false, editingTea: null, restockFor: null,
   vesselFormOpen: false, editingVessel: null,
   sessionEditOpen: false, editingSession: null,
   activeSessionId: null,          // #02b: the sitting whose detail is open
@@ -274,7 +274,7 @@ function installKeyboardReveal(){
 async function refreshData(){
   if(!state.loaded) return;
   // never refetch over unsaved work
-  if(state.sessionDraft || state.teaFormOpen || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen || state.passSheet) return;
+  if(state.sessionDraft || state.teaFormOpen || state.restockFor || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen || state.passSheet) return;
   try{
     const [teas, vessels, sessions, tagLibrary, wishlist] = await Promise.all([
       loadKey('teas', state.teas), loadKey('vessels', state.vessels),
@@ -1035,6 +1035,7 @@ function render(){
     ${state.hubOpen ? hubSheetHTML() : ''}
     ${state.passSheet ? passSheetHTML() : ''}
     ${state.teaFormOpen ? teaFormModal() : ''}
+    ${state.restockFor ? restockModal() : ''}
     ${state.vesselFormOpen ? vesselFormModal() : ''}
     ${state.settingsOpen ? settingsModal() : ''}
   `;

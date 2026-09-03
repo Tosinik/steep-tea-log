@@ -16,6 +16,7 @@ fixtures/*
 !fixtures/brew-feedback-test.js
 !fixtures/flavor-tree-test.js
 !fixtures/flavor-tagger-test.js
+!fixtures/restock-test.js
 # The export gate is the exception to "data-free": it asserts the CSV set itself is current and
 # single-vintage. It reads the exports rather than generating from source, but it must be tracked —
 # a gate that only exists on one machine is not a gate. Run it before every other suite.
