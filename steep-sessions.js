@@ -176,9 +176,9 @@ function vesselFormModal(){
         <div class="field" style="margin-bottom:12px;">
           <label>Photo</label>
           <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
-            ${state._draftImage?'':'Tap to upload photo'}
-            <input type="file" accept="image/*" class="js-img-input">
+            ${state._draftImage?'':'Add a photo'}
           </div>
+          ${photoInputs()}
         </div>
         <div class="field" style="margin-bottom:12px;"><label>Name</label><input type="text" name="name" required placeholder="My gaiwan" value="${escapeHtml(v.name||'')}"></div>
         <div class="field" style="margin-bottom:12px;"><label>Type</label><select name="type">${opts}</select></div>
@@ -772,9 +772,9 @@ function sessionQuickHTML(d){
       <div class="field span2" style="margin:14px 0;">
         <label>Photo (optional)</label>
         <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
-          ${state._draftImage?'':'Tap to add a photo of this cup'}
-          <input type="file" accept="image/*" class="js-img-input">
+          ${state._draftImage?'':'Add a photo of this cup'}
         </div>
+        ${photoInputs()}
       </div>
       <div class="field" style="margin-bottom:14px;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
       ${feedbackRowHTML(d)}
@@ -1683,9 +1683,9 @@ function sessionFinishHTML(d){
       <div class="field span2" style="margin:14px 0;">
         <label>Photo (optional)</label>
         <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
-          ${state._draftImage?'':'Tap to add a photo of this cup'}
-          <input type="file" accept="image/*" class="js-img-input">
+          ${state._draftImage?'':'Add a photo of this cup'}
         </div>
+        ${photoInputs()}
       </div>
       <div class="field" style="margin:14px 0;"><label>Overall rating</label><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating,true,'setSessionRating')}</div></div>
       ${feedbackRowHTML(d)}

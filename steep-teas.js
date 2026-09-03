@@ -741,9 +741,9 @@ function teaFormModal(){
              "Specifics". The fold is a DOM toggle, NOT a re-render — submitTeaForm reads the fields on
              submit, so they must stay in the DOM (display:none inputs still submit their values). -->
         <div class="img-upload dropzone${state._draftImage?' has-img':''}" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
-          ${state._draftImage?'':`${icon('i-camera-hl',26)}<span>Tap to add a photo</span>`}
-          <input type="file" accept="image/*" class="js-img-input">
+          ${state._draftImage?'':`${icon('i-camera-hl',26)}<span>Add a photo</span>`}
         </div>
+        ${photoInputs()}
         <div class="field" style="margin-top:14px;"><label>Name</label><input type="text" name="name" required value="${escapeHtml(t.name||'')}" oninput="teaFormNameSuggest();liquorRefresh()" placeholder="e.g. Sencha Kagoshima"><div id="teaKbSuggest"></div></div>
         <div class="field" style="margin-top:12px;"><label>Tea type</label><select name="type" onchange="liquorRefresh()">${typeOpts}</select></div>
         ${promoted}

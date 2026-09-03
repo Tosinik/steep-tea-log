@@ -85,8 +85,9 @@ function profileSetupHTML(){
         <div class="field" style="margin-bottom:12px;">
           <label>Avatar</label>
           <div class="img-upload" id="imgUploadWrap" style="width:90px;height:90px;border-radius:50%;${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
-            ${state._draftImage?'':'Photo'}<input type="file" accept="image/*" class="js-img-input">
+            ${state._draftImage?'':'Photo'}
           </div>
+          ${photoInputs()}
         </div>
         <div class="field" style="margin-bottom:12px;"><label>Username</label><input type="text" name="username" required value="${escapeHtml(p.username||'')}" oninput="setProfileDraft('username',this.value)" placeholder="teafiend"></div>
         <div class="field" style="margin-bottom:12px;"><label>Display name</label><input type="text" name="displayName" value="${escapeHtml(p.displayName||'')}" oninput="setProfileDraft('displayName',this.value)" placeholder="Optional"></div>

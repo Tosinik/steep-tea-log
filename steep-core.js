@@ -1223,6 +1223,15 @@ function toggleInfoPop(btn){
   setTimeout(()=>{ document.addEventListener('pointerdown', onDown); document.addEventListener('keydown', onKey); }, 0);
   _infoPopCleanup = ()=>{ document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey); };
 }
+// Camera alongside gallery (v4.43): two labelled options feeding the SAME .js-img-input handler below.
+// "Take photo" carries capture=environment (the camera on mobile, a harmless picker fallback on desktop);
+// "Choose" is the plain gallery input, kept. Never removes the gallery; never changes the handler.
+function photoInputs(){
+  return '<div class="img-controls">'
+    + '<label class="btn-photo">Take photo<input type="file" accept="image/*" capture="environment" class="js-img-input" hidden></label>'
+    + '<label class="btn-photo">Choose<input type="file" accept="image/*" class="js-img-input" hidden></label>'
+    + '</div>';
+}
 function bindDynamic(){
   // image upload
   document.querySelectorAll('.js-img-input').forEach(inp=>{

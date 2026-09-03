@@ -485,6 +485,9 @@ html[data-theme="dark"] .mood-chip.on{color:#15140F;}
 .starL{font-size:20px;}
 .starL .star{width:22px;height:22px;}
 .starL .star svg{width:22px;height:22px;}
+/* v4.43: the session-rating input gets larger tap targets than the tea/edit ratings (half-stars kept — the half/full hit-zones scale with the star width) */
+#sessRatingWrap .star,#editRatingWrap .star{width:32px;height:32px;}
+#sessRatingWrap .star svg,#editRatingWrap .star svg{width:32px;height:32px;}
 
 /* teas grid */
 .tea-card{background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .1s;}
@@ -622,6 +625,9 @@ html[data-theme="dark"] .steep-pill.active{color:#15140F;}
 .empty{color:var(--ink-soft);font-size:13px;padding:20px 0;text-align:center;}
 .img-upload{width:100%;height:110px;border:1.5px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-soft);background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden;}
 .img-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+/* v4.43: camera-or-gallery controls below the preview (the .js-img-input inputs inside are hidden, labelled) */
+.img-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.btn-photo{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;}
 
 .session-hist{border-top:1px solid var(--line);margin-top:14px;padding-top:12px;}
 .session-hist-row{padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;}
