@@ -250,7 +250,29 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.41 LIVE `7c27cb9` — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3, Bug B) (R182)**
+**NOW — v4.42 STAGED `9c25e52` (code committed, UNPUSHED — apply the SQL, then push) — Smart Restock: one entry + a purchase log (retires R11) (R184)**
+(cache **v152**, APP_VERSION v4.42, **SQL: apply `sql/v4_42-purchase-log.sql` FIRST**, **no new module**).
+Standalone stock-management slice (`docs/r5/planning/SPEC-restock-model.md`); retires R11 (rebuy = new row).
+- **Restock button + modal** on the tea's "On hand" (grams · date · cost; the new-harvest cue; "Opening
+  this bag now?" toggle default ON). `commitRestock` single-writer-clean: SETS `amountGrams` (stockTier
+  reads it) + `openedDate` when opening (freshnessReading reads it); appends the log event; `wouldRebuy=true`.
+- **Buy decoupled from open:** ON → opened=date + openedDate=date; OFF stockpiles (opened=null, openedDate
+  untouched, grams still grow); a sealed bag opens via the one-tap `d_openBatch`. Lifespan reads `opened`.
+- **Purchase log** JSONB `purchase_log` = `[{grams,date,cost,opened}]` — history, weighted cost/gram
+  (`purchaseTotals`), soft-link (`teaSoftLinks`, name+vendor, read-only). Legacy cost fields = fallback; a
+  legacy tea's first restock seeds buy #1.
+- **R11 retired forward-only:** `isRepeat` removed, `restockTea` → modal, existing dup rows left as-is.
+- **Fixtures:** new `restock-test.js` (20), `liquor §G1` field-drop guard kept green. All 41 suites green.
+- **Deferred:** cross-tea "teas you return to" Insights list (per-tea soft-link ships now); sample→full-buy.
+- **ON DEVICE (`smoke.md §v4.42`, POST-DEPLOY, needs the SQL applied):** restock in place; stockpile + the
+  one-tap open; the log reads (history, weighted cost, soft-link); no "Repeat buy" checkbox; edit keeps the log.
+- **PUSH STATE:** SQL `sql/v4_42-purchase-log.sql` pushed alone (`205df70`) — **apply it in Supabase FIRST**;
+  code commit `9c25e52` is UNPUSHED (PAUSE-THEN-PUSH). After the SQL is applied, push the code; then
+  phone-look + Planning's clone-verify → flip STAGED→LIVE.
+- **NEXT:** guided mode (D4, wave-1 #3 slice c) + the "teas you return to" fast-follow. Then SECURITY
+  re-blocks before the beta widens. Also parked on origin: `SPEC-best-pour.md`, `NOTE-identity-accent-direction.md`.
+
+**Previously — v4.41 LIVE `7c27cb9` — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3, Bug B) (R182)**
 (cache **v151**, APP_VERSION v4.41, **no SQL**, **no new module**). The data-touching slice of
 `SESSION-FLOW-REDESIGN.md`; slice c (guided mode, D4) is the remaining piece.
 - **D3 tagger** — `flavorCaptureHTML` rewritten on `FLAVOR_TREE` (12 families → sub-families → notes): a

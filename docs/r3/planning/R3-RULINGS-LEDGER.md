@@ -2631,6 +2631,29 @@ proposal; **SQL-first** per the deploy ritual (the migration file ships and appl
 commit exists). Mints its own build ruling on ship. The **sample flag** pairs with this round; sample→
 full-buy conversion is deferred to that slice.
 
+**R184 — Smart Restock BUILT: one entry + a purchase log, R11 retired.** Shipped v4.42 (cache v152; SQL
+`sql/v4_42-purchase-log.sql` — one nullable JSONB `purchase_log` column, pushed + applied FIRST; no new
+module). The build of R183 (`docs/r5/planning/SPEC-restock-model.md`). **Data model:** JSONB `purchase_log`
+on `teas` (Code's lean over a `purchases` table — the app is flat-row, the log is small and always read with
+its tea, aggregates are client-side); each event `{grams, date, cost, opened}`. **Restock:** a button on the
+tea's "On hand" opens an in-app **modal** (grams · date · cost; the new-harvest cue; the "Opening this bag
+now?" toggle default ON). `commitRestock` is single-writer-clean — SETS `amountGrams` (stockTier reads it)
+and, when opening, `openedDate` (freshnessReading reads it); appends the event; `wouldRebuy=true`. **Buy
+decoupled from open (mini-gate ruling):** ON → `opened=date` + `openedDate=date`; OFF (stockpile) →
+`opened=null`, `openedDate` untouched (amountGrams still grows — sealed leaf is stock); a sealed bag opens
+later via the explicit one-tap `d_openBatch` (the app can't detect it); lifespan reads the `opened` dates.
+**Cost:** weighted Σcost/Σgrams from the log; `cost_total`/`cost_original_grams` kept as the legacy fallback,
+a legacy tea's first restock seeds buy #1 from them. **Soft-link** `teaSoftLinks` groups same name+vendor
+across harvests, read-only. **R11 retired forward-only:** `isRepeat` removed (new adds always `'first'`,
+column kept for legacy display), `restockTea` reroutes to the modal, existing dup rows left as-is. **Design
+calls confirmed:** modal not inline; wouldRebuy flips true (its rethink is a separate backlog item); no
+sample handling. **Deferred:** the cross-tea "teas you return to" Insights list (the per-tea soft-link ships;
+the list is a fast-follow); sample→full-buy conversion (the sample-flag slice). Fixtures: new
+`restock-test.js` (20), `liquor-test §G1` field-drop guard kept green (`purchaseLog` a `data`-literal key,
+the mapper value reworded to dodge the ternary-colon parse). All 41 suites green. On-device: `smoke.md
+§v4.42` (post-deploy). **NEXT: guided mode (D4, wave-1 #3 slice c) + the "teas you return to" fast-follow;
+then SECURITY re-blocks before the beta widens.**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

@@ -46,6 +46,47 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.42 — Smart Restock: one entry + a purchase log (retires R11) — R184
+
+Deploy: steep-data.js, steep-core.js, steep-teas.js, steep-shopping.js, styles.css, service-worker.js
+(cache v152), steep-version.js, fixtures/restock-test.js, .gitignore, CHANGELOG.md, STATE.md, ROADMAP-v4.md,
+smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md. SQL: apply sql/v4_42-purchase-log.sql FIRST (pushed alone,
+`205df70`) — one nullable JSONB column. No new module.
+
+Standalone stock-management slice (`docs/r5/planning/SPEC-restock-model.md`). **Retires R11** (a rebuy made
+a new tea row): rebuying the exact same tea now tops up ONE entry via a Restock button + a per-entry
+purchase log. The reversal was filed as R183 (docs-first); this is the build, R184.
+
+- **Identity + the Restock button.** One entry = name + vendor (`source`) + harvest year; any differ is a
+  separate entry (a new freshness clock, last year's notes stay last year's). A **Restock** button on the
+  tea's "On hand" section opens an in-app **modal** (grams · date · cost, never a browser prompt), carrying
+  a quiet "New harvest or crop year? Add it as a separate tea →" cue (the app can't detect harvest, so the
+  user self-selects). `commitRestock` is single-writer-clean: it SETS `amountGrams += grams` (`stockTier`
+  reads the total) and, when opening, `openedDate` (`freshnessReading` refreshes); it never re-implements
+  the tier or the clock.
+- **Buy decoupled from open.** The modal's "Opening this bag now?" toggle (default on): ON sets `openedDate`
+  and the event's `opened=date`; OFF stockpiles — `amountGrams` still grows (sealed leaf is stock) but
+  `openedDate` is untouched and the event records `opened=null`. A sealed bag is opened later by an explicit
+  one-tap on the tea detail (`d_openBatch`, the app can't detect it), which sets the oldest sealed event's
+  `opened` and resets the clock. Per-batch lifespan reads the log's `opened` dates, never the purchase dates.
+- **The purchase log is the engine.** Each entry carries `[{grams, date, cost, opened}]` (JSONB
+  `purchase_log`). It powers purchase history, per-batch lifespan, total spend + a **true weighted
+  cost/gram** across all buys (`purchaseTotals`), and the read-only **soft-link** (`teaSoftLinks`) that
+  surfaces "you come back to this" across same-name+vendor harvest entries without merging them. Legacy
+  cost fields (`cost_total`/`cost_original_grams`) stay the fallback for rows with no log; a legacy tea's
+  first restock seeds buy #1 from them.
+- **R11 retired forward-only.** The `isRepeat` checkbox is gone (new adds are always `purchaseType:'first'`;
+  the column is kept for legacy display); `restockTea` reroutes from a new-row prefill to the modal.
+  Existing R11 duplicate rows are LEFT AS-IS (no migration guesses which rows are the same tea); the
+  soft-link groups them read-only.
+- **Deferred:** the cross-tea "teas you return to" Insights list (the per-tea soft-link ships now); the
+  sample→full-buy conversion (rides the sample-flag slice).
+- **Fixtures.** New `fixtures/restock-test.js` (20 — single-writer `commitRestock`, the toggle, the legacy
+  seed, the one-tap open, weighted cost + honest floor, lifespan from opened dates, the identity soft-link,
+  stockTier reads the total). `liquor-test §G1` (the "no persisted field silently dropped" guard) stays
+  green — `purchaseLog` is a `data`-literal key. All 41 suites green, export-gate first. On-device:
+  `smoke.md §v4.42` (post-deploy).
+
 ## v4.41 — wave-1 #3 slice b: the flavour tagger + session-level tasting (D2/D3) — R182
 
 Deploy: steep-sessions.js, steep-teas.js, styles.css, service-worker.js (cache v151), steep-version.js,

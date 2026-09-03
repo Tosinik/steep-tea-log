@@ -155,7 +155,7 @@ Each with its data prerequisite — the point is they get better every season:
   freshness readings get evidence. *(Corrected v3.98: purchase is deliberately NOT the freshness
   anchor — it says when the tea reached you, not when the seal broke. `teas.opened_date` shipped in
   B3 and is the input this idea actually waits on.)*
-- **Restock lead-time learning** [needs shopping-list + rebuy history]: "you usually rebuy ~5 days after
+- **Restock lead-time learning** [needs shopping-list + rebuy history — the R184 purchase log now supplies the rebuy history]: "you usually rebuy ~5 days after
   the low warning" → earlier, smarter Running-low timing.
 - **Seasonal palate** [needs 2+ seasons]: Wrapped gains year-over-year texture.
 - **Tea atlas** [M, mostly rendering work]: browsable KB — types → ~35 styles → 30+ cultivars, regions,

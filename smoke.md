@@ -116,6 +116,23 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.42 · Smart Restock — one entry + a purchase log  *(post-deploy; needs the SQL applied)*
+
+`commitRestock` + the log math are vm-covered (restock-test 20); a phone confirms the modal + the reads.
+Requires `sql/v4_42-purchase-log.sql` applied first. On a tea's detail:
+
+1. **Restock in place.** "On hand" shows a **Restock** button → a modal (grams · date · cost) with a "New
+   harvest? Add it as a separate tea →" cue and an "Opening this bag now?" toggle (default on). Submitting
+   grows the grams, appends to the purchase history, and (if opening) resets the freshness clock. No second
+   tea row is created.
+2. **Stockpile.** Restock with the toggle OFF → the grams grow but freshness is untouched; the tea detail
+   then shows a quiet "Newest bag still sealed — open it?" one-tap that opens it and starts the clock.
+3. **The log reads.** "Where this came from" shows the purchase history ("100 g · … → 50 g · …"), a weighted
+   cost/gram across buys, total spent, and a "You come back to this" soft-link to the same tea's other
+   harvests (tapping opens that entry). A tea bought once reads as before (no empty scaffold).
+4. **Regression.** The tea form no longer has a "Repeat buy" checkbox; editing a tea keeps its purchase log
+   (not wiped); an existing duplicate row from the old rebuy behaviour still shows normally.
+
 ## v4.41 · wave-1 #3 slice b — the flavour tagger + session-level tasting  *(post-deploy on the served PWA)*
 
 Render paths are vm-covered (flavor-tagger 27, render-smoke 219); a phone confirms the tap-through and the
