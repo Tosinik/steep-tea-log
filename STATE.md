@@ -250,7 +250,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.44 STAGED `a390f06` (code committed, UNPUSHED — awaiting Niklas's push) — photo field opens a source sheet (R186)**
+**NOW — v4.44 LIVE `a390f06` — photo field opens a source sheet (R186)**
 (cache **v154**, APP_VERSION v4.44, **no SQL**, **no new module**). Fixes the v4.43 photo control.
 - **The bug (v4.43):** `photoInputs()` stranded the working buttons in a row under the preview and left the
   big "Add a photo" drop-zone inert. The obvious target did nothing.
@@ -268,8 +268,8 @@ low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unseq
 - **ON DEVICE (`smoke.md §v4.44`, POST-DEPLOY):** tap the "Add a photo" field → the sheet appears → Take
   photo opens the camera, Choose from library opens the gallery, both save + preview, no leftover buttons
   under the field. Check tea-add + one session spot + the social avatar (the 90px circle).
-- **PUSH STATE:** code commit `a390f06` is UNPUSHED (PAUSE-THEN-PUSH). After Niklas's push + phone-look +
-  Planning's clone-verify, flip STAGED→LIVE.
+- **LIVE:** pushed (`a390f06`); Niklas's phone-look (`smoke.md §v4.44`) + Planning's clone-verify passed,
+  flipped STAGED→LIVE.
 - **NEXT:** guided mode (D4, wave-1 #3 slice c) + the "teas you return to" fast-follow. Then SECURITY
   re-blocks before the beta widens.
 
