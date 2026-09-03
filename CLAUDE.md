@@ -364,6 +364,14 @@ when the app-wide copy pass runs.
   (4 families / 20 terms / the R30 orphans), so deleting it reddens the suite. Remove them together with a
   §A rewrite when the flavour-capture area is next opened.
 
+- **Docs hygiene (low priority): relocate the legacy root-level spec cluster into `docs/rN/planning/`.** Nine
+  spec/brief docs predate the `docs/` convention and still sit at the repo root: `SPEC-brew-advice-v2.md`,
+  `SPEC-brew-advice-v3-feedback.md`, `SPEC-brew-advice-v4.md`, `TEA-HANDBOOK.md`, `TEA-REFERENCE-BRIEF.md`,
+  `TEA-REFERENCE-HANDOVER.md`, `TEA-TYPES-SEED.md`, `PHASE2-PRESPEC-NOTES.md`, `R3-BRIEF.md`. A standalone
+  docs-only pass, one `git mv` each. Every reference to them is a bare filename, so a move breaks nothing
+  (verified when `IDEA-tasting-mode.md` moved into `docs/r5/planning/`, v4.44 session). The genuine top-level
+  docs stay at root: CLAUDE, STATE, CHANGELOG, DESIGN, SECURITY, ROADMAP, smoke.
+
 ## Known open bugs
 
 Live issues (see STATE.md / ROADMAP for the full backlog):
