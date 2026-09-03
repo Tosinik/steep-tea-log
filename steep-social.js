@@ -84,7 +84,7 @@ function profileSetupHTML(){
       <form onsubmit="submitProfile(event)">
         <div class="field" style="margin-bottom:12px;">
           <label>Avatar</label>
-          <div class="img-upload" id="imgUploadWrap" style="width:90px;height:90px;border-radius:50%;${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
+          <div class="img-upload" id="imgUploadWrap" onclick="openPhotoSheet()" style="width:90px;height:90px;border-radius:50%;${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
             ${state._draftImage?'':'Photo'}
           </div>
           ${photoInputs()}

@@ -175,7 +175,7 @@ function vesselFormModal(){
       <form onsubmit="submitVesselForm(event)">
         <div class="field" style="margin-bottom:12px;">
           <label>Photo</label>
-          <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+          <div class="img-upload" id="imgUploadWrap" onclick="openPhotoSheet()" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
             ${state._draftImage?'':'Add a photo'}
           </div>
           ${photoInputs()}
@@ -771,7 +771,7 @@ function sessionQuickHTML(d){
       `}
       <div class="field span2" style="margin:14px 0;">
         <label>Photo (optional)</label>
-        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+        <div class="img-upload" id="imgUploadWrap" onclick="openPhotoSheet()" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
           ${state._draftImage?'':'Add a photo of this cup'}
         </div>
         ${photoInputs()}
@@ -1682,7 +1682,7 @@ function sessionFinishHTML(d){
       </div>
       <div class="field span2" style="margin:14px 0;">
         <label>Photo (optional)</label>
-        <div class="img-upload" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
+        <div class="img-upload" id="imgUploadWrap" onclick="openPhotoSheet()" style="${state._draftImage?`background-image:url(${escapeHtml(state._draftImage)})`:''}">
           ${state._draftImage?'':'Add a photo of this cup'}
         </div>
         ${photoInputs()}

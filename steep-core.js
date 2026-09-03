@@ -148,7 +148,7 @@ let state = {
   teas: [], vessels: [], sessions: [], tagLibrary: [...DEFAULT_TAGS],
   view: 'dashboard',
   activeTeaId: null,
-  teaFormOpen: false, editingTea: null, restockFor: null,
+  teaFormOpen: false, editingTea: null, restockFor: null, photoSheetOpen: false,
   vesselFormOpen: false, editingVessel: null,
   sessionEditOpen: false, editingSession: null,
   activeSessionId: null,          // #02b: the sitting whose detail is open
@@ -274,7 +274,7 @@ function installKeyboardReveal(){
 async function refreshData(){
   if(!state.loaded) return;
   // never refetch over unsaved work
-  if(state.sessionDraft || state.teaFormOpen || state.restockFor || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen || state.passSheet) return;
+  if(state.sessionDraft || state.teaFormOpen || state.restockFor || state.photoSheetOpen || state.vesselFormOpen || state.sessionEditOpen || state.social.profileEditOpen || state.passSheet) return;
   try{
     const [teas, vessels, sessions, tagLibrary, wishlist] = await Promise.all([
       loadKey('teas', state.teas), loadKey('vessels', state.vessels),
@@ -1036,6 +1036,7 @@ function render(){
     ${state.passSheet ? passSheetHTML() : ''}
     ${state.teaFormOpen ? teaFormModal() : ''}
     ${state.restockFor ? restockModal() : ''}
+    ${state.photoSheetOpen ? photoSheet() : ''}
     ${state.vesselFormOpen ? vesselFormModal() : ''}
     ${state.settingsOpen ? settingsModal() : ''}
   `;
@@ -1223,14 +1224,33 @@ function toggleInfoPop(btn){
   setTimeout(()=>{ document.addEventListener('pointerdown', onDown); document.addEventListener('keydown', onKey); }, 0);
   _infoPopCleanup = ()=>{ document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey); };
 }
-// Camera alongside gallery (v4.43): two labelled options feeding the SAME .js-img-input handler below.
-// "Take photo" carries capture=environment (the camera on mobile, a harmless picker fallback on desktop);
-// "Choose" is the plain gallery input, kept. Never removes the gallery; never changes the handler.
+// Camera alongside gallery (v4.43, reworked v4.44): the photo FIELD is the single tap target; tapping it
+// opens an in-app sheet that routes to one of two hidden inputs (camera vs gallery). photoInputs() renders
+// just those hidden inputs — both js-img-input, so the unchanged bindDynamic handler wires them. One fix
+// serves all 5 spots; never a browser prompt.
 function photoInputs(){
-  return '<div class="img-controls">'
-    + '<label class="btn-photo">Take photo<input type="file" accept="image/*" capture="environment" class="js-img-input" hidden></label>'
-    + '<label class="btn-photo">Choose<input type="file" accept="image/*" class="js-img-input" hidden></label>'
-    + '</div>';
+  return '<input type="file" accept="image/*" capture="environment" class="js-img-input" data-cam hidden>'
+    + '<input type="file" accept="image/*" class="js-img-input" hidden>';
+}
+function openPhotoSheet(){ state.photoSheetOpen = true; render(); }
+function closePhotoSheet(){ const s=document.getElementById('photoSheetOverlay'); if(s) s.remove(); state.photoSheetOpen=false; }
+// Close the sheet WITHOUT a re-render (so the field's hidden input stays the same wired element), then
+// trigger it. The input's own onchange (bindDynamic, unchanged) takes the file and updates the preview.
+function d_pickPhoto(kind){
+  closePhotoSheet();
+  const inp = document.querySelector(kind==='cam' ? '.js-img-input[data-cam]' : '.js-img-input:not([data-cam])');
+  if(inp) inp.click();
+}
+function photoSheet(){
+  return `<div class="overlay" id="photoSheetOverlay" onclick="if(event.target===this) closePhotoSheet()">
+    <div class="modal photo-sheet" style="max-width:360px;">
+      <div class="modal-head"><h2>Add a photo</h2><button class="close-x" onclick="closePhotoSheet()">✕</button></div>
+      <div class="photo-choices">
+        <button type="button" class="btn-photo" onclick="d_pickPhoto('cam')">Take photo</button>
+        <button type="button" class="btn-photo" onclick="d_pickPhoto('lib')">Choose from library</button>
+      </div>
+    </div>
+  </div>`;
 }
 function bindDynamic(){
   // image upload

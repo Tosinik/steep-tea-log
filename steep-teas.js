@@ -740,7 +740,7 @@ function teaFormModal(){
         <!-- WS1: photo · name · type up front (the minimum to save); everything else folds behind
              "Specifics". The fold is a DOM toggle, NOT a re-render — submitTeaForm reads the fields on
              submit, so they must stay in the DOM (display:none inputs still submit their values). -->
-        <div class="img-upload dropzone${state._draftImage?' has-img':''}" id="imgUploadWrap" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
+        <div class="img-upload dropzone${state._draftImage?' has-img':''}" id="imgUploadWrap" onclick="openPhotoSheet()" style="${state._draftImage?`background-image:url(${state._draftImage})`:''}">
           ${state._draftImage?'':`${icon('i-camera-hl',26)}<span>Add a photo</span>`}
         </div>
         ${photoInputs()}
