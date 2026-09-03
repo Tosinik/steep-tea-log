@@ -2668,6 +2668,24 @@ half-stars untouched (the 50%-width hit-zones scale). Display size only, no mode
 reach either surface → on-device `smoke.md §v4.43`. All 41 suites green. **NEXT: guided mode (D4, slice c) +
 the "teas you return to" fast-follow; then SECURITY re-blocks before the beta widens.**
 
+**R186 — photo field opens a source sheet (fixes the v4.43 photo control).** Shipped v4.44 (cache v154, no
+SQL, no new module). R185's camera slice left the big "Add a photo" drop-zone inert and stranded the two
+working buttons in a row beneath it, so the obvious target did nothing. Found on Niklas's phone-look, so
+R185's `smoke.md §v4.43` never certified LIVE. v4.44 restores the field as the single tap target: tapping it
+opens an in-app sheet (`photoSheet()`, the shared `.overlay`/`.modal`) with **Take photo** + **Choose from
+library**. `photoInputs()` now renders only the two hidden inputs (one `capture="environment"` marked
+`data-cam`, one gallery); `d_pickPhoto('cam'|'lib')` closes the sheet with a direct DOM remove — NO re-render,
+so the field's hidden input stays the same wired element — then `.click()`s the matching one. New
+`openPhotoSheet`/`closePhotoSheet`/`d_pickPhoto`/`photoSheet` + `state.photoSheetOpen` (in the back-guard).
+**The one deviation from "fix once in `photoInputs()`":** the helper renders as a sibling after the field, so
+it can't attach the tap handler itself. Each of the 5 `.img-upload` fields carries a one-line
+`onclick="openPhotoSheet()"` pointing at the shared `openPhotoSheet`. Routing shared once; the fields just
+point at it, so all 5 behave identically; the 90px avatar is a normal tap target. `.btn-photo` stays on
+`--line`/`--ink` (no `--clay`); dead `.img-controls` removed; no browser prompt; no em dashes in the copy.
+Interaction is device-only → `smoke.md §v4.44`; markup/routing/copy vm-checked, export-gate + 47 suites
+green. **NEXT: unchanged — guided mode (D4, slice c) + the "teas you return to" fast-follow; then SECURITY
+re-blocks before the beta widens.**
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

@@ -46,6 +46,33 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.44 — photo field opens a source sheet — R186
+
+Deploy: steep-core.js, steep-sessions.js, steep-social.js, steep-teas.js, styles.css, service-worker.js
+(cache v154), steep-version.js, CHANGELOG.md, STATE.md, smoke.md, docs/r3/planning/R3-RULINGS-LEDGER.md.
+No SQL.
+
+Fixes the v4.43 photo control. That slice put "Take photo"/"Choose" buttons in a row under the preview and
+left the big "Add a photo" drop-zone inert, so the obvious target did nothing. This restores the field as
+the single tap target: tapping it opens an in-app sheet (`photoSheet()`) with two choices, Take photo and
+Choose from library.
+
+- `photoInputs()` now renders only the two hidden inputs. One carries `capture="environment"` (marked
+  `data-cam`), one is the plain gallery input. Both keep `class="js-img-input"`, so the unchanged
+  `bindDynamic` handler wires both. `d_pickPhoto('cam'|'lib')` closes the sheet with a direct DOM remove
+  (NO re-render, so the field's hidden input stays the same wired element) and `.click()`s the matching one.
+- New `openPhotoSheet`/`closePhotoSheet`/`d_pickPhoto`/`photoSheet` + `state.photoSheetOpen` (added to the
+  back-guard alongside the other modals). One shared fix; all 5 spots (3 session, social avatar, tea) behave
+  identically. The 90px avatar is a normal tap target too.
+- Each of the 5 `.img-upload` fields gained `onclick="openPhotoSheet()"`. The routing lives once in the
+  shared helper; the fields just point at it. `photoInputs()` renders as a sibling after the field, so it
+  can't attach the handler itself.
+- The sheet reuses the shared `.overlay`/`.modal`; the two options reuse `.btn-photo` on `--line`/`--ink`
+  (home-test's accent guard holds, no `--clay`). The dead `.img-controls` rule is removed. No browser
+  prompt. No em dashes in the copy.
+- Interaction is device-only (camera vs gallery), so it rides `smoke.md §v4.44`. The markup, routing, and
+  copy are vm-checked, and 47 suites + export-gate stay green.
+
 ## v4.43 — camera alongside gallery + bigger session-rating stars — R185
 
 Deploy: steep-core.js, steep-sessions.js, steep-social.js, steep-teas.js, styles.css, service-worker.js

@@ -250,22 +250,33 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.43 STAGED `0b34649` (code committed, UNPUSHED — awaiting Niklas's push) — camera alongside gallery + bigger session-rating stars (R185)**
-(cache **v153**, APP_VERSION v4.43, **no SQL**, **no new module**). A small UX-polish slice, direct-built.
-- **Camera alongside gallery** — all 5 `.js-img-input` spots (3 session · social avatar · tea) now render two
-  labelled buttons via a shared `photoInputs()`: "Take photo" (`capture="environment"`) + "Choose" (the kept
-  gallery input). Both `js-img-input`, so the unchanged `bindDynamic` handler wires both. `.btn-photo` on
-  `--line`/`--ink`, not `--clay`.
-- **Bigger session stars** — the session rating was ALREADY `.starL` (22px; every `renderStarsInteractive`
-  passes big=true), so the literal ask was a no-op; the intent shipped as a 32px tier scoped to
-  `#sessRatingWrap`+`#editRatingWrap`. Half-stars untouched (50%-width hit-zones scale). Display size only.
-- **Fixtures:** none new (UI-only); all 41 suites green, node --check clean.
-- **ON DEVICE (`smoke.md §v4.43`, POST-DEPLOY):** "Take photo" opens the camera; "Choose" opens the gallery;
-  both save + preview; the session stars are bigger and half-star taps still work.
-- **PUSH STATE:** code commit `0b34649` is UNPUSHED (PAUSE-THEN-PUSH). After Niklas's push + phone-look +
+**NOW — v4.44 STAGED `a390f06` (code committed, UNPUSHED — awaiting Niklas's push) — photo field opens a source sheet (R186)**
+(cache **v154**, APP_VERSION v4.44, **no SQL**, **no new module**). Fixes the v4.43 photo control.
+- **The bug (v4.43):** `photoInputs()` stranded the working buttons in a row under the preview and left the
+  big "Add a photo" drop-zone inert. The obvious target did nothing.
+- **The fix:** the field is the single tap target again. Tapping it opens an in-app sheet (`photoSheet()`)
+  with **Take photo** + **Choose from library**. `photoInputs()` now renders just the two hidden inputs (one
+  `capture="environment"`, marked `data-cam`; one gallery), both `js-img-input` so the unchanged `bindDynamic`
+  wires them. `d_pickPhoto` closes the sheet with a direct DOM remove (no re-render, input stays wired) then
+  `.click()`s the matching one.
+- **Shared once:** `openPhotoSheet`/`closePhotoSheet`/`d_pickPhoto`/`photoSheet` + `state.photoSheetOpen` (in
+  the back-guard). The 5 `.img-upload` fields each carry a one-line `onclick="openPhotoSheet()"` pointing at
+  it, so all 5 spots behave identically; the 90px avatar is a normal tap target. `.btn-photo` stays on
+  `--line`/`--ink`, no `--clay`. Dead `.img-controls` removed.
+- **Fixtures:** none new (interaction is device-only); export-gate + 47 suites green, node --check clean,
+  markup/routing/copy vm-checked.
+- **ON DEVICE (`smoke.md §v4.44`, POST-DEPLOY):** tap the "Add a photo" field → the sheet appears → Take
+  photo opens the camera, Choose from library opens the gallery, both save + preview, no leftover buttons
+  under the field. Check tea-add + one session spot + the social avatar (the 90px circle).
+- **PUSH STATE:** code commit `a390f06` is UNPUSHED (PAUSE-THEN-PUSH). After Niklas's push + phone-look +
   Planning's clone-verify, flip STAGED→LIVE.
 - **NEXT:** guided mode (D4, wave-1 #3 slice c) + the "teas you return to" fast-follow. Then SECURITY
   re-blocks before the beta widens.
+
+**Previously — v4.43 STAGED `0b34649` — camera alongside gallery + bigger session-rating stars (R185)**
+(cache **v153**, no SQL). Pushed; its phone-look found the inert drop-zone above, fixed forward in v4.44, so
+this block never flipped LIVE. Camera-alongside-gallery via `photoInputs()` at all 5 photo spots; a 32px
+session-rating star tier scoped to `#sessRatingWrap`/`#editRatingWrap` (half-stars kept).
 
 **Previously — v4.42 LIVE `9c25e52` — Smart Restock: one entry + a purchase log (retires R11) (R184)**
 (cache **v152**, APP_VERSION v4.42, **SQL: apply `sql/v4_42-purchase-log.sql` FIRST**, **no new module**).

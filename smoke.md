@@ -116,7 +116,21 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
-## v4.43 · camera alongside gallery + bigger session stars  *(post-deploy — the camera + tap targets need a phone)*
+## v4.44 · photo field opens a source sheet  *(post-deploy — the camera + the sheet need a phone)*
+
+Fixes the v4.43 photo control (the drop-zone was inert, the working buttons stranded below). No fixture
+reaches the sheet or the camera. On a phone:
+
+1. **Tea-add.** On the tea photo field, tap the big **"Add a photo"** area → a sheet appears with **Take
+   photo** and **Choose from library**. There are **no buttons left under the field**. "Take photo" opens the
+   **camera**; "Choose from library" opens the **gallery**. Both save the photo and update the preview.
+2. **A session photo.** Same on a session photo spot (finish or quick-log): the field opens the sheet, both
+   options work, nothing stranded below.
+3. **Social avatar.** The **90px avatar** circle is the tap target and opens the same sheet; it renders
+   sanely (no overflow, the circle stays round). Both options work.
+4. **Close.** Tapping outside the sheet, or its ✕, closes it without picking anything.
+
+## v4.43 · camera alongside gallery + bigger session stars  *(post-deploy — the camera + tap targets need a phone; SUPERSEDED by v4.44 — its drop-zone was inert)*
 
 UI-only; no fixture reaches the camera or a tap target. On a phone:
 
