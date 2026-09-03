@@ -270,7 +270,10 @@ low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unseq
   under the field. Check tea-add + one session spot + the social avatar (the 90px circle).
 - **LIVE:** pushed (`a390f06`); Niklas's phone-look (`smoke.md §v4.44`) + Planning's clone-verify passed,
   flipped STAGED→LIVE.
-- **NEXT:** guided mode (D4, wave-1 #3 slice c) + the "teas you return to" fast-follow. Then SECURITY
+- **NEXT — Tea Tasting mode** (guided mode, D4, wave-1 #3 slice c): **authority spec
+  `docs/r5/planning/SPEC-guided-mode-FINAL.md`** (added c92275a; §10 = the plan-gate build questions, storage
+  is the open one), design ruling `SESSION-FLOW-REDESIGN.md` §D4. Big, multi-slice (c1/c2/c3 in §11), builds
+  after smart-restock (done v4.42) — PLAN-GATE it. Then the "teas you return to" fast-follow. Then SECURITY
   re-blocks before the beta widens.
 
 **Previously — v4.43 STAGED `0b34649` — camera alongside gallery + bigger session-rating stars (R185)**
