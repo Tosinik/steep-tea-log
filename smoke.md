@@ -116,6 +116,33 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.45 · colour system — 25-stop liquor ramp + net-new leaf ramp  *(post-deploy — this look IS the hex validation, Q1)*
+
+The 13 new liquor hexes and all 9 leaf hexes ship **provisional**; this check is where they lock. The 12
+original liquor stops are FROZEN (do not retune). Keys-not-hexes: any retune or drop is a one-line token
+edit in `styles.css` with no data migration (a dropped new stop collapses into its neighbour).
+
+1. **Open a tea → Edit → the Colour row → "correct the colour".** The picker is a **two-step drill-down**:
+   six family rows (Barely there · Green · Yellow and gold · Amber and orange · Red and brown · Dark), one
+   open at a time showing its shades as **big (44px) tappable cells**, the others shown as a small strip.
+   Tapping a family opens it and closes the last. Tapping a shade selects it (outline), and the form's Save
+   commits. Does it read and tap cleanly on the phone (targets big enough, the neighbourhood legible)?
+2. **The ramp against a real cup.** Do the 25 liquor swatches read as a coherent pale→dark ramp, and do the
+   **13 new stops** each earn their place, or do any two collide on a real screen? Retune or drop the
+   offenders (new stops only). Watch the greens (now six) and the reds (rust/brick/garnet).
+3. **`clear` vs "no colour yet".** `clear` is the deliberate near-colourless first-rinse stop; the tier-3
+   "no colour yet" state is a dashed empty plate. On the shelf, does a tea set to `clear` read as a distinct
+   (near-white, solid-outline) swatch, or is it indistinguishable from the dashed plate? If the latter,
+   **collapse `clear` into `ivory`** (drop the stop).
+4. **Dark theme.** Repeat 2–3 in dark mode: the ramp order holds, nothing vanishes into the dark card.
+5. **Leaf ramp** — the `--leaf-*` tokens ship but the leaf picker has no live surface until c1. Validate the
+   nine leaf colours + the mottled split-swatch against **real leaf** when c1 wires the dry-leaf room; noted
+   here so it is not forgotten.
+
+*Pass:* the picker taps cleanly, the ramp reads on a real cup in both themes, and the `clear`/plate call is
+made. Dev pre-push saw all 34 tokens resolve in both themes and the picker render with real 44px targets
+(swatch gallery + real `liquorGridCells`), but only a real cup certifies the hexes.
+
 ## v4.44 · photo field opens a source sheet  *(post-deploy — the camera + the sheet need a phone)*
 
 Fixes the v4.43 photo control (the drop-zone was inert, the working buttons stranded below). No fixture

@@ -46,6 +46,47 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.45 — colour system: 25-stop liquor ramp in six families + a net-new leaf ramp — R187
+
+Deploy: styles.css, steep-tea-types.js, steep-teas.js, service-worker.js (cache v155),
+steep-version.js, fixtures/liquor-test.js, CHANGELOG.md, STATE.md, ROADMAP-v4.md, smoke.md,
+docs/r3/planning/R3-RULINGS-LEDGER.md, docs/r4/planning/SPEC-liquor-swatch-model.md (sweep).
+Authority spec docs/r5/planning/SPEC-colour-system.md was pushed earlier, docs-only (3930afc).
+No SQL. No new module.
+
+The ramp pre-slice for guided tasting mode. It ships alone and first; the migration and c1 follow.
+All hexes are provisional and validated live on a real cup and real leaf (smoke.md §v4.45), except
+the 12 original liquor stops, which are frozen. The column stores a KEY, not a hex, so any retune is
+a token edit with no data migration.
+
+- Liquor ramp grows 12 to 25 stops. The 12 existing keys and hexes are preserved exactly; 13 new
+  stops land where the ramp was thinnest (four greens, three reds), both themes. `LIQUOR_FAMILIES`
+  (steep-tea-types.js) holds the six picker families; `LIQUOR_KEYS` is derived from it as the one
+  flat ramp order (membership plus the Insights-clock sort), and `liquorFamilyOf` maps a key to its
+  family (Q5: the family label is derived, never stored). This closes the audit's "liquor ramp too
+  thin" backlog item.
+- The type cascade stays coarse (Q2, ruled): the new stops are tier-1-only, the catalog is NOT
+  re-authored, so `liquorFor` and its 44 catalog assignments are unchanged.
+- Net-new leaf-appearance ramp: a separate `--leaf-*` token set, nine colours in both themes, never
+  merged with `--liquor-*` even where a key string collides (leaf `deep-green` is not liquor
+  `deep-green`). `mottled` is a modifier with no token, rendered as a split swatch. `LEAF_KEYS`,
+  `isLeafKey`, and `leafGridCells`/`leafSelect`/`leafToggleMottled` ship ready, consumed by c1.
+- Picker: the flat 13-cell grid becomes a two-step drill-down (`liquorGridCells`). A default/clear
+  shade, then six family rows, one open at a time (`liquorOpenFamily`, DOM-only) with 44px shades,
+  the rest shown as a mini strip so the neighbourhood reads before committing. 44px is the whole
+  reason for two steps: 25 stops in one row are ~14px and unhittable. Every write-path mechanism is
+  unchanged (real `<button>` cells with aria, the hidden input plus a dispatched input event, the
+  `isLiquorKey` gate, and F1 containment).
+- Tests (fixtures/liquor-test.js, 89 checks): section A rewritten to 25 stops. A3 is now a GLOBAL
+  minimum-distance check in deltaE (Lab, hue-aware) across every pair in both themes (min 4.91 light,
+  5.98 dark), the right instrument for a ramp with a green arm and a brown arm that are close in
+  luminance but far in hue. The luminance-monotonic A4 is retired, since six families break
+  monotonicity (garnet is darker than mahogany). A3b is endpoint-aware (the ramp's lightest and
+  darkest stops sit near their grounds by design, carried by the swatch outline). C3 splits for Q2
+  (the 12 originals stay catalog-occupied, the 13 new are tier-1-only). G10 asserts the 44px targets.
+  All 41 committed suites green; frame-test 46 unchanged (the picker rides the un-spined form modal).
+
+---
 ## v4.44 — photo field opens a source sheet — R186
 
 Deploy: steep-core.js, steep-sessions.js, steep-social.js, steep-teas.js, styles.css, service-worker.js

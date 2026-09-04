@@ -2686,6 +2686,37 @@ Interaction is device-only → `smoke.md §v4.44`; markup/routing/copy vm-checke
 green. **NEXT: unchanged — guided mode (D4, slice c) + the "teas you return to" fast-follow; then SECURITY
 re-blocks before the beta widens.**
 
+**R187 — colour system: the liquor ramp grows to 25 stops in six families + a net-new leaf ramp (the
+guided-mode colour PRE-SLICE).** Shipped v4.45 (cache v155, no SQL, no new module). Step 1 of guided
+tasting mode (D4), shipped ALONE and FIRST per the packaging ruling (Q6). Authority is
+`docs/r5/planning/SPEC-colour-system.md`, reconciled from the R5 "Colour System" board and pushed
+docs-only (`3930afc`). **Liquor:** 12 → 25 stops. The 12 originals are FROZEN (keys AND hexes byte-exact,
+asserted in `liquor-test.js` A2b); 13 new landed where the ramp was thinnest (four greens, three reds),
+both themes. `LIQUOR_FAMILIES` is the six-family picker grouping and `LIQUOR_KEYS` derives from it as the
+one flat ramp order (membership + the clock sort); `liquorFamilyOf` maps key→family (Q5: the family label
+is DERIVED, never stored). **Q2 (ruled): the type cascade stays COARSE** — the new stops are tier-1-only,
+the catalog is NOT re-authored, so `liquorFor` and its 44 assignments are unchanged (C3 was split to assert
+exactly that: the 12 catalog-occupied, the 13 tier-1-only). **Leaf:** a net-new `--leaf-*` set, nine colours
+both themes, never merged with `--liquor-*` even where a key string collides (leaf `deep-green` is not liquor
+`deep-green`); `mottled` is a tokenless split-swatch MODIFIER. `LEAF_KEYS`/`isLeafKey`/`leafGridCells` ship
+ready, consumed by c1. **Picker:** the flat 13-cell grid becomes a two-step drill-down (`liquorGridCells`) —
+a default/clear shade then six family rows, one open at a time (`liquorOpenFamily`, DOM-only), 44px shades,
+the rest shown as their mini strip. 44px is the accessibility floor the spec mandates, SUPERSEDING R121's
+22×22 for this control (25 stops in one row are ~14px, unhittable); the write-path mechanics (button/aria,
+hidden input + dispatched input event, `isLiquorKey` gate, F1 containment) are unchanged, and G10 was
+updated to assert the new geometry. **Test (Q3 ruled):** A3 is now a GLOBAL minimum-distance check in ΔE
+(Lab, hue-aware) across every pair in both themes (min 4.91 light / 5.98 dark), which CLOSES the
+swatch-model §9 two-arm open question — the luminance-only adjacency check was blind across arms, and ΔE
+shows `straw`↔`gold-pale` reads comfortably clear. The luminance-monotonic A4 is retired (six families
+break monotonicity: garnet is darker than mahogany); A3b is endpoint-aware (a ramp spanning near-white to
+near-black has endpoints that sit near their grounds by design, carried by the swatch outline). **Q1
+(validation is LIVE, not pre-lock):** the 13 new hexes ship provisional and are validated by Niklas against
+a real cup and real leaf on the shipped ramp (`smoke.md §v4.45`); the 12 originals are frozen; keys-not-hexes
+means any retune or drop is a token edit with no data migration. Closes the audit's "liquor ramp too thin"
+backlog. Browser-verified in both themes (all 34 tokens resolve; the picker renders with real 44px targets
+and DOM-only family drill). **NEXT: guided mode c1** — the `tasting_record` jsonb migration (alone and
+first), then the c1 spine (both entry doors, the two registers, the reuse-existing stages, the verdict close).
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

@@ -116,8 +116,11 @@ decisions rather than any single ruling:
   de-AI-ification + the CLAUDE.md "Copy voice" rule; the material field's vendor treatment;
   `TEA-PAGE-CALM-COPY-POLISH.md`, feeds #3); **#3 session-flow re-dress — slice a (IA + timer + focus cue)
   SHIPPED v4.40/R181, slice b (FLAVOR_TREE tagger + session-level D2/Bug B) SHIPPED v4.41/R182**
-  (`SESSION-FLOW-REDESIGN.md`); **slice c (guided mode, D4) is the remaining piece**. Then SECURITY
-  re-blocks before the beta widens.
+  (`SESSION-FLOW-REDESIGN.md`); **slice c (guided mode, D4) is building — its colour-ramp PRE-SLICE
+  shipped v4.45/R187** (liquor 12→25 stops in six families + a net-new leaf ramp + the two-step picker,
+  `docs/r5/planning/SPEC-colour-system.md`); **the c1 spine is next** (the `tasting_record` migration,
+  then both entry doors, the two registers, the reuse-existing stages, and the verdict close,
+  `SPEC-guided-mode-FINAL.md`). Then SECURITY re-blocks before the beta widens.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
   next person logs in). Findings

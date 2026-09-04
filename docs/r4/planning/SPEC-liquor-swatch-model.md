@@ -274,6 +274,12 @@ in the first place.
 
 ## 7 · The ramp
 
+> **SUPERSEDED v4.45 (R187) for the STOP COUNT.** The ramp is now **25 stops in six families** —
+> authority is `docs/r5/planning/SPEC-colour-system.md`. The twelve below are preserved verbatim as the
+> FROZEN originals (keys + hexes unchanged); thirteen new stops were added. The tier model, the cascade,
+> the assignments (§8), and the keys-not-hexes reasoning all still hold. This section is kept as the
+> record of how the twelve were sized.
+
 **TWELVE stops (A5)** — ~~Ten stops.~~ Sized from evidence, not from the board's fourteen. ~~the catalog uses **nine**, and
 Niklas's 21-tea shelf needs **five**. The tenth (`amber`) sits in the widest gap as headroom.~~
 **Amended (A1): the catalog uses all TEN and Niklas's shelf needs SIX.** `amber` is occupied by
@@ -386,6 +392,11 @@ written down in two files and asserted in two suites.** So:
 - **Eleven catalog rows are deliberately null.** A suite must assert they stay null, or a later pass
   will "complete" the table and assert a colour for a style that varies.
 - **The small geometry is derived, not locked** (R121).
+- **RESOLVED v4.45 (R187): the non-adjacent decision was made — a GLOBAL minimum-distance check in
+  deltaE (Lab), which is hue-aware, so the two-arm blindness is closed** (`liquor-test.js` A3, both
+  themes; `straw`↔`gold-pale` reads comfortably clear under deltaE, and jade↔gold is told apart by hue
+  as predicted). The original open-question text is kept below as the record of why luminance-only was
+  the wrong instrument.
 - **OPEN QUESTION, recorded before the cascade rather than rediscovered after it: the ramp is TWO
   ARMS, and the adjacent-pair invariant is blind across them.** Luminance ascends
   `jade-pale` 184.1 → `straw` 207.5 → `ivory` 234.8, then descends to `near-black`. A3 asserts

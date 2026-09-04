@@ -147,7 +147,7 @@ build.** What's next, in order:
    mode (contained). **Backlog the audit ranks into this:** ~~freshness-framing fix~~ **DONE in B2**; the
    **sticky-rice catalog row** (an unmatched roasted oolong still defaults to the oolong family — B2's roast
    fix reaches catalog-matched teas only); a **vendor picker**; masthead session-start; stale-override reset;
-   Favourites default order; liquor-ramp-too-thin; the **senchadō ratio-seed reachability** (a v2-ratio task —
+   Favourites default order; ~~liquor-ramp-too-thin~~ (**DONE v4.45/R187** — ramp 12→25 in six families); the **senchadō ratio-seed reachability** (a v2-ratio task —
    `senchado:2.8` in `LEAF_RATIO_DEFAULT` is unreachable; the gyokuro revisit needs `ratioSenchado` in the KB).
    Label scanner — deferred.
 5. **Brew-advice Stage 2** — learned per-tea time adaptation + science-prior→preference (+ the earned brew
@@ -250,7 +250,33 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.44 LIVE `a390f06` — photo field opens a source sheet (R186)**
+**NOW — v4.45 STAGED `dd236ab` — colour system: 25-stop liquor ramp + net-new leaf ramp (R187)**
+(cache **v155**, APP_VERSION v4.45, **no SQL**, **no new module**). Step 1 of guided tasting mode (D4):
+the colour-ramp **pre-slice**, shipped ALONE and FIRST. Authority `docs/r5/planning/SPEC-colour-system.md`
+(pushed docs-only, `3930afc`).
+- **Liquor ramp 12 → 25 stops in six families.** The 12 keys+hexes preserved exactly; 13 new (four
+  greens, three reds), both themes. `LIQUOR_FAMILIES` is the picker grouping; `LIQUOR_KEYS` derives from
+  it (flat ramp order + the clock sort); `liquorFamilyOf` maps key→family. Type cascade stays coarse (Q2):
+  new stops tier-1-only, the catalog is NOT re-authored, `liquorFor` unchanged. **Closes the audit's
+  "liquor ramp too thin" backlog.**
+- **Net-new leaf ramp** (`--leaf-*`, 9 colours both themes) + `mottled` tokenless split-swatch modifier;
+  a SEPARATE set from `--liquor-*`. `LEAF_KEYS`/`isLeafKey`/`leafGridCells` ship ready for c1.
+- **Two-step drill-down picker** (44px shades, one family open, others as strips; `liquorOpenFamily`
+  DOM-only) wired to the per-tea identity pick. Leaf flat picker built for c1. Write-path unchanged.
+- **Tests:** liquor-test §A rewritten — 25 stops, A3 GLOBAL ΔE (Lab) min-distance both themes (min 4.91
+  light / 5.98 dark), A4 retired (families break monotonicity), A3b endpoint-aware, leaf asserted; C3 split
+  for Q2; G10 → 44px. 89 checks; 41 suites green; frame-test 46 unchanged.
+- **ON DEVICE (`smoke.md §v4.45`, POST-PUSH — this IS the hex validation, Q1):** the 25 liquor swatches
+  read as a coherent ramp on a real cup; the two-step picker taps (families open one at a time, 44px);
+  **does `clear` read distinct from the tier-3 dashed plate, or collapse it into `ivory`?**; leaf ramp
+  against real leaf when c1 lands. The 12 originals are FROZEN; the 13 new may retune/drop (keys-not-hexes
+  = no data migration).
+- **STAGED:** code `dd236ab` + docs committed, UNPUSHED. Awaiting Niklas's push, then the phone-look +
+  Planning's clone-verify, then the STAGED→LIVE flip.
+- **NEXT — guided mode c1:** the `tasting_record` jsonb migration (alone and FIRST), then the c1 spine
+  (both entry doors, the two registers, the reuse-existing stages, JSON storage, the verdict close).
+
+**Previously — v4.44 LIVE `a390f06` — photo field opens a source sheet (R186)**
 (cache **v154**, APP_VERSION v4.44, **no SQL**, **no new module**). Fixes the v4.43 photo control.
 - **The bug (v4.43):** `photoInputs()` stranded the working buttons in a row under the preview and left the
   big "Add a photo" drop-zone inert. The obvious target did nothing.
@@ -633,11 +659,10 @@ tea → no mark (never-guess).
   fire — `ttFreshness` is already type-aware, the insight isn't using it. (2) **reliable masthead
   session-start** — a "Log a cup" always on the Home masthead, not only the nav FAB. (3) **stale-override
   reset** — offer a dash layout reset when a user's overrides predate a redesign (old Wrapped/`week` linger).
-  (4) **Favourites default order** — consider lower by default. (5) **liquor ramp too thin for some families**
-  — the 12-stop `--liquor-*` ramp (`SPEC-liquor-swatch-model.md`) is thin at points (notably the green end),
-  so distinct teas can resolve to near-identical swatches; the warmth pass makes this visible (bold swatches
-  + the colour clock, where two greens sharing a bar reads as an error) — consider expanding the ramp without
-  breaking per-row assignments or never-guess.
+  (4) **Favourites default order** — consider lower by default. (5) ~~**liquor ramp too thin for some
+  families**~~ **DONE v4.45/R187** — the ramp went 12→25 stops in six families (green arm 2→6, three new
+  reds), per `docs/r5/planning/SPEC-colour-system.md`. Per-row assignments intact and never-guess held (Q2:
+  the type cascade stays coarse, new stops tier-1-only, catalog un-re-authored); the 12 originals frozen.
 
 **Previously — v4.27 (SHIPPED, LIVE `50e40f0`) — R5: the warm Home combined slice (R159 — frame + content + warmth)**
 (cache **v137**, APP_VERSION v4.27, **no SQL**). The HELD Home slice, landed: the R2/R3 overhaul on Home +
