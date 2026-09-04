@@ -1161,18 +1161,27 @@ function liquorSourceText(tier, tea){
   if(tier===2){ const m = matchTeaType(tea.name||''); return 'catalog default · ' + (m ? m.display_name : ''); }
   return 'no colour yet — shows its type tint';
 }
-// The 13 cells: a DEFAULT cell first (value '' → clears → tier 2 by construction), then the twelve ramp
-// stops in order. Every cell a real <button type=button> (keyboard-reachable, testable without
-// synthesised pointer events; type=button so a cell is never an accidental form submit).
+// v4.45: the ramp is 25 stops now, so the flat grid becomes a TWO-STEP drill-down (SPEC-colour-system.md
+// "picker"). A DEFAULT/clear SHADE first (value '' → clears → tier 2 by construction), then six family
+// rows; the family holding the current correction opens (its 44px shades shown), the others stay as their
+// mini strip so the neighbourhood reads before committing. Every shade a real <button type=button>
+// (keyboard-reachable, testable without synthesised pointer events; type=button so it never submits).
 function liquorGridCells(tea){
   const type = tea.type || (TYPES[0] && TYPES[0].k) || 'green';
   const correction = tea.liquor || '';
   const defaultKey = liquorFor(Object.assign({}, tea, {liquor:null}));   // tier 2/3 — what clearing returns to
-  const defAttr = defaultKey ? `class="liquor-cell" style="background:var(--liquor-${escapeHtml(defaultKey)});"`
-                             : `class="liquor-cell t-${escapeHtml((type||'unknown').toLowerCase())}"`;
-  let cells = `<button type="button" ${defAttr} data-liquor="" aria-pressed="${correction===''?'true':'false'}" aria-label="Default — catalog colour or type tint" onclick="liquorSelect('')"></button>`;
-  cells += LIQUOR_KEYS.map(k=>`<button type="button" class="liquor-cell" style="background:var(--liquor-${k});" data-liquor="${k}" aria-pressed="${correction===k?'true':'false'}" aria-label="${escapeHtml(liquorLabel(k))}" onclick="liquorSelect('${k}')"></button>`).join('');
-  return cells;
+  const defAttr = defaultKey ? `class="liquor-shade" style="background:var(--liquor-${escapeHtml(defaultKey)});"`
+                             : `class="liquor-shade t-${escapeHtml((type||'unknown').toLowerCase())}"`;
+  const defCell = `<button type="button" ${defAttr} data-liquor="" aria-pressed="${correction===''?'true':'false'}" aria-label="Default — catalog colour or type tint" onclick="liquorSelect('')"></button>`;
+  const openFam = (correction && liquorFamilyOf(correction)) ? liquorFamilyOf(correction).key : '';  // open the correction's family, else all closed
+  const fams = LIQUOR_FAMILIES.map(f=>{
+    const strip = f.keys.map(k=>`<span style="background:var(--liquor-${k});"></span>`).join('');
+    const shades = f.keys.map(k=>`<button type="button" class="liquor-shade" style="background:var(--liquor-${k});" data-liquor="${k}" aria-pressed="${correction===k?'true':'false'}" aria-label="${escapeHtml(liquorLabel(k))}" onclick="liquorSelect('${escapeJsArg(k)}')"></button>`).join('');
+    return `<div class="liquor-fam-group${f.key===openFam?' is-open':''}" data-fam="${escapeHtml(f.key)}">`
+      + `<button type="button" class="liquor-fam" aria-expanded="${f.key===openFam?'true':'false'}" onclick="liquorOpenFamily('${escapeJsArg(f.key)}')"><span class="liquor-fam-name">${escapeHtml(f.name)}</span><span class="liquor-fam-strip">${strip}</span></button>`
+      + `<div class="liquor-shades">${shades}</div></div>`;
+  }).join('');
+  return `<div class="liquor-defrow">${defCell}</div><div class="liquor-fams">${fams}</div>`;
 }
 function liquorRowHTML(tea){
   const type = tea.type || (TYPES[0] && TYPES[0].k) || 'green';
@@ -1227,11 +1236,44 @@ function liquorRefresh(){
   const openEl = document.getElementById('liquorOpen'); if(openEl) openEl.textContent = resolved ? 'correct the colour ›' : 'set a colour ›';
   const grid = document.getElementById('liquorGrid');
   if(grid){
-    const def = grid.querySelector('.liquor-cell[data-liquor=""]');
-    if(def){ if(defaultKey){ def.className='liquor-cell'; def.style.background='var(--liquor-'+defaultKey+')'; }
-             else { def.className='liquor-cell t-'+((type||'unknown').toLowerCase()); def.style.background=''; } }
-    grid.querySelectorAll('.liquor-cell').forEach(c=>c.setAttribute('aria-pressed', (c.getAttribute('data-liquor')||'')===correction ? 'true':'false'));
+    const def = grid.querySelector('.liquor-shade[data-liquor=""]');
+    if(def){ if(defaultKey){ def.className='liquor-shade'; def.style.background='var(--liquor-'+defaultKey+')'; }
+             else { def.className='liquor-shade t-'+((type||'unknown').toLowerCase()); def.style.background=''; } }
+    grid.querySelectorAll('.liquor-shade').forEach(c=>c.setAttribute('aria-pressed', (c.getAttribute('data-liquor')||'')===correction ? 'true':'false'));
   }
+}
+// v4.45: open one family, close the rest — DOM-only (the form reads its fields on submit, so a
+// re-render mid-edit wipes unsaved values). Toggles .is-open (CSS shows/hides the 44px shades) and aria.
+function liquorOpenFamily(fam){
+  const grid = document.getElementById('liquorGrid'); if(!grid) return;
+  grid.querySelectorAll('.liquor-fam-group').forEach(g=>{
+    const on = g.getAttribute('data-fam')===fam;
+    g.classList.toggle('is-open', on);
+    const btn = g.querySelector('.liquor-fam'); if(btn) btn.setAttribute('aria-expanded', on?'true':'false');
+  });
+}
+// Leaf-appearance picker (v4.45, SPEC-colour-system.md) — a FLAT strip (nine well-separated colours,
+// no family step) plus a `mottled` MODIFIER cell (a split swatch, tracked separately from the colour).
+// Built here as the READY control; c1's dry-leaf room renders it with a hidden #leafInput (+ #leafMottled)
+// and reads them on save. DOM-only like the liquor picker, so a re-render never wipes an in-progress form.
+function leafLabel(k){ return k.charAt(0).toUpperCase() + k.slice(1).replace(/-/g,' '); }
+function leafGridCells(value){
+  const cur = value || '';
+  let cells = LEAF_KEYS.map(k=>`<button type="button" class="leaf-cell" style="background:var(--leaf-${k});" data-leaf="${k}" aria-pressed="${cur===k?'true':'false'}" aria-label="${escapeHtml(leafLabel(k))}" onclick="leafSelect('${escapeJsArg(k)}')"></button>`).join('');
+  cells += `<button type="button" class="leaf-cell is-mottled" data-leaf="mottled" aria-pressed="false" aria-label="Mottled: variegated, over the dominant colour" onclick="leafToggleMottled(this)"></button>`;
+  return cells;
+}
+function leafSelect(key){
+  const inp = document.getElementById('leafInput'); if(!inp) return;   // rendered by c1; a no-op until then
+  inp.value = key;
+  inp.dispatchEvent(new Event('input', { bubbles:true }));
+  const grid = document.getElementById('leafGrid');
+  if(grid) grid.querySelectorAll('.leaf-cell').forEach(c=>c.setAttribute('aria-pressed', (c.getAttribute('data-leaf')||'')===key ? 'true':'false'));
+}
+function leafToggleMottled(btn){   // mottled is a MODIFIER (variegation, not a hue) — its own flag, not a LEAF_KEYS value
+  const on = btn.getAttribute('aria-pressed')!=='true';
+  btn.setAttribute('aria-pressed', on?'true':'false');
+  const flag = document.getElementById('leafMottled'); if(flag){ flag.value = on?'1':''; flag.dispatchEvent(new Event('input',{bubbles:true})); }
 }
 
 /* The ⋯ menu (#03), enumerated to what actually exists. Pass-tea LANDS HERE in v4.02, on the R25

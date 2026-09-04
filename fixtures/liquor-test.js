@@ -42,79 +42,99 @@ const ok=(c,m)=>{ if(c){passed++;} else {failures++; console.log('  FAIL: '+m);}
 // generalise. An absence check must never read prose, not the code's and not its own.
 const strip=s=>s.replace(/\/\*[\s\S]*?\*\//g,' ');
 const cssSrc=strip(fs.readFileSync(path.join(repo,'styles.css'),'utf8'));
-/* Twelve stops since A5. `ivory` and `yellow-pale` are inserted at the PALE end — above `gold-pale`
-   in lightness, below it in the ramp's reading order — so the brown arm gains two members and the
-   green arm (jade-pale, straw) is unchanged. */
-const RAMP=['jade-pale','straw','ivory','yellow-pale','gold-pale','gold','amber','amber-deep','copper','mahogany','sepia','near-black'];
-/* TWO SEPARATION FLOORS, and they are the whole of what this ramp has to guarantee.
-   `SEP_MIN` — every adjacent pair, in EVERY theme. Taken from the light column's own spacing, whose
-   tightest gap is 9.2 (yellow-pale ↔ gold-pale); 9 is that floor, not a number chosen to pass.
-   `GROUND_MIN` — every stop against the card it sits on. This one is a COLLAPSE detector and says
-   so: it catches a swatch becoming invisible against its surface, and it does not prove any pair is
-   comfortable. The tightest real value is `ivory` at 19.2 from `--white` in the light theme, and
-   nobody has looked at it rendered — flagged rather than certified. */
-const SEP_MIN=9;
+/* v4.45 (SPEC-colour-system.md): the ramp is 25 stops in six PICKER families now, keys not hexes, in
+   both themes. RAMP is the flat ramp order (matches LIQUOR_KEYS). FROZEN12 are the originals — their
+   exact shipped hexes are unchanged; NEW13 are PROVISIONAL, validated live on a real cup (may retune
+   or drop). A5's `ivory`/`yellow-pale` are still here, now inside their families. */
+const RAMP=['clear','ivory','oat','pale-grey','straw','pale-green','jade-pale','grey-green','leaf-green','deep-green','yellow-pale','gold-pale','green-gold','gold','apricot','amber','amber-deep','copper','rust','brick','garnet','mahogany','sepia','coffee','near-black'];
+const FROZEN12=['jade-pale','straw','ivory','yellow-pale','gold-pale','gold','amber','amber-deep','copper','mahogany','sepia','near-black'];
+const NEW13=RAMP.filter(k=>!FROZEN12.includes(k));
+/* The FROZEN hexes, both themes — a new-stop retune must NEVER drift a shipped one (validation policy:
+   "do not retune an existing one"). Byte-exact, asserted in A2b. */
+const FROZEN_HEX={ 'jade-pale':['#A9C46E','#B8D07E'],'straw':['#D8D48A','#DFD996'],'ivory':['#F2EBD4','#EFE7CE'],
+  'yellow-pale':['#EDE2B8','#E8DDB6'],'gold-pale':['#E8D9A0','#DED2A0'],'gold':['#DCB863','#E2C275'],
+  'amber':['#C99447','#D2A05A'],'amber-deep':['#B87A38','#C4884A'],'copper':['#A15E2E','#B26F3D'],
+  'mahogany':['#7E3B26','#96503A'],'sepia':['#5A3122','#7A4A36'],'near-black':['#2E1C14','#4A3125'] };
+/* The net-new LEAF ramp — flat 9 colours (mottled is a MODIFIER with no token, so it is not listed). */
+const LEAF=['silver-down','jade','olive','deep-green','golden','amber','chestnut','dark-brown','near-black'];
+/* Q3 (ruled): distinctness is a GLOBAL minimum across ALL stops, both themes, measured in ΔE (Lab) —
+   the right instrument, because the ramp deliberately holds a green arm and a brown arm that are close
+   in luminance but far in HUE (jade-pale↔gold: 1.5 luminance apart, 37° hue apart — plainly distinct).
+   The old luminance-adjacency check was blind across arms (its own comment flagged straw↔gold-pale);
+   the global ΔE closes that. DE_MIN is JND-anchored: ΔE76's just-noticeable-difference is ~2.3, so 3.0
+   is "perceptibly distinct" — it catches a genuine collision yet survives the on-device re-tunes the
+   spec mandates. The pale "Barely there" family sits at ΔE ~5 (subtle BY DESIGN); the real distinctness
+   call is the phone-look (validation policy Q1), not this floor, which is a regression tripwire.
+   GROUND_MIN — a swatch must not vanish into its card (a COLLAPSE detector), now endpoint-aware (A3b). */
+const DE_MIN=3;
 const GROUND_MIN=18;
 const NULLS=['dong-ding-oolong','phoenix-dancong','mi-lan-xiang','ya-shi-xiang','huang-zhi-xiang',
   'zhi-lan-xiang','xing-ren-xiang','phoenix-shui-xian','anxi-tie-guan-yin','huang-jin-gui','sheng-puerh'];
 
-console.log('LIQUOR SWATCH — the data model (SPEC-liquor-swatch-model.md)');
+console.log('LIQUOR SWATCH — the data model (SPEC-liquor-swatch-model.md + SPEC-colour-system.md)');
 const rows=G('TEA_TYPES');
 
-/* ---- A · the ramp is ten stops, in both themes, keys not hexes ---- */
+/* ---- A · the ramps — 25 liquor stops + 9 leaf, both themes, keys not hexes, globally distinct ---- */
 const light=cssSrc.slice(cssSrc.indexOf(':root{'), cssSrc.indexOf('html[data-theme="dark"]{'));
 const dark=cssSrc.slice(cssSrc.indexOf('html[data-theme="dark"]{'));
 const hexOf=(blk,k)=>(blk.match(new RegExp('--liquor-'+k+':(#[0-9A-Fa-f]{6})'))||[])[1];
-ok(RAMP.every(k=>hexOf(light,k)), 'A1 all ten stops are declared in the light theme');
-ok(RAMP.every(k=>hexOf(dark,k)), 'A2 …and all ten in the dark theme, so no stop falls back to a light hex on a dark ground');
-/* Lifted, NOT inverted — the rule the whole ramp turns on. A swatch is the colour of tea in a cup,
-   so an inverted ramp renders pu-erh pale, and a pale pu-erh identifies a different tea. */
+const leafHexOf=(blk,k)=>(blk.match(new RegExp('--leaf-'+k+':(#[0-9A-Fa-f]{6})'))||[])[1];
 const lum=h=>{const n=parseInt(h.slice(1),16);return 0.2126*((n>>16)&255)+0.7152*((n>>8)&255)+0.0722*(n&255);};
-/* A3 ASSERTS THE PROPERTY, NOT THE PROXY, and the difference was found the hard way.
-   The rule was written as "every dark stop is lifted", reasoned from the dark end: a pale pu-erh
-   identifies a different tea. Then A5's two stops moved DOWN in dark while `gold-pale` was lifted UP
-   — each defensible alone — and closed the gap between them to 1.9 luminance, one fifth of their
-   light spacing. On a dark card Niklas's Huang Ya and his Fujian White would have been the same
-   swatch: the exact collision A5 was written to remove, reintroduced by the theme, while a
-   named-exemption check reported green.
-   What lifting was protecting is that ADJACENT STOPS STAY TELLABLE APART IN EVERY THEME. That is
-   assertable directly, so it is. A stop that does not lift now passes as long as it stays separated;
-   one that lifts too far reddens for the right reason; and there is no exemption list to maintain. */
+/* CIE76 ΔE (Lab): sRGB→XYZ(D65)→Lab, Euclidean. Dependency-free, deterministic, and HUE-aware —
+   which plain luminance is not, and is why it is the right instrument for a two-arm ramp (Q3). */
+function _lab(hex){const s=c=>{c/=255;return c<=0.04045?c/12.92:Math.pow((c+0.055)/1.055,2.4);};
+  const n=parseInt(hex.slice(1),16),R=s((n>>16)&255),Gc=s((n>>8)&255),B=s(n&255);
+  const X=(R*0.4124+Gc*0.3576+B*0.1805)/0.95047,Y=R*0.2126+Gc*0.7152+B*0.0722,Z=(R*0.0193+Gc*0.1192+B*0.9505)/1.08883;
+  const f=t=>t>0.008856?Math.cbrt(t):(7.787*t+16/116);
+  return [116*f(Y)-16,500*(f(X)-f(Y)),200*(f(Y)-f(Z))];}
+const deltaE=(h1,h2)=>{const a=_lab(h1),b=_lab(h2);return Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);};
+ok(RAMP.length===25, 'A0 the ramp is 25 stops — 12 frozen + 13 new (got '+RAMP.length+')');
+ok(RAMP.every(k=>hexOf(light,k)), 'A1 all 25 stops are declared in the light theme');
+ok(RAMP.every(k=>hexOf(dark,k)), 'A2 …and all 25 in the dark theme, so no stop falls back to a light hex on a dark ground');
+/* The 12 originals are FROZEN — exact shipped hexes, both themes. A NEW-stop retune must never drift a
+   shipped one (validation policy: "do not retune an existing one"). */
+const drifted=Object.keys(FROZEN_HEX).filter(k=>hexOf(light,k)!==FROZEN_HEX[k][0]||hexOf(dark,k)!==FROZEN_HEX[k][1]);
+ok(!drifted.length, 'A2b the 12 FROZEN hexes are byte-exact in both themes ('+(drifted.join(', ')||'all frozen')+')');
+/* A3 — Q3: GLOBAL minimum ΔE across ALL 25 stops, both themes (not just adjacent). ΔE (Lab) is the
+   instrument, so a green and a gold at the same luminance still read as distinct (the old luminance-
+   adjacency check was blind across the two arms — its own comment flagged straw↔gold-pale, which ΔE
+   shows is comfortably clear). Prints the min + tightest so the number is VISIBLE every run (a
+   tripwire); the pale "Barely there" family sits at ΔE ~5, subtle BY DESIGN — the phone-look certifies
+   (Q1), this floor only catches a gross collision. */
 [['light',light],['dark',dark]].forEach(([name,blk])=>{
-  const tight=[];
-  for(let i=1;i<RAMP.length;i++){
-    const d=Math.abs(lum(hexOf(blk,RAMP[i]))-lum(hexOf(blk,RAMP[i-1])));
-    if(d<SEP_MIN) tight.push(RAMP[i-1]+'↔'+RAMP[i]+' '+d.toFixed(1));
-  }
-  ok(!tight.length, 'A3 every adjacent pair stays ≥'+SEP_MIN+' luminance apart in '+name
-     +' — two swatches a human cannot tell apart are one swatch ('+(tight.join(', ')||'all clear')+')');
+  const pairs=[]; for(let i=0;i<RAMP.length;i++) for(let j=i+1;j<RAMP.length;j++) pairs.push([RAMP[i]+'↔'+RAMP[j],deltaE(hexOf(blk,RAMP[i]),hexOf(blk,RAMP[j]))]);
+  pairs.sort((a,b)=>a[1]-b[1]);
+  ok(pairs[0][1]>=DE_MIN, 'A3 global min ΔE ≥'+DE_MIN+' across all 25 stops in '+name
+     +' — no two the eye reads as one (min '+pairs[0][1].toFixed(2)+' '+pairs[0][0]+'; tightest: '+pairs.slice(0,3).map(p=>p[0]+' '+p[1].toFixed(1)).join(', ')+')');
 });
-/* WHAT A3 CANNOT SEE, stated because an invariant's blind spot is not obvious from reading it: the
-   ramp is TWO ARMS, ascending to `ivory` then descending, so adjacent-pair separation says nothing
-   about two stops at opposite ends. `jade-pale` and `gold` sit 1.5 luminance apart and are told
-   apart by 37° of hue alone; `straw` and `gold-pale` are 4.5 apart in dark at 7° of hue, which is
-   the case that does not obviously resolve. No live collision on this shelf — `straw` holds only
-   anji-bai-cha, which matches nothing Niklas owns. Recorded as an open question in the spec with the
-   full pairwise table; a luminance-only non-adjacent check would be the wrong instrument, and
-   choosing the right one is a decision nobody has made. */
-/* The other half of "can a human tell these apart": separation from the SURFACE, not the neighbour.
-   Same class of failure, and it was equally unasserted — found by measuring `ivory` against the card
-   it will sit on once the cascade lands, rather than by discovering it then. */
+/* A3b — a swatch must not vanish into the CARD it sits on. ENDPOINT-AWARE: a ramp that spans near-white
+   to near-black HAS endpoints that legitimately sit near their grounds (clear≈paper in light,
+   near-black≈card in dark), carried by the swatch OUTLINE (every swatch has a --line stroke/border). So
+   the collapse floor guards the INTERIOR; the computed lightest/darkest stop per theme is exempt as the
+   outline-identified endpoint. This formalises what the old comment hand-waved about `ivory`. Whether
+   `clear` reads distinctly from the tier-3 "no colour yet" plate is a phone-look item (smoke.md). */
 [['light',light,'#FFFEFB'],['dark',dark,'#1C1A14']].forEach(([name,blk,card])=>{
-  const faint=RAMP.filter(k=>Math.abs(lum(hexOf(blk,k))-lum(card))<GROUND_MIN);
-  ok(!faint.length, 'A3b every stop stays ≥'+GROUND_MIN+' from the card it sits on in '+name
-     +' — a swatch that vanishes into its surface identifies nothing ('+(faint.join(', ')||'all clear')+')');
+  const byLum=RAMP.map(k=>[k,lum(hexOf(blk,k))]).sort((a,b)=>a[1]-b[1]);
+  const ends=[byLum[0][0], byLum[byLum.length-1][0]];   // darkest + lightest = the outline-identified endpoints
+  const faint=RAMP.filter(k=>!ends.includes(k) && Math.abs(lum(hexOf(blk,k))-lum(card))<GROUND_MIN);
+  ok(!faint.length, 'A3b every INTERIOR stop stays ≥'+GROUND_MIN+' from the card in '+name
+     +' (endpoints '+ends.join('/')+' exempt) — a swatch that vanishes into its surface identifies nothing ('+(faint.join(', ')||'all clear')+')');
 });
-/* Asserted on the BROWN ARM only, and deliberately so: §2 gives the ramp a green arm (jade-pale,
-   straw) beside the brown one, so a monotonicity check over all ten fails for the right reason.
-   Testing the wrong property would have made this check either wrong or vacuous. */
-const BROWN=RAMP.slice(2);
-[['light',light],['dark',dark]].forEach(([n,blk])=>{
-  const l=BROWN.map(k=>lum(hexOf(blk,k)));
-  ok(l.every((v,i)=>i===0||v<l[i-1]), 'A4 the brown arm darkens strictly in '+n+' — the ramp\'s ORDER survives the theme');
+ok(!/--liquor-[a-z-]+:\s*var\(/.test(cssSrc), 'A4 each liquor stop is its own value, not an alias of another token');
+/* The net-new LEAF ramp — flat 9 colours, both themes, a SEPARATE token set. mottled is a MODIFIER
+   (variegation, not a hue): it carries NO token, so it is not in LEAF and A8 asserts its absence. */
+ok(LEAF.every(k=>leafHexOf(light,k)) && LEAF.every(k=>leafHexOf(dark,k)),
+   'A5 the leaf ramp is 9 colours in BOTH themes — --leaf-*, never merged with --liquor-*');
+ok(leafHexOf(light,'deep-green')!==hexOf(light,'deep-green'),
+   'A5b a colliding key is a DIFFERENT token per ramp — leaf deep-green ('+leafHexOf(light,'deep-green')+') != liquor deep-green ('+hexOf(light,'deep-green')+')');
+[['light',light],['dark',dark]].forEach(([name,blk])=>{
+  const pairs=[]; for(let i=0;i<LEAF.length;i++) for(let j=i+1;j<LEAF.length;j++) pairs.push([LEAF[i]+'↔'+LEAF[j],deltaE(leafHexOf(blk,LEAF[i]),leafHexOf(blk,LEAF[j]))]);
+  pairs.sort((a,b)=>a[1]-b[1]);
+  ok(pairs[0][1]>=DE_MIN, 'A6 leaf global min ΔE ≥'+DE_MIN+' in '+name+' — nine well-separated colours (min '+pairs[0][1].toFixed(2)+' '+pairs[0][0]+')');
 });
-ok(!/--liquor-[a-z-]+:\s*var\(/.test(cssSrc), 'A5 each stop is its own value, not an alias of another token');
-console.log('  A the ramp: 6 checks');
+ok(!/--leaf-[a-z-]+:\s*var\(/.test(cssSrc), 'A7 each leaf stop is its own value, not an alias');
+ok(!/--leaf-mottled\s*:/.test(cssSrc), 'A8 `mottled` has NO token — it is a MODIFIER (a split swatch), not a hue');
+console.log('  A the ramps: 15 checks');
 
 /* ---- B · the eleven deliberate nulls. THE ASSERTION THIS SLICE EXISTS FOR ---- */
 ok(rows.length===55, 'B1 the catalog is 55 rows (got '+rows.length+')');
@@ -137,14 +157,21 @@ ok(rows.find(r=>r.slug==='sheng-puerh').liquor===undefined && rows.find(r=>r.slu
    'B6 sheng and shou pu-erh differ — the most visually different pair in the catalog, and `family: dark` must be per-slug because oxidation 0-100 is a null signal');
 console.log('  B the deliberate nulls: '+(4+NULLS.length)+' checks');
 
-/* ---- C · the 44 assignments, and the ramp fully occupied ---- */
+/* ---- C · the 44 assignments; the 12 originals occupied, the 13 new tier-1-only (Q2) ---- */
 const assigned=rows.filter(r=>r.liquor!==undefined);
 ok(assigned.length===44, 'C1 forty-four rows carry a liquor (got '+assigned.length+')');
 const bad=assigned.filter(r=>!RAMP.includes(r.liquor));
 ok(!bad.length, 'C2 every assigned value is a ramp KEY, never a hex — so the ramp can be retuned without rewriting user data ('+(bad.map(r=>r.slug+'='+r.liquor).join(', ')||'all valid')+')');
-const occupied=RAMP.filter(k=>assigned.some(r=>r.liquor===k));
-ok(occupied.length===RAMP.length,
-   'C3 every stop on the ramp is occupied — there is no headroom stop (A1: `amber` holds gui-fei-oolong; A5 added two more, both occupied). A future gap is a deliberate ramp EXTENSION, never an empty slot waiting (got '+occupied.length+' of '+RAMP.length+')');
+/* v4.45: C3 was "every stop occupied — no headroom" for the 12-stop ramp. Q2 INVERTS that for the new
+   stops: they are tier-1-only BY DESIGN (the catalog is NOT re-authored), so the assertion splits — the
+   12 ORIGINALS stay fully catalog-occupied, and the 13 NEW carry no catalog row (the precision belongs
+   where someone actually looked at the cup). */
+const occupied=FROZEN12.filter(k=>assigned.some(r=>r.liquor===k));
+ok(occupied.length===FROZEN12.length,
+   'C3 every one of the 12 ORIGINAL stops is catalog-occupied — no headroom among them (A1 `amber`=gui-fei; A5 `ivory`/`yellow-pale`) (got '+occupied.length+' of '+FROZEN12.length+')');
+const newAssigned=NEW13.filter(k=>assigned.some(r=>r.liquor===k));
+ok(!newAssigned.length,
+   'C3b Q2 — the 13 NEW stops are TIER-1-ONLY: the catalog assigns none ('+(newAssigned.join(', ')||'none assigned, as designed')+')');
 ok(rows.find(r=>r.slug==='gui-fei-oolong').liquor==='amber',
    'C4 gui-fei-oolong is `amber` — the row §8 omitted, on Niklas\'s shelf, ruled from the anchor rather than left to preserve a headroom claim');
 ok(rows.find(r=>r.slug==='hojicha').liquor==='copper',
@@ -164,7 +191,7 @@ ok(lum(hexOf(light,'yellow-pale'))>lum(hexOf(light,'gold-pale')),
    'C9 yellow-pale sits ABOVE gold-pale, which is OBSERVATION AGAINST THE RULE: men huang predicted deeper, Niklas tasted paler, and the taste wins — do not "correct" this back to the reasoning');
 ok(rows.find(r=>r.slug==='ruan-zhi-oolong').liquor==='gold-pale',
    'C10 A6: Ruby Ruanzhi has NOT moved. A tea that disagrees with its style is tier 1; a style that disagrees with itself is a catalog defect — and darkening the row would make every pale Ruan Zhi wrong to fix one jar');
-console.log('  C the assignments: 10 checks');
+console.log('  C the assignments: 11 checks');
 
 /* ---- D · the fence: what this slice deliberately does NOT do (R116's pattern) ---- */
 /* PRESENCE checks read the RAW source; ABSENCE checks read the stripped one. strip() treats the
@@ -368,17 +395,17 @@ ok(/inp\.dispatchEvent\(new Event\('input', \{ bubbles:true \}\)\)/.test(teasRaw
    'G5 selection writes the hidden field and DISPATCHES an input event (WS1 dirty guard) — exactly acceptOriginOffer, so a backdrop tap cannot discard the choice silently');
 /* DOM-only: the three interactive functions must never call render() — the form reads fields on
    submit, so a re-render mid-edit wipes unsaved values (toggleSpecifics' constraint). */
-const pickerFns=(strip(teasRaw).match(/function (?:liquorSelect|liquorRefresh|toggleLiquorGrid)\([\s\S]*?\n\}/g)||[]).join('\n');
+const pickerFns=(strip(teasRaw).match(/function (?:liquorSelect|liquorRefresh|toggleLiquorGrid|liquorOpenFamily|leafSelect|leafToggleMottled)\([\s\S]*?\n\}/g)||[]).join('\n');
 ok(pickerFns && !/\brender\(\)/.test(pickerFns),
-   'G6 open/close and selection are DOM-only — liquorSelect/liquorRefresh/toggleLiquorGrid never call render()');
+   'G6 open/close/select/family-drill are DOM-only — liquorSelect/liquorRefresh/toggleLiquorGrid/liquorOpenFamily + leafSelect/leafToggleMottled never call render() (the form reads its fields on submit)');
 ok(/data-liquor=""[\s\S]*?onclick="liquorSelect\(''\)"/.test(teasRaw),
    "G7 CLEARING is a first-class cell — the default cell writes '' → submitTeaForm maps '' → null → tier 2 by construction (the UI wiring behind E4)");
 ok(/liquorFor\(\{ name, type, liquor: correction \}\)/.test(teasRaw) && /F2: resolution follows NAME/.test(teasRaw),
    'G8 F2 — the preview resolves via liquorFor(NAME), not the type control; type only re-tints the tier-3 fallback (build to §4.1, not board #06 rev 4)');
 ok(/\.liquor-preview\{[^}]*width:26px;height:34px/.test(cssSrc),
    'G9 preview swatch is 26x34 — the shipped .social-tile/.ref-swatch family (R121)');
-ok(/\.liquor-cell\{[^}]*width:22px;height:22px/.test(cssSrc) && !/width:40px;height:50px/.test(cssSrc),
-   "G10 grid cells are 22x22 (board #03), and #06 rev 4's 40x50 4:5 aspect is NOT adopted (R121: scale the lock, not a new aspect)");
+ok(/\.liquor-shade\{[^}]*width:44px;height:44px/.test(cssSrc) && /\.liquor-fam\{[^}]*min-height:44px/.test(cssSrc) && /\.leaf-cell\{[^}]*width:44px;height:44px/.test(cssSrc),
+   "G10 v4.45: the two-step picker's shade + family + leaf targets are 44px+ (spec 'picker': the whole reason for two steps — 25 stops in one row are ~14px, unhittable). The 22x22 flat grid is superseded");
 console.log('  G the picker + F1 guard: 11 checks');
 
 console.log('');

@@ -58,6 +58,38 @@
   --liquor-mahogany:#7E3B26;    /* hong cha — the whole red-tea family */
   --liquor-sepia:#5A3122;       /* hei cha */
   --liquor-near-black:#2E1C14;  /* shou pu-erh */
+  /* v4.45 (SPEC-colour-system.md) — the ramp grows 12 -> 25 in six PICKER families. The 12 above
+     stay FROZEN in place (keys + hexes, set by taste, shipped). These 13 are NEW and PROVISIONAL:
+     validated against a real cup on device, may be re-tuned or DROPPED (a dropped stop collapses
+     into its neighbour). Keys not hexes — a re-tune never rewrites a stored tea/tasting. Grouped
+     by family below for reading; LIQUOR_KEYS (steep-tea-types.js) owns the flat ramp order. */
+  --liquor-clear:#F7F4EA;       /* Barely there — a first rinse, near-colourless */
+  --liquor-oat:#E9DEC4;         /* Barely there */
+  --liquor-pale-grey:#E5E2D6;   /* Barely there */
+  --liquor-pale-green:#C6D68F;  /* Green */
+  --liquor-grey-green:#9DAE7B;  /* Green */
+  --liquor-leaf-green:#85A548;  /* Green */
+  --liquor-deep-green:#6B8A3A;  /* Green */
+  --liquor-green-gold:#DCCB72;  /* Yellow and gold — a greenish gold */
+  --liquor-apricot:#E0A45F;     /* Amber and orange */
+  --liquor-rust:#C0632F;        /* Red and brown */
+  --liquor-brick:#A94A2B;       /* Red and brown */
+  --liquor-garnet:#85302A;      /* Red and brown */
+  --liquor-coffee:#40241A;      /* Dark */
+  /* Leaf-appearance ramp (v4.45) — NET-NEW, flat 9 colours (a dry-leaf reading, consumed by the
+     tasting rooms in c1). Matte, and darker than liquor at the same name (leaf amber #8F5C2A vs
+     liquor amber #C99447) — a SEPARATE token set, never merged with --liquor-* even where the key
+     string collides. `mottled` is a MODIFIER, not a hue: it has no token (rendered as a split
+     swatch over the dominant stop). All provisional, validated on real leaf. */
+  --leaf-silver-down:#D8D6C4;
+  --leaf-jade:#7E9A55;
+  --leaf-olive:#6B7340;
+  --leaf-deep-green:#3F4B2A;
+  --leaf-golden:#B98A3C;
+  --leaf-amber:#8F5C2A;
+  --leaf-chestnut:#6B3B22;
+  --leaf-dark-brown:#43291B;
+  --leaf-near-black:#241812;
   /* --greeting-eye / --greeting-body DELETED in v4.10: both were tuned as green-ink FOR the
      jade-pale greeting card, and R114 put the masthead on bare ground. A token kept after its
      ground is gone is a colour waiting to be reused for the wrong reason. */
@@ -115,6 +147,31 @@ html[data-theme="dark"]{
   --liquor-mahogany:#96503A;
   --liquor-sepia:#7A4A36;
   --liquor-near-black:#4A3125;
+  /* v4.45 — 13 new liquor stops (dark), the 12 above FROZEN; see the light block. Lifted, not
+     inverted, so the ramp's order survives the theme. Provisional, validated on device. */
+  --liquor-clear:#F6F2E6;
+  --liquor-oat:#E2D6BC;
+  --liquor-pale-grey:#DCD9CB;
+  --liquor-pale-green:#CFDD9C;
+  --liquor-grey-green:#A9B98A;
+  --liquor-leaf-green:#93B159;
+  --liquor-deep-green:#7B9A4A;
+  --liquor-green-gold:#D3C069;
+  --liquor-apricot:#E4AE70;
+  --liquor-rust:#CB7442;
+  --liquor-brick:#B85C3D;
+  --liquor-garnet:#8E3A34;
+  --liquor-coffee:#5F3A2A;
+  /* Leaf ramp (dark) — NET-NEW, matte, separate token set. See the light block. */
+  --leaf-silver-down:#CFCDBB;
+  --leaf-jade:#8CA863;
+  --leaf-olive:#79814E;
+  --leaf-deep-green:#4D5938;
+  --leaf-golden:#C5964A;
+  --leaf-amber:#9D6A38;
+  --leaf-chestnut:#7A4A30;
+  --leaf-dark-brown:#523829;
+  --leaf-near-black:#33251E;
   --clay:#C99872;
   --line:#332F24;
   --white:#1C1A14;
@@ -1347,9 +1404,32 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .liquor-row-txt{display:flex;flex-direction:column;gap:1px;min-width:0;}
 .liquor-source{font-size:12px;color:var(--ink-soft);}
 .liquor-open{align-self:flex-start;background:none;border:none;padding:0;font-family:inherit;font-size:12px;color:var(--jade-deep);cursor:pointer;}
-.liquor-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
-.liquor-cell{width:22px;height:22px;padding:0;flex:none;border-radius:6px 3px 5px 3px;border:1px solid var(--line);background:var(--porcelain-dim);cursor:pointer;}
-.liquor-cell[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px;}
+/* v4.45 (SPEC-colour-system.md) — the picker is a TWO-STEP drill-down now the ramp is 25 stops: a
+   default/clear shade, then six family rows. One family opens at a time (.is-open, toggled by
+   liquorOpenFamily — DOM-only, never render()); the others stay visible as their mini strip so the
+   neighbourhood reads before committing. Shade targets are 44px+ — the whole reason for two steps
+   (25 stops in one row are ~14px, unhittable). The 22x22 flat grid is superseded (spec "picker").
+   Colours come from the theme-aware --liquor-*/--leaf-* tokens; the tier-3 preview + default cell
+   still borrow the .t-<type> tint (no colour hardcoded here). */
+.liquor-grid{margin-top:10px;}
+.liquor-defrow{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.liquor-fams{display:flex;flex-direction:column;gap:6px;}
+.liquor-fam{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:5px 8px;background:var(--porcelain-dim);border:1px solid var(--line);border-radius:9px 4px 8px 4px;cursor:pointer;font-family:inherit;text-align:left;}
+.liquor-fam[aria-expanded="true"]{border-color:var(--ink-soft);}
+.liquor-fam-name{flex:none;font-size:12.5px;color:var(--ink);min-width:92px;}
+.liquor-fam-strip{display:flex;gap:2px;flex-wrap:wrap;}
+.liquor-fam-strip span{width:15px;height:20px;flex:none;border-radius:3px;border:1px solid var(--line);}
+.liquor-shades{display:none;flex-wrap:wrap;gap:8px;padding:8px 2px 2px;}
+.liquor-fam-group.is-open .liquor-shades{display:flex;}
+.liquor-shade{width:44px;height:44px;padding:0;flex:none;border-radius:9px 4px 8px 4px;border:1px solid var(--line);background:var(--porcelain-dim);cursor:pointer;}
+.liquor-shade[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px;}
+/* Leaf flat strip (v4.45) — nine 44px colour cells + a mottled split-swatch modifier, no family
+   step (nine well-separated colours). Consumed by c1's dry-leaf room; the control ships here. */
+.leaf-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.leaf-cell{width:44px;height:44px;padding:0;flex:none;border-radius:9px 4px 8px 4px;border:1px solid var(--line);background:var(--porcelain-dim);cursor:pointer;}
+.leaf-cell[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px;}
+/* mottled = variegation, not a hue: a split swatch, two representative leaf tones on the diagonal. */
+.leaf-cell.is-mottled{background:linear-gradient(135deg,var(--leaf-olive) 0 50%,var(--leaf-golden) 50% 100%);}
 .pass-card{border:1px solid var(--line);border-radius:13px;background:var(--porcelain-dim);padding:12px;margin-top:10px;}
 .pass-deeper{display:block;padding:4px 0 0;font-family:var(--font-mono);font-size:10px;color:var(--jade-deep);text-decoration:underline;}
 .pass-add{flex:none;font-size:12px;padding:6px 10px;}

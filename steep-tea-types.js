@@ -124,9 +124,30 @@ function matchTeaType(name){
    An UNKNOWN key degrades rather than breaks: `LIQUOR_KEYS` is the palette's membership set, so a
    value from a future ramp, a typo, or a hand-edited row falls through to the catalog answer instead
    of rendering `var(--liquor-nonsense)` as nothing. That is why the column stores a key and not a hex. */
-var LIQUOR_KEYS = ['jade-pale','straw','ivory','yellow-pale','gold-pale','gold','amber',
-                   'amber-deep','copper','mahogany','sepia','near-black'];
+// v4.45 (SPEC-colour-system.md) — the ramp grows 12 -> 25 stops in six PICKER families. Families are
+// a picker GROUPING only; LIQUOR_KEYS stays the one flat ordered ramp (membership + the clock's ramp
+// order). The 12 originals are FROZEN (keys + hexes, set by taste); the 13 new are PROVISIONAL,
+// validated live on a real cup (may retune/drop). Keys not hexes: a retune never rewrites user data.
+// Q2 (ruled): the type cascade stays COARSE — the new stops are tier-1-only, the catalog is NOT
+// re-authored, so liquorFor below is unchanged and its tier-2 answers remain the original 12.
+var LIQUOR_FAMILIES = [
+  { key:'barely', name:'Barely there',    keys:['clear','ivory','oat','pale-grey'] },
+  { key:'green',  name:'Green',           keys:['straw','pale-green','jade-pale','grey-green','leaf-green','deep-green'] },
+  { key:'gold',   name:'Yellow and gold', keys:['yellow-pale','gold-pale','green-gold','gold'] },
+  { key:'amber',  name:'Amber and orange',keys:['apricot','amber','amber-deep','copper'] },
+  { key:'red',    name:'Red and brown',   keys:['rust','brick','garnet','mahogany'] },
+  { key:'dark',   name:'Dark',            keys:['sepia','coffee','near-black'] }
+];
+var LIQUOR_KEYS = LIQUOR_FAMILIES.reduce(function(a,f){ return a.concat(f.keys); }, []); // 25, flat ramp order
 function isLiquorKey(k){ return LIQUOR_KEYS.indexOf(k) !== -1; }
+// The picker family a key sits in (Q5: the family LABEL is DERIVED from the key, never stored).
+function liquorFamilyOf(k){ for(var i=0;i<LIQUOR_FAMILIES.length;i++){ if(LIQUOR_FAMILIES[i].keys.indexOf(k)>=0) return LIQUOR_FAMILIES[i]; } return null; }
+// Leaf-appearance ramp (v4.45) — NET-NEW, flat, PER-OBSERVATION (a dry-leaf reading in a tasting),
+// never a cascade like liquorFor. Nine colours; `mottled` is a MODIFIER (variegation, not a hue) with
+// no token, so it is NOT a LEAF_KEYS member. SEPARATE token set from --liquor-* — never merged, even
+// where a key string collides (leaf `deep-green` != liquor `deep-green`). Consumed by c1's dry leaf.
+var LEAF_KEYS = ['silver-down','jade','olive','deep-green','golden','amber','chestnut','dark-brown','near-black'];
+function isLeafKey(k){ return LEAF_KEYS.indexOf(k) !== -1; }
 function liquorFor(tea){
   if(!tea) return null;
   if(isLiquorKey(tea.liquor)) return tea.liquor;                 // tier 1 — the user's own correction
