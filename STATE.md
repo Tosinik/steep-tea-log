@@ -250,7 +250,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.45 STAGED `dd236ab` — colour system: 25-stop liquor ramp + net-new leaf ramp (R187)**
+**NOW — v4.45 LIVE `dd236ab` — colour system: 25-stop liquor ramp + net-new leaf ramp (R187)**
 (cache **v155**, APP_VERSION v4.45, **no SQL**, **no new module**). Step 1 of guided tasting mode (D4):
 the colour-ramp **pre-slice**, shipped ALONE and FIRST. Authority `docs/r5/planning/SPEC-colour-system.md`
 (pushed docs-only, `3930afc`).
@@ -266,15 +266,17 @@ the colour-ramp **pre-slice**, shipped ALONE and FIRST. Authority `docs/r5/plann
 - **Tests:** liquor-test §A rewritten — 25 stops, A3 GLOBAL ΔE (Lab) min-distance both themes (min 4.91
   light / 5.98 dark), A4 retired (families break monotonicity), A3b endpoint-aware, leaf asserted; C3 split
   for Q2; G10 → 44px. 89 checks; 41 suites green; frame-test 46 unchanged.
-- **ON DEVICE (`smoke.md §v4.45`, POST-PUSH — this IS the hex validation, Q1):** the 25 liquor swatches
-  read as a coherent ramp on a real cup; the two-step picker taps (families open one at a time, 44px);
-  **does `clear` read distinct from the tier-3 dashed plate, or collapse it into `ivory`?**; leaf ramp
-  against real leaf when c1 lands. The 12 originals are FROZEN; the 13 new may retune/drop (keys-not-hexes
-  = no data migration).
-- **STAGED:** code `dd236ab` + docs committed, UNPUSHED. Awaiting Niklas's push, then the phone-look +
-  Planning's clone-verify, then the STAGED→LIVE flip.
-- **NEXT — guided mode c1:** the `tasting_record` jsonb migration (alone and FIRST), then the c1 spine
-  (both entry doors, the two registers, the reuse-existing stages, JSON storage, the verdict close).
+- **ON DEVICE (`smoke.md §v4.45`) — VERIFIED + SIGNED OFF:** the ramp reads on a real cup, the two-step
+  picker taps, both themes hold. **Hex fine-tuning (incl. the `clear` vs `ivory` call) is a separate
+  WHENEVER task, NOT a blocker** — keys-not-hexes means any retune or drop is an independent token edit.
+  The 12 originals stay FROZEN.
+- **LIVE:** code `dd236ab` + docs `cda7305` pushed; Niklas's phone-look (ramp verified on a real cup,
+  signed off) + Planning's clone-verify (lockstep v155/v4.45, 12 originals byte-exact, leaf ramp in,
+  em-dash sweep clean) passed → flipped STAGED→LIVE.
+- **NEXT — guided mode c1 (building):** the `tasting_record` jsonb migration shipped as
+  `sql/v3_13-tasting-record.sql`, push-first and ALONE (ritual step 0). **Niklas applies it in Supabase,
+  THEN the c1 spine code lands** (both entry doors, the two registers, the reuse-existing stages, JSON
+  storage, the verdict close; `SPEC-guided-mode-FINAL.md` §11).
 
 **Previously — v4.44 LIVE `a390f06` — photo field opens a source sheet (R186)**
 (cache **v154**, APP_VERSION v4.44, **no SQL**, **no new module**). Fixes the v4.43 photo control.
