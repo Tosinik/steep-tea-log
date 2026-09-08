@@ -312,7 +312,7 @@ FILES_SCANNED.forEach(f=>{
   painted += (src.match(/swatchAttr\(/g)||[]).length;
 });
 ok(tinted===10, 'F1 TEN type-tint writes across the seven files (was 12 — R178 removed the sessions-list thumb placeholders .sess-thumb.shelf-ph/.shelf-kanji, now the photo/liquor-swatch lead): the v4.19 picker two + seven labels/placeholders/chart + the R172 palate-families dot-<type> bar; steep-shopping.js adds none (got '+tinted+')');
-ok(painted===13, 'F2 …and exactly THIRTEEN swatchAttr call sites paint a liquor now — the twelve prior (six warm Home R159 + the Insights note R170 + the three R171 marks + the R177 .td-swatch + the R174 .tot-arr-swatch) plus R178 .sess-swatch (the sessions-list lead liquor fallback). The colour-clock bars and the Teas-brewed strip paint via var(--liquor-*) directly, not swatchAttr, so they stay outside this count (got '+painted+')');
+ok(painted===14, 'F2 …and exactly FOURTEEN swatchAttr call sites paint a liquor now — the thirteen prior (six warm Home R159 + the Insights note R170 + the three R171 marks + the R177 .td-swatch + the R174 .tot-arr-swatch + the R178 .sess-swatch) plus the c1 tasting-record .sd-swatch (viewTastingRecord — a tasting opens to its rich read and paints the tea\'s liquor, like session detail). The colour-clock bars and the Teas-brewed strip paint via var(--liquor-*) directly, not swatchAttr, so they stay outside this count (got '+painted+')');
 /* The regression this scan exists to prevent: a type LABEL taking a liquor. The pill says "Oolong";
    colouring it by what the tea pours is a category error, and it would look deliberate. */
 const teasSrc=strip(fs.readFileSync(path.join(repo,'steep-teas.js'),'utf8'));
@@ -395,11 +395,11 @@ ok(/inp\.dispatchEvent\(new Event\('input', \{ bubbles:true \}\)\)/.test(teasRaw
    'G5 selection writes the hidden field and DISPATCHES an input event (WS1 dirty guard) — exactly acceptOriginOffer, so a backdrop tap cannot discard the choice silently');
 /* DOM-only: the three interactive functions must never call render() — the form reads fields on
    submit, so a re-render mid-edit wipes unsaved values (toggleSpecifics' constraint). */
-const pickerFns=(strip(teasRaw).match(/function (?:liquorSelect|liquorRefresh|toggleLiquorGrid|liquorOpenFamily|leafSelect|leafToggleMottled)\([\s\S]*?\n\}/g)||[]).join('\n');
+const pickerFns=(strip(teasRaw).match(/function (?:liquorSelect|liquorRefresh|toggleLiquorGrid|liquorOpenFamily)\([\s\S]*?\n\}/g)||[]).join('\n');
 ok(pickerFns && !/\brender\(\)/.test(pickerFns),
-   'G6 open/close/select/family-drill are DOM-only — liquorSelect/liquorRefresh/toggleLiquorGrid/liquorOpenFamily + leafSelect/leafToggleMottled never call render() (the form reads its fields on submit)');
-ok(/data-liquor=""[\s\S]*?onclick="liquorSelect\(''\)"/.test(teasRaw),
-   "G7 CLEARING is a first-class cell — the default cell writes '' → submitTeaForm maps '' → null → tier 2 by construction (the UI wiring behind E4)");
+   'G6 the TEA-FORM picker is DOM-only — liquorSelect/liquorRefresh/toggleLiquorGrid/liquorOpenFamily never call render() (the form reads its fields on submit, so a re-render mid-edit wipes them). c1 wired leafGridCells to render-based tasting handlers (tastingSetLeaf/tastingToggleMottled), which is correct there — a tasting has no uncommitted form to wipe.');
+ok(/data-liquor=""[\s\S]*?onclick="liquorSelect\(''\)"/.test(G("liquorGridCells({name:'x',type:'green'})")),
+   "G7 CLEARING is a first-class cell — the RENDERED default cell calls liquorSelect('') (onSelect defaults to liquorSelect for the tea form; c1's tasting picker passes 'tastingSetLiquor'); '' → submitTeaForm maps to null → tier 2, the UI wiring behind E4");
 ok(/liquorFor\(\{ name, type, liquor: correction \}\)/.test(teasRaw) && /F2: resolution follows NAME/.test(teasRaw),
    'G8 F2 — the preview resolves via liquorFor(NAME), not the type control; type only re-tints the tier-3 fallback (build to §4.1, not board #06 rev 4)');
 ok(/\.liquor-preview\{[^}]*width:26px;height:34px/.test(cssSrc),

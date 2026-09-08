@@ -53,7 +53,7 @@ function sessionRowHTML(s){
     ${sessLeadHTML(s, tea)}
     <div class="sess-main">
       <div class="sess-top">${teaName}${s.rating?renderStarsStatic(s.rating,false):''}</div>
-      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}${all.length?'':' · no notes'}</div>
+      <div class="sess-sub">${fmtDateTime(s.date)} · ${v?escapeHtml(v.name):'—'} · ${brewCountLabel(s)}${s.isColdBrew?' · cold brew':''}${s.tastingRecord?' · tasting':''}${all.length?'':' · no notes'}</div>
       ${all.length?`<div class="sess-tags">${chips}</div>`:''}
     </div>
     <span class="sess-chev">›</span>
@@ -374,6 +374,7 @@ function sessionSteepRowHTML(st, i){
 function viewSessionDetail(){
   const s = state.sessions.find(x=>x.id===state.activeSessionId);
   if(!s) return '<div class="empty">Sitting not found.</div>';
+  if(s.tastingRecord) return viewTastingRecord(s);   // c1: a tasting opens to its rich Tier-2 read, not the plain session view
   const tea = teaById(s.teaId), ves = vesselById(s.vesselId);
   const method = sessionMethodLabel(s);
   const ident = [tea?typeLabel(tea.type):'', method,
@@ -567,6 +568,7 @@ function draftForPersist(draft, draftImage){
 }
 function sessionDraftDirty(d){
   if(!d) return false;
+  if(d.isTasting) return true;                            // c1: a tasting is always worth keeping (keep the partial) — Home offers to resume it
   if(d.stage!=='setup') return true;                     // steeping/finish/quick carry logged work
   return !!d._pristine && draftFingerprint(d)!==d._pristine;
 }
@@ -673,7 +675,8 @@ function clearTimerInterval(){
 function viewSessionFlow(){
   const d = state.sessionDraft;
   if(!d) return '<div class="empty">No active session.</div>';
-  if(d.stage==='setup') return sessionSetupHTML(d);
+  if(d.isTasting && d.stage==='tasting') return tastingRoomHTML(d);   // c1: the guided-tasting walk
+  if(d.stage==='setup') return d.isTasting ? tastingSetupHTML(d) : sessionSetupHTML(d);
   if(d.stage==='steeping') return sessionSteepingHTML(d);
   if(d.stage==='finish') return sessionFinishHTML(d);
   if(d.stage==='quick') return sessionQuickHTML(d);
@@ -853,6 +856,7 @@ function sessionSetupHTML(d){
       <button class="btn btn-primary begin-btn" onclick="beginSteeping()">Begin steeping</button>
       <button class="btn" style="margin-top:8px;width:100%;" onclick="beginQuickLog()">Quick log — just infusions & notes</button>
     `}
+    ${!d.isColdBrew && d.teaId ? `<button class="tst-setup-link" onclick="d_convertToTasting()">&hellip;or taste this tea properly</button>` : ''}
   `;
 }
 // WS1: the session method segment — senchadō added v3.91 (a data change, no layout rebuild). Gongfu
@@ -1208,9 +1212,24 @@ function scheduleStripHTML(d){
 // subsumed). Never a modal, never required; the stored word is the word as written, membership resolves.
 const FLAV_STRIP = ['sweet','umami','crisp']; // taste & structure (Design's proposal) — NOT astringent/bitter (the pour-feedback nudge owns those); creamy lives in Milky only.
 function flavorFamilies(){ return [...new Set(FLAVOR_TREE.map(n=>n.f))]; } // 12, in tree order
+// c1 (guided mode): the tagger's target array. Default is the session's tags (D2, unchanged); a tasting
+// room sets d.flavCtx so the SAME tagger writes that stage's aroma array in the blob instead. This is how
+// the aroma capture is scoped per stage (dry/wet/liquor/taste) without three stores muddying the profile:
+// only the CUP stages (liquorAroma + taste) are folded into session.tags at commit (commitTasting).
+function flavArrayFor(d){
+  const c = d && d.flavCtx, t = d && d.tasting;
+  if(c && t){
+    if(c==='dryLeaf')     return t.dryLeaf.aroma;
+    if(c==='wetLeaf')     return t.wetLeaf.aromaShift;
+    if(c==='liquorAroma') return t.liquor.aroma;
+    if(c==='taste')       return t.taste.notes;
+  }
+  if(!d.sessionTags) d.sessionTags = [];
+  return d.sessionTags;
+}
 function flavFamilyPanelHTML(d){
   const fam = d.flavFam; const nodes = FLAVOR_TREE.filter(n=>n.f===fam);
-  const sel = (d.sessionTags||[]).map(t=>String(t).toLowerCase());
+  const sel = flavArrayFor(d).map(t=>String(t).toLowerCase());
   const chip = t => `<button type="button" class="flav-chip${sel.includes(String(t).toLowerCase())?' on':''}" onclick="toggleSessionFlavor('${escapeJsArg(t)}')">${escapeHtml(flavorLabel(t))}</button>`;
   const rows=[];
   // (1) this tea's own noted profile within the family (relabelled from "Typical for X"; the catalog row is a later fast-follow)
@@ -1228,15 +1247,16 @@ function flavFamilyPanelHTML(d){
   return `<div class="flav-panel">${rows.join('')}</div>`;
 }
 function flavorCaptureHTML(d){
-  const sel = (d.sessionTags||[]).map(t=>String(t).toLowerCase());
+  const _fa = flavArrayFor(d);
+  const sel = _fa.map(t=>String(t).toLowerCase());
   const chip = t => `<button type="button" class="flav-chip${sel.includes(String(t).toLowerCase())?' on':''}" onclick="toggleSessionFlavor('${escapeJsArg(t)}')">${escapeHtml(flavorLabel(t))}</button>`;
   // What you've chosen so far — every picked word visible + removable (the honest floor: nothing stranded
   // when a family is collapsed, and a word the tree can't place stays here bare rather than force-fit).
-  const chosen = (d.sessionTags||[]).length ? `<div class="flav-freesel">${d.sessionTags.map(t=>`<span class="flav-chip on">${escapeHtml(flavorLabel(t))} <button onclick="removeSessionTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : '';
+  const chosen = _fa.length ? `<div class="flav-freesel">${_fa.map(t=>`<span class="flav-chip on">${escapeHtml(flavorLabel(t))} <button onclick="removeSessionTag('${escapeJsArg(t)}')" aria-label="remove ${escapeHtml(t)}">✕</button></span>`).join('')}</div>` : '';
   const strip = `<div class="flav-strip">${FLAV_STRIP.map(chip).join('')}</div>`;
   const fams = `<div class="flav-fams">${flavorFamilies().map(f=>`<button type="button" class="flav-fam-chip${d.flavFam===f?' open':''}" onclick="d_flavFam('${escapeJsArg(f)}')">${escapeHtml(f)}</button>`).join('')}</div>`;
   const freeDoor = d.flavorFreeOpen
-    ? `<div class="tag-input-wrap"><input type="text" id="tagInputField" data-target="session" enterkeyhint="done" placeholder="your own word, press Enter…"><div id="tagSuggestBox"></div></div>`
+    ? `<div class="tag-input-wrap"><input type="text" id="tagInputField" data-target="${d.flavCtx?'flav':'session'}" enterkeyhint="done" placeholder="your own word, press Enter…"><div id="tagSuggestBox"></div></div>`
     : `<button type="button" class="flav-door" onclick="d_flavorFreeOpen()">${icon('i-plus-hl',18)}<span>your own word</span></button>`;
   return `
     <div class="flav-capture">
@@ -1260,9 +1280,9 @@ function toggleFlavor(term){
 function toggleSessionFlavor(term){
   const d = state.sessionDraft; if(!d) return;
   term = String(term).toLowerCase();
-  if(!d.sessionTags) d.sessionTags=[];
-  const i = d.sessionTags.findIndex(t=>String(t).toLowerCase()===term);
-  if(i>=0) d.sessionTags.splice(i,1); else d.sessionTags.push(term);
+  const arr = flavArrayFor(d);                    // d.sessionTags by default; a tasting stage's aroma when d.flavCtx is set
+  const i = arr.findIndex(t=>String(t).toLowerCase()===term);
+  if(i>=0) arr.splice(i,1); else arr.push(term);
   render();
 }
 function d_flavFam(fam){ const d=state.sessionDraft; if(d){ d.flavFam = d.flavFam===fam ? null : fam; render(); } } // tap a family → expand its notes in place
@@ -1570,6 +1590,7 @@ function addTagFromInput(target, refocus){
 function tagListFor(target){
   if(target==='steep') return state.sessionDraft.curSteepTags;
   if(target==='session') return state.sessionDraft.sessionTags;
+  if(target==='flav') return flavArrayFor(state.sessionDraft);   // c1: the tasting free-word door, routed to the active stage's aroma array
   if(target==='edit') return state.editingSession.tags;
   return [];
 }
@@ -1594,8 +1615,9 @@ function removeCurTag(tag){
   render();
 }
 function removeSessionTag(tag){
-  const d = state.sessionDraft;
-  d.sessionTags = d.sessionTags.filter(t=>t!==tag);
+  const d = state.sessionDraft; const arr = flavArrayFor(d);   // mutate in place — a stage array is a ref into the blob, so reassigning would orphan it
+  const i = arr.findIndex(t=>String(t).toLowerCase()===String(tag).toLowerCase());
+  if(i>=0) arr.splice(i,1);
   render();
 }
 function removeEditTag(tag){
@@ -1776,5 +1798,284 @@ async function commitSession(){
       showToast('Session saved. Your photo needs a connection — add it later by editing the session.');
     }
   } finally { _sessionSaving = false; }
+}
+
+/* ============================================================================
+   TEA TASTING MODE (guided mode, D4 — slice c1). A SESSION VARIANT: an opt-in,
+   abandonable walk from a first door to a verdict, storing a Tier-2 tasting_record
+   blob (present ONLY on tastings; its presence is the flag). Reuses the shipped
+   FLAVOR_TREE tagger (per stage via d.flavCtx), the two-step liquor picker, and the
+   leaf ramp picker. Every capture writes d.tasting live + render() (notes bound on
+   input), so a re-render never strands a capture and the draft persists as usual.
+   The fleshed new axes (umami/astringency/palate/finish detail), the AUTHORED §6
+   walkthrough copy, the glossary and the tradition lens are c2; the per-steep
+   evolution loop is c3, so a c1 tasting is steepless.
+   ============================================================================ */
+
+// Dry-leaf FORM (SPEC §4): a NEW observational vocabulary, multi-select (one leaf can be twisted AND
+// wiry). NOT the stored leaf_form (a brew-curve classification, a different layer).
+const DRY_LEAF_FORMS = ['needle','twisted','rolled','curled','flat','wiry','broken','downy'];
+const DRY_LEAF_FORM_LABELS = { needle:'Needle', twisted:'Twisted', rolled:'Rolled / balled', curled:'Curled', flat:'Flat / open', wiry:'Wiry', broken:'Broken', downy:'Downy' };
+function leafFormLabel(f){ return DRY_LEAF_FORM_LABELS[f] || f; }
+// The walk. Each room: key + expert label + a short GUIDE cue (the authored §6 copy + the glossary and
+// the tradition lens land in c2 — c1 ships the register MECHANISM with brief functional cues).
+const TASTING_ROOMS = [
+  { key:'dryLeaf',     label:'Dry leaf',      cue:'Look at the dry leaves and give them a smell.' },
+  { key:'wetLeaf',     label:'Warmed leaf',   cue:'After the first pour, smell the hot leaves. What shifted?' },
+  { key:'liquor',      label:'Liquor colour', cue:'Hold the cup to the light. What colour, and how deep?' },
+  { key:'liquorAroma', label:'Aroma',         cue:'Bring the cup to your nose. What do you smell now?' },
+  { key:'taste',       label:'Taste',         cue:'Take a bold sip, like soup, so it coats the mouth.' },
+  { key:'mouthfeel',   label:'Mouthfeel',     cue:'Forget flavour a moment. How does it feel in the mouth?' },
+  { key:'finish',      label:'Finish',        cue:'Swallow, then wait. What comes back, and how long does it linger?' },
+  { key:'verdict',     label:'Your verdict',  cue:'So, is this one to your liking?' }
+];
+const TASTING_SCHEMA_V = 1;   // stamped on the blob; a restored draft with a different v is handled, not crashed
+const TASTING_FLAV_ROOMS = ['dryLeaf','wetLeaf','liquorAroma','taste'];   // rooms whose aroma tagger writes a stage array
+// Tier-1 profile feed: ONLY the CUP stages (liquor aroma + taste notes), deduped + lowercased → the
+// session's tags. The dry/wet-leaf aroma stay blob-only (leaf observations, a different layer) so the
+// three aroma stages never triple-count or contaminate the tea's TASTE profile. This is how the aroma
+// tagger is scoped across its stages (the c1 build question). Pure, so the fixture pins it directly.
+function tastingProfileTags(blob){
+  const liq = (blob && blob.liquor && blob.liquor.aroma) || [];
+  const tas = (blob && blob.taste && blob.taste.notes) || [];
+  return [...new Set([...liq, ...tas].map(t=>String(t).toLowerCase()))];
+}
+function newTastingBlob(){
+  return { v:TASTING_SCHEMA_V, register:null, startedAt:new Date().toISOString(), endedEarly:false,
+    dryLeaf:{ form:[], colour:null, mottled:false, aroma:[], note:'' },
+    wetLeaf:{ aromaShift:[], note:'' },
+    liquor:{ colour:null, aroma:[], note:'' },
+    taste:{ notes:[], note:'' },
+    mouthfeel:{ note:'' },
+    finish:{ note:'' },
+    verdict:{ liked:'', teaRatingOffered:false } };
+}
+// Entry — reuses startSessionFor's draft (tea/vessel/grams/method/date, and its vessel guard), then flags
+// it a tasting and attaches a fresh blob. Stays on stage 'setup' until a register is chosen and begun.
+function startTastingFor(teaId){
+  startSessionFor(teaId);
+  const d = state.sessionDraft; if(!d) return;   // startSessionFor bailed (no vessels) — its toast already fired
+  d.isTasting = true; d.register = null; d.tasting = newTastingBlob(); d.tastingRoom = 0;
+  d.flavFam = null; d.flavorFreeOpen = false; d.flavCtx = null;
+  d._offerTeaRatingOn = false; d._offerTeaRating = null;
+  render();
+}
+function d_setRegister(r){ const d=state.sessionDraft; if(d){ d.register=r; if(d.tasting) d.tasting.register=r; render(); } }
+function d_tastingBegin(){
+  const d=state.sessionDraft; if(!d||!d.isTasting) return;
+  if(!d.teaId){ showToast('Pick a tea first — a tasting needs a tea.'); return; }
+  if(!d.register){ showToast('Choose how you would like to taste first.'); return; }
+  d.stage='tasting'; d.tastingRoom=0; d.flavFam=null; d.flavorFreeOpen=false; render();
+}
+function d_tastingLeave(){ const d=state.sessionDraft; if(d) d.flavCtx=null; state.view='dashboard'; render(); }  // keep the partial; Home offers resume
+function d_resumeTasting(){ if(state.sessionDraft && state.sessionDraft.isTasting){ state.view='session'; render(); } }
+// Secondary entry (SPEC §2): convert the current setup-stage session draft into a tasting IN PLACE, so
+// the tea/vessel/method already chosen carry over (no rebuild). viewSessionFlow then routes setup -> tastingSetupHTML.
+function d_convertToTasting(){
+  const d=state.sessionDraft; if(!d) return;
+  d.isTasting=true; d.isColdBrew=false; d.register=null; d.tasting=newTastingBlob(); d.tastingRoom=0;
+  d.flavFam=null; d.flavorFreeOpen=false; d.flavCtx=null; d._offerTeaRatingOn=false; d._offerTeaRating=null;
+  render();
+}
+
+/* ---- the setup card: tea + vessel + method (reused) + the register choice, then begin ---- */
+function tastingSetupHTML(d){
+  d.flavCtx=null;
+  const tea=teaById(d.teaId), selVesName=(vesselById(d.vesselId)||{}).name, ves=vesselById(d.vesselId);
+  const cap=(ves||{}).capacityMl||null;
+  const methodLanes = methodLanesHTML({ brewStyle:d.brewStyle, isColdBrew:false, capacityMl:cap, resolve:true, onMethod:'d_pickMethodLane', onCold:'d_pickColdLane()', small:true });
+  const caret = `<span class="trio-caret">${icon('i-caret-hl',20)}</span>`;
+  const reg = (k,title,sub)=>`<button type="button" class="tst-reg${d.register===k?' on':''}" onclick="d_setRegister('${k}')"><span class="tst-reg-t">${escapeHtml(title)}</span><span class="tst-reg-s">${escapeHtml(sub)}</span></button>`;
+  return `
+    <button class="detail-back" onclick="armConfirm(this,'Discard this tasting?',()=>cancelSession())">✕ Cancel tasting</button>
+    <h2 style="margin:2px 0 4px;">Taste a tea properly</h2>
+    <div class="eyebrow" style="margin-bottom:14px;">A slower sitting: attend to each step, end with your own verdict.</div>
+    <div class="trio-card">
+      <div class="trio-row">
+        <div class="trio-eyebrow">Tea</div>
+        <div class="trio-line trio-picker-field" role="button" tabindex="0" onclick="openPicker('draft-tea','session')" aria-label="Choose a tea"><span class="trio-value${d.teaId?'':' trio-placeholder'}">${d.teaId?escapeHtml((tea&&tea.name)||'(unknown tea)'):'Which tea?'}</span>${caret}</div>
+      </div>
+      <div class="trio-row">
+        <div class="trio-eyebrow">Vessel <span class="trio-optional">optional</span></div>
+        <div class="trio-line trio-picker-field" role="button" tabindex="0" onclick="openPicker('draft-vessel','session')" aria-label="Choose a vessel"><span class="trio-value${d.vesselId?'':' trio-placeholder'}">${d.vesselId?escapeHtml(selVesName||'(unknown vessel)'):'Which vessel? (optional)'}</span>${caret}</div>
+      </div>
+      <div class="trio-row trio-method-row">
+        <div class="trio-eyebrow">Method</div>
+        ${methodLanes}
+      </div>
+    </div>
+    <div class="tst-reg-row">
+      <div class="tst-label">How would you like to taste?</div>
+      <div class="tst-regs">${reg('guide','Guide me','a prompt at each step')}${reg('expert','I know what I am doing','just the fields')}</div>
+    </div>
+    ${d.teaId
+      ? `<button class="btn btn-primary begin-btn" onclick="d_tastingBegin()">Begin tasting →</button>`
+      : `<button class="btn btn-primary begin-btn" disabled>Begin tasting →</button><div class="hint" style="margin-top:6px;">Pick a tea first.</div>`}
+  `;
+}
+
+/* ---- the room walk ---- */
+function tastingRoomHTML(d){
+  const idx=d.tastingRoom||0, room=TASTING_ROOMS[idx], tea=teaById(d.teaId);
+  d.flavCtx = TASTING_FLAV_ROOMS.includes(room.key) ? room.key : null;   // scopes the reused tagger to this stage
+  const body = room.key==='dryLeaf' ? tr_dryLeaf(d,tea)
+    : room.key==='wetLeaf' ? `${flavorCaptureHTML(d)}${tr_noteField(d,'wetLeaf','What shifted? (optional)')}`
+    : room.key==='liquor' ? tr_liquorColour(d,tea)
+    : room.key==='liquorAroma' ? `${flavorCaptureHTML(d)}${tr_noteField(d,'liquor','What does it bring to mind? (optional)')}`
+    : room.key==='taste' ? `${flavorCaptureHTML(d)}${tr_noteField(d,'taste','Where do you notice it, front or back? (optional)')}`
+    : room.key==='mouthfeel' ? tr_noteField(d,'mouthfeel','Light like water or thick like broth? Any drying grip, and is it pleasant or harsh?')
+    : room.key==='finish' ? tr_noteField(d,'finish','Any returning sweetness? How long does it linger?')
+    : tr_verdict(d,tea);
+  const guide = d.register==='guide' ? `<div class="tst-cue">${escapeHtml(room.cue)}</div>` : '';
+  const isVerdict = room.key==='verdict';
+  const footer = isVerdict
+    ? `<button class="btn btn-primary" style="margin-top:16px;" onclick="commitTasting(false)">Save tasting</button>`
+    : `<div class="tst-nav"><button class="btn" onclick="d_tastingBack()">← Back</button><button class="btn btn-primary" onclick="d_tastingNext()">Continue →</button></div>`;
+  return `
+    <button class="detail-back" onclick="armConfirm(this,'Leave this tasting? Your progress is kept.',()=>d_tastingLeave())">✕ Leave</button>
+    <div class="tst-room">
+      <div class="tst-head">
+        <div class="tst-eyebrow mono">Tasting · ${idx+1} of ${TASTING_ROOMS.length}${tea?' · '+escapeHtml(tea.name):''}</div>
+        <h2 class="tst-title">${escapeHtml(room.label)}</h2>
+        ${guide}
+      </div>
+      ${body}
+      ${footer}
+      ${!isVerdict?`<button class="tst-endearly" onclick="armConfirm(this,'End the tasting here and save what you have?',()=>commitTasting(true))">End early &amp; save</button>`:''}
+    </div>`;
+}
+function tr_dryLeaf(d,tea){
+  const t=d.tasting.dryLeaf;
+  const forms = DRY_LEAF_FORMS.map(f=>`<button type="button" class="tst-chip${t.form.includes(f)?' on':''}" onclick="tastingToggleForm('${escapeJsArg(f)}')">${escapeHtml(leafFormLabel(f))}</button>`).join('');
+  return `
+    <div class="tst-field"><div class="tst-label">Form <span class="tst-opt mono">optional</span></div><div class="tst-chips">${forms}</div></div>
+    <div class="tst-field"><div class="tst-label">Colour <span class="tst-opt mono">optional</span></div><div class="leaf-grid">${leafGridCells(t.colour, t.mottled)}</div></div>
+    ${flavorCaptureHTML(d)}
+    ${tr_noteField(d,'dryLeaf','A word on the dry leaf (optional)')}`;
+}
+function tr_liquorColour(d,tea){
+  const pseudo={ name:(tea&&tea.name)||'', type:(tea&&tea.type)||'green', liquor:d.tasting.liquor.colour };
+  return `
+    <div class="tst-field"><div class="tst-label">The colour you see now <span class="tst-opt mono">optional</span></div>
+      <div class="liquor-field"><div class="liquor-grid" id="liquorGrid">${liquorGridCells(pseudo,'tastingSetLiquor')}</div></div></div>
+    ${tr_noteField(d,'liquor','Clear and bright, or cloudy? (optional)')}`;
+}
+function tr_noteField(d,key,placeholder){
+  return `<div class="tst-field"><div class="tst-label">Notes <span class="tst-opt mono">optional</span></div>
+    <textarea class="tst-note" placeholder="${escapeHtml(placeholder)}" oninput="d_tastingNote('${escapeJsArg(key)}',this.value)">${escapeHtml((d.tasting[key]&&d.tasting[key].note)||'')}</textarea></div>`;
+}
+function tr_verdict(d,tea){
+  const curRating = tea?Number(tea.rating)||0:0;
+  const offerOn = !!d._offerTeaRatingOn;
+  const offerStars = d._offerTeaRating!=null ? d._offerTeaRating : (d.sessionRating||0);
+  const offer = tea ? `
+    <div class="tst-field">
+      <label class="checkrow"><input type="checkbox" ${offerOn?'checked':''} onchange="d_tastingToggleOffer(this.checked)"> Set your overall rating for ${escapeHtml(tea.name)}${curRating?` (now ${curRating}★)`:''}</label>
+      ${offerOn?`<div style="margin-top:8px;">${renderStarsInteractive(offerStars,true,'d_tastingOfferStars')}</div>`:''}
+    </div>` : '';
+  return `
+    <div class="tst-field"><div class="tst-label">This cup</div><div id="sessRatingWrap">${renderStarsInteractive(d.sessionRating||0,true,'setTastingSessionRating')}</div></div>
+    ${offer}
+    <label class="checkrow"><input type="checkbox" ${d.wouldRebuy?'checked':''} onchange="d_tastingRebuy(this.checked)"> Would you buy this again?</label>
+    <div class="tst-field"><div class="tst-label">What did you love, what did not land? <span class="tst-opt mono">optional</span></div>
+      <textarea class="tst-note" oninput="d_tastingLiked(this.value)">${escapeHtml((d.tasting.verdict&&d.tasting.verdict.liked)||'')}</textarea></div>`;
+}
+/* ---- tasting capture handlers (all write d.tasting; render() is safe because notes bind on input) ---- */
+function d_tastingNote(key,val){ const d=state.sessionDraft; if(d&&d.tasting&&d.tasting[key]) d.tasting[key].note=val; }
+function d_tastingLiked(val){ const d=state.sessionDraft; if(d&&d.tasting&&d.tasting.verdict) d.tasting.verdict.liked=val; }
+function tastingToggleForm(f){ const d=state.sessionDraft; if(!d||!d.tasting) return; const a=d.tasting.dryLeaf.form,i=a.indexOf(f); if(i>=0)a.splice(i,1);else a.push(f); render(); }
+function tastingSetLeaf(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.dryLeaf.colour=(d.tasting.dryLeaf.colour===k)?null:k; render(); }
+function tastingToggleMottled(){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.dryLeaf.mottled=!d.tasting.dryLeaf.mottled; render(); }
+function tastingSetLiquor(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.liquor.colour=(!k||d.tasting.liquor.colour===k)?null:k; render(); }
+function setTastingSessionRating(v){ const d=state.sessionDraft; if(d){ d.sessionRating=v; render(); } }
+function d_tastingToggleOffer(on){ const d=state.sessionDraft; if(!d) return; d._offerTeaRatingOn=!!on; if(on && d._offerTeaRating==null) d._offerTeaRating=d.sessionRating||0; render(); }
+function d_tastingOfferStars(v){ const d=state.sessionDraft; if(d){ d._offerTeaRating=v; render(); } }
+function d_tastingRebuy(on){ const d=state.sessionDraft; if(d){ d.wouldRebuy=!!on; render(); } }
+/* ---- navigation (flavFam/free-word reset per room; tastingRoomHTML sets flavCtx from the room) ---- */
+function d_tastingNext(){ const d=state.sessionDraft; if(!d||!d.isTasting) return; if(d.tastingRoom<TASTING_ROOMS.length-1){ d.tastingRoom++; d.flavFam=null; d.flavorFreeOpen=false; render(); } }
+function d_tastingBack(){ const d=state.sessionDraft; if(!d||!d.isTasting) return; if(d.tastingRoom<=0){ d.stage='setup'; } else d.tastingRoom--; d.flavFam=null; d.flavorFreeOpen=false; render(); }
+/* ---- commit: builds the session + the tasting_record blob. NEVER shared (also forced in sessionToDb).
+   endedEarly saves a complete SHORTER tasting: no verdict, so no rating and no offered tea update. ---- */
+async function commitTasting(endedEarly){
+  if(_sessionSaving) return; _sessionSaving=true;
+  try{
+    const d=state.sessionDraft; if(!d||!d.isTasting) return;
+    const tea=teaById(d.teaId), ves=vesselById(d.vesselId);
+    const blob=JSON.parse(JSON.stringify(d.tasting));
+    blob.endedEarly=!!endedEarly;
+    blob.verdict.teaRatingOffered = !endedEarly && !!d._offerTeaRatingOn;
+    if(endedEarly) blob.verdict.liked='';   // no verdict room was reached
+    const cup=tastingProfileTags(blob);
+    const hadInline=!!(state._draftImage && String(state._draftImage).startsWith('data:'));
+    const photoUrl=await resolveDraftImage();
+    const photoDeferred=hadInline && photoUrl && String(photoUrl).startsWith('data:');
+    const session={
+      id:uid(), teaId:d.teaId, vesselId:d.vesselId,
+      date: d.sessionDate ? new Date(d.sessionDate).toISOString() : new Date().toISOString(),
+      isColdBrew:false, waterType:d.waterType, waterTDS:d.waterTDS?Number(d.waterTDS):null,
+      gramsUsed:d.gramsUsed?Number(d.gramsUsed):0,
+      steeps:[], rating: endedEarly?0:(d.sessionRating||0), description:'', tags:cup,
+      isShared:false, photoUrl: photoDeferred?null:(photoUrl||null),
+      infusionCount:1, feedback:null, mood:null,
+      waterMl:d.waterMl?Number(d.waterMl):null,
+      brewStyle: brewMethodFor(d.brewStyle, ves&&ves.capacityMl),
+      teaName:tea?tea.name:'', teaType:tea?tea.type:'', vesselName:ves?ves.name:'',
+      tastingRecord:blob
+    };
+    state.sessions.push(session);
+    if(tea){
+      let changed=false;
+      if(session.gramsUsed){ tea.amountGrams=Math.max(0,(Number(tea.amountGrams)||0)-session.gramsUsed); changed=true; }
+      if(!endedEarly && d._offerTeaRatingOn){ tea.rating=Number(d._offerTeaRating)||0; changed=true; }   // tea.rating: written ONLY here, via the offered close
+      if(!endedEarly && d.wouldRebuy){ tea.wouldRebuy=true; changed=true; }
+      if(changed) persistTea(tea);
+    }
+    persistSession(session);
+    state.sessionDraft=null; state._draftImage=null;
+    if(window.SteepDB && SteepDB.clearDraft) SteepDB.clearDraft();
+    state.activeTeaId=d.teaId; state.view='tea-detail';
+    syncAchievements(true); render();
+    if(photoDeferred && typeof showToast==='function') showToast('Tasting saved. Your photo needs a connection; add it later by editing the session.');
+    else if(typeof showToast==='function') showToast('Tasting saved.');
+  } finally { _sessionSaving=false; }
+}
+
+/* ---- the Tier-2 read: a tasting opens to its rich record, not the plain session view ---- */
+function tastingSwatch(kind,key){ return `<span class="tst-rec-swatch" style="background:var(--${kind}-${escapeHtml(key)});"></span>`; }
+function tastingChips(arr){ return (arr||[]).map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join(''); }
+function viewTastingRecord(s){
+  const tea=teaById(s.teaId), ves=vesselById(s.vesselId), r=s.tastingRecord||{};
+  const dl=r.dryLeaf||{}, wl=r.wetLeaf||{}, lq=r.liquor||{}, ta=r.taste||{}, mf=r.mouthfeel||{}, fi=r.finish||{}, vd=r.verdict||{};
+  const sec=(title,inner)=> inner ? `<div class="sd-sec tst-rec-sec"><div class="eyebrow rule-head">${escapeHtml(title)}</div>${inner}</div>` : '';
+  const noteP = n => n ? `<p class="tst-rec-note">${escapeHtml(n)}</p>` : '';
+  const chipsRow = (label,arr)=> (arr&&arr.length) ? `<div class="tst-rec-row"><span class="tst-rec-k mono">${escapeHtml(label)}</span><span class="tst-rec-chips">${tastingChips(arr)}</span></div>` : '';
+  const formRow = (dl.form&&dl.form.length) ? `<div class="tst-rec-row"><span class="tst-rec-k mono">form</span><span class="tst-rec-chips">${dl.form.map(f=>`<span class="hist-chip">${escapeHtml(leafFormLabel(f))}</span>`).join('')}</span></div>` : '';
+  const leafColour = dl.colour ? `<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">${tastingSwatch('leaf',dl.colour)}${escapeHtml(leafLabel(dl.colour))}${dl.mottled?' · mottled':''}</span></div>` : (dl.mottled?`<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">mottled</span></div>`:'');
+  const liqColour = lq.colour ? `<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">${tastingSwatch('liquor',lq.colour)}${escapeHtml(liquorLabel(lq.colour))}</span></div>` : '';
+  const rating = s.rating ? renderStarsStatic(Number(s.rating),true) : '';
+  const rebuy = tea && tea.wouldRebuy ? `<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">would rebuy</span>` : '';
+  const verdict = (rating || vd.liked || rebuy) ? `<div class="sd-sec tst-rec-sec"><div class="eyebrow rule-head">Verdict</div>${rating?`<div>${rating}</div>`:''}${rebuy?`<div style="margin-top:8px;">${rebuy}</div>`:''}${noteP(vd.liked)}${r.endedEarly?`<div class="tst-rec-early mono">ended early</div>`:''}</div>` : (r.endedEarly?`<div class="sd-sec tst-rec-sec"><div class="tst-rec-early mono">ended early — no verdict</div></div>`:'');
+  return `
+    <div class="detail-head">
+      <button class="detail-back" onclick="goView('sessions')">← Back to sittings</button>
+      <button class="tea-more" onclick="toggleSessionMenu()" aria-label="More" aria-expanded="${state.sessionMenuOpen?'true':'false'}">⋯</button>
+    </div>
+    ${sessionMenuHTML(s)}
+    <div class="band sd-band">
+      ${tea?swatchAttr('sd-swatch', liquorFor(tea), tea.type, true):''}
+      <div class="sd-band-main">
+        <div class="sd-kicker mono">${escapeHtml(fmtDateTime(s.date))} · tasting</div>
+        <h2 class="sd-title">${tea?`<span class="sd-link" onclick="openTeaDetail('${escapeJsArg(tea.id)}','sessions')">${escapeHtml(tea.name)}</span>`:'Unknown tea'}</h2>
+        ${(tea||ves)?`<div class="sd-ident">${[tea?typeLabel(tea.type):'', sessionMethodLabel(s), ves?escapeHtml(ves.name):''].filter(Boolean).join(' · ')}</div>`:''}
+      </div>
+    </div>
+    ${verdict}
+    ${sec('Dry leaf', formRow+leafColour+chipsRow('aroma',dl.aroma)+noteP(dl.note))}
+    ${sec('Warmed leaf', chipsRow('shifted',wl.aromaShift)+noteP(wl.note))}
+    ${sec('Liquor', liqColour+chipsRow('aroma',lq.aroma)+noteP(lq.note))}
+    ${sec('Taste', chipsRow('notes',ta.notes)+noteP(ta.note))}
+    ${sec('Mouthfeel', noteP(mf.note))}
+    ${sec('Finish', noteP(fi.note))}
+  `;
 }
 

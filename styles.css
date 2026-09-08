@@ -1430,6 +1430,43 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .leaf-cell[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px;}
 /* mottled = variegation, not a hue: a split swatch, two representative leaf tones on the diagonal. */
 .leaf-cell.is-mottled{background:linear-gradient(135deg,var(--leaf-olive) 0 50%,var(--leaf-golden) 50% 100%);}
+
+/* ===== Tea Tasting mode (guided mode, c1 — v4.46) ===== */
+/* The stable Home door (SPEC §2): a quiet full-width door below the greeting, not a rotating card. */
+.home-tasting-door{display:block;width:100%;margin:0 0 16px;padding:13px 16px;text-align:left;background:var(--white);border:1px solid var(--line);border-radius:2px;font-family:var(--font-display);font-size:15px;color:var(--jade-deep);cursor:pointer;}
+.home-tasting-door.is-resume{background:var(--porcelain-dim);}
+.tst-setup-link{display:block;width:100%;margin-top:14px;background:none;border:0;padding:6px;font-family:inherit;font-size:13px;color:var(--jade-deep);text-decoration:underline;cursor:pointer;text-align:center;}
+/* Register choice on the setup card */
+.tst-reg-row{margin-top:18px;}
+.tst-regs{display:flex;gap:10px;margin-top:8px;}
+.tst-reg{flex:1;display:flex;flex-direction:column;gap:3px;padding:12px;background:var(--white);border:1px solid var(--line);border-radius:12px;cursor:pointer;text-align:left;font-family:inherit;}
+.tst-reg.on{border-color:var(--jade);box-shadow:inset 0 0 0 1px var(--jade);}
+.tst-reg-t{font-family:var(--font-display);font-size:14px;color:var(--ink);}
+.tst-reg-s{font-size:11px;color:var(--ink-soft);}
+/* A room */
+.tst-room{max-width:640px;margin:0 auto;}
+.tst-head{margin:2px 0 16px;}
+.tst-eyebrow{font-size:11px;color:var(--ink-soft);letter-spacing:.04em;}
+.tst-title{font-family:var(--font-display);font-size:24px;margin:4px 0 0;line-height:1.15;}
+.tst-cue{margin-top:8px;font-family:var(--font-display);font-style:italic;font-size:14px;color:var(--ink-soft);line-height:1.5;}
+.tst-field{margin:16px 0;}
+.tst-label{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
+.tst-opt{color:var(--ink-soft);opacity:.8;}
+.tst-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.tst-chip{padding:7px 12px;background:var(--white);border:1px solid var(--line);border-radius:999px;font-family:inherit;font-size:13px;color:var(--ink);cursor:pointer;}
+.tst-chip.on{background:var(--amber);border-color:var(--amber);color:var(--flav-onfg);font-weight:600;}
+.tst-note{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-family:inherit;font-size:13.5px;background:var(--porcelain);color:var(--ink);resize:vertical;min-height:56px;}
+.tst-nav{display:flex;gap:10px;justify-content:space-between;margin-top:20px;}
+.tst-nav .btn{flex:1;}
+.tst-endearly{display:block;width:100%;margin-top:14px;background:none;border:0;padding:6px;font-size:12px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;text-align:center;}
+/* The tasting record read (Tier-2) */
+.tst-rec-row{display:flex;gap:10px;align-items:baseline;margin:7px 0;}
+.tst-rec-k{flex:none;width:64px;font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
+.tst-rec-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.tst-rec-colour{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);}
+.tst-rec-swatch{display:inline-block;width:22px;height:22px;flex:none;border-radius:6px 3px 5px 3px;border:1px solid var(--line);}
+.tst-rec-note{margin:8px 0 0;font-size:13.5px;color:var(--ink);line-height:1.5;}
+.tst-rec-early{margin-top:8px;font-size:11px;color:var(--ink-soft);}
 .pass-card{border:1px solid var(--line);border-radius:13px;background:var(--porcelain-dim);padding:12px;margin-top:10px;}
 .pass-deeper{display:block;padding:4px 0 0;font-family:var(--font-mono);font-size:10px;color:var(--jade-deep);text-decoration:underline;}
 .pass-add{flex:none;font-size:12px;padding:6px 10px;}

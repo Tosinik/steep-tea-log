@@ -1291,6 +1291,25 @@ function homeLogCup(btn, teaId){
   }
   go();
 }
+// c1 (guided mode): the STABLE Home door for a tea tasting (SPEC §2 — a fixed door below the greeting,
+// NOT part of the greeting/insight rotation). If a tasting is already in progress (in memory or restored
+// from a persisted draft), it offers to RESUME instead of starting a new one (the partial is kept).
+function tastingDoorHTML(){
+  const d = state.sessionDraft;
+  if(d && d.isTasting){
+    const t = teaById(d.teaId);
+    return `<button class="home-tasting-door is-resume" onclick="d_resumeTasting()">Resume your tasting${t?' of '+escapeHtml(t.name):''} &rarr;</button>`;
+  }
+  if(!(state.teas||[]).length) return '';   // nothing on the shelf to taste yet
+  return `<button class="home-tasting-door" onclick="homeStartTasting(this)">Taste a tea properly &rarr;</button>`;
+}
+function homeStartTasting(btn){
+  if(sessionDraftDirty(state.sessionDraft)){   // a session/tasting already in progress — prompt rather than discard (keep the partial)
+    if(btn){ armConfirm(btn, 'Discard the session in progress?', ()=>startTastingFor(null)); return; }
+    state.view='session'; render(); return;
+  }
+  startTastingFor(null);
+}
 
 // R161 — one ledger row: a label on the left, a mono figure on the right, a hairline under it. The
 // spine's RULE row for a retrospective number (totals/week/cost). k and v are literal labels + computed
@@ -1421,7 +1440,7 @@ function dashCardsHome(s){
    card and belongs to one surface only. Insights keeps its own head. */
 function viewDashboard(){
   if(!state.teas.length) return dayOneHTML();
-  return `${greetingMastheadHTML()}${wrappedMomentHTML()}${renderDashboard(dashCards(), 'home')}`;
+  return `${greetingMastheadHTML()}${tastingDoorHTML()}${wrappedMomentHTML()}${renderDashboard(dashCards(), 'home')}`;
 }
 
 /* ================= TEAS ================= */
