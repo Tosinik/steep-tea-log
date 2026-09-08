@@ -74,12 +74,15 @@ steep-teas → steep-shopping → steep-passport → steep-social → steep-sess
 schema.sql · v2_1-migration · v2_2-photos-storage · v3_0-social · v3_1-quick-log ·
 v3_2-session-photos · v3_3-wishlist · v3_4-brew-advice · v3_5-purchase-date · v3_6-leaf-form ·
 v3_7-mood · v3_8-water-ml · v3_9-steep-feedback · **v3_10-pass-record (v4.02)** ·
-**v3_11-opened-date (v3.98)** · **v3_12-liquor (v4.14)**.
+**v3_11-opened-date (v3.98)** · **v3_12-liquor (v4.14)** · **v4_42-purchase-log (v4.42)** ·
+**v3_13-tasting-record (applied v4.45, for guided mode c1)**.
 **Read the version, not the sort.** `v3_10` sorts between `v3_1` and `v3_2` as a string, and it was
-applied *after* `v3_11`. Both happen to be order-independent; the list above is by version.
+applied *after* `v3_11`. All are order-independent (add-column-if-not-exists); the list above is by
+application order, not filename sort.
 **The `v3_` prefix is a SERIES number, not the app version** — `v3_10-pass-record` was applied at app
-**v4.02**, which already disproves any correspondence. R4's first migration continues the series as
-`v3_12`; starting a `v4_` prefix would imply a rule that file breaks.
+**v4.02**, which already disproves any correspondence. `v4_42-purchase-log` is the ONE deviation: it was
+app-version-prefixed, breaking the series rule (the exact thing this note warns against). `v3_13-tasting-record`
+returns to the series. Prefer the series number for the next migration.
 
 ## Conventions / principles
 - Calm-first; achievements/XP dormant app-wide (`ACHIEVEMENTS_ENABLED=false`, v3.72 — the old
@@ -250,7 +253,36 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.45 LIVE `dd236ab` — colour system: 25-stop liquor ramp + net-new leaf ramp (R187)**
+**NOW — v4.46 STAGED `5eb41bd` — Tea Tasting mode (guided mode c1): the spine, first door to verdict (R188)**
+(cache **v156**, APP_VERSION v4.46, **no SQL** — `v3_13` shipped + applied at v4.45, **no new module**).
+Slice c1 of guided tasting mode (`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11): the walkable skeleton.
+A tasting is a SESSION VARIANT (`isTasting` on the draft, `tasting_record` jsonb on the row, present only on
+tastings). The reconcile GO governed the build.
+- **Entry (both doors):** a STABLE Home door (`tastingDoorHTML`, below the greeting, with a Resume state) +
+  a quiet "…or taste this tea properly" link in session setup (`d_convertToTasting`, in place).
+- **Walk (8 rooms, `TASTING_ROOMS`/`tastingRoomHTML`):** two registers → dry leaf (`DRY_LEAF_FORMS` chips +
+  leaf ramp picker + aroma) → warmed leaf → liquor colour (reused two-step picker, tea's swatch as reference)
+  → liquor aroma → taste → mouthfeel → finish → verdict. Guide cues are brief c1 placeholders.
+- **Storage:** `newTastingBlob()` versioned Tier-2 blob. Tier-1 stays in columns (profile → session.tags via
+  `tastingProfileTags` = CUP stages only; rating → session.rating; offered tea.rating + would-rebuy → teas).
+- **Reuse:** `flavArrayFor`/`d.flavCtx` scopes the shipped `FLAVOR_TREE` tagger per stage (default path
+  untouched); `liquorGridCells` gained `onSelect`; the ramp leaf picker is wired; draft persistence/resume/
+  collision ride the existing `sessionDraft` (`sessionDraftDirty` treats a tasting as always-dirty).
+- **Not shareable (F3):** `sessionToDb` forces `is_shared` false when `tasting_record` present.
+- **Record:** badged "· tasting" in both lists; opens to `viewTastingRecord` (rich Tier-2 read); editing
+  rides the deep-copy/writeback (blob preserved, captures read-only).
+- **c2 next:** the fleshed axes (umami/astringency/palate/finish) + authored §6 copy + glossary ⓘ + tradition
+  lens. **c3:** the per-steep evolution loop + brewStyle reshaping + aroma-cup. Known c1 roughnesses: the
+  reused tagger's "What are you tasting?" prompt shows in the smell rooms (c2 copy); the method control still
+  offers a Cold-brew lane in tasting setup, ignored at commit (c2 can drop it).
+- **Tests:** new `fixtures/tasting-mode-test.js` (30). `liquor-test` F2 13→14, G6/G7 updated. All 42 suites
+  green; browser-verified end to end, both themes, no console errors.
+- **ON DEVICE (`smoke.md §v4.46`, POST-PUSH):** walk a real tasting on a phone — the pickers tap, the note
+  keyboard behaves, the record reads back, both themes; the Home door + resume; the not-shareable check.
+- **STAGED:** code `5eb41bd` + docs committed, UNPUSHED. Awaiting Niklas's push, then the phone-look +
+  Planning's clone-verify, then the STAGED→LIVE flip.
+
+**Previously — v4.45 LIVE `dd236ab` — colour system: 25-stop liquor ramp + net-new leaf ramp (R187)**
 (cache **v155**, APP_VERSION v4.45, **no SQL**, **no new module**). Step 1 of guided tasting mode (D4):
 the colour-ramp **pre-slice**, shipped ALONE and FIRST. Authority `docs/r5/planning/SPEC-colour-system.md`
 (pushed docs-only, `3930afc`).

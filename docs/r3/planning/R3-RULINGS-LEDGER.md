@@ -2717,6 +2717,38 @@ backlog. Browser-verified in both themes (all 34 tokens resolve; the picker rend
 and DOM-only family drill). **NEXT: guided mode c1** — the `tasting_record` jsonb migration (alone and
 first), then the c1 spine (both entry doors, the two registers, the reuse-existing stages, the verdict close).
 
+**R188 — Tea Tasting mode (guided mode c1): the spine, first door to verdict.** Shipped v4.46 (cache v156,
+no SQL — the `sql/v3_13-tasting-record.sql` migration shipped + was applied at v4.45, commit 3cc9099; no new
+module). Slice c1 of `docs/r5/planning/SPEC-guided-mode-FINAL.md` §11, built to the reconcile GO. A tasting
+is a SESSION VARIANT, not a new store: `isTasting` on the draft, a versioned `tasting_record` jsonb on the
+row (present ONLY on tastings, its presence being the flag). **Entry:** two doors — a STABLE Home door
+(`tastingDoorHTML`, below the greeting, not in the rotation, with a Resume state) and a quiet in-place
+convert from session setup (`d_convertToTasting`). **Walk:** `TASTING_ROOMS` (8 rooms, `tastingRoomHTML`) —
+the two registers, then dry leaf (new `DRY_LEAF_FORMS` chips + the leaf ramp picker + aroma) → warmed leaf →
+liquor colour (the reused two-step picker, the tea's own swatch as reference) → liquor aroma → taste →
+mouthfeel → finish → verdict. **Storage tiers:** the blob is Tier-2 render-only; Tier-1 stays in columns —
+profile tags → `session.tags` via `tastingProfileTags` (the CUP stages ONLY: liquor aroma + taste notes,
+deduped, so the three aroma stages never muddy the profile), session rating → `session.rating`, the OFFERED
+tea rating + would-rebuy → `teas`. **Reuse without touching shipped callers:** `flavArrayFor` + `d.flavCtx`
+scope the shipped `FLAVOR_TREE` tagger per stage (the default path unchanged, so the ordinary session tagger
+is untouched — flavor-tagger-test stayed green); `liquorGridCells` gained an `onSelect` arg (default
+`liquorSelect`); the ramp slice's leaf picker is now wired; draft persistence / resume / the collision guard
+ride the existing `sessionDraft` (`sessionDraftDirty` treats any tasting as always-dirty, so the partial is
+kept). **Verdict:** session rating + an offered overall tea-rating (prefilled, a checkbox, declinable — the
+ONLY writer of `tea.rating` in this flow) + would-rebuy + a liked/didn't-land takeaway; "End early" saves a
+complete shorter tasting with no invented rating. **Not shareable (F3):** `sessionToDb` forces `is_shared`
+false whenever `tasting_record` is present. **Placement:** badged "· tasting" in both session lists; opens to
+`viewTastingRecord` (branched from `viewSessionDetail`); editing rides the existing deep-copy/writeback, which
+preserves the blob (captures read-only, verdict/notes/tags editable). **c1 boundaries (for c2/c3):** the
+fleshed axes (umami/astringency/palate/finish), the authored §6 copy, the glossary ⓘ and the tradition lens
+are c2 — c1 guide cues are brief functional placeholders, and the reused tagger's "What are you tasting?"
+prompt shows in the smell rooms until c2's authored copy; the method control still offers a Cold-brew lane in
+tasting setup, ignored at commit (c2 can drop it); the per-steep evolution loop is c3, so a c1 tasting is
+steepless. **Tests:** new `fixtures/tasting-mode-test.js` (30 checks); `liquor-test` F2 13→14, G6/G7 for the
+picker `onSelect`; all 42 committed suites green; browser-verified end to end in both themes, no console
+errors. **NEXT: guided mode c2** (the axes + authored copy + glossary + tradition lens), then c3, then
+SECURITY re-blocks before the beta widens.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

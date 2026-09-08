@@ -116,6 +116,36 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.46 · Tea Tasting mode (guided mode c1)  *(post-deploy on the served PWA — a real walk needs a phone)*
+
+The whole c1 walk is new interactive surface a vm cannot exercise (touch, the note keyboard, the pickers,
+the persisted draft). Fixtures pin the data (blob round-trip, not-shareable, aroma scoping, the render);
+this is the on-device half.
+
+1. **Both entry doors.** Home shows "Taste a tea properly" below the greeting (a fixed door, not rotating).
+   Session setup shows "…or taste this tea properly". Both open the tasting.
+2. **The walk.** Pick a register (Guide me shows a cue line per room; expert shows just the field). Walk all
+   eight rooms: dry-leaf FORM chips + the leaf colour strip + the aroma tagger; warmed leaf; the liquor
+   two-step picker (a family opens, its 44px shades tap, the tea's own swatch shows as reference); liquor
+   aroma; taste; mouthfeel/finish notes; the verdict. Back and Continue move cleanly; the note keyboard does
+   not occlude the field.
+3. **The verdict.** Session stars; the offered "Set your overall rating for [tea]" (prefilled, a checkbox,
+   declinable — declining must NOT change the tea's rating); would-rebuy; the liked note. Save lands on the
+   tea page.
+4. **The record.** Open the saved tasting from Sessions: it reads back as the rich record (verdict, dry
+   leaf, liquor, taste, mouthfeel, finish) with the per-cup colour swatches, badged "· tasting". Editing it
+   (⋯ → edit) changes rating/notes and KEEPS the rich captures.
+5. **Keep the partial.** Start a tasting, capture a little, leave (✕ Leave or background the app). Home
+   offers "Resume your tasting of [tea]"; resuming returns to where you were. Starting a new session while
+   one is unfinished PROMPTS rather than discarding.
+6. **Not shared.** A tasting never offers a share control and never appears in the shared-by-you list.
+7. **Both themes.** The rooms and the record read in light and dark.
+
+*Pass:* a full walk saves and reads back, the partial survives a leave/resume, the tea-rating offer is
+declinable, and nothing is shareable. Dev pre-push drove the whole flow in the browser (both themes, no
+console errors) and confirmed live that dry-leaf aroma stays out of the tea's profile; only a real phone
+certifies the touch + keyboard.
+
 ## v4.45 · colour system — 25-stop liquor ramp + net-new leaf ramp  *(post-deploy — this look IS the hex validation, Q1)*
 
 The 13 new liquor hexes and all 9 leaf hexes ship **provisional**; this check is where they lock. The 12

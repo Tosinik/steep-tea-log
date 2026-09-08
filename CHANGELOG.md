@@ -46,7 +46,56 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
-## v4.45 — colour system: 25-stop liquor ramp in six families + a net-new leaf ramp — R187
+## v4.46 — Tea Tasting mode (guided mode c1): the spine, first door to verdict — R188
+
+Deploy: steep-data.js, steep-sessions.js, steep-teas.js, steep-dashboard.js, styles.css,
+service-worker.js (cache v156), steep-version.js, fixtures/liquor-test.js, fixtures/tasting-mode-test.js
+(new), .gitignore, CHANGELOG.md, STATE.md, ROADMAP-v4.md, smoke.md,
+docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL (the `sql/v3_13-tasting-record.sql` migration shipped and
+was applied at v4.45, commit 3cc9099). No new module.
+
+Slice c1 of the guided tasting mode (`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11): the walkable
+skeleton, first door to verdict. A tasting is a SESSION VARIANT, not a new store. The fleshed axes
+(umami/astringency/palate/finish detail), the authored §6 walkthrough copy, the glossary and the tradition
+lens are c2; the per-steep evolution loop is c3, so a c1 tasting is steepless.
+
+- **Two entry doors:** a STABLE Home door (`tastingDoorHTML`, below the greeting, not in the rotation),
+  which shows "Resume your tasting of [tea]" when a partial exists; and a quiet "…or taste this tea
+  properly" link in session setup (`d_convertToTasting`, converts the draft in place).
+- **The walk** (`TASTING_ROOMS`, 8 rooms; `tastingRoomHTML` routes by `d.tastingRoom`): the two registers
+  (Guide me / I know what I'm doing) on the setup card, then dry leaf (new `DRY_LEAF_FORMS` chips + the leaf
+  ramp picker + aroma) → warmed leaf → liquor colour (the reused two-step liquor picker, the tea's own
+  swatch as reference) → liquor aroma → taste → mouthfeel → finish → verdict. c1 guide cues are brief
+  functional lines; the authored §6 copy is c2.
+- **Storage** (`tasting_record` jsonb, present ONLY on tastings, `newTastingBlob`): a versioned Tier-2
+  render-only blob. Tier-1 data stays in its columns: profile tags → `session.tags`, session rating →
+  `session.rating`, the offered tea rating + would-rebuy → `teas`. Ramp colours store a KEY (retune-safe);
+  worded axes (c2) will store {word, position}.
+- **Aroma scoped per stage** (`flavArrayFor` + `d.flavCtx`): the shipped `FLAVOR_TREE` tagger is reused,
+  writing each stage's own array in the blob; ONLY the cup stages (`tastingProfileTags` = liquor aroma +
+  taste notes, deduped) feed the tea's flavour profile, so the three aroma stages never triple-count or
+  muddy it. The default (no `flavCtx`) path is unchanged, so the ordinary session tagger is untouched.
+- **Verdict close:** session rating, an OFFERED overall tea-rating (prefilled from the session rating,
+  a checkbox, declinable — the only writer of `tea.rating` in this flow), would-rebuy, and a liked/didn't-land
+  takeaway. "End early & save" on every room saves a complete SHORTER tasting: no verdict, so no rating and
+  no invented tea update.
+- **Not shareable** (F3): `sessionToDb` FORCES `is_shared` false whenever `tasting_record` is present, so a
+  tasting never enters the "followers read shared sessions" path (the migration added the column alone; the
+  RLS-level defence pairs with F3 in the security round).
+- **Placement:** a tasting badges "· tasting" in the Sessions list and the tea's history, and opens to the
+  rich record read (`viewTastingRecord`, branched from `viewSessionDetail`) instead of the plain session
+  view. Editing a tasting rides the existing deep-copy / whole-object writeback (`openSessionEdit` /
+  `saveSessionEdit`), which preserves the blob for free; the rich captures are read-only, verdict/notes/tags
+  editable.
+- **Reuse, parameterized without touching the shipped callers:** `liquorGridCells` gained an `onSelect` arg
+  (default `liquorSelect`; tasting passes `tastingSetLiquor`); the ramp slice's leaf picker (`leafGridCells`)
+  is now wired render-based; `tagListFor` gained a `flav` target. Durable draft persistence, the resume
+  affordance, and the collision guard all ride the existing `sessionDraft` mechanism (`sessionDraftDirty`
+  now treats any tasting as dirty, so the partial is always kept).
+- **Fixtures:** new `fixtures/tasting-mode-test.js` (30 checks: the mapper round-trip, the not-shareable
+  guard, aroma scoping, the blob shape, the record render). `liquor-test` updated (F2 13→14 for the record's
+  swatch, G6/G7 for the picker `onSelect` param). All 42 committed suites green; browser-verified end to end
+  in both themes, no console errors.
 
 Deploy: styles.css, steep-tea-types.js, steep-teas.js, service-worker.js (cache v155),
 steep-version.js, fixtures/liquor-test.js, CHANGELOG.md, STATE.md, ROADMAP-v4.md, smoke.md,
