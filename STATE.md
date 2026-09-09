@@ -253,7 +253,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.46 STAGED `5eb41bd` — Tea Tasting mode (guided mode c1): the spine, first door to verdict (R188)**
+**NOW — v4.46 LIVE `5eb41bd` — Tea Tasting mode (guided mode c1): the spine, first door to verdict (R188)**
 (cache **v156**, APP_VERSION v4.46, **no SQL** — `v3_13` shipped + applied at v4.45, **no new module**).
 Slice c1 of guided tasting mode (`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11): the walkable skeleton.
 A tasting is a SESSION VARIANT (`isTasting` on the draft, `tasting_record` jsonb on the row, present only on
@@ -279,8 +279,8 @@ tastings). The reconcile GO governed the build.
   green; browser-verified end to end, both themes, no console errors.
 - **ON DEVICE (`smoke.md §v4.46`, POST-PUSH):** walk a real tasting on a phone — the pickers tap, the note
   keyboard behaves, the record reads back, both themes; the Home door + resume; the not-shareable check.
-- **STAGED:** code `5eb41bd` + docs committed, UNPUSHED. Awaiting Niklas's push, then the phone-look +
-  Planning's clone-verify, then the STAGED→LIVE flip.
+- **LIVE:** code `5eb41bd` + docs `2ca3010` pushed; Niklas's phone-look (`smoke.md §v4.46`) + Planning's
+  clone-verify passed → flipped STAGED→LIVE.
 
 **Previously — v4.45 LIVE `dd236ab` — colour system: 25-stop liquor ramp + net-new leaf ramp (R187)**
 (cache **v155**, APP_VERSION v4.45, **no SQL**, **no new module**). Step 1 of guided tasting mode (D4):
