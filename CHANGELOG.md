@@ -46,6 +46,54 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.47 — Tea Tasting mode (guided mode c2): fleshed axes, glossary, tradition lens — R189
+
+Deploy: steep-core.js, steep-sessions.js, steep-dashboard.js, styles.css, service-worker.js (cache v157),
+steep-version.js, fixtures/tasting-mode-test.js, CHANGELOG.md, STATE.md, ROADMAP-v4.md, smoke.md,
+docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL (the axes nest into the existing `tasting_record` blob objects,
+no migration). No new module.
+
+Slice c2 of the guided tasting mode (`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11): c1's free-text stub
+rooms become the ratified axes, and the authored copy, the glossary and the tradition lens ship. Tier-2
+render-only; the cup-only profile feed, the verdict close, the not-shareable guard and the durable draft are
+unchanged from c1. The per-steep evolution loop, `brewStyle` reshaping and the aroma-cup sub-step are c3.
+
+- **Taste** (`tr_taste`): four worded scales — sweet · bitter · sour · umami (Umami carries the glossary ⓘ) —
+  plus palate position (front / mid / back, MULTI-select, places not amounts), above the kept `FLAVOR_TREE`
+  flavour-notes tagger.
+- **Mouthfeel** (`tr_mouthfeel`): body (named steps thin/medium/full) and astringency as TWO reads under ONE
+  heading + ONE ⓘ — level (a worded scale, faint…pronounced) and quality (pleasant / just there / harsh),
+  kept explicitly distinct from bitterness (the glossary ⓘ says so).
+- **Finish** (`tr_finish`): length (a worded scale, gone at once…lingering), huigan (none / faint / clear,
+  with ⓘ), and hou-yun (throat feel) offered ONLY for oolong and pu-erh (`tastingHouYunType`), independent of
+  the lens, drawn OPEN in the guide register and a disclosure in terse.
+- **The frozen-word convention, declared in c1, bites here and holds:** worded scales store `{word, position}`
+  (`tastingSetAxis` / `tastingSetAstrLevel` / `tastingSetFinishLen`); the record renders the STORED word and
+  never re-derives it, so a later ladder re-tune can never rewrite an old tasting. Named steps store the enum
+  key. Ladders live in `TASTING_INTENSITY` (four axes + astringency level) and `TASTING_FINISH_LEN`.
+- **Glossary** (`TASTING_GLOSSARY`): the seven SPEC §5 definitions verbatim (umami · amami · shibumi · nigami ·
+  astringency-vs-bitterness · huigan · hou-yun), one tap, both registers, via the R180
+  `infoMark`/`toggleInfoPop`.
+- **Tradition lens** (`tastingLensBlock`): surfaced by tea TYPE (green), default OFF, at the bottom of the
+  Mouthfeel room — a READ-ONLY re-reading of the taste + mouthfeel axes already captured (amami←sweet,
+  nigami←bitter, umami←umami, shibumi←astringency). It FILLS from the stored values and never asks for new
+  input. hou-yun is separate (the finish room), not the lens.
+- **Authored §6 copy** (`TASTING_ROOMS` cues), both registers (guide shows the cue, expert sees the field
+  labels). **c1 bug fixed:** the reused tagger's "What are you tasting?" prompt leaked into the SMELL rooms;
+  `flavPromptFor` now asks about smell in the dry-leaf / warmed-leaf / liquor-aroma rooms and about taste only
+  in the taste room. The ordinary session flow (no `flavCtx`) is unchanged.
+- **Deliberate discard** (the c1 no-exit loop, folded in): a new `armChoice` (core.js, beside `armConfirm`)
+  drives ✕ Leave → Keep for later / Discard / Cancel, and the Home resume door now offers Resume AND Discard.
+  `discardTasting` clears the in-memory AND the persisted draft. An ACCIDENTAL leave (back-swipe / lock /
+  tap-away) still KEEPS — a tasting stays always-dirty; discard is only ever an explicit, confirmed choice.
+- **Cleanup:** the Cold-brew lane is dropped from tasting setup (a tasting is never cold; `methodLanesHTML`
+  gained an optional `noCold`, so the session-flow callers and the method-lane fixture are untouched).
+- **Tests:** `fixtures/tasting-mode-test.js` 30 → 67 checks (B rewritten for the c2 blob shape; +H the axes
+  and the frozen `{word,position}` / enum / multi-select shapes; +I the lens fills-but-never-asks; +J hou-yun
+  gated by tea type; +K a confirmed discard clears the draft; +L the smell/taste prompt fix; +M the authored
+  copy + glossary ship with no em/en dashes). All 49 committed suites green; browser-verified end to end in
+  both themes, no console errors.
+
 ## v4.46 — Tea Tasting mode (guided mode c1): the spine, first door to verdict — R188
 
 Deploy: steep-data.js, steep-sessions.js, steep-teas.js, steep-dashboard.js, styles.css,

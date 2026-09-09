@@ -253,7 +253,39 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.46 LIVE `5eb41bd` — Tea Tasting mode (guided mode c1): the spine, first door to verdict (R188)**
+**NOW — v4.47 STAGED `6916bd9` — Tea Tasting mode (guided mode c2): fleshed axes, glossary, tradition lens (R189)**
+(cache **v157**, APP_VERSION v4.47, **no SQL** — the axes nest into the existing `tasting_record` blob objects,
+no migration; **no new module**). Slice c2 of `docs/r5/planning/SPEC-guided-mode-FINAL.md` §11: c1's free-text
+stub rooms become the ratified axes; the authored copy, the glossary and the tradition lens ship. Tier-2
+render-only; the cup-only profile feed, the verdict close, the not-shareable guard and the durable draft are
+unchanged from c1.
+- **Taste** (`tr_taste`): sweet/bitter/sour/umami worded scales + palate position (front/mid/back, MULTI-select)
+  + the kept `FLAVOR_TREE` tagger. **Mouthfeel** (`tr_mouthfeel`): body (steps) + astringency as TWO reads under
+  ONE heading + ONE ⓘ (level worded, quality steps), distinct from bitterness. **Finish** (`tr_finish`): length
+  (worded) + huigan (steps) + hou-yun (oolong/pu-erh only, open in guide / disclosure in terse).
+- **Frozen-word convention:** worded scales store `{word,position}` and the record renders the STORED word,
+  never re-derived — a later ladder re-tune can't rewrite an old tasting; steps store the enum key.
+- **Glossary** (`TASTING_GLOSSARY`, 7 §5 defs via R180 `infoMark`) + **tradition lens** (`tastingLensBlock`,
+  bottom of Mouthfeel, tea type green, default off): a READ-ONLY re-reading that FILLS from captures
+  (amami←sweet, nigami←bitter, umami←umami, shibumi←astringency), never asks new input.
+- **Authored §6 cues** both registers; **c1 bug fixed** (`flavPromptFor`): smell rooms ask about smell, only
+  the taste room asks about taste; the ordinary session flow (no flavCtx) unchanged.
+- **Deliberate discard** (new `armChoice`): ✕ Leave → Keep/Discard/Cancel + Home resume → Resume/Discard;
+  `discardTasting` clears the in-memory AND persisted draft. Accidental leave still KEEPS (always-dirty).
+- **Cleanup:** Cold-brew lane dropped from tasting setup (`methodLanesHTML` `noCold`; session callers + the
+  method-lane fixture unchanged).
+- **Three build decisions (surfaced):** worded-scale mechanics read as FIXED anchor words (the "never re-derive"
+  convention rules out interpolation); the lens lives in the Mouthfeel room (all four re-read values captured by
+  then); hou-yun modelled as none/faint/clear steps (its shape was unlisted).
+- **Tests:** `fixtures/tasting-mode-test.js` 30→67. All 49 committed suites green; node --check clean;
+  browser-verified end to end, both themes, no console errors.
+- **ON DEVICE (`smoke.md §v4.47`, POST-PUSH):** walk a tasting on a phone — the axis chips + worded scales tap,
+  palate multi-selects, the ⓘ popovers open + dismiss, the lens reads (green tea), hou-yun shows for an
+  oolong/pu-erh; the ✕ Leave Keep/Discard + Home Resume/Discard; both themes.
+- **STATE:** code `6916bd9` committed, PAUSED UNPUSHED (Niklas pushes). Docs push on write. Flip STAGED→LIVE
+  after Niklas's phone-look + Planning's clone-verify.
+
+**Previously — v4.46 LIVE `5eb41bd` — Tea Tasting mode (guided mode c1): the spine, first door to verdict (R188)**
 (cache **v156**, APP_VERSION v4.46, **no SQL** — `v3_13` shipped + applied at v4.45, **no new module**).
 Slice c1 of guided tasting mode (`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11): the walkable skeleton.
 A tasting is a SESSION VARIANT (`isTasting` on the draft, `tasting_record` jsonb on the row, present only on
@@ -271,10 +303,10 @@ tastings). The reconcile GO governed the build.
 - **Not shareable (F3):** `sessionToDb` forces `is_shared` false when `tasting_record` present.
 - **Record:** badged "· tasting" in both lists; opens to `viewTastingRecord` (rich Tier-2 read); editing
   rides the deep-copy/writeback (blob preserved, captures read-only).
-- **c2 next:** the fleshed axes (umami/astringency/palate/finish) + authored §6 copy + glossary ⓘ + tradition
-  lens. **c3:** the per-steep evolution loop + brewStyle reshaping + aroma-cup. Known c1 roughnesses: the
-  reused tagger's "What are you tasting?" prompt shows in the smell rooms (c2 copy); the method control still
-  offers a Cold-brew lane in tasting setup, ignored at commit (c2 can drop it).
+- ~~**c2 next:** the fleshed axes + authored §6 copy + glossary ⓘ + tradition lens.~~ **DONE v4.47 (below).**
+  **c3:** the per-steep evolution loop + brewStyle reshaping + aroma-cup. ~~Known c1 roughnesses: the reused
+  tagger's "What are you tasting?" prompt shows in the smell rooms; the method control still offers a Cold-brew
+  lane in tasting setup.~~ **Both fixed v4.47** (smell/taste prompt split; Cold-brew lane dropped).
 - **Tests:** new `fixtures/tasting-mode-test.js` (30). `liquor-test` F2 13→14, G6/G7 updated. All 42 suites
   green; browser-verified end to end, both themes, no console errors.
 - **ON DEVICE (`smoke.md §v4.46`, POST-PUSH):** walk a real tasting on a phone — the pickers tap, the note

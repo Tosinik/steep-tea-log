@@ -2749,6 +2749,37 @@ picker `onSelect`; all 42 committed suites green; browser-verified end to end in
 errors. **NEXT: guided mode c2** (the axes + authored copy + glossary + tradition lens), then c3, then
 SECURITY re-blocks before the beta widens.
 
+**R189 — Tea Tasting mode (guided mode c2): the fleshed axes, the glossary, and the tradition lens.** Shipped
+v4.47 (cache v157, no SQL — the axes nest into the existing `tasting_record` blob objects, no migration; no
+new module). Slice c2 of `docs/r5/planning/SPEC-guided-mode-FINAL.md` §11, replacing c1's free-text stubs.
+**Axes** (all optional, all clear on a re-tap): Taste = four worded scales sweet/bitter/sour/umami + palate
+position (front/mid/back, MULTI-select) + the kept `FLAVOR_TREE` tagger; Mouthfeel = body (steps) + astringency
+as TWO reads under ONE heading + ONE ⓘ (level worded, quality steps), kept distinct from bitterness; Finish =
+length (worded) + huigan (steps) + hou-yun (steps, oolong/pu-erh only). **The frozen-word convention bites and
+holds:** worded scales store `{word, position}` (`tastingSetAxis`/`SetAstrLevel`/`SetFinishLen`), the record
+renders the stored word and NEVER re-derives it, so a later ladder re-tune can never rewrite an old tasting;
+named steps store the enum key. Ladders: intensity `faint·light·medium·strong·pronounced` (four axes + astr
+level), finish `gone at once·short·medium·long·lingering`. **Three build decisions (surfaced, not blocked):**
+(1) the §4 worded-scale mechanics were read as FIXED anchor words, not interpolated phrases — the c1 "never
+re-derive" convention rules interpolation out, so it was not genuinely ambiguous; (2) the tradition lens lives
+at the BOTTOM of the Mouthfeel room (all four re-read values — sweet/bitter/umami + astringency — are captured
+by then), gated by tea TYPE `green`, a READ-ONLY re-reading that FILLS from captures and never asks new input
+(`tastingLensBlock`); (3) hou-yun modelled as `none/faint/clear` steps (its shape was unlisted), gated
+`oolong`/`puerh`, drawn open in guide / a disclosure in terse, independent of the lens. **Glossary:** the seven
+§5 definitions verbatim via R180 `infoMark`/`toggleInfoPop` (`TASTING_GLOSSARY`), both registers. **Authored
+copy:** the §6 room cues shipped verbatim (`TASTING_ROOMS` cues), both registers; the c1 leak fixed —
+`flavPromptFor` makes the smell rooms ask about smell, only the taste room asks about taste, the ordinary
+session flow (flavCtx null) unchanged. **Deliberate discard (FOLDED-IN FIX, the c1 no-exit loop):** new
+`armChoice` (core.js, beside armConfirm) drives ✕ Leave → Keep/Discard/Cancel and the Home resume door →
+Resume/Discard; `discardTasting` clears the in-memory AND persisted draft; an ACCIDENTAL leave still KEEPS (a
+tasting stays always-dirty). **Cleanup:** the Cold-brew lane dropped from tasting setup (`methodLanesHTML`
+gained an optional `noCold`; session-flow callers + the method-lane test unchanged). **Tests:**
+`fixtures/tasting-mode-test.js` 30→67 (B rewritten for the c2 blob, +H axes/frozen-shape/multi-select, +I lens
+reflects-not-asks, +J hou-yun type gating, +K confirmed-discard-clears-draft, +L the smell/taste prompt fix,
++M authored copy + glossary + no-dash); all 49 committed suites green; browser-verified both themes, no console
+errors. **NEXT: guided mode c3** (the per-steep evolution loop + `brewStyle` reshaping + the aroma-cup
+sub-step), then SECURITY re-blocks before the beta widens.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

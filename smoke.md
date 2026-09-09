@@ -116,6 +116,37 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.47 · Tea Tasting mode (guided mode c2)  *(post-deploy on the served PWA — the fleshed axes need a phone)*
+
+The c2 axes, glossary and lens are all new interactive surface a vm cannot exercise (touch, the ⓘ popovers,
+the disclosure). Fixtures pin the shapes (frozen `{word,position}`, steps, palate multi, the lens fills-not-
+asks, hou-yun gating, the discard clears the draft); this is the on-device half. Dev drove the whole c2 flow
+in the browser (both themes, no console errors) — a phone certifies the touch + the popover dismissal.
+
+1. **Taste room.** Sweet/bitter/sour/umami each show a worded row (faint…pronounced); one tap selects, a
+   re-tap clears. "Where do you notice it?" takes MORE than one place (front + back both stay lit). The Umami
+   ⓘ opens its definition on tap and dismisses on an outside tap / re-tap.
+2. **Mouthfeel room.** Body (thin/medium/full); Astringency with ONE ⓘ over two rows — "how much" (worded)
+   and "and is it" (pleasant/just there/harsh). For a GREEN tea, "Read this the Japanese way" appears at the
+   bottom; tapping it shows Amami/Nigami/Umami/Shibumi filled with the values you just set (it reads, never
+   asks). For a non-green it is absent.
+3. **Finish room.** Length (worded) + Returning sweetness (huigan). For an OOLONG or PU-ERH, "Throat feel
+   (hou yun)" is offered — drawn open in Guide me, a tap-to-open disclosure in the expert register; for other
+   types it is absent.
+4. **Smell vs taste copy.** The dry-leaf, warmed-leaf and liquor-aroma rooms ask "What do you smell?"; only
+   the taste room asks "What are you tasting?" (the c1 leak is gone).
+5. **Deliberate discard.** ✕ Leave offers Keep for later / Discard / Cancel. Discard leaves to Home and the
+   tasting is GONE (no resume door). The Home resume door itself shows Resume AND Discard. An accidental leave
+   (background / swipe) still KEEPS the partial.
+6. **No Cold-brew lane** in tasting setup (the method row is Gongfu / Senchadō / Western only).
+7. **The record** shows the new axes (the frozen worded words + the step labels + the palate places) under
+   Taste / Mouthfeel / Finish, alongside the c1 captures.
+8. **Both themes.** The chips, the lens panel and the ⓘ popovers read in light and dark.
+
+*Pass:* the axes tap and clear, palate multi-selects, the ⓘ popovers open and dismiss, the lens reads the set
+values for a green (and is absent otherwise), hou-yun shows for an oolong/pu-erh only, a confirmed discard
+clears the draft while an accidental leave keeps it, and both themes hold.
+
 ## v4.46 · Tea Tasting mode (guided mode c1)  *(post-deploy on the served PWA — a real walk needs a phone)*
 
 The whole c1 walk is new interactive surface a vm cannot exercise (touch, the note keyboard, the pickers,

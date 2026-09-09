@@ -119,9 +119,10 @@ decisions rather than any single ruling:
   (`SESSION-FLOW-REDESIGN.md`); **slice c (guided mode, D4) is building** (`SPEC-guided-mode-FINAL.md`):
   the colour-ramp PRE-SLICE shipped v4.45/R187 (`docs/r5/planning/SPEC-colour-system.md`); the **c1 spine
   SHIPPED v4.46/R188** (both entry doors, the two registers, the 8-room walk, the `tasting_record` blob, the
-  verdict close, not-shareable). **Remaining: c2** (the fleshed axes umami/astringency/palate/finish +
-  authored §6 walkthrough copy + glossary ⓘ + tradition lens) **and c3** (the per-steep evolution loop +
-  brewStyle reshaping + aroma-cup). Then SECURITY re-blocks before the beta widens.
+  verdict close, not-shareable); **c2 SHIPPED v4.47/R189** (the fleshed axes taste/mouthfeel/finish + palate
+  multi-select + authored §6 copy + the 7-term glossary ⓘ + the tradition lens + the deliberate-discard fix +
+  the Cold-brew-lane drop). **Remaining: c3** (the per-steep evolution loop + brewStyle reshaping + aroma-cup).
+  Then SECURITY re-blocks before the beta widens.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
   next person logs in). Findings
