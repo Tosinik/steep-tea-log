@@ -2828,6 +2828,24 @@ one-column collapse (matching `.form-grid`); no logic change. Verified both widt
 two-up, neither overflows). **This patch and v4.49 flip STAGED→LIVE together** after the combined re-look +
 Planning clone-verify.
 
+**R193 — leaf-form inference: puerh is loose-vs-compressed, not ripe-vs-raw.** Shipped v4.51 (cache v161, no
+SQL, no new module). A STANDALONE correctness fix, explicitly NOT the brew-guidance rework. `inferLeafForm`'s
+puerh branch read `has('loose','shou','ripe','maocha') ? 'open' : 'compressed'`; `shou`/`ripe` are PROCESSING
+words, so a ripe pu'er that reached the branch inferred `open` when a cake is `compressed`, and the form-keyed
+brew logic then advised it wrong. **Fix:** `has('loose','maocha','散') ? 'open' : 'compressed'` (drop the
+processing words, add the Chinese 散 per the KB rule). **Precise mechanism** (pinned in the fixture): resolution
+is three ordered steps — (1) kbResolve maps `shou`/`sheng`/`puerh` aliases to `compressed` and returns first;
+(2) name-keyword `cake`/`bing`/`tuo`/`brick` → `compressed`; (3) the type-switch puerh case, reached only when
+1+2 miss. The bug lived in step 3 on `ripe` (a ripe name kbResolve misses, e.g. "Menghai Ripe 2019", matched
+`ripe` → `open`). **Planning's brief expected "loose shou → open"; that is NOT achievable** — a `shou` name is
+pre-empted to `compressed` by kbResolve (step 1) and never reaches the branch; asserting it would mean
+re-tuning the KB default, which is the brew initiative's territory (out of scope). Code lane flagged this and
+Niklas ruled: ship the narrowed fix, don't chase the literal loose-shou assertion. **Zero real-data impact:**
+the one puerh in the export has a STORED `compressed` and infers `compressed` anyway via `bing`; kb-test over
+the real CSV is byte-identical with/without the change. **Tests:** new committed data-free
+`fixtures/leaf-form-test.js` (12 checks; the three-step mechanism documented in the header). All committed
+suites green.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

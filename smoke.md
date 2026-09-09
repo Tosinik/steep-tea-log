@@ -116,6 +116,14 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.51 · leaf-form inference: puerh loose-vs-compressed  *(logic-only — light / no real UI)*
+
+Pure inference (`inferLeafForm`), no UI change, and nothing to see on the current data (the one puerh carries a
+STORED `compressed`, so it never infers). The vm probe + `fixtures/leaf-form-test.js` are the real proof. If you
+ever add a ripe pu'er cake WITHOUT setting its leaf form, its brew guide should now use the compressed curve
+(shorter opening, the cake pattern), not the loose one. *Pass:* nothing regresses; a stored-form tea is
+untouched. Flips STAGED→LIVE on Planning's clone-verify (no phone gate required).
+
 ## v4.50 · evolution temp-field fits a narrow screen  *(the c3 phone-look fix — ships WITH v4.49)*
 
 Dev forced a 375px viewport and confirmed the fields fit; a phone confirms it for real. In an active evolution

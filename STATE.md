@@ -254,7 +254,31 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.50 LIVE `192e960` — evolution temp-field fits a narrow screen (the c3 phone-look) (R192)**
+**NOW — v4.51 STAGED `97d3d18` — leaf-form inference: puerh is loose-vs-compressed, not ripe-vs-raw (R193)**
+(cache **v161**, APP_VERSION v4.51, **no SQL**, **no new module**). A STANDALONE correctness fix (NOT the
+brew-guidance rework). `inferLeafForm`'s puerh branch (steep-core.js ~L559) keyed on `shou`/`ripe` — PROCESSING
+words, not FORM — so a ripe pu'er the branch saw inferred `open` when a cake is `compressed`, mis-advising the
+form-keyed brew logic.
+- **Fix:** `case 'puerh': return has('loose','maocha','散') ? 'open' : 'compressed';` (drop the processing
+  words, keep the form signals, add 散 = loose per the KB rule). Pure inference, no stored data touched.
+- **Precise path (pinned in the fixture):** three ordered steps — (1) kbResolve maps `shou`/`sheng`/`puerh`
+  aliases to `compressed` and returns FIRST; (2) name-keyword `cake`/`bing`/`tuo`/`brick` → `compressed`;
+  (3) the type-switch puerh case, reached only when 1+2 miss. The bug was step 3 on `ripe` (a ripe name
+  kbResolve misses, e.g. "Menghai Ripe 2019" → `open`). Now defaults `compressed`; a genuinely loose puerh
+  still reads `open`.
+- **Planning's "loose shou → open" was NOT achievable** — kbResolve (step 1) pre-empts a `shou` name to
+  `compressed` before the branch; Niklas ruled ship the narrowed fix, don't chase it (re-tuning the KB default
+  is the brew initiative's territory).
+- **Zero real-data impact:** the one puerh in the export ("Fei Bing Beeng Cha") has a STORED `compressed` and
+  infers `compressed` anyway via `bing`; kb-test over the real CSV is byte-identical with/without the change.
+- **Tests:** new committed data-free `fixtures/leaf-form-test.js` (12 checks; three-step mechanism in the
+  header). All committed suites green; node --check clean.
+- **ON DEVICE:** light (`smoke.md §v4.51`) — no real UI change; on the current data there is nothing to see
+  (the one puerh is stored-compressed). The vm probe + the committed suite are the real proof.
+- **STATE:** code committed, PAUSED then PUSHED on Niklas's instruction (he authorized the push with the
+  deploy). Flip STAGED→LIVE after Planning's clone-verify.
+
+**Previously — v4.50 LIVE `192e960` — evolution temp-field fits a narrow screen (the c3 phone-look) (R192)**
 (cache **v160**, APP_VERSION v4.50, **no SQL**, **no new module** — CSS-only, touches `styles.css` + the
 version files). A CSS fix to the c3 evolution steep card, found on the v4.49 phone-look: the per-steep
 Time/Temp grid overflowed the right edge on a phone, pushing the Temp field off-screen.

@@ -46,6 +46,38 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.51 — leaf-form inference: puerh is loose-vs-compressed, not ripe-vs-raw — R193
+
+Deploy: steep-core.js, service-worker.js (cache v161), steep-version.js, .gitignore,
+fixtures/leaf-form-test.js (new), CHANGELOG.md, STATE.md, smoke.md,
+docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL. No new module.
+
+A standalone correctness fix (NOT the brew-guidance rework). `inferLeafForm`'s puerh branch (steep-core.js
+~L559) read `has('loose','shou','ripe','maocha') ? 'open' : 'compressed'`. `shou` and `ripe` are PROCESSING
+words (ripe vs raw pu'er), not FORM words: a tea's leaf form is decided by loose-vs-compressed. Lumping them
+with `loose` meant a ripe pu'er the branch actually saw (see below) inferred `open` when a cake is
+`compressed`, so the form-keyed brew logic then advised it wrong.
+
+- **Fix:** `case 'puerh': return has('loose','maocha','散') ? 'open' : 'compressed';` — dropped the processing
+  words, kept the form signals, and added the Chinese `散` (loose) to match the KB parser rule ("puerh →
+  compressed unless loose/散"). Pure inference; no stored data touched.
+- **The precise path (documented in the fixture):** `inferLeafForm` resolves in three ordered steps —
+  (1) `kbResolve`, which already maps any `shou`/`sheng`/`puerh` alias to `compressed` (the common-cake
+  default) and returns before the branch; (2) the name-keyword checks incl. `cake`/`bing`/`tuo`/`brick` →
+  `compressed`; (3) the type `switch`'s puerh case, reached ONLY when 1+2 miss. The bug lived in step 3, on the
+  `ripe` keyword: a ripe name kbResolve missed (no `ripe puerh` alias, no cake word — e.g. "Menghai Ripe 2019")
+  matched `ripe` and returned `open`. Now it correctly defaults `compressed`. A genuinely loose puerh
+  (`loose`/`maocha`/`散`) still reads `open`.
+- **Scope:** ONLY this branch. NOT gating the diagnosis on leaf form, NOT any re-derivation of `leaf_form` on
+  type change (those belong to the brew initiative). The KB's `shou`→`compressed` default (step 1) is
+  unchanged, so a "loose shou" name still resolves `compressed` via the KB — deliberately out of scope.
+- **Zero real-data impact:** the only puerh in the current export ("Fei Bing Beeng Cha") carries a STORED
+  `compressed` (so `effectiveLeafForm` never infers) and would infer `compressed` anyway via `bing`. `kb-test`
+  over the real CSV is byte-identical with and without the change (40 checks).
+- **Tests:** new committed data-free invariant `fixtures/leaf-form-test.js` (12 checks): the ripe-cake fix,
+  loose/maocha/散 → open, cakes/tuo → compressed, the kbResolve step-1 pre-emption pinned, and non-puerh types
+  unchanged; the header spells out the three-step mechanism. All committed suites green; node --check clean.
+
 ## v4.50 — evolution temp-field fits a narrow screen (the c3 phone-look) — R192
 
 Deploy: styles.css, service-worker.js (cache v160), steep-version.js, CHANGELOG.md, STATE.md, smoke.md,
