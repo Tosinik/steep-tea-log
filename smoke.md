@@ -116,6 +116,29 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.49 · Tea Tasting mode (guided mode c3)  *(the evolution loop + the phantom fix — on a real phone)*
+
+The evolution loop, the reshaping and the phantom fix are all touch/flow behaviour a vm cannot exercise (the
+fixtures pin the shapes + the arc + `steepEngaged`; dev drove the whole flow in the browser, both themes, no
+console errors). On the phone:
+
+1. **The gongfu loop.** Start a tasting on an oolong/pu-erh with a small vessel (gongfu). Walk to "How it
+   changes". Add a steep, jot time/colour/a note, add another, jot a NEW note → the quiet line "… opened up by
+   steep 2" appears (never at steep 1, never a "faded"). Tap an earlier (collapsed) steep to re-open it. A
+   steep you add and leave blank still counts. Nothing blocks moving on.
+2. **The empty cup** (gongfu only): a room after "How it changes" asks "What do you smell?" (smell, not taste).
+3. **Western reshaping.** A tasting brewed western (a mug / big pot) shows "As it cools, what shifts?" instead
+   of the loop, and NO empty-cup room.
+4. **The record.** Open the saved tasting: "How it changes" reads back the per-steep breakdown (time + colour
+   swatch + notes) with the arc line, and "The empty cup" for a gongfu one.
+5. **The phantom fix (ordinary session, the important regression).** Log a NORMAL session: brew a real steep
+   (run the timer or type a time), "Save steep & brew another", then tap **Finish session** WITHOUT touching
+   the next steep → the session has ONLY the steeps you actually brewed, no bogus trailing steep. A steep you
+   DID engage (timer ran, or you typed/edited its time, or added a note) still auto-captures on Finish.
+
+*Pass:* the loop collects without blocking, the arc reads positive-presence only, the empty-cup + western
+reshaping are right, the record reads back, and a normal session no longer logs a phantom trailing steep.
+
 ## v4.48 · info-popover left-edge clamp  *(the c2 phone-look fix — re-look on a real phone)*
 
 The clamp reads the visual viewport, which only a device has for real (dev forced a 375px viewport and

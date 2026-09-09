@@ -146,7 +146,8 @@ build.** What's next, in order:
      delete-vs-keep (bookkeeping still recomputes on every write); fix CLAUDE.md's passport dead-table
      over-claim (`passportSubFor`/`PASSPORT_SUB` are not live).
 4. **Features, prioritised by the audit:** Go Deeper / tea-reference redesign · tasting input (the
-   "What are you tasting?" tags — partly live — + the guided tasting mode, `IDEA-tasting-mode.md`) · matcha
+   "What are you tasting?" tags — partly live — + ~~the guided tasting mode, `IDEA-tasting-mode.md`~~
+   **the guided tasting mode is COMPLETE, v4.46–v4.49 / R188–R191, `SPEC-guided-mode-FINAL.md`**) · matcha
    mode (contained). **Backlog the audit ranks into this:** ~~freshness-framing fix~~ **DONE in B2**; the
    **sticky-rice catalog row** (an unmatched roasted oolong still defaults to the oolong family — B2's roast
    fix reaches catalog-matched teas only); a **vendor picker**; masthead session-start; stale-override reset;
@@ -253,7 +254,39 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.48 LIVE `04e7536` — info-popover left-edge clamp (the c2 phone-look) (R190)**
+**NOW — v4.49 STAGED `41bd57c` — Tea Tasting mode (guided mode c3): the evolution loop + the phantom-steep fix (R191)**
+(cache **v159**, APP_VERSION v4.49, **no SQL** — per-steep tags/time/temp ride the existing steeps rows, only
+the per-steep colour lands in the `tasting_record` blob; **no new module**). The last tasting slice
+(`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11): **c3 COMPLETES the guided tasting mode.**
+- **Evolution room** (`tr_evolution`, reshaped by `brewMethodFor`): gongfu/senchadō = a per-steep loop
+  (add-steep, one active steep with time/temp + colour picker + FLAVOR_TREE tagger, others collapsed; a
+  zero-tap steep counts, never blocks a pour); western = a single "as it cools" blob delta. The room list is
+  method-dependent (`tastingRoomsFor`). Running observation reuses `sessionFlavorStory` (positive-presence,
+  floored at steep 2, D2).
+- **Aroma cup** = a gongfu-only room before the verdict (smell language, blob delta). Cold brew is unreachable
+  in a tasting (c2 dropped the lane), so no cold path is built.
+- **Data model (no SQL):** `commitTasting` writes `d.steeps` to the session steeps rows + a real
+  `infusionCount`, so the evolution feeds the tea's profile + the arc; per-steep colour keyed by steep id in
+  `blob.evolution.colours`; `flavArrayFor` gained `evolution`/`cooling`/`aromaCup` routing; the record renders
+  "How it changes" + "The empty cup".
+- **Phantom-steep fix (SHARED flow, a live v4.48 bug):** `finishSteeping` auto-captured any steep with time>0,
+  so a schedule-pre-filled trailing time committed a phantom steep. `setSteepTime` gained a provenance arg
+  (`d.curTimeUserSet`), and the pure `steepEngaged` gates auto-capture on real engagement (timer ran / user set
+  the time / notes / tags). No retroactive cleanup (lossy, a separate confirmed job).
+- **Four build decisions (constraint-forced, surfaced):** cold-brew reshaping not built (unreachable);
+  per-steep colour → blob (steeps has no colour column, no SQL); western → blob delta not fake steeps; aroma
+  cup as its own gongfu-only room.
+- **Tests:** `tasting-mode-test.js` 67→98 (N reshaping, O loop+colour, P arc floor, Q western, R aroma cup,
+  S commit-carries-steeps, T phantom fix). All 49 committed suites green; node --check clean; browser-verified
+  both themes, no console errors.
+- **ON DEVICE (`smoke.md §v4.49`, POST-PUSH):** a real gongfu tasting on a phone — add steeps, tag/colour/time
+  each, the arc at steep 2, tap a collapsed steep to re-open, the empty-cup room; a western tasting shows "as
+  it cools" and no aroma cup; the record reads back; the PHANTOM check (a normal session: log a real steep,
+  "brew another", then Finish → no bogus trailing steep).
+- **STATE:** code `41bd57c` committed, PAUSED UNPUSHED (Niklas pushes). Flip STAGED→LIVE after his phone-look +
+  Planning's clone-verify.
+
+**Previously — v4.48 LIVE `04e7536` — info-popover left-edge clamp (the c2 phone-look) (R190)**
 (cache **v158**, APP_VERSION v4.48, **no SQL**, **no new module** — touches only `steep-core.js` + the version
 files). A tiny fix to the R180 info-popover (`toggleInfoPop`), latent since v4.39, surfaced by c2's glossary
 marks on the v4.47 phone-look: a mid-right ⓘ could render past the LEFT edge on a narrow phone.

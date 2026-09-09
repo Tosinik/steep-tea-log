@@ -2794,6 +2794,30 @@ two clipping Finish marks now pin to the 8px margin, both edges in; the taste + 
 unclamped, both themes); no fixture reaches `getBoundingClientRect`, so browser-verified, all 49 suites green.
 **This patch and v4.47 flip STAGED→LIVE together** after the combined re-look + Planning clone-verify.
 
+**R191 — Tea Tasting mode (guided mode c3): the evolution loop + the phantom-steep fix.** Shipped v4.49 (cache
+v159, no SQL, no new module). The last tasting slice (`SPEC-guided-mode-FINAL.md` §11); c3 COMPLETES the guided
+tasting mode. **Evolution room** (`tr_evolution`, reshaped by `brewMethodFor`): gongfu/senchadō = a per-steep
+loop (add-steep, one active steep with time/temp + colour picker + FLAVOR_TREE tagger, others collapsed; a
+zero-tap steep counts, the room never blocks a pour); western = a single "as it cools" blob delta; the room
+list is method-dependent (`tastingRoomsFor`). **Running observation** reuses `sessionFlavorStory` (positive
+presence only, floored at steep 2, D2). **Aroma cup** = a gongfu-only room, smell language, blob delta.
+**Four build decisions (constraint-forced, surfaced not blocked):** (1) cold-brew reshaping NOT built — c2
+dropped the cold lane, so a tasting's `isColdBrew` is always false and the path is unreachable; (2) per-steep
+COLOUR → the blob (`evolution.colours[steepId]`) because the steeps table has no colour column and the slice
+is no-SQL — the SPEC §10 escape hatch; per-steep tags/time/temp stay canonical in the steeps rows; (3) western
+→ a blob delta, not fake steeps (only the loop writes steeps rows); (4) the aroma cup is its own gongfu-only
+room (its own `flavCtx`), not crammed into the evolution room's single-tagger context. **Data model (no SQL):**
+`commitTasting` writes `d.steeps` to the session steeps rows + a real `infusionCount`, so the evolution feeds
+the tea's profile + the arc; `flavArrayFor` gained `evolution`/`cooling`/`aromaCup` routing; the record renders
+"How it changes" + "The empty cup". **Phantom-steep fix (a live v4.48 bug in the SHARED session flow):**
+`finishSteeping` auto-captured any steep with time > 0, so a schedule-pre-filled trailing time committed a
+phantom steep; `setSteepTime` gained a provenance arg (`d.curTimeUserSet`), and the pure `steepEngaged` gates
+auto-capture on real engagement (timer ran / user set the time / notes / tags). NO retroactive cleanup of
+existing bare trailing steeps (lossy; a separate confirmed job). **Tests:** `tasting-mode-test.js` 67→98
+(N reshaping, O loop + colour-to-blob, P arc floor, Q western, R aroma cup, S commit-carries-steeps, T phantom
+fix); all 49 suites green; browser-verified both themes, no console errors. **NEXT: the guided tasting mode is
+DONE; SECURITY re-blocks before the beta widens** (F1/F2/F3 + GDPR erasure + Datenschutzerklärung/Impressum).
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

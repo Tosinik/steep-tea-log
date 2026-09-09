@@ -46,6 +46,45 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.49 — Tea Tasting mode (guided mode c3): the evolution loop + the phantom-steep fix — R191
+
+Deploy: steep-sessions.js, service-worker.js (cache v159), steep-version.js, styles.css,
+fixtures/tasting-mode-test.js, CHANGELOG.md, STATE.md, ROADMAP-v4.md, smoke.md,
+docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL (the per-steep tags/time/temp ride the existing steeps rows;
+only the per-steep colour lands in the `tasting_record` blob, which has no schema). No new module.
+
+The last tasting slice (`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11). The steepless c1/c2 tasting gains a
+per-steep evolution reshaped by method, and the shared session flow loses a phantom trailing steep. **c3
+completes the guided tasting mode** (D4, wave-1 #3 slice c).
+
+- **Evolution room** (`tr_evolution`, reshaped through `brewMethodFor`, SPEC §3): gongfu/senchadō is a
+  per-steep loop (`tr_evoLoop`) — `tastingAddSteep` appends a steep, one active steep carries time/temp + the
+  liquor colour picker + the FLAVOR_TREE tagger, earlier steeps collapse to summaries (`tastingActivateSteep`
+  re-opens one); a zero-tap steep still counts, and the room never blocks a pour ("it collects, it does not
+  conclude"). Western is a single "as it cools" delta (`tr_evoCooling`), no steeps. The room list is
+  method-dependent (`tastingRoomsFor`).
+- **The running observation** reuses `sessionFlavorStory`: positive-presence only ("X opened up by steep N"),
+  floored at steep 2, never inferred from a note's absence (D2). The full phased arc still reads in the record.
+- **Aroma cup** (`tr_aromaCup`): a GONGFU-ONLY room before the verdict, smell language (`flavPromptFor`), a
+  blob delta. Cold brew is unreachable in a tasting (c2 dropped the lane), so no cold path is built.
+- **Data model (no SQL):** the per-steep tags/time/temp are the CANONICAL data and ride the **steeps rows** —
+  `commitTasting` writes `d.steeps` to the session's steeps + a real `infusionCount`, so the evolution feeds
+  the tea's flavour profile and the D2 arc like any session. The per-steep **colour** has no steep column, so
+  it lands in `blob.evolution.colours` keyed by steep id (the SPEC §10 escape hatch). `flavArrayFor` gained
+  `evolution` / `cooling` / `aromaCup` routing. The record renders "How it changes" (per-steep breakdown +
+  per-cup colour swatches + the arc) and "The empty cup".
+- **Phantom-steep fix** (a live v4.48 bug in the SHARED session flow): "Save steep & brew another" pre-fills
+  the next steep's time from the guide (`applyScheduleToCurrentSteep` → `setSteepTime` → `curTime`), and
+  `finishSteeping` auto-captured any steep with a time > 0 — committing a phantom trailing steep with no
+  notes/tags/feedback. `setSteepTime` gained a provenance arg (user edit vs schedule pre-fill, tracked on
+  `d.curTimeUserSet`); the new pure `steepEngaged` gates the auto-capture on real engagement (the timer ran,
+  the user set/edited the time, or there are notes/tags). A bare pre-filled trailing time is no longer
+  captured. **No retroactive cleanup** of existing bare trailing steeps (lossy, a separate confirmed job).
+- **Tests:** `fixtures/tasting-mode-test.js` 67 → 98 (N reshaping, O the loop + colour-to-blob, P the arc
+  floor, Q western, R the aroma cup, S commit carries the steeps, T the phantom fix); A1/A2 updated for the
+  9-room base walk. All 49 committed suites green; node --check clean; browser-verified both themes end to end
+  (the loop, the arc, the aroma cup, western, the record, and the phantom fix), no console errors.
+
 ## v4.48 — info-popover left-edge clamp (the c2 phone-look) — R190
 
 Deploy: steep-core.js, service-worker.js (cache v158), steep-version.js, CHANGELOG.md, STATE.md, smoke.md,

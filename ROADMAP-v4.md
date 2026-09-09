@@ -121,8 +121,9 @@ decisions rather than any single ruling:
   SHIPPED v4.46/R188** (both entry doors, the two registers, the 8-room walk, the `tasting_record` blob, the
   verdict close, not-shareable); **c2 SHIPPED v4.47/R189** (the fleshed axes taste/mouthfeel/finish + palate
   multi-select + authored §6 copy + the 7-term glossary ⓘ + the tradition lens + the deliberate-discard fix +
-  the Cold-brew-lane drop). **Remaining: c3** (the per-steep evolution loop + brewStyle reshaping + aroma-cup).
-  Then SECURITY re-blocks before the beta widens.
+  the Cold-brew-lane drop); **c3 SHIPPED v4.49/R191** (the per-steep evolution loop + brewStyle reshaping +
+  the gongfu aroma cup + the phantom-steep fix in the shared session flow). **The guided tasting mode (D4) is
+  COMPLETE.** Then SECURITY re-blocks before the beta widens.
 - **Security & legal hardening pass — DEFERRED by decision (2026-08-28); the pre-widening gate, NOT the
   next item.** It comes **after** the R5 design work and **re-blocks before the beta widens** (before the
   next person logs in). Findings
