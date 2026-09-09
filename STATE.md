@@ -254,7 +254,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.51 STAGED `97d3d18` — leaf-form inference: puerh is loose-vs-compressed, not ripe-vs-raw (R193)**
+**NOW — v4.51 LIVE `97d3d18` — leaf-form inference: puerh is loose-vs-compressed, not ripe-vs-raw (R193)**
 (cache **v161**, APP_VERSION v4.51, **no SQL**, **no new module**). A STANDALONE correctness fix (NOT the
 brew-guidance rework). `inferLeafForm`'s puerh branch (steep-core.js ~L559) keyed on `shou`/`ripe` — PROCESSING
 words, not FORM — so a ripe pu'er the branch saw inferred `open` when a cake is `compressed`, mis-advising the
@@ -275,8 +275,8 @@ form-keyed brew logic.
   header). All committed suites green; node --check clean.
 - **ON DEVICE:** light (`smoke.md §v4.51`) — no real UI change; on the current data there is nothing to see
   (the one puerh is stored-compressed). The vm probe + the committed suite are the real proof.
-- **STATE:** code committed, PAUSED then PUSHED on Niklas's instruction (he authorized the push with the
-  deploy). Flip STAGED→LIVE after Planning's clone-verify.
+- **LIVE:** code `97d3d18` + docs `14f16ac` pushed; Planning's clone-verify passed (no phone gate — logic-only,
+  no real UI change) → flipped STAGED→LIVE.
 
 **Previously — v4.50 LIVE `192e960` — evolution temp-field fits a narrow screen (the c3 phone-look) (R192)**
 (cache **v160**, APP_VERSION v4.50, **no SQL**, **no new module** — CSS-only, touches `styles.css` + the
