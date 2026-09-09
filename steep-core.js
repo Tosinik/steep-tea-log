@@ -1239,6 +1239,18 @@ function toggleInfoPop(btn){
     const r = pop.getBoundingClientRect();
     if(r.bottom > vBot - 8) pop.classList.add('info-pop-above');
     if(r.right > vRight - 8) pop.classList.add('info-pop-right');
+    // Horizontal clamp (R190, the c2 phone-look): the right-flip above can push a mid-right mark's
+    // popover off the LEFT edge on a narrow phone (it was unclamped there). Re-measure and pin the
+    // popover inside the visual viewport, ~8px each side, overriding both anchor modes. Set left/right
+    // in px (NOT transform) so the open animation's translateY is left free to run.
+    const r2 = pop.getBoundingClientRect();
+    let left = r2.left;
+    if(left + r2.width > vRight - 8) left = vRight - 8 - r2.width;   // keep the right edge in
+    if(left < vLeft + 8) left = vLeft + 8;                          // keep the left edge in (wins if too wide to fit both)
+    if(Math.abs(left - r2.left) > 0.5){
+      pop.style.left = (left - wrap.getBoundingClientRect().left) + 'px';
+      pop.style.right = 'auto';
+    }
   }catch(e){}
   // Dismiss: outside tap (armed next tick so this opening tap does not self-close) + Escape. Re-tap and
   // any render() clear it too (the pop lives in #app).
