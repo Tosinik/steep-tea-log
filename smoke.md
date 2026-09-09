@@ -116,6 +116,13 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.50 · evolution temp-field fits a narrow screen  *(the c3 phone-look fix — ships WITH v4.49)*
+
+Dev forced a 375px viewport and confirmed the fields fit; a phone confirms it for real. In an active evolution
+steep card (the gongfu loop, "How it changes"): the **Time (s)** and **Temp (°C)** fields sit fully on screen,
+nothing runs off the right edge. On a phone they stack; on a wider screen they sit two-up. *Pass:* no field
+clips at the right edge. This flips STAGED→LIVE together with v4.49.
+
 ## v4.49 · Tea Tasting mode (guided mode c3)  *(the evolution loop + the phantom fix — on a real phone)*
 
 The evolution loop, the reshaping and the phantom fix are all touch/flow behaviour a vm cannot exercise (the

@@ -254,7 +254,21 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.49 STAGED `41bd57c` — Tea Tasting mode (guided mode c3): the evolution loop + the phantom-steep fix (R191)**
+**NOW — v4.50 STAGED `192e960` — evolution temp-field fits a narrow screen (the c3 phone-look) (R192)**
+(cache **v160**, APP_VERSION v4.50, **no SQL**, **no new module** — CSS-only, touches `styles.css` + the
+version files). A CSS fix to the c3 evolution steep card, found on the v4.49 phone-look: the per-steep
+Time/Temp grid overflowed the right edge on a phone, pushing the Temp field off-screen.
+- **Cause:** `.tst-evo-tt` was `1fr 1fr` with no phone collapse (unlike `.form-grid`, which stacks at 600px);
+  `1fr`=`minmax(auto,1fr)`, and the number inputs' ~201px min-content forced the tracks wide (~412px > the
+  ~313px card).
+- **Fix:** `minmax(0,1fr)` columns + `.field{min-width:0}` + `input{width:100%}` + a `max-width:600px`
+  one-column collapse (matching `.form-grid`). No logic change.
+- **Verified** with the SW cache cleared: 375px stacked (right edge 344 < 375), 720px two-up (665 < 720),
+  neither overflows; the ordinary steeping room was already fine. All 49 suites green; node --check clean.
+- **STATE:** rides on v4.49 (still STAGED). **v4.49 + v4.50 flip STAGED→LIVE TOGETHER** after Niklas pushes,
+  re-looks on the live app, and Planning clone-verifies. Do NOT flip either alone.
+
+**Previously — v4.49 STAGED `41bd57c` — Tea Tasting mode (guided mode c3): the evolution loop + the phantom-steep fix (R191)**
 (cache **v159**, APP_VERSION v4.49, **no SQL** — per-steep tags/time/temp ride the existing steeps rows, only
 the per-steep colour lands in the `tasting_record` blob; **no new module**). The last tasting slice
 (`docs/r5/planning/SPEC-guided-mode-FINAL.md` §11): **c3 COMPLETES the guided tasting mode.**
@@ -283,8 +297,9 @@ the per-steep colour lands in the `tasting_record` blob; **no new module**). The
   each, the arc at steep 2, tap a collapsed steep to re-open, the empty-cup room; a western tasting shows "as
   it cools" and no aroma cup; the record reads back; the PHANTOM check (a normal session: log a real steep,
   "brew another", then Finish → no bogus trailing steep).
-- **STATE:** code `41bd57c` committed, PAUSED UNPUSHED (Niklas pushes). Flip STAGED→LIVE after his phone-look +
-  Planning's clone-verify.
+- **STATE:** code `41bd57c` + docs `7e9d02f` pushed. Niklas's phone-look found the evolution steep card's
+  Time/Temp grid overflowing the right edge on a phone → **fixed in v4.50 (below).** v4.49 stays STAGED;
+  **v4.49 + v4.50 flip STAGED→LIVE TOGETHER** after the combined re-look + Planning's clone-verify.
 
 **Previously — v4.48 LIVE `04e7536` — info-popover left-edge clamp (the c2 phone-look) (R190)**
 (cache **v158**, APP_VERSION v4.48, **no SQL**, **no new module** — touches only `steep-core.js` + the version

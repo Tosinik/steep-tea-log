@@ -2818,6 +2818,16 @@ existing bare trailing steeps (lossy; a separate confirmed job). **Tests:** `tas
 fix); all 49 suites green; browser-verified both themes, no console errors. **NEXT: the guided tasting mode is
 DONE; SECURITY re-blocks before the beta widens** (F1/F2/F3 + GDPR erasure + Datenschutzerklärung/Impressum).
 
+**R192 — evolution temp-field fits a narrow screen (the c3 phone-look).** Shipped v4.50 (cache v160, no SQL,
+no new module; CSS-only). Niklas's v4.49 phone-look found the c3 evolution steep card's per-steep Time/Temp
+grid overflowing the right edge on a phone (the Temp field ran off-screen). **Cause:** `.tst-evo-tt` was
+`1fr 1fr` with no phone collapse (unlike `.form-grid`, which stacks at `max-width:600px`); `1fr` =
+`minmax(auto,1fr)`, and the number inputs' ~201px min-content forced each track wide, overflowing the ~313px
+card. **Fix:** `minmax(0,1fr)` columns + `.field{min-width:0}` + `input{width:100%}` + a `max-width:600px`
+one-column collapse (matching `.form-grid`); no logic change. Verified both widths (375px stacked, 720px
+two-up, neither overflows). **This patch and v4.49 flip STAGED→LIVE together** after the combined re-look +
+Planning clone-verify.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

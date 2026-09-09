@@ -46,6 +46,26 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.50 — evolution temp-field fits a narrow screen (the c3 phone-look) — R192
+
+Deploy: styles.css, service-worker.js (cache v160), steep-version.js, CHANGELOG.md, STATE.md, smoke.md,
+docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL. No new module.
+
+A CSS-only fix to the c3 evolution steep card, found on Niklas's v4.49 phone-look: the per-steep Time/Temp
+grid overflowed the right edge on a phone, pushing the Temp field off-screen.
+
+- **Cause:** `.tst-evo-tt` was `grid-template-columns:1fr 1fr` with no phone handling (unlike the ordinary
+  steeping room's `.form-grid`, which collapses to one column at `max-width:600px`). A `1fr` track is
+  `minmax(auto,1fr)`, and the number inputs' intrinsic min-content width (~201px each) forced the `auto`
+  floor, so the two tracks summed ~412px and overflowed the ~313px card, running the Temp field to the
+  viewport edge.
+- **Fix:** `grid-template-columns:minmax(0,1fr) minmax(0,1fr)` so the tracks can shrink below content
+  min-content, `.tst-evo-tt .field{min-width:0}` + `.field input{width:100%}` so the inputs follow, and a
+  `@media(max-width:600px)` collapse to one column on phones (matching `.form-grid`). No logic change.
+- **Verified** in-browser with the SW cache cleared: at 375px the fields stack, both right edges 344 < 375
+  (no overflow); at 720px they sit two-up, 300px each, right edge 665 < 720. The ordinary steeping room was
+  already fine. All 49 committed suites green; node --check clean.
+
 ## v4.49 — Tea Tasting mode (guided mode c3): the evolution loop + the phantom-steep fix — R191
 
 Deploy: steep-sessions.js, service-worker.js (cache v159), steep-version.js, styles.css,
