@@ -1298,7 +1298,12 @@ function tastingDoorHTML(){
   const d = state.sessionDraft;
   if(d && d.isTasting){
     const t = teaById(d.teaId);
-    return `<button class="home-tasting-door is-resume" onclick="d_resumeTasting()">Resume your tasting${t?' of '+escapeHtml(t.name):''} &rarr;</button>`;
+    // Resume AND Discard (FOLDED-IN FIX): the partial is kept by default, but a discard is offered here
+    // as an explicit, confirmed choice (armConfirm) that clears the persisted draft.
+    return `<div class="home-tasting-resume">
+      <button class="home-tasting-door is-resume" onclick="d_resumeTasting()">Resume your tasting${t?' of '+escapeHtml(t.name):''} &rarr;</button>
+      <button class="home-tasting-discard" onclick="armConfirm(this,'Discard this tasting?',()=>discardTasting())">Discard</button>
+    </div>`;
   }
   if(!(state.teas||[]).length) return '';   // nothing on the shelf to taste yet
   return `<button class="home-tasting-door" onclick="homeStartTasting(this)">Taste a tea properly &rarr;</button>`;

@@ -1166,6 +1166,29 @@ function armConfirm(btn, message, onYes){
   box.appendChild(yes); box.appendChild(no);
   btn.insertAdjacentElement('afterend', box);
 }
+// Like armConfirm, but offers SEVERAL named actions (plus Cancel) in place of the button — a calm
+// inline chooser for a decision with more than a yes/no (leaving a tasting: Keep vs Discard). Each
+// choice {label,onPick,danger}; any pick or Cancel restores the button; any render() clears it.
+function armChoice(btn, message, choices){
+  if(!btn || btn._confirmOpen) return;
+  btn._confirmOpen = true;
+  btn.style.display = 'none';
+  const box = document.createElement('span');
+  box.className = 'confirm-inline';
+  box.style.cssText = 'display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);';
+  const label = document.createElement('span'); label.textContent = message; box.appendChild(label);
+  const restore = ()=>{ box.remove(); btn.style.display=''; btn._confirmOpen=false; };
+  (choices||[]).forEach(c=>{
+    const b = document.createElement('button'); b.type='button'; b.className='btn-ghost'; b.textContent=c.label;
+    if(c.danger){ b.style.color='var(--red)'; b.style.fontWeight='600'; }
+    b.addEventListener('click', ()=>{ restore(); try{ c.onPick&&c.onPick(); }catch(e){ console.error('[Steep] choice action failed', e); } });
+    box.appendChild(b);
+  });
+  const no = document.createElement('button'); no.type='button'; no.className='btn-ghost'; no.textContent='Cancel';
+  no.addEventListener('click', restore);
+  box.appendChild(no);
+  btn.insertAdjacentElement('afterend', box);
+}
 
 // Shared inline suggestion list under a text field — the .tag-suggest popover, extracted (R179) so
 // the tag input and the vendor fields share ONE renderer. It rides the layout (an absolutely-

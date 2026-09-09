@@ -1435,6 +1435,24 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 /* The stable Home door (SPEC §2): a quiet full-width door below the greeting, not a rotating card. */
 .home-tasting-door{display:block;width:100%;margin:0 0 16px;padding:13px 16px;text-align:left;background:var(--white);border:1px solid var(--line);border-radius:2px;font-family:var(--font-display);font-size:15px;color:var(--jade-deep);cursor:pointer;}
 .home-tasting-door.is-resume{background:var(--porcelain-dim);}
+.home-tasting-resume{display:flex;align-items:stretch;gap:8px;margin:0 0 16px;}
+.home-tasting-resume .home-tasting-door{flex:1;margin:0;}
+.home-tasting-discard{flex:none;background:none;border:1px solid var(--line);border-radius:2px;padding:0 14px;font-family:inherit;font-size:12.5px;color:var(--ink-soft);cursor:pointer;}
+/* c2 axes: worded scales + steps reuse .tst-chip; astringency pairs two reads under one heading */
+.tst-sublabel{font-size:10.5px;color:var(--ink-soft);letter-spacing:.03em;margin:10px 0 6px;}
+.tst-scale{gap:6px;}
+.tst-rec-val{font-size:13px;color:var(--ink);}
+.tst-disclose{background:none;border:0;padding:2px 0;font-family:inherit;font-size:13px;color:var(--jade-deep);cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
+.tst-lens-toggle{background:none;border:0;padding:2px 0;font-family:var(--font-display);font-size:13.5px;color:var(--jade-deep);cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
+.tst-lens-toggle.inline{font-family:inherit;font-size:11px;color:var(--ink-soft);text-decoration:underline;margin-left:6px;}
+.tst-lens-panel{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--porcelain);}
+.tst-lens-intro{font-size:11px;color:var(--ink-soft);margin-bottom:8px;}
+.tst-lens-row{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-top:1px solid var(--line);}
+.tst-lens-row:first-of-type{border-top:0;}
+.tst-lens-term{font-family:var(--font-display);font-size:13.5px;color:var(--ink);flex:none;display:inline-flex;align-items:center;gap:2px;}
+.tst-lens-map{flex:1;font-size:11px;color:var(--ink-soft);}
+.tst-lens-val{font-size:13px;color:var(--jade-deep);font-weight:600;}
+.tst-lens-none{font-size:11px;color:var(--ink-soft);opacity:.8;}
 .tst-setup-link{display:block;width:100%;margin-top:14px;background:none;border:0;padding:6px;font-family:inherit;font-size:13px;color:var(--jade-deep);text-decoration:underline;cursor:pointer;text-align:center;}
 /* Register choice on the setup card */
 .tst-reg-row{margin-top:18px;}

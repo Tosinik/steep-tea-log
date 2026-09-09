@@ -878,7 +878,7 @@ const COLD_LANE_KEY = '__cold';
 function methodLanesHTML(cfg){
   const cur = cfg.isColdBrew ? COLD_LANE_KEY
             : (cfg.resolve ? brewMethodFor(cfg.brewStyle, cfg.capacityMl) : (cfg.brewStyle || ''));
-  const lanes = SESSION_METHODS.concat([{k:COLD_LANE_KEY, label:'Cold brew'}]);
+  const lanes = cfg.noCold ? SESSION_METHODS : SESSION_METHODS.concat([{k:COLD_LANE_KEY, label:'Cold brew'}]);   // a tasting is never cold (c2): no cold lane
   return `<div class="seg${cfg.small?' seg-sm':''} seg-lanes">` + lanes.map(m=>{
     const cb = m.k===COLD_LANE_KEY ? cfg.onCold : `${cfg.onMethod}('${m.k}')`;
     return `<button type="button" class="${cur===m.k?'active':''}" onclick="${cb}">${escapeHtml(m.label)}</button>`;
@@ -1246,6 +1246,12 @@ function flavFamilyPanelHTML(d){
   if(bare.length) rows.push(`<div class="flav-sub"><div class="flav-chips">${bare.map(chip).join('')}</div></div>`);
   return `<div class="flav-panel">${rows.join('')}</div>`;
 }
+// The tagger is reused across the tasting SMELL rooms + the taste room + the ordinary session flow.
+// Only the taste room (and the default session flow) asks about taste; the smell rooms ask about smell
+// (c2 fix: c1's hardcoded "What are you tasting?" leaked into the dry-leaf room). flavCtx null = session
+// flow → the unchanged default, so the ordinary flow is untouched.
+const FLAV_PROMPTS = { dryLeaf:'What do you smell?', wetLeaf:'What do you smell now?', liquorAroma:'What do you smell?', taste:'What are you tasting?' };
+function flavPromptFor(d){ return (d && d.flavCtx && FLAV_PROMPTS[d.flavCtx]) || 'What are you tasting?'; }
 function flavorCaptureHTML(d){
   const _fa = flavArrayFor(d);
   const sel = _fa.map(t=>String(t).toLowerCase());
@@ -1260,7 +1266,7 @@ function flavorCaptureHTML(d){
     : `<button type="button" class="flav-door" onclick="d_flavorFreeOpen()">${icon('i-plus-hl',18)}<span>your own word</span></button>`;
   return `
     <div class="flav-capture">
-      <div class="flav-prompt"><span class="flav-q">What are you tasting?</span><span class="flav-opt mono">optional</span></div>
+      <div class="flav-prompt"><span class="flav-q">${escapeHtml(flavPromptFor(d))}</span><span class="flav-opt mono">optional</span></div>
       ${chosen}
       ${strip}
       ${fams}
@@ -1817,18 +1823,44 @@ async function commitSession(){
 const DRY_LEAF_FORMS = ['needle','twisted','rolled','curled','flat','wiry','broken','downy'];
 const DRY_LEAF_FORM_LABELS = { needle:'Needle', twisted:'Twisted', rolled:'Rolled / balled', curled:'Curled', flat:'Flat / open', wiry:'Wiry', broken:'Broken', downy:'Downy' };
 function leafFormLabel(f){ return DRY_LEAF_FORM_LABELS[f] || f; }
-// The walk. Each room: key + expert label + a short GUIDE cue (the authored §6 copy + the glossary and
-// the tradition lens land in c2 — c1 ships the register MECHANISM with brief functional cues).
+// The walk. Each room: key + expert label + the authored GUIDE cue (SPEC §6, both registers: guide
+// shows the cue, expert sees just the field labels). Verbatim from the spec; plain, no em dashes.
 const TASTING_ROOMS = [
-  { key:'dryLeaf',     label:'Dry leaf',      cue:'Look at the dry leaves and give them a smell.' },
-  { key:'wetLeaf',     label:'Warmed leaf',   cue:'After the first pour, smell the hot leaves. What shifted?' },
-  { key:'liquor',      label:'Liquor colour', cue:'Hold the cup to the light. What colour, and how deep?' },
-  { key:'liquorAroma', label:'Aroma',         cue:'Bring the cup to your nose. What do you smell now?' },
-  { key:'taste',       label:'Taste',         cue:'Take a bold sip, like soup, so it coats the mouth.' },
-  { key:'mouthfeel',   label:'Mouthfeel',     cue:'Forget flavour a moment. How does it feel in the mouth?' },
-  { key:'finish',      label:'Finish',        cue:'Swallow, then wait. What comes back, and how long does it linger?' },
-  { key:'verdict',     label:'Your verdict',  cue:'So, is this one to your liking?' }
+  { key:'dryLeaf',     label:'Dry leaf',      cue:'Tip the leaves into your hand. Whole or broken? What colour? Now smell. Fresh and sweet, or dusty and flat?' },
+  { key:'wetLeaf',     label:'Warmed leaf',   cue:"After the first pour, lift the lid and smell the hot leaves. Then again once they've cooled a little. The scent shifts." },
+  { key:'liquor',      label:'Liquor colour', cue:'Hold the cup over something white. How deep is the colour, and is it clear and bright or cloudy?' },
+  { key:'liquorAroma', label:'Aroma',         cue:'Bring the cup to your nose, a few short sniffs. What does it bring to mind: flowers, fruit, fresh grass, toast?' },
+  { key:'taste',       label:'Taste',         cue:'A bold sip with a little air, like soup, so it coats the whole mouth. Sweet, savoury, grassy, bitter? And where do you notice each part, front or back?' },
+  { key:'mouthfeel',   label:'Mouthfeel',     cue:'Forget flavour for a moment. How does it feel? Light like water or thick like broth? Any drying, puckering feeling, and is that pleasant or harsh?' },
+  { key:'finish',      label:'Finish',        cue:'Swallow, then wait a few seconds. Does a sweetness come back? How long does it linger? Is your throat smooth and open, or tight?' },
+  { key:'verdict',     label:'Your verdict',  cue:"So, is this one to your liking? What did you love, what didn't land? Enough to want more?" }
 ];
+// c2 axes. WORDED scales = an ordered ladder of anchor words (a pick freezes {word, position}); STEPS =
+// named enum keys. The intensity ladder serves the four taste axes AND astringency level (SPEC §4:
+// "faint … pronounced"); finish length has its own (SPEC §4: "gone at once … lingers").
+const TASTING_INTENSITY = ['faint','light','medium','strong','pronounced'];
+const TASTING_FINISH_LEN = ['gone at once','short','medium','long','lingering'];
+const TASTING_BODY = [{k:'thin',label:'Thin'},{k:'medium',label:'Medium'},{k:'full',label:'Full'}];
+const TASTING_ASTR_QUALITY = [{k:'pleasant',label:'Pleasant'},{k:'just-there',label:'Just there'},{k:'harsh',label:'Harsh'}];
+const TASTING_HUIGAN = [{k:'none',label:'None'},{k:'faint',label:'Faint'},{k:'clear',label:'Clear'}];
+const TASTING_HOUYUN = [{k:'none',label:'None'},{k:'faint',label:'Faint'},{k:'clear',label:'Clear'}];
+const TASTING_PALATE = [{k:'front',label:'Front'},{k:'mid',label:'Mid'},{k:'back',label:'Back'}];
+const TASTING_TASTE_AXES = [{k:'sweet',label:'Sweet'},{k:'bitter',label:'Bitter'},{k:'sour',label:'Sour'},{k:'umami',label:'Umami',info:'umami'}];
+// SPEC §5 glossary — the ⓘ definitions, verbatim, house voice. Shipped from here, NOT the board glosses.
+const TASTING_GLOSSARY = {
+  umami:"The savoury, brothy depth that comes from a tea's amino acids, theanine most of all. Strongest in shaded Japanese greens like gyokuro. Closer to stock or seaweed than to sweetness.",
+  amami:"Sweetness. In Japanese greens it usually arrives alongside umami and rounds off the edges.",
+  shibumi:"Astringency, but the good kind. A pleasant drying grip that gives a tea its structure. Wanted in balance, not a fault.",
+  nigami:"Bitterness, mostly from caffeine. Usually the least welcome of the four, and the first thing to spike when the water runs too hot or the steep too long.",
+  astringency:"Astringency is a feeling: a drying, puckering grip as tannins bind with your saliva. Bitterness is a taste. They often show up together, but they are not the same, and astringency can be lovely where sharp bitterness rarely is.",
+  huigan:"The returning sweetness. A sweetness that rises in the mouth and throat a moment after you swallow, and a prized sign of quality in Chinese teas.",
+  houyun:"Throat feel. A cooling, opening sensation that carries down the throat and lingers, valued in aged and high-grade teas."
+};
+function tastingGloss(k){ return infoMark(TASTING_GLOSSARY[k]||'', k); }
+// The tradition lens is surfaced by tea TYPE (the amami/nigami/umami/shibumi reading is the Japanese-
+// green vocabulary), independent of brew method. hou-yun rides the finish room by its own gate.
+function tastingLensType(tea){ return tea && tea.type==='green'; }
+function tastingHouYunType(tea){ return tea && (tea.type==='oolong' || tea.type==='puerh'); }
 const TASTING_SCHEMA_V = 1;   // stamped on the blob; a restored draft with a different v is handled, not crashed
 const TASTING_FLAV_ROOMS = ['dryLeaf','wetLeaf','liquorAroma','taste'];   // rooms whose aroma tagger writes a stage array
 // Tier-1 profile feed: ONLY the CUP stages (liquor aroma + taste notes), deduped + lowercased → the
@@ -1841,13 +1873,21 @@ function tastingProfileTags(blob){
   return [...new Set([...liq, ...tas].map(t=>String(t).toLowerCase()))];
 }
 function newTastingBlob(){
+  // c2 nests the fleshed axes into the existing stage objects (no migration). WORDED scales store a
+  // FROZEN {word,position} — the record renders the stored word and never re-derives it, so a later
+  // ladder re-tune can never rewrite an old tasting. Named STEPS store the enum key. Palate is a
+  // multi-select array of place keys. All optional (null / []).
   return { v:TASTING_SCHEMA_V, register:null, startedAt:new Date().toISOString(), endedEarly:false,
     dryLeaf:{ form:[], colour:null, mottled:false, aroma:[], note:'' },
     wetLeaf:{ aromaShift:[], note:'' },
     liquor:{ colour:null, aroma:[], note:'' },
-    taste:{ notes:[], note:'' },
-    mouthfeel:{ note:'' },
-    finish:{ note:'' },
+    taste:{ notes:[], note:'',
+            axes:{ sweet:null, bitter:null, sour:null, umami:null },   // each null | {word,position} (worded scale)
+            palatePosition:[] },                                       // multi-select subset of front/mid/back (places, not amounts)
+    mouthfeel:{ note:'', body:null,                                    // body: named step key
+            astringency:{ level:null, quality:null } },                // level: {word,position} · quality: named step key
+    finish:{ note:'', length:null,                                     // length: {word,position} (worded scale)
+            huigan:null, houYun:null },                                // huigan/houYun: named step keys (houYun oolong/pu-erh only)
     verdict:{ liked:'', teaRatingOffered:false } };
 }
 // Entry — reuses startSessionFor's draft (tea/vessel/grams/method/date, and its vessel guard), then flags
@@ -1883,7 +1923,7 @@ function tastingSetupHTML(d){
   d.flavCtx=null;
   const tea=teaById(d.teaId), selVesName=(vesselById(d.vesselId)||{}).name, ves=vesselById(d.vesselId);
   const cap=(ves||{}).capacityMl||null;
-  const methodLanes = methodLanesHTML({ brewStyle:d.brewStyle, isColdBrew:false, capacityMl:cap, resolve:true, onMethod:'d_pickMethodLane', onCold:'d_pickColdLane()', small:true });
+  const methodLanes = methodLanesHTML({ brewStyle:d.brewStyle, isColdBrew:false, capacityMl:cap, resolve:true, onMethod:'d_pickMethodLane', noCold:true, small:true });
   const caret = `<span class="trio-caret">${icon('i-caret-hl',20)}</span>`;
   const reg = (k,title,sub)=>`<button type="button" class="tst-reg${d.register===k?' on':''}" onclick="d_setRegister('${k}')"><span class="tst-reg-t">${escapeHtml(title)}</span><span class="tst-reg-s">${escapeHtml(sub)}</span></button>`;
   return `
@@ -1922,9 +1962,9 @@ function tastingRoomHTML(d){
     : room.key==='wetLeaf' ? `${flavorCaptureHTML(d)}${tr_noteField(d,'wetLeaf','What shifted? (optional)')}`
     : room.key==='liquor' ? tr_liquorColour(d,tea)
     : room.key==='liquorAroma' ? `${flavorCaptureHTML(d)}${tr_noteField(d,'liquor','What does it bring to mind? (optional)')}`
-    : room.key==='taste' ? `${flavorCaptureHTML(d)}${tr_noteField(d,'taste','Where do you notice it, front or back? (optional)')}`
-    : room.key==='mouthfeel' ? tr_noteField(d,'mouthfeel','Light like water or thick like broth? Any drying grip, and is it pleasant or harsh?')
-    : room.key==='finish' ? tr_noteField(d,'finish','Any returning sweetness? How long does it linger?')
+    : room.key==='taste' ? tr_taste(d,tea)
+    : room.key==='mouthfeel' ? tr_mouthfeel(d,tea)
+    : room.key==='finish' ? tr_finish(d,tea)
     : tr_verdict(d,tea);
   const guide = d.register==='guide' ? `<div class="tst-cue">${escapeHtml(room.cue)}</div>` : '';
   const isVerdict = room.key==='verdict';
@@ -1932,7 +1972,7 @@ function tastingRoomHTML(d){
     ? `<button class="btn btn-primary" style="margin-top:16px;" onclick="commitTasting(false)">Save tasting</button>`
     : `<div class="tst-nav"><button class="btn" onclick="d_tastingBack()">← Back</button><button class="btn btn-primary" onclick="d_tastingNext()">Continue →</button></div>`;
   return `
-    <button class="detail-back" onclick="armConfirm(this,'Leave this tasting? Your progress is kept.',()=>d_tastingLeave())">✕ Leave</button>
+    <button class="detail-back" onclick="tastingLeaveChoice(this)">✕ Leave</button>
     <div class="tst-room">
       <div class="tst-head">
         <div class="tst-eyebrow mono">Tasting · ${idx+1} of ${TASTING_ROOMS.length}${tea?' · '+escapeHtml(tea.name):''}</div>
@@ -1964,6 +2004,78 @@ function tr_noteField(d,key,placeholder){
   return `<div class="tst-field"><div class="tst-label">Notes <span class="tst-opt mono">optional</span></div>
     <textarea class="tst-note" placeholder="${escapeHtml(placeholder)}" oninput="d_tastingNote('${escapeJsArg(key)}',this.value)">${escapeHtml((d.tasting[key]&&d.tasting[key].note)||'')}</textarea></div>`;
 }
+/* ---- c2 axis controls. A worded SCALE stores a FROZEN {word,position} (arg0 lets one handler serve
+   the four taste axes); named STEPS store the enum key; MULTI toggles a set. All single tap, all clear
+   on a re-tap (nothing is forced). ---- */
+function tr_scale(label, steps, cur, fnName, arg0, info){
+  const pos = (cur && typeof cur.position==='number') ? cur.position : -1;
+  const pre = (arg0!=null) ? `${fnName}('${escapeJsArg(arg0)}',` : `${fnName}(`;
+  const btns = steps.map((w,i)=>`<button type="button" class="tst-chip${pos===i?' on':''}" onclick="${pre}${i})">${escapeHtml(w)}</button>`).join('');
+  return `<div class="tst-field"><div class="tst-label">${escapeHtml(label)}${info?tastingGloss(info):''} <span class="tst-opt mono">optional</span></div><div class="tst-chips tst-scale">${btns}</div></div>`;
+}
+function tr_steps(label, opts, cur, fnName, info){
+  const btns = opts.map(o=>`<button type="button" class="tst-chip${cur===o.k?' on':''}" onclick="${fnName}('${escapeJsArg(o.k)}')">${escapeHtml(o.label)}</button>`).join('');
+  return `<div class="tst-field"><div class="tst-label">${escapeHtml(label)}${info?tastingGloss(info):''} <span class="tst-opt mono">optional</span></div><div class="tst-chips">${btns}</div></div>`;
+}
+function tr_multi(label, opts, curArr, fnName, info){
+  const arr = curArr||[];
+  const btns = opts.map(o=>`<button type="button" class="tst-chip${arr.includes(o.k)?' on':''}" onclick="${fnName}('${escapeJsArg(o.k)}')">${escapeHtml(o.label)}</button>`).join('');
+  return `<div class="tst-field"><div class="tst-label">${escapeHtml(label)}${info?tastingGloss(info):''} <span class="tst-opt mono">optional</span></div><div class="tst-chips">${btns}</div></div>`;
+}
+function tr_taste(d,tea){
+  const t=d.tasting.taste;
+  const axes = TASTING_TASTE_AXES.map(a=>tr_scale(a.label, TASTING_INTENSITY, t.axes[a.k], 'tastingSetAxis', a.k, a.info)).join('');
+  return `${axes}
+    ${tr_multi('Where do you notice it?', TASTING_PALATE, t.palatePosition, 'tastingTogglePalate')}
+    ${flavorCaptureHTML(d)}
+    ${tr_noteField(d,'taste','A word on the taste (optional)')}`;
+}
+function tr_mouthfeel(d,tea){
+  const mf=d.tasting.mouthfeel, astr=mf.astringency;
+  const lvl = TASTING_INTENSITY.map((w,i)=>`<button type="button" class="tst-chip${(astr.level&&astr.level.position===i)?' on':''}" onclick="tastingSetAstrLevel(${i})">${escapeHtml(w)}</button>`).join('');
+  const qual = TASTING_ASTR_QUALITY.map(o=>`<button type="button" class="tst-chip${astr.quality===o.k?' on':''}" onclick="tastingSetAstrQuality('${o.k}')">${escapeHtml(o.label)}</button>`).join('');
+  // Astringency = TWO reads under ONE heading + ONE ⓘ (level + quality), kept distinct from bitterness.
+  const astringency = `<div class="tst-field"><div class="tst-label">Astringency${tastingGloss('astringency')} <span class="tst-opt mono">optional</span></div>
+      <div class="tst-sublabel mono">how much</div><div class="tst-chips tst-scale">${lvl}</div>
+      <div class="tst-sublabel mono">and is it</div><div class="tst-chips">${qual}</div></div>`;
+  return `${tr_steps('Body', TASTING_BODY, mf.body, 'tastingSetBody')}
+    ${astringency}
+    ${tastingLensType(tea)?tastingLensBlock(d):''}
+    ${tr_noteField(d,'mouthfeel','A word on the feel (optional)')}`;
+}
+function tr_finish(d,tea){
+  const fin=d.tasting.finish;
+  const houYun = tastingHouYunType(tea) ? tr_houYun(d) : '';
+  return `${tr_scale('Length', TASTING_FINISH_LEN, fin.length, 'tastingSetFinishLen', null, null)}
+    ${tr_steps('Returning sweetness (huigan)', TASTING_HUIGAN, fin.huigan, 'tastingSetHuigan', 'huigan')}
+    ${houYun}
+    ${tr_noteField(d,'finish','A word on the finish (optional)')}`;
+}
+// hou-yun (SPEC §4): the one genuinely new field, oolong/pu-erh only, drawn OPEN in the guide register
+// and CLOSED behind a disclosure in terse. Independent of the lens toggle.
+function tr_houYun(d){
+  const fin=d.tasting.finish;
+  const open = d.register==='guide' || d._houYunOpen;
+  if(!open) return `<div class="tst-field"><button type="button" class="tst-disclose" onclick="d_toggleHouYun()">Throat feel (hou yun) ${icon('i-caret-hl',16)}</button></div>`;
+  const steps = TASTING_HOUYUN.map(o=>`<button type="button" class="tst-chip${fin.houYun===o.k?' on':''}" onclick="tastingSetHouYun('${o.k}')">${escapeHtml(o.label)}</button>`).join('');
+  return `<div class="tst-field"><div class="tst-label">Throat feel (hou yun)${tastingGloss('houyun')} <span class="tst-opt mono">optional</span></div><div class="tst-chips">${steps}</div></div>`;
+}
+// The tradition lens (SPEC §4): a READ-ONLY re-reading of the taste + mouthfeel axes already captured,
+// surfaced for the type, default off. It FILLS from the stored values and never asks for new input.
+function tastingLensBlock(d){
+  if(!d._lensOn) return `<div class="tst-field"><button type="button" class="tst-lens-toggle" onclick="d_tastingToggleLens()">Read this the Japanese way ${icon('i-caret-hl',16)}</button></div>`;
+  const ax=d.tasting.taste.axes, astr=d.tasting.mouthfeel.astringency;
+  const v = x => (x && x.word) ? `<span class="tst-lens-val">${escapeHtml(x.word)}</span>` : `<span class="tst-lens-none mono">not set</span>`;
+  const row=(term,glossKey,mapping,val)=>`<div class="tst-lens-row"><span class="tst-lens-term">${escapeHtml(term)}${tastingGloss(glossKey)}</span><span class="tst-lens-map mono">${escapeHtml(mapping)}</span>${val}</div>`;
+  return `<div class="tst-field"><div class="tst-label">The Japanese reading <button type="button" class="tst-lens-toggle inline" onclick="d_tastingToggleLens()">hide</button></div>
+    <div class="tst-lens-panel">
+      <div class="tst-lens-intro mono">A re-reading of what you tasted. Nothing new to set.</div>
+      ${row('Amami','amami','your sweet',v(ax.sweet))}
+      ${row('Nigami','nigami','your bitter',v(ax.bitter))}
+      ${row('Umami','umami','your umami',v(ax.umami))}
+      ${row('Shibumi','shibumi','your astringency',v(astr.level))}
+    </div></div>`;
+}
 function tr_verdict(d,tea){
   const curRating = tea?Number(tea.rating)||0:0;
   const offerOn = !!d._offerTeaRatingOn;
@@ -1987,6 +2099,23 @@ function tastingToggleForm(f){ const d=state.sessionDraft; if(!d||!d.tasting) re
 function tastingSetLeaf(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.dryLeaf.colour=(d.tasting.dryLeaf.colour===k)?null:k; render(); }
 function tastingToggleMottled(){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.dryLeaf.mottled=!d.tasting.dryLeaf.mottled; render(); }
 function tastingSetLiquor(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.liquor.colour=(!k||d.tasting.liquor.colour===k)?null:k; render(); }
+/* ---- c2 axis writers. Worded scales freeze {word,position} (never re-derived); steps store the key;
+   palate is multi-select; each clears on a re-tap. ---- */
+function tastingSetAxis(axis,i){ const d=state.sessionDraft; if(!d||!d.tasting) return; const cur=d.tasting.taste.axes[axis]; d.tasting.taste.axes[axis]=(cur&&cur.position===i)?null:{word:TASTING_INTENSITY[i],position:i}; render(); }
+function tastingTogglePalate(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; const a=d.tasting.taste.palatePosition,i=a.indexOf(k); if(i>=0)a.splice(i,1);else a.push(k); render(); }
+function tastingSetBody(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.mouthfeel.body=(d.tasting.mouthfeel.body===k)?null:k; render(); }
+function tastingSetAstrLevel(i){ const d=state.sessionDraft; if(!d||!d.tasting) return; const cur=d.tasting.mouthfeel.astringency.level; d.tasting.mouthfeel.astringency.level=(cur&&cur.position===i)?null:{word:TASTING_INTENSITY[i],position:i}; render(); }
+function tastingSetAstrQuality(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; const a=d.tasting.mouthfeel.astringency; a.quality=(a.quality===k)?null:k; render(); }
+function tastingSetFinishLen(i){ const d=state.sessionDraft; if(!d||!d.tasting) return; const cur=d.tasting.finish.length; d.tasting.finish.length=(cur&&cur.position===i)?null:{word:TASTING_FINISH_LEN[i],position:i}; render(); }
+function tastingSetHuigan(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.finish.huigan=(d.tasting.finish.huigan===k)?null:k; render(); }
+function tastingSetHouYun(k){ const d=state.sessionDraft; if(!d||!d.tasting) return; d.tasting.finish.houYun=(d.tasting.finish.houYun===k)?null:k; render(); }
+function d_toggleHouYun(){ const d=state.sessionDraft; if(d){ d._houYunOpen=!d._houYunOpen; render(); } }
+function d_tastingToggleLens(){ const d=state.sessionDraft; if(d){ d._lensOn=!d._lensOn; render(); } }
+/* Deliberate discard (FOLDED-IN FIX): a confirmed, explicit choice clears the draft AND the persisted
+   copy. An accidental leave (back-swipe/lock/tap-away) still KEEPS — that invariant is unchanged; only
+   this path throws the partial away, and only after a confirm. */
+function discardTasting(){ clearTimerInterval(); state.sessionDraft=null; state._draftImage=null; if(window.SteepDB && SteepDB.clearDraft) SteepDB.clearDraft(); state.view='dashboard'; render(); }
+function tastingLeaveChoice(btn){ armChoice(btn,'Leave this tasting?',[{label:'Keep for later',onPick:d_tastingLeave},{label:'Discard',danger:true,onPick:discardTasting}]); }
 function setTastingSessionRating(v){ const d=state.sessionDraft; if(d){ d.sessionRating=v; render(); } }
 function d_tastingToggleOffer(on){ const d=state.sessionDraft; if(!d) return; d._offerTeaRatingOn=!!on; if(on && d._offerTeaRating==null) d._offerTeaRating=d.sessionRating||0; render(); }
 function d_tastingOfferStars(v){ const d=state.sessionDraft; if(d){ d._offerTeaRating=v; render(); } }
@@ -2043,12 +2172,24 @@ async function commitTasting(endedEarly){
 /* ---- the Tier-2 read: a tasting opens to its rich record, not the plain session view ---- */
 function tastingSwatch(kind,key){ return `<span class="tst-rec-swatch" style="background:var(--${kind}-${escapeHtml(key)});"></span>`; }
 function tastingChips(arr){ return (arr||[]).map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join(''); }
+function tastingStepLabel(opts,k){ const o=(opts||[]).find(x=>x.k===k); return o?o.label:k; }
 function viewTastingRecord(s){
   const tea=teaById(s.teaId), ves=vesselById(s.vesselId), r=s.tastingRecord||{};
   const dl=r.dryLeaf||{}, wl=r.wetLeaf||{}, lq=r.liquor||{}, ta=r.taste||{}, mf=r.mouthfeel||{}, fi=r.finish||{}, vd=r.verdict||{};
   const sec=(title,inner)=> inner ? `<div class="sd-sec tst-rec-sec"><div class="eyebrow rule-head">${escapeHtml(title)}</div>${inner}</div>` : '';
   const noteP = n => n ? `<p class="tst-rec-note">${escapeHtml(n)}</p>` : '';
   const chipsRow = (label,arr)=> (arr&&arr.length) ? `<div class="tst-rec-row"><span class="tst-rec-k mono">${escapeHtml(label)}</span><span class="tst-rec-chips">${tastingChips(arr)}</span></div>` : '';
+  // c2 axes are render-only here (Tier-2): the FROZEN word for worded scales, the step label for steps.
+  const valRow = (label,val)=> val ? `<div class="tst-rec-row"><span class="tst-rec-k mono">${escapeHtml(label)}</span><span class="tst-rec-val">${escapeHtml(val)}</span></div>` : '';
+  const wordRow = (label,x)=> valRow(label, (x&&x.word)?x.word:'');
+  const axRows = TASTING_TASTE_AXES.map(a=>wordRow(a.label.toLowerCase(), ta.axes&&ta.axes[a.k])).join('');
+  const palateRow = (ta.palatePosition&&ta.palatePosition.length) ? valRow('where', ta.palatePosition.map(k=>tastingStepLabel(TASTING_PALATE,k)).join(', ')) : '';
+  const astr = mf.astringency||{};
+  const astrRow = valRow('astringency', [astr.level&&astr.level.word, astr.quality&&tastingStepLabel(TASTING_ASTR_QUALITY,astr.quality)].filter(Boolean).join(', '));
+  const bodyRow = valRow('body', mf.body?tastingStepLabel(TASTING_BODY,mf.body):'');
+  const lenRow = wordRow('length', fi.length);
+  const huiRow = valRow('huigan', fi.huigan?tastingStepLabel(TASTING_HUIGAN,fi.huigan):'');
+  const houRow = valRow('hou yun', fi.houYun?tastingStepLabel(TASTING_HOUYUN,fi.houYun):'');
   const formRow = (dl.form&&dl.form.length) ? `<div class="tst-rec-row"><span class="tst-rec-k mono">form</span><span class="tst-rec-chips">${dl.form.map(f=>`<span class="hist-chip">${escapeHtml(leafFormLabel(f))}</span>`).join('')}</span></div>` : '';
   const leafColour = dl.colour ? `<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">${tastingSwatch('leaf',dl.colour)}${escapeHtml(leafLabel(dl.colour))}${dl.mottled?' · mottled':''}</span></div>` : (dl.mottled?`<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">mottled</span></div>`:'');
   const liqColour = lq.colour ? `<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">${tastingSwatch('liquor',lq.colour)}${escapeHtml(liquorLabel(lq.colour))}</span></div>` : '';
@@ -2073,9 +2214,9 @@ function viewTastingRecord(s){
     ${sec('Dry leaf', formRow+leafColour+chipsRow('aroma',dl.aroma)+noteP(dl.note))}
     ${sec('Warmed leaf', chipsRow('shifted',wl.aromaShift)+noteP(wl.note))}
     ${sec('Liquor', liqColour+chipsRow('aroma',lq.aroma)+noteP(lq.note))}
-    ${sec('Taste', chipsRow('notes',ta.notes)+noteP(ta.note))}
-    ${sec('Mouthfeel', noteP(mf.note))}
-    ${sec('Finish', noteP(fi.note))}
+    ${sec('Taste', axRows+palateRow+chipsRow('notes',ta.notes)+noteP(ta.note))}
+    ${sec('Mouthfeel', bodyRow+astrRow+noteP(mf.note))}
+    ${sec('Finish', lenRow+huiRow+houRow+noteP(fi.note))}
   `;
 }
 
