@@ -556,7 +556,7 @@ function inferLeafForm(tea){
     case 'green':  return 'green_cn';
     case 'white':  return 'open';                                   // bai mu dan / pai mu tan (needle & cake caught above)
     case 'oolong': return 'rolled';                                 // Dan Cong / yancha caught above
-    case 'puerh':  return has('loose','shou','ripe','maocha') ? 'open' : 'compressed';
+    case 'puerh':  return has('loose','maocha','散') ? 'open' : 'compressed';   // FORM is loose-vs-compressed, not ripe-vs-raw: `shou`/`ripe` are PROCESSING words, so a ripe CAKE (no cake-word in the name, kbResolve missed) was wrongly read `open`. Loose signals only (散 = loose).
     case 'black':  return 'open';
     case 'yellow': return has('needle','bud') ? 'bud' : 'green_cn';
     default:       return 'open';
