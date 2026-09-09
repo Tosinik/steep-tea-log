@@ -1496,7 +1496,10 @@ html[data-theme="dark"] .vessel-kanji.v-cold-brew-jar{--vk-bg:#1e2325;--vk-ink:#
 .tst-evo-meta{font-size:12px;color:var(--ink-soft);}
 .tst-evo-remove{margin-left:auto;background:none;border:0;padding:2px 6px;font-size:13px;color:var(--ink-soft);cursor:pointer;}
 .tst-evo-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
-.tst-evo-tt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;}
+.tst-evo-tt{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin:10px 0;}
+.tst-evo-tt .field{min-width:0;}
+.tst-evo-tt .field input{width:100%;}
+@media(max-width:600px){.tst-evo-tt{grid-template-columns:1fr;}}
 .tst-evo-obs{font-family:var(--font-display);font-style:italic;font-size:13.5px;color:var(--ink-soft);padding:2px 0;}
 .tst-evo-add{align-self:flex-start;background:none;border:1px dashed var(--line);border-radius:10px;padding:9px 14px;font-family:inherit;font-size:13px;color:var(--jade-deep);cursor:pointer;}
 .tst-evo-single{display:flex;flex-direction:column;gap:10px;}
