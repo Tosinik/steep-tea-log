@@ -253,7 +253,7 @@ reinstalls on the new origin~~ (**Ruth reinstalled; Supabase allowlist cleanup D
 gate now **fills UNDER the shipped per-steep control** (the old end-of-session control is why the rate was
 low) → then the phase-2 brew-advice build (learned defaults, post-gate). Unsequenced beta inbox: issues **#7–#12** — triage into a fresh tail when ready.
 
-**NOW — v4.48 STAGED — info-popover left-edge clamp (the c2 phone-look) (R190)**
+**NOW — v4.48 LIVE `04e7536` — info-popover left-edge clamp (the c2 phone-look) (R190)**
 (cache **v158**, APP_VERSION v4.48, **no SQL**, **no new module** — touches only `steep-core.js` + the version
 files). A tiny fix to the R180 info-popover (`toggleInfoPop`), latent since v4.39, surfaced by c2's glossary
 marks on the v4.47 phone-look: a mid-right ⓘ could render past the LEFT edge on a narrow phone.
@@ -266,10 +266,10 @@ marks on the v4.47 phone-look: a mid-right ⓘ could render past the LEFT edge o
 - **Verified** on a forced 375px viewport: the two clipping Finish marks (huigan, hou-yun) now pin to 8px, both
   edges in; the taste + five mouthfeel marks stay unclamped; both themes. All 49 suites green; node --check clean
   (no vm reaches `getBoundingClientRect`, so browser-verified).
-- **STATE:** rides on v4.47 (still STAGED). **v4.47 + v4.48 flip STAGED→LIVE TOGETHER** after Niklas pushes,
-  re-looks the popover on the live app, and Planning clone-verifies. Do NOT flip either alone.
+- **LIVE:** code `04e7536` + docs `2562729` pushed; Niklas's re-look (the huigan/hou-yun ⓘ no longer clip
+  left on a narrow phone) + Planning's clone-verify passed → flipped STAGED→LIVE together with v4.47.
 
-**Previously — v4.47 STAGED `6916bd9` — Tea Tasting mode (guided mode c2): fleshed axes, glossary, tradition lens (R189)**
+**Previously — v4.47 LIVE `6916bd9` — Tea Tasting mode (guided mode c2): fleshed axes, glossary, tradition lens (R189)**
 (cache **v157**, APP_VERSION v4.47, **no SQL** — the axes nest into the existing `tasting_record` blob objects,
 no migration; **no new module**). Slice c2 of `docs/r5/planning/SPEC-guided-mode-FINAL.md` §11: c1's free-text
 stub rooms become the ratified axes; the authored copy, the glossary and the tradition lens ship. Tier-2
@@ -298,9 +298,9 @@ unchanged from c1.
 - **ON DEVICE (`smoke.md §v4.47`, POST-PUSH):** walk a tasting on a phone — the axis chips + worded scales tap,
   palate multi-selects, the ⓘ popovers open + dismiss, the lens reads (green tea), hou-yun shows for an
   oolong/pu-erh; the ✕ Leave Keep/Discard + Home Resume/Discard; both themes.
-- **STATE:** code `6916bd9` + docs `9825430` pushed. Niklas's phone-look found the glossary ⓘ clipping off the
-  LEFT edge on a narrow phone → **fixed in v4.48 (below).** v4.47 stays STAGED; **v4.47 + v4.48 flip STAGED→LIVE
-  TOGETHER** after the combined re-look + Planning's clone-verify.
+- **LIVE:** code `6916bd9` + docs `9825430` pushed. Niklas's phone-look found the glossary ⓘ clipping off the
+  LEFT edge on a narrow phone → fixed in **v4.48**; the combined re-look + Planning's clone-verify passed →
+  **v4.47 + v4.48 flipped STAGED→LIVE together.**
 
 **Previously — v4.46 LIVE `5eb41bd` — Tea Tasting mode (guided mode c1): the spine, first door to verdict (R188)**
 (cache **v156**, APP_VERSION v4.46, **no SQL** — `v3_13` shipped + applied at v4.45, **no new module**).
