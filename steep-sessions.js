@@ -1021,11 +1021,11 @@ function saveTuningToGuide(teaId){
 function applyScheduleToCurrentSteep(d){
   if(!d) return;
   // No guide (brewMode 'off'): still seed a sane countdown so target + logged time agree (#13).
-  if(!d.schedule){ if(d.timer.mode==='timer' && !(Number(d.curTime)>0)) setSteepTime(d.timer.target||15); return; }
+  if(!d.schedule){ if(d.timer.mode==='timer' && !(Number(d.curTime)>0)) setSteepTime(d.timer.target||15, false); return; }
   const i = d.steeps.length;
   d.activeSteep = i; // WS3: the pill for the steep you're about to brew is the active one
   const t = scheduleTimeForIndex(d.schedule, i);
-  if(t!=null){ d.timer.mode='timer'; setSteepTime(Math.max(3, Math.round(t + (d.timeShift||0)))); }
+  if(t!=null){ d.timer.mode='timer'; setSteepTime(Math.max(3, Math.round(t + (d.timeShift||0))), false); }
   if(d.schedule.tempC!=null){ const disp=cToDisplay(d.schedule.tempC); if(disp!=='') d.curTemp=String(disp); }
 }
 // WS3: tap a brew-guide pill → time that steep. Sets the ring's target + the "steep N" label; the
@@ -1038,7 +1038,7 @@ function d_setActiveSteep(i){
   d.activeSteep = i;
   clearTimerInterval();
   d.timer.mode = 'timer'; d.timer.elapsed = 0; d.timer.running = false; d.timeEditing = false;
-  setSteepTime(Math.max(3, Math.round(t + (d.timeShift||0))));
+  setSteepTime(Math.max(3, Math.round(t + (d.timeShift||0))), false);   // a pill loads a schedule time — not user engagement
   render();
 }
 // Per-steep taste is captured (and echoed) only for the multi-infusion methods — the §3 quietness
@@ -1223,6 +1223,10 @@ function flavArrayFor(d){
     if(c==='wetLeaf')     return t.wetLeaf.aromaShift;
     if(c==='liquorAroma') return t.liquor.aroma;
     if(c==='taste')       return t.taste.notes;
+    if(c==='cooling')     return t.evolution.cooling.tags;   // c3: western "as it cools" delta (blob, not a steep)
+    if(c==='aromaCup')    return t.evolution.aromaCup.aroma;  // c3: gongfu empty-cup aroma (blob delta)
+    // c3: the per-steep loop writes the ACTIVE steep's own tags (canonical, in the steeps rows)
+    if(c==='evolution'){ const s = d.steeps && d.steeps[d.evoActive]; if(s){ if(!s.tags) s.tags=[]; return s.tags; } }
   }
   if(!d.sessionTags) d.sessionTags = [];
   return d.sessionTags;
@@ -1250,7 +1254,7 @@ function flavFamilyPanelHTML(d){
 // Only the taste room (and the default session flow) asks about taste; the smell rooms ask about smell
 // (c2 fix: c1's hardcoded "What are you tasting?" leaked into the dry-leaf room). flavCtx null = session
 // flow → the unchanged default, so the ordinary flow is untouched.
-const FLAV_PROMPTS = { dryLeaf:'What do you smell?', wetLeaf:'What do you smell now?', liquorAroma:'What do you smell?', taste:'What are you tasting?' };
+const FLAV_PROMPTS = { dryLeaf:'What do you smell?', wetLeaf:'What do you smell now?', liquorAroma:'What do you smell?', taste:'What are you tasting?', aromaCup:'What do you smell?' };
 function flavPromptFor(d){ return (d && d.flavCtx && FLAV_PROMPTS[d.flavCtx]) || 'What are you tasting?'; }
 function flavorCaptureHTML(d){
   const _fa = flavArrayFor(d);
@@ -1327,7 +1331,7 @@ function sessionSteepingHTML(d){
   // #13/D5: the countdown length is tap-to-edit here (running AND stopped). It IS the logged steep time.
   let subLabel;
   if(tm.mode!=='timer'){ subLabel = `steep ${active+1}`; }
-  else if(d.timeEditing){ subLabel = `of <input type="number" id="timerTargetEdit" class="timer-target-inline" value="${tm.target||''}" oninput="setSteepTime(this.value)" onblur="d_endTimeEdit()" onkeydown="if(event.key==='Enter'){this.blur();}">s · steep ${active+1}`; }
+  else if(d.timeEditing){ subLabel = `of <input type="number" id="timerTargetEdit" class="timer-target-inline" value="${tm.target||''}" oninput="setSteepTime(this.value, true)" onblur="d_endTimeEdit()" onkeydown="if(event.key==='Enter'){this.blur();}">s · steep ${active+1}`; }
   else { subLabel = `of <button type="button" class="timer-target-tap" onclick="d_beginTimeEdit()"><span id="timerTargetLabel">${tm.target}</span>s</button> · steep ${active+1}`; }
   const soundOn = !!state.settings.soundEnabled;
 
@@ -1372,7 +1376,7 @@ function sessionSteepingHTML(d){
 
     <div class="form-grid" style="margin-top:14px;">
       <div class="field"><label>Water temp (${tempUnitLabel()})</label><input type="number" id="steepTemp" value="${d.curTemp||''}" oninput="d_setcur('curTemp', this.value)"></div>
-      <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="setSteepTime(this.value)"></div>
+      <div class="field"><label>Steep time (seconds)</label><input type="number" id="steepTime" value="${d.curTime||''}" oninput="setSteepTime(this.value, true)"></div>
     </div>
     ${ratioStr ? `<div class="steep-ratio">${ratioStr}</div>` : ''}
     <div class="field" style="margin-top:12px;"><label>Notes for this steep</label><textarea id="steepDesc" placeholder="optional" oninput="d_setcur('curSteepDesc', this.value)">${d.curSteepDesc||''}</textarea></div>
@@ -1464,11 +1468,15 @@ function setTimerMode(m){ state.sessionDraft.timer.mode=m; state.sessionDraft.ti
 // #13 — the countdown length (timer.target) and the logged "Steep time (seconds)" field
 // (curTime) are ONE value, written only here so they can never drift. No render(); callers
 // that need the field/sub-label redrawn call render() themselves.
-function setSteepTime(secs){
+function setSteepTime(secs, userSet){
   const d=state.sessionDraft; if(!d) return;
   const n=Math.round(Number(secs));
   const v=(isFinite(n)&&n>0)?n:0;
   d.timer.target=v; d.curTime=v?String(v):'';
+  // Provenance for the phantom-steep guard (c3): true when the user set/edited the time, false when the
+  // schedule pre-filled it. undefined = leave unchanged (a caller that isn't touching provenance). A bare
+  // schedule pre-fill must not read as an engaged steep at finish (see steepEngaged / finishSteeping).
+  if(userSet!==undefined) d.curTimeUserSet = !!userSet;
   updateTimerDisplayOnly();
 }
 // Inline tap-to-edit on the countdown's "of Ns" (never a popup). D5: works running AND stopped.
@@ -1487,7 +1495,7 @@ function d_endTimeEdit(){
 }
 // D5: ±5/±10 mid- and post-run nudges. A CALLER of the single writer setSteepTime (#13), never a
 // second writer. Floors at 5s so Start never faces a 0s countdown.
-function d_bumpTime(delta){ const d=state.sessionDraft; if(!d) return; setSteepTime(Math.max(5, (d.timer.target||0)+delta)); }
+function d_bumpTime(delta){ const d=state.sessionDraft; if(!d) return; setSteepTime(Math.max(5, (d.timer.target||0)+delta), true); }
 
 let _audioCtx = null;
 function playTimerDone(){
@@ -1647,16 +1655,26 @@ function saveSteepAndContinue(){
     if(raw!=null) d.timeShift = Math.max(-45, Math.min(45, Number(time)-raw));
   }
   clearTimerInterval();
-  d.curSteepTags=[]; d.flavorMore=false; d.flavorFreeOpen=false; d.curSteepDesc=''; d.curTemp=''; d.curTime=''; d.timeEditing=false;
+  d.curSteepTags=[]; d.flavorMore=false; d.flavorFreeOpen=false; d.curSteepDesc=''; d.curTemp=''; d.curTime=''; d.timeEditing=false; d.curTimeUserSet=false;
   d.timer = {mode:d.timer.mode, target:d.timer.target, elapsed:0, running:false, intervalId:null};
   applyScheduleToCurrentSteep(d); // prefill the next steep's timer + temp from the guide
   render();
 }
+// The phantom-steep guard (c3). "Save steep & brew another" pre-fills the NEXT steep's time from the guide
+// (applyScheduleToCurrentSteep → setSteepTime → curTime), so a trailing pre-filled time is NOT proof the
+// user brewed another steep. Auto-capture on finish only when the steep is ENGAGED: the user set/edited the
+// time (curTimeUserSet), the timer ran (elapsed>0), or it carries notes/tags. Pure so the fixture can pin it
+// without a DOM (a vm has no #steepTime). timeVal/descVal are read from the fields by the caller.
+function steepEngaged(d, timeVal, descVal){
+  if(!d || !(timeVal && Number(timeVal)>0)) return false;
+  return !!d.curTimeUserSet || !!(d.timer && d.timer.elapsed>0) || String(descVal||'').trim().length>0 || !!(d.curSteepTags && d.curSteepTags.length);
+}
 function finishSteeping(){
   const d = state.sessionDraft;
-  // Auto-capture an in-progress steep (time filled in) — no browser popup.
+  // Auto-capture an in-progress steep only if ENGAGED — a bare schedule-pre-filled time is not (see above).
   const timeVal = document.getElementById('steepTime')?.value;
-  if(timeVal && Number(timeVal)>0){ saveSteepAndContinue(); }
+  const descVal = document.getElementById('steepDesc')?.value || '';
+  if(steepEngaged(d, timeVal, descVal)){ saveSteepAndContinue(); }
   if(state.sessionDraft.steeps.length===0){ showToast('Log at least one steep first.'); return; }
   clearTimerInterval();
   state.sessionDraft.completedAt = new Date().toISOString(); // frozen "Session complete · HH:MM"
@@ -1833,8 +1851,25 @@ const TASTING_ROOMS = [
   { key:'taste',       label:'Taste',         cue:'A bold sip with a little air, like soup, so it coats the whole mouth. Sweet, savoury, grassy, bitter? And where do you notice each part, front or back?' },
   { key:'mouthfeel',   label:'Mouthfeel',     cue:'Forget flavour for a moment. How does it feel? Light like water or thick like broth? Any drying, puckering feeling, and is that pleasant or harsh?' },
   { key:'finish',      label:'Finish',        cue:'Swallow, then wait a few seconds. Does a sweetness come back? How long does it linger? Is your throat smooth and open, or tight?' },
+  { key:'evolution',   label:'How it changes', cue:'Taste each steep and notice how it changes. The early ones bright, the middle ones richest, the later ones softer and sweeter.' },
   { key:'verdict',     label:'Your verdict',  cue:"So, is this one to your liking? What did you love, what didn't land? Enough to want more?" }
 ];
+// c3: the aroma-cup sub-step is a GONGFU-ONLY room, inserted before the verdict (SPEC §3). The walk's room
+// list is method-dependent, so it is built per-render from the resolved method, not read off a fixed array.
+const TASTING_AROMACUP_ROOM = { key:'aromaCup', label:'The empty cup', cue:'The tea is gone. Smell the empty, still-warm cup. A last aroma often lingers there, sometimes the sweetest of all.' };
+function tastingMethodFor(d){ const ves=vesselById(d.vesselId); return brewMethodFor(d.brewStyle, ves&&ves.capacityMl); }
+function tastingRoomsFor(d){
+  const rooms = TASTING_ROOMS.slice();
+  if(tastingMethodFor(d)==='gongfu'){ const vi = rooms.findIndex(r=>r.key==='verdict'); rooms.splice(vi, 0, TASTING_AROMACUP_ROOM); }
+  return rooms;
+}
+// SPEC §6: the evolution cue reshapes by method — the per-steep loop (gongfu/senchadō) vs the western single
+// "first sip vs. as it cools". (Cold brew would collapse it, but a tasting is never cold — c2 dropped that lane.)
+function tastingEvolutionCue(d){
+  return tastingMethodFor(d)==='western'
+    ? 'Sip now, then again as it cools. Notice how it shifts.'
+    : 'Taste each steep and notice how it changes. The early ones bright, the middle ones richest, the later ones softer and sweeter.';
+}
 // c2 axes. WORDED scales = an ordered ladder of anchor words (a pick freezes {word, position}); STEPS =
 // named enum keys. The intensity ladder serves the four taste axes AND astringency level (SPEC §4:
 // "faint … pronounced"); finish length has its own (SPEC §4: "gone at once … lingers").
@@ -1888,6 +1923,11 @@ function newTastingBlob(){
             astringency:{ level:null, quality:null } },                // level: {word,position} · quality: named step key
     finish:{ note:'', length:null,                                     // length: {word,position} (worded scale)
             huigan:null, houYun:null },                                // huigan/houYun: named step keys (houYun oolong/pu-erh only)
+    // c3 evolution. The per-steep loop's canonical data (tags/time/temp) lives in the SESSION'S steeps
+    // rows (steeps has those columns; the D2 arc reads d.steeps). Only the per-steep COLOUR has no steep
+    // column, so it lands here keyed by steep id (no migration). `cooling` is western's single "as it
+    // cools" delta (not a steep); `aromaCup` is the gongfu empty-cup aroma (a blob-only delta, like leaf).
+    evolution:{ colours:{}, cooling:{ tags:[], note:'' }, aromaCup:{ aroma:[], note:'' } },
     verdict:{ liked:'', teaRatingOffered:false } };
 }
 // Entry — reuses startSessionFor's draft (tea/vessel/grams/method/date, and its vessel guard), then flags
@@ -1956,8 +1996,9 @@ function tastingSetupHTML(d){
 
 /* ---- the room walk ---- */
 function tastingRoomHTML(d){
-  const idx=d.tastingRoom||0, room=TASTING_ROOMS[idx], tea=teaById(d.teaId);
-  d.flavCtx = TASTING_FLAV_ROOMS.includes(room.key) ? room.key : null;   // scopes the reused tagger to this stage
+  const rooms=tastingRoomsFor(d);                                        // c3: method-dependent (gongfu adds the empty-cup room)
+  const idx=Math.min(d.tastingRoom||0, rooms.length-1), room=rooms[idx], tea=teaById(d.teaId);
+  d.flavCtx = TASTING_FLAV_ROOMS.includes(room.key) ? room.key : null;   // scopes the reused tagger to this stage (evolution/aromaCup set their own ctx below)
   const body = room.key==='dryLeaf' ? tr_dryLeaf(d,tea)
     : room.key==='wetLeaf' ? `${flavorCaptureHTML(d)}${tr_noteField(d,'wetLeaf','What shifted? (optional)')}`
     : room.key==='liquor' ? tr_liquorColour(d,tea)
@@ -1965,8 +2006,11 @@ function tastingRoomHTML(d){
     : room.key==='taste' ? tr_taste(d,tea)
     : room.key==='mouthfeel' ? tr_mouthfeel(d,tea)
     : room.key==='finish' ? tr_finish(d,tea)
+    : room.key==='evolution' ? tr_evolution(d,tea)
+    : room.key==='aromaCup' ? tr_aromaCup(d,tea)
     : tr_verdict(d,tea);
-  const guide = d.register==='guide' ? `<div class="tst-cue">${escapeHtml(room.cue)}</div>` : '';
+  const cue = room.key==='evolution' ? tastingEvolutionCue(d) : room.cue;
+  const guide = d.register==='guide' ? `<div class="tst-cue">${escapeHtml(cue)}</div>` : '';
   const isVerdict = room.key==='verdict';
   const footer = isVerdict
     ? `<button class="btn btn-primary" style="margin-top:16px;" onclick="commitTasting(false)">Save tasting</button>`
@@ -1975,7 +2019,7 @@ function tastingRoomHTML(d){
     <button class="detail-back" onclick="tastingLeaveChoice(this)">✕ Leave</button>
     <div class="tst-room">
       <div class="tst-head">
-        <div class="tst-eyebrow mono">Tasting · ${idx+1} of ${TASTING_ROOMS.length}${tea?' · '+escapeHtml(tea.name):''}</div>
+        <div class="tst-eyebrow mono">Tasting · ${idx+1} of ${rooms.length}${tea?' · '+escapeHtml(tea.name):''}</div>
         <h2 class="tst-title">${escapeHtml(room.label)}</h2>
         ${guide}
       </div>
@@ -2076,6 +2120,70 @@ function tastingLensBlock(d){
       ${row('Shibumi','shibumi','your astringency',v(astr.level))}
     </div></div>`;
 }
+/* ---- c3: the evolution room. Reshaped by method (SPEC §3): gongfu/senchadō = a per-steep loop writing
+   the session's steeps rows (tags/time/temp), the per-steep colour in the blob; western = one "as it cools"
+   delta. The room COLLECTS, it does not conclude: capture is optional, a zero-tap steep still counts, and
+   the most it ever says is one quiet positive-presence observation (D2), floored at steep 2. ---- */
+function tr_evolution(d,tea){
+  return tastingMethodFor(d)==='western' ? tr_evoCooling(d,tea) : tr_evoLoop(d,tea);
+}
+function tr_evoCooling(d,tea){
+  d.flavCtx='cooling';
+  const ev=d.tasting.evolution;
+  return `<div class="tst-evo-single">
+      <div class="tst-label">As it cools, what shifts?</div>
+      ${flavorCaptureHTML(d)}
+      <div class="tst-field"><textarea class="tst-note" placeholder="A word on how it changed (optional)" oninput="d_tastingEvoCoolNote(this.value)">${escapeHtml(ev.cooling.note||'')}</textarea></div>
+    </div>`;
+}
+function tr_evoLoop(d,tea){
+  if(!Array.isArray(d.steeps)) d.steeps=[];
+  if(d.evoActive==null || d.evoActive>=d.steeps.length) d.evoActive = d.steeps.length-1;   // default: the newest steep
+  d.flavCtx = (d.evoActive>=0) ? 'evolution' : null;                                        // the active steep's tagger writes its own tags
+  const cards = d.steeps.map((s,i)=>tastingEvoCard(d,s,i,tea)).join('');
+  const obs = sessionFlavorStory(d.steeps);                                                 // reused D2 arc: "X opened up by steep N", floored at n<2
+  return `<div class="tst-evo">
+      ${d.steeps.length ? cards : `<div class="tst-evo-empty mono">Brew at your own rhythm. Add a steep whenever you want to jot something down. None of it is required.</div>`}
+      ${obs?`<div class="tst-evo-obs">${escapeHtml(obs)}</div>`:''}
+      <button type="button" class="tst-evo-add" onclick="tastingAddSteep()">${d.steeps.length?'+ Add another steep':'+ Add the first steep'}</button>
+    </div>`;
+}
+function tastingEvoCard(d,s,i,tea){
+  const colourKey=(d.tasting.evolution.colours||{})[s.id]||null;
+  if(i!==d.evoActive){
+    const bits=[]; if(s.timeSeconds>0) bits.push(fmtSec(s.timeSeconds)); if(s.tempC!=null&&s.tempC!=='') bits.push(cToDisplay(s.tempC)+tempUnitLabel());
+    const chips=(s.tags||[]).map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join('');
+    return `<div class="tst-evo-card collapsed" onclick="tastingActivateSteep(${i})" role="button" tabindex="0">
+      <div class="tst-evo-cardhead"><span class="tst-evo-n mono">Steep ${i+1}</span>${colourKey?tastingSwatch('liquor',colourKey):''}<span class="tst-evo-meta mono">${escapeHtml(bits.join(' · '))}</span></div>
+      ${chips?`<div class="tst-evo-chips">${chips}</div>`:''}</div>`;
+  }
+  const pseudo={ name:(tea&&tea.name)||'', type:(tea&&tea.type)||'green', liquor:colourKey };
+  return `<div class="tst-evo-card active">
+    <div class="tst-evo-cardhead"><span class="tst-evo-n mono">Steep ${i+1}</span>${d.steeps.length>1?`<button type="button" class="tst-evo-remove" onclick="event.stopPropagation();tastingRemoveSteep(${i})" aria-label="Remove steep ${i+1}">✕</button>`:''}</div>
+    <div class="tst-evo-tt">
+      <div class="field"><label>Time (s)</label><input type="number" inputmode="numeric" value="${s.timeSeconds>0?s.timeSeconds:''}" oninput="tastingSetEvoTime(${i},this.value)"></div>
+      <div class="field"><label>Temp (${tempUnitLabel()})</label><input type="number" inputmode="numeric" value="${(s.tempC!=null&&s.tempC!=='')?cToDisplay(s.tempC):''}" oninput="tastingSetEvoTemp(${i},this.value)"></div>
+    </div>
+    <div class="tst-field"><div class="tst-label">Colour <span class="tst-opt mono">optional</span></div>
+      <div class="liquor-field"><div class="liquor-grid" id="liquorGrid">${liquorGridCells(pseudo,'tastingSetEvoColour')}</div></div></div>
+    ${flavorCaptureHTML(d)}</div>`;
+}
+function tr_aromaCup(d,tea){
+  d.flavCtx='aromaCup';
+  const ev=d.tasting.evolution;
+  return `${flavorCaptureHTML(d)}
+    <div class="tst-field"><textarea class="tst-note" placeholder="A word on the empty cup (optional)" oninput="d_tastingAromaCupNote(this.value)">${escapeHtml(ev.aromaCup.note||'')}</textarea></div>`;
+}
+/* ---- evolution handlers. Time/temp bind on input (no render — never yank a field's focus mid-type); the
+   per-steep tags/time/temp are the canonical steeps rows; the colour is blob-keyed by steep id. ---- */
+function tastingAddSteep(){ const d=state.sessionDraft; if(!d||!d.tasting) return; if(!Array.isArray(d.steeps)) d.steeps=[]; d.steeps.push({id:uid(), order:d.steeps.length+1, tempC:null, timeSeconds:0, description:'', tags:[]}); d.evoActive=d.steeps.length-1; d.flavFam=null; d.flavorFreeOpen=false; render(); }
+function tastingActivateSteep(i){ const d=state.sessionDraft; if(!d) return; d.evoActive=i; d.flavFam=null; d.flavorFreeOpen=false; render(); }
+function tastingRemoveSteep(i){ const d=state.sessionDraft; if(!d||!d.steeps) return; const s=d.steeps[i]; if(s&&d.tasting.evolution.colours) delete d.tasting.evolution.colours[s.id]; d.steeps.splice(i,1); d.steeps.forEach((x,j)=>x.order=j+1); if(d.evoActive>=d.steeps.length) d.evoActive=d.steeps.length-1; d.flavFam=null; d.flavorFreeOpen=false; render(); }
+function tastingSetEvoTime(i,val){ const d=state.sessionDraft; if(d&&d.steeps&&d.steeps[i]) d.steeps[i].timeSeconds=Math.max(0,Math.round(Number(val)||0)); }
+function tastingSetEvoTemp(i,val){ const d=state.sessionDraft; if(d&&d.steeps&&d.steeps[i]) d.steeps[i].tempC=(val===''||val==null)?null:displayToC(val); }
+function tastingSetEvoColour(key){ const d=state.sessionDraft; if(!d||!d.tasting||d.evoActive==null) return; const s=d.steeps[d.evoActive]; if(!s) return; const cur=d.tasting.evolution.colours[s.id]; if(!key||cur===key) delete d.tasting.evolution.colours[s.id]; else d.tasting.evolution.colours[s.id]=key; render(); }
+function d_tastingEvoCoolNote(val){ const d=state.sessionDraft; if(d&&d.tasting) d.tasting.evolution.cooling.note=val; }
+function d_tastingAromaCupNote(val){ const d=state.sessionDraft; if(d&&d.tasting) d.tasting.evolution.aromaCup.note=val; }
 function tr_verdict(d,tea){
   const curRating = tea?Number(tea.rating)||0:0;
   const offerOn = !!d._offerTeaRatingOn;
@@ -2121,7 +2229,7 @@ function d_tastingToggleOffer(on){ const d=state.sessionDraft; if(!d) return; d.
 function d_tastingOfferStars(v){ const d=state.sessionDraft; if(d){ d._offerTeaRating=v; render(); } }
 function d_tastingRebuy(on){ const d=state.sessionDraft; if(d){ d.wouldRebuy=!!on; render(); } }
 /* ---- navigation (flavFam/free-word reset per room; tastingRoomHTML sets flavCtx from the room) ---- */
-function d_tastingNext(){ const d=state.sessionDraft; if(!d||!d.isTasting) return; if(d.tastingRoom<TASTING_ROOMS.length-1){ d.tastingRoom++; d.flavFam=null; d.flavorFreeOpen=false; render(); } }
+function d_tastingNext(){ const d=state.sessionDraft; if(!d||!d.isTasting) return; if(d.tastingRoom<tastingRoomsFor(d).length-1){ d.tastingRoom++; d.flavFam=null; d.flavorFreeOpen=false; render(); } }
 function d_tastingBack(){ const d=state.sessionDraft; if(!d||!d.isTasting) return; if(d.tastingRoom<=0){ d.stage='setup'; } else d.tastingRoom--; d.flavFam=null; d.flavorFreeOpen=false; render(); }
 /* ---- commit: builds the session + the tasting_record blob. NEVER shared (also forced in sessionToDb).
    endedEarly saves a complete SHORTER tasting: no verdict, so no rating and no offered tea update. ---- */
@@ -2143,9 +2251,13 @@ async function commitTasting(endedEarly){
       date: d.sessionDate ? new Date(d.sessionDate).toISOString() : new Date().toISOString(),
       isColdBrew:false, waterType:d.waterType, waterTDS:d.waterTDS?Number(d.waterTDS):null,
       gramsUsed:d.gramsUsed?Number(d.gramsUsed):0,
-      steeps:[], rating: endedEarly?0:(d.sessionRating||0), description:'', tags:cup,
+      // c3: the evolution loop (gongfu/senchadō) fills d.steeps — the CANONICAL per-steep data (tags/time/
+      // temp) rides the steeps rows, feeding the tea's profile + the D2 arc like any session's steeps.
+      // Western/cold leave it empty (their evolution is a blob delta). Deep-copied so the draft can't alias.
+      steeps: (d.steeps||[]).map(s=>({ id:s.id, order:s.order, tempC:s.tempC, timeSeconds:s.timeSeconds||0, description:s.description||'', tags:[...(s.tags||[])] })),
+      rating: endedEarly?0:(d.sessionRating||0), description:'', tags:cup,
       isShared:false, photoUrl: photoDeferred?null:(photoUrl||null),
-      infusionCount:1, feedback:null, mood:null,
+      infusionCount: (d.steeps&&d.steeps.length)||1, feedback:null, mood:null,
       waterMl:d.waterMl?Number(d.waterMl):null,
       brewStyle: brewMethodFor(d.brewStyle, ves&&ves.capacityMl),
       teaName:tea?tea.name:'', teaType:tea?tea.type:'', vesselName:ves?ves.name:'',
@@ -2193,6 +2305,18 @@ function viewTastingRecord(s){
   const formRow = (dl.form&&dl.form.length) ? `<div class="tst-rec-row"><span class="tst-rec-k mono">form</span><span class="tst-rec-chips">${dl.form.map(f=>`<span class="hist-chip">${escapeHtml(leafFormLabel(f))}</span>`).join('')}</span></div>` : '';
   const leafColour = dl.colour ? `<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">${tastingSwatch('leaf',dl.colour)}${escapeHtml(leafLabel(dl.colour))}${dl.mottled?' · mottled':''}</span></div>` : (dl.mottled?`<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">mottled</span></div>`:'');
   const liqColour = lq.colour ? `<div class="tst-rec-row"><span class="tst-rec-k mono">colour</span><span class="tst-rec-colour">${tastingSwatch('liquor',lq.colour)}${escapeHtml(liquorLabel(lq.colour))}</span></div>` : '';
+  // c3 evolution: the per-steep breakdown (steeps rows) + the arc (sessionFlavorStory, positive-presence,
+  // floored at 2); western's "as it cools" delta + the gongfu empty-cup aroma read from the blob.
+  const ev = r.evolution||{}, evCol = ev.colours||{};
+  const steepRows = (s.steeps||[]).map((st,i)=>{
+    const parts=[]; if(st.timeSeconds>0) parts.push(fmtSec(st.timeSeconds)); if(st.tempC!=null&&st.tempC!=='') parts.push(cToDisplay(st.tempC)+tempUnitLabel());
+    const ck=evCol[st.id], chips=(st.tags||[]).map(t=>`<span class="hist-chip">${escapeHtml(flavorLabel(t))}</span>`).join('');
+    return `<div class="tst-rec-row"><span class="tst-rec-k mono">steep ${i+1}</span><span class="tst-rec-colour">${ck?tastingSwatch('liquor',ck):''}${parts.length?`<span class="mono">${escapeHtml(parts.join(' · '))}</span>`:''}${chips?`<span class="tst-rec-chips">${chips}</span>`:''}</span></div>`;
+  }).join('');
+  const arc = sessionFlavorStory(s.steeps);
+  const cool = ev.cooling||{}, coolInner = ((cool.tags&&cool.tags.length)||cool.note) ? chipsRow('as it cools', cool.tags)+noteP(cool.note) : '';
+  const evolutionSec = sec('How it changes', steepRows + (arc?`<div class="tst-rec-obs">${escapeHtml(arc)}</div>`:'') + coolInner);
+  const cup = ev.aromaCup||{}, aromaCupSec = ((cup.aroma&&cup.aroma.length)||cup.note) ? sec('The empty cup', chipsRow('aroma',cup.aroma)+noteP(cup.note)) : '';
   const rating = s.rating ? renderStarsStatic(Number(s.rating),true) : '';
   const rebuy = tea && tea.wouldRebuy ? `<span class="pill" style="background:var(--jade-pale);color:var(--jade-deep);">would rebuy</span>` : '';
   const verdict = (rating || vd.liked || rebuy) ? `<div class="sd-sec tst-rec-sec"><div class="eyebrow rule-head">Verdict</div>${rating?`<div>${rating}</div>`:''}${rebuy?`<div style="margin-top:8px;">${rebuy}</div>`:''}${noteP(vd.liked)}${r.endedEarly?`<div class="tst-rec-early mono">ended early</div>`:''}</div>` : (r.endedEarly?`<div class="sd-sec tst-rec-sec"><div class="tst-rec-early mono">ended early — no verdict</div></div>`:'');
@@ -2217,6 +2341,8 @@ function viewTastingRecord(s){
     ${sec('Taste', axRows+palateRow+chipsRow('notes',ta.notes)+noteP(ta.note))}
     ${sec('Mouthfeel', bodyRow+astrRow+noteP(mf.note))}
     ${sec('Finish', lenRow+huiRow+houRow+noteP(fi.note))}
+    ${evolutionSec}
+    ${aromaCupSec}
   `;
 }
 

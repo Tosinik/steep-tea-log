@@ -37,13 +37,13 @@ const G=e=>vm.runInContext(e,ctx);
 let passed=0,failures=0;
 const ok=(c,m)=>{ if(c){passed++;} else {failures++; console.log('  FAIL: '+m);} };
 
-console.log('TEA TASTING MODE — guided mode c1 + c2 (SPEC-guided-mode-FINAL.md)');
+console.log('TEA TASTING MODE — guided mode c1 + c2 + c3 (SPEC-guided-mode-FINAL.md)');
 
 /* ---- A · the walk + vocab constants ---- */
 const rooms=G('TASTING_ROOMS');
-ok(Array.isArray(rooms)&&rooms.length===8, 'A1 the walk is 8 rooms (got '+(rooms&&rooms.length)+')');
-ok(rooms.map(r=>r.key).join(',')==='dryLeaf,wetLeaf,liquor,liquorAroma,taste,mouthfeel,finish,verdict',
-   'A2 rooms in spine order, ending at the verdict');
+ok(Array.isArray(rooms)&&rooms.length===9, 'A1 the base walk is 9 rooms (c3 added evolution) (got '+(rooms&&rooms.length)+')');
+ok(rooms.map(r=>r.key).join(',')==='dryLeaf,wetLeaf,liquor,liquorAroma,taste,mouthfeel,finish,evolution,verdict',
+   'A2 rooms in spine order, evolution before the verdict');
 ok(rooms.every(r=>r.key&&r.label&&r.cue), 'A3 every room has a key, an expert label and a guide cue');
 const forms=G('DRY_LEAF_FORMS');
 ok(Array.isArray(forms)&&forms.length===8&&forms.includes('needle')&&forms.includes('downy'),
@@ -220,6 +220,81 @@ const gloss=G('TASTING_GLOSSARY');
 ok(['umami','amami','shibumi','nigami','astringency','huigan','houyun'].every(k=>gloss[k]&&gloss[k].length>20), 'M4 all seven §5 glossary definitions ship');
 ok(Object.values(gloss).every(v=>v.indexOf(EM)<0 && v.indexOf(EN)<0), 'M5 no em/en dashes in the glossary (house voice)');
 console.log('  M authored copy + glossary: 5 checks');
+
+/* ---- N · c3 brewStyle reshaping: the room list is method-dependent (SPEC §3) ---- */
+G('render=function(){};');
+const rms3=G('TASTING_ROOMS');
+ok(rms3.some(r=>r.key==='evolution') && rms3[rms3.length-1].key==='verdict', 'N1 the base walk gained an evolution room, before the verdict');
+ok(rms3.findIndex(r=>r.key==='evolution')===rms3.findIndex(r=>r.key==='finish')+1, 'N2 evolution sits right after finish');
+function roomKeys(style){ G('state.sessionDraft={isTasting:true,brewStyle:"'+style+'",vesselId:null,steeps:[],tasting:newTastingBlob()};'); return G('tastingRoomsFor(state.sessionDraft).map(function(r){return r.key;})'); }
+const gong=roomKeys('gongfu'), sen=roomKeys('senchado'), wes=roomKeys('western');
+ok(gong.includes('aromaCup') && gong.indexOf('aromaCup')===gong.indexOf('verdict')-1, 'N3 gongfu inserts the empty-cup (aroma cup) room right before the verdict');
+ok(!sen.includes('aromaCup') && sen.includes('evolution'), 'N4 senchadō gets the evolution loop but NOT the aroma cup');
+ok(!wes.includes('aromaCup') && wes.includes('evolution'), 'N5 western gets evolution but no aroma cup (aroma cup is gongfu-only)');
+console.log('  N brewStyle reshaping: 5 checks');
+
+/* ---- O · the per-steep loop writes the STEEPS ROWS; colour lands in the blob (no steep column) ---- */
+G('state.sessionDraft={isTasting:true,brewStyle:"gongfu",vesselId:null,steeps:[],evoActive:null,tasting:newTastingBlob(),sessionTags:[]};');
+G('tastingAddSteep();');
+ok(G('state.sessionDraft.steeps.length')===1, 'O1 add-steep appends a steep row');
+ok(G('state.sessionDraft.evoActive')===0, 'O2 …and makes it the active steep');
+const zt=G('state.sessionDraft.steeps[0]');
+ok(zt.timeSeconds===0 && Array.isArray(zt.tags) && zt.tags.length===0 && ('id'in zt), 'O3 a fresh, zero-tap steep is a valid, countable steep row');
+G('state.sessionDraft.flavCtx="evolution";');
+ok(G('(function(){var d=state.sessionDraft; return flavArrayFor(d)===d.steeps[0].tags;})()'), 'O4 flavCtx=evolution routes the tagger to the ACTIVE steep row (canonical per-steep data)');
+G('toggleSessionFlavor("honey");');
+ok(JSON.stringify(G('state.sessionDraft.steeps[0].tags'))==='["honey"]', 'O5 a tapped note writes to the steep row, not the session');
+G('tastingSetEvoColour("gold-pale");');
+ok(G('state.sessionDraft.tasting.evolution.colours[state.sessionDraft.steeps[0].id]')==='gold-pale', 'O6 the per-steep COLOUR lands in the blob, keyed by steep id (steeps has no colour column, no SQL)');
+G('tastingSetEvoTime(0,"25");');
+ok(G('state.sessionDraft.steeps[0].timeSeconds')===25, 'O7 time writes to the steep row');
+G('tastingAddSteep();');
+ok(G('state.sessionDraft.steeps.length')===2 && G('state.sessionDraft.evoActive')===1, 'O8 add-steep again focuses the new one (jots ride the current pour)');
+console.log('  O the per-steep loop: 8 checks');
+
+/* ---- P · the running observation reuses the D2 arc: positive-presence only, floored at steep 2 ---- */
+const VOCAB=G('FLAVOR_TREE.filter(function(n){return n.t;}).map(function(n){return String(n.t).toLowerCase();})');
+const va=VOCAB[0], vb=VOCAB.find(x=>x!==va);
+ok(G('sessionFlavorStory('+JSON.stringify([{tags:[va]}])+')')==='', 'P1 one steep says nothing (a "so far" needs two)');
+ok(G('sessionFlavorStory('+JSON.stringify([{tags:[va]},{tags:[va,vb]}])+')').indexOf('opened up by steep 2')>=0, 'P2 a note appearing in a later steep: "opened up by steep 2"');
+ok(G('sessionFlavorStory('+JSON.stringify([{tags:[va,vb]},{tags:[va]}])+')')==='', 'P3 a note DROPPING out is never reported (never inferred from absence, D2)');
+console.log('  P the arc: 3 checks');
+
+/* ---- Q · western → an "as it cools" delta in the blob, NOT a steep row ---- */
+G('state.sessionDraft={isTasting:true,brewStyle:"western",vesselId:null,steeps:[],tasting:newTastingBlob(),sessionTags:[]};');
+G('state.sessionDraft.flavCtx="cooling";');
+ok(G('(function(){var d=state.sessionDraft; return flavArrayFor(d)===d.tasting.evolution.cooling.tags;})()'), 'Q1 flavCtx=cooling routes to the blob cooling delta');
+G('toggleSessionFlavor("'+va+'");');
+ok(G('state.sessionDraft.tasting.evolution.cooling.tags.length')===1 && G('state.sessionDraft.steeps.length')===0, 'Q2 western writes the blob and creates NO steeps rows');
+console.log('  Q western reshaping: 2 checks');
+
+/* ---- R · the gongfu aroma cup: a blob delta, smell language ---- */
+G('state.sessionDraft={isTasting:true,brewStyle:"gongfu",vesselId:null,steeps:[],tasting:newTastingBlob(),sessionTags:[]};');
+G('state.sessionDraft.flavCtx="aromaCup";');
+ok(G('(function(){var d=state.sessionDraft; return flavArrayFor(d)===d.tasting.evolution.aromaCup.aroma;})()'), 'R1 flavCtx=aromaCup routes to the blob empty-cup aroma');
+ok(/smell/i.test(G('flavPromptFor({flavCtx:"aromaCup"})')), 'R2 the empty-cup room asks about SMELL, not taste');
+console.log('  R the aroma cup: 2 checks');
+
+/* ---- S · commit carries the evolution steeps to the session steeps rows (the tier boundary) ---- */
+ok(/steeps: \(d\.steeps\|\|\[\]\)\.map/.test(sessRaw), 'S1 commitTasting writes d.steeps to the session steeps rows');
+ok(/infusionCount: \(d\.steeps&&d\.steeps\.length\)\|\|1/.test(sessRaw), 'S2 …and infusionCount reflects the real steep count');
+console.log('  S commit carries the steeps: 2 checks');
+
+/* ---- T · the phantom-steep fix: finish auto-captures ONLY an engaged steep (shared session flow) ---- */
+ok(G('steepEngaged({curTimeUserSet:false,timer:{elapsed:0},curSteepTags:[]}, "117", "")')===false,
+   'T1 a bare schedule-pre-filled time is NOT engaged — the phantom trailing steep no longer commits');
+ok(G('steepEngaged({curTimeUserSet:true,timer:{elapsed:0},curSteepTags:[]}, "117", "")')===true, 'T2 a user-set/edited time IS engaged');
+ok(G('steepEngaged({curTimeUserSet:false,timer:{elapsed:20},curSteepTags:[]}, "117", "")')===true, 'T3 a steep whose timer ran IS engaged');
+ok(G('steepEngaged({curTimeUserSet:false,timer:{elapsed:0},curSteepTags:[]}, "117", "grassy")')===true, 'T4 notes make it engaged');
+ok(G('steepEngaged({curTimeUserSet:false,timer:{elapsed:0},curSteepTags:["x"]}, "117", "")')===true, 'T5 tags make it engaged');
+ok(G('steepEngaged({curTimeUserSet:true,timer:{elapsed:0},curSteepTags:[]}, "", "")')===false, 'T6 no positive time → nothing to capture');
+G('state.sessionDraft={steeps:[],schedule:{tempC:null,times:[117,140],form:"open"},timeShift:0,curTime:"",timer:{mode:"timer",target:15,elapsed:0,running:false,intervalId:null}};');
+G('applyScheduleToCurrentSteep(state.sessionDraft);');
+ok(G('state.sessionDraft.curTimeUserSet')===false, 'T7 applyScheduleToCurrentSteep marks the pre-filled time NOT user-set');
+G('setSteepTime(45, true);');
+ok(G('state.sessionDraft.curTimeUserSet')===true, 'T8 a user edit (setSteepTime …,true) marks it user-set');
+ok(/if\(steepEngaged\(d, timeVal, descVal\)\)\{ saveSteepAndContinue\(\); \}/.test(sessRaw), 'T9 finishSteeping auto-captures only through the engaged guard');
+console.log('  T the phantom-steep fix: 9 checks');
 
 console.log('');
 if(failures){ console.log('FAILED: '+failures+' of '+(passed+failures)); process.exit(1); }
