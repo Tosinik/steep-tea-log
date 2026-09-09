@@ -116,6 +116,20 @@ localStorage cooldown, and the app-wide ground change have no vm reach. On devic
 
 ---
 
+## v4.48 · info-popover left-edge clamp  *(the c2 phone-look fix — re-look on a real phone)*
+
+The clamp reads the visual viewport, which only a device has for real (dev forced a 375px viewport and
+confirmed the two clipping marks pin to the 8px margin). On the phone, in a narrow portrait tasting walk:
+
+1. **The mark that clipped.** Open the glossary ⓘ that ran off the left edge before (the Finish room's
+   Returning sweetness (huigan) and Throat feel (hou yun) marks on an oolong/pu-erh are the worst case) → the
+   popover now sits fully on screen, left edge visible, not cut off.
+2. **Every c2 ⓘ.** Umami (taste), Astringency (mouthfeel), the four lens terms, huigan and hou-yun (finish) →
+   each opens fully within both edges, both themes. A mark that already fit reads exactly as before (no jump).
+
+*Pass:* no glossary popover clips at either edge on a narrow phone; marks that already fit are unchanged. This
+ships WITH v4.47 — the two flip STAGED→LIVE together after this re-look + Planning's clone-verify.
+
 ## v4.47 · Tea Tasting mode (guided mode c2)  *(post-deploy on the served PWA — the fleshed axes need a phone)*
 
 The c2 axes, glossary and lens are all new interactive surface a vm cannot exercise (touch, the ⓘ popovers,

@@ -2780,6 +2780,20 @@ reflects-not-asks, +J hou-yun type gating, +K confirmed-discard-clears-draft, +L
 errors. **NEXT: guided mode c3** (the per-steep evolution loop + `brewStyle` reshaping + the aroma-cup
 sub-step), then SECURITY re-blocks before the beta widens.
 
+**R190 — info-popover left-edge clamp (the c2 phone-look).** Shipped v4.48 (cache v158, no SQL, no new
+module; touches only `steep-core.js` + the version files). Niklas's v4.47 phone-look found a glossary ⓘ
+rendering past the LEFT viewport edge on a phone. Latent in the R180 `toggleInfoPop` since v4.39, surfaced
+(not caused) by c2's marks. **Root cause:** the popover defaults left-aligned (`left:0`) and flips
+right-aligned (`.info-pop-right`) only on RIGHT overflow — no left-edge check, so a mid-right mark's
+right-flipped popover ran off the LEFT edge unclamped (a huigan mark measured at left −30px on 375px).
+**Fix:** after the flip, re-measure and pin the popover inside the visual viewport ~8px each side, overriding
+both anchor modes, via `left`/`right` in px (NOT `transform`, so the open animation's `translateY` survives);
+fires only when a mark would overflow, so wide viewports and already-fitting marks are untouched. App-wide (in
+`toggleInfoPop`), so every ⓘ benefits, not only the tasting ones. **Verified** on a forced 375px viewport (the
+two clipping Finish marks now pin to the 8px margin, both edges in; the taste + five mouthfeel marks stay
+unclamped, both themes); no fixture reaches `getBoundingClientRect`, so browser-verified, all 49 suites green.
+**This patch and v4.47 flip STAGED→LIVE together** after the combined re-look + Planning clone-verify.
+
 ### Also recorded (not rulings) — the frame ruling (map still held)
 
 > **The board itself is BANKED, late — 2026-08-06, `docs/r3/boards/origins-frame-ruling.dc.html`.**

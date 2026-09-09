@@ -46,6 +46,29 @@ mechanical cut of `app.js`; it has drifted far since — the old "concatenating 
 13. `steep-boot.js` — `SteepDB.boot(init)` + service-worker registration (loads last).
 
 ---
+## v4.48 — info-popover left-edge clamp (the c2 phone-look) — R190
+
+Deploy: steep-core.js, service-worker.js (cache v158), steep-version.js, CHANGELOG.md, STATE.md, smoke.md,
+docs/r3/planning/R3-RULINGS-LEDGER.md. No SQL. No new module.
+
+A tiny fix to the R180 info-popover (`toggleInfoPop`), latent since v4.39 and surfaced by c2's glossary
+marks on Niklas's v4.47 phone-look: a mid-right ⓘ could render past the LEFT edge of a narrow phone.
+
+- **Root cause:** the popover defaults to left-aligned (`left:0`) and flips to right-aligned
+  (`.info-pop-right`, `right:0`, extending leftward) only when it overflows the RIGHT edge. There was no
+  left-edge check, so on a narrow viewport a mid-right mark's right-flipped popover ran off the LEFT edge
+  unclamped (measured: a Finish-room huigan mark's popover sat at left −30px on a 375px screen).
+- **Fix:** after the existing above/right flip, `toggleInfoPop` re-measures and pins the popover inside the
+  visual viewport with an ~8px margin each side, overriding both anchor modes. Applied via `left`/`right` in
+  px (NOT `transform`), so the open animation's `translateY` is left free to run. App-wide — every ⓘ popover,
+  not just the tasting ones. The clamp only fires when a mark would overflow (marks that already fit are
+  untouched), so nothing changes on a wide viewport.
+- **Verified** on a forced 375px viewport: the two Finish-room marks that clipped (huigan, hou-yun) now pin
+  to the 8px margin, fully on-screen at both edges; the taste Umami mark and the five Mouthfeel marks
+  (astringency + the four lens terms) already fit and stay unclamped. Both themes. No fixture reaches
+  `getBoundingClientRect` (a vm has no layout), so this is browser-verified; all 49 committed suites stay
+  green and node --check is clean.
+
 ## v4.47 — Tea Tasting mode (guided mode c2): fleshed axes, glossary, tradition lens — R189
 
 Deploy: steep-core.js, steep-sessions.js, steep-dashboard.js, styles.css, service-worker.js (cache v157),
